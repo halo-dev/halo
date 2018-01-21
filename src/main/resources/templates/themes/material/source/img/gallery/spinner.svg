@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="96px" height="96px" viewBox="0 0 96 96" zoomAndPan="disable">
+  <style>
+    circle {
+      fill: transparent;
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+  </style>
+  <defs>
+    <clipPath id="corner">
+      <polygon points="0,0 48,0 48,48 96,48 96,96 0,96" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#corner)">
+    <circle cx="48" cy="48" r="32"/>
+  </g>
+</svg>

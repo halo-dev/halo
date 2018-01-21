@@ -1,0 +1,101 @@
+/**
+    皮肤颜色附加
+ */
+.skin-blue .box.box-primary{
+    border-top-color: #3c8dbc;
+}
+
+.skin-blue .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #3c8dbc;
+}
+
+.skin-blue-light .box.box-primary{
+    border-top-color: #3c8dbc;
+}
+
+.skin-blue-light .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #3c8dbc;
+}
+
+.skin-black .box.box-primary{
+    border-top-color: #fff;
+}
+
+.skin-black .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #fff;
+}
+
+.skin-black-light .box.box-primary{
+    border-top-color: #fff;
+}
+
+.skin-black-light .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #fff;
+}
+
+.skin-green .box.box-primary{
+    border-top-color: #00a65a;
+}
+
+.skin-green .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #00a65a;
+}
+
+.skin-green-light .box.box-primary{
+    border-top-color: #00a65a;
+}
+
+.skin-green-light .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #00a65a;
+}
+
+.skin-purple .box.box-primary{
+    border-top-color: #605ca8;
+}
+
+.skin-purple .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #605ca8;
+}
+
+.skin-purple-light .box.box-primary{
+    border-top-color: #605ca8;
+}
+
+.skin-purple-light .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #605ca8;
+}
+
+.skin-red .box.box-primary{
+    border-top-color: #dd4b39;
+}
+
+.skin-red .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #dd4b39;
+}
+
+.skin-red-light .box.box-primary{
+    border-top-color: #dd4b39;
+}
+
+.skin-red-light .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #dd4b39;
+}
+
+.skin-yellow .box.box-primary{
+    border-top-color: #f39c12;
+}
+
+.skin-yellow .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #f39c12;
+}
+
+.skin-yellow-light .box.box-primary{
+    border-top-color: #f39c12;
+}
+
+.skin-yellow-light .nav-tabs-custom > .nav-tabs > li.active{
+    border-top-color: #f39c12;
+}
+.layout-boxed {
+    background: url('../images/boxed-bg.jpg') repeat fixed;
+}

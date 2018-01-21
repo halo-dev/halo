@@ -1,0 +1,98 @@
+/*
+ * Editor.md
+ *
+ * @file        editormd.logo.css 
+ * @version     v1.5.0 
+ * @description Open source online markdown editor.
+ * @license     MIT License
+ * @author      Pandao
+ * {@link       https://github.com/pandao/editor.md}
+ * @updateTime  2015-06-09
+ */
+
+/*! prefixes.scss v0.1.0 | Author: Pandao | https://github.com/pandao/prefixes.scss | MIT license | Copyright (c) 2015 */
+@font-face {
+  font-family: 'editormd-logo';
+  src: url("../fonts/editormd-logo.eot?-5y8q6h");
+  src: url(".../fonts/editormd-logo.eot?#iefix-5y8q6h") format("embedded-opentype"), url("../fonts/editormd-logo.woff?-5y8q6h") format("woff"), url("../fonts/editormd-logo.ttf?-5y8q6h") format("truetype"), url("../fonts/editormd-logo.svg?-5y8q6h#icomoon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+.editormd-logo,
+.editormd-logo-1x,
+.editormd-logo-2x,
+.editormd-logo-3x,
+.editormd-logo-4x,
+.editormd-logo-5x,
+.editormd-logo-6x,
+.editormd-logo-7x,
+.editormd-logo-8x {
+  font-family: 'editormd-logo';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  font-size: inherit;
+  line-height: 1;
+  display: inline-block;
+  text-rendering: auto;
+  vertical-align: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.editormd-logo:before,
+.editormd-logo-1x:before,
+.editormd-logo-2x:before,
+.editormd-logo-3x:before,
+.editormd-logo-4x:before,
+.editormd-logo-5x:before,
+.editormd-logo-6x:before,
+.editormd-logo-7x:before,
+.editormd-logo-8x:before {
+  content: "\e1987";
+  /* 
+  HTML Entity &#xe1987; 
+  example: <span class="editormd-logo">&#xe1987;</span>
+  */
+}
+
+.editormd-logo-1x {
+  font-size: 1em;
+}
+
+.editormd-logo-lg {
+  font-size: 1.2em;
+}
+
+.editormd-logo-2x {
+  font-size: 2em;
+}
+
+.editormd-logo-3x {
+  font-size: 3em;
+}
+
+.editormd-logo-4x {
+  font-size: 4em;
+}
+
+.editormd-logo-5x {
+  font-size: 5em;
+}
+
+.editormd-logo-6x {
+  font-size: 6em;
+}
+
+.editormd-logo-7x {
+  font-size: 7em;
+}
+
+.editormd-logo-8x {
+  font-size: 8em;
+}
+
+.editormd-logo-color {
+  color: #2196F3;
+}
