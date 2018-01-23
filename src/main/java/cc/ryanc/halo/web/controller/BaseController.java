@@ -1,7 +1,14 @@
 package cc.ryanc.halo.web.controller;
 
+import cc.ryanc.halo.model.domain.Comment;
+import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import javax.servlet.http.HttpSession;
 
 /**
@@ -18,7 +25,7 @@ public abstract class BaseController {
     public static String THEME = "halo";
 
     @Autowired
-    private PostService postService;
+    private CommentService commentService;
 
     /**
      * 渲染页面
@@ -29,7 +36,15 @@ public abstract class BaseController {
         return "themes/"+THEME+"/"+pageName;
     }
 
+    /**
+     * 获取新评论
+     * @param session session
+     */
     protected void getNewComments(HttpSession session){
-        session.setAttribute("postTopFive",postService.findPostLatest());
+        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
+        Pageable pageable = new PageRequest(0,999,sort);
+        Page<Comment> comments = commentService.findAllComments(1,pageable);
+        session.removeAttribute("newComments");
+        session.setAttribute("newComments",comments.getContent());
     }
 }

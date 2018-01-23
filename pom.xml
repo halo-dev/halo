@@ -51,6 +51,12 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<!-- 邮件 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
 		<!-- mysql -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -92,6 +98,12 @@
 			<artifactId>rome</artifactId>
 			<version>1.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.7</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -101,7 +113,6 @@
 			<build>
 				<finalName>halo</finalName>
 				<resources>
-					<!-- 让jar包只存在字节码文件 -->
 					<resource>
 						<directory>src/main/java</directory>
 						<filtering>false</filtering>

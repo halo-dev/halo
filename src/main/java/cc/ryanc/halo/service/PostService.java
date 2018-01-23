@@ -28,7 +28,7 @@ public interface PostService {
      * @param postId postId
      * @return Post
      */
-    Post removeByPostId(Integer postId);
+    Post removeByPostId(Long postId);
 
     /**
      * 修改文章
@@ -43,7 +43,7 @@ public interface PostService {
      * @param status status
      * @return Post
      */
-    Post updatePostStatus(Integer postId,Integer status);
+    Post updatePostStatus(Long postId,Integer status);
 
     /**
      * 批量修改摘要
@@ -90,7 +90,7 @@ public interface PostService {
      * @param postId postId
      * @return Post
      */
-    Post findByPostId(Integer postId);
+    Post findByPostId(Long postId);
 
     /**
      * 根据文章路径查询
@@ -133,6 +133,12 @@ public interface PostService {
      */
     List<Post> findPostByYearAndMonth(String year,String month);
 
+    /**
+     * 根据年份和月份查询文章 分页
+     * @param year year
+     * @param month month
+     * @param pageable pageable
+     * @return page
+     */
     Page<Post> findPostByYearAndMonth(@Param("year") String year, @Param("month") String month, Pageable pageable);
-
 }

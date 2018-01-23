@@ -24,7 +24,7 @@ public interface TagService {
      * @param tagId tagId
      * @return Tag
      */
-    Tag removeByTagId(Integer tagId);
+    Tag removeByTagId(Long tagId);
 
     /**
      * 更新标签
@@ -44,7 +44,7 @@ public interface TagService {
      * @param tagId tagId
      * @return Link
      */
-    Tag findByTagId(Integer tagId);
+    Tag findByTagId(Long tagId);
 
     /**
      * 根据标签路径查询

@@ -1,18 +1,12 @@
 package cc.ryanc.halo.web.controller;
 
-import cc.ryanc.halo.model.domain.Category;
-import cc.ryanc.halo.model.domain.Link;
-import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.service.CategoryService;
-import cc.ryanc.halo.service.LinkService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.TagService;
+import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,11 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +45,11 @@ public class IndexController extends BaseController{
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private MailService mailService;
 
     /**
      * 请求首页
@@ -79,10 +76,9 @@ public class IndexController extends BaseController{
         //默认显示10条
         Integer size = 10;
         //尝试加载设置选项，用于设置显示条数
-        if(HaloUtil.isNotNull(HaloConst.OPTIONS.get("index_posts"))){
+        if(!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))){
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
-
         //所有文章数据，分页
         Pageable pageable = new PageRequest(page-1,size,sort);
         Page<Post> posts = postService.findPostByStatus(0,pageable);
@@ -98,7 +94,7 @@ public class IndexController extends BaseController{
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
 
-        //归档数据，包含[year,month,List<Post>]
+        //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByPostDate();
         model.addAttribute("archives",archives);
         return this.render("index");
@@ -116,7 +112,7 @@ public class IndexController extends BaseController{
         //默认显示10条
         Integer size = 10;
         //尝试加载设置选项，用于设置显示条数
-        if(HaloUtil.isNotNull(HaloConst.OPTIONS.get("index_posts"))){
+        if(!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))){
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
 
@@ -164,6 +160,17 @@ public class IndexController extends BaseController{
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
+
+        //归档数据，包含[year,month,count,List<Post>]
+        List<Archive> archives = postService.findPostGroupByPostDate();
+
+        //该文章的评论
+        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
+        Pageable pageable = new PageRequest(0,10,sort);
+        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
+        model.addAttribute("comments",comments);
+
+        model.addAttribute("archives",archives);
         return this.render("post");
     }
 
@@ -206,9 +213,15 @@ public class IndexController extends BaseController{
         //系统设置
         model.addAttribute("options",HaloConst.OPTIONS);
 
+        model.addAttribute("user",HaloConst.USER);
+
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
+
+        //归档数据，包含[year,month,count,List<Post>]
+        List<Archive> archives = postService.findPostGroupByPostDate();
+        model.addAttribute("archives",archives);
         return this.render("links");
     }
 
@@ -226,6 +239,12 @@ public class IndexController extends BaseController{
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
+
+        model.addAttribute("user",HaloConst.USER);
+
+        //归档数据，包含[year,month,count,List<Post>]
+        List<Archive> archives = postService.findPostGroupByPostDate();
+        model.addAttribute("archives",archives);
 
         //系统设置
         model.addAttribute("options",HaloConst.OPTIONS);
@@ -318,6 +337,10 @@ public class IndexController extends BaseController{
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
 
+        //归档数据，包含[year,month,count,List<Post>]
+        List<Archive> archives = postService.findPostGroupByPostDate();
+        model.addAttribute("archives",archives);
+
         //是否是归档页，用于判断输出链接
         model.addAttribute("isArchives","true");
         return this.render("archives");
@@ -331,7 +354,7 @@ public class IndexController extends BaseController{
     @ResponseBody
     public String feed(){
         String rssPosts = HaloConst.OPTIONS.get("rss_posts");
-        if(null==rssPosts || "".equals(rssPosts)){
+        if(StringUtils.isBlank(rssPosts)){
             rssPosts = "20";
         }
         //获取文章列表并根据时间排序
@@ -361,5 +384,23 @@ public class IndexController extends BaseController{
         Page<Post> postsPage = postService.findPostByStatus(0,pageable);
         List<Post> posts = postsPage.getContent();
         return HaloUtil.getSiteMap(posts);
+    }
+
+
+    /**
+     * 提交新评论
+     * @param comment comment
+     * @return string
+     */
+    @PostMapping(value = "/newComment")
+    @ResponseBody
+    public String newComment(@ModelAttribute("comment") Comment comment,
+                             @ModelAttribute("post") Post post,
+                             HttpServletRequest request){
+        comment.setPost(post);
+        comment.setCommentDate(new Date());
+        comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
+        commentService.saveByComment(comment);
+        return "success";
     }
 }

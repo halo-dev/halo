@@ -9,15 +9,14 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
-            .form-horizontal .control-label{
-                text-align: left;
-            }
-            .nav-tabs-custom > .nav-tabs > li.active {
-                border-top-color: #d2d6de;
-            }
+            #btnNewPage{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
+            #btnNewPage:hover{background:#3c8dbc;color:#fff}
         </style>
         <section class="content-header">
-            <h1>页面<small></small></h1>
+            <h1 style="display: inline-block;">页面<small></small></h1>
+            <a id="btnNewPage" href="/admin/posts/new">
+                新建页面
+            </a>
             <ol class="breadcrumb">
                 <li>
                     <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
@@ -51,18 +50,26 @@
                                         <tbody>
                                         <tr>
                                             <td>友情链接</td>
-                                            <td>/link</td>
+                                            <td>/links</td>
                                             <td>
-                                                <a href="/links" class="btn btn-info btn-sm" target="_blank">预览</a>
-                                                <a href="/admin/page/links" class="btn btn-primary btn-sm">配置</a>
+                                                <a href="/links" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
+                                                <a href="/admin/page/links" class="btn btn-primary btn-sm btn-flat">配置</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>图库页面</td>
+                                            <td>/about</td>
+                                            <td>
+                                                <a href="/gallery" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
+                                                <a href="/admin/page/gallery" class="btn btn-primary btn-sm btn-flat">配置</a>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>关于页面</td>
                                             <td>/about</td>
                                             <td>
-                                                <a href="#" class="btn btn-info btn-sm" target="_blank">预览</a>
-                                                <a href="/admin/page/about" class="btn btn-primary btn-sm">配置</a>
+                                                <a href="/about" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
+                                                <a href="/admin/page/about" class="btn btn-primary btn-sm btn-flat">配置</a>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -70,43 +77,38 @@
                                 </div>
                             </div>
                             <div class="tab-pane" id="pages">
-                                <form method="post" class="form-horizontal" id="seoOptions">
-                                    <div class="box-body">
-                                        <div class="form-group">
-                                            <label for="keywords" class="col-sm-2 control-label">QQ：</label>
-                                            <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="keywords" name="seo_keywords" value="">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="desc" class="col-sm-2 control-label">微信：</label>
-                                            <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="desc" name="seo_desc" value="">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="siteMap" class="col-sm-2 control-label">站点地图：</label>
-                                            <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="siteMap" name="seo_site_map" value="">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="baiduToken" class="col-sm-2 control-label">百度推送token：</label>
-                                            <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="baiduToken" name="seo_baidu_token" value="">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="seoRobots" class="col-sm-2 control-label">robots.txt：</label>
-                                            <div class="col-sm-4">
-                                                <textarea class="form-control" rows="5" id="seoRobots" name="seo_robots" style="resize: none"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveOptions('seoOptions')">保存</button>
-                                    </div>
-                                </form>
+                                <div class="box-body table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>标题</th>
+                                            <th>路径</th>
+                                            <th>日期</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>友情链接</td>
+                                            <td>/link</td>
+                                            <th>日期</th>
+                                            <td>
+                                                <a href="/links" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
+                                                <a href="/admin/page/links" class="btn btn-primary btn-sm btn-flat">配置</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>关于页面</td>
+                                            <td>/about</td>
+                                            <th>日期</th>
+                                            <td>
+                                                <a href="#" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
+                                                <a href="/admin/page/about" class="btn btn-primary btn-sm btn-flat">配置</a>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -115,7 +117,6 @@
         </section>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>
 </#compress>

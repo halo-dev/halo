@@ -36,5 +36,5 @@ public interface UserService {
      * @param userPass userpass
      * @return user
      */
-    User findByUserIdAndUserPass(Integer userId,String userPass);
+    User findByUserIdAndUserPass(Long userId,String userPass);
 }

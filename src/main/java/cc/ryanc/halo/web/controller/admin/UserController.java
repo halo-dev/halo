@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
  * @author : RYAN0UP
  * @date : 2017/12/24
  * @version : 1.0
- * description:
+ * description: 用户控制
  */
 @Slf4j
 @Controller
@@ -72,7 +72,7 @@ public class UserController {
     @ResponseBody
     public String changePass(@ModelAttribute("beforePass") String beforePass,
                              @ModelAttribute("newPass") String newPass,
-                             @ModelAttribute("userId") Integer userId,
+                             @ModelAttribute("userId") Long userId,
                              HttpSession session){
         try {
             User user = userService.findByUserIdAndUserPass(userId,HaloUtil.getMD5(beforePass));

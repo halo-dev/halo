@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @date : 2017/11/14
  * description: 友情链接持久层
  */
-public interface LinkRepository extends JpaRepository<Link,Integer>{
+public interface LinkRepository extends JpaRepository<Link,Long>{
 }

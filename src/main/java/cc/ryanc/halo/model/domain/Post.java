@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ public class Post implements Serializable{
      */
     @Id
     @GeneratedValue
-    private Integer postId;
+    private Long postId;
 
     /**
      * 发表用户 多对一
@@ -34,6 +35,13 @@ public class Post implements Serializable{
      * 文章标题
      */
     private String postTitle;
+
+    /**
+     * 文章类型
+     * post  文章
+     * page  页面
+     */
+    private String postType = "post";
 
     /**
      * 文章内容 Markdown格式
@@ -75,6 +83,11 @@ public class Post implements Serializable{
             joinColumns = {@JoinColumn(name = "post_id",nullable = false)},
             inverseJoinColumns = {@JoinColumn(name = "tag_id",nullable = false)})
     private List<Tag> tags = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "post",cascade = {CascadeType.REMOVE},fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<Comment> comments = new ArrayList<>();
 
     /**
      * 发表日期

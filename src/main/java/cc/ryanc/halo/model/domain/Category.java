@@ -20,7 +20,7 @@ import java.util.List;
 public class Category implements Serializable{
     @Id
     @GeneratedValue
-    private Integer cateId;
+    private Long cateId;
     private String cateName;
     private String cateUrl;
     private String cateDesc;

@@ -24,7 +24,7 @@ import java.io.File;
  * @author : RYAN0UP
  * @date : 2017/12/19
  * @version : 1.0
- * description:
+ * description: 附件
  */
 @Slf4j
 @Controller
@@ -87,9 +87,9 @@ public class AttachmentController {
      * 上传文件
      * @param file file
      */
-    @RequestMapping(value = "/upload",method = RequestMethod.POST)
+    @PostMapping(value = "/upload",produces = { "application/json;charset=UTF-8" })
     @ResponseBody
-    public String uploadAttachment(@RequestParam("file") MultipartFile file){
+    public boolean uploadAttachment(@RequestParam("file") MultipartFile file){
         if(!file.isEmpty()){
             try{
                 File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
@@ -117,15 +117,14 @@ public class AttachmentController {
 
                 updateConst();
                 log.info("上传文件["+file.getOriginalFilename()+"]到["+mediaPath.getAbsolutePath()+"]成功");
-                return RespStatus.SUCCESS;
+                return true;
             }catch (Exception e){
                 log.error("未知错误："+e.getMessage());
-                return RespStatus.ERROR;
             }
         }else {
             log.error("文件不能为空");
-            return RespStatus.ERROR;
         }
+        return false;
     }
 
     /**
@@ -134,7 +133,7 @@ public class AttachmentController {
      * @return string
      */
     @GetMapping(value = "/attachment")
-    public String attachmentDetail(Model model,@PathParam("attachId") Integer attachId){
+    public String attachmentDetail(Model model,@PathParam("attachId") Long attachId){
         Attachment attachment = attachmentService.findByAttachId(attachId);
         model.addAttribute("attachment",attachment);
         return "admin/widget/_attachment-detail";
@@ -147,7 +146,7 @@ public class AttachmentController {
      */
     @GetMapping(value = "/remove")
     @ResponseBody
-    public String removeAttachment(@PathParam("attachId") Integer attachId){
+    public String removeAttachment(@PathParam("attachId") Long attachId){
         Attachment attachment = attachmentService.findByAttachId(attachId);
         String delFileName = attachment.getAttachName();
         String delSmallFileName = delFileName.substring(0,delFileName.lastIndexOf('.'))+"_small"+attachment.getAttachSuffix();

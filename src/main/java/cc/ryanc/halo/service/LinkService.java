@@ -23,7 +23,7 @@ public interface LinkService {
      * @param linkId linkId
      * @return Link
      */
-    Link removeByLinkId(Integer linkId);
+    Link removeByLinkId(Long linkId);
 
     /**
      * 修改
@@ -43,5 +43,5 @@ public interface LinkService {
      * @param linkId linkId
      * @return Link
      */
-    Link findByLinkId(Integer linkId);
+    Link findByLinkId(Long linkId);
 }

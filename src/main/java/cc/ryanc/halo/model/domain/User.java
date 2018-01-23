@@ -21,7 +21,7 @@ public class User implements Serializable{
     /**
      * 编号
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 用户名
      */

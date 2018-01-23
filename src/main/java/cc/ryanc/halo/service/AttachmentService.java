@@ -26,6 +26,11 @@ public interface AttachmentService {
      */
     List<Attachment> findAllAttachments();
 
+    /**
+     * 查询所有附件，分类
+     * @param pageable pageable
+     * @return page
+     */
     Page<Attachment> findAllAttachments(Pageable pageable);
 
     /**
@@ -33,12 +38,12 @@ public interface AttachmentService {
      * @param attachId attachId
      * @return Attachment
      */
-    Attachment findByAttachId(Integer attachId);
+    Attachment findByAttachId(Long attachId);
 
     /**
      * 根据编号移除
      * @param attachId attachId
      * @return Attachment
      */
-    Attachment removeByAttachId(Integer attachId);
+    Attachment removeByAttachId(Long attachId);
 }

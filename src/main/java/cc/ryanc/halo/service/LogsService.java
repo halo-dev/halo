@@ -25,9 +25,8 @@ public interface LogsService {
     /**
      * 根据编号移除
      * @param logsId logsId
-     * @return Logs
      */
-    void removeByLogsId(Integer logsId);
+    void removeByLogsId(Long logsId);
 
     /**
      * 移除所有日志
@@ -52,5 +51,5 @@ public interface LogsService {
      * @param logsId logsId
      * @return logs
      */
-    Logs findLogsByLogsId(Integer logsId);
+    Logs findLogsByLogsId(Long logsId);
 }

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version : 1.0
  * description:
  */
-public interface UserRepository extends JpaRepository<User,Integer>{
+public interface UserRepository extends JpaRepository<User,Long>{
     /**
      * 根据用户名和密码查询
      * @param userName userName
@@ -24,5 +24,5 @@ public interface UserRepository extends JpaRepository<User,Integer>{
      * @param userPass userpass
      * @return User
      */
-    User findByUserIdAndUserPass(Integer userId,String userPass);
+    User findByUserIdAndUserPass(Long userId,String userPass);
 }

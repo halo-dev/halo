@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version : 1.0
  * description: 分类目录持久层
  */
-public interface CategoryRepository extends JpaRepository<Category,Integer>{
+public interface CategoryRepository extends JpaRepository<Category,Long>{
 
     /**
      * 根据分类目录路径查询，用于验证是否已经存在该路径

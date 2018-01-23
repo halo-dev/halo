@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
      * @return User
      */
     @Override
-    public User findByUserIdAndUserPass(Integer userId, String userPass) {
+    public User findByUserIdAndUserPass(Long userId, String userPass) {
         return userRepository.findByUserIdAndUserPass(userId,userPass);
     }
 }

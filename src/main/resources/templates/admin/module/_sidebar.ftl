@@ -2,7 +2,7 @@
     <section class="sidebar">
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<#if user.userAvatar!="">${user.userAvatar?if_exists}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
+                <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar?if_exists}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
                 <p>${user.userDisplayName?if_exists}</p><a href="/admin/profile"><i class="fa fa-circle text-success"></i>编辑</a>
@@ -59,11 +59,13 @@
                 </a>
             </li>
             <li>
-                <a href="/admin/comment">
+                <a href="/admin/comments">
                     <i class="fa fa-comment"></i>
                     <span>评论</span>
                     <span class="pull-right-container">
-                        <span class="label label-primary pull-right">4</span>
+                        <#if newComments?size gt 0>
+                            <span class="label label-primary pull-right">${newComments?size}</span>
+                        </#if>
                     </span>
                 </a>
             </li>

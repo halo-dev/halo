@@ -69,12 +69,9 @@ public class PostController extends BaseController{
             Pageable pageable = new PageRequest(page,size,sort);
             Page<Post> posts = postService.findPostByStatus(status,pageable);
             model.addAttribute("posts",posts);
-            List<Post> postsPublish = postService.findPostByStatus(0);
-            model.addAttribute("publishCount",postsPublish.size());
-            List<Post> postsDraft = postService.findPostByStatus(1);
-            model.addAttribute("draftCount",postsDraft.size());
-            List<Post> postsTrash = postService.findPostByStatus(2);
-            model.addAttribute("trashCount",postsTrash.size());
+            model.addAttribute("publishCount",postService.findPostByStatus(0,pageable).getTotalElements());
+            model.addAttribute("draftCount",postService.findPostByStatus(1,pageable).getTotalElements());
+            model.addAttribute("trashCount",postService.findPostByStatus(2,pageable).getTotalElements());
             model.addAttribute("options", HaloConst.OPTIONS);
             model.addAttribute("status",status);
         }catch (Exception e){
@@ -115,7 +112,7 @@ public class PostController extends BaseController{
      * @return freemarker
      */
     @GetMapping(value = "/view")
-    public String viewPost(@PathParam("postId") Integer postId,Model model){
+    public String viewPost(@PathParam("postId") Long postId,Model model){
         Post post = postService.findByPostId(postId);
         model.addAttribute("post",post);
         model.addAttribute("options", HaloConst.OPTIONS);
@@ -179,7 +176,7 @@ public class PostController extends BaseController{
      * @return String
      */
     @GetMapping("/throw")
-    public String moveToTrash(@RequestParam("postId") Integer postId){
+    public String moveToTrash(@RequestParam("postId") Long postId){
         try{
             postService.updatePostStatus(postId,2);
             log.info("编号为"+postId+"的文章已被移到回收站");
@@ -195,7 +192,7 @@ public class PostController extends BaseController{
      * @return String
      */
     @GetMapping("/revert")
-    public String moveToPublish(@RequestParam("postId") Integer postId,
+    public String moveToPublish(@RequestParam("postId") Long postId,
                                 @RequestParam("status") Integer status){
         try{
             postService.updatePostStatus(postId,0);
@@ -212,7 +209,7 @@ public class PostController extends BaseController{
      * @return 转发
      */
     @GetMapping(value = "/remove")
-    public String removePost(@PathParam("postId") Integer postId){
+    public String removePost(@PathParam("postId") Long postId){
         try{
             Post post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
@@ -231,7 +228,7 @@ public class PostController extends BaseController{
      * @return String
      */
     @GetMapping(value = "/edit")
-    public String editPost(@PathParam("postId") Integer postId, Model model){
+    public String editPost(@PathParam("postId") Long postId, Model model){
         try {
             Post post = postService.findByPostId(postId);
             model.addAttribute("post",post);

@@ -20,7 +20,7 @@ import java.util.List;
 public class Tag implements Serializable{
     @Id
     @GeneratedValue
-    private Integer tagId;
+    private Long tagId;
     private String tagName;
     private String tagUrl;
 

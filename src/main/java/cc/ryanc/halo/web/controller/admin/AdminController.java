@@ -1,11 +1,13 @@
 package cc.ryanc.halo.web.controller.admin;
 
+import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.dto.RespStatus;
+import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
@@ -49,6 +51,9 @@ public class AdminController extends BaseController{
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private CommentService commentService;
+
     /**
      * 请求后台页面
      * @return freemarker
@@ -58,13 +63,21 @@ public class AdminController extends BaseController{
         //查询文章条数
         Integer postCount = postService.findAllPosts().size();
         model.addAttribute("postCount",postCount);
+        //查询评论的条数
+        Integer commentCount = commentService.findAllComments().size();
+        model.addAttribute("commentCount",commentCount);
         //查询最新的文章
         List<Post> postsLatest = postService.findPostLatest();
         model.addAttribute("postTopFive",postsLatest);
-        model.addAttribute("options", HaloConst.OPTIONS);
-        model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
+        //查询最新的日志
         List<Logs> logsLatest = logsService.findLogsLatest();
         model.addAttribute("logs",logsLatest);
+        //查询最新的评论
+        List<Comment> comments = commentService.findCommentsLatest();
+        model.addAttribute("comments",comments);
+
+        model.addAttribute("options", HaloConst.OPTIONS);
+        model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
         this.getNewComments(session);
         return "admin/index";
     }
@@ -147,6 +160,10 @@ public class AdminController extends BaseController{
         return "admin/widget/_logs-all";
     }
 
+    /**
+     * 清除所有日志
+     * @return return
+     */
     @GetMapping(value = "/logs/clear")
     public String logsClear(){
         try {
@@ -155,5 +172,16 @@ public class AdminController extends BaseController{
             log.error("未知错误："+e.getMessage());
         }
         return "redirect:/admin";
+    }
+
+    /**
+     * 不可描述的页面
+     * @param model model
+     * @return string
+     */
+    @GetMapping(value = "/halo")
+    public String halo(Model model){
+        model.addAttribute("options",HaloConst.OPTIONS);
+        return "admin/halo";
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2017/12/10
  * @version : 1.0
- * description:
+ * description: 标签控制器
  */
 @Slf4j
 @Controller
@@ -78,7 +78,7 @@ public class TagController {
      * @return string
      */
     @GetMapping(value = "/remove")
-    public String removeTag(@PathParam("tagId") Integer tagId){
+    public String removeTag(@PathParam("tagId") Long tagId){
         try{
             Tag tag = tagService.removeByTagId(tagId);
             log.info("删除的标签："+tag);
@@ -95,7 +95,7 @@ public class TagController {
      * @return string
      */
     @GetMapping(value = "/edit")
-    public String toEditTag(Model model,@PathParam("tagId") Integer tagId){
+    public String toEditTag(Model model,@PathParam("tagId") Long tagId){
         try{
             Tag tag = tagService.findByTagId(tagId);
             model.addAttribute("tag",tag);

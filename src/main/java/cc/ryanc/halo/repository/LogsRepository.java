@@ -12,12 +12,12 @@ import java.util.List;
  * description :
  * @date : 2018/1/19
  */
-public interface LogsRepository extends JpaRepository<Logs,Integer> {
+public interface LogsRepository extends JpaRepository<Logs,Long> {
 
     /**
      * 查询最新的五条数据
      * @return list
      */
-    @Query(value = "SELECT * FROM halo_logs ORDER BY log_id DESC LIMIT 5",nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_logs ORDER BY log_created DESC LIMIT 5",nativeQuery = true)
     List<Logs> findTopFive();
 }

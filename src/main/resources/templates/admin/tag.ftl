@@ -43,7 +43,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary">添加新标签</button>
+                                <button type="submit" class="btn btn-primary btn-flat">添加新标签</button>
                             </div>
                         </form>
                     </div>
@@ -70,8 +70,8 @@
                                         <td>${tag.tagUrl}</td>
                                         <td>2</td>
                                         <td>
-                                            <a class="btn btn-danger btn-xs" href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>
-                                            <button class="btn btn-primary btn-xs" onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>
+                                            <a class="btn btn-danger btn-xs btn-flat" href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>
+                                            <button class="btn btn-primary btn-xs btn-flat" onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>
                                         </td>
                                     </tr>
                                 </#list>
@@ -95,8 +95,8 @@
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                        <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">取消</button>
+                        <a onclick="removeIt()" class="btn btn-danger btn-flat" data-dismiss="modal">确定</a>
                     </div>
                 </div>
             </div>
@@ -138,7 +138,6 @@
         </script>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>
 </#compress>

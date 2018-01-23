@@ -20,6 +20,6 @@ import java.io.Serializable;
 public class PostMeta implements Serializable{
     @Id
     @GeneratedValue
-    private Integer metaId;
+    private Long metaId;
 
 }

@@ -25,7 +25,7 @@ public class Logs implements Serializable {
      */
     @Id
     @GeneratedValue
-    private Integer logId;
+    private Long logId;
 
     /**
      * 标题

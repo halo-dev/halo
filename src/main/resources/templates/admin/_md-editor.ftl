@@ -41,8 +41,8 @@
                         <span>
                             永久链接：
                             <a href="#">https://ryanc.cc/archives/<span id="postUrl"></span>/</a>
-                            <button class="btn btn-default btn-sm" id="btn_input_postUrl">编辑</button>
-                            <button class="btn btn-default btn-sm" id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
+                            <button class="btn btn-default btn-sm btn-flat" id="btn_input_postUrl">编辑</button>
+                            <button class="btn btn-default btn-sm btn-flat" id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
                         </span>
                     </div>
                     <div class="box box-primary">
@@ -69,8 +69,8 @@
                             </div>
                         </div>
                         <div class="box-footer">
-                            <button onclick="push(1)" class="btn btn-default btn-sm">保存草稿</button>
-                            <button onclick="push(0)" class="btn btn-primary btn-sm pull-right" data-loading-text="发布中...">${btnPush}</button>
+                            <button onclick="push(1)" class="btn btn-default btn-sm btn-flat">保存草稿</button>
+                            <button onclick="push(0)" class="btn btn-primary btn-sm pull-right btn-flat" data-loading-text="发布中...">${btnPush}</button>
                         </div>
                     </div>
                     <div class="box box-primary">
@@ -121,7 +121,7 @@
                         <div class="box-body">
                             <div>
                                 <img class="img-responsive selectData">
-                                <button class="btn btn-primary btn-sm" onclick="openAttach()">选择</button>
+                                <button class="btn btn-primary btn-sm btn-flat" onclick="openAttach()">选择</button>
                             </div>
                         </div>
                     </div>
@@ -257,6 +257,5 @@
         </script>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>

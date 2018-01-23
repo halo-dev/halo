@@ -13,37 +13,39 @@
                 <li class="dropdown messages-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-envelope-o"></i>
-                        <span class="label label-success">4</span>
+                        <#if newComments?size gt 0>
+                        <span class="label label-success">${newComments?size}</span>
+                        </#if>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">你有4条新评论</li>
+                        <li class="header">你有${newComments?size}条新评论</li>
                         <li>
                             <ul class="menu">
-                                <#list postTopFive! as post>
+                                <#list newComments! as comment>
                                     <li>
-                                        <a href="#">
+                                        <a href="/admin/comments?status=1">
                                             <div class="pull-left">
                                                 <img src="/static/images/ryan0up.png" class="img-circle" alt="User Image">
                                             </div>
-                                            <h4>Support Team<small><i class="fa fa-clock-o"></i> 5 mins</small></h4>
-                                            <p>${post.postTitle!}</p>
+                                            <h4>${comment.commentAuthor}<small>${comment.commentDate}</small></h4>
+                                            <p>${comment.commentContent}</p>
                                         </a>
                                     </li>
                                 </#list>
                             </ul>
                         </li>
-                        <li class="footer"><a href="#">查看所有评论</a></li>
+                        <li class="footer"><a href="/admin/comments">查看所有评论</a></li>
                     </ul>
                 </li>
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<#if user.userAvatar!="">${user.userAvatar?if_exists}<#else >/static/images/default.png</#if>" class="user-image" alt="User Image">
+                        <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/images/default.png</#if>" class="user-image" alt="User Image">
                         <span class="hidden-xs">${user.userDisplayName?if_exists}</span>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="user-header">
-                            <img src="<#if user.userAvatar!="">${user.userAvatar?if_exists}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
-                            <p>${user.userDisplayName?if_exists}-${user.userDesc?if_exists}<small></small></p>
+                            <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
+                            <p>${user.userDisplayName?if_exists}</p>
                         </li>
                         <li class="user-footer">
                             <div class="pull-left"><a href="/admin/profile" class="btn btn-default btn-flat">个人资料</a></div>
@@ -51,10 +53,6 @@
                         </li>
                     </ul>
                 </li>
-                <!-- 工具栏 TODO: 暂时先不做 -->
-                <!--
-                <li><a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a></li>
-                -->
             </ul>
         </div>
     </nav>

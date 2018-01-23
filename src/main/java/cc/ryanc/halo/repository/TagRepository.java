@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * description :
  * @date : 2018/1/12
  */
-public interface TagRepository extends JpaRepository<Tag,Integer>{
+public interface TagRepository extends JpaRepository<Tag,Long>{
 
     /**
      * 根据标签路径查询，用于验证是否已经存在该路径

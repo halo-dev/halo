@@ -41,10 +41,10 @@
                                         <label for="widgetPostCount" class="col-sm-4 control-label">文章总数：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="true" ${((options.widget_postcount?if_exists)=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="true" ${((options.widget_postcount?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="false" ${((options.widget_postcount?if_exists)=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="false" ${((options.widget_postcount?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -52,10 +52,10 @@
                                         <label for="widgetCommentCount" class="col-sm-4 control-label">评论总数：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="true" ${((options.widget_commentcount?if_exists)=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="true" ${((options.widget_commentcount?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="false" ${((options.widget_commentcount?if_exists)=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="false" ${((options.widget_commentcount?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -63,10 +63,10 @@
                                         <label for="widgetAttachmentCount" class="col-sm-4 control-label">附件总数：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="true" ${((options.widget_attachmentcount?if_exists)=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="true" ${((options.widget_attachmentcount?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="false" ${((options.widget_attachmentcount?if_exists)=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="false" ${((options.widget_attachmentcount?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -74,10 +74,10 @@
                                         <label for="widgetVisitorCount" class="col-sm-4 control-label">访客总数：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_visitorcount" id="widgetVisitorCount" value="true" ${((options.widget_visitorcount?if_exists)=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_visitorcount" id="widgetVisitorCount" value="true" ${((options.widget_visitorcount?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_visitorcount" id="widgetVisitorCount" value="false" ${((options.widget_visitorcount?if_exists)=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_visitorcount" id="widgetVisitorCount" value="false" ${((options.widget_visitorcount?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -87,10 +87,10 @@
                                         <label for="widgetPostLastest" class="col-sm-4 control-label">最新文章：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="true" ${((options.widget_postlastest?if_exists)=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="true" ${((options.widget_postlastest?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="false" ${((options.widget_postlastest?if_exists)=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="false" ${((options.widget_postlastest?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -98,10 +98,10 @@
                                         <label for="widgetCommentLastest" class="col-sm-4 control-label">最新评论：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="true" ${((options.widget_commentlastest?if_exists)=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="true" ${((options.widget_commentlastest?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="false" ${((options.widget_commentlastest?if_exists)=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="false" ${((options.widget_commentlastest?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -109,10 +109,10 @@
                                         <label for="widgetLogsLastest" class="col-sm-4 control-label">最新日志：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="true" ${((options.widget_logslastest?if_exists)=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="true" ${((options.widget_logslastest?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="false" ${((options.widget_logslastest?if_exists)=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="false" ${((options.widget_logslastest?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -138,9 +138,9 @@
                 <div class="col-lg-3 col-xs-6" id="widgetCommentCountBody">
                     <!-- small box -->
                     <div class="small-box bg-green">
-                        <div class="inner"><h3>53</h3><p>评论</p></div>
+                        <div class="inner"><h3>${commentCount?default(0)}</h3><p>评论</p></div>
                         <div class="icon"><i class="ion ion-stats-bars"></i></div>
-                        <a href="#" class="small-box-footer">查看所有 <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="/admin/comments" class="small-box-footer">查看所有 <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 </#if>
@@ -182,13 +182,20 @@
                             </div>
                         </div>
                         <div class="box-body table-responsive">
-                            <table class="table table-bordered table-hover">
+                            <table class="table table-bordered table-hover text-center">
+                                <thead>
+                                    <tr>
+                                        <th>标题</th>
+                                        <th>状态</th>
+                                        <th>日期</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <#if postTopFive??>
                                         <tr>
                                             <#list postTopFive as post>
                                                 <tr>
-                                                    <td><a target="_blank" href="/admin/posts/view?postId=${post.postId}">${post.postTitle}</a></td>
+                                                    <td><a target="_blank" href="/article/${post.postUrl}">${post.postTitle}</a></td>
                                                     <td class="text-center">
                                                         <#if post.postStatus==0>
                                                             <span class="label bg-green">已发布</span>
@@ -223,9 +230,46 @@
                             </div>
                         </div>
                         <div class="box-body table-responsive">
-                            <table class="table table-bordered table-hover">
+                            <table class="table table-bordered table-hover text-center">
+                                <thead>
+                                <th>评论者</th>
+                                <th>评论页面</th>
+                                <th>内容</th>
+                                <th>状态</th>
+                                <th>时间</th>
+                                </thead>
                                 <tbody>
-                                <tr><th>暂无数据</th></tr>
+                                    <#if comments??>
+                                    <tr>
+                                        <#list comments as comment>
+                                            <tr>
+                                                <td>${comment.commentAuthor}</td>
+                                                <td>
+                                                    <a href="/article/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                                </td>
+                                                <td>
+                                                    <a href="/admin/comments">${comment.commentContent}</a>
+                                                </td>
+                                                <td>
+                                                    <#switch comment.commentStatus>
+                                                    <#case 0>
+                                                    <span class="label bg-green">已发布</span>
+                                                    <#break >
+                                                    <#case 1>
+                                                    <span class="label bg-yellow">待审核</span>
+                                                    <#break >
+                                                    <#case 2>
+                                                    <span class="label bg-red">回收站</span>
+                                                    <#break >
+                                                    </#switch>
+                                                </td>
+                                                <td>${comment.commentDate}</td>
+                                            </tr>
+                                        </#list>
+                                    </tr>
+                                    <#else>
+                                        <tr><td>暂无数据</td></tr>
+                                    </#if>
                                 </tbody>
                             </table>
                         </div>
@@ -245,11 +289,14 @@
                                         <li><a href="#" onclick="openAllLogs()">查看所有</a></li>
                                         <li><a href="/admin/logs/clear">清空日志</a></li>
                                     </ul>
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         <div class="box-body table-responsive">
-                            <table class="table table-bordered table-hover">
+                            <table class="table table-bordered table-hover text-center">
                                 <thead>
                                     <th>事件</th>
                                     <th>结果</th>
@@ -325,6 +372,5 @@
         </script>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>

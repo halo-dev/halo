@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version : 1.0
  * description:
  */
-public interface PostMetaRepository extends JpaRepository<PostMeta,Integer>{
+public interface PostMetaRepository extends JpaRepository<PostMeta,Long>{
 }

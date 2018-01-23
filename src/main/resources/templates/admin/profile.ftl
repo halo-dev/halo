@@ -77,7 +77,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default" type="button" style="border-radius: 0" onclick="openAttach()">选择</button>
+                                                        <button class="btn btn-default btn-flat" type="button" onclick="openAttach()">选择</button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -94,7 +94,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveUser('profileForm')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveUser('profileForm')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -122,7 +122,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="changPass()">修改</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="changPass()">修改</button>
                                     </div>
                                 </form>
                             </div>
@@ -224,7 +224,6 @@
         </@compress>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>
 </#compress>

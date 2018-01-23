@@ -1,7 +1,6 @@
 package cc.ryanc.halo.model.dto;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.domain.Theme;
 import cc.ryanc.halo.model.domain.User;
 
 import java.util.ArrayList;

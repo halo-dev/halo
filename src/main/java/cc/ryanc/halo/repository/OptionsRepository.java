@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @version : 1.0
  * description: 设置选项持久层
  */
-public interface OptionsRepository extends JpaRepository<Options,Integer>{
+public interface OptionsRepository extends JpaRepository<Options,Long>{
 
     /**
      * 根据key查询单个option

@@ -19,7 +19,7 @@ import java.io.File;
  * @author : RYAN0UP
  * @date : 2017/12/16
  * @version : 1.0
- * description:
+ * description: 主题控制器
  */
 @Slf4j
 @Controller
@@ -28,19 +28,18 @@ public class ThemeController extends BaseController{
 
     @Autowired
     private OptionsService optionsService;
+
     /**
      * 渲染主题设置页面
      * @return String
      */
     @GetMapping
     public String themes(Model model){
-        try {
-            model.addAttribute("theme",BaseController.THEME);
-            model.addAttribute("options", HaloConst.OPTIONS);
-            log.info("当前的主题为："+BaseController.THEME);
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+        model.addAttribute("activeTheme",BaseController.THEME);
+        if(null!=HaloConst.THEMES){
+            model.addAttribute("themes",HaloConst.THEMES);
         }
+        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/theme";
     }
 
@@ -72,7 +71,7 @@ public class ThemeController extends BaseController{
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
-    public void uploadTheme(@RequestParam("file") MultipartFile file){
+    public boolean uploadTheme(@RequestParam("file") MultipartFile file){
         try {
             if(!file.isEmpty()) {
                 //获取项目根路径
@@ -81,12 +80,18 @@ public class ThemeController extends BaseController{
                 file.transferTo(themePath);
                 log.info("上传主题成功，路径：" + themePath.getAbsolutePath());
                 HaloUtil.unZip(themePath.getAbsolutePath(),new File(basePath.getAbsolutePath(),"templates/themes/").getAbsolutePath());
+                HaloUtil.removeFile(themePath.getAbsolutePath());
+                System.out.println(themePath);
+                HaloConst.THEMES.clear();
+                HaloConst.THEMES = HaloUtil.getThemes();
+                return true;
             }else{
                 log.error("上传失败，没有选择文件");
             }
         }catch (Exception e){
             log.error("上传失败："+e.getMessage());
         }
+        return false;
     }
 
     /**
@@ -96,6 +101,7 @@ public class ThemeController extends BaseController{
     @GetMapping(value = "/options")
     public String setting(Model model,@RequestParam("theme") String theme){
         model.addAttribute("options",HaloConst.OPTIONS);
+        model.addAttribute("themeDir",theme);
         return "themes/"+theme+"/module/options";
     }
 }

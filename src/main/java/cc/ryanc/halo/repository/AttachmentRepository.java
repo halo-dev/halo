@@ -11,7 +11,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * description :
  * @date : 2018/1/10
  */
-public interface AttachmentRepository extends JpaRepository<Attachment,Integer>{
+public interface AttachmentRepository extends JpaRepository<Attachment,Long>{
+
+    /**
+     * 查询所有附件，分页
+     * @param pageable pageable
+     * @return  page
+     */
     @Override
     Page<Attachment> findAll(Pageable pageable);
 }

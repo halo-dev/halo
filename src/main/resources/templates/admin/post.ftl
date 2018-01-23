@@ -41,20 +41,6 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div class="box box-primary">
-                        <!--
-                        <div class="box-header">
-                            <div class="box-tools">
-                                <form action="/admin/posts/search" method="post">
-                                    <div class="input-group input-group-sm" style="width: 200px;">
-                                        <input type="text" name="keyword" class="form-control pull-right">
-                                        <div class="input-group-btn">
-                                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        -->
                         <div class="box-body table-responsive">
                             <table class="table table-bordered table-hover">
                                 <thead>
@@ -69,37 +55,43 @@
                                 </thead>
                                 <tbody>
                                     <#list posts.content as post>
-                                    <tr>
-                                        <td>${post.postTitle}</td>
-                                        <td>
-                                            <#if post.categories??>
-                                                <#list post.categories as cate>
-                                                    ${cate.cateName}
-                                                </#list>
-                                            </#if>
-                                        </td>
-                                        <td>无标签</td>
-                                        <td>0</td>
-                                        <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
-                                        <td>
-                                            <#switch post.postStatus>
-                                                <#case 0>
-                                                    <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-info btn-sm" target="_blank">预览</a>
-                                                    <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-primary btn-sm">修改</a>
-                                                    <button class="btn btn-danger btn-sm" onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
-                                                    <#break >
-                                                <#case 1>
-                                                    <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-info btn-sm" target="_blank">预览</a>
-                                                    <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-primary btn-sm">修改</a>
-                                                    <button class="btn btn-danger btn-sm" onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
-                                                    <#break >
-                                                <#case 2>
-                                                    <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-info btn-sm">还原</a>
-                                                    <button class="btn btn-danger btn-sm" onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
-                                                    <#break >
-                                            </#switch>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td>${post.postTitle}</td>
+                                            <td>
+                                                <#if post.categories?size gt 0>
+                                                    <#list post.categories as cate>
+                                                        ${cate.cateName}
+                                                    </#list>
+                                                    <#else >
+                                                    无分类
+                                                </#if>
+                                            </td>
+                                            <td>无标签</td>
+                                            <td>
+                                                <#if post.getComments()??>
+                                                    ${post.getComments()?size}
+                                                </#if>
+                                            </td>
+                                            <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
+                                            <td>
+                                                <#switch post.postStatus>
+                                                    <#case 0>
+                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
+                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-primary btn-sm btn-flat">修改</a>
+                                                        <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
+                                                        <#break >
+                                                    <#case 1>
+                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
+                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-primary btn-sm btn-flat">修改</a>
+                                                        <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
+                                                        <#break >
+                                                    <#case 2>
+                                                        <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-info btn-sm btn-flat">还原</a>
+                                                        <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
+                                                        <#break >
+                                                </#switch>
+                                            </td>
+                                        </tr>
                                     </#list>
                                 </tbody>
                             </table>
@@ -151,7 +143,6 @@
         </script>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>
 </#compress>

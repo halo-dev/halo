@@ -51,7 +51,7 @@ public class PostServiceImpl implements PostService {
      */
     @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
-    public Post removeByPostId(Integer postId) {
+    public Post removeByPostId(Long postId) {
         Post post = this.findByPostId(postId);
         postRepository.delete(post);
         return post;
@@ -76,7 +76,7 @@ public class PostServiceImpl implements PostService {
      */
     @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
-    public Post updatePostStatus(Integer postId, Integer status) {
+    public Post updatePostStatus(Long postId, Integer status) {
         Post post = this.findByPostId(postId);
         post.setPostStatus(status);
         return postRepository.save(post);
@@ -158,7 +158,7 @@ public class PostServiceImpl implements PostService {
      */
     @Cacheable(value = POST_CACHE_NAME,key = "#postId+'post'")
     @Override
-    public Post findByPostId(Integer postId) {
+    public Post findByPostId(Long postId) {
         return postRepository.findOne(postId);
     }
 

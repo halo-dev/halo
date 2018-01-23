@@ -9,6 +9,7 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
+        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <style type="text/css" rel="stylesheet">
             #showForm{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
             #showForm:hover{background:#3c8dbc;color:#fff}
@@ -81,6 +82,27 @@
                             maxFileCount: 100,
                             enctype : 'multipart/form-data',
                             showClose: false
+                        }).on("fileuploaded",function (event,data,previewId,index) {
+                            var data = data.jqXHR.responseJSON;
+                            if(data==true){
+                                $("#uploadForm").hide(400);
+                                $.toast({
+                                    text: "上传成功！",
+                                    heading: '提示',
+                                    icon: 'success',
+                                    showHideTransition: 'fade',
+                                    allowToastClose: true,
+                                    hideAfter: 1000,
+                                    stack: 1,
+                                    position: 'top-center',
+                                    textAlign: 'left',
+                                    loader: true,
+                                    loaderBg: '#ffffff',
+                                    afterHidden: function () {
+                                        window.location.reload();
+                                    }
+                                });
+                            }
                         });
                     });
                 });
@@ -99,7 +121,6 @@
         </script>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>
 </#compress>

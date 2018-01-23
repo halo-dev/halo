@@ -20,7 +20,7 @@ import java.io.Serializable;
 public class Link implements Serializable{
     @Id
     @GeneratedValue
-    private Integer linkId;
+    private Long linkId;
     private String linkName;
     private String linkUrl;
     private String linkPic;

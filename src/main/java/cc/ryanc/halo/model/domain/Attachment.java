@@ -21,7 +21,7 @@ import java.util.Date;
 public class Attachment implements Serializable{
     @Id
     @GeneratedValue
-    private Integer attachId;
+    private Long attachId;
     private String attachName;
     private String attachPath;
     private String attachSmallPath;

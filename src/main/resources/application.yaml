@@ -33,7 +33,18 @@ spring:
   http:
     multipart:
       max-file-size: 10Mb
-      max-request-size: 20Mb
+      max-request-size:
+  mail:
+    host: smtp.exmail.qq.com
+    username: i@ryanc.cc
+    password: Wangdashen666
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
   # TODO config this ehcache
   cache:
     ehcache:
@@ -41,5 +52,6 @@ spring:
 # 设置日志输出路径
 logging:
   file: ./logs/log.log
+
 
 

@@ -80,48 +80,35 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3">
-                    <div class="box box-solid">
-                        <div class="box-body theme-thumbnail" style="background-image: url(/static/images/boxed-bg.jpg)"></div>
-                        <div class="box-footer">
-                            <span class="theme-title">Halo</span>
-                            <button class="btn btn-primary btn-sm pull-right" onclick="openSetting('halo')">设置</button>
-                            <#if theme == "halo">
-                                <button class="btn btn-primary btn-sm pull-right" disabled>已启用</button>
-                            <#else >
-                                <button onclick="setTheme('halo')" class="btn btn-primary btn-sm pull-right">启用</button>
-                            </#if>
+                <#if themes?? && (themes?size>0)>
+                    <#list themes as theme>
+                        <div class="col-md-3">
+                            <div class="box box-solid">
+                                <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName?if_exists}/screenshot.png)"></div>
+                                <div class="box-footer">
+                                    <span class="theme-title">${theme.themeName?if_exists}</span>
+                                    <#if theme.hasOptions==true>
+                                        <button class="btn btn-primary btn-sm pull-right btn-flat" onclick="openSetting('${theme.themeName?if_exists}')">设置</button>
+                                    </#if>
+                                    <#if activeTheme == "${theme.themeName?if_exists}">
+                                        <button class="btn btn-primary btn-sm pull-right btn-flat" disabled>已启用</button>
+                                    <#else >
+                                        <button onclick="setTheme('${theme.themeName?if_exists}')" class="btn btn-primary btn-sm pull-right btn-flat">启用</button>
+                                    </#if>
+                                </div>
+                            </div>
                         </div>
+                    </#list>
+                    <#else>
+                    <div class="col-md-12">
+                        <h2>居然没有主题？</h2>
+                        <h2>你仿佛在逗我？</h2>
+                        <h2>赶紧去上传一个主题，不然前台会报错！</h2>
+                        <h2>No themes?</h2>
+                        <h2>You fang fu is douing me?</h2>
+                        <h2>Please upload a theme,Otherwise the page will be incorrect.</h2>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="box box-solid">
-                        <div class="box-body theme-thumbnail" style="background-image: url(/static/images/material.png)"></div>
-                        <div class="box-footer">
-                            <span class="theme-title">Material</span>
-                            <button class="btn btn-primary btn-sm pull-right" onclick="openSetting('material')">设置</button>
-                            <#if theme == "material">
-                                <button class="btn btn-primary btn-sm pull-right" disabled>已启用</button>
-                            <#else >
-                                <button onclick="setTheme('material')" class="btn btn-primary btn-sm pull-right">启用</button>
-                            </#if>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="box box-solid">
-                        <div class="box-body theme-thumbnail" style="background-image: url(/static/images/material.png)"></div>
-                        <div class="box-footer">
-                            <span class="theme-title">Anatole</span>
-                            <button class="btn btn-primary btn-sm pull-right" onclick="openSetting('Anatole')">设置</button>
-                            <#if theme == "Anatole">
-                                <button class="btn btn-primary btn-sm pull-right" disabled>已启用</button>
-                            <#else >
-                                <button onclick="setTheme('Anatole')" class="btn btn-primary btn-sm pull-right">启用</button>
-                            </#if>
-                        </div>
-                    </div>
-                </div>
+                </#if>
             </div>
         </section>
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
@@ -133,11 +120,32 @@
                         $('#uploadTheme').fileinput({
                             language: 'zh',
                             uploadUrl: '/admin/themes/upload',
-                            allowedFileExtensions: ['zip'],
+                            allowedFileExtensions: ['zip','jpg'],
                             maxFileCount: 1,
                             enctype: 'multipart/form-data',
                             dropZoneTitle: '拖拽文件到这里 &hellip;<br>此模式不支持多文件同时上传',
                             showClose: false
+                        }).on("fileuploaded",function (event,data,previewId,index) {
+                            var data = data.jqXHR.responseJSON;
+                            if(data==true){
+                                $("#uploadForm").hide(400);
+                                $.toast({
+                                    text: "上传成功！",
+                                    heading: '提示',
+                                    icon: 'success',
+                                    showHideTransition: 'fade',
+                                    allowToastClose: true,
+                                    hideAfter: 1000,
+                                    stack: 1,
+                                    position: 'top-center',
+                                    textAlign: 'left',
+                                    loader: true,
+                                    loaderBg: '#ffffff',
+                                    afterHidden: function () {
+                                        window.location.reload();
+                                    }
+                                });
+                            }
                         });
                     });
                 });
@@ -197,6 +205,5 @@
         </script>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>

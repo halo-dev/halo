@@ -64,6 +64,7 @@
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/fileinput/fileinput.min.js"></script>
 <script src="/static/plugins/fileinput/zh.min.js"></script>
+<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script>
     $('#uploadImg').fileinput({
         language: 'zh',
@@ -73,6 +74,27 @@
         maxFileCount: 10,
         enctype : 'multipart/form-data',
         showClose: false
+    }).on("fileuploaded",function (event,data,previewId,index) {
+        var data = data.jqXHR.responseJSON;
+        if(data==true){
+            $("#uploadForm").hide(400);
+            $.toast({
+                text: "上传成功！",
+                heading: '提示',
+                icon: 'success',
+                showHideTransition: 'fade',
+                allowToastClose: true,
+                hideAfter: 1000,
+                stack: 1,
+                position: 'top-center',
+                textAlign: 'left',
+                loader: true,
+                loaderBg: '#ffffff',
+                afterHidden: function () {
+                    window.location.reload();
+                }
+            });
+        }
     });
     function doTransport(url) {
         parent.$('.selectData').val(url);

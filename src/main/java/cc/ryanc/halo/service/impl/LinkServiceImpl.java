@@ -45,7 +45,7 @@ public class LinkServiceImpl implements LinkService {
      */
     @CacheEvict(value = LINK_CACHE_NAME,key = LINK_KEY)
     @Override
-    public Link removeByLinkId(Integer linkId) {
+    public Link removeByLinkId(Long linkId) {
         Link link = this.findByLinkId(linkId);
         linkRepository.delete(link);
         return link;
@@ -80,7 +80,7 @@ public class LinkServiceImpl implements LinkService {
      */
     @Cacheable(value = LINK_CACHE_NAME,key = "#linkId+'link'")
     @Override
-    public Link findByLinkId(Integer linkId) {
+    public Link findByLinkId(Long linkId) {
         return linkRepository.findOne(linkId);
     }
 }

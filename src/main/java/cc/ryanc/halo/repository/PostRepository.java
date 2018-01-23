@@ -18,13 +18,13 @@ import java.util.List;
  * @date : 2017/11/14
  * description : 文章持久层
  */
-public interface PostRepository extends JpaRepository<Post,Integer>{
+public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 查询前五条文章
      * @return list
      */
-    @Query(value = "SELECT * FROM halo_post ORDER BY post_id DESC LIMIT 5",nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_post ORDER BY post_date DESC LIMIT 5",nativeQuery = true)
     List<Post> findTopFive();
 
     /**

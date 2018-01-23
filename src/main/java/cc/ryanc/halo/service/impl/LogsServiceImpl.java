@@ -40,7 +40,7 @@ public class LogsServiceImpl implements LogsService {
      * @return Logs
      */
     @Override
-    public void removeByLogsId(Integer logsId) {
+    public void removeByLogsId(Long logsId) {
         Logs logs = this.findLogsByLogsId(logsId);
         logsRepository.delete(logs);
     }
@@ -81,7 +81,7 @@ public class LogsServiceImpl implements LogsService {
      * @return logs
      */
     @Override
-    public Logs findLogsByLogsId(Integer logsId) {
+    public Logs findLogsByLogsId(Long logsId) {
         return logsRepository.findOne(logsId);
     }
 }

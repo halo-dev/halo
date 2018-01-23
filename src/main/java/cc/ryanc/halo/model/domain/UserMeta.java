@@ -17,8 +17,8 @@ import java.io.Serializable;
 public class UserMeta implements Serializable{
     @Id
     @GeneratedValue
-    private Integer userMetaId;
-    private Integer userId;
+    private Long userMetaId;
+    private Long userId;
     private String userMetaKey;
     @Lob
     private String userMetaValue;

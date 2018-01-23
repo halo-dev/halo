@@ -17,9 +17,9 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
- * description :
  * @date : 2018/1/21
+ * @version : 1.0
+ * description : 备份
  */
 @Slf4j
 @Controller
@@ -47,7 +47,7 @@ public class BackupController {
      */
     @GetMapping(value = "/backupDb")
     public String backupDatabase(){
-        String fileName = "db_backup_"+HaloUtil.getStringDateWithLine()+".sql";
+        String fileName = "db_backup_"+HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss")+".sql";
         try {
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
             String savePath = path.getAbsolutePath()+"/backup/database";
@@ -76,7 +76,7 @@ public class BackupController {
         List<Post> posts = postService.findAllPosts();
         try {
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            String savePath = path.getAbsolutePath()+"/backup/posts/posts_backup_"+HaloUtil.getStringDateWithLine();
+            String savePath = path.getAbsolutePath()+"/backup/posts/posts_backup_"+HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss");
             for(Post post : posts){
                 HaloUtil.dbToFile(post.getPostContentMd(),savePath,post.getPostTitle()+".md");
             }

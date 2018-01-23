@@ -51,6 +51,9 @@
                                 <a href="#admin" data-toggle="tab">后台设置</a>
                             </li>
                             <li>
+                                <a href="#email" data-toggle="tab">邮箱设置</a>
+                            </li>
+                            <li>
                                 <a href="#other" data-toggle="tab">其他设置</a>
                             </li>
                         </ul>
@@ -81,7 +84,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="siteLogo" name="site_logo" value="${options.site_logo?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default" type="button" onclick="openAttach()" style="border-radius: 0">选择</button>
+                                                        <button class="btn btn-default btn-flat" type="button" onclick="openAttach()">选择</button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -98,7 +101,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveOptions('commonOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('commonOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -134,7 +137,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveOptions('seoOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('seoOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -164,25 +167,25 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control" id="postSummary" name="post_summary" value="${options.post_summary?default('50')}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default" id="btn_update_summary" onclick="updateAllSummary()" type="button" style="border-radius: 0">更新</button>
+                                                        <button class="btn btn-default btn-flat" id="btn_update_summary" onclick="updateAllSummary()" type="button">更新</button>
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="sharePost" class="col-sm-2 control-label">文章分享：</label>
+                                            <label class="col-sm-2 control-label">文章分享：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="share_post" id="sharePost" value="true" ${((options.share_post?default('true'))=='true')?string('checked','')}> 开启
+                                                    <input type="radio" name="share_post" value="true" ${((options.share_post?default('true'))=='true')?string('checked','')}> 开启
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="share_post" id="sharePost" value="false" ${((options.share_post?default('true'))=='false')?string('checked','')}> 关闭
+                                                    <input type="radio" name="share_post" value="false" ${((options.share_post?default('true'))=='false')?string('checked','')}> 关闭
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveOptions('postOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('postOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -192,26 +195,26 @@
                                 <form method="post" class="form-horizontal" id="commentOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="CommentSystem" class="col-sm-2 control-label">评论系统：
+                                            <label class="col-sm-2 control-label">评论系统：
                                                 <span data-toggle="tooltip" data-placement="top" title="其他第三方评论系统在后台无法管理" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" id="CommentSystem" value="native" ${((options.comment_system?default('native'))=='native')?string('checked','')}> 原生
+                                                    <input type="radio" name="comment_system" value="native" ${((options.comment_system?default('native'))=='native')?string('checked','')}> 原生
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" id="CommentSystem" value="valine" ${((options.comment_system?default('native'))=='valine')?string('checked','')}> Valine
+                                                    <input type="radio" name="comment_system" value="valine" ${((options.comment_system?default('native'))=='valine')?string('checked','')}> Valine
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" id="CommentSystem" value="disqus" ${((options.comment_system?default('native'))=='disqus')?string('checked','')}> Disqus
+                                                    <input type="radio" name="comment_system" value="disqus" ${((options.comment_system?default('native'))=='disqus')?string('checked','')}> Disqus
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" id="CommentSystem" value="livere" ${((options.comment_system?default('native'))=='livere')?string('checked','')}> Livere
+                                                    <input type="radio" name="comment_system" value="livere" ${((options.comment_system?default('native'))=='livere')?string('checked','')}> Livere
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" id="CommentSystem" value="changyan" ${((options.comment_system?default('native'))=='changyan')?string('checked','')}> 畅言
+                                                    <input type="radio" name="comment_system" value="changyan" ${((options.comment_system?default('native'))=='changyan')?string('checked','')}> 畅言
                                                 </label>
                                             </div>
                                         </div>
@@ -219,17 +222,17 @@
                                         <!-- 原生设置 -->
                                         <div class="native-options" style="display: none">
                                             <div class="form-group">
-                                                <label for="CommentSystem" class="col-sm-2 control-label">是否启用：
+                                                <label class="col-sm-2 control-label">是否启用：
                                                     <span data-toggle="tooltip" data-placement="top" title="其他第三方评论系统在后台无法管理" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
                                                 </label>
                                                 <div class="col-sm-4">
                                                     <label class="radio-inline">
-                                                        <input type="radio" name="comment_system" id="CommentSystem" value="native" disabled> 启用
+                                                        <input type="radio" name="comment_system" value="native" disabled> 启用
                                                     </label>
                                                     <label class="radio-inline">
-                                                        <input type="radio" name="comment_system" id="CommentSystem" value="valine"> 禁用
+                                                        <input type="radio" name="comment_system" value="valine"> 禁用
                                                     </label>
                                                 </div>
                                             </div>
@@ -340,7 +343,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveOptions('commentOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('commentOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -350,24 +353,24 @@
                                 <form method="post" class="form-horizontal" id="adminOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="adminPjax" class="col-sm-2 control-label">启用pjax：</label>
+                                            <label class="col-sm-2 control-label">启用pjax：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_pjax" id="adminPjax" value="true" ${((options.admin_pjax?default('true'))=='true')?string('checked','')}> 启用
+                                                    <input type="radio" name="admin_pjax" value="true" ${((options.admin_pjax?default('true'))=='true')?string('checked','')}> 启用
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_pjax" id="adminPjax" value="false" ${((options.admin_pjax?if_exists)=='false')?string('checked','')}> 禁用
+                                                    <input type="radio" name="admin_pjax" value="false" ${((options.admin_pjax?if_exists)=='false')?string('checked','')}> 禁用
                                                 </label>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="adminLayout" class="col-sm-2 control-label">后台布局：</label>
+                                            <label class="col-sm-2 control-label">后台布局：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_layout" id="adminLayout" value="" ${((options.admin_layout?default(''))=='')?string('checked','')}> 正常布局
+                                                    <input type="radio" name="admin_layout" value="" ${((options.admin_layout?default(''))=='')?string('checked','')}> 正常布局
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_layout" id="adminLayout" value="layout-boxed" ${((options.admin_layout?default(''))=='layout-boxed')?string('checked','')}> 盒子布局
+                                                    <input type="radio" name="admin_layout" value="layout-boxed" ${((options.admin_layout?default(''))=='layout-boxed')?string('checked','')}> 盒子布局
                                                 </label>
                                             </div>
                                         </div>
@@ -391,13 +394,13 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="sidebarStyle" class="col-sm-2 control-label">侧边栏样式：</label>
+                                            <label class="col-sm-2 control-label">侧边栏样式：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="sidebar_style" id="sidebarStyle" value="" ${((options.sidebar_style?default(''))=='')?string('checked','')}> 展开
+                                                    <input type="radio" name="sidebar_style" value="" ${((options.sidebar_style?default(''))=='')?string('checked','')}> 展开
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="sidebar_style" id="sidebarStyle" value="sidebar-collapse" ${((options.sidebar_style?default(''))=='sidebar-collapse')?string('checked','')}> 收拢
+                                                    <input type="radio" name="sidebar_style" value="sidebar-collapse" ${((options.sidebar_style?default(''))=='sidebar-collapse')?string('checked','')}> 收拢
                                                 </label>
                                             </div>
                                         </div>
@@ -429,11 +432,51 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveOptions('adminOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('adminOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
 
+                            <!-- 邮箱设置 -->
+                            <div class="tab-pane" id="email">
+                                <form method="post" class="form-horizontal" id="emailOptions">
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="emailSmtpHost" class="col-sm-2 control-label">SMTP地址：</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="emailSmtpHost" name="mail_smtp_host" value="${options.mail_smtp_host?if_exists}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="emailSmtpUserName" class="col-sm-2 control-label">邮箱账号：</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="emailSmtpUserName" name="mail_smtp_username" value="${options.mail_smtp_username?if_exists}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="emailSmtpPassword" class="col-sm-2 control-label">邮箱密码：</label>
+                                            <div class="col-sm-4">
+                                                <input type="password" class="form-control" id="emailSmtpPassword" name="mail_smtp_password" value="${options.mail_smtp_password?if_exists}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="emailFromName" class="col-sm-2 control-label">发件姓名：</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="emailFromName" name="mail_from_name" value="${options.mail_from_name?if_exists}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="box-footer">
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('emailOptions')">保存</button>
+                                    </div>
+                                </form>
+                            </div>
                             <!-- 其他设置 -->
                             <div class="tab-pane" id="other">
                                 <form method="post" class="form-horizontal" id="otherOptions">
@@ -450,7 +493,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="saveOptions('otherOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('otherOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -579,7 +622,6 @@
         </@compress>
     </div>
     <#include "module/_footer.ftl">
-    <div class="control-sidebar-bg"></div>
 </div>
 <@footer></@footer>
 </#compress>

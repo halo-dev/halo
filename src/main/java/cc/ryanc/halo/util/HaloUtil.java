@@ -2,12 +2,14 @@ package cc.ryanc.halo.util;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.Theme;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Content;
 import com.sun.syndication.feed.rss.Item;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
@@ -176,7 +178,7 @@ public class HaloUtil {
     }
 
     /**
-     * 获取所有文件
+     * 获取所有附件
      * @param filePath filePath
      * @return Map
      */
@@ -203,22 +205,55 @@ public class HaloUtil {
     }
 
     /**
-     * 获取当前时间
-     * @return 字符串
+     * 获取所有主题
+     * @return list
      */
-    public static String getStringDate() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = formatter.format(new Date());
-        return dateString;
+    public static List<Theme> getThemes(){
+        List<Theme> themes = new ArrayList<>();
+        try {
+            //获取项目根路径
+            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            //获取主题路径
+            File themesPath = new File(basePath.getAbsolutePath(),"templates/themes");
+            File[] files = themesPath.listFiles();
+            if(null!=files) {
+                Theme theme = null;
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        theme = new Theme();
+                        theme.setThemeName(file.getName());
+                        File optionsPath = new File(themesPath.getAbsolutePath(), file.getName() + "/module/options.ftl");
+                        if (optionsPath.exists()) {
+                            theme.setHasOptions(true);
+                        } else {
+                            theme.setHasOptions(false);
+                        }
+                        themes.add(theme);
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.error("主题获取失败："+e.getMessage());
+        }
+        return themes;
+    }
+
+    public static boolean removeFile(String fileName){
+        File file = new File(fileName);
+        if(!file.exists()){
+            return false;
+        }else{
+            return file.delete();
+        }
     }
 
     /**
      * 获取当前时间
-     * @return 字符串使用下划线，用于备份文件名
+     * @return 字符串
      */
-    public static String getStringDateWithLine(){
-        SimpleDateFormat format = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-        String dateString = format.format(new Date());
+    public static String getStringDate(String format) {
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+        String dateString = formatter.format(new Date());
         return dateString;
     }
 
@@ -446,4 +481,27 @@ public class HaloUtil {
         }
         return head+urlBody+"</urlset>";
     }
+
+//    public static String importMarkdowns(String filePath) throws Exception{
+//        File file = new File(filePath);
+//        FileReader reader = new FileReader(file);
+//        BufferedReader bufferedReader = new BufferedReader(reader);
+//        StringBuffer stringBuffer = new StringBuffer();
+//        String s = "";
+//        while ((s = bufferedReader.readLine())!=null){
+//            stringBuffer.append(s+"\n");
+//        }
+//        bufferedReader.close();
+//        String str = stringBuffer.toString();
+//        return str;
+//    }
+//
+//    public static void main(String[] args) throws Exception{
+//        String content = importMarkdowns("/Users/ryan0up/Desktop/hello-hexo.md");
+//        String matter = StringUtils.substringBetween(content,"---","---");
+//        String[] strs =  matter.split("\n");
+//        for(String str:strs){
+//            System.out.println(StringUtils.substringBetween("title","\n","\n"));
+//        }
+//    }
 }

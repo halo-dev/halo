@@ -3,6 +3,7 @@ package cc.ryanc.halo.config;
 import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.service.UserService;
@@ -87,8 +88,19 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
         }
     }
 
+    /**
+     * 加载所有主题
+     */
     private void loadThemes(){
-
+        try{
+            HaloConst.THEMES.clear();
+            List<Theme> themes = HaloUtil.getThemes();
+            if(null!=themes){
+                HaloConst.THEMES = themes;
+            }
+        }catch (Exception e){
+            log.error("加载主题失败："+e.getMessage());
+        }
     }
 
     private void loadUser(){

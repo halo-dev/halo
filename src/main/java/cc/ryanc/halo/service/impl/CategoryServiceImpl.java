@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService{
      */
     @CacheEvict(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
     @Override
-    public Category removeByCateId(Integer cateId) {
+    public Category removeByCateId(Long cateId) {
         Category category = this.findByCateId(cateId);
         categoryRepository.delete(category);
         return category;
@@ -83,7 +83,7 @@ public class CategoryServiceImpl implements CategoryService{
      */
     @Cacheable(value = CATEGORY_CACHE_NAME,key = "#cateId+'cate'")
     @Override
-    public Category findByCateId(Integer cateId) {
+    public Category findByCateId(Long cateId) {
         return categoryRepository.findOne(cateId);
     }
 
@@ -106,7 +106,7 @@ public class CategoryServiceImpl implements CategoryService{
         List<Category> categories = new ArrayList<>();
         Category category = null;
         for(String str:strings){
-            category = findByCateId(Integer.parseInt(str));
+            category = findByCateId(Long.parseLong(str));
             categories.add(category);
         }
         return categories;

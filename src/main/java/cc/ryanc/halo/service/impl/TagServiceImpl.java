@@ -38,7 +38,7 @@ public class TagServiceImpl implements TagService {
      * @return Tag
      */
     @Override
-    public Tag removeByTagId(Integer tagId) {
+    public Tag removeByTagId(Long tagId) {
         Tag tag = findByTagId(tagId);
         tagRepository.delete(tag);
         return tag;
@@ -72,7 +72,7 @@ public class TagServiceImpl implements TagService {
      * @return Link
      */
     @Override
-    public Tag findByTagId(Integer tagId) {
+    public Tag findByTagId(Long tagId) {
         return tagRepository.findOne(tagId);
     }
 

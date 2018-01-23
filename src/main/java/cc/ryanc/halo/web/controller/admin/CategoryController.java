@@ -78,7 +78,7 @@ public class CategoryController {
      * @return freemarker
      */
     @GetMapping(value = "/remove")
-    public String removeCategory(@PathParam("cateId") Integer cateId){
+    public String removeCategory(@PathParam("cateId") Long cateId){
         try{
             Category category = categoryService.removeByCateId(cateId);
             log.info("删除的分类目录："+category);
@@ -112,7 +112,7 @@ public class CategoryController {
      * @return String
      */
     @GetMapping(value = "/edit")
-    public String toEditCategory(Model model,@PathParam("cateId") Integer cateId){
+    public String toEditCategory(Model model,@PathParam("cateId") Long cateId){
         try{
             Category category = categoryService.findByCateId(cateId);
             model.addAttribute("category",category);

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @date : 2017/11/14
  * description:
  */
-public interface UserMetaRepository extends JpaRepository<UserMeta,Integer>{
+public interface UserMetaRepository extends JpaRepository<UserMeta,Long>{
 
     UserMeta findByUserMetaKey(String key);
 }

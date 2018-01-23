@@ -43,12 +43,12 @@ public class AttachmentServiceImpl implements AttachmentService{
     }
 
     @Override
-    public Attachment findByAttachId(Integer attachId) {
+    public Attachment findByAttachId(Long attachId) {
         return attachmentRepository.findOne(attachId);
     }
 
     @Override
-    public Attachment removeByAttachId(Integer attachId) {
+    public Attachment removeByAttachId(Long attachId) {
         Attachment attachment = this.findByAttachId(attachId);
         attachmentRepository.delete(attachment);
         return attachment;

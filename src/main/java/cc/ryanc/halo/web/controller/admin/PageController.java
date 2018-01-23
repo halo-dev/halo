@@ -19,7 +19,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2017/12/10
  * @version : 1.0
- * description :
+ * description : 预设页面，自定义页面
  */
 @Slf4j
 @Controller
@@ -58,7 +58,7 @@ public class PageController {
      * @return String
      */
     @GetMapping(value = "/links/remove")
-    public String removeLink(@PathParam("linkId") Integer linkId){
+    public String removeLink(@PathParam("linkId") Long linkId){
         try{
             Link link = linkService.removeByLinkId(linkId);
             log.info("删除的友情链接："+link);
@@ -105,7 +105,7 @@ public class PageController {
      * @return String
      */
     @GetMapping("/links/edit")
-    public String toEditLink(Model model,@PathParam("linkId") Integer linkId){
+    public String toEditLink(Model model,@PathParam("linkId") Long linkId){
         Link link = linkService.findByLinkId(linkId);
         model.addAttribute("link",link);
         model.addAttribute("options", HaloConst.OPTIONS);
