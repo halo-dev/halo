@@ -17,13 +17,13 @@
             .thumbnail{margin-bottom:0}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">媒体库</h1>
+            <h1 style="display: inline-block;">附件</h1>
             <a id="showForm" href="#">
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i>上传
             </a>
             <ol class="breadcrumb">
                 <li><a href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
-                <li class="active">媒体库</li>
+                <li class="active">附件</li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -66,7 +66,7 @@
                     title: '附件详情',
                     shadeClose: true,
                     shade: 0.5,
-                    area: ['66%', '66%'],
+                    area: ['90%', '90%'],
                     content: '/admin/attachments/attachment?attachId='+id,
                     scrollbar: false
                 });

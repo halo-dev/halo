@@ -97,7 +97,7 @@
         }
     });
     function doTransport(url) {
-        parent.$('.selectData').val(url);
+        parent.$('#${id}').val(url);
         parent.layer.closeAll();
     }
 </script>

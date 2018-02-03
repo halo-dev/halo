@@ -15,6 +15,7 @@ import java.util.List;
 public interface AttachmentService {
     /**
      * 添加附件信息
+     *
      * @param attachment attachment
      * @return Attachment
      */
@@ -22,12 +23,14 @@ public interface AttachmentService {
 
     /**
      * 查询所有附件信息
+     *
      * @return list
      */
     List<Attachment> findAllAttachments();
 
     /**
      * 查询所有附件，分类
+     *
      * @param pageable pageable
      * @return page
      */
@@ -35,6 +38,7 @@ public interface AttachmentService {
 
     /**
      * 根据编号查询
+     *
      * @param attachId attachId
      * @return Attachment
      */
@@ -42,6 +46,7 @@ public interface AttachmentService {
 
     /**
      * 根据编号移除
+     *
      * @param attachId attachId
      * @return Attachment
      */

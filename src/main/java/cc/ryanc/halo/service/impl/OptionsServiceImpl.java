@@ -31,6 +31,7 @@ public class OptionsServiceImpl implements OptionsService {
 
     /**
      * 批量保存设置
+     *
      * @param options options
      */
     @CacheEvict(value = OPTIONS_CACHE_NAME,key = OPTIONS_KEY)
@@ -43,6 +44,7 @@ public class OptionsServiceImpl implements OptionsService {
 
     /**
      * 保存单个设置选项
+     *
      * @param key key
      * @param value value
      */
@@ -73,6 +75,7 @@ public class OptionsServiceImpl implements OptionsService {
 
     /**
      * 移除设置项
+     *
      * @param options options
      */
     @CacheEvict(value = OPTIONS_CACHE_NAME,key = OPTIONS_KEY)
@@ -83,6 +86,7 @@ public class OptionsServiceImpl implements OptionsService {
 
     /**
      * 获取设置选项
+     *
      * @return map
      */
     @Cacheable(value = OPTIONS_CACHE_NAME,key = OPTIONS_KEY)
@@ -98,6 +102,7 @@ public class OptionsServiceImpl implements OptionsService {
 
     /**
      * 根据key查询单个设置选项
+     *
      * @param key key
      * @return String
      */

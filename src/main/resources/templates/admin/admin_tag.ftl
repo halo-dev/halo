@@ -19,6 +19,7 @@
                     <a href="#">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
+                <li><a href="#">文章</a></li>
                 <li class="active">标签</li>
             </ol>
         </section>

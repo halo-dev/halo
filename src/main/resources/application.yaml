@@ -5,13 +5,22 @@ spring:
   # 数据源配置 使用druid数据源
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/testdb?useUnicode=true&characterEncoding=utf8&useSSL=false
-    username: root
+    # H2database 配置
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:~/halo/halo_db
+    username: admin
     password: 123456
-    #SQL脚本导入
-    #schema: classpath:/import.sql
-    #sql-script-encoding: utf-8
+    # MySQL配置
+    #driver-class-name: com.mysql.jdbc.Driver
+    #url: jdbc:mysql://localhost:3306/halodb?useUnicode=true&characterEncoding=utf8&useSSL=false
+    #username: root
+    #password: 123456
+  h2:
+    console:
+      settings:
+        web-allow-others: true
+      path: /h2-console
+      enabled: true
 
   # jpa配置
   jpa:
@@ -33,19 +42,7 @@ spring:
   http:
     multipart:
       max-file-size: 10Mb
-      max-request-size:
-  mail:
-    host: smtp.exmail.qq.com
-    username: i@ryanc.cc
-    password: Wangdashen666
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-  # TODO config this ehcache
+      max-request-size: 10Mb
   cache:
     ehcache:
       config: ehcache.xml

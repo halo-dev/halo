@@ -28,10 +28,11 @@ public class CategoryServiceImpl implements CategoryService{
 
     private static final String CATEGORY_KEY = "'category_key'";
 
-    private static final String CATEGORY_CACHE_NAME = "inkCache";
+    private static final String CATEGORY_CACHE_NAME = "cate_cache";
 
     /**
      * 保存分类目录 清除缓存
+     *
      * @param category 分类目录
      * @return ategory
      */
@@ -43,6 +44,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     /**
      * 根据编号移除分类目录 清除缓存
+     *
      * @param cateId 分类目录编号
      * @return Category
      */
@@ -56,6 +58,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     /**
      * 修改分类目录 缓存
+     *
      * @param category 分类目录对象
      * @return Category
      */
@@ -68,6 +71,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     /**
      * 查询所有分类目录 缓存
+     *
      * @return list
      */
     @Cacheable(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
@@ -78,6 +82,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     /**
      * 根据编号查询分类目录 缓存
+     *
      * @param cateId 分类编号
      * @return Category
      */
@@ -97,6 +102,7 @@ public class CategoryServiceImpl implements CategoryService{
     public Category findByCateUrl(String cateUrl) {
         return categoryRepository.findCategoryByCateUrl(cateUrl);
     }
+
 
     @Override
     public List<Category> strListToCateList(List<String> strings) {

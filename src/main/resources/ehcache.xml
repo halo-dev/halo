@@ -4,31 +4,51 @@
          updateCheck="false">
     <diskStore path="java.io.tmpdir"/>
     <defaultCache
-        eternal="false"
-        maxElementsInMemory="1000"
-        overflowToDisk="false"
-        diskPersistent="false"
-        timeToIdleSeconds="0"
-        timeToLiveSeconds="600"
-        memoryStoreEvictionPolicy="LRU" />
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="600"
+            memoryStoreEvictionPolicy="LRU" />
 
     <cache
-        name="inkCache"
-        eternal="false"
-        maxElementsInMemory="10000"
-        overflowToDisk="false"
-        diskPersistent="false"
-        timeToIdleSeconds="0"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LRU" />
+            name="cate_cache"
+            eternal="false"
+            maxElementsInMemory="10000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU" />
 
     <cache
-        name="options_cache"
-        eternal="false"
-        maxElementsInMemory="10000"
-        overflowToDisk="false"
-        diskPersistent="false"
-        timeToIdleSeconds="0"
-        timeToLiveSeconds="300"
-        memoryStoreEvictionPolicy="LRU" />
+            name="options_cache"
+            eternal="false"
+            maxElementsInMemory="10000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU" />
+
+    <cache
+            name="link_cache"
+            eternal="false"
+            maxElementsInMemory="10000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU" />
+
+    <cache
+            name="post_cache"
+            eternal="false"
+            maxElementsInMemory="10000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU" />
 </ehcache>

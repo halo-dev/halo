@@ -1,6 +1,6 @@
 package cc.ryanc.halo.config;
 
-import cc.ryanc.halo.service.OptionsService;
+import cc.ryanc.halo.web.interceptor.InstallInterceptor;
 import cc.ryanc.halo.web.interceptor.LoginInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     private LoginInterceptor loginInterceptor;
 
     @Autowired
-    private OptionsService optionsService;
+    private InstallInterceptor installInterceptor;
 
     /**
      * 注册拦截器
@@ -34,7 +34,14 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/admin/**").excludePathPatterns("/admin/login").excludePathPatterns("/admin/getLogin");
+        registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/admin/**")
+                .excludePathPatterns("/admin/login")
+                .excludePathPatterns("/admin/getLogin");
+        registry.addInterceptor(installInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/install")
+                .excludePathPatterns("/install/do");
     }
 
     /**
@@ -43,11 +50,12 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-        registry.addResourceHandler("/**").addResourceLocations("classpath:/templates/themes/")
-                                                        .addResourceLocations("classpath:/robots.txt");
-        registry.addResourceHandler("/upload/**").addResourceLocations("classpath:/upload/");
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/templates/themes/")
+                .addResourceLocations("classpath:/robots.txt");
+        registry.addResourceHandler("/upload/**")
+                .addResourceLocations("classpath:/upload/");
     }
-
-
 }

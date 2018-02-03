@@ -32,12 +32,41 @@ public class PageController {
     @GetMapping
     public String pages(Model model){
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/page";
+        return "admin/admin_page";
     }
 
+    /**
+     * 获取友情链接列表并渲染页面
+     *
+     * @param map ModelMap
+     * @return String
+     */
+    @GetMapping(value = "/links")
+    public String links(Model model){
+        List<Link> links = linkService.findAllLinks();
+        model.addAttribute("links",links);
+        model.addAttribute("options", HaloConst.OPTIONS);
+        return "admin/admin_link";
+    }
+
+    /**
+     * 跳转到修改页面
+     *
+     * @param model model
+     * @param linkId linkId
+     * @return String
+     */
+    @GetMapping("/links/edit")
+    public String toEditLink(Model model,@PathParam("linkId") Long linkId){
+        Link link = linkService.findByLinkId(linkId);
+        model.addAttribute("link",link);
+        model.addAttribute("options", HaloConst.OPTIONS);
+        return "admin/admin_link-update";
+    }
 
     /**
      * 处理添加友链的请求并渲染页面
+     *
      * @param link Link
      * @return freemarker
      */
@@ -54,6 +83,7 @@ public class PageController {
 
     /**
      * 处理删除友情链接的请求并重定向
+     *
      * @param linkId linkId
      * @return String
      */
@@ -70,6 +100,7 @@ public class PageController {
 
     /**
      * 处理修改的请求并重定向
+     *
      * @param link Link
      * @return freemarker
      */
@@ -83,33 +114,5 @@ public class PageController {
             log.error("未知错误："+e.getMessage());
         }
         return "redirect:/admin/page/links";
-    }
-
-    /**
-     * 获取友情链接列表并渲染页面
-     * @param map ModelMap
-     * @return String
-     */
-    @GetMapping(value = "/links")
-    public String links(Model model){
-        List<Link> links = linkService.findAllLinks();
-        model.addAttribute("links",links);
-        model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/link";
-    }
-
-    /**
-     * 跳转到修改页面
-     * @param model model
-     * @param linkId linkId
-     * @return String
-     */
-    @GetMapping("/links/edit")
-    public String toEditLink(Model model,@PathParam("linkId") Long linkId){
-        Link link = linkService.findByLinkId(linkId);
-        model.addAttribute("link",link);
-        model.addAttribute("options", HaloConst.OPTIONS);
-        log.info("linkId"+linkId+"的数据为："+link);
-        return "admin/_link-update";
     }
 }

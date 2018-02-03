@@ -40,6 +40,9 @@
                         <a href="#sns-share" data-toggle="tab">分享设置</a>
                     </li>
                     <li>
+                        <a href="#other" data-toggle="tab">其他设置</a>
+                    </li>
+                    <li>
                         <a href="#about" data-toggle="tab">关于</a>
                     </li>
                 </ul>
@@ -60,37 +63,67 @@
                                 <div class="form-group">
                                     <label for="materialFavicon" class="col-sm-4 control-label">Favicon：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialFavicon" name="theme_material_favicon" value="${options.theme_material_favicon?if_exists}" >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="materialFavicon" name="theme_material_favicon" value="${options.theme_material_favicon?if_exists}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('materialFavicon')">选择</button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="materialHighFavicon" class="col-sm-4 control-label">高清Favicon：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialHighFavicon" name="theme_material_high_res_favicon" value="${options.theme_material_high_res_favicon?if_exists}" >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="materialHighFavicon" name="theme_material_high_res_favicon" value="${options.theme_material_high_res_favicon?if_exists}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('materialHighFavicon')">选择</button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="materialAppleFavicon" class="col-sm-4 control-label">IOS主屏按钮图标：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialAppleFavicon" name="theme_material_apple_touch_icon" value="${options.theme_material_apple_touch_icon?if_exists}" >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="materialAppleFavicon" name="theme_material_apple_touch_icon" value="${options.theme_material_apple_touch_icon?if_exists}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('materialAppleFavicon')">选择</button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="materialDialyPic" class="col-sm-4 control-label">daily_pic：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialDialyPic" name="theme_material_daily_pic" value="${options.theme_material_daily_pic?if_exists}" >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="materialDialyPic" name="theme_material_daily_pic" value="${options.theme_material_daily_pic?if_exists}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('materialDialyPic')">选择</button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="materialSidebarHeader" class="col-sm-4 control-label">Sidebar顶部图片：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialSidebarHeader" name="theme_material_sidebar_header" value="${options.theme_material_sidebar_header?if_exists}" >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="materialSidebarHeader" name="theme_material_sidebar_header" value="${options.theme_material_sidebar_header?if_exists}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('materialSidebarHeader')">选择</button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="materialFooterImage" class="col-sm-4 control-label">Sidebar底部图片：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialFooterImage" name="theme_material_footer_image" value="${options.theme_material_footer_image?if_exists}" >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="materialFooterImage" name="theme_material_footer_image" value="${options.theme_material_footer_image?if_exists}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('materialFooterImage')">选择</button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -126,6 +159,12 @@
                                     <label for="materialUiuxSlogan" class="col-sm-4 control-label">Slogan：</label>
                                     <div class="col-sm-8">
                                         <textarea class="form-control" rows="3" id="materialUiuxSlogan" name="theme_material_uiux_slogan" style="resize: none">${options.theme_material_uiux_slogan?default("Hi, nice to meet you")}</textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="materialUiuxCardElevation" class="col-sm-4 control-label">卡片深度：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="materialUiuxCardElevation" name="theme_material_uiux_card_elevation" value="${options.theme_material_uiux_card_elevation?default("2")}" >
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -179,7 +218,12 @@
                                 <div class="form-group">
                                     <label for="materialBackgroundImage" class="col-sm-4 control-label">背景图片：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialBackgroundImage" name="theme_material_background_bgimg" value="${options.theme_material_background_bgimg?if_exists}" >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="materialBackgroundImage" name="theme_material_background_bgimg" value="${options.theme_material_background_bgimg?if_exists}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('materialBackgroundImage')">选择</button>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -287,10 +331,10 @@
                         </form>
                     </div>
 
+                    <!-- 分享设置 -->
                     <div class="tab-pane" id="sns-share">
                         <form method="post" class="form-horizontal" id="materialSnsShareOptions">
                             <div class="box-body">
-                                <!-- 社交分享 -->
                                 <div class="form-group">
                                     <label for="materialSnsShareTwitter" class="col-sm-4 control-label">分享到Twitter：</label>
                                     <div class="col-sm-8">
@@ -380,6 +424,78 @@
                         </form>
                     </div>
 
+                    <!-- 其他设置 -->
+                    <div class="tab-pane" id="other">
+                        <form method="post" class="form-horizontal" id="materialOtherOptions">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label for="materialOtherJsFade" class="col-sm-4 control-label">渐显效果：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_js_fade" id="materialOtherJsFade" value="true" ${((options.theme_material_other_js_fade?default('true'))=='true')?string('checked','')}> 开启
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_js_fade" id="materialOtherJsFade" value="false" ${((options.theme_material_other_js_fade?default('true'))=='false')?string('checked','')}> 关闭
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="materialOtherJsSmoothScroll" class="col-sm-4 control-label">平滑滚动效果：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_js_smoothscroll" id="materialOtherJsSmoothScroll" value="true" ${((options.theme_material_other_js_smoothscroll?default('true'))=='true')?string('checked','')}> 开启
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_js_smoothscroll" id="materialOtherJsSmoothScroll" value="false" ${((options.theme_material_other_js_smoothscroll?default('true'))=='false')?string('checked','')}> 关闭
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="materialOtherSidebarArchives" class="col-sm-4 control-label">侧边栏归档：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_sidebar_archives" id="materialOtherSidebarArchives" value="true" ${((options.theme_material_other_sidebar_archives?default('true'))=='true')?string('checked','')}> 显示
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_sidebar_archives" id="materialOtherSidebarArchives" value="false" ${((options.theme_material_other_sidebar_archives?default('true'))=='false')?string('checked','')}> 隐藏
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="materialOtherSidebarCates" class="col-sm-4 control-label">侧边栏分类：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_sidebar_cates" id="materialOtherSidebarCates" value="true" ${((options.theme_material_other_sidebar_cates?default('true'))=='true')?string('checked','')}> 显示
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_sidebar_cates" id="materialOtherSidebarCates" value="false" ${((options.theme_material_other_sidebar_cates?default('true'))=='false')?string('checked','')}> 隐藏
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="materialOtherSidebarPostCount" class="col-sm-4 control-label">侧边栏文章总数：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_sidebar_postcount" id="materialOtherSidebarPostCount" value="true" ${((options.theme_material_other_sidebar_postcount?default('true'))=='true')?string('checked','')}> 显示
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_sidebar_postcount" id="materialOtherSidebarPostCount" value="false" ${((options.theme_material_other_sidebar_postcount?default('true'))=='false')?string('checked','')}> 隐藏
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="materialOtherPostLicense" class="col-sm-4 control-label">文章License：</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" rows="3" id="materialOtherPostLicense" name="theme_material_other_post_license" style="resize: none">${options.theme_material_other_post_license?if_exists}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                <button type="button" class="btn btn-primary btn-sm pull-right" onclick="saveThemeOptions('materialOtherOptions')">保存设置</button>
+                            </div>
+                        </form>
+                    </div>
+
                     <!-- 关于该主题 -->
                     <div class="tab-pane" id="about">
                         <div class="box box-widget widget-user-2">
@@ -409,7 +525,6 @@
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/plugins/colorpicker/js/bootstrap-colorpicker.min.js"></script>
-<script src="/static/js/adminlte.min.js"></script>
 <script src="/static/js/app.js"></script>
 <script>
     $(document).ready(function () {
@@ -430,6 +545,17 @@
             success: function (data) {
                 showMsg("保存成功！","success",1000);
             }
+        });
+    }
+    function openAttach(id) {
+        layer.open({
+            type: 2,
+            title: '所有附件',
+            shadeClose: true,
+            shade: 0.5,
+            area: ['90%', '90%'],
+            content: '/admin/attachments/select?id='+id,
+            scrollbar: false
         });
     }
 </script>

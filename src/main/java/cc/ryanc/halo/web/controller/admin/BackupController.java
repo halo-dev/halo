@@ -32,17 +32,19 @@ public class BackupController {
 
     /**
      * 渲染备份页面
+     *
      * @param model model
      * @return return
      */
     @GetMapping
     public String backup(Model model){
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/backup";
+        return "admin/admin_backup";
     }
 
     /**
      * 备份数据库
+     *
      * @return return
      */
     @GetMapping(value = "/backupDb")
@@ -60,6 +62,7 @@ public class BackupController {
 
     /**
      * 备份资源文件 重要
+     *
      * @return return
      */
     @GetMapping(value = "/backupRe")
@@ -69,6 +72,7 @@ public class BackupController {
 
     /**
      * 备份文章，导出markdown文件
+     *
      * @return return
      */
     @GetMapping(value = "/backupPost")

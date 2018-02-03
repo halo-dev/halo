@@ -49,10 +49,17 @@ public class IndexController extends BaseController{
     private CommentService commentService;
 
     @Autowired
+    private MenuService menuService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private MailService mailService;
 
     /**
      * 请求首页
+     *
      * @param model model
      * @return freemarker
      */
@@ -64,6 +71,7 @@ public class IndexController extends BaseController{
 
     /**
      * 首页分页
+     *
      * @param model model
      * @param page page
      * @param size size
@@ -84,15 +92,25 @@ public class IndexController extends BaseController{
         Page<Post> posts = postService.findPostByStatus(0,pageable);
         model.addAttribute("posts",posts);
 
+        //文章总数
+        model.addAttribute("postsCount",postService.findAllPosts().size());
+
+        model.addAttribute("is_home",true);
+
         //系统设置
         model.addAttribute("options",HaloConst.OPTIONS);
 
         //用户信息
-        model.addAttribute("user",HaloConst.USER);
+        List<User> users = userService.findAllUser();
+        model.addAttribute("user",users.get(0));
 
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
+
+        //菜单列表
+        List<Menu> menus = menuService.findAllMenus();
+        model.addAttribute("menus",menus);
 
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByPostDate();
@@ -102,8 +120,9 @@ public class IndexController extends BaseController{
 
     /**
      * ajax分页
-     * @param page
-     * @return
+     *
+     * @param page page
+     * @return list
      */
     @GetMapping(value = "next")
     @ResponseBody
@@ -124,6 +143,7 @@ public class IndexController extends BaseController{
 
     /**
      * 渲染文章详情
+     *
      * @param postId postId
      * @param model model
      * @return String
@@ -151,11 +171,15 @@ public class IndexController extends BaseController{
         }
         model.addAttribute("post",post);
 
+        //文章总数
+        model.addAttribute("postsCount",postService.findAllPosts().size());
+
         //系统设置
         model.addAttribute("options",HaloConst.OPTIONS);
 
         //用户信息
-        model.addAttribute("user",HaloConst.USER);
+        List<User> users = userService.findAllUser();
+        model.addAttribute("user",users.get(0));
 
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
@@ -163,6 +187,10 @@ public class IndexController extends BaseController{
 
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByPostDate();
+
+        //菜单列表
+        List<Menu> menus = menuService.findAllMenus();
+        model.addAttribute("menus",menus);
 
         //该文章的评论
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
@@ -176,6 +204,7 @@ public class IndexController extends BaseController{
 
     /**
      * 渲染关于页面
+     *
      * @param model model
      * @return string
      */
@@ -190,6 +219,7 @@ public class IndexController extends BaseController{
 
     /**
      * 跳转到图库页面
+     *
      * @return String
      */
     @GetMapping(value = "/gallery")
@@ -201,6 +231,7 @@ public class IndexController extends BaseController{
 
     /**
      * 友情链接
+     *
      * @return string
      */
     @GetMapping(value = "/links")
@@ -213,7 +244,18 @@ public class IndexController extends BaseController{
         //系统设置
         model.addAttribute("options",HaloConst.OPTIONS);
 
-        model.addAttribute("user",HaloConst.USER);
+        //用户信息
+        List<User> users = userService.findAllUser();
+        model.addAttribute("user",users.get(0));
+
+        model.addAttribute("is_links",true);
+
+        //文章总数
+        model.addAttribute("postsCount",postService.findAllPosts().size());
+
+        //菜单列表
+        List<Menu> menus = menuService.findAllMenus();
+        model.addAttribute("menus",menus);
 
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
@@ -227,6 +269,7 @@ public class IndexController extends BaseController{
 
     /**
      * 标签
+     *
      * @param model model
      * @return string
      */
@@ -240,7 +283,15 @@ public class IndexController extends BaseController{
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
 
-        model.addAttribute("user",HaloConst.USER);
+        List<User> users = userService.findAllUser();
+        model.addAttribute("user",users.get(0));
+
+        //文章总数
+        model.addAttribute("postsCount",postService.findAllPosts().size());
+
+        //菜单列表
+        List<Menu> menus = menuService.findAllMenus();
+        model.addAttribute("menus",menus);
 
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByPostDate();
@@ -253,6 +304,7 @@ public class IndexController extends BaseController{
 
     /**
      * 根据分类路径查询文章
+     *
      * @param model model
      * @param cateUrl cateUrl
      * @return string
@@ -266,6 +318,7 @@ public class IndexController extends BaseController{
 
     /**
      * 文章归档
+     *
      * @param model model
      * @return string
      */
@@ -276,6 +329,7 @@ public class IndexController extends BaseController{
 
     /**
      * 文章归档分页
+     *
      * @param model model
      * @param page page
      * @return string
@@ -290,6 +344,11 @@ public class IndexController extends BaseController{
         Page<Post> posts = postService.findPostByStatus(0,pageable);
         model.addAttribute("posts",posts);
 
+        //文章总数
+        model.addAttribute("postsCount",postService.findAllPosts().size());
+
+        model.addAttribute("is_archives",true);
+
         //包含[List<Post>,year,month,count]
         List<Archive> archives = postService.findPostGroupByPostDate();
         model.addAttribute("archives",archives);
@@ -298,7 +357,12 @@ public class IndexController extends BaseController{
         model.addAttribute("options",HaloConst.OPTIONS);
 
         //用户信息
-        model.addAttribute("user",HaloConst.USER);
+        List<User> users = userService.findAllUser();
+        model.addAttribute("user",users.get(0));
+
+        //菜单列表
+        List<Menu> menus = menuService.findAllMenus();
+        model.addAttribute("menus",menus);
 
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
@@ -311,6 +375,7 @@ public class IndexController extends BaseController{
 
     /**
      * 文章归档，根据年月
+     *
      * @param model model
      * @param year year
      * @param month month
@@ -327,15 +392,23 @@ public class IndexController extends BaseController{
         Page<Post> posts = postService.findPostByYearAndMonth(year,month,pageable);
         model.addAttribute("posts",posts);
 
+        //文章总数
+        model.addAttribute("postsCount",postService.findAllPosts().size());
+
         //系统设置
         model.addAttribute("options",HaloConst.OPTIONS);
 
         //用户信息
-        model.addAttribute("user",HaloConst.USER);
+        List<User> users = userService.findAllUser();
+        model.addAttribute("user",users.get(0));
 
         //分类目录
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
+
+        //菜单列表
+        List<Menu> menus = menuService.findAllMenus();
+        model.addAttribute("menus",menus);
 
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByPostDate();
@@ -348,6 +421,7 @@ public class IndexController extends BaseController{
 
     /**
      * 获取文章rss
+     *
      * @return rss
      */
     @GetMapping(value = {"feed","feed.xml","atom.xml"},produces = { "application/xml;charset=UTF-8" })
@@ -362,17 +436,12 @@ public class IndexController extends BaseController{
         Pageable pageable = new PageRequest(0,Integer.parseInt(rssPosts),sort);
         Page<Post> postsPage = postService.findPostByStatus(0,pageable);
         List<Post> posts = postsPage.getContent();
-        String rss = "";
-        try {
-            rss = HaloUtil.getRss(posts);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return rss;
+        return postService.buildRss(posts);
     }
 
     /**
      * 获取sitemap
+     *
      * @return sitemap
      */
     @GetMapping(value = {"sitemap","sitemap.xml"},produces = { "application/xml;charset=UTF-8" })
@@ -383,12 +452,13 @@ public class IndexController extends BaseController{
         Pageable pageable = new PageRequest(0,999,sort);
         Page<Post> postsPage = postService.findPostByStatus(0,pageable);
         List<Post> posts = postsPage.getContent();
-        return HaloUtil.getSiteMap(posts);
+        return postService.buildSiteMap(posts);
     }
 
 
     /**
      * 提交新评论
+     *
      * @param comment comment
      * @return string
      */

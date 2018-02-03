@@ -35,7 +35,7 @@
     <meta name="format-detection" content="telephone=no"/>
     <meta name="description" itemprop="description" content="${description}">
     <meta name="keywords" content="${keywords?default('null')}">
-    <meta name="theme-color" content="${options.theme_material_footer_uiux_android_chrome_color?if_exists}">
+    <meta name="theme-color" content="${options.theme_material_footer_uiux_android_chrome_color?default('#0097a7')}">
 
     <!-- Disable Fucking Bloody Baidu Tranformation -->
     <meta http-equiv="Cache-Control" content="no-transform" />
@@ -56,7 +56,7 @@
     <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/material/source/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
     <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/material/source/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
 
-    <#if options.theme_material_scheme?if_exists == "Isolation">
+    <#if options.theme_material_scheme?default('Paradox') == "Isolation">
         <link rel="stylesheet" href="/material/source/css/fontawesome.min.css">
     </#if>
 
@@ -69,7 +69,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="${title?default('null')}">
     <meta name="msapplication-starturl" content="https://ryanc.cc/">
-    <meta name="msapplication-navbutton-color" content="${options.theme_material_footer_uiux_android_chrome_color?if_exists}">
+    <meta name="msapplication-navbutton-color" content="${options.theme_material_footer_uiux_android_chrome_color?default('#0097a7')}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="${title?default('null')}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">

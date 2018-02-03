@@ -21,7 +21,8 @@
                 <li>
                     <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li class="active">页面</li>
+                <li><a href="#">页面</a></li>
+                <li class="active">所有页面</li>
             </ol>
         </section>
         <section class="content container-fluid">

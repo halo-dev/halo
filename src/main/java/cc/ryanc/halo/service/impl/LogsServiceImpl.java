@@ -37,7 +37,6 @@ public class LogsServiceImpl implements LogsService {
      * 根据编号移除
      *
      * @param logsId logsId
-     * @return Logs
      */
     @Override
     public void removeByLogsId(Long logsId) {

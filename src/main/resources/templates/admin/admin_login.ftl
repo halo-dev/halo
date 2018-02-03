@@ -15,19 +15,19 @@
     </style>
 </head>
 <body>
-<div class="container login-form animated fadeInDown">
-    <div class="login-logo">
+<div class="container login-form">
+    <div class="login-logo animated fadeInUp">
         Halo
     </div>
-    <div class="login-body">
+    <div class="login-body animated">
         <form>
-            <div class="form-group">
-                <input type="text" class="form-control" name="loginName" id="login-name" placeholder="用户名" value="admin">
+            <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
+                <input type="text" class="form-control" name="loginName" id="login-name" placeholder="用户名/邮箱">
             </div>
-            <div class="form-group">
-                <input type="password" class="form-control" name="loginPwd" id="login-pwd" placeholder="密码" value="123456">
+            <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
+                <input type="password" class="form-control" name="loginPwd" id="login-pwd" placeholder="密码">
             </div>
-            <div class="row control">
+            <div class="row control animated fadeInUp" style="animation-delay: 0.3s">
                 <div class="col-xs-6">
                     <label for="remember"><input type="checkbox" id="remember">  <span style="color: #000;font-weight: lighter">记住我</span></label>
                 </div>
@@ -35,7 +35,7 @@
                     <a href="#" style="color: #000;">忘记密码？</a>
                 </div>
             </div>
-            <button type="button" id="btn-login" data-loading-text="登录中..." class="btn btn-block login-button" onclick="btn_login()">登录</button>
+            <button type="button" id="btn-login" data-loading-text="登录中..." class="btn btn-block login-button animated fadeInUp" onclick="btn_login()"  style="animation-delay: 0.4s">登录</button>
         </form>
     </div>
 </div>
@@ -80,7 +80,27 @@
                                 window.location.href="/admin";
                             }
                         });
+                    }else if(data=="wait"){
+                        $('.login-body').addClass('animate shake');
+                        $.toast({
+                            text: "密码错误已达到5次，请30分钟后再试！",
+                            heading: '提示',
+                            icon: 'error',
+                            showHideTransition: 'fade',
+                            allowToastClose: true,
+                            hideAfter: 2000,
+                            stack: 1,
+                            position: 'top-center',
+                            textAlign: 'left',
+                            loader: true,
+                            loaderBg: '#ffffff',
+                            afterHidden: function () {
+                                $('.login-body').removeClass('animate shake');
+                            }
+                        });
+                        $('#btn-login').button('reset');
                     }else{
+                        $('.login-body').addClass('animate shake');
                         $.toast({
                             text: "用户名或者密码错误！",
                             heading: '提示',
@@ -92,7 +112,10 @@
                             position: 'top-center',
                             textAlign: 'left',
                             loader: true,
-                            loaderBg: '#ffffff'
+                            loaderBg: '#ffffff',
+                            afterHidden: function () {
+                                $('.login-body').removeClass('animate shake');
+                            }
                         });
                         $('#btn-login').button('reset');
                     }

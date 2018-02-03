@@ -23,22 +23,25 @@
                     <a href="/admin">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li class="active">文章</li>
+                <li><a href="#">文章</a></li>
+                <li class="active">所有文章</li>
             </ol>
         </section>
         <section class="content container-fluid">
-            <ul style="list-style: none;padding-left: 0">
-                <li class="publish">
-                    <a href="/admin/posts">已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
-                </li>
-                <li class="draft">
-                    <a href="/admin/posts?status=1">草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
-                </li>
-                <li class="trash">
-                    <a href="/admin/posts?status=2">回收站<span class="count">(${trashCount})</span></a>
-                </li>
-            </ul>
             <div class="row">
+                <div class="col-xs-12">
+                    <ul style="list-style: none;padding-left: 0">
+                        <li class="publish">
+                            <a href="/admin/posts">已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
+                        </li>
+                        <li class="draft">
+                            <a href="/admin/posts?status=1">草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
+                        </li>
+                        <li class="trash">
+                            <a href="/admin/posts?status=2">回收站<span class="count">(${trashCount})</span></a>
+                        </li>
+                    </ul>
+                </div>
                 <div class="col-xs-12">
                     <div class="box box-primary">
                         <div class="box-body table-responsive">

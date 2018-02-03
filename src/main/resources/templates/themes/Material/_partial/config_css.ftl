@@ -105,9 +105,10 @@
 
 <!-- Fade Effect -->
 
+<#if options.theme_material_other_js_fade?default('true')=='true'>
 <style>
     .fade {
-        transition: all <%= theme.uiux.nprogress_buffer %>ms linear;
+        transition: all ${options.theme_material_uiux_nprogress_buffer?default('800')}ms linear;
         -webkit-transform: translate3d(0,0,0);
         -moz-transform: translate3d(0,0,0);
         -ms-transform: translate3d(0,0,0);
@@ -120,6 +121,7 @@
         opacity: 0;
     }
 </style>
+</#if>
 
 <!-- Import Font -->
 <#include "config_font.ftl">

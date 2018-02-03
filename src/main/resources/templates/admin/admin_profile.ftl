@@ -23,6 +23,7 @@
                     <a href="/admin">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
+                <li><a href="#">用户</a></li>
                 <li class="active">个人资料</li>
             </ol>
         </section>
@@ -75,9 +76,9 @@
                                             <label for="userAvatar" class="col-sm-2 control-label">头像：</label>
                                             <div class="col-sm-4">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control selectData" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
+                                                    <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default btn-flat" type="button" onclick="openAttach()">选择</button>
+                                                        <button class="btn btn-default btn-flat" type="button" onclick="openAttach('userAvatar')">选择</button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -138,14 +139,14 @@
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
             });
-            function openAttach() {
+            function openAttach(id) {
                 layer.open({
                     type: 2,
                     title: '所有附件',
                     shadeClose: true,
                     shade: 0.5,
                     area: ['90%', '90%'],
-                    content: '/admin/attachments/select',
+                    content: '/admin/attachments/select?id='+id,
                     scrollbar: false
                 });
             }
@@ -164,7 +165,7 @@
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
                                 hideAfter: 1000,
-                                stack: 5,
+                                stack: 1,
                                 position: 'top-center',
                                 textAlign: 'left',
                                 loader: true,
@@ -205,7 +206,7 @@
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
                                 hideAfter: 1000,
-                                stack: 5,
+                                stack: 1,
                                 position: 'top-center',
                                 textAlign: 'left',
                                 loader: true,

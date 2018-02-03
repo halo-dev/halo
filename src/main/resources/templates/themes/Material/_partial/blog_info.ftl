@@ -1,5 +1,5 @@
 <!-- Blog info -->
-<div class="mdl-card mdl-shadow--2dp something-else mdl-cell mdl-cell--8-col mdl-cell--4-col-desktop index-top-block">
+<div class="mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp something-else mdl-cell mdl-cell--8-col mdl-cell--4-col-desktop index-top-block">
 
     <!-- Search -->
     <#include "Paradox-search.ftl">

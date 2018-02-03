@@ -22,6 +22,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 查询前五条文章
+     *
      * @return list
      */
     @Query(value = "SELECT * FROM halo_post ORDER BY post_date DESC LIMIT 5",nativeQuery = true)
@@ -29,6 +30,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 分页查询文章
+     *
      * @param pageable pageable
      * @return page
      */
@@ -37,6 +39,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 模糊查询
+     *
      * @param keyWord keyword
      * @param pageable pageable
      * @return list
@@ -45,6 +48,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 根据文章的状态查询 分页
+     *
      * @param status status
      * @param pageable pageable
      * @return page
@@ -53,6 +57,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 根据文章的状态查询
+     *
      * @param status status
      * @return List
      */
@@ -60,6 +65,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 根据路径查询文章
+     *
      * @param postUrl postUrl
      * @return Post
      */
@@ -67,6 +73,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 查询之后文章
+     *
      * @param postDate postDate
      * @param postStatus postStatus
      * @return list
@@ -76,6 +83,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 查询之前的文章
+     *
      * @param postDate postDate
      * @param postStatus postStatus
      * @return list
@@ -84,22 +92,25 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 
     /**
      * 查询文章归档信息
+     *
      * @return list
      */
-    @Query(value = "select year(post_date) as year,month(post_date) as month,count(*) as count from halo_post where post_status=0 group by year(post_date) DESC ,month(post_date) DESC",nativeQuery = true)
+    @Query(value = "select year(post_date) as year,month(post_date) as month,count(*) as count from halo_post where post_status=0 group by year(post_date),month(post_date)",nativeQuery = true)
     List<Object[]> findPostGroupByDate();
 
     /**
      * 根据年份和月份查询文章
+     *
      * @param year year
      * @param month month
      * @return list
      */
-    @Query(value = "select *,year(post_date) as year,month(post_date) as month from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by post_date desc",nativeQuery = true)
+    @Query(value = "select *,year(post_date) as year,month(post_date) as month from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by post_date",nativeQuery = true)
     List<Post> findPostByYearAndMonth(@Param("year") String year,@Param("month") String month);
 
     /**
      * 根据年份和月份查询文章 分页
+     *
      * @param year year
      * @param month month
      * @param pageable pageable

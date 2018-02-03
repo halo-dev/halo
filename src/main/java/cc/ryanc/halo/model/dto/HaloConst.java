@@ -21,11 +21,6 @@ public class HaloConst {
     public static Map<String,String> OPTIONS = new HashMap<>();
 
     /**
-     * 用户信息
-     */
-    public static User USER = new User();
-
-    /**
      * 所有文件
      */
     public static List<Attachment> ATTACHMENTS = new ArrayList<>();

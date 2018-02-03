@@ -22,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 保存个人资料
+     *
      * @param user user
      */
     @Override
@@ -31,17 +32,31 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 根据用户名和密码查询
+     *
      * @param userName userName
      * @param userPass userPass
      * @return user
      */
     @Override
-    public User userLogin(String userName, String userPass) {
+    public List<User> userLoginByName(String userName, String userPass) {
         return userRepository.findByUserNameAndUserPass(userName,userPass);
     }
 
     /**
+     * 根据邮箱和密码查询，用户登录
+     *
+     * @param userEmail userEmail
+     * @param userPass  userPass
+     * @return list
+     */
+    @Override
+    public List<User> userLoginByEmail(String userEmail, String userPass) {
+        return userRepository.findByUserEmailAndUserPass(userEmail,userPass);
+    }
+
+    /**
      * 查询所有用户
+     *
      * @return list
      */
     @Override
@@ -51,6 +66,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 验证修改密码时，密码是否正确
+     *
      * @param userId userid
      * @param userPass userpass
      * @return User

@@ -26,7 +26,8 @@
                     <a href="/admin">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li class="active">设置</li>
+                <li><a href="#">设置</a></li>
+                <li class="active">网站设置</li>
             </ol>
         </section>
         <!-- tab选项卡 -->

@@ -1,6 +1,6 @@
 <#list posts.content as post>
 <!-- Paradox Thumbnail -->
-<div class="post_entry-module mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col fade out">
+<div class="post_entry-module mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp mdl-cell mdl-cell--12-col fade out">
     <!-- Post Thumbnail -->
     <!-- Random Thumbnail -->
     <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
@@ -24,7 +24,7 @@
                      alt="RYAN0UP's avatar">
             </div>
             <div>
-                <strong>RYAN0UP</strong>
+                <strong>${user.userDisplayName?default('Material')}</strong>
                 <span>${post.postDate?string("MM月 dd,yyyy")}</span>
             </div>
         </div>

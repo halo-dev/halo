@@ -29,6 +29,7 @@ public class CategoryController {
 
     /**
      * 查询所有分类并渲染category页面
+     *
      * @param model model
      * @return freemarker页面
      */
@@ -37,11 +38,12 @@ public class CategoryController {
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/category";
+        return "admin/admin_category";
     }
 
     /**
      * 新增分类目录
+     *
      * @param category category对象
      * @return freemarker页面
      */
@@ -58,6 +60,7 @@ public class CategoryController {
 
     /**
      * 验证分类目录路径是否已经存在
+     *
      * @param cateUrl cateUrl
      * @return string
      */
@@ -74,6 +77,7 @@ public class CategoryController {
 
     /**
      * 处理删除分类目录的请求
+     *
      * @param cateId cateId
      * @return freemarker
      */
@@ -90,6 +94,7 @@ public class CategoryController {
 
     /**
      * 处理修改分类的请求
+     *
      * @param category category
      * @return redirect
      */
@@ -107,6 +112,7 @@ public class CategoryController {
 
     /**
      * 跳转到修改页面
+     *
      * @param cateId cateId
      * @param model model
      * @return String
@@ -121,6 +127,6 @@ public class CategoryController {
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
-        return "admin/_cate-update";
+        return "admin/admin_cate-update";
     }
 }

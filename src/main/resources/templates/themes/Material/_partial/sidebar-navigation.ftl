@@ -10,30 +10,26 @@
             </li>
         </ul>
     </li>
-
     <!-- Homepage -->
-
     <li id="sidebar-first-li">
         <a href="/">
-
             <i class="material-icons sidebar-material-icons">home</i>
-
             主页
         </a>
     </li>
     <li class="divider"></li>
+
+    <#if options.theme_material_other_sidebar_archives?default('true') == 'true'>
     <!-- Archives  -->
     <li class="dropdown">
         <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
-
             <i class="material-icons sidebar-material-icons">inbox</i>
-
             归档
             <b class="caret"></b>
         </a>
         <ul class="dropdown-menu">
             <#if archives??>
-                <#list archives as archive>
+                <#list archives?sort_by("year")?reverse as archive>
                     <li>
                         <a class="sidebar_archives-link" href="/archives/${archive.year}/${archive.month}/">${archive.month}月 ${archive.year}<span class="sidebar_archives-count">${archive.count}</span></a>
                     </li>
@@ -41,13 +37,13 @@
             </#if>
         </ul>
     </li>
-    <!-- Categories  -->
+    </#if>
 
+    <#if options.theme_material_other_sidebar_cates?default('true') == 'true'>
+    <!-- Categories  -->
     <li class="dropdown">
         <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
-
             <i class="material-icons sidebar-material-icons">chrome_reader_mode</i>
-
             分类
             <b class="caret"></b>
         </a>
@@ -59,60 +55,27 @@
             </#list>
         </ul>
     </li>
-
-
+    </#if>
 
     <!-- Pages  -->
+    <#list menus?sort_by("menuSort") as menu>
+        <li>
+            <a href="${menu.menuUrl}" title="${menu.menuName}">
+                <#if menu.menuIcon!="">
+                    <i class="material-icons sidebar-material-icons">${menu.menuIcon}</i>
+                </#if>
+                ${menu.menuName}
+            </a>
+        </li>
+    </#list>
 
-    <li>
-        <a href="/tags" title="标签">
-
-            <i class="material-icons sidebar-material-icons">merge_type</i>
-
-            标签
-        </a>
-    </li>
-
-
-    <li>
-        <a href="/gallery" title="图库">
-
-            <i class="material-icons sidebar-material-icons">photo_library</i>
-
-            图库
-        </a>
-    </li>
-
-
-    <li>
-        <a href="/links" title="友链">
-
-            <i class="material-icons sidebar-material-icons">link</i>
-
-            友链
-        </a>
-    </li>
-
-
-    <li>
-        <a href="/about" title="关于">
-
-            <i class="material-icons sidebar-material-icons">tag_faces</i>
-
-            关于
-        </a>
-    </li>
-
-
-
+    <#if options.theme_material_other_sidebar_postcount?default('true') == 'true'>
     <!-- Article Number  -->
-
     <li>
         <a href="/archives">
             文章总数
-            <span class="sidebar-badge">16</span>
+            <span class="sidebar-badge">${postsCount}</span>
         </a>
     </li>
-
-
+    </#if>
 </ul>

@@ -12,7 +12,7 @@ function showMsg(text,icon,hideAfter) {
         showHideTransition: 'fade',
         allowToastClose: true,
         hideAfter: hideAfter,
-        stack: 5,
+        stack: 1,
         position: 'top-center',
         textAlign: 'left',
         loader: true,

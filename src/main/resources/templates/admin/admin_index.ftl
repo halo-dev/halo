@@ -71,13 +71,13 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="widgetVisitorCount" class="col-sm-4 control-label">访客总数：</label>
+                                        <label for="widgetDayCount" class="col-sm-4 control-label">成立天数：</label>
                                         <div class="col-sm-8">
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_visitorcount" id="widgetVisitorCount" value="true" ${((options.widget_visitorcount?default('true'))=='true')?string('checked','')}> 显示
+                                                <input type="radio" name="widget_daycount" id="widgetDayCount" value="true" ${((options.widget_daycount?default('true'))=='true')?string('checked','')}> 显示
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="widget_visitorcount" id="widgetVisitorCount" value="false" ${((options.widget_visitorcount?default('true'))=='false')?string('checked','')}> 隐藏
+                                                <input type="radio" name="widget_daycount" id="widgetDayCount" value="false" ${((options.widget_daycount?default('true'))=='false')?string('checked','')}> 隐藏
                                             </label>
                                         </div>
                                     </div>
@@ -151,18 +151,18 @@
                     <div class="small-box bg-yellow">
                         <div class="inner"><h3>${mediaCount?default(0)}</h3><p>媒体库</p></div>
                         <div class="icon"><i class="ion ion-person-add"></i></div>
-                        <a href="/admin/attachments" class="small-box-footer">上传图片<i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="/admin/attachments" class="small-box-footer">上传图片 <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 </#if>
                 <!-- ./col -->
-                <#if options.widget_visitorcount?default("true")=="true">
-                <div class="col-lg-3 col-xs-6" id="widgetVisitorCountBody">
+                <#if options.widget_daycount?default("true")=="true">
+                <div class="col-lg-3 col-xs-6" id="widgetDayCountBody">
                     <!-- small box -->
                     <div class="small-box bg-red">
-                        <div class="inner"><h3>65</h3><p>今日访客</p></div>
+                        <div class="inner"><h3 id="siteStart">1</h3><p>成立天数</p></div>
                         <div class="icon"><i class="ion ion-pie-graph"></i></div>
-                        <a href="#" class="small-box-footer">清空数据 <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="#" class="small-box-footer">${options.site_start?default('0000-00-00')} <i class="fa fa-star"></i></a>
                     </div>
                 </div>
                 </#if>
@@ -329,6 +329,13 @@
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
         <script type="application/javascript">
+            $(document).ready(function () {
+                var dateBegin = new Date("${options.site_start?default('0000-00-00')}");
+                var dateEnd = new Date();
+                var parseDate = dateEnd.getTime() - dateBegin.getTime();
+                var days = Math.floor(parseDate/(24*3600*1000));
+                $('#siteStart').html(days+1);
+            });
             function openAllLogs() {
                 layer.open({
                     type: 2,
@@ -357,7 +364,7 @@
                             showHideTransition: 'fade',
                             allowToastClose: true,
                             hideAfter: 1000,
-                            stack: 5,
+                            stack: 1,
                             position: 'top-center',
                             textAlign: 'left',
                             loader: true,

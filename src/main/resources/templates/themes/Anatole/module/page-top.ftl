@@ -1,16 +1,16 @@
 <div class="page-top animated fadeInDown">
     <div class="nav">
         <li>
-            <a href="/" class="current">Home </a>
+            <a href="/" <#if is_home?default(false)==true>class="current"</#if>>Home </a>
         </li>
         <li>
             <a href="/about">About</a>
         </li>
         <li>
-            <a href="/archives">Archive</a>
+            <a href="/archives" <#if is_archives?default(false)==true>class="current"</#if>>Archive</a>
         </li>
         <li>
-            <a href="/links">Links</a>
+            <a href="/links" <#if is_links?default(false)==true>class="current"</#if>>Links</a>
         </li>
     </div>
     <div class="information">

@@ -4,8 +4,6 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,6 +38,7 @@ public class CommentController extends BaseController{
 
     /**
      * 渲染评论管理页面
+     *
      * @param model model
      * @param status status
      * @param page page
@@ -61,11 +59,12 @@ public class CommentController extends BaseController{
         model.addAttribute("trashCount",commentService.findAllComments(2,pageable).getTotalElements());
         model.addAttribute("status",status);
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/comment";
+        return "admin/admin_comment";
     }
 
     /**
      * 将评论移到回收站
+     *
      * @param commentId commentId
      * @return string
      */
@@ -83,9 +82,10 @@ public class CommentController extends BaseController{
 
     /**
      * 将评论改变为发布状态
+     *
      * @param commentId commentId
      * @param status status
-     * @return
+     * @return string
      */
     @GetMapping("/revert")
     public String moveToPublish(@RequestParam("commentId") Long commentId,

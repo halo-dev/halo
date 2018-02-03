@@ -1,7 +1,7 @@
 <!-- Daily pic -->
-<div class="mdl-card mdl-shadow--2dp daily-pic mdl-cell mdl-cell--8-col index-top-block">
+<div class="mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp daily-pic mdl-cell mdl-cell--8-col index-top-block">
     <!-- Pic & Slogan -->
-    <div class="mdl-card__media mdl-color-text--grey-50" style="background-image:url(/material/source/img/daily_pic.png)">
+    <div class="mdl-card__media mdl-color-text--grey-50" style="background-image:url(${options.theme_material_daily_pic?default('/material/source/img/daily_pic.png')})">
         <p class="index-top-block-slogan"><a href="#">
             ${options.theme_material_uiux_slogan?default("Hi,nice to meet you")}
         </a></p>

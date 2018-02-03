@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * @className: LinkServiceImpl
- * @author: RYAN0UP
- * @date: 2017/11/14
- * @description:
+ * @author : RYAN0UP
+ * @date : 2017/11/14
+ * @version : 1.0
+ * description:
  */
 @Service
 public class LinkServiceImpl implements LinkService {
@@ -25,10 +25,11 @@ public class LinkServiceImpl implements LinkService {
 
     private static final String LINK_KEY = "'link_key'";
 
-    private static final String LINK_CACHE_NAME = "inkCache";
+    private static final String LINK_CACHE_NAME = "link_cache";
 
     /**
      * 保存友情链接 清除缓存
+     *
      * @param link link
      * @return Link
      */
@@ -40,6 +41,7 @@ public class LinkServiceImpl implements LinkService {
 
     /**
      * 移除友情链接 清除缓存
+     *
      * @param linkId linkId
      * @return link
      */
@@ -53,6 +55,7 @@ public class LinkServiceImpl implements LinkService {
 
     /**
      * 修改友情链接 清除缓存
+     *
      * @param link link
      * @return Link
      */
@@ -65,6 +68,7 @@ public class LinkServiceImpl implements LinkService {
 
     /**
      * 查询所有友情链接 缓存
+     *
      * @return list
      */
     @Cacheable(value = LINK_CACHE_NAME,key = LINK_KEY)
@@ -75,6 +79,7 @@ public class LinkServiceImpl implements LinkService {
 
     /**
      * 根据编号查询友情链接 缓存
+     *
      * @param linkId linkId
      * @return Link
      */

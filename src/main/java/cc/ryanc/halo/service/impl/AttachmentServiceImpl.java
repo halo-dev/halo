@@ -22,8 +22,13 @@ public class AttachmentServiceImpl implements AttachmentService{
     @Autowired
     private AttachmentRepository attachmentRepository;
 
+    private static final String CATEGORY_KEY = "'category_key'";
+
+    private static final String CATEGORY_CACHE_NAME = "cateCache";
+
     /**
      * 新增附件信息
+     *
      * @param attachment attachment
      * @return Attachment
      */
@@ -32,21 +37,44 @@ public class AttachmentServiceImpl implements AttachmentService{
         return attachmentRepository.save(attachment);
     }
 
+    /**
+     * 获取所有附件信息
+     *
+     * @return list
+     */
     @Override
     public List<Attachment> findAllAttachments() {
         return attachmentRepository.findAll();
     }
 
+    /**
+     * 获取所有附件信息 分页
+     *
+     * @param pageable pageable
+     * @return page
+     */
     @Override
     public Page<Attachment> findAllAttachments(Pageable pageable) {
         return attachmentRepository.findAll(pageable);
     }
 
+    /**
+     * 根据附件id查询附件
+     *
+     * @param attachId attachId
+     * @return attachment
+     */
     @Override
     public Attachment findByAttachId(Long attachId) {
         return attachmentRepository.findOne(attachId);
     }
 
+    /**
+     * 根据编号移除附件
+     *
+     * @param attachId attachId
+     * @return attachment
+     */
     @Override
     public Attachment removeByAttachId(Long attachId) {
         Attachment attachment = this.findByAttachId(attachId);

@@ -14,6 +14,7 @@ public interface TagService {
 
     /**
      * 新增标签
+     *
      * @param tag tag
      * @return Tag
      */
@@ -21,6 +22,7 @@ public interface TagService {
 
     /**
      * 根据编号移除标签
+     *
      * @param tagId tagId
      * @return Tag
      */
@@ -28,6 +30,7 @@ public interface TagService {
 
     /**
      * 更新标签
+     *
      * @param tag tag
      * @return tag
      */
@@ -35,12 +38,14 @@ public interface TagService {
 
     /**
      * 获取所有标签
+     *
      * @return list
      */
     List<Tag> findAllTags();
 
     /**
      * 根据编号查询标签
+     *
      * @param tagId tagId
      * @return Link
      */
@@ -48,6 +53,7 @@ public interface TagService {
 
     /**
      * 根据标签路径查询
+     *
      * @param tagUrl tagUrl
      * @return tag
      */

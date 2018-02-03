@@ -1,4 +1,4 @@
-<#include "module/marco.ftl">
+<#include "module/macro.ftl">
 <@head title="${post.postTitle} · ${options.site_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">

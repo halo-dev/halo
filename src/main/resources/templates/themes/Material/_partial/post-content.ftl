@@ -1,13 +1,15 @@
 <div id="post-content" class="mdl-color-text--grey-700 mdl-card__supporting-text fade out">
     <#if options.theme_material_scheme?if_exists == "Paradox">
         ${post.postContent?if_exists}
+        <#if options.theme_material_other_post_license??>
         <blockquote style="margin: 2em 0 0;padding: 0.5em 1em;border-left: 3px solid #F44336;background-color: #F5F5F5;list-style: none;">
             <p>
-                <strong></strong>
+                <strong>${options.theme_material_other_post_license?if_exists}</strong>
                 <br>
-                <strong>本文链接</strong><a href="#">#</a>
+                <strong>本文链接：</strong><a href="${options.site_url?if_exists}/article/${post.postUrl}">${options.site_url?if_exists}/article/${post.postUrl}</a>
             </p>
         </blockquote>
+        </#if>
     </#if>
 
     <#if options.theme_material_scheme?if_exists == "Isolation">
@@ -16,13 +18,15 @@
                 ${post.postTitle?if_exists}
             </p>
             ${post.postContent?if_exists}
+            <#if options.theme_material_other_post_license??>
             <blockquote>
                 <p>
-                    <strong></strong>
+                    <strong>${options.theme_material_other_post_license?if_exists}</strong>
                     <br>
-                    <strong>本文链接</strong><a href="#">#</a>
+                    <strong>本文链接：</strong><a href="${options.site_url?if_exists}/article/${post.postUrl}">${options.site_url?if_exists}/article/${post.postUrl}</a>
                 </p>
             </blockquote>
+            </#if>
         </div>
     </#if>
 </div>

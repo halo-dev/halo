@@ -13,6 +13,7 @@ import java.util.List;
 public interface CategoryService {
     /**
      * 新增分类目录
+     *
      * @param category 分类目录
      * @return 如果插入成功，返回分类目录对象
      */
@@ -20,6 +21,7 @@ public interface CategoryService {
 
     /**
      * 根据编号删除分类目录
+     *
      * @param cateId 分类目录编号
      * @return category
      */
@@ -27,6 +29,7 @@ public interface CategoryService {
 
     /**
      * 修改分类目录信息
+     *
      * @param category 分类目录对象
      * @return 如果修改成功 返回当前分类目录对象
      */
@@ -34,12 +37,14 @@ public interface CategoryService {
 
     /**
      * 获取所有分类目录
+     *
      * @return 返回List集合
      */
     List<Category> findAllCategories();
 
     /**
      * 根据编号查询单个分类
+     *
      * @param cateId 分类编号
      * @return 返回category实体
      */
@@ -47,6 +52,7 @@ public interface CategoryService {
 
     /**
      * 根据分类目录路径查询，用于验证是否已经存在该路径
+     *
      * @param cateUrl cateUrl
      * @return category
      */

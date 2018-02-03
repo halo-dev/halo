@@ -27,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author : RYAN0UP
@@ -56,6 +58,7 @@ public class AdminController extends BaseController{
 
     /**
      * 请求后台页面
+     *
      * @return freemarker
      */
     @GetMapping(value = {"","/index"})
@@ -63,15 +66,19 @@ public class AdminController extends BaseController{
         //查询文章条数
         Integer postCount = postService.findAllPosts().size();
         model.addAttribute("postCount",postCount);
+
         //查询评论的条数
         Integer commentCount = commentService.findAllComments().size();
         model.addAttribute("commentCount",commentCount);
+
         //查询最新的文章
         List<Post> postsLatest = postService.findPostLatest();
         model.addAttribute("postTopFive",postsLatest);
+
         //查询最新的日志
         List<Logs> logsLatest = logsService.findLogsLatest();
         model.addAttribute("logs",logsLatest);
+
         //查询最新的评论
         List<Comment> comments = commentService.findCommentsLatest();
         model.addAttribute("comments",comments);
@@ -79,11 +86,12 @@ public class AdminController extends BaseController{
         model.addAttribute("options", HaloConst.OPTIONS);
         model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
         this.getNewComments(session);
-        return "admin/index";
+        return "admin/admin_index";
     }
 
     /**
      * 处理跳转到登录页的请求
+     *
      * @return freemarker
      */
     @GetMapping(value = "/login")
@@ -93,11 +101,12 @@ public class AdminController extends BaseController{
         if(null!=user){
             return "redirect:/admin";
         }
-        return "admin/login";
+        return "admin/admin_login";
     }
 
     /**
      * 验证登录信息
+     *
      * @param loginName loginName
      * @param loginPwd loginPwd
      * @param session session
@@ -109,10 +118,17 @@ public class AdminController extends BaseController{
                            @ModelAttribute("loginPwd") String loginPwd,
                            HttpSession session){
         try {
-            User user = userService.userLogin(loginName, loginPwd);
-            if(null!=user){
-                session.setAttribute("user",user);
-                log.info("用户["+user.getUserName()+"]登录成功！");
+            List<User> users = null;
+            Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
+            Matcher matcher = patternEmail.matcher(loginName);
+            if(matcher.find()){
+                users = userService.userLoginByEmail(loginName,HaloUtil.getMD5(loginPwd));
+            }else{
+                users = userService.userLoginByName(loginName,HaloUtil.getMD5(loginPwd));
+            }
+            if(null!=users){
+                session.setAttribute("user", users.get(0));
+                log.info("用户["+ users.get(0).getUserName()+"]登录成功！");
                 logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_SUCCESS,HaloUtil.getIpAddr(request), HaloUtil.getDate()));
                 return RespStatus.SUCCESS;
             }else{
@@ -126,6 +142,7 @@ public class AdminController extends BaseController{
 
     /**
      * 退出登录 销毁session
+     *
      * @param session session
      * @return string
      */
@@ -140,6 +157,7 @@ public class AdminController extends BaseController{
 
     /**
      * 查看所有日志
+     *
      * @param model model
      * @param page page
      * @param size size
@@ -149,19 +167,16 @@ public class AdminController extends BaseController{
     public String logs(Model model,
                        @RequestParam(value = "page",defaultValue = "0") Integer page,
                        @RequestParam(value = "size",defaultValue = "10") Integer size){
-        try {
-            Sort sort = new Sort(Sort.Direction.DESC,"logId");
-            Pageable pageable = new PageRequest(page,size,sort);
-            Page<Logs> logs = logsService.findAllLogs(pageable);
-            model.addAttribute("logs",logs);
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
-        }
+        Sort sort = new Sort(Sort.Direction.DESC,"logId");
+        Pageable pageable = new PageRequest(page,size,sort);
+        Page<Logs> logs = logsService.findAllLogs(pageable);
+        model.addAttribute("logs",logs);
         return "admin/widget/_logs-all";
     }
 
     /**
      * 清除所有日志
+     *
      * @return return
      */
     @GetMapping(value = "/logs/clear")
@@ -176,12 +191,13 @@ public class AdminController extends BaseController{
 
     /**
      * 不可描述的页面
+     *
      * @param model model
      * @return string
      */
     @GetMapping(value = "/halo")
     public String halo(Model model){
         model.addAttribute("options",HaloConst.OPTIONS);
-        return "admin/halo";
+        return "admin/admin_halo";
     }
 }

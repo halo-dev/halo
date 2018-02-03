@@ -8,22 +8,15 @@ It will not impact the appearance and can give developers a lot of support :)
 如果您仍然想删除的话 能否只保留第一项呢？即 "Theme Material"
 它不会影响美观并可以给开发者很大的支持和动力。 :)
 -->
-
 <!-- Sidebar Divider -->
-
     <div class="sidebar-divider"></div>
-
-
 <!-- Theme Material -->
-
     <a href="https://github.com/viosey/hexo-theme-material"  class="sidebar-footer-text-a" target="_blank">
         <div class="sidebar-text mdl-button mdl-js-button mdl-js-ripple-effect sidebar-footer-text-div" data-upgraded=",MaterialButton,MaterialRipple">
             主题 - Material
             <span class="sidebar-badge badge-circle">i</span>
         </div>
     </a>
-
-
 <!-- Help & Support -->
 <!--
 

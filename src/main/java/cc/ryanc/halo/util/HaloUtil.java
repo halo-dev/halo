@@ -238,13 +238,76 @@ public class HaloUtil {
         return themes;
     }
 
+    /**
+     * 获取主题下的模板文件名
+     * @param theme theme
+     * @return list
+     */
+    public static List<String> getTplName (String theme){
+        List<String> tpls = new ArrayList<>();
+        try{
+            //获取项目根路径
+            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            //获取主题路径
+            File themesPath = new File(basePath.getAbsolutePath(),"templates/themes/"+theme);
+            File modulePath = new File(themesPath.getAbsolutePath(),"module");
+            File[] baseFiles = themesPath.listFiles();
+            File[] moduleFiles = modulePath.listFiles();
+            if(null!=moduleFiles) {
+                for (File file : moduleFiles) {
+                    if (file.isFile()) {
+                        if (file.getName().endsWith(".ftl")) {
+                            tpls.add("module/" + file.getName());
+                        }
+                    }
+                }
+            }
+            if(null!=baseFiles){
+                for (File file:baseFiles){
+                    if(file.isFile()) {
+                        if (file.getName().endsWith(".ftl")) {
+                            tpls.add(file.getName());
+                        }
+                    }
+                }
+            }
+        }catch (Exception e){
+            log.error("未知错误："+e.getMessage());
+        }
+        return tpls;
+    }
+
+    /**
+     * 获取文件内容
+     * @param filePath filePath
+     * @return string
+     */
+    public static String getFileContent(String filePath){
+        File file = new File(filePath);
+        Long fileLength = file.length();
+        byte[] fileContent = new byte[fileLength.intValue()];
+        try{
+            FileInputStream inputStream = new FileInputStream(file);
+            inputStream.read(fileContent);
+            inputStream.close();
+            return new String(fileContent,"UTF-8");
+        }catch (Exception e){
+            log.error("读取模板文件错误："+e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 移除文件
+     * @param fileName fileName
+     * @return true or false
+     */
     public static boolean removeFile(String fileName){
         File file = new File(fileName);
-        if(!file.exists()){
-            return false;
-        }else{
-            return file.delete();
+        if(file.exists() && file.delete()){
+            return true;
         }
+        return false;
     }
 
     /**
@@ -304,6 +367,10 @@ public class HaloUtil {
             e.printStackTrace();
         }
         return md5;
+    }
+
+    public static void main(String[] args){
+        System.out.println(getMD5("123456"));
     }
 
     /**

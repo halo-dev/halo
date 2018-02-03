@@ -79,8 +79,8 @@
                 </a>
                 <ul class="treeview-menu">
                     <li><a href="/admin/themes"><i class="fa fa-circle-o"></i>主题</a></li>
-                    <li><a href="/admin/themes"><i class="fa fa-circle-o"></i>菜单</a></li>
-                    <li><a href="#"><i class="fa fa-circle-o"></i>自定义</a></li>
+                    <li><a href="/admin/menu"><i class="fa fa-circle-o"></i>菜单</a></li>
+                    <li><a href="/admin/themes/editor"><i class="fa fa-circle-o"></i>自定义</a></li>
                 </ul>
             </li>
             <li class="treeview">

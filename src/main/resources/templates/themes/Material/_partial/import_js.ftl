@@ -3,9 +3,9 @@
 <script>lsloader.load("js_js","/material/source/js/js.min.js?V/53wGualMuiPM3xoetD5Q==", true)</script>
 
 <#include "../_widget/nprogress.ftl">
-
-<script>lsloader.load("sm_js","/material/source/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
-
+<#if options.theme_material_other_js_smoothscroll?default('true')=='true'>
+    <script>lsloader.load("sm_js","/material/source/js/smoothscroll.js?lOy/ACj5suSNi7ZVFVbpFQ==", true)</script>
+</#if>
 <#include "footer-option.ftl">
 <!-- UC Browser Compatible -->
 <script>

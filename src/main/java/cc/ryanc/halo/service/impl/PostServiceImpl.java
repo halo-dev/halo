@@ -31,10 +31,11 @@ public class PostServiceImpl implements PostService {
 
     private static final String POST_KEY = "'post_key'";
 
-    private static final String POST_CACHE_NAME = "inkCache";
+    private static final String POST_CACHE_NAME = "post_cache";
 
     /**
      * 保存文章 清除缓存
+     *
      * @param post Post
      * @return Post
      */
@@ -46,6 +47,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 根据编号移除文章 清除缓存
+     *
      * @param postId postId
      * @return Post
      */
@@ -59,8 +61,9 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 修改文章 清除缓存
+     *
      * @param post Post
-     * @return
+     * @return post
      */
     @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
@@ -70,6 +73,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 修改文章状态 清除缓存
+     *
      * @param postId postId
      * @param status status
      * @return Post
@@ -84,6 +88,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 批量更新文章摘要
+     *
      * @param postSummary postSummary
      */
     @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
@@ -100,6 +105,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 查询所有文章 分页
+     *
      * @param pageable Pageable
      * @return Page
      */
@@ -110,6 +116,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 查询所有文章 不分页 缓存
+     *
      * @return List
      */
     @Cacheable(value = POST_CACHE_NAME,key = POST_KEY)
@@ -120,6 +127,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 模糊查询文章
+     *
      * @param keyWord keyword
      * @param pageable pageable
      * @return list
@@ -131,6 +139,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 根据状态分页查询文章 清除缓存
+     *
      * @param status status
      * @param pageable pageable
      * @return page
@@ -143,6 +152,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 根据状态查询文章
+     *
      * @param status status
      * @return list
      */
@@ -153,6 +163,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 根据编号查询文章 缓存
+     *
      * @param postId postId
      * @return post
      */
@@ -164,10 +175,12 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 根据文章路径查询 缓存
+     *
      * @param postUrl postUrl
      * @return post
      */
     @Override
+    @CacheEvict(value = POST_CACHE_NAME)
     @Cacheable(value = POST_CACHE_NAME,key = "#postUrl+'post'")
     public Post findByPostUrl(String postUrl) {
         return postRepository.findPostByPostUrl(postUrl);
@@ -175,6 +188,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 查询最新的5篇文章
+     *
      * @return list
      */
     @Override
@@ -197,7 +211,7 @@ public class PostServiceImpl implements PostService {
      * 查询Id之前的文章
      *
      * @param postId
-     * @return
+     * @return list
      */
     @Override
     public List<Post> findByPostDateBefore(Date postDate) {
@@ -228,6 +242,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * 根据年份和月份查询文章
+     *
      * @param year year
      * @param month month
      * @return list
@@ -237,8 +252,43 @@ public class PostServiceImpl implements PostService {
         return postRepository.findPostByYearAndMonth(year,month);
     }
 
+    /**
+     * 根据年份和月份索引文章
+     * @param year year year
+     * @param month month month
+     * @param pageable pageable pageable
+     * @return page
+     */
     @Override
     public Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable) {
         return postRepository.findPostByYearAndMonth(year,month,pageable);
+    }
+
+    /**
+     * 生成rss
+     *
+     * @param posts posts
+     * @return string
+     */
+    @Override
+    public String buildRss(List<Post> posts) {
+        String rss = "";
+        try{
+            rss = HaloUtil.getRss(posts);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return rss;
+    }
+
+    /**
+     * 生成sitemap
+     *
+     * @param posts posts
+     * @return string
+     */
+    @Override
+    public String buildSiteMap(List<Post> posts) {
+        return HaloUtil.getSiteMap(posts);
     }
 }

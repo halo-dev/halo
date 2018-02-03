@@ -13,6 +13,7 @@ import java.util.List;
 public interface LinkService {
     /**
      * 新增友情链接
+     *
      * @param link link
      * @return Link
      */
@@ -20,6 +21,7 @@ public interface LinkService {
 
     /**
      * 根据编号删除
+     *
      * @param linkId linkId
      * @return Link
      */
@@ -27,6 +29,7 @@ public interface LinkService {
 
     /**
      * 修改
+     *
      * @param link link
      * @return Link
      */
@@ -34,12 +37,14 @@ public interface LinkService {
 
     /**
      * 查询所有
+     *
      * @return List
      */
     List<Link> findAllLinks();
 
     /**
      * 根据编号查询单个链接
+     *
      * @param linkId linkId
      * @return Link
      */

@@ -10,7 +10,7 @@
         <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
         <link href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css" rel="stylesheet">
         <style type="text/css" rel="stylesheet">
-            body{margin:0}*{box-sizing:border-box}h1,h2{margin:0}a{color:#fff;text-decoration:none}body,html{font-family:-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}.fullscreen{background-position:50% 50%;background-size:cover}.fullscreen,.fullscreen .backColor{position:absolute;top:0;left:0;width:100%;height:100%}.fullscreen .backColor{background-color:rgba(0,0,0,.1)}.infos{display:flex;text-align:center;align-items:center;justify-content:center}.infos,.main-content{position:absolute;top:0;left:0;width:100%;height:100%;color:#fff}.main-content{background-color:#000}.errorPage{position:relative;width:100vw;height:100vh}.infos-h1{margin:0;font-size:5em;line-height:1}.infos-h1 h1{font-weight:200}.footer{position:absolute;right:1rem;bottom:1rem;left:1rem;z-index:9999;font-size:14px}.infos-h2{font-size:24px}.infos-h2 a:hover{color:#7a8d85}
+            body{margin:0}*{box-sizing:border-box}h1,h2{margin:0}a{color:#fff;text-decoration:none}body,html{font-family:-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif}.fullscreen{background-position:50% 50%;background-size:cover}.fullscreen,.fullscreen .backColor{position:absolute;top:0;left:0;width:100%;height:100%}.fullscreen .backColor{background-color:rgba(0,0,0,.1)}.infos{display:flex;text-align:center;align-items:center;justify-content:center}.infos,.main-content{position:absolute;top:0;left:0;width:100%;height:100%;color:#fff}.main-content{background: #833ab4;background: -webkit-linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);}.errorPage{position:relative;width:100vw;height:100vh}.infos-h1{margin:0;font-size:5em;line-height:1}.infos-h1 h1{font-weight:200}.footer{position:absolute;right:1rem;bottom:1rem;left:1rem;z-index:9999;font-size:14px}.infos-h2{font-size:24px}.infos-h2 a:hover{color:#7a8d85}
         </style>
     </head>
     <body>
@@ -34,10 +34,10 @@
                         </div>
                     </div>
                     <div class="footer">
-                        <span>Copyright © 2016</span>
-                        <a href="https://ryanc.cc">Ryan0up'S Blog</a>
+                        <span>Copyright © 2018</span>
+                        <a href="https://ryanc.cc">${options.site_title?default('Halo')}</a>
                         <span style="float: right">
-                                背景来自<a href="https://cn.bing.com/" target="_blank">Bing</a>
+                                Background image from <a href="https://cn.bing.com/" target="_blank">Bing</a>.
                         </span>
                     </div>
                 </div>

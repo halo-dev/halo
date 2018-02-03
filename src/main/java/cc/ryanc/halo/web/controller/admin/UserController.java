@@ -29,17 +29,19 @@ public class UserController {
 
     /**
      * 获取用户信息并跳转
+     *
      * @return string
      */
     @GetMapping
     public String profile(Model model){
         model.addAttribute("user",userService.findAllUser().get(0));
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/profile";
+        return "admin/admin_profile";
     }
 
     /**
      * 处理修改用户资料的请求
+     *
      * @param user user
      * @return String
      */
@@ -49,7 +51,6 @@ public class UserController {
         try{
             if(null!=user){
                 userService.saveByUser(user);
-                HaloConst.USER = userService.findAllUser().get(0);
                 session.invalidate();
             }else{
                 log.error("用户信息不能为空值");
@@ -64,6 +65,7 @@ public class UserController {
 
     /**
      * 处理修改密码的请求
+     *
      * @param beforePass 之前的密码
      * @param newPass 新密码
      * @return String

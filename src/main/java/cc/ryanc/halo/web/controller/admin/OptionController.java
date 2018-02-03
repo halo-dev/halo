@@ -26,16 +26,18 @@ public class OptionController {
 
     /**
      * 请求跳转到option页面并完成渲染
+     *
      * @return freemarker
      */
     @GetMapping
     public String options(Model model){
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/option";
+        return "admin/admin_option";
     }
 
     /**
      * 保存设置选项
+     *
      * @param options options
      */
     @PostMapping(value = "/save")

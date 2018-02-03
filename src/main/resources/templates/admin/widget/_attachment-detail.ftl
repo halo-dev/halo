@@ -102,7 +102,7 @@
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
                                 hideAfter: 1000,
-                                stack: 5,
+                                stack: 1,
                                 position: 'top-center',
                                 textAlign: 'left',
                                 loader: true,

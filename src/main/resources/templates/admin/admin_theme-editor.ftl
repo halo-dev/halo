@@ -1,0 +1,174 @@
+<#include "module/_macro.ftl">
+<@head title="Halo后台管理-主题编辑"></@head>
+<div class="wrapper">
+    <!-- 顶部栏模块 -->
+    <#include "module/_header.ftl">
+    <!-- 菜单栏模块 -->
+    <#include "module/_sidebar.ftl">
+    <div class="content-wrapper">
+        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
+        <link rel="stylesheet" href="/static/plugins/editor.md/css/editormd.min.css">
+        <section class="content-header">
+            <h1 style="display: inline-block;">主题编辑</h1>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                </li>
+                <li><a href="#">外观</a></li>
+                <li class="active">主题编辑</li>
+            </ol>
+        </section>
+        <section class="content container-fluid">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title" id="tplNameTitle"></h3>
+                        </div>
+                        <div class="box-body">
+                            <div id="theme-editor">
+                                <textarea style="display:none;" id="tplContent"></textarea>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <button type="button" class="btn btn-primary btn-flat" onclick="saveTpl()">确定修改</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">${options.theme?default('halo')}主题</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <div class="table-responsive mailbox-messages">
+                                <table class="table table-hover table-striped">
+                                    <tbody>
+                                        <#list tpls as tpl>
+                                            <tr style="cursor: pointer">
+                                                <td class="mailbox-name" onclick="loadContent('${tpl}')"><a href="#">${tpl}</a></td>
+                                                <td class="mailbox-subject">
+                                                    <#switch tpl>
+                                                        <#case "index.ftl">
+                                                        首页
+                                                        <#break >
+                                                        <#case "post.ftl">
+                                                        文章内容
+                                                        <#break >
+                                                        <#case "archives.ftl">
+                                                        文章归档
+                                                        <#break >
+                                                        <#case "links.ftl">
+                                                        友情链接
+                                                        <#break >
+                                                        <#case "module/macro.ftl">
+                                                        宏模板
+                                                        <#break >
+                                                    </#switch>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
+        <script>
+            var editor;
+            function loadEditor() {
+                $.getScript("/static/plugins/editor.md/editormd.min.js",function () {
+                    editor = editormd("theme-editor", {
+                        width: "100%",
+                        height: 620,
+                        syncScrolling: "single",
+                        path: "/static/plugins/editor.md/lib/",
+                        watch            : false,
+                        toolbar          : false,
+                        codeFold         : true,
+                        searchReplace    : true,
+                        placeholder      : "Enjoy coding!",
+                        value            : (localStorage.mode) ? $("#"+localStorage.mode.replace("text/", "")+"-code").val() : $("#html-code").val(),
+                        theme            : (localStorage.theme) ? localStorage.theme : "default",
+                        mode             : (localStorage.mode) ? localStorage.mode : "text/html"
+                    });
+                });
+            }
+            $(document).ready(function () {
+                loadEditor();
+            });
+            <#if options.admin_pjax?default("true") == "true">
+            $(document).on('pjax:complete',function () {
+                loadEditor();
+            });
+            </#if>
+            function loadContent(tplName) {
+                if (tplName && tplName != '') {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/admin/themes/getTpl',
+                        async: false,
+                        data: {
+                            tplName: tplName
+                        },
+                        success: function (data) {
+                            editor.setValue(data);
+                            $('#tplNameTitle').html(tplName);
+                        }
+                    });
+                } else {
+                    editor.setValue('');
+                    $('#tplNameTitle').html('');
+                }
+            }
+            
+            function saveTpl() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/themes/editor/save',
+                    async: false,
+                    data:{
+                        'tplName': $('#tplNameTitle').html(),
+                        'tplContent': editor.getValue()
+                    },
+                    success: function (data) {
+                        if(data==true){
+                            $.toast({
+                                text: "保存成功！",
+                                heading: '提示',
+                                icon: 'success',
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: 1000,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff'
+                            });
+                        }else{
+                            $.toast({
+                                text: "保存失败！",
+                                heading: '提示',
+                                icon: 'error',
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: 2000,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff'
+                            });
+                        }
+                    }
+                });
+            }
+        </script>
+    </div>
+    <#include "module/_footer.ftl">
+</div>
+<@footer></@footer>

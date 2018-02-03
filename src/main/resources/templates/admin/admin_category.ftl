@@ -18,6 +18,7 @@
                     <a href="/admin">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
+                <li><a href="#">文章</a></li>
                 <li class="active">分类目录</li>
             </ol>
         </section>

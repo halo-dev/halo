@@ -32,9 +32,6 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
     private OptionsService optionsService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private AttachmentService attachmentService;
 
     @Override
@@ -43,7 +40,6 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
         this.loadOptions();
         this.loadFiles();
         this.loadThemes();
-        this.loadUser();
     }
 
     /**
@@ -100,17 +96,6 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
             }
         }catch (Exception e){
             log.error("加载主题失败："+e.getMessage());
-        }
-    }
-
-    private void loadUser(){
-        try {
-            User user = userService.findAllUser().get(0);
-            if(null!=user){
-                HaloConst.USER = user;
-            }
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
         }
     }
 }

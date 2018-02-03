@@ -29,6 +29,7 @@ public class TagController {
 
     /**
      * 渲染标签管理页面
+     *
      * @param model model
      * @return string
      */
@@ -37,11 +38,12 @@ public class TagController {
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("tags",tags);
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/tag";
+        return "admin/admin_tag";
     }
 
     /**
      * 新增标签
+     *
      * @param tag tag
      * @return string
      */
@@ -58,6 +60,7 @@ public class TagController {
 
     /**
      * 验证是否存在该路径
+     *
      * @param tagUrl tagUrl
      * @return string
      */
@@ -74,6 +77,7 @@ public class TagController {
 
     /**
      * 处理删除标签的请求
+     *
      * @param tagId tagId
      * @return string
      */
@@ -90,6 +94,7 @@ public class TagController {
 
     /**
      * 跳转到修改标签页面
+     *
      * @param model model
      * @param tagId tagId
      * @return string
@@ -104,11 +109,12 @@ public class TagController {
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
-        return "admin/_tag-update";
+        return "admin/admin_tag-update";
     }
 
     /**
      * 处理修改标签的请求
+     *
      * @param tag tag
      * @return string
      */

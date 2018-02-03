@@ -1,8 +1,12 @@
 package cc.ryanc.halo.web.controller;
 
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.service.OptionsService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +19,19 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @Controller
 public class CommonController implements ErrorController{
-
     private static final String ERROR_PATH = "/error";
 
+    /**
+     * 渲染404，500
+     *
+     * @param request request
+     * @return string
+     */
     @GetMapping(value = ERROR_PATH)
-    public String handleError(HttpServletRequest request){
+    public String handleError(HttpServletRequest request, Model model){
+
+        model.addAttribute("options", HaloConst.OPTIONS);
+
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         if(statusCode==404) {
             return "common/404";

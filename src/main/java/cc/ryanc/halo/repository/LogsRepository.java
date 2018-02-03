@@ -9,13 +9,14 @@ import java.util.List;
 /**
  * @author : RYAN0UP
  * @version : 1.0
- * description :
  * @date : 2018/1/19
+ * description :
  */
 public interface LogsRepository extends JpaRepository<Logs,Long> {
 
     /**
      * 查询最新的五条数据
+     *
      * @return list
      */
     @Query(value = "SELECT * FROM halo_logs ORDER BY log_created DESC LIMIT 5",nativeQuery = true)

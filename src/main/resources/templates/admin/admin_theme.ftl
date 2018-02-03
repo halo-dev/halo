@@ -66,6 +66,7 @@
             </a>
             <ol class="breadcrumb">
                 <li><a href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a href="#">外观</a></li>
                 <li class="active">主题设置</li>
             </ol>
         </section>
@@ -86,13 +87,13 @@
                             <div class="box box-solid">
                                 <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName?if_exists}/screenshot.png)"></div>
                                 <div class="box-footer">
-                                    <span class="theme-title">${theme.themeName?if_exists}</span>
+                                    <span class="theme-title">${theme.themeName?if_exists?upper_case}</span>
                                     <#if theme.hasOptions==true>
                                         <button class="btn btn-primary btn-sm pull-right btn-flat" onclick="openSetting('${theme.themeName?if_exists}')">设置</button>
                                     </#if>
-                                    <#if activeTheme == "${theme.themeName?if_exists}">
+                                    <#if activeTheme == "${theme.themeName}">
                                         <button class="btn btn-primary btn-sm pull-right btn-flat" disabled>已启用</button>
-                                    <#else >
+                                    <#else>
                                         <button onclick="setTheme('${theme.themeName?if_exists}')" class="btn btn-primary btn-sm pull-right btn-flat">启用</button>
                                     </#if>
                                 </div>
@@ -178,7 +179,7 @@
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
                                 hideAfter: 1000,
-                                stack: 5,
+                                stack: 1,
                                 position: 'top-center',
                                 textAlign: 'left',
                                 loader: true,

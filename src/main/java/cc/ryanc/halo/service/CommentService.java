@@ -17,12 +17,14 @@ public interface CommentService {
 
     /**
      * 新增评论
+     *
      * @param comment comment
      */
     void saveByComment(Comment comment);
 
     /**
      * 查询所有的评论，用于后台管理
+     *
      * @param status status
      * @param pageable pageable
      * @return page
@@ -32,12 +34,14 @@ public interface CommentService {
 
     /**
      * 查询所有评论，不分页
-     * @return
+     *
+     * @return list
      */
     List<Comment> findAllComments();
 
     /**
      * 更改评论的状态
+     *
      * @param commentId commentId
      * @param status status
      * @return comment
@@ -46,6 +50,7 @@ public interface CommentService {
 
     /**
      * 根据评论编号查询评论
+     *
      * @param commentId commentId
      * @return comment
      */
@@ -53,6 +58,7 @@ public interface CommentService {
 
     /**
      * 根据文章查询评论
+     *
      * @param post post
      * @param pageable pageable
      * @return page
@@ -61,6 +67,7 @@ public interface CommentService {
 
     /**
      * 根据文章和评论状态查询评论
+     *
      * @param post post
      * @param pageable pageable
      * @param status status
@@ -70,6 +77,7 @@ public interface CommentService {
 
     /**
      * 查询最新的前五条评论
+     *
      * @return list
      */
     List<Comment> findCommentsLatest();

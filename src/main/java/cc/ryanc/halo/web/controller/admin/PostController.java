@@ -25,9 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author : RYAN0UP
@@ -54,6 +52,7 @@ public class PostController extends BaseController{
 
     /**
      * 处理后台获取文章列表的请求
+     *
      * @param model Model
      * @param page Page
      * @param size Size
@@ -64,24 +63,22 @@ public class PostController extends BaseController{
                         @RequestParam(value = "status",defaultValue = "0") Integer status,
                         @RequestParam(value = "page",defaultValue = "0") Integer page,
                         @RequestParam(value = "size",defaultValue = "10") Integer size){
-        try {
-            Sort sort = new Sort(Sort.Direction.DESC,"postId");
-            Pageable pageable = new PageRequest(page,size,sort);
-            Page<Post> posts = postService.findPostByStatus(status,pageable);
-            model.addAttribute("posts",posts);
-            model.addAttribute("publishCount",postService.findPostByStatus(0,pageable).getTotalElements());
-            model.addAttribute("draftCount",postService.findPostByStatus(1,pageable).getTotalElements());
-            model.addAttribute("trashCount",postService.findPostByStatus(2,pageable).getTotalElements());
-            model.addAttribute("options", HaloConst.OPTIONS);
-            model.addAttribute("status",status);
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
-        }
-        return "admin/post";
+        Sort sort = new Sort(Sort.Direction.DESC,"postId");
+        Pageable pageable = new PageRequest(page,size,sort);
+        Page<Post> posts = postService.findPostByStatus(status,pageable);
+        model.addAttribute("posts",posts);
+        model.addAttribute("publishCount",postService.findPostByStatus(0,pageable).getTotalElements());
+        model.addAttribute("draftCount",postService.findPostByStatus(1,pageable).getTotalElements());
+        model.addAttribute("trashCount",postService.findPostByStatus(2,pageable).getTotalElements());
+        model.addAttribute("options", HaloConst.OPTIONS);
+        model.addAttribute("status",status);
+
+        return "admin/admin_post";
     }
 
     /**
      * 模糊查询文章
+     *
      * @param model Model
      * @param keyword keyword
      * @param page page
@@ -102,11 +99,12 @@ public class PostController extends BaseController{
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
-        return "admin/post";
+        return "admin/admin_post";
     }
 
     /**
      * 处理预览文章的请求
+     *
      * @param postId postId
      * @param model model
      * @return freemarker
@@ -121,6 +119,7 @@ public class PostController extends BaseController{
 
     /**
      * 处理跳转到新建文章页面
+     *
      * @return freemarker
      */
     @GetMapping(value = "/new")
@@ -133,11 +132,12 @@ public class PostController extends BaseController{
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
-        return "admin/editor";
+        return "admin/admin_editor";
     }
 
     /**
      * 添加文章
+     *
      * @param post Post
      */
     @PostMapping(value = "/new/push")
@@ -156,7 +156,7 @@ public class PostController extends BaseController{
                 String summary = HaloUtil.getSummary(post.getPostContent(), postSummary);
                 post.setPostSummary(summary);
             }
-            post.setPostDate(new Date());
+            post.setPostDate(HaloUtil.getDate());
             //发表用户
             User user = (User)session.getAttribute("user");
             post.setUser(user);
@@ -172,6 +172,7 @@ public class PostController extends BaseController{
 
     /**
      * 处理移至回收站的请求
+     *
      * @param postId postId
      * @return String
      */
@@ -188,6 +189,7 @@ public class PostController extends BaseController{
 
     /**
      * 处理文章为发布的状态
+     *
      * @param postId postId
      * @return String
      */
@@ -205,6 +207,7 @@ public class PostController extends BaseController{
 
     /**
      * 处理删除文章的请求
+     *
      * @param postId postId
      * @return 转发
      */
@@ -223,6 +226,7 @@ public class PostController extends BaseController{
 
     /**
      * 跳转到编辑文章页面
+     *
      * @param postId postId
      * @param model Model
      * @return String
@@ -239,11 +243,12 @@ public class PostController extends BaseController{
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
-        return "admin/editor";
+        return "admin/admin_editor";
     }
 
     /**
      * 更新所有摘要
+     *
      * @param postSummary postSummary
      * @return string
      */
@@ -261,6 +266,7 @@ public class PostController extends BaseController{
 
     /**
      * 验证文章路径是否已经存在
+     *
      * @param postUrl postUrl
      * @return String
      */

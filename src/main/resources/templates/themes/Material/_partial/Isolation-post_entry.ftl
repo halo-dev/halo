@@ -1,5 +1,5 @@
 <#list posts.content as post>
-<div class="post_entry-module mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col fade out">
+<div class="post_entry-module mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp mdl-cell mdl-cell--12-col fade out">
     <!-- Post_entry Header -->
     <!-- Post Header Info -->
     <div class="post_entry-header_info without-thumbnail">
