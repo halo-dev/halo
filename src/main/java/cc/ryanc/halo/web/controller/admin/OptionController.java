@@ -31,7 +31,6 @@ public class OptionController {
      */
     @GetMapping
     public String options(Model model){
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_option";
     }
 

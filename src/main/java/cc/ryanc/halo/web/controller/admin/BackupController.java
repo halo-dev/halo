@@ -38,7 +38,6 @@ public class BackupController {
      */
     @GetMapping
     public String backup(Model model){
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_backup";
     }
 

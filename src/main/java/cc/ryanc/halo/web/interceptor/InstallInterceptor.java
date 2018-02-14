@@ -12,8 +12,8 @@ import java.io.File;
 /**
  * @author : RYAN0UP
  * @version : 1.0
- * description :
  * @date : 2018/1/28
+ * description : 安装拦截器
  */
 @Component
 public class InstallInterceptor implements HandlerInterceptor {
@@ -29,12 +29,8 @@ public class InstallInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
-
-    }
+    public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception { }
 
     @Override
-    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-
-    }
+    public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception { }
 }

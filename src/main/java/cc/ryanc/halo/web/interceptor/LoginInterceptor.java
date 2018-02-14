@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.interceptor;
 
+import cc.ryanc.halo.model.dto.HaloConst;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginInterceptor implements HandlerInterceptor{
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Object obj = request.getSession().getAttribute("user");
+        Object obj = request.getSession().getAttribute(HaloConst.USER_SESSION_KEY);
         //如果user不为空则放行
         if(null!=obj){
             return true;
@@ -28,12 +29,8 @@ public class LoginInterceptor implements HandlerInterceptor{
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        //
-    }
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception { }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        //
-    }
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception { }
 }

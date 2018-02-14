@@ -1,12 +1,10 @@
 package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.OptionsService;
-import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;

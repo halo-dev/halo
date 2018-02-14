@@ -1,20 +1,13 @@
 package cc.ryanc.halo.web.controller;
 
 import cc.ryanc.halo.model.domain.Comment;
-import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.service.OptionsService;
-import cc.ryanc.halo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.ui.Model;
-
 import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author : RYAN0UP
@@ -31,12 +24,6 @@ public abstract class BaseController {
 
     @Autowired
     private CommentService commentService;
-
-    @Autowired
-    private OptionsService optionsService;
-
-    @Autowired
-    private UserService userService;
 
     /**
      * 根据主题名称渲染页面

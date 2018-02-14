@@ -83,7 +83,6 @@ public class AdminController extends BaseController{
         List<Comment> comments = commentService.findCommentsLatest();
         model.addAttribute("comments",comments);
 
-        model.addAttribute("options", HaloConst.OPTIONS);
         model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
         this.getNewComments(session);
         return "admin/admin_index";
@@ -127,7 +126,7 @@ public class AdminController extends BaseController{
                 users = userService.userLoginByName(loginName,HaloUtil.getMD5(loginPwd));
             }
             if(null!=users){
-                session.setAttribute("user", users.get(0));
+                session.setAttribute(HaloConst.USER_SESSION_KEY, users.get(0));
                 log.info("用户["+ users.get(0).getUserName()+"]登录成功！");
                 logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_SUCCESS,HaloUtil.getIpAddr(request), HaloUtil.getDate()));
                 return RespStatus.SUCCESS;
@@ -148,7 +147,7 @@ public class AdminController extends BaseController{
      */
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session){
-        User user = (User) session.getAttribute("user");
+        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         log.info("用户["+user.getUserName()+"]退出登录");
         logsService.saveByLogs(new Logs(LogsRecord.LOGOUT,user.getUserName(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         session.invalidate();

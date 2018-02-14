@@ -37,7 +37,6 @@ public class CategoryController {
     public String categories(Model model){
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_category";
     }
 
@@ -122,7 +121,6 @@ public class CategoryController {
         try{
             Category category = categoryService.findByCateId(cateId);
             model.addAttribute("category",category);
-            model.addAttribute("options", HaloConst.OPTIONS);
             log.info("cateId为"+cateId+"的数据为："+category);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());

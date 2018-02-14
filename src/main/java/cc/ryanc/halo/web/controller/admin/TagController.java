@@ -37,7 +37,6 @@ public class TagController {
     public String tags(Model model){
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("tags",tags);
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_tag";
     }
 
@@ -104,7 +103,6 @@ public class TagController {
         try{
             Tag tag = tagService.findByTagId(tagId);
             model.addAttribute("tag",tag);
-            model.addAttribute("options",HaloConst.OPTIONS);
             log.info("tagId为"+tagId+"的数据为："+tag);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());

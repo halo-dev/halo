@@ -16,11 +16,11 @@ import java.io.Serializable;
 @Table(name = "halo_user")
 public class User implements Serializable{
 
-    @Id
-    @GeneratedValue
     /**
      * 编号
      */
+    @Id
+    @GeneratedValue
     private Long userId;
     /**
      * 用户名

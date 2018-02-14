@@ -29,4 +29,9 @@ public class HaloConst {
      * 所有主题
      */
     public static List<Theme> THEMES = new ArrayList<>();
+
+    /**
+     * user_session
+     */
+    public static String USER_SESSION_KEY = "user_session";
 }

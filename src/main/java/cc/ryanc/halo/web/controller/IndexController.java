@@ -26,7 +26,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2017/11/23
  * @version : 1.0
- * description : 首页控制器
+ * description : 前台控制器
  */
 @Slf4j
 @Controller
@@ -96,9 +96,6 @@ public class IndexController extends BaseController{
         model.addAttribute("postsCount",postService.findAllPosts().size());
 
         model.addAttribute("is_home",true);
-
-        //系统设置
-        model.addAttribute("options",HaloConst.OPTIONS);
 
         //用户信息
         List<User> users = userService.findAllUser();
@@ -174,9 +171,6 @@ public class IndexController extends BaseController{
         //文章总数
         model.addAttribute("postsCount",postService.findAllPosts().size());
 
-        //系统设置
-        model.addAttribute("options",HaloConst.OPTIONS);
-
         //用户信息
         List<User> users = userService.findAllUser();
         model.addAttribute("user",users.get(0));
@@ -211,7 +205,6 @@ public class IndexController extends BaseController{
     @GetMapping(value = "/about")
     public String about(Model model){
         model.addAttribute("about","709831589");
-        model.addAttribute("options",HaloConst.OPTIONS);
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
         return this.render("about");
@@ -223,9 +216,7 @@ public class IndexController extends BaseController{
      * @return String
      */
     @GetMapping(value = "/gallery")
-    public String gallery(Model model){
-        //系统设置
-        model.addAttribute("options",HaloConst.OPTIONS);
+    public String gallery(){
         return this.render("gallery");
     }
 
@@ -240,9 +231,6 @@ public class IndexController extends BaseController{
         //所有友情链接
         List<Link> links = linkService.findAllLinks();
         model.addAttribute("links",links);
-
-        //系统设置
-        model.addAttribute("options",HaloConst.OPTIONS);
 
         //用户信息
         List<User> users = userService.findAllUser();
@@ -297,8 +285,6 @@ public class IndexController extends BaseController{
         List<Archive> archives = postService.findPostGroupByPostDate();
         model.addAttribute("archives",archives);
 
-        //系统设置
-        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("tags");
     }
 
@@ -353,9 +339,6 @@ public class IndexController extends BaseController{
         List<Archive> archives = postService.findPostGroupByPostDate();
         model.addAttribute("archives",archives);
 
-        //系统设置
-        model.addAttribute("options",HaloConst.OPTIONS);
-
         //用户信息
         List<User> users = userService.findAllUser();
         model.addAttribute("user",users.get(0));
@@ -394,9 +377,6 @@ public class IndexController extends BaseController{
 
         //文章总数
         model.addAttribute("postsCount",postService.findAllPosts().size());
-
-        //系统设置
-        model.addAttribute("options",HaloConst.OPTIONS);
 
         //用户信息
         List<User> users = userService.findAllUser();

@@ -18,11 +18,31 @@ import java.io.Serializable;
 @Entity
 @Table(name = "halo_link")
 public class Link implements Serializable{
+
+    /**
+     * 友情链接编号
+     */
     @Id
     @GeneratedValue
     private Long linkId;
+
+    /**
+     * 友情链接名称
+     */
     private String linkName;
+
+    /**
+     * 友情链接地址
+     */
     private String linkUrl;
+
+    /**
+     * 友情链接头像
+     */
     private String linkPic;
+
+    /**
+     * 友情链接描述
+     */
     private String linkDesc;
 }

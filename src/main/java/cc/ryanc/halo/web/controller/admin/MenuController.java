@@ -34,7 +34,6 @@ public class MenuController {
      */
     @GetMapping
     public String menu(Model model){
-        model.addAttribute("options", HaloConst.OPTIONS);
         List<Menu> menus = menuService.findAllMenus();
         model.addAttribute("menus",menus);
         return "/admin/admin_menu";

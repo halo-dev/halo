@@ -8,17 +8,29 @@ import java.util.List;
 /**
  * @author : RYAN0UP
  * @version : 1.0
- * description :
  * @date : 2018/1/20
+ * description : 文章归档数据
  */
 @Data
 public class Archive {
 
+    /**
+     * 年份
+     */
     private String year;
 
+    /**
+     * 月份
+     */
     private String month;
 
+    /**
+     * 对应的文章数
+     */
     private String count;
 
+    /**
+     * 对应的文章
+     */
     private List<Post> posts;
 }

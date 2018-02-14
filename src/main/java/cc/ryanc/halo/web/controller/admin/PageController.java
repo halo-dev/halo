@@ -30,8 +30,7 @@ public class PageController {
     private LinkService linkService;
 
     @GetMapping
-    public String pages(Model model){
-        model.addAttribute("options", HaloConst.OPTIONS);
+    public String pages(){
         return "admin/admin_page";
     }
 
@@ -45,7 +44,6 @@ public class PageController {
     public String links(Model model){
         List<Link> links = linkService.findAllLinks();
         model.addAttribute("links",links);
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_link";
     }
 
@@ -60,7 +58,6 @@ public class PageController {
     public String toEditLink(Model model,@PathParam("linkId") Long linkId){
         Link link = linkService.findByLinkId(linkId);
         model.addAttribute("link",link);
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_link-update";
     }
 

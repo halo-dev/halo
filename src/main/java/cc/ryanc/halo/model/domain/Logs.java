@@ -11,9 +11,9 @@ import java.util.Date;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
- * description :
  * @date : 2018/1/19
+ * @version : 1.0
+ * description : 操作日志实体类
  */
 @Data
 @Entity

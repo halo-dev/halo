@@ -39,13 +39,13 @@
                 </li>
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/images/default.png</#if>" class="user-image" alt="User Image">
-                        <span class="hidden-xs">${user.userDisplayName?if_exists}</span>
+                        <img src="<#if user_session.userAvatar?if_exists!="">${user_session.userAvatar}<#else >/static/images/default.png</#if>" class="user-image" alt="User Image">
+                        <span class="hidden-xs">${user_session.userDisplayName?if_exists}</span>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="user-header">
-                            <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
-                            <p>${user.userDisplayName?if_exists}</p>
+                            <img src="<#if user_session.userAvatar?if_exists!="">${user_session.userAvatar}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
+                            <p>${user_session.userDisplayName?if_exists}</p>
                         </li>
                         <li class="user-footer">
                             <div class="pull-left"><a href="/admin/profile" class="btn btn-default btn-flat">个人资料</a></div>

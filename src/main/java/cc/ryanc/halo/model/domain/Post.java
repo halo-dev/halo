@@ -84,7 +84,9 @@ public class Post implements Serializable{
             inverseJoinColumns = {@JoinColumn(name = "tag_id",nullable = false)})
     private List<Tag> tags = new ArrayList<>();
 
-
+    /**
+     * 文章的评论
+     */
     @OneToMany(mappedBy = "post",cascade = {CascadeType.REMOVE},fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Comment> comments = new ArrayList<>();

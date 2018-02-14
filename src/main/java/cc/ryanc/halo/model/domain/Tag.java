@@ -10,18 +10,30 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
- * description :
  * @date : 2018/1/12
+ * @version : 1.0
+ * description : 文章标签实体类
  */
 @Data
 @Entity
 @Table(name = "halo_tag")
 public class Tag implements Serializable{
+
+    /**
+     * 标签编号
+     */
     @Id
     @GeneratedValue
     private Long tagId;
+
+    /**
+     * 标签名称
+     */
     private String tagName;
+
+    /**
+     * 标签路径
+     */
     private String tagUrl;
 
     @ManyToMany(mappedBy = "tags")

@@ -9,9 +9,9 @@ import javax.persistence.Table;
 
 /**
  * @author : RYAN0UP
+ * @date : 2018/1/24
  * @version : 1.0
  * description :
- * @date : 2018/1/24
  */
 @Data
 @Entity

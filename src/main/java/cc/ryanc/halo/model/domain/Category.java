@@ -18,11 +18,27 @@ import java.util.List;
 @Entity
 @Table(name = "halo_category")
 public class Category implements Serializable{
+
+    /**
+     * 分类编号
+     */
     @Id
     @GeneratedValue
     private Long cateId;
+
+    /**
+     * 分类名称
+     */
     private String cateName;
+
+    /**
+     * 分类路径
+     */
     private String cateUrl;
+
+    /**
+     * 分类描述
+     */
     private String cateDesc;
 
     @ManyToMany(mappedBy = "categories")

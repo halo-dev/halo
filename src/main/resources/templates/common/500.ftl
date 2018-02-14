@@ -22,7 +22,7 @@
             </div>
             <div class="infos">
                 <div class="infos-main">
-                    <div class="infos-h1"><h1>500内部错误</h1></div>
+                    <div class="infos-h1"><h1>500</h1></div>
                     <div class="infos-h2">
                         <a href="javascript:window.history.back()" title="返回上一页">
                             <i class="fa fa-chevron-left"></i>

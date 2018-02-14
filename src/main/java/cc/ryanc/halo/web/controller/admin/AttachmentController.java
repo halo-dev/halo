@@ -63,7 +63,6 @@ public class AttachmentController {
         Pageable pageable = new PageRequest(page,size,sort);
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments",attachments);
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_attachment";
     }
 

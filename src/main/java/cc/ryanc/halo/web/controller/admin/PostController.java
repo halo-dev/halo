@@ -70,7 +70,6 @@ public class PostController extends BaseController{
         model.addAttribute("publishCount",postService.findPostByStatus(0,pageable).getTotalElements());
         model.addAttribute("draftCount",postService.findPostByStatus(1,pageable).getTotalElements());
         model.addAttribute("trashCount",postService.findPostByStatus(2,pageable).getTotalElements());
-        model.addAttribute("options", HaloConst.OPTIONS);
         model.addAttribute("status",status);
 
         return "admin/admin_post";
@@ -95,7 +94,6 @@ public class PostController extends BaseController{
             Sort sort = new Sort(Sort.Direction.DESC,"postId");
             Pageable pageable = new PageRequest(page,size,sort);
             model.addAttribute("posts",postService.searchPosts(keyword,pageable));
-            model.addAttribute("options", HaloConst.OPTIONS);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -113,7 +111,6 @@ public class PostController extends BaseController{
     public String viewPost(@PathParam("postId") Long postId,Model model){
         Post post = postService.findByPostId(postId);
         model.addAttribute("post",post);
-        model.addAttribute("options", HaloConst.OPTIONS);
         return this.render("post");
     }
 
@@ -127,7 +124,6 @@ public class PostController extends BaseController{
         try {
             List<Category> categories = categoryService.findAllCategories();
             model.addAttribute("categories",categories);
-            model.addAttribute("options", HaloConst.OPTIONS);
             model.addAttribute("btnPush","发布");
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
@@ -239,7 +235,6 @@ public class PostController extends BaseController{
             List<Category> categories = categoryService.findAllCategories();
             model.addAttribute("categories",categories);
             model.addAttribute("btnPush","更新");
-            model.addAttribute("options", HaloConst.OPTIONS);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
