@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Link;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.LinkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,5 +110,15 @@ public class PageController {
             log.error("未知错误："+e.getMessage());
         }
         return "redirect:/admin/page/links";
+    }
+
+    /**
+     * 图库管理
+     *
+     * @return String
+     */
+    @GetMapping(value = "/gallery")
+    public String gallery(){
+        return "";
     }
 }

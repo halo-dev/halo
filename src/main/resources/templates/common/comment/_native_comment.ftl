@@ -1,90 +1,109 @@
 <style>
-    input[type=text],textarea{
-        width: 100%;
-        outline: none;
-        font-size: 16px;
-    }
-    input[type=text]{
-        height: 40px;
-        font-size: 16px;
-        opacity: 0.8;
-        border-top: none;
-        border-left: none;
-        border-right: none;
-        border-bottom: 1px dashed #70c09f;
-    }
-    input[type=text]:focus{
-        border-bottom: 1px dashed red;
-    }
-    textarea{
-        opacity: 0.8;
-        border: 1px dashed #70c09f;
-    }
-    #native-comment{
-        padding : 10px;
-    }
-    #inputAuthor,#inputAuthorEmail,#inputAuthorUrl,#inputContent{
-        padding: 0;
-        margin-bottom: 10px;
-    }
-    #btn-push{
-        border: 1px solid #000;
-        background: transparent;
-        width: 65px;
-        height: 35px;
-        transition: all .5s ease-in-out;
-    }
-    #btn-push:hover{
-        border: none;
-        background: #000;
-        color: #fff;
+    *{
+        box-sizing: border-box;
     }
 
-    #comments-list ul{
+    .native-comment{
+        padding: 10px;
+    }
+
+    .native-wrap{
+        border: 1px solid #f0f0f0;
+        padding: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    input,textarea,button{
+        outline: none;
+    }
+
+    .comment-header{
+        width: 100%;
+        line-height: 1.8;
+    }
+
+    .comment-input-who,.comment-input-email,.comment-input-website{
+        width: 33.33%;
+        padding: 10px 0;
+        font-size: .8rem;
+        float: left;
+        border: none;
+        border-bottom: 1px dashed #dedede;
+    }
+
+    .comment-input:focus{
+        border-bottom: 1px dashed red;
+    }
+
+    .comment-input-content{
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        border: none;
+        padding: 10px 0;
+    }
+
+    .comment-footer{
+        text-align: right;
+        vertical-align: middle;
+    }
+
+    .comment-submit{
+        border-radius: 0;
+        vertical-align: middle;
+        padding: 7px 14px;
+        font-size: .9rem;
+        cursor: pointer;
+        border: 1px solid #ededed;
+        background: #ededed;
+        color: #313131;
+    }
+
+    .native-list{
         width: 100%;
         list-style: none;
         margin: 0 auto;
         padding: 0;
-        font-weight: 400;
-        letter-spacing: 0;
-        font-size: 14px;
     }
-    .vcard{
-        padding-top: 1.5rem;
+
+    .native-list .native-list-one{
+        padding-top: 10px;
         position: relative;
         display: block;
-        list-style: none;
-        margin: 0 auto;
-        padding: 0;
+        transition: all .3s ease-in-out;
     }
-    .vimg{
+
+    .native-list .native-list-one .native-list-one-img{
         width: 2.5rem;
         height: 2.5rem;
         float: left;
         border-radius: 50%;
-        margin-right: .7525rem;
+        margin-right: .7rem;
     }
-    .v .vlist .vcard section {
+
+    .native-list .native-list-one section{
         overflow: hidden;
         padding-bottom: 1.5rem;
         border-bottom: 1px dashed #f5f5f5;
     }
-     .vhead {
+
+    .native-list .native-list-one section .native-list-one-head{
         line-height: 1.5;
         margin-bottom: .625rem;
         margin-top: 0;
     }
-     .vcontent {
-        word-wrap: break-word;
-        word-break: break-all;
-        text-align: justify;
-        color: #4a4a4a;
+
+    .native-list-one-head-name{
         font-size: .875rem;
-        line-height: 2;
-        position: relative;
-        margin-bottom: .75rem;
+        font-weight: 700;
+        margin-right: .875rem;
+        cursor: pointer;
+        text-decoration: none;
+        color: #555;
     }
-    .vsys {
+
+    .ua{
         display: inline-block;
         padding: .2rem .5rem;
         background: #ededed;
@@ -93,67 +112,90 @@
         border-radius: .2rem;
         margin-right: .3rem;
     }
-    .vtime {
+
+    .native-list-one-content p{
+        font-size: 14px;
+        letter-spacing: 0;
+        margin: 0 0 1pc;
+        font-weight: 400;
+    }
+
+    .native-list-one-footer-time{
         color: #b3b3b3;
         font-size: .75rem;
         margin-right: .875rem;
     }
+
+    .native-list-one-footer-reback{
+        font-size: .8125rem;
+        color: #ef2f11;
+        cursor: pointer;
+    }
+
+
+    @media screen and (max-width:560px){
+        .comment-input-who,.comment-input-email,.comment-input-website{
+            width: 100%;
+        }
+    }
 </style>
-<div id="native-comment">
-    <div class="row" style="margin: 0">
-        <form action="/newComment" method="post" id="comment-form">
+<div class="native-comment">
+    <div class="native-wrap">
+        <div class="comment-header">
             <input type="hidden" name="postId" value="${post.postId}">
-            <div class="col-lg-12 col-xs-12" id="inputContent">
-                <textarea rows="5" name="commentContent" placeholder="赶快评论一个吧！" style="resize: none;"></textarea>
-            </div>
-            <div class="col-lg-4 col-xs-12" id="inputAuthor">
-                <input name="commentAuthor" type="text" placeholder="昵称">
-            </div>
-            <div class="col-lg-4 col-xs-12" id="inputAuthorEmail">
-                <input name="commentAuthorEmail" type="text" placeholder="邮箱">
-            </div>
-            <div class="col-lg-4 col-xs-12" id="inputAuthorUrl">
-                <input name="commentAuthorUrl" type="text" placeholder="链接(http/https)">
-            </div>
-            <div class="col-lg-12" style="padding: 0;">
-                <input class="pull-right" type="button" id="btn-push" value="提交">
-            </div>
-        </form>
-        <div class="commentCount" style="display:block;">
-            <div class="vcount col">
-                <span class="vnum">${comments.totalElements}</span> 评论
-            </div>
+            <input type="text" class="comment-input comment-input-who" name="commentAuthor" placeholder="昵称">
+            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" placeholder="邮箱">
+            <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" placeholder="网址(https/http)">
         </div>
-        <div class="col-lg-12" style="padding: 0;">
-            <div id="comments-list">
-                <ul>
-                    <#list comments.content as comment>
-                    <li class="vcard">
-                        <img class="vimg" src="https://gravatar.cat.net/avatar/36a181c9a5a9ab58f0212a216ac677f4?d=identicon">
-                        <section>
-                            <div class="vhead">
-                                <a class="vname" rel="nofollow" href="https://ryanc.cc" target="_blank">${comment.commentAuthor}</a>
-                                <span class="vsys">Chrome 63.0.3239.84</span>
-                                <span class="vsys">Mac OS 10.12.6</span>
-                            </div>
-                            <div class="vcontent">
-                                <p>${comment.commentContent?if_exists}</p>
-                            </div>
-                            <div class="vfooter">
-                                <span class="vtime">${comment.commentDate?string("yyyy-MM-dd")}</span>
-                                <div>
-                                </div>
-                            </div>
-                        </section>
-                    </li>
-                    </#list>
-                </ul>
-            </div>
+        <div class="comment-content">
+            <textarea class="comment-input-content" name="commentContent" placeholder="come on"></textarea>
         </div>
+        <div class="comment-footer">
+            <button type="button" class="comment-submit" id="btn-push">提交</button>
+        </div>
+    </div>
+    <div class="native-info" style="padding-top: 5px;font-size: 12px;color: #0F192A;">
+
+    </div>
+    <ul class="native-list">
+
+    </ul>
+    <div class="native-loading" style="text-align: center;padding-top: 5px">
+        <img src="/static/images/tail-spin.svg" width="36" alt="">
     </div>
 </div>
 <script src="/static/plugins/jquery/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+<script src="//cdn.bootcss.com/UAParser.js/0.7.7/ua-parser.min.js"></script>
 <script>
+    $(document).ready(function(){
+        $.ajax({
+            type: "get",
+            async: true,
+            url: "/getComment/${post.postId}",
+            dataType: "json",
+            success: function(data){
+                setTimeout(function(){
+                    $('.native-loading').hide();
+                },2000);
+                $.each(data,function(i,element){
+                    $.ua.set(element.commentAgent);
+                    var uua = $.ua;
+                    var browser = uua.browser.name+' '+uua.browser.version;
+                    var os = uua.os.name + ' ' + uua.os.version;
+                    var author = element.commentAuthor;
+                    var authorEmail = element.commentAuthorEmail;
+                    var authorUrl = element.commentAuthorUrl;
+                    var timestamp = element.commentDate;
+                    var date = new Date(timestamp).toLocaleDateString();
+                    var content = element.commentContent;
+                    var authorPic = md5(authorEmail);
+                    $('.native-list').append("<li class=\"native-list-one\"><img class=\"native-list-one-img\" src=\"http://www.gravatar.com/avatar/"+authorPic+"?s=256&d=${options.native_comment_avatar?default('default')}\"><section><div class=\"native-list-one-head\"><a class=\"native-list-one-head-name\" rel=\"nofollow\" href=\""+authorUrl+"\" target=\"_blank\">"+author+"</a> <span class=\"ua\">"+browser+"</span> <span class=\"ua\">"+os+"</span></div><div class=\"native-list-one-content\"><p>"+content+"</p></div><div class=\"native-list-one-footer\"><span class=\"native-list-one-footer-time\">"+date+"</span> <span rid=\"5a58569744d904006a970794\" at=\"@舍的研习室\" mail=\"veganshe@163.com\" class=\"native-list-one-footer-reback\">回复</span></div></section></li>");
+                });
+                $('.native-info').append("<span id=\"native-info-total\">${post.comments?size}</span>条评论");
+            }
+        });
+    });
     $('#btn-push').click(function () {
         $.ajax({
             type: 'POST',
@@ -164,7 +206,9 @@
                 'commentContent' : $('textarea[name=commentContent]').val(),
                 'commentAuthor' : $('input[name=commentAuthor]').val(),
                 'commentAuthorEmail' : $('input[name=commentAuthorEmail]').val(),
-                'commentAuthorUrl' : $('input[name=commentAuthorUrl]').val()
+                'commentAuthorUrl' : $('input[name=commentAuthorUrl]').val(),
+                'commentAgent' : navigator.userAgent,
+                'commentAuthorAvatarMd5' : md5($('input[name=commentAuthorEmail]').val())
             },
             success: function (data) {
                 if(data=="success"){

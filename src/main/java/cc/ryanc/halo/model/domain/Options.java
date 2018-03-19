@@ -19,6 +19,8 @@ import java.io.Serializable;
 @Table(name = "halo_options")
 public class Options implements Serializable {
 
+    private static final long serialVersionUID = -4065369084341893446L;
+
     /**
      * 设置项名称
      */

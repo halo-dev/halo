@@ -16,11 +16,11 @@
         el: '#valine-comment',
         notify: notify,
         verify: verify,
-        appId: "${options.valine_appid}",
-        appKey: "${options.valine_appkey}",
-        placeholder: "${options.valine_placeholder}",
+        appId: "${options.valine_appid?if_exists}",
+        appKey: "${options.valine_appkey?if_exists}",
+        placeholder: "${options.valine_placeholder?if_exists}",
         pageSize:'10',
-        avatar:'${options.valine_avatar}',
+        avatar:'${options.valine_avatar?if_exists}',
         lang:'zh-cn'
     });
 </script>

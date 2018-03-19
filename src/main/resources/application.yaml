@@ -8,6 +8,7 @@ spring:
     # H2database 配置
     driver-class-name: org.h2.Driver
     url: jdbc:h2:file:~/halo/halo_db
+    # url: jdbc:h2:mem:halo_db
     username: admin
     password: 123456
     # MySQL配置
@@ -46,9 +47,15 @@ spring:
   cache:
     ehcache:
       config: ehcache.xml
+
+  mail:
+    host: smtp.163.com
+    username: ryan0up@163.com
+    password: wangdashen666
 # 设置日志输出路径
 logging:
   file: ./logs/log.log
+
 
 
 

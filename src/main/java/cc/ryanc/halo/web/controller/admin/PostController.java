@@ -140,9 +140,6 @@ public class PostController extends BaseController{
     @ResponseBody
     public void pushPost(@ModelAttribute Post post,@RequestParam("cateList") List<String> cateList, HttpSession session){
         try{
-            for(String a:cateList){
-                System.out.println(a);
-            }
             //提取摘要
             int postSummary = 50;
             if(HaloUtil.isNotNull(HaloConst.OPTIONS.get("post_summary"))){
@@ -154,7 +151,7 @@ public class PostController extends BaseController{
             }
             post.setPostDate(HaloUtil.getDate());
             //发表用户
-            User user = (User)session.getAttribute("user");
+            User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
@@ -212,7 +209,6 @@ public class PostController extends BaseController{
         try{
             Post post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
-            log.info("删除的文章为："+post.getPostTitle());
             logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());

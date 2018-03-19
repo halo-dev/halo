@@ -23,6 +23,14 @@ public interface CommentService {
     void saveByComment(Comment comment);
 
     /**
+     * 删除评论
+     *
+     * @param commentId
+     * @return comment
+     */
+    Comment removeByCommentId(Long commentId);
+
+    /**
      * 查询所有的评论，用于后台管理
      *
      * @param status status

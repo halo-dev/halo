@@ -19,6 +19,8 @@ import java.util.List;
 @Table(name = "halo_tag")
 public class Tag implements Serializable{
 
+    private static final long serialVersionUID = -7501342327884372194L;
+
     /**
      * 标签编号
      */

@@ -17,6 +17,8 @@ import java.util.Date;
 @Table(name = "halo_comment")
 public class Comment implements Serializable {
 
+    private static final long serialVersionUID = -6639021627094260505L;
+
     /**
      * 评论id 自增
      */
@@ -52,6 +54,11 @@ public class Comment implements Serializable {
     private String commentAuthorIp;
 
     /**
+     * 评论人的头像，用于gavatar
+     */
+    private String commentAuthorAvatarMd5;
+
+    /**
      * 评论时间
      */
     private Date commentDate;
@@ -68,11 +75,21 @@ public class Comment implements Serializable {
     private String commentAgent;
 
     /**
+     * 评论页面的路径
+     */
+    private String commentPageUrl;
+
+    /**
+     * 评论页面的标题
+     */
+    private String commentPageTitle;
+
+    /**
      * 上一级
      */
-    @OneToOne
-    @JoinColumn(name = "comment_id")
-    private Comment commentParent;
+    //@OneToOne
+    //@JoinColumn(name = "comment_id")
+    //private Comment commentParent;
 
     /**
      * 评论状态，0：正常，1：待审核，2：回收站

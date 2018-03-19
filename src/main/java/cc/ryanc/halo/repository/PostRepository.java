@@ -2,7 +2,6 @@ package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.Archive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -116,7 +115,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
      * @param pageable pageable
      * @return page
      */
-    @Query(value = "select * from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by ?#{#pageable}",countQuery = "select * from halo_post",nativeQuery = true)
+    @Query(value = "select * from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by ?#{#pageable}",countQuery = "select count(*) from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month",nativeQuery = true)
     Page<Post> findPostByYearAndMonth(@Param("year") String year,@Param("month") String month,Pageable pageable);
 
     List<Post> findPostByCategories(Category category);

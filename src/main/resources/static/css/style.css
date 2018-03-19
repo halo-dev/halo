@@ -2,19 +2,19 @@
     皮肤颜色附加
  */
 .skin-blue .box.box-primary{
-    border-top-color: #3c8dbc;
+    border-top-color: #fff;
 }
 
 .skin-blue .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #3c8dbc;
+    border-top-color: #fff;
 }
 
 .skin-blue-light .box.box-primary{
-    border-top-color: #3c8dbc;
+    border-top-color: #fff;
 }
 
 .skin-blue-light .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #3c8dbc;
+    border-top-color: #fff;
 }
 
 .skin-black .box.box-primary{
@@ -34,67 +34,67 @@
 }
 
 .skin-green .box.box-primary{
-    border-top-color: #00a65a;
+    border-top-color: #fff;
 }
 
 .skin-green .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #00a65a;
+    border-top-color: #fff;
 }
 
 .skin-green-light .box.box-primary{
-    border-top-color: #00a65a;
+    border-top-color: #fff;
 }
 
 .skin-green-light .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #00a65a;
+    border-top-color: #fff;
 }
 
 .skin-purple .box.box-primary{
-    border-top-color: #605ca8;
+    border-top-color: #fff;
 }
 
 .skin-purple .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #605ca8;
+    border-top-color: #fff;
 }
 
 .skin-purple-light .box.box-primary{
-    border-top-color: #605ca8;
+    border-top-color: #fff;
 }
 
 .skin-purple-light .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #605ca8;
+    border-top-color: #fff;
 }
 
 .skin-red .box.box-primary{
-    border-top-color: #dd4b39;
+    border-top-color: #fff;
 }
 
 .skin-red .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #dd4b39;
+    border-top-color: #fff;
 }
 
 .skin-red-light .box.box-primary{
-    border-top-color: #dd4b39;
+    border-top-color: #fff;
 }
 
 .skin-red-light .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #dd4b39;
+    border-top-color: #fff;
 }
 
 .skin-yellow .box.box-primary{
-    border-top-color: #f39c12;
+    border-top-color: #fff;
 }
 
 .skin-yellow .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #f39c12;
+    border-top-color: #fff;
 }
 
 .skin-yellow-light .box.box-primary{
-    border-top-color: #f39c12;
+    border-top-color: #fff;
 }
 
 .skin-yellow-light .nav-tabs-custom > .nav-tabs > li.active{
-    border-top-color: #f39c12;
+    border-top-color: #fff;
 }
 .layout-boxed {
     background: url('../images/boxed-bg.jpg') repeat fixed;

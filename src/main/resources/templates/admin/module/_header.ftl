@@ -25,9 +25,9 @@
                                     <li>
                                         <a href="/admin/comments?status=1">
                                             <div class="pull-left">
-                                                <img src="/static/images/ryan0up.png" class="img-circle" alt="User Image">
+                                                <img src="http://www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=gravatar" class="img-circle" alt="User Image">
                                             </div>
-                                            <h4>${comment.commentAuthor}<small>${comment.commentDate}</small></h4>
+                                            <h5>${comment.commentAuthor}<small> ${comment.commentDate}</small></h5>
                                             <p>${comment.commentContent}</p>
                                         </a>
                                     </li>

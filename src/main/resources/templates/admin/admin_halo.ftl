@@ -11,6 +11,7 @@
                 border-left: 4px solid #dddddd;
                 padding: 0 15px;
                 color: #777777;
+                font-size: 16px;
             }
         </style>
         <section class="content-header">
@@ -29,8 +30,10 @@
                     <p>非常感谢你使用Halo进行创作。</p>
                 </blockquote>
                 <p>目前该博客系统为beta测试版，有可能会出现一些莫名奇妙的bug，所以希望各位在使用过程中及时向我反馈：</p>
-                <p>Github issues ：<a href='https://github.com/ruibaby/halo'>https://github.com/ruibaby/halo</a></p>
+                <p>Github issues ：<a href='https://github.com/ruibaby/halo' target="_blank">https://github.com/ruibaby/halo</a></p>
+                <p>Blog : <a href="https://ryanc.cc" target="_blank">https://ryanc.cc</a> </p>
                 <p>Email : <a href='mailto:i@ryanc.cc'>i@ryanc.cc</a></p>
+                <p>Telegram : <a href="https://telegram.me/RYAN0UP" target="_blank">RYAN0UP</a></p>
                 <p>QQ : 709831589</p>
             </div>
         </section>

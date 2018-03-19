@@ -29,4 +29,50 @@ public class MenuServiceImpl implements MenuService{
     public List<Menu> findAllMenus() {
         return menuRepository.findAll();
     }
+
+    /**
+     * 新增菜单
+     *
+     * @param menu menu
+     * @return Menu
+     */
+    @Override
+    public Menu saveByMenu(Menu menu) {
+        return menuRepository.save(menu);
+    }
+
+    /**
+     * 删除菜单
+     *
+     * @param menuId menuId
+     * @return menu
+     */
+    @Override
+    public Menu removeByMenuId(Long menuId) {
+        Menu menu = this.findByMenuId(menuId);
+        menuRepository.delete(menu);
+        return menu;
+    }
+
+    /**
+     * 修改菜单
+     *
+     * @param menu menu
+     * @return Menu
+     */
+    @Override
+    public Menu updateByMenu(Menu menu) {
+        return menuRepository.save(menu);
+    }
+
+    /**
+     * 根据编号查询菜单
+     *
+     * @param menuId menuId
+     * @return Menu
+     */
+    @Override
+    public Menu findByMenuId(Long menuId) {
+        return menuRepository.findOne(menuId);
+    }
 }

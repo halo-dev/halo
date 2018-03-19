@@ -10,11 +10,10 @@
 	<description>
 		halo，一个基于SpringBoot的博客系统，最求轻快，易用，以内容为中心。
 	</description>
-	<!-- 填坑的人 -->
 	<developers>
 		<developer>
 			<id>RYAN0UP</id>
-			<name>Ruiyuan Wang</name>
+			<name>Ryan Wang</name>
 			<email>i@ryanc.cc</email>
 			<url>https://ryanc.cc</url>
 		</developer>
@@ -23,7 +22,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.9.RELEASE</version>
+		<version>1.5.10.RELEASE</version>
 		<relativePath/>
 	</parent>
 
@@ -94,7 +93,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- enCache -->
+		<!-- ehCache -->
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>

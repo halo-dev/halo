@@ -36,7 +36,7 @@
                         </div>
                         <form class="form-horizontal" id="widgetsOption">
                             <div class="box-body">
-                                <div class="col-sm-6">
+                                <div class="col-sm-6 col-xs-6">
                                     <div class="form-group">
                                         <label for="widgetPostCount" class="col-sm-4 control-label">文章总数：</label>
                                         <div class="col-sm-8">
@@ -82,7 +82,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
+                                <div class="col-sm-6 col-xs-6">
                                     <div class="form-group">
                                         <label for="widgetPostLastest" class="col-sm-4 control-label">最新文章：</label>
                                         <div class="col-sm-8">
@@ -342,7 +342,7 @@
                     title: '所有日志',
                     shadeClose: true,
                     shade: 0.5,
-                    area: ['66%', '66%'],
+                    area: ['90%', '90%'],
                     content: '/admin/logs',
                     scrollbar: false
                 });

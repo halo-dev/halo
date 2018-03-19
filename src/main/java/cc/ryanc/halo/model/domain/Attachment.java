@@ -20,6 +20,8 @@ import java.util.Date;
 @Table(name = "halo_attachment")
 public class Attachment implements Serializable{
 
+    private static final long serialVersionUID = 3060117944880138064L;
+
     /**
      * 附件编号
      */

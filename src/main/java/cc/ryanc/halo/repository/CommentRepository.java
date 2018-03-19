@@ -43,7 +43,7 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
      * @param status status
      * @return page
      */
-    Page<Comment> findCommentsByPostAndCommentStatus(Post post,Pageable pageable,Integer status);
+    Page<Comment> findCommentsByPostAndCommentStatusNot(Post post,Pageable pageable,Integer status);
 
     /**
      * 查询最新的前五条评论

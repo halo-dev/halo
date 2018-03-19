@@ -9,6 +9,7 @@ import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ResourceUtils;
@@ -64,6 +65,7 @@ public class InstallController {
     @PostMapping(value = "/do")
     @ResponseBody
     public boolean doInstall(@RequestParam("siteTitle") String siteTitle,
+                            @RequestParam("siteUrl") String siteUrl,
                             @RequestParam("userName") String userName,
                             @RequestParam("userDisplayName") String userDisplayName,
                             @RequestParam("userEmail") String userEmail,
@@ -79,10 +81,14 @@ public class InstallController {
 
             //保存title设置
             optionsService.saveOption("site_title",siteTitle);
+            optionsService.saveOption("site_url",siteUrl);
 
             //创建新的用户
             User user=  new User();
             user.setUserName(userName);
+            if(StringUtils.isBlank(userDisplayName)){
+                userDisplayName = userName;
+            }
             user.setUserDisplayName(userDisplayName);
             user.setUserEmail(userEmail);
             user.setUserPass(HaloUtil.getMD5(userPwd));
@@ -116,6 +122,9 @@ public class InstallController {
 
             //建立网站时间
             optionsService.saveOption("site_start",HaloUtil.getStringDate("yyyy-MM-dd"));
+
+            //默认评论系统
+            optionsService.saveOption("comment_system","native");
 
             //更新日志
             logsService.saveByLogs(

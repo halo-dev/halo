@@ -5,7 +5,7 @@ import org.junit.Test;
 /**
  * @author : RYAN0UP
  * @date : 2017/12/26
- * @version: 1.0
+ * @version : 1.0
  * description:
  */
 public class DemoUtilTest {

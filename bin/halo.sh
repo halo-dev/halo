@@ -1,8 +1,8 @@
 #!/bin/bash
-APP_NAME=halo-beta.jar
+APP_NAME=halo-*.jar
 
 usage() {
-    echo "用法: sh halo.sh [start|stop|restart|status]"
+    echo "用法: sh halo.sh [start(启动)|stop(停止)|restart(重启)|status(状态)]"
     exit 1
 }
 
@@ -18,10 +18,10 @@ is_exist(){
 start(){
   is_exist
   if [ $? -eq "0" ]; then
-    echo "${APP_NAME} is already running. pid=${pid} ."
+    echo "${APP_NAME} 正在运行。 pid=${pid} ."
   else
     nohup java -jar $APP_NAME > /dev/null 2>&1 &
-    echo "${APP_NAME} is starting..."
+    echo "${APP_NAME}启动成功，请查看日志确保运行正常。"
     fi
 }
 
@@ -29,18 +29,18 @@ stop(){
   is_exist
   if [ $? -eq "0" ]; then
     kill -9 $pid
-    echo "${pid} will be killing"
+    echo "${pid} 进程已被杀死，程序停止运行"
   else
-    echo "${APP_NAME} is not running"
+    echo "${APP_NAME} 没有运行。"
   fi
 }
 
 status(){
   is_exist
   if [ $? -eq "0" ]; then
-    echo "${APP_NAME} is running. Pid is ${pid}"
+    echo "${APP_NAME} 正在运行。Pid is ${pid}"
   else
-    echo "${APP_NAME} is NOT running."
+    echo "${APP_NAME} 没有运行。"
   fi
 }
 

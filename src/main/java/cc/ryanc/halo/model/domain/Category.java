@@ -19,6 +19,8 @@ import java.util.List;
 @Table(name = "halo_category")
 public class Category implements Serializable{
 
+    private static final long serialVersionUID = 8383678847517271505L;
+
     /**
      * 分类编号
      */

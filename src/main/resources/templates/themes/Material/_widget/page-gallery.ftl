@@ -21,12 +21,17 @@
 
     <!-- Main -->
     <div id="main">
-        <article class="thumb">
-            <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_1.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_1.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_1.jpeg" alt="2016长江" /></a>
-            <h2>2016长江</h2>
-            <p>2016-04-04</p>
-        </article>
+        <#list galleries as gallery>
+            <article class="thumb">
+                <a href="${gallery.galleryThumbnailUrl}" class="image lazy" data-original="${gallery.galleryThumbnailUrl}">
+                    <img class="lazy" data-original="${gallery.galleryUrl}" alt="${gallery.galleryDesc}" />
+                </a>
+                <h2>${gallery.galleryName}</h2>
+                <p>${gallery.galleryDate?string("yyyy-MM-dd")}</p>
+            </article>
+        </#list>
 
+        <!--
         <article class="thumb">
             <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_2.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_2.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_2.jpeg" alt="2016日落" /></a>
             <h2>2016日落</h2>
@@ -62,6 +67,7 @@
             <h2>2017重庆B</h2>
             <p>2017-5-4</p>
         </article>
+        -->
     </div>
     <!-- Footer -->
     <!--

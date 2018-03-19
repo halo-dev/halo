@@ -20,6 +20,8 @@ import java.util.Date;
 @Table(name = "halo_logs")
 public class Logs implements Serializable {
 
+    private static final long serialVersionUID = -2571815432301283171L;
+
     /**
      * id
      */

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * @author : RYAN0UP
@@ -16,7 +17,9 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "halo_menu")
-public class Menu {
+public class Menu implements Serializable {
+
+    private static final long serialVersionUID = -7726233157376388786L;
 
     /**
      * 编号 自增

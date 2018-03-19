@@ -34,6 +34,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
+     * 删除评论
+     *
+     * @param comment
+     */
+    @Override
+    public Comment removeByCommentId(Long commentId) {
+        Comment comment = this.findCommentById(commentId);
+        commentRepository.delete(comment);
+        return comment;
+    }
+
+    /**
      * 查询所有的评论，用于后台管理
      *
      * @param pageable pageable
@@ -101,7 +113,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status) {
-        return commentRepository.findCommentsByPostAndCommentStatus(post,pageable,status);
+        return commentRepository.findCommentsByPostAndCommentStatusNot(post,pageable,status);
     }
 
     /**

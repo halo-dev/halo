@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Category;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +48,7 @@ public class CategoryController {
     @PostMapping(value = "/save")
     public String saveCategory(@ModelAttribute Category category){
         try{
-            Category backCate = categoryService.saveByCategory(category);
-            log.info("新添加的分类目录为："+backCate);
+            categoryService.saveByCategory(category);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -118,13 +116,8 @@ public class CategoryController {
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model,@PathParam("cateId") Long cateId){
-        try{
-            Category category = categoryService.findByCateId(cateId);
-            model.addAttribute("category",category);
-            log.info("cateId为"+cateId+"的数据为："+category);
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
-        }
+        Category category = categoryService.findByCateId(cateId);
+        model.addAttribute("category",category);
         return "admin/admin_cate-update";
     }
 }

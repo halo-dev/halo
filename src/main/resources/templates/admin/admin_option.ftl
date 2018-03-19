@@ -72,7 +72,7 @@
                                         <div class="form-group">
                                             <label for="siteUrl" class="col-sm-2 control-label">网站链接：</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="siteUrl" name="site_url" value="${options.site_url?default('localhost:8080')}">
+                                                <input type="text" class="form-control" id="siteUrl" name="site_url" value="${options.site_url?default('http://localhost:8080')}">
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -173,17 +173,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="col-sm-2 control-label">文章分享：</label>
-                                            <div class="col-sm-4">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="share_post" value="true" ${((options.share_post?default('true'))=='true')?string('checked','')}> 开启
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="share_post" value="false" ${((options.share_post?default('true'))=='false')?string('checked','')}> 关闭
-                                                </label>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="box-footer">
                                         <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('postOptions')">保存</button>
@@ -223,18 +212,21 @@
                                         <!-- 原生设置 -->
                                         <div class="native-options" style="display: none">
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">是否启用：
-                                                    <span data-toggle="tooltip" data-placement="top" title="其他第三方评论系统在后台无法管理" style="cursor: pointer">
+                                                <label class="col-sm-2 control-label">评论者头像：
+                                                    <span data-toggle="tooltip" data-placement="top" title="为用户评论者默认设置一个邮箱" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
                                                 </label>
                                                 <div class="col-sm-4">
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="comment_system" value="native" disabled> 启用
-                                                    </label>
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="comment_system" value="valine"> 禁用
-                                                    </label>
+                                                    <select class="form-control" id="nativeCommentAvatar" name="native_comment_avatar">
+                                                        <option value="default" ${((options.native_comment_avatar?default('default'))=='default')?string('selected','')}>神秘人</option>
+                                                        <option value="gravatar" ${((options.native_comment_avatar?default('default'))=='gravatar')?string('selected','')}>Gravatar标志</option>
+                                                        <option value="identicon" ${((options.native_comment_avatar?default('default'))=='identicon')?string('selected','')}>抽象几何图形</option>
+                                                        <option value="monsterid" ${((options.native_comment_avatar?default('default'))=='monsterid')?string('selected','')}>小怪物</option>
+                                                        <option value="wavatar" ${((options.native_comment_avatar?default('default'))=='wavatar')?string('selected','')}>Wavatar</option>
+                                                        <option value="retro" ${((options.native_comment_avatar?default('default'))=='retro')?string('selected','')}>复古</option>
+                                                        <option value="hide" ${((options.native_comment_avatar?default('default'))=='hide')?string('selected','')}>不显示头像</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -448,24 +440,18 @@
                                                 <input type="text" class="form-control" id="emailSmtpHost" name="mail_smtp_host" value="${options.mail_smtp_host?if_exists}">
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="box-body">
                                         <div class="form-group">
                                             <label for="emailSmtpUserName" class="col-sm-2 control-label">邮箱账号：</label>
                                             <div class="col-sm-4">
                                                 <input type="text" class="form-control" id="emailSmtpUserName" name="mail_smtp_username" value="${options.mail_smtp_username?if_exists}">
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="box-body">
                                         <div class="form-group">
                                             <label for="emailSmtpPassword" class="col-sm-2 control-label">邮箱密码：</label>
                                             <div class="col-sm-4">
                                                 <input type="password" class="form-control" id="emailSmtpPassword" name="mail_smtp_password" value="${options.mail_smtp_password?if_exists}">
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="box-body">
                                         <div class="form-group">
                                             <label for="emailFromName" class="col-sm-2 control-label">发件姓名：</label>
                                             <div class="col-sm-4">

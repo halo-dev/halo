@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -53,6 +55,9 @@ public class IndexController extends BaseController{
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private GalleryService galleryService;
 
     @Autowired
     private MailService mailService;
@@ -186,14 +191,32 @@ public class IndexController extends BaseController{
         List<Menu> menus = menuService.findAllMenus();
         model.addAttribute("menus",menus);
 
-        //该文章的评论
-        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
-        Pageable pageable = new PageRequest(0,10,sort);
-        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
-        model.addAttribute("comments",comments);
+//        //该文章的评论
+//        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
+//        Pageable pageable = new PageRequest(0,10,sort);
+//        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
+//        model.addAttribute("comments",comments);
 
         model.addAttribute("archives",archives);
         return this.render("post");
+    }
+
+    /**
+     * 获取文章的评论
+     * @param postId postId
+     * @return page
+     */
+    @GetMapping(value = "/getComment/{postId}",produces = { "application/json;charset=UTF-8" })
+    @ResponseBody
+    public List<Comment> getComment(@PathVariable Long postId){
+        Post post = postService.findByPostId(postId);
+        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
+        Pageable pageable = new PageRequest(0,10,sort);
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2).getContent();
+        if(null==comments){
+            return null;
+        }
+        return comments;
     }
 
     /**
@@ -216,7 +239,9 @@ public class IndexController extends BaseController{
      * @return String
      */
     @GetMapping(value = "/gallery")
-    public String gallery(){
+    public String gallery(Model model){
+        List<Gallery> galleries = galleryService.findAllGalleries();
+        model.addAttribute("galleries",galleries);
         return this.render("gallery");
     }
 
@@ -368,10 +393,12 @@ public class IndexController extends BaseController{
     public String archives(Model model,
                            @PathVariable(value = "year") String year,
                            @PathVariable(value = "month") String month){
+        log.info(year);
+        log.info(month);
 
         //根据年月查出的文章数据，分页
         Sort sort = new Sort(Sort.Direction.DESC,"post_date");
-        Pageable pageable = new PageRequest(0,9999,sort);
+        Pageable pageable = new PageRequest(0,5,sort);
         Page<Post> posts = postService.findPostByYearAndMonth(year,month,pageable);
         model.addAttribute("posts",posts);
 
@@ -447,10 +474,20 @@ public class IndexController extends BaseController{
     public String newComment(@ModelAttribute("comment") Comment comment,
                              @ModelAttribute("post") Post post,
                              HttpServletRequest request){
+        comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
         comment.setPost(post);
         comment.setCommentDate(new Date());
         comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
         commentService.saveByComment(comment);
+
+        //发送邮件到博主
+        Map<String,Object> map = new HashMap<>();
+        map.put("author",userService.findAllUser().get(0).getUserDisplayName());
+        map.put("pageName",postService.findByPostId(post.getPostId()).getPostTitle());
+        map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
+        map.put("visitor",comment.getCommentAuthor());
+        map.put("commentContent",comment.getCommentContent());
+        mailService.sendTemplateMail("i@ryanc.cc","有新的评论",map,"common/mail/mail_admin.ftl");
         return "success";
     }
 }

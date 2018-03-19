@@ -42,10 +42,10 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/login")
                 .excludePathPatterns("/admin/getLogin");
-        registry.addInterceptor(installInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/install")
-                .excludePathPatterns("/install/do");
+        //registry.addInterceptor(installInterceptor)
+        //        .addPathPatterns("/**")
+        //        .excludePathPatterns("/install")
+        //        .excludePathPatterns("/install/do");
         registry.addInterceptor(commonInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/admin/getLogin")
@@ -70,7 +70,8 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
                 .excludePathPatterns("/sitemap")
                 .excludePathPatterns("/sitemap.xml")
                 .excludePathPatterns("/newComment")
-                .excludePathPatterns("/install/do");
+                .excludePathPatterns("/install/do")
+                .excludePathPatterns("/getComment/{postId}");
     }
 
     /**

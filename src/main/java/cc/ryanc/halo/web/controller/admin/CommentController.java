@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
+import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.web.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import javax.websocket.server.PathParam;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author : RYAN0UP
@@ -35,6 +41,9 @@ public class CommentController extends BaseController{
 
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 渲染评论管理页面
@@ -68,7 +77,7 @@ public class CommentController extends BaseController{
      * @return string
      */
     @GetMapping(value = "/throw")
-    public String moveToTrash(@RequestParam("commentId") Long commentId,
+    public String moveToTrash(@PathParam("commentId") Long commentId,
                               HttpSession session){
         try {
             commentService.updateCommentStatus(commentId,2);
@@ -87,17 +96,47 @@ public class CommentController extends BaseController{
      * @return string
      */
     @GetMapping("/revert")
-    public String moveToPublish(@RequestParam("commentId") Long commentId,
-                                @RequestParam("status") Integer status,
+    public String moveToPublish(@PathParam("commentId") Long commentId,
+                                @PathParam("status") Integer status,
                                 HttpSession session){
+        Comment comment = commentService.updateCommentStatus(commentId,0);
+
+        Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
+        Matcher matcher = patternEmail.matcher(comment.getCommentAuthorEmail());
+
+        if(status==1&&matcher.find()){
+            Map<String,Object> map = new HashMap<>();
+            map.put("pageUrl",comment.getPost().getPostUrl());
+            map.put("pageName",comment.getPost().getPostTitle());
+            map.put("commentContent",comment.getCommentContent());
+            map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
+            map.put("siteTitle",HaloConst.OPTIONS.get("site_title"));
+            map.put("author",userService.findAllUser().get(0).getUserDisplayName());
+            mailService.sendTemplateMail(
+                    comment.getCommentAuthorEmail(),
+                    "您在"+HaloConst.OPTIONS.get("site_title")+"的评论已审核通过！",map,"common/mail/mail_passed.ftl");
+        }
+        this.getNewComments(session);
+        return "redirect:/admin/comments?status="+status;
+    }
+
+    /**
+     * 删除评论
+     *
+     * @param commentId commentId
+     * @param status status
+     * @param session session
+     * @return string
+     */
+    @GetMapping("/remove")
+    public String moveToAway(@PathParam("commentId") Long commentId,
+                             @PathParam("status") Integer status,
+                             HttpSession session){
         try{
-            Comment comment = commentService.updateCommentStatus(commentId,0);
-            if(status==1){
-                mailService.sendMail(comment.getCommentAuthorEmail(),"你在"+ HaloConst.OPTIONS.get("site_title")+"的评论已通过审核","你在"+comment.getPost().getPostTitle()+"的评论已经通过审核！");
-            }
+            commentService.removeByCommentId(commentId);
             this.getNewComments(session);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("删除评论失败："+e.getMessage());
         }
         return "redirect:/admin/comments?status="+status;
     }

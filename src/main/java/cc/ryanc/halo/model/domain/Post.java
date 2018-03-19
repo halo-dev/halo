@@ -17,6 +17,9 @@ import java.util.*;
 @Entity
 @Table(name = "halo_post")
 public class Post implements Serializable{
+
+    private static final long serialVersionUID = -6019684584665869629L;
+
     /**
      * 文章编号
      */

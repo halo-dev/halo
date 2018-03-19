@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -37,5 +39,21 @@ public class MenuController {
         List<Menu> menus = menuService.findAllMenus();
         model.addAttribute("menus",menus);
         return "/admin/admin_menu";
+    }
+
+    /**
+     * 新增菜单
+     *
+     * @param menu menu
+     * @return string
+     */
+    @PostMapping(value = "/save")
+    public String saveMenu(@ModelAttribute Menu menu){
+        try{
+            menuService.saveByMenu(menu);
+        }catch (Exception e){
+            log.error("保存菜单失败："+e.getMessage());
+        }
+        return "redirect:/admin/menu";
     }
 }

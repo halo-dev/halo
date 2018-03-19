@@ -8,24 +8,11 @@
             </div>
             <div class="navbar-menu pull-right hidden-xs">
                 <ul>
-                    <li>
-                        <a href="/" style="color: rgb(235, 67, 125);!important;">HOME</a>
-                    </li>
-                    <li>
-                        <a href="/links">LINK</a>
-                    </li>
-                    <li>
-                        <a href="/archives">ARCHIVES</a>
-                    </li>
-                    <li>
-                        <a href="#">ABOUT ME</a>
-                    </li>
-                    <li>
-                        |
-                    </li>
-                    <li>
-                        <a href="/admin/login" target="_blank" style="font-size: 16px;color: rgb(129, 129, 129);!important;">SIGN IN</a>
-                    </li>
+                    <#list menus?sort_by('menuSort') as menu>
+                        <li>
+                            <a href="${menu.menuUrl}">${menu.menuName}</a>
+                        </li>
+                    </#list>
                 </ul>
             </div>
         </div>

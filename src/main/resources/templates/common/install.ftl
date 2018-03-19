@@ -22,7 +22,7 @@
                 position: absolute;
                 top: 40%;
                 left: 50%;
-                transform: translate(-50%, -60%);
+                transform: translate(-50%, -50%);
             }
             .form-horizontal .control-label{
                 text-align: left;
@@ -33,7 +33,7 @@
     <body>
         <div class="container">
             <div class="row row-centered">
-                <div class="col-lg-4 vertical-center">
+                <div class="col-lg-4 col-xs-11 vertical-center">
                     <div class="logo animated fadeInUp">
                         Halo<small style="font-size: 14px;">安装向导</small>
                     </div>
@@ -43,7 +43,13 @@
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
                                     <label for="siteTitle" class="col-sm-4 control-label">网站标题：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="siteTitle" name="siteTitle">
+                                        <input type="text" class="form-control" id="siteTitle" name="siteTitle" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
+                                    <label for="siteUrl" class="col-sm-4 control-label">网站地址：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="siteUrl" name="siteUrl" value="">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
@@ -53,7 +59,7 @@
                                         </span>
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="userEmail" name="userEmail">
+                                        <input type="text" class="form-control" id="userEmail" name="userEmail" value="">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.3s">
@@ -63,7 +69,7 @@
                                         </span>
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="userName" name="userName">
+                                        <input type="text" class="form-control" id="userName" name="userName" value="">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.4s">
@@ -73,19 +79,19 @@
                                         </span>
                                     </label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="userDisplayName" name="userDisplayName">
+                                        <input type="text" class="form-control" id="userDisplayName" name="userDisplayName" value="">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.5s">
                                     <label for="userPwd" class="col-sm-4 control-label">登录密码：</label>
                                     <div class="col-sm-8">
-                                        <input type="password" class="form-control" id="userPwd" name="userPwd">
+                                        <input type="password" class="form-control" id="userPwd" name="userPwd" value="">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.6s">
                                     <label for="userRePwd" class="col-sm-4 control-label">确认密码：</label>
                                     <div class="col-sm-8">
-                                        <input type="password" class="form-control" id="userRePwd" name="userRePwd">
+                                        <input type="password" class="form-control" id="userRePwd" name="userRePwd" value="">
                                     </div>
                                 </div>
                             </div>
@@ -122,10 +128,12 @@
     <script src="/static/plugins/bootstrapvalidator/js/bootstrapValidator.min.js"></script>
     <script src="/static/plugins/bootstrapvalidator/js/language/zh_CN.js"></script>
     <script>
+        var domain = window.location.host;
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         });
         $(document).ready(function () {
+            $('#siteUrl').val("http://"+domain);
             $('#installForm')
                 .bootstrapValidator({
                     message: '安装表单验证失败',

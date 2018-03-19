@@ -56,16 +56,16 @@
                                             <td>
                                                 <#switch comment.commentStatus>
                                                     <#case 0>
-                                                    <button class="btn btn-info btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">回复</button>
+                                                    <button class="btn btn-info btn-sm btn-flat" onclick="modelShow()">回复</button>
                                                     <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 1>
                                                     <a class="btn btn-info btn-sm btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
-                                                    <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">删除</button>
+                                                    <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 2>
                                                     <a class="btn btn-info btn-sm btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
-                                                    <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">删除</button>
+                                                    <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId}&status=2','确定要永久删除？')">删除</button>
                                                     <#break >
                                                 </#switch>
                                             </td>
