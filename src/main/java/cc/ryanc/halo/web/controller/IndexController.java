@@ -474,7 +474,7 @@ public class IndexController extends BaseController{
      */
     @GetMapping(value = {"sitemap","sitemap.xml"},produces = { "application/xml;charset=UTF-8" })
     @ResponseBody
-    public String sitemap(){
+    public String siteMap(){
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
         Pageable pageable = new PageRequest(0,999,sort);
@@ -492,7 +492,7 @@ public class IndexController extends BaseController{
      */
     @PostMapping(value = "/newComment")
     @ResponseBody
-    public String newComment(@ModelAttribute("comment") Comment comment,
+    public boolean newComment(@ModelAttribute("comment") Comment comment,
                              @ModelAttribute("post") Post post,
                              HttpServletRequest request){
         comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
@@ -515,6 +515,6 @@ public class IndexController extends BaseController{
                 log.error("邮件服务器未配置："+e.getMessage());
             }
         }
-        return "success";
+        return true;
     }
 }

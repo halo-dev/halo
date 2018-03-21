@@ -55,7 +55,7 @@ public interface CommentService {
      * @param status status
      * @return comment
      */
-    Optional<Comment> updateCommentStatus(Long commentId,Integer status);
+    Comment updateCommentStatus(Long commentId,Integer status);
 
     /**
      * 根据评论编号查询评论

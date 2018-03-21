@@ -43,10 +43,10 @@ public class TagServiceImpl implements TagService {
      * @return Tag
      */
     @Override
-    public Optional<Tag> removeByTagId(Long tagId) {
+    public Tag removeByTagId(Long tagId) {
         Optional<Tag> tag = findByTagId(tagId);
         tagRepository.delete(tag.get());
-        return tag;
+        return tag.get();
     }
 
     /**

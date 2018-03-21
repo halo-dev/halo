@@ -6,7 +6,6 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -256,13 +255,13 @@ public class PostController extends BaseController{
      */
     @GetMapping(value = "/updateSummary")
     @ResponseBody
-    public String updateSummary(@PathParam("postSummary") Integer postSummary){
+    public boolean updateSummary(@PathParam("postSummary") Integer postSummary){
         try {
             postService.updateAllSummary(postSummary);
-            return RespStatus.SUCCESS;
+            return true;
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
-            return RespStatus.ERROR;
+            return false;
         }
     }
 
@@ -274,12 +273,12 @@ public class PostController extends BaseController{
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public String checkUrlExists(@PathParam("postUrl") String postUrl){
+    public boolean checkUrlExists(@PathParam("postUrl") String postUrl){
         Post post = postService.findByPostUrl(postUrl);
         if(null!=post){
-            return RespStatus.EXISTS;
+            return true;
         }else{
-            return RespStatus.NOTEXISTS;
+            return false;
         }
     }
 }

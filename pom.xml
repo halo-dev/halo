@@ -10,6 +10,7 @@
 	<description>
 		halo，一个基于SpringBoot的博客系统，最求轻快，易用，以内容为中心。
 	</description>
+
 	<developers>
 		<developer>
 			<id>RYAN0UP</id>

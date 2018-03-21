@@ -48,10 +48,10 @@ public class CategoryServiceImpl implements CategoryService{
      */
     @CacheEvict(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
     @Override
-    public Optional<Category> removeByCateId(Long cateId) {
+    public Category removeByCateId(Long cateId) {
         Optional<Category> category = this.findByCateId(cateId);
         categoryRepository.delete(category.get());
-        return category;
+        return category.get();
     }
 
     /**

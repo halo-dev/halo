@@ -4,7 +4,6 @@ import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.util.HaloUtil;
@@ -20,9 +19,12 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Optional;
 
 /**
@@ -120,14 +122,21 @@ public class AttachmentController {
                 Attachment attachment = new Attachment();
                 attachment.setAttachName(fileName);
                 attachment.setAttachPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(fileName).toString());
-                attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
+                System.out.println(mediaPath.getAbsolutePath()+"/"+fileName);
+                //判断图片大小，如果长宽都小于500，则保存原始图片路径
+                BufferedImage sourceImg = ImageIO.read(new FileInputStream(mediaPath.getPath()+"/"+fileName));
+                if(sourceImg.getWidth()<500 && sourceImg.getHeight()<500){
+                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(fileName).toString());
+                }else{
+                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
+                    //剪裁图片
+                    HaloUtil.cutCenterImage(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString(),new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString(),500,500,fileSuffix);
+                }
+
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
                 attachment.setAttachCreated(HaloUtil.getDate());
                 attachmentService.saveByAttachment(attachment);
-
-                //剪裁图片
-                HaloUtil.cutCenterImage(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString(),new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString(),500,500,fileSuffix);
 
                 updateConst();
                 log.info("上传文件["+file.getOriginalFilename()+"]到["+mediaPath.getAbsolutePath()+"]成功");
@@ -168,7 +177,7 @@ public class AttachmentController {
      */
     @GetMapping(value = "/remove")
     @ResponseBody
-    public String removeAttachment(@PathParam("attachId") Long attachId,
+    public boolean removeAttachment(@PathParam("attachId") Long attachId,
                                    HttpServletRequest request){
         Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
         String delFileName = attachment.get().getAttachName();
@@ -183,8 +192,17 @@ public class AttachmentController {
             File mediaPath = new File(basePath.getAbsolutePath(),attachment.get().getAttachPath().substring(0,attachment.get().getAttachPath().lastIndexOf('/')));
             File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
             File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
+
+            BufferedImage sourceImg = ImageIO.read(new FileInputStream(delFile));
+            if(sourceImg.getWidth()>500 && sourceImg.getHeight()>500){
+                if(delSmallFile.exists()){
+                    if(delSmallFile.delete()){
+                        updateConst();
+                    }
+                }
+            }
             if(delFile.exists() && delFile.isFile()){
-                if(delFile.delete()&&delSmallFile.delete()){
+                if(delFile.delete()){
                     updateConst();
                     log.info("删除文件["+delFileName+"]成功！");
                     logsService.saveByLogs(
@@ -192,13 +210,13 @@ public class AttachmentController {
                     );
                 }else{
                     log.error("删除附件["+delFileName+"]失败！");
-                    return RespStatus.ERROR;
+                    return false;
                 }
             }
         }catch (Exception e){
             log.error("删除附件["+delFileName+"]失败！"+e.getMessage());
-            return RespStatus.ERROR;
+            return false;
         }
-        return RespStatus.SUCCESS;
+        return true;
     }
 }

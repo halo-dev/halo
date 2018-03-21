@@ -76,10 +76,10 @@ public class CommentServiceImpl implements CommentService {
      * @return comment
      */
     @Override
-    public Optional<Comment> updateCommentStatus(Long commentId, Integer status) {
+    public Comment updateCommentStatus(Long commentId, Integer status) {
         Optional<Comment> comment = findCommentById(commentId);
-        commentRepository.save(comment.get());
-        return comment;
+        comment.get().setCommentStatus(status);
+        return commentRepository.save(comment.get());
     }
 
     /**

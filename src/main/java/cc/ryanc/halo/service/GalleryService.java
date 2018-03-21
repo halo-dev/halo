@@ -28,7 +28,7 @@ public interface GalleryService {
      *
      * @param galleryId galleryId
      */
-    Optional<Gallery> removeByGalleryId(Long galleryId);
+    Gallery removeByGalleryId(Long galleryId);
 
     /**
      * 修改图片信息

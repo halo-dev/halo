@@ -27,7 +27,7 @@ public interface TagService {
      * @param tagId tagId
      * @return Tag
      */
-    Optional<Tag> removeByTagId(Long tagId);
+    Tag removeByTagId(Long tagId);
 
     /**
      * 更新标签

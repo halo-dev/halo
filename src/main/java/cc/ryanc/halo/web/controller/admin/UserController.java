@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -48,20 +47,20 @@ public class UserController {
      */
     @PostMapping(value = "save")
     @ResponseBody
-    public String saveProfile(@ModelAttribute User user,HttpSession session){
+    public boolean saveProfile(@ModelAttribute User user,HttpSession session){
         try{
             if(null!=user){
                 userService.saveByUser(user);
                 session.invalidate();
             }else{
                 log.error("用户信息不能为空值");
-                return RespStatus.ERROR;
+                return false;
             }
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
-            return RespStatus.ERROR;
+            return false;
         }
-        return RespStatus.SUCCESS;
+        return true;
     }
 
     /**
@@ -73,7 +72,7 @@ public class UserController {
      */
     @PostMapping(value = "changePass")
     @ResponseBody
-    public String changePass(@ModelAttribute("beforePass") String beforePass,
+    public boolean changePass(@ModelAttribute("beforePass") String beforePass,
                              @ModelAttribute("newPass") String newPass,
                              @ModelAttribute("userId") Long userId,
                              HttpSession session){
@@ -86,12 +85,12 @@ public class UserController {
                 session.invalidate();
             }else{
                 log.error("修改密码：原密码错误！");
-                return RespStatus.ERROR;
+                return false;
             }
         }catch (Exception e){
             log.error("修改密码：未知错误，"+e.getMessage());
-            return RespStatus.ERROR;
+            return false;
         }
-        return RespStatus.SUCCESS;
+        return true;
     }
 }

@@ -26,7 +26,7 @@ public interface LinkService {
      * @param linkId linkId
      * @return Link
      */
-    Optional<Link> removeByLinkId(Long linkId);
+    Link removeByLinkId(Long linkId);
 
     /**
      * 修改

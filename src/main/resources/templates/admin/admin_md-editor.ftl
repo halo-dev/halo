@@ -181,7 +181,7 @@
                         'postUrl': $('#newPostUrl').val()
                     },
                     success: function (data) {
-                        if(data=="exists"){
+                        if(data==true){
                             showMsg("该路径已经存在！","info",2000);
                             return;
                         }else{

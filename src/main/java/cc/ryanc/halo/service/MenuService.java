@@ -34,7 +34,7 @@ public interface MenuService {
      * @param menuId menuId
      * @return menu
      */
-    Optional<Menu> removeByMenuId(Long menuId);
+    Menu removeByMenuId(Long menuId);
 
     /**
      * 修改菜单

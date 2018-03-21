@@ -157,7 +157,7 @@
                     url: '/admin/profile/save',
                     data: param,
                     success: function (result) {
-                        if(result=="success"){
+                        if(result==true){
                             $.toast({
                                 text: "保存成功！",
                                 heading: '提示',
@@ -198,7 +198,7 @@
                     url: '/admin/profile/changePass',
                     data: param,
                     success: function (result) {
-                        if(result=="success"){
+                        if(result==true){
                             $.toast({
                                 text: "修改密码成功！",
                                 heading: '提示',

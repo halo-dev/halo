@@ -40,10 +40,10 @@ public class GalleryServiceImpl implements GalleryService{
      * @param galleryId galleryId
      */
     @Override
-    public Optional<Gallery> removeByGalleryId(Long galleryId) {
+    public Gallery removeByGalleryId(Long galleryId) {
         Optional<Gallery> gallery = this.findByGalleryId(galleryId);
         galleryRepository.delete(gallery.get());
-        return gallery;
+        return gallery.get();
     }
 
     /**

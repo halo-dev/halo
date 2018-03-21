@@ -34,6 +34,7 @@
                     <div class="logo animated fadeInUp">
                         Halo<small style="font-size: 14px;">安装向导</small>
                     </div>
+                    <#if isInstall==false>
                     <form method="post" action="/install/do" class="form-horizontal" id="installForm">
                         <div class="box box-solid animated" id="installFirst">
                             <div class="box-body" style="padding: 30px;">
@@ -116,6 +117,11 @@
                             </div>
                         </div>
                     </form>
+                    <#else >
+                    <div class="animated fadeInUp" style="animation-delay: 0.1s">
+                        <h4>已经安装过了，不能重复安装的酱紫！</h4>
+                    </div>
+                    </#if>
                 </div>
             </div>
         </div>
@@ -124,6 +130,7 @@
     <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/plugins/bootstrapvalidator/js/bootstrapValidator.min.js"></script>
     <script src="/static/plugins/bootstrapvalidator/js/language/zh_CN.js"></script>
+    <#if isInstall==false>
     <script>
         var domain = window.location.host;
         $(function () {
@@ -215,4 +222,7 @@
                 });
         });
     </script>
+    <#else>
+    <noscript>Not have Script!</noscript>
+    </#if>
 </html>

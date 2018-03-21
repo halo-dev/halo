@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.OptionsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +42,16 @@ public class OptionController {
      */
     @PostMapping(value = "/save")
     @ResponseBody
-    public String saveOptions(@RequestParam Map<String,String> options){
+    public boolean saveOptions(@RequestParam Map<String,String> options){
         try {
             optionsService.saveOptions(options);
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
             log.info("所保存的设置选项列表："+options);
-            return RespStatus.SUCCESS;
+            return true;
         }catch (Exception e){
             log.error("未知错误：",e.getMessage());
-            return RespStatus.ERROR;
+            return false;
         }
     }
 }

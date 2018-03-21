@@ -31,7 +31,7 @@ public interface PostService {
      * @param postId postId
      * @return Post
      */
-    Optional<Post> removeByPostId(Long postId);
+    Post removeByPostId(Long postId);
 
     /**
      * 修改文章

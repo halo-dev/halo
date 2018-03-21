@@ -54,10 +54,10 @@ public class PostServiceImpl implements PostService {
      */
     @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
-    public Optional<Post> removeByPostId(Long postId) {
+    public Post removeByPostId(Long postId) {
         Optional<Post> post = this.findByPostId(postId);
         postRepository.delete(post.get());
-        return post;
+        return post.get();
     }
 
     /**

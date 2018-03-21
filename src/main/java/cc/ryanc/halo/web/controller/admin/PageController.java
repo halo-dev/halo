@@ -101,8 +101,8 @@ public class PageController {
     @GetMapping(value = "/links/remove")
     public String removeLink(@PathParam("linkId") Long linkId){
         try{
-            Optional<Link> link = linkService.removeByLinkId(linkId);
-            log.info("删除的友情链接："+link.get());
+            Link link = linkService.removeByLinkId(linkId);
+            log.info("删除的友情链接："+link);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }

@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,12 +67,12 @@ public class CategoryController {
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public String checkCateUrlExists(@RequestParam("cateUrl") String cateUrl){
+    public boolean checkCateUrlExists(@RequestParam("cateUrl") String cateUrl){
         Category category = categoryService.findByCateUrl(cateUrl);
         if(null!=category){
-            return RespStatus.EXISTS;
+            return true;
         }else{
-            return RespStatus.NOTEXISTS;
+            return false;
         }
     }
 
@@ -86,8 +85,8 @@ public class CategoryController {
     @GetMapping(value = "/remove")
     public String removeCategory(@PathParam("cateId") Long cateId){
         try{
-            Optional<Category> category = categoryService.removeByCateId(cateId);
-            log.info("删除的分类目录："+category.get());
+            Category category = categoryService.removeByCateId(cateId);
+            log.info("删除的分类目录："+category);
         } catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }

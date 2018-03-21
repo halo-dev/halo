@@ -169,9 +169,8 @@
                     data: {
                         'siteTheme': site_theme
                     },
-                    dataType: 'text',
-                    success: function (result) {
-                        if(result=="success"){
+                    success: function (data) {
+                        if(data==true){
                             $.toast({
                                 text: "设置中...",
                                 heading: '提示',

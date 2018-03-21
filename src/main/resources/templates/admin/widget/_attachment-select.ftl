@@ -70,7 +70,7 @@
         language: 'zh',
         uploadUrl: '/admin/attachments/upload',
         uploadAsync: true,
-        allowedFileExtensions: ['jpg','gif','png'],
+        allowedFileExtensions: ['jpg','gif','png','jpeg','svg'],
         maxFileCount: 10,
         enctype : 'multipart/form-data',
         showClose: false

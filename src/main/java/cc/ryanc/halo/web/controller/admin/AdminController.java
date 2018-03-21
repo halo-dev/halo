@@ -6,7 +6,6 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -116,7 +115,7 @@ public class AdminController extends BaseController{
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
-    public String getLogin(@ModelAttribute("loginName") String loginName,
+    public boolean getLogin(@ModelAttribute("loginName") String loginName,
                            @ModelAttribute("loginPwd") String loginPwd,
                            HttpSession session){
         try {
@@ -132,14 +131,14 @@ public class AdminController extends BaseController{
                 session.setAttribute(HaloConst.USER_SESSION_KEY, users.get(0));
                 log.info("用户["+ users.get(0).getUserName()+"]登录成功！");
                 logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_SUCCESS,HaloUtil.getIpAddr(request), HaloUtil.getDate()));
-                return RespStatus.SUCCESS;
+                return true;
             }else{
                 logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_ERROR,HaloUtil.getIpAddr(request),new Date()));
             }
         }catch (Exception e){
             log.error("登录失败！："+e.getMessage());
         }
-        return RespStatus.ERROR;
+        return false;
     }
 
     /**

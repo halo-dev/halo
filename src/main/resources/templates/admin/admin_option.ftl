@@ -571,7 +571,7 @@
                         postSummary : $('#postSummary').val()
                     },
                     success: function (data) {
-                        if(data=="success"){
+                        if(data==true){
                             showMsg("所有文章摘要更新成功！","success",1000);
                         }else{
                             showMsg("更新失败！","success",2000);

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,7 +54,18 @@ public class InstallController {
      * @return string
      */
     @GetMapping
-    public String install(){
+    public String install(Model model){
+        try{
+            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            File installFile = new File(basePath.getAbsolutePath(), "install.lock");
+            if(installFile.exists()){
+                model.addAttribute("isInstall",true);
+            }else{
+                model.addAttribute("isInstall",false);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
         return "common/install";
     }
 

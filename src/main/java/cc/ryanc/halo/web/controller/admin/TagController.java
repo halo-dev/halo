@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,12 +67,12 @@ public class TagController {
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public String checkTagUrlExists(@RequestParam("tagUrl") String tagUrl){
+    public boolean checkTagUrlExists(@RequestParam("tagUrl") String tagUrl){
         Tag tag = tagService.findByTagUrl(tagUrl);
         if(null!=tag){
-            return RespStatus.EXISTS;
+            return true;
         }else{
-            return RespStatus.NOTEXISTS;
+            return false;
         }
     }
 
@@ -86,8 +85,8 @@ public class TagController {
     @GetMapping(value = "/remove")
     public String removeTag(@PathParam("tagId") Long tagId){
         try{
-            Optional<Tag> tag = tagService.removeByTagId(tagId);
-            log.info("删除的标签："+tag.get());
+            Tag tag = tagService.removeByTagId(tagId);
+            log.info("删除的标签："+tag);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }

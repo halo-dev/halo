@@ -26,7 +26,7 @@ public interface CategoryService {
      * @param cateId 分类目录编号
      * @return category
      */
-    Optional<Category> removeByCateId(Long cateId);
+    Category removeByCateId(Long cateId);
 
     /**
      * 修改分类目录信息

@@ -263,7 +263,7 @@
                                                     <#break >
                                                     </#switch>
                                                 </td>
-                                                <td>${comment.commentDate}</td>
+                                                <td>${comment.commentDate?string("yyyy-MM-dd HH:mm")}</td>
                                             </tr>
                                         </#list>
                                     </tr>
@@ -311,7 +311,7 @@
                                                 <td>${log.logTitle}</td>
                                                 <td>${log.logContent}</td>
                                                 <td>${log.logIp}</td>
-                                                <td>${log.logCreated}</td>
+                                                <td>${log.logCreated?string("yyyy-MM-dd HH:mm")}</td>
                                             </tr>
                                         </#list>
                                     </tr>

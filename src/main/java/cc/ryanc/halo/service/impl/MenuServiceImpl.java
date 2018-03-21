@@ -49,10 +49,10 @@ public class MenuServiceImpl implements MenuService{
      * @return menu
      */
     @Override
-    public Optional<Menu> removeByMenuId(Long menuId) {
+    public Menu removeByMenuId(Long menuId) {
         Optional<Menu> menu = this.findByMenuId(menuId);
         menuRepository.delete(menu.get());
-        return menu;
+        return menu.get();
     }
 
     /**

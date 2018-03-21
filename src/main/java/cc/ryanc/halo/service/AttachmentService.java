@@ -51,5 +51,5 @@ public interface AttachmentService {
      * @param attachId attachId
      * @return Attachment
      */
-    Optional<Attachment> removeByAttachId(Long attachId);
+    Attachment removeByAttachId(Long attachId);
 }

@@ -63,7 +63,7 @@
                     'loginPwd': pwd
                 },
                 success: function (data) {
-                    if(data=="success"){
+                    if(data==true){
                         $.toast({
                             text: "登录成功！",
                             heading: '提示',

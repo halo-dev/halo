@@ -77,9 +77,9 @@ public class AttachmentServiceImpl implements AttachmentService{
      * @return attachment
      */
     @Override
-    public Optional<Attachment> removeByAttachId(Long attachId) {
+    public Attachment removeByAttachId(Long attachId) {
         Optional<Attachment> attachment = this.findByAttachId(attachId);
         attachmentRepository.delete(attachment.get());
-        return attachment;
+        return attachment.get();
     }
 }

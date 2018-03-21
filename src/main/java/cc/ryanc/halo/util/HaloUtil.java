@@ -160,7 +160,7 @@ public class HaloUtil {
      * @param suffix 后缀
      * @throws IOException
      */
-    public static void cutCenterImage(String src,String dest,int w,int h,String suffix) throws IOException{
+    public static void cutCenterImage(String src,String dest,int w,int h,String suffix){
         try{
             Iterator iterator = ImageIO.getImageReadersByFormatName(suffix);
             ImageReader reader = (ImageReader)iterator.next();

@@ -3,7 +3,6 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.dto.RespStatus;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.util.HaloUtil;
@@ -64,7 +63,7 @@ public class ThemeController extends BaseController{
      */
     @GetMapping(value = "/set")
     @ResponseBody
-    public String activeTheme(@PathParam("siteTheme") String siteTheme,
+    public boolean activeTheme(@PathParam("siteTheme") String siteTheme,
                               HttpServletRequest request){
         try {
             //保存主题设置项在数据库
@@ -75,10 +74,10 @@ public class ThemeController extends BaseController{
             logsService.saveByLogs(
                     new Logs(LogsRecord.CHANGE_THEME,"更换为"+siteTheme,HaloUtil.getIpAddr(request),HaloUtil.getDate())
             );
-            return RespStatus.SUCCESS;
+            return true;
         }catch (Exception e){
             log.error("主题设置失败，当前主题为："+BaseController.THEME);
-            return RespStatus.ERROR;
+            return false;
         }
     }
 
@@ -176,7 +175,6 @@ public class ThemeController extends BaseController{
     @ResponseBody
     public boolean saveTpl(@RequestParam("tplName") String tplName,
                           @RequestParam("tplContent") String tplContent){
-        System.out.println(tplContent);
         if(StringUtils.isBlank(tplContent)){
             return false;
         }
