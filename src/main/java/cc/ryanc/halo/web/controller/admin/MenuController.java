@@ -38,6 +38,9 @@ public class MenuController {
     public String menu(Model model){
         List<Menu> menus = menuService.findAllMenus();
         model.addAttribute("menus",menus);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "/admin/admin_menu";
     }
 

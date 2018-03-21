@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -47,9 +48,9 @@ public class LinkServiceImpl implements LinkService {
      */
     @CacheEvict(value = LINK_CACHE_NAME,key = LINK_KEY)
     @Override
-    public Link removeByLinkId(Long linkId) {
-        Link link = this.findByLinkId(linkId);
-        linkRepository.delete(link);
+    public Optional<Link> removeByLinkId(Long linkId) {
+        Optional<Link> link = this.findByLinkId(linkId);
+        linkRepository.delete(link.get());
         return link;
     }
 
@@ -85,7 +86,7 @@ public class LinkServiceImpl implements LinkService {
      */
     @Cacheable(value = LINK_CACHE_NAME,key = "#linkId+'link'")
     @Override
-    public Link findByLinkId(Long linkId) {
-        return linkRepository.findOne(linkId);
+    public Optional<Link> findByLinkId(Long linkId) {
+        return linkRepository.findById(linkId);
     }
 }

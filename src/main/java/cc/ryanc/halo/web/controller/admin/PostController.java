@@ -24,8 +24,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.text.html.Option;
 import javax.websocket.server.PathParam;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -72,6 +74,9 @@ public class PostController extends BaseController{
         model.addAttribute("trashCount",postService.findPostByStatus(2,pageable).getTotalElements());
         model.addAttribute("status",status);
 
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
+
         return "admin/admin_post";
     }
 
@@ -109,8 +114,10 @@ public class PostController extends BaseController{
      */
     @GetMapping(value = "/view")
     public String viewPost(@PathParam("postId") Long postId,Model model){
-        Post post = postService.findByPostId(postId);
-        model.addAttribute("post",post);
+        Optional<Post> post = postService.findByPostId(postId);
+        model.addAttribute("post",post.get());
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("post");
     }
 
@@ -125,6 +132,8 @@ public class PostController extends BaseController{
             List<Category> categories = categoryService.findAllCategories();
             model.addAttribute("categories",categories);
             model.addAttribute("btnPush","发布");
+            //设置选项
+            model.addAttribute("options",HaloConst.OPTIONS);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -207,9 +216,9 @@ public class PostController extends BaseController{
     @GetMapping(value = "/remove")
     public String removePost(@PathParam("postId") Long postId){
         try{
-            Post post = postService.findByPostId(postId);
+            Optional<Post> post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
-            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
+            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -226,11 +235,13 @@ public class PostController extends BaseController{
     @GetMapping(value = "/edit")
     public String editPost(@PathParam("postId") Long postId, Model model){
         try {
-            Post post = postService.findByPostId(postId);
-            model.addAttribute("post",post);
+            Optional<Post> post = postService.findByPostId(postId);
+            model.addAttribute("post",post.get());
             List<Category> categories = categoryService.findAllCategories();
             model.addAttribute("categories",categories);
             model.addAttribute("btnPush","更新");
+            //设置选项
+            model.addAttribute("options",HaloConst.OPTIONS);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }

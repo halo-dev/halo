@@ -47,7 +47,7 @@
                                 <tbody>
                                     <#list comments.content as comment>
                                         <tr>
-                                            <td>${comment.commentAuthor}</td>
+                                            <td><a href="${comment.commentAuthorUrl}" target="_blank">${comment.commentAuthor}</a></td>
                                             <td>${comment.commentContent}</td>
                                             <td>
                                                 <a target="_blank" href="/article/${comment.post.postUrl}">${comment.post.postTitle}</a>

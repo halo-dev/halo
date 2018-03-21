@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -42,7 +43,7 @@ public interface AttachmentService {
      * @param attachId attachId
      * @return Attachment
      */
-    Attachment findByAttachId(Long attachId);
+    Optional<Attachment> findByAttachId(Long attachId);
 
     /**
      * 根据编号移除
@@ -50,5 +51,5 @@ public interface AttachmentService {
      * @param attachId attachId
      * @return Attachment
      */
-    Attachment removeByAttachId(Long attachId);
+    Optional<Attachment> removeByAttachId(Long attachId);
 }

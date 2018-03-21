@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -37,6 +38,8 @@ public class TagController {
     public String tags(Model model){
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("tags",tags);
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_tag";
     }
 
@@ -83,8 +86,8 @@ public class TagController {
     @GetMapping(value = "/remove")
     public String removeTag(@PathParam("tagId") Long tagId){
         try{
-            Tag tag = tagService.removeByTagId(tagId);
-            log.info("删除的标签："+tag);
+            Optional<Tag> tag = tagService.removeByTagId(tagId);
+            log.info("删除的标签："+tag.get());
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -101,9 +104,11 @@ public class TagController {
     @GetMapping(value = "/edit")
     public String toEditTag(Model model,@PathParam("tagId") Long tagId){
         try{
-            Tag tag = tagService.findByTagId(tagId);
-            model.addAttribute("tag",tag);
-            log.info("tagId为"+tagId+"的数据为："+tag);
+            Optional<Tag> tag = tagService.findByTagId(tagId);
+            model.addAttribute("tag",tag.get());
+            //设置选项
+            model.addAttribute("options",HaloConst.OPTIONS);
+            log.info("tagId为"+tagId+"的数据为："+tag.get());
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -119,8 +124,8 @@ public class TagController {
     @PostMapping(value = "/update")
     public String updateTag(@ModelAttribute Tag tag){
         try {
-            Tag beforeTag = tagService.findByTagId(tag.getTagId());
-            log.info("修改之前的数据："+beforeTag+"，修改之后的数据："+tag);
+            Optional<Tag> beforeTag = tagService.findByTagId(tag.getTagId());
+            log.info("修改之前的数据："+beforeTag.get()+"，修改之后的数据："+tag);
             tagService.updateByTag(tag);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());

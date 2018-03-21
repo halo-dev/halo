@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -39,9 +40,9 @@ public class GalleryServiceImpl implements GalleryService{
      * @param galleryId galleryId
      */
     @Override
-    public Gallery removeByGalleryId(Long galleryId) {
-        Gallery gallery = this.findByGalleryId(galleryId);
-        galleryRepository.delete(gallery);
+    public Optional<Gallery> removeByGalleryId(Long galleryId) {
+        Optional<Gallery> gallery = this.findByGalleryId(galleryId);
+        galleryRepository.delete(gallery.get());
         return gallery;
     }
 
@@ -84,7 +85,7 @@ public class GalleryServiceImpl implements GalleryService{
      * @return gallery
      */
     @Override
-    public Gallery findByGalleryId(Long galleryId) {
-        return galleryRepository.findOne(galleryId);
+    public Optional<Gallery> findByGalleryId(Long galleryId) {
+        return galleryRepository.findById(galleryId);
     }
 }

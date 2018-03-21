@@ -2,7 +2,6 @@ package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.web.interceptor.InstallInterceptor;
 import cc.ryanc.halo.web.interceptor.LoginInterceptor;
-import cc.ryanc.halo.web.interceptor.CommonInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,16 +20,15 @@ import org.springframework.web.servlet.config.annotation.*;
 @EnableWebMvc
 @ComponentScan(basePackages = "cc.ryanc.halo.web.controller")
 @PropertySource(value = "classpath:application.yaml",ignoreResourceNotFound = true,encoding = "UTF-8")
-public class MvcConfiguration extends WebMvcConfigurerAdapter {
+public class MvcConfiguration implements WebMvcConfigurer {
+
+
 
     @Autowired
     private LoginInterceptor loginInterceptor;
 
     @Autowired
     private InstallInterceptor installInterceptor;
-
-    @Autowired
-    private CommonInterceptor commonInterceptor;
 
     /**
      * 注册拦截器
@@ -46,32 +44,6 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
         //        .addPathPatterns("/**")
         //        .excludePathPatterns("/install")
         //        .excludePathPatterns("/install/do");
-        registry.addInterceptor(commonInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/admin/getLogin")
-                .excludePathPatterns("/admin/attachments/upload")
-                .excludePathPatterns("/admin/attachments/remove")
-                .excludePathPatterns("/admin/category/checkUrl")
-                .excludePathPatterns("/admin/option/save")
-                .excludePathPatterns("/admin/posts/new/push")
-                .excludePathPatterns("/admin/posts/updateSummary")
-                .excludePathPatterns("/admin/posts/checkUrl")
-                .excludePathPatterns("/admin/tag/checkUrl")
-                .excludePathPatterns("/admin/themes/set")
-                .excludePathPatterns("/admin/themes/upload")
-                .excludePathPatterns("/admin/themes/getTpl")
-                .excludePathPatterns("/admin/themes/editor/save")
-                .excludePathPatterns("/admin/profile/save")
-                .excludePathPatterns("/admin/profile/changePass")
-                .excludePathPatterns("/next")
-                .excludePathPatterns("/feed")
-                .excludePathPatterns("/feed.xml")
-                .excludePathPatterns("/atom.xml")
-                .excludePathPatterns("/sitemap")
-                .excludePathPatterns("/sitemap.xml")
-                .excludePathPatterns("/newComment")
-                .excludePathPatterns("/install/do")
-                .excludePathPatterns("/getComment/{postId}");
     }
 
     /**

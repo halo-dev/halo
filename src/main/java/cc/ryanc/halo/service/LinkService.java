@@ -3,6 +3,7 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.domain.Link;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -25,7 +26,7 @@ public interface LinkService {
      * @param linkId linkId
      * @return Link
      */
-    Link removeByLinkId(Long linkId);
+    Optional<Link> removeByLinkId(Long linkId);
 
     /**
      * 修改
@@ -48,5 +49,5 @@ public interface LinkService {
      * @param linkId linkId
      * @return Link
      */
-    Link findByLinkId(Long linkId);
+    Optional<Link> findByLinkId(Long linkId);
 }

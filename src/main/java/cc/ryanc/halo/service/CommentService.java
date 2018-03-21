@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -25,10 +26,10 @@ public interface CommentService {
     /**
      * 删除评论
      *
-     * @param commentId
+     * @param commentId commentId
      * @return comment
      */
-    Comment removeByCommentId(Long commentId);
+    Optional<Comment> removeByCommentId(Long commentId);
 
     /**
      * 查询所有的评论，用于后台管理
@@ -54,7 +55,7 @@ public interface CommentService {
      * @param status status
      * @return comment
      */
-    Comment updateCommentStatus(Long commentId,Integer status);
+    Optional<Comment> updateCommentStatus(Long commentId,Integer status);
 
     /**
      * 根据评论编号查询评论
@@ -62,7 +63,7 @@ public interface CommentService {
      * @param commentId commentId
      * @return comment
      */
-    Comment findCommentById(Long commentId);
+    Optional<Comment> findCommentById(Long commentId);
 
     /**
      * 根据文章查询评论

@@ -8,6 +8,7 @@ import com.sun.syndication.feed.rss.Content;
 import com.sun.syndication.feed.rss.Item;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
+import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
@@ -547,6 +548,18 @@ public class HaloUtil {
             urlBody+=urlItem;
         }
         return head+urlBody+"</urlset>";
+    }
+
+    /**
+     * 配置邮件
+     * @param smtpHost smtpHost
+     * @param userName 邮件地址
+     * @param password 密码
+     */
+    public static void configMail(String smtpHost,String userName,String password){
+        Properties properties = OhMyEmail.defaultConfig(false);
+        properties.setProperty("mail.smtp.host",smtpHost);
+        OhMyEmail.config(properties,userName,password);
     }
 
 //    public static String importMarkdowns(String filePath) throws Exception{

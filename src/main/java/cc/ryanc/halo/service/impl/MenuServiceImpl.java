@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -48,9 +49,9 @@ public class MenuServiceImpl implements MenuService{
      * @return menu
      */
     @Override
-    public Menu removeByMenuId(Long menuId) {
-        Menu menu = this.findByMenuId(menuId);
-        menuRepository.delete(menu);
+    public Optional<Menu> removeByMenuId(Long menuId) {
+        Optional<Menu> menu = this.findByMenuId(menuId);
+        menuRepository.delete(menu.get());
         return menu;
     }
 
@@ -72,7 +73,7 @@ public class MenuServiceImpl implements MenuService{
      * @return Menu
      */
     @Override
-    public Menu findByMenuId(Long menuId) {
-        return menuRepository.findOne(menuId);
+    public Optional<Menu> findByMenuId(Long menuId) {
+        return menuRepository.findById(menuId);
     }
 }

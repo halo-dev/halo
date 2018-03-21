@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -42,9 +43,9 @@ public class TagServiceImpl implements TagService {
      * @return Tag
      */
     @Override
-    public Tag removeByTagId(Long tagId) {
-        Tag tag = findByTagId(tagId);
-        tagRepository.delete(tag);
+    public Optional<Tag> removeByTagId(Long tagId) {
+        Optional<Tag> tag = findByTagId(tagId);
+        tagRepository.delete(tag.get());
         return tag;
     }
 
@@ -76,8 +77,8 @@ public class TagServiceImpl implements TagService {
      * @return Link
      */
     @Override
-    public Tag findByTagId(Long tagId) {
-        return tagRepository.findOne(tagId);
+    public Optional<Tag> findByTagId(Long tagId) {
+        return tagRepository.findById(tagId);
     }
 
     /**

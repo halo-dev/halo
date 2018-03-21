@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -27,7 +28,7 @@ public interface GalleryService {
      *
      * @param galleryId galleryId
      */
-    Gallery removeByGalleryId(Long galleryId);
+    Optional<Gallery> removeByGalleryId(Long galleryId);
 
     /**
      * 修改图片信息
@@ -56,5 +57,5 @@ public interface GalleryService {
      * @param galleryId galleryId
      * @return gallery
      */
-    Gallery findByGalleryId(Long galleryId);
+    Optional<Gallery> findByGalleryId(Long galleryId);
 }

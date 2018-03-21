@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -54,5 +55,5 @@ public interface LogsService {
      * @param logsId logsId
      * @return logs
      */
-    Logs findLogsByLogsId(Long logsId);
+    Optional<Logs> findLogsByLogsId(Long logsId);
 }

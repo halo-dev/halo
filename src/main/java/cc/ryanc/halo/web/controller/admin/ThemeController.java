@@ -52,6 +52,8 @@ public class ThemeController extends BaseController{
         if(null!=HaloConst.THEMES){
             model.addAttribute("themes",HaloConst.THEMES);
         }
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_theme";
     }
 
@@ -123,6 +125,8 @@ public class ThemeController extends BaseController{
     @GetMapping(value = "/options")
     public String setting(Model model,@RequestParam("theme") String theme){
         model.addAttribute("themeDir",theme);
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "themes/"+theme+"/module/options";
     }
 
@@ -135,6 +139,8 @@ public class ThemeController extends BaseController{
     public String editor(Model model){
         List<String> tpls = HaloUtil.getTplName(BaseController.THEME);
         model.addAttribute("tpls",tpls);
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_theme-editor";
     }
 

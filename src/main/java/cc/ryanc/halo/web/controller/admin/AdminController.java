@@ -84,6 +84,9 @@ public class AdminController extends BaseController{
         model.addAttribute("comments",comments);
 
         model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         this.getNewComments(session);
         return "admin/admin_index";
     }

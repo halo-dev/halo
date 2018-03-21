@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -65,8 +66,8 @@ public class AttachmentServiceImpl implements AttachmentService{
      * @return attachment
      */
     @Override
-    public Attachment findByAttachId(Long attachId) {
-        return attachmentRepository.findOne(attachId);
+    public Optional<Attachment> findByAttachId(Long attachId) {
+        return attachmentRepository.findById(attachId);
     }
 
     /**
@@ -76,9 +77,9 @@ public class AttachmentServiceImpl implements AttachmentService{
      * @return attachment
      */
     @Override
-    public Attachment removeByAttachId(Long attachId) {
-        Attachment attachment = this.findByAttachId(attachId);
-        attachmentRepository.delete(attachment);
+    public Optional<Attachment> removeByAttachId(Long attachId) {
+        Optional<Attachment> attachment = this.findByAttachId(attachId);
+        attachmentRepository.delete(attachment.get());
         return attachment;
     }
 }

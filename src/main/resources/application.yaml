@@ -27,7 +27,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
 
   # freemarker配置
   freemarker:
@@ -40,18 +40,9 @@ spring:
     expose-session-attributes: false
     expose-spring-macro-helpers: false
     suffix: .ftl
-  http:
-    multipart:
-      max-file-size: 10Mb
-      max-request-size: 10Mb
   cache:
     ehcache:
       config: ehcache.xml
-
-  mail:
-    host: smtp.163.com
-    username: ryan0up@163.com
-    password: wangdashen666
 # 设置日志输出路径
 logging:
   file: ./logs/log.log

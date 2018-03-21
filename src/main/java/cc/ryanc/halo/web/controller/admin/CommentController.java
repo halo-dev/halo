@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,6 +68,9 @@ public class CommentController extends BaseController{
         model.addAttribute("checkCount",commentService.findAllComments(1,pageable).getTotalElements());
         model.addAttribute("trashCount",commentService.findAllComments(2,pageable).getTotalElements());
         model.addAttribute("status",status);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_comment";
     }
 
@@ -99,22 +103,29 @@ public class CommentController extends BaseController{
     public String moveToPublish(@PathParam("commentId") Long commentId,
                                 @PathParam("status") Integer status,
                                 HttpSession session){
-        Comment comment = commentService.updateCommentStatus(commentId,0);
+        Optional<Comment> comment = commentService.updateCommentStatus(commentId,0);
 
         Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-        Matcher matcher = patternEmail.matcher(comment.getCommentAuthorEmail());
+        Matcher matcher = patternEmail.matcher(comment.get().getCommentAuthorEmail());
 
-        if(status==1&&matcher.find()){
-            Map<String,Object> map = new HashMap<>();
-            map.put("pageUrl",comment.getPost().getPostUrl());
-            map.put("pageName",comment.getPost().getPostTitle());
-            map.put("commentContent",comment.getCommentContent());
-            map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
-            map.put("siteTitle",HaloConst.OPTIONS.get("site_title"));
-            map.put("author",userService.findAllUser().get(0).getUserDisplayName());
-            mailService.sendTemplateMail(
-                    comment.getCommentAuthorEmail(),
-                    "您在"+HaloConst.OPTIONS.get("site_title")+"的评论已审核通过！",map,"common/mail/mail_passed.ftl");
+        //判断是否启用邮件服务
+        if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable"))) {
+            try {
+                if (status == 1 && matcher.find()) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("pageUrl", comment.get().getPost().getPostUrl());
+                    map.put("pageName", comment.get().getPost().getPostTitle());
+                    map.put("commentContent", comment.get().getCommentContent());
+                    map.put("siteUrl", HaloConst.OPTIONS.get("site_url"));
+                    map.put("siteTitle", HaloConst.OPTIONS.get("site_title"));
+                    map.put("author", userService.findAllUser().get(0).getUserDisplayName());
+                    mailService.sendTemplateMail(
+                            comment.get().getCommentAuthorEmail(),
+                            "您在" + HaloConst.OPTIONS.get("site_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
+                }
+            } catch (Exception e) {
+                log.error("邮件服务器未配置：" + e.getMessage());
+            }
         }
         this.getNewComments(session);
         return "redirect:/admin/comments?status="+status;

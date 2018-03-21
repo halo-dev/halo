@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -30,7 +31,7 @@ public interface PostService {
      * @param postId postId
      * @return Post
      */
-    Post removeByPostId(Long postId);
+    Optional<Post> removeByPostId(Long postId);
 
     /**
      * 修改文章
@@ -103,7 +104,7 @@ public interface PostService {
      * @param postId postId
      * @return Post
      */
-    Post findByPostId(Long postId);
+    Optional<Post> findByPostId(Long postId);
 
     /**
      * 根据文章路径查询

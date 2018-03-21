@@ -1,9 +1,6 @@
 package cc.ryanc.halo.web.controller;
 
-import cc.ryanc.halo.model.domain.Category;
-import cc.ryanc.halo.model.domain.Logs;
-import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.*;
@@ -47,6 +44,9 @@ public class InstallController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private CommentService commentService;
+
     /**
      * 渲染安装页面
      *
@@ -60,7 +60,7 @@ public class InstallController {
     /**
      * 执行安装
      *
-     * @return string
+     * @return boolean
      */
     @PostMapping(value = "/do")
     @ResponseBody
@@ -71,14 +71,15 @@ public class InstallController {
                             @RequestParam("userEmail") String userEmail,
                             @RequestParam("userPwd") String userPwd,
                             HttpServletRequest request){
-
-        //创建install.lock文件
         try{
+            //创建install.lock文件
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             File installFile = new File(basePath.getAbsolutePath(), "install.lock");
-            System.out.println(installFile.getAbsolutePath());
-            installFile.createNewFile();
-
+            if(installFile.exists()){
+                return false;
+            }else{
+                installFile.createNewFile();
+            }
             //保存title设置
             optionsService.saveOption("site_title",siteTitle);
             optionsService.saveOption("site_url",siteUrl);
@@ -117,6 +118,19 @@ public class InstallController {
             post.setCategories(categories);
             postService.saveByPost(post);
 
+            //第一个评论
+            Comment comment = new Comment();
+            comment.setPost(post);
+            comment.setCommentAuthor("ruibaby");
+            comment.setCommentAuthorEmail("i@ryanc.cc");
+            comment.setCommentAuthorUrl("https://ryanc.cc");
+            comment.setCommentAuthorIp("127.0.0.1");
+            comment.setCommentAuthorAvatarMd5("7cc7f29278071bd4dce995612d428834");
+            comment.setCommentDate(new Date());
+            comment.setCommentContent("欢迎，欢迎！");
+            comment.setCommentAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
+            commentService.saveByComment(comment);
+
             //设置默认主题
             optionsService.saveOption("theme","halo");
 
@@ -126,11 +140,19 @@ public class InstallController {
             //默认评论系统
             optionsService.saveOption("comment_system","native");
 
+            //默认不配置邮件系统
+            optionsService.saveOption("smtp_email_enable","false");
+
+            //新评论，审核通过，回复，默认不通知
+            optionsService.saveOption("new_comment_notice","false");
+            optionsService.saveOption("comment_pass_notice","false");
+            optionsService.saveOption("comment_reply_notice","false");
+
             //更新日志
             logsService.saveByLogs(
                     new Logs(
                             LogsRecord.INSTALL,
-                            "欢迎使用Halo",
+                            "安装成功，欢迎使用Halo。",
                             HaloUtil.getIpAddr(request),
                             HaloUtil.getDate()
                     )

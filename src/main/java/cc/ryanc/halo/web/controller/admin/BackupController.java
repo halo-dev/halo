@@ -38,6 +38,9 @@ public class BackupController {
      */
     @GetMapping
     public String backup(Model model){
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_backup";
     }
 

@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.10.RELEASE</version>
+		<version>2.0.0.RELEASE</version>
 		<relativePath/>
 	</parent>
 
@@ -30,6 +30,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<oh-my-email.version>0.0.3</oh-my-email.version>
+        <druid.version>1.1.9</druid.version>
+        <lombok.version>1.16.20</lombok.version>
+        <ehcache.version>3.5.2</ehcache.version>
+        <rome.version>1.0</rome.version>
+        <commons-lang3.version>3.7</commons-lang3.version>
 	</properties>
 
 	<dependencies>
@@ -53,8 +59,9 @@
 
 		<!-- 邮件 -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
+			<groupId>io.github.biezhi</groupId>
+			<artifactId>oh-my-email</artifactId>
+			<version>${oh-my-email.version}</version>
 		</dependency>
 
 		<!-- mysql -->
@@ -76,7 +83,7 @@
 		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>druid</artifactId>
-			<version>1.1.6</version>
+			<version>${druid.version}</version>
 		</dependency>
 
 		<dependency>
@@ -89,7 +96,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.18</version>
+			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -97,20 +104,20 @@
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>3.4.0</version>
+			<version>${ehcache.version}</version>
 		</dependency>
 
 		<!-- rss -->
 		<dependency>
 			<groupId>rome</groupId>
 			<artifactId>rome</artifactId>
-			<version>1.0</version>
+			<version>${rome.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.7</version>
+			<version>${commons-lang3.version}</version>
 		</dependency>
 	</dependencies>
 

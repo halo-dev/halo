@@ -9,10 +9,8 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.swing.text.html.Option;
+import java.util.*;
 
 /**
  * @author : RYAN0UP
@@ -50,9 +48,9 @@ public class CategoryServiceImpl implements CategoryService{
      */
     @CacheEvict(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
     @Override
-    public Category removeByCateId(Long cateId) {
-        Category category = this.findByCateId(cateId);
-        categoryRepository.delete(category);
+    public Optional<Category> removeByCateId(Long cateId) {
+        Optional<Category> category = this.findByCateId(cateId);
+        categoryRepository.delete(category.get());
         return category;
     }
 
@@ -88,8 +86,8 @@ public class CategoryServiceImpl implements CategoryService{
      */
     @Cacheable(value = CATEGORY_CACHE_NAME,key = "#cateId+'cate'")
     @Override
-    public Category findByCateId(Long cateId) {
-        return categoryRepository.findOne(cateId);
+    public Optional<Category> findByCateId(Long cateId) {
+        return categoryRepository.findById(cateId);
     }
 
     /**
@@ -110,10 +108,10 @@ public class CategoryServiceImpl implements CategoryService{
             return null;
         }
         List<Category> categories = new ArrayList<>();
-        Category category = null;
+        Optional<Category> category = null;
         for(String str:strings){
             category = findByCateId(Long.parseLong(str));
-            categories.add(category);
+            categories.add(category.get());
         }
         return categories;
     }

@@ -75,16 +75,6 @@ public class Comment implements Serializable {
     private String commentAgent;
 
     /**
-     * 评论页面的路径
-     */
-    private String commentPageUrl;
-
-    /**
-     * 评论页面的标题
-     */
-    private String commentPageTitle;
-
-    /**
      * 上一级
      */
     //@OneToOne

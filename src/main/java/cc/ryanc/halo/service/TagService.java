@@ -3,6 +3,7 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.domain.Tag;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -26,7 +27,7 @@ public interface TagService {
      * @param tagId tagId
      * @return Tag
      */
-    Tag removeByTagId(Long tagId);
+    Optional<Tag> removeByTagId(Long tagId);
 
     /**
      * 更新标签
@@ -49,7 +50,7 @@ public interface TagService {
      * @param tagId tagId
      * @return Link
      */
-    Tag findByTagId(Long tagId);
+    Optional<Tag> findByTagId(Long tagId);
 
     /**
      * 根据标签路径查询

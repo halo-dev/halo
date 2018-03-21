@@ -9,7 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -39,9 +41,9 @@ public class CommentServiceImpl implements CommentService {
      * @param comment
      */
     @Override
-    public Comment removeByCommentId(Long commentId) {
-        Comment comment = this.findCommentById(commentId);
-        commentRepository.delete(comment);
+    public Optional<Comment> removeByCommentId(Long commentId) {
+        Optional<Comment> comment = this.findCommentById(commentId);
+        commentRepository.delete(comment.get());
         return comment;
     }
 
@@ -74,10 +76,10 @@ public class CommentServiceImpl implements CommentService {
      * @return comment
      */
     @Override
-    public Comment updateCommentStatus(Long commentId, Integer status) {
-        Comment comment = findCommentById(commentId);
-        comment.setCommentStatus(status);
-        return commentRepository.save(comment);
+    public Optional<Comment> updateCommentStatus(Long commentId, Integer status) {
+        Optional<Comment> comment = findCommentById(commentId);
+        commentRepository.save(comment.get());
+        return comment;
     }
 
     /**
@@ -87,8 +89,8 @@ public class CommentServiceImpl implements CommentService {
      * @return comment
      */
     @Override
-    public Comment findCommentById(Long commentId) {
-        return commentRepository.findOne(commentId);
+    public Optional<Comment> findCommentById(Long commentId) {
+        return commentRepository.findById(commentId);
     }
 
     /**

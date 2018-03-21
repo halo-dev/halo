@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -40,8 +41,8 @@ public class LogsServiceImpl implements LogsService {
      */
     @Override
     public void removeByLogsId(Long logsId) {
-        Logs logs = this.findLogsByLogsId(logsId);
-        logsRepository.delete(logs);
+        Optional<Logs> logs = this.findLogsByLogsId(logsId);
+        logsRepository.delete(logs.get());
     }
 
     /**
@@ -80,7 +81,7 @@ public class LogsServiceImpl implements LogsService {
      * @return logs
      */
     @Override
-    public Logs findLogsByLogsId(Long logsId) {
-        return logsRepository.findOne(logsId);
+    public Optional<Logs> findLogsByLogsId(Long logsId) {
+        return logsRepository.findById(logsId);
     }
 }

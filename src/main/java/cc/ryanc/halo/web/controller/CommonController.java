@@ -1,7 +1,8 @@
 package cc.ryanc.halo.web.controller;
 
+import cc.ryanc.halo.model.dto.HaloConst;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.web.ErrorController;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,8 @@ public class CommonController implements ErrorController{
     @GetMapping(value = ERROR_PATH)
     public String handleError(HttpServletRequest request, Model model){
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        //设置选项
+        model.addAttribute("options", HaloConst.OPTIONS);
         if(statusCode==404) {
             return "common/404";
         }else{

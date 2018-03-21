@@ -212,7 +212,7 @@
                                         <!-- 原生设置 -->
                                         <div class="native-options" style="display: none">
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">评论者头像：
+                                                <label for="nativeCommentAvatar" class="col-sm-2 control-label">评论者头像：
                                                     <span data-toggle="tooltip" data-placement="top" title="为用户评论者默认设置一个邮箱" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
@@ -227,6 +227,39 @@
                                                         <option value="retro" ${((options.native_comment_avatar?default('default'))=='retro')?string('selected','')}>复古</option>
                                                         <option value="hide" ${((options.native_comment_avatar?default('default'))=='hide')?string('selected','')}>不显示头像</option>
                                                     </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="newCommentNotice" class="col-sm-2 control-label">新评论通知：</label>
+                                                <div class="col-sm-4">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="new_comment_notice" id="newCommentNotice" value="true" ${((options.new_comment_notice?if_exists)=='true')?string('checked','')}> 启用
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="new_comment_notice" id="newCommentNotice" value="false" ${((options.new_comment_notice?if_exists)=='false')?string('checked','')}> 禁用
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="commentPassNotice" class="col-sm-2 control-label">评论审核通过通知对方：</label>
+                                                <div class="col-sm-4">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="comment_pass_notice" id="commentPassNotice" value="true" ${((options.comment_pass_notice?if_exists)=='true')?string('checked','')}> 启用
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="comment_pass_notice" id="commentPassNotice" value="false" ${((options.comment_pass_notice?if_exists)=='false')?string('checked','')}> 禁用
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="commentReplyNotice" class="col-sm-2 control-label">评论回复通知对方：</label>
+                                                <div class="col-sm-4">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="comment_reply_notice" id="commentReplyNotice" value="true" ${((options.comment_reply_notice?if_exists)=='true')?string('checked','')}> 启用
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="comment_reply_notice" id="commentReplyNotice" value="false" ${((options.comment_reply_notice?if_exists)=='false')?string('checked','')}> 禁用
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
@@ -346,24 +379,24 @@
                                 <form method="post" class="form-horizontal" id="adminOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">启用pjax：</label>
+                                            <label for="adminPjax" class="col-sm-2 control-label">启用pjax：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_pjax" value="true" ${((options.admin_pjax?default('true'))=='true')?string('checked','')}> 启用
+                                                    <input type="radio" name="admin_pjax" id="adminPjax" value="true" ${((options.admin_pjax?default('true'))=='true')?string('checked','')}> 启用
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_pjax" value="false" ${((options.admin_pjax?if_exists)=='false')?string('checked','')}> 禁用
+                                                    <input type="radio" name="admin_pjax" id="adminPjax" value="false" ${((options.admin_pjax?if_exists)=='false')?string('checked','')}> 禁用
                                                 </label>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">后台布局：</label>
+                                            <label for="adminLayout" class="col-sm-2 control-label">后台布局：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_layout" value="" ${((options.admin_layout?default(''))=='')?string('checked','')}> 正常布局
+                                                    <input type="radio" name="admin_layout" id="adminLayout" value="" ${((options.admin_layout?default(''))=='')?string('checked','')}> 正常布局
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_layout" value="layout-boxed" ${((options.admin_layout?default(''))=='layout-boxed')?string('checked','')}> 盒子布局
+                                                    <input type="radio" name="admin_layout" id="adminLayout" value="layout-boxed" ${((options.admin_layout?default(''))=='layout-boxed')?string('checked','')}> 盒子布局
                                                 </label>
                                             </div>
                                         </div>
@@ -387,13 +420,13 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-sm-2 control-label">侧边栏样式：</label>
+                                            <label for="sidebarStyle" class="col-sm-2 control-label">侧边栏样式：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="sidebar_style" value="" ${((options.sidebar_style?default(''))=='')?string('checked','')}> 展开
+                                                    <input type="radio" name="sidebar_style" id="sidebarStyle" value="" ${((options.sidebar_style?default(''))=='')?string('checked','')}> 展开
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="sidebar_style" value="sidebar-collapse" ${((options.sidebar_style?default(''))=='sidebar-collapse')?string('checked','')}> 收拢
+                                                    <input type="radio" name="sidebar_style" id="sidebarStyle" value="sidebar-collapse" ${((options.sidebar_style?default(''))=='sidebar-collapse')?string('checked','')}> 收拢
                                                 </label>
                                             </div>
                                         </div>
@@ -434,6 +467,17 @@
                             <div class="tab-pane" id="email">
                                 <form method="post" class="form-horizontal" id="emailOptions">
                                     <div class="box-body">
+                                        <div class="form-group">
+                                            <label for="smtpEmailEnable" class="col-sm-2 control-label">是否启用：</label>
+                                            <div class="col-sm-4">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="smtp_email_enable" id="smtpEmailEnable" value="true" ${((options.smtp_email_enable?default('false'))=='true')?string('checked','')}> 启用
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="smtp_email_enable" id="smtpEmailEnable" value="false" ${((options.smtp_email_enable?if_exists)=='false')?string('checked','')}> 禁用
+                                                </label>
+                                            </div>
+                                        </div>
                                         <div class="form-group">
                                             <label for="emailSmtpHost" class="col-sm-2 control-label">SMTP地址：</label>
                                             <div class="col-sm-4">

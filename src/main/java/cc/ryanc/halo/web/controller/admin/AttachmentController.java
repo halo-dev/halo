@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.io.File;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -63,6 +64,9 @@ public class AttachmentController {
         Pageable pageable = new PageRequest(page,size,sort);
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments",attachments);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_attachment";
     }
 
@@ -82,6 +86,9 @@ public class AttachmentController {
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments",attachments);
         model.addAttribute("id",id);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/widget/_attachment-select";
     }
 
@@ -145,8 +152,11 @@ public class AttachmentController {
      */
     @GetMapping(value = "/attachment")
     public String attachmentDetail(Model model,@PathParam("attachId") Long attachId){
-        Attachment attachment = attachmentService.findByAttachId(attachId);
-        model.addAttribute("attachment",attachment);
+        Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
+        model.addAttribute("attachment",attachment.get());
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/widget/_attachment-detail";
     }
 
@@ -160,9 +170,9 @@ public class AttachmentController {
     @ResponseBody
     public String removeAttachment(@PathParam("attachId") Long attachId,
                                    HttpServletRequest request){
-        Attachment attachment = attachmentService.findByAttachId(attachId);
-        String delFileName = attachment.getAttachName();
-        String delSmallFileName = delFileName.substring(0,delFileName.lastIndexOf('.'))+"_small"+attachment.getAttachSuffix();
+        Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
+        String delFileName = attachment.get().getAttachName();
+        String delSmallFileName = delFileName.substring(0,delFileName.lastIndexOf('.'))+"_small"+attachment.get().getAttachSuffix();
         try {
             //删除数据库中的内容
             attachmentService.removeByAttachId(attachId);
@@ -170,7 +180,7 @@ public class AttachmentController {
             updateConst();
             //删除文件
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File mediaPath = new File(basePath.getAbsolutePath(),attachment.getAttachPath().substring(0,attachment.getAttachPath().lastIndexOf('/')));
+            File mediaPath = new File(basePath.getAbsolutePath(),attachment.get().getAttachPath().substring(0,attachment.get().getAttachPath().lastIndexOf('/')));
             File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
             File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
             if(delFile.exists() && delFile.isFile()){

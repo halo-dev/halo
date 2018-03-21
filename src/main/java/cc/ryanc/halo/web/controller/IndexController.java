@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -117,6 +114,9 @@ public class IndexController extends BaseController{
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByPostDate();
         model.addAttribute("archives",archives);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("index");
     }
 
@@ -198,6 +198,9 @@ public class IndexController extends BaseController{
 //        model.addAttribute("comments",comments);
 
         model.addAttribute("archives",archives);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("post");
     }
 
@@ -209,10 +212,10 @@ public class IndexController extends BaseController{
     @GetMapping(value = "/getComment/{postId}",produces = { "application/json;charset=UTF-8" })
     @ResponseBody
     public List<Comment> getComment(@PathVariable Long postId){
-        Post post = postService.findByPostId(postId);
+        Optional<Post> post = postService.findByPostId(postId);
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = new PageRequest(0,10,sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2).getContent();
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(),pageable,2).getContent();
         if(null==comments){
             return null;
         }
@@ -230,6 +233,9 @@ public class IndexController extends BaseController{
         model.addAttribute("about","709831589");
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("about");
     }
 
@@ -242,6 +248,9 @@ public class IndexController extends BaseController{
     public String gallery(Model model){
         List<Gallery> galleries = galleryService.findAllGalleries();
         model.addAttribute("galleries",galleries);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("gallery");
     }
 
@@ -277,6 +286,9 @@ public class IndexController extends BaseController{
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByPostDate();
         model.addAttribute("archives",archives);
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("links");
     }
 
@@ -310,6 +322,9 @@ public class IndexController extends BaseController{
         List<Archive> archives = postService.findPostGroupByPostDate();
         model.addAttribute("archives",archives);
 
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("tags");
     }
 
@@ -378,6 +393,9 @@ public class IndexController extends BaseController{
 
         //是否是归档页，用于判断输出链接
         model.addAttribute("isArchives","true");
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("archives");
     }
 
@@ -423,6 +441,9 @@ public class IndexController extends BaseController{
 
         //是否是归档页，用于判断输出链接
         model.addAttribute("isArchives","true");
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("archives");
     }
 
@@ -480,14 +501,20 @@ public class IndexController extends BaseController{
         comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
         commentService.saveByComment(comment);
 
-        //发送邮件到博主
-        Map<String,Object> map = new HashMap<>();
-        map.put("author",userService.findAllUser().get(0).getUserDisplayName());
-        map.put("pageName",postService.findByPostId(post.getPostId()).getPostTitle());
-        map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
-        map.put("visitor",comment.getCommentAuthor());
-        map.put("commentContent",comment.getCommentContent());
-        mailService.sendTemplateMail("i@ryanc.cc","有新的评论",map,"common/mail/mail_admin.ftl");
+        if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("new_comment_notice"))){
+            try {
+                //发送邮件到博主
+                Map<String,Object> map = new HashMap<>();
+                map.put("author",userService.findAllUser().get(0).getUserDisplayName());
+                map.put("pageName",postService.findByPostId(post.getPostId()).get().getPostTitle());
+                map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
+                map.put("visitor",comment.getCommentAuthor());
+                map.put("commentContent",comment.getCommentContent());
+                mailService.sendTemplateMail(userService.findAllUser().get(0).getUserEmail(),"有新的评论",map,"common/mail/mail_admin.ftl");
+            }catch (Exception e){
+                log.error("邮件服务器未配置："+e.getMessage());
+            }
+        }
         return "success";
     }
 }

@@ -18,11 +18,8 @@
             body{
                 background-color: #f5f5f5;
             }
-            .vertical-center{
-                position: absolute;
-                top: 40%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+            .container{
+                max-width: 850px;
             }
             .form-horizontal .control-label{
                 text-align: left;
@@ -32,8 +29,8 @@
     </head>
     <body>
         <div class="container">
-            <div class="row row-centered">
-                <div class="col-lg-4 col-xs-11 vertical-center">
+            <div class="row" style="padding-top: 50px">
+                <div class="col-lg-12 col-xs-12">
                     <div class="logo animated fadeInUp">
                         Halo<small style="font-size: 14px;">安装向导</small>
                     </div>

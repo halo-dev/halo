@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Link;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.LinkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.websocket.server.PathParam;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -28,8 +30,15 @@ public class PageController {
     @Autowired
     private LinkService linkService;
 
+    /**
+     * 页面管理页面
+     *
+     * @param model model
+     * @return string
+     */
     @GetMapping
-    public String pages(){
+    public String pages(Model model){
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_page";
     }
 
@@ -43,6 +52,9 @@ public class PageController {
     public String links(Model model){
         List<Link> links = linkService.findAllLinks();
         model.addAttribute("links",links);
+
+        //设置选项
+        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_link";
     }
 
@@ -55,8 +67,11 @@ public class PageController {
      */
     @GetMapping("/links/edit")
     public String toEditLink(Model model,@PathParam("linkId") Long linkId){
-        Link link = linkService.findByLinkId(linkId);
-        model.addAttribute("link",link);
+        Optional<Link> link = linkService.findByLinkId(linkId);
+        model.addAttribute("link",link.get());
+
+        //设置选项
+        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_link-update";
     }
 
@@ -86,8 +101,8 @@ public class PageController {
     @GetMapping(value = "/links/remove")
     public String removeLink(@PathParam("linkId") Long linkId){
         try{
-            Link link = linkService.removeByLinkId(linkId);
-            log.info("删除的友情链接："+link);
+            Optional<Link> link = linkService.removeByLinkId(linkId);
+            log.info("删除的友情链接："+link.get());
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -103,9 +118,9 @@ public class PageController {
     @PostMapping(value = "/links/update")
     public String updateLink(@ModelAttribute Link link){
         try {
-            Link beforeLink = linkService.findByLinkId(link.getLinkId());
+            Optional<Link> beforeLink = linkService.findByLinkId(link.getLinkId());
             linkService.updateByLink(link);
-            log.info("修改友情链接页面：修改之前的数据："+beforeLink+"，修改之后的数据："+link);
+            log.info("修改友情链接页面：修改之前的数据："+beforeLink.get()+"，修改之后的数据："+link);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }

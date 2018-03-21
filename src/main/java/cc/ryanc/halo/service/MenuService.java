@@ -3,6 +3,7 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.domain.Menu;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -33,7 +34,7 @@ public interface MenuService {
      * @param menuId menuId
      * @return menu
      */
-    Menu removeByMenuId(Long menuId);
+    Optional<Menu> removeByMenuId(Long menuId);
 
     /**
      * 修改菜单
@@ -47,5 +48,5 @@ public interface MenuService {
      * @param menuId menuId
      * @return Menu
      */
-    Menu findByMenuId(Long menuId);
+    Optional<Menu> findByMenuId(Long menuId);
 }

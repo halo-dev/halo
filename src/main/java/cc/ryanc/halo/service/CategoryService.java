@@ -3,6 +3,7 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.domain.Category;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -25,7 +26,7 @@ public interface CategoryService {
      * @param cateId 分类目录编号
      * @return category
      */
-    Category removeByCateId(Long cateId);
+    Optional<Category> removeByCateId(Long cateId);
 
     /**
      * 修改分类目录信息
@@ -48,7 +49,7 @@ public interface CategoryService {
      * @param cateId 分类编号
      * @return 返回category实体
      */
-    Category findByCateId(Long cateId);
+    Optional<Category> findByCateId(Long cateId);
 
     /**
      * 根据分类目录路径查询，用于验证是否已经存在该路径

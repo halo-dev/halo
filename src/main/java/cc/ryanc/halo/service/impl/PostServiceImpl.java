@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
@@ -53,9 +54,9 @@ public class PostServiceImpl implements PostService {
      */
     @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
-    public Post removeByPostId(Long postId) {
-        Post post = this.findByPostId(postId);
-        postRepository.delete(post);
+    public Optional<Post> removeByPostId(Long postId) {
+        Optional<Post> post = this.findByPostId(postId);
+        postRepository.delete(post.get());
         return post;
     }
 
@@ -81,9 +82,9 @@ public class PostServiceImpl implements PostService {
     @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public Post updatePostStatus(Long postId, Integer status) {
-        Post post = this.findByPostId(postId);
-        post.setPostStatus(status);
-        return postRepository.save(post);
+        Optional<Post> post = this.findByPostId(postId);
+        post.get().setPostStatus(status);
+        return postRepository.save(post.get());
     }
 
     /**
@@ -169,8 +170,8 @@ public class PostServiceImpl implements PostService {
      */
     @Cacheable(value = POST_CACHE_NAME,key = "#postId+'post'")
     @Override
-    public Post findByPostId(Long postId) {
-        return postRepository.findOne(postId);
+    public Optional<Post> findByPostId(Long postId) {
+        return postRepository.findById(postId);
     }
 
     /**
