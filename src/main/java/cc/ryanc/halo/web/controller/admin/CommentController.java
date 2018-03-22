@@ -1,10 +1,12 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Comment;
+import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.UserService;
+import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -150,5 +155,44 @@ public class CommentController extends BaseController{
             log.error("删除评论失败："+e.getMessage());
         }
         return "redirect:/admin/comments?status="+status;
+    }
+
+
+    /**
+     * 管理员回复评论
+     *
+     * @param commentId 被回复的评论
+     * @param commentContent 回复的内容
+     * @return string
+     */
+    @PostMapping("/reply")
+    public String replyComment(@RequestParam("commentId") Long commentId,
+                               @RequestParam("postId") Long postId,
+                               @RequestParam("commentContent") String commentContent,
+                               @RequestParam("userAgent") String userAgent,
+                               HttpServletRequest request){
+        try {
+            Post post = new Post();
+            post.setPostId(postId);
+
+            //保存评论
+            Comment comment = new Comment();
+            comment.setPost(post);
+            comment.setCommentAuthor(userService.findAllUser().get(0).getUserDisplayName());
+            comment.setCommentAuthorEmail(userService.findAllUser().get(0).getUserEmail());
+            comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("site_url"));
+            comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
+            comment.setCommentAuthorAvatarMd5(HaloUtil.getMD5(userService.findAllUser().get(0).getUserEmail()));
+            comment.setCommentDate(new Date());
+            String at = "<a href='#'>@"+commentService.findCommentById(commentId).get().getCommentAuthor()+"</a>";
+            comment.setCommentContent(at+commentContent);
+            comment.setCommentAgent(userAgent);
+            comment.setCommentParent(commentId);
+            comment.setCommentStatus(0);
+            commentService.saveByComment(comment);
+        }catch (Exception e){
+            log.error("回复评论失败！"+e.getMessage());
+        }
+        return "redirect:/admin/comments";
     }
 }

@@ -77,9 +77,7 @@ public class Comment implements Serializable {
     /**
      * 上一级
      */
-    //@OneToOne
-    //@JoinColumn(name = "comment_id")
-    //private Comment commentParent;
+    private Long commentParent = 0L;
 
     /**
      * 评论状态，0：正常，1：待审核，2：回收站

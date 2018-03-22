@@ -56,7 +56,7 @@
                                             <td>
                                                 <#switch comment.commentStatus>
                                                     <#case 0>
-                                                    <button class="btn btn-info btn-sm btn-flat" onclick="modelShow()">回复</button>
+                                                    <button class="btn btn-info btn-sm btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')">回复</button>
                                                     <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 1>
@@ -90,7 +90,7 @@
             </div>
         </section>
         <!-- 删除确认弹出层 -->
-        <div class="modal fade" id="removePostModal">
+        <div class="modal fade" id="removeCommentModal">
             <div class="modal-dialog">
                 <div class="modal-content message_align">
                     <div class="modal-header">
@@ -108,15 +108,45 @@
                 </div>
             </div>
         </div>
+        <!-- 回复弹出层 -->
+        <div class="modal fade" id="commentReplyModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">回复</h4>
+                    </div>
+                    <form method="post" action="/admin/comments/reply">
+                        <div class="modal-body">
+                            <textarea class="form-control" rows="5" id="commentContent" name="commentContent" style="resize: none"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="hidden" id="commentId" name="commentId" value=""/>
+                            <input type="hidden" id="userAgent" name="userAgent" value=""/>
+                            <input type="hidden" id="postId" name="postId" value="" />
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">确定</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <script>
             function modelShow(url,message) {
                 $('#url').val(url);
                 $('#message').html(message);
-                $('#removePostModal').modal();
+                $('#removeCommentModal').modal();
             }
             function removeIt(){
                 var url=$.trim($("#url").val());
                 window.location.href=url;
+            }
+
+            function replyShow(commentId,postId) {
+                $('#userAgent').val(navigator.userAgent);
+                $('#commentId').val(commentId);
+                $('#postId').val(postId);
+                $('#commentReplyModal').modal();
             }
         </script>
     </div>
