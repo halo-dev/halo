@@ -19,14 +19,14 @@
 ## Introduction 简介
 
 **Halo** [ˈheɪloʊ]<br>
-Fast Simple Powerful blog System using Java.
+Fast,simple,powerful blog system powered by Java.
 
 **Halo** [ˈheɪloʊ]，意为光环。当然，你也可以读拼音(哈喽)。<br>
 轻快，简洁，功能强大，使用Java开发的博客系统。
 
 ## Demo 演示
 
-- [https://halo.ryanc.cc](https://halo.ryanc.cc)
+[http://halo.ryanc.cc](http://halo.ryanc.cc)
 
 ## Download 下载
 
