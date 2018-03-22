@@ -26,13 +26,15 @@ Fast,simple,powerful blog system powered by Java.
 
 ## Demo 演示
 
+[界面预览](PREVIEW.md)
+
 [http://halo.ryanc.cc](http://halo.ryanc.cc)
 
 ## Download 下载
 
 ### [Download](https://github.com/ruibaby/halo/releases)
 
-> 目前处于1.0 Beta版，使用过程中可能会出现一些bug，希望可以得到反馈。
+> 目前并未打包成可使用版本，因为目前bug还有点多，需要花点时间才行。
 
 ## Docs 文档
 
