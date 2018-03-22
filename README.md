@@ -1,6 +1,6 @@
 <h1><a href="#" target="_blank">Halo</a></h1>
 
-> Fast,Simple,PowerFul blog System | 轻快，简洁，功能强大的博客系统。
+> Halo may be the best Java blog system. | Halo可能是最好的Java博客系统。
 
 [![GitHub release](https://img.shields.io/github/release/ruibaby/halo.svg)](https://github.com/ruibaby/halo/releases)
 [![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
