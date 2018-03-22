@@ -1,6 +1,6 @@
 # 端口配置
 server:
-  port: 8080
+  port: 8090
 spring:
   # 数据源配置 使用druid数据源
   datasource:
