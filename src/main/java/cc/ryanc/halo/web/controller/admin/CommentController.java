@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
@@ -110,11 +111,12 @@ public class CommentController extends BaseController{
                                 HttpSession session){
         Comment comment = commentService.updateCommentStatus(commentId,0);
 
+        //判断评论者的邮箱是否符合规则
         Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
         Matcher matcher = patternEmail.matcher(comment.getCommentAuthorEmail());
 
         //判断是否启用邮件服务
-        if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable"))) {
+        if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("comment_pass_notice"))) {
             try {
                 if (status == 1 && matcher.find()) {
                     Map<String, Object> map = new HashMap<>();
@@ -170,26 +172,53 @@ public class CommentController extends BaseController{
                                @RequestParam("postId") Long postId,
                                @RequestParam("commentContent") String commentContent,
                                @RequestParam("userAgent") String userAgent,
-                               HttpServletRequest request){
+                               HttpServletRequest request,
+                               HttpSession session){
         try {
             Post post = new Post();
             post.setPostId(postId);
 
+            //博主信息
+            User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+
+            //被回复的评论
+            Comment lastComment = commentService.findCommentById(commentId).get();
+
             //保存评论
             Comment comment = new Comment();
             comment.setPost(post);
-            comment.setCommentAuthor(userService.findAllUser().get(0).getUserDisplayName());
-            comment.setCommentAuthorEmail(userService.findAllUser().get(0).getUserEmail());
+            comment.setCommentAuthor(user.getUserDisplayName());
+            comment.setCommentAuthorEmail(user.getUserEmail());
             comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("site_url"));
             comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
             comment.setCommentAuthorAvatarMd5(HaloUtil.getMD5(userService.findAllUser().get(0).getUserEmail()));
             comment.setCommentDate(new Date());
-            String at = "<a href='#'>@"+commentService.findCommentById(commentId).get().getCommentAuthor()+"</a>";
-            comment.setCommentContent(at+commentContent);
+            String lastContent = " //<a href='#'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
+            comment.setCommentContent(commentContent+lastContent);
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
             comment.setCommentStatus(0);
             commentService.saveByComment(comment);
+
+            //正则表达式判断对方的邮箱是否是正确的格式
+            Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
+            Matcher matcher = patternEmail.matcher(lastComment.getCommentAuthorEmail());
+
+            //邮件通知
+            if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("comment_reply_notice"))) {
+                if(matcher.find()){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("siteTitle",HaloConst.OPTIONS.get("site_title"));
+                    map.put("commentAuthor",lastComment.getCommentAuthor());
+                    map.put("pageName",lastComment.getPost().getPostTitle());
+                    map.put("commentContent",lastComment.getCommentContent());
+                    map.put("replyAuthor",user.getUserDisplayName());
+                    map.put("replyContent",commentContent);
+                    map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
+                    mailService.sendTemplateMail(
+                            lastComment.getCommentAuthorEmail(),"您在"+HaloConst.OPTIONS.get("site_title")+"的评论有了新回复",map,"common/mail/mail_reply.ftl");
+                }
+            }
         }catch (Exception e){
             log.error("回复评论失败！"+e.getMessage());
         }
