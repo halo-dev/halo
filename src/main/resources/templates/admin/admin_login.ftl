@@ -62,8 +62,8 @@
                     'loginName': name,
                     'loginPwd': pwd
                 },
-                success: function (data) {
-                    if(data==true){
+                success: function (status) {
+                    if(status=="true"){
                         $.toast({
                             text: "登录成功！",
                             heading: '提示',
@@ -80,10 +80,10 @@
                                 window.location.href="/admin";
                             }
                         });
-                    }else if(data=="wait"){
+                    }else if(status=="disable"){
                         $('.login-body').addClass('animate shake');
                         $.toast({
-                            text: "密码错误已达到5次，请30分钟后再试！",
+                            text: "密码错误已达到5次，请10分钟后再试！",
                             heading: '提示',
                             icon: 'error',
                             showHideTransition: 'fade',

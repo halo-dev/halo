@@ -2,6 +2,7 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.domain.User;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,4 +51,30 @@ public interface UserService {
      * @return user
      */
     User findByUserIdAndUserPass(Long userId,String userPass);
+
+    /**
+     * 修改禁用状态
+     *
+     * @param enable enable
+     */
+    void updateUserLoginEnable(String enable);
+
+    /**
+     * 修改最后登录时间
+     *
+     * @param lastDate lastDate
+     */
+    User updateUserLoginLast(Date lastDate);
+
+    /**
+     * 增加登录错误次数
+     *
+     * @param error error
+     */
+    Integer updateUserLoginError();
+
+    /**
+     * 修改用户的状态为正常
+     */
+    User updateUserNormal();
 }

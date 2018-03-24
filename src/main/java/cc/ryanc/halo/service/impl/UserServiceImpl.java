@@ -6,6 +6,7 @@ import cc.ryanc.halo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -74,5 +75,56 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUserIdAndUserPass(Long userId, String userPass) {
         return userRepository.findByUserIdAndUserPass(userId,userPass);
+    }
+
+    /**
+     * 修改禁用状态
+     *
+     * @param enable enable
+     */
+    @Override
+    public void updateUserLoginEnable(String enable) {
+        User user = this.findAllUser().get(0);
+        user.setLoginEnable(enable);
+        userRepository.save(user);
+    }
+
+    /**
+     * 修改最后登录时间
+     *
+     * @param lastDate lastDate
+     */
+    @Override
+    public User updateUserLoginLast(Date lastDate) {
+        User user = this.findAllUser().get(0);
+        user.setLoginLast(lastDate);
+        userRepository.save(user);
+        return user;
+    }
+
+    /**
+     * 修改登录错误次数
+     *
+     * @param error error
+     */
+    @Override
+    public Integer updateUserLoginError() {
+        User user = this.findAllUser().get(0);
+        user.setLoginError(user.getLoginError()+1);
+        userRepository.save(user);
+        return user.getLoginError();
+    }
+
+    /**
+     * 修改用户的状态为正常
+     */
+    @Override
+    public User updateUserNormal() {
+        User user = this.findAllUser().get(0);
+        user.setLoginEnable("true");
+        user.setLoginError(0);
+        user.setLoginLast(new Date());
+        userRepository.save(user);
+        return user;
     }
 }
