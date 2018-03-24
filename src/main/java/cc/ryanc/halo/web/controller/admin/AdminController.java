@@ -115,30 +115,43 @@ public class AdminController extends BaseController{
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
-    public boolean getLogin(@ModelAttribute("loginName") String loginName,
+    public String getLogin(@ModelAttribute("loginName") String loginName,
                            @ModelAttribute("loginPwd") String loginPwd,
                            HttpSession session){
+        String status = "false";
         try {
-            List<User> users = null;
-            Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-            Matcher matcher = patternEmail.matcher(loginName);
-            if(matcher.find()){
-                users = userService.userLoginByEmail(loginName,HaloUtil.getMD5(loginPwd));
+            User aUser = userService.findAllUser().get(0);
+            User user = null;
+            if("false".equals(aUser.getLoginEnable())){
+                status = "disable";
             }else{
-                users = userService.userLoginByName(loginName,HaloUtil.getMD5(loginPwd));
-            }
-            if(null!=users){
-                session.setAttribute(HaloConst.USER_SESSION_KEY, users.get(0));
-                log.info("用户["+ users.get(0).getUserName()+"]登录成功！");
-                logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_SUCCESS,HaloUtil.getIpAddr(request), HaloUtil.getDate()));
-                return true;
-            }else{
-                logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_ERROR,HaloUtil.getIpAddr(request),new Date()));
+                //验证是否是邮箱登录
+                Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
+                Matcher matcher = patternEmail.matcher(loginName);
+                if(matcher.find()){
+                    user = userService.userLoginByEmail(loginName,HaloUtil.getMD5(loginPwd)).get(0);
+                }else{
+                    user = userService.userLoginByName(loginName,HaloUtil.getMD5(loginPwd)).get(0);
+                }
+                if(aUser==user){
+                    session.setAttribute(HaloConst.USER_SESSION_KEY, user);
+                    //重置用户的登录状态为正常
+                    userService.updateUserNormal();
+                    userService.updateUserLoginLast(new Date());
+                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_SUCCESS,HaloUtil.getIpAddr(request), HaloUtil.getDate()));
+                    status = "true";
+                }
             }
         }catch (Exception e){
+            Integer errorCount = userService.updateUserLoginError();
+            if(errorCount>=5){
+                userService.updateUserLoginEnable("false");
+            }
+            userService.updateUserLoginLast(new Date());
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_ERROR,HaloUtil.getIpAddr(request),new Date()));
             log.error("登录失败！："+e.getMessage());
         }
-        return false;
+        return status;
     }
 
     /**

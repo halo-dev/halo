@@ -22,7 +22,6 @@ public class InstallInterceptor implements HandlerInterceptor {
         File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
         File installFile = new File(basePath.getAbsolutePath(), "install.lock");
         if(installFile.exists()){
-            response.sendRedirect("/");
             return true;
         }
         response.sendRedirect("/install");

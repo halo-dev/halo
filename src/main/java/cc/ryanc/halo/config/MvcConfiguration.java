@@ -39,11 +39,13 @@ public class MvcConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/login")
-                .excludePathPatterns("/admin/getLogin");
-        //registry.addInterceptor(installInterceptor)
-        //        .addPathPatterns("/**")
-        //        .excludePathPatterns("/install")
-        //        .excludePathPatterns("/install/do");
+                .excludePathPatterns("/admin/getLogin")
+                .excludePathPatterns("/static/**");
+        registry.addInterceptor(installInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/install")
+                .excludePathPatterns("/install/do")
+                .excludePathPatterns("/static/**");
     }
 
     /**
