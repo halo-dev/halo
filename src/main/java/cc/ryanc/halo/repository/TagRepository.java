@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author : RYAN0UP
+ * @date : 2018/1/12
  * @version : 1.0
  * description :
- * @date : 2018/1/12
  */
 public interface TagRepository extends JpaRepository<Tag,Long>{
 

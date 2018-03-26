@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/3
+ * @version : 1.0
  * description : 主题数据
  */
 @Data

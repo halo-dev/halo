@@ -12,7 +12,6 @@ import java.util.Map;
  */
 public interface OptionsService {
 
-
     /**
      * 保存单个设置选项
      *

@@ -7,8 +7,8 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/20
+ * @version : 1.0
  * description : 文章归档数据
  */
 @Data

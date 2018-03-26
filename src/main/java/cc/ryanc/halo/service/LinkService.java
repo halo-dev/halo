@@ -12,6 +12,7 @@ import java.util.Optional;
  * description:
  */
 public interface LinkService {
+
     /**
      * 新增友情链接
      *

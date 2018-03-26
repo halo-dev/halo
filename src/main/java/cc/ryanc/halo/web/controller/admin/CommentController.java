@@ -125,7 +125,7 @@ public class CommentController extends BaseController{
                     map.put("commentContent", comment.getCommentContent());
                     map.put("siteUrl", HaloConst.OPTIONS.get("site_url"));
                     map.put("siteTitle", HaloConst.OPTIONS.get("site_title"));
-                    map.put("author", userService.findAllUser().get(0).getUserDisplayName());
+                    map.put("author", userService.findUser().getUserDisplayName());
                     mailService.sendTemplateMail(
                             comment.getCommentAuthorEmail(),
                             "您在" + HaloConst.OPTIONS.get("site_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
@@ -184,6 +184,10 @@ public class CommentController extends BaseController{
             //被回复的评论
             Comment lastComment = commentService.findCommentById(commentId).get();
 
+            //修改被回复的评论的状态
+            lastComment.setCommentStatus(0);
+            commentService.saveByComment(lastComment);
+
             //保存评论
             Comment comment = new Comment();
             comment.setPost(post);
@@ -191,7 +195,7 @@ public class CommentController extends BaseController{
             comment.setCommentAuthorEmail(user.getUserEmail());
             comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("site_url"));
             comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
-            comment.setCommentAuthorAvatarMd5(HaloUtil.getMD5(userService.findAllUser().get(0).getUserEmail()));
+            comment.setCommentAuthorAvatarMd5(HaloUtil.getMD5(userService.findUser().getUserEmail()));
             comment.setCommentDate(new Date());
             String lastContent = " //<a href='#'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
             comment.setCommentContent(commentContent+lastContent);

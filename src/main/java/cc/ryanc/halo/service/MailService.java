@@ -4,9 +4,9 @@ import java.util.Map;
 
 /**
  * @author : RYAN0UP
+ * @date : 2018/1/23
  * @version : 1.0
  * description :
- * @date : 2018/1/23
  */
 public interface MailService {
 

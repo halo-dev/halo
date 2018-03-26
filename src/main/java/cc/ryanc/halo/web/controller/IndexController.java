@@ -100,8 +100,8 @@ public class IndexController extends BaseController{
         model.addAttribute("is_home",true);
 
         //用户信息
-        List<User> users = userService.findAllUser();
-        model.addAttribute("user",users.get(0));
+        User user = userService.findUser();
+        model.addAttribute("user",user);
 
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
@@ -177,8 +177,8 @@ public class IndexController extends BaseController{
         model.addAttribute("postsCount",postService.findAllPosts().size());
 
         //用户信息
-        List<User> users = userService.findAllUser();
-        model.addAttribute("user",users.get(0));
+        User user = userService.findUser();
+        model.addAttribute("user",user);
 
         //所有分类目录
         List<Category> categories = categoryService.findAllCategories();
@@ -267,8 +267,8 @@ public class IndexController extends BaseController{
         model.addAttribute("links",links);
 
         //用户信息
-        List<User> users = userService.findAllUser();
-        model.addAttribute("user",users.get(0));
+        User user = userService.findUser();
+        model.addAttribute("user",user);
 
         model.addAttribute("is_links",true);
 
@@ -308,8 +308,8 @@ public class IndexController extends BaseController{
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
 
-        List<User> users = userService.findAllUser();
-        model.addAttribute("user",users.get(0));
+        User user = userService.findUser();
+        model.addAttribute("user",user);
 
         //文章总数
         model.addAttribute("postsCount",postService.findAllPosts().size());
@@ -380,8 +380,8 @@ public class IndexController extends BaseController{
         model.addAttribute("archives",archives);
 
         //用户信息
-        List<User> users = userService.findAllUser();
-        model.addAttribute("user",users.get(0));
+        User user = userService.findUser();
+        model.addAttribute("user",user);
 
         //菜单列表
         List<Menu> menus = menuService.findAllMenus();
@@ -424,8 +424,8 @@ public class IndexController extends BaseController{
         model.addAttribute("postsCount",postService.findAllPosts().size());
 
         //用户信息
-        List<User> users = userService.findAllUser();
-        model.addAttribute("user",users.get(0));
+        User user = userService.findUser();
+        model.addAttribute("user",user);
 
         //分类目录
         List<Category> categories = categoryService.findAllCategories();
@@ -505,12 +505,12 @@ public class IndexController extends BaseController{
             try {
                 //发送邮件到博主
                 Map<String,Object> map = new HashMap<>();
-                map.put("author",userService.findAllUser().get(0).getUserDisplayName());
+                map.put("author",userService.findUser().getUserDisplayName());
                 map.put("pageName",postService.findByPostId(post.getPostId()).get().getPostTitle());
                 map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
                 map.put("visitor",comment.getCommentAuthor());
                 map.put("commentContent",comment.getCommentContent());
-                mailService.sendTemplateMail(userService.findAllUser().get(0).getUserEmail(),"有新的评论",map,"common/mail/mail_admin.ftl");
+                mailService.sendTemplateMail(userService.findUser().getUserEmail(),"有新的评论",map,"common/mail/mail_admin.ftl");
             }catch (Exception e){
                 log.error("邮件服务器未配置："+e.getMessage());
             }

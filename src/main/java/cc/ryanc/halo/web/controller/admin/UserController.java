@@ -33,7 +33,7 @@ public class UserController {
      */
     @GetMapping
     public String profile(Model model){
-        model.addAttribute("user",userService.findAllUser().get(0));
+        model.addAttribute("user",userService.findUser());
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_profile";

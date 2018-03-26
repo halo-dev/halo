@@ -11,8 +11,8 @@ import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/2
+ * @version : 1.0
  * description:
  */
 @Slf4j
@@ -21,8 +21,6 @@ import org.springframework.web.servlet.config.annotation.*;
 @ComponentScan(basePackages = "cc.ryanc.halo.web.controller")
 @PropertySource(value = "classpath:application.yaml",ignoreResourceNotFound = true,encoding = "UTF-8")
 public class MvcConfiguration implements WebMvcConfigurer {
-
-
 
     @Autowired
     private LoginInterceptor loginInterceptor;

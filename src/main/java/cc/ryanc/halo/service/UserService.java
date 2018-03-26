@@ -7,11 +7,12 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
+ * @version : 1.0
  * description:
  */
 public interface UserService {
+
     /**
      * 保存个人资料
      *
@@ -41,7 +42,7 @@ public interface UserService {
      *
      * @return list
      */
-    List<User> findAllUser();
+    User findUser();
 
     /**
      * 根据用户编号和密码查询

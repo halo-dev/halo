@@ -11,8 +11,8 @@ import java.io.File;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/28
+ * @version : 1.0
  * description : 安装拦截器
  */
 @Component
