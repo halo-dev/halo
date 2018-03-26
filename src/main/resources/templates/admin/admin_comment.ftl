@@ -61,6 +61,7 @@
                                                     <#break >
                                                     <#case 1>
                                                     <a class="btn btn-info btn-sm btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
+                                                    <a class="btn btn-primary btn-sm btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</a>
                                                     <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 2>

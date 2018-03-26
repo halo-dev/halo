@@ -15,6 +15,7 @@ import java.util.Map;
  * description: 环境常量
  */
 public class HaloConst {
+
     /**
      * 所有设置选项（key,value）
      */

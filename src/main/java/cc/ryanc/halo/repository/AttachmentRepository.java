@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * @author : RYAN0UP
+ * @date : 2018/1/10
  * @version : 1.0
  * description :
- * @date : 2018/1/10
  */
 public interface AttachmentRepository extends JpaRepository<Attachment,Long>{
 

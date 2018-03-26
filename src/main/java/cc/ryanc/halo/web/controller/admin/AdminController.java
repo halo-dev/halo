@@ -120,7 +120,7 @@ public class AdminController extends BaseController{
                            HttpSession session){
         String status = "false";
         try {
-            User aUser = userService.findAllUser().get(0);
+            User aUser = userService.findUser();
             User user = null;
             if("false".equals(aUser.getLoginEnable())){
                 status = "disable";

@@ -8,8 +8,8 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/19
+ * @version : 1.0
  * description :
  */
 public interface LogsRepository extends JpaRepository<Logs,Long> {

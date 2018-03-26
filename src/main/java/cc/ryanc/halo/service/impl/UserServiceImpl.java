@@ -11,8 +11,8 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
+ * @version : 1.0
  * description:
  */
 @Service
@@ -61,8 +61,8 @@ public class UserServiceImpl implements UserService {
      * @return list
      */
     @Override
-    public List<User> findAllUser() {
-        return userRepository.findAll();
+    public User findUser() {
+        return userRepository.findAll().get(0);
     }
 
     /**
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserLoginEnable(String enable) {
-        User user = this.findAllUser().get(0);
+        User user = this.findUser();
         user.setLoginEnable(enable);
         userRepository.save(user);
     }
@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User updateUserLoginLast(Date lastDate) {
-        User user = this.findAllUser().get(0);
+        User user = this.findUser();
         user.setLoginLast(lastDate);
         userRepository.save(user);
         return user;
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Integer updateUserLoginError() {
-        User user = this.findAllUser().get(0);
+        User user = this.findUser();
         user.setLoginError(user.getLoginError()+1);
         userRepository.save(user);
         return user.getLoginError();
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User updateUserNormal() {
-        User user = this.findAllUser().get(0);
+        User user = this.findUser();
         user.setLoginEnable("true");
         user.setLoginError(0);
         user.setLoginLast(new Date());
