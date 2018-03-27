@@ -10,9 +10,9 @@
             <h1 style="display: inline-block;">菜单设置</h1>
             <ol class="breadcrumb">
                 <li>
-                    <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a href="#">外观</a></li>
+                <li><a data-pjax="true" href="#">外观</a></li>
                 <li class="active">菜单设置</li>
             </ol>
         </section>

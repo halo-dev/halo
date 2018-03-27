@@ -20,10 +20,10 @@
             </h1>
             <ol class="breadcrumb">
                 <li>
-                    <a href="#"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
                 <li>
-                    <a href="/admin/posts">文章</a>
+                    <a data-pjax="true" href="/admin/posts">文章</a>
                 </li>
                 <li class="active">新建文章</li>
             </ol>
@@ -40,7 +40,7 @@
                     <div style="display: block;margin-bottom: 10px;">
                         <span>
                             永久链接：
-                            <a href="#">https://ryanc.cc/archives/<span id="postUrl"></span>/</a>
+                            <a href="#">${options.site_url}/article/<span id="postUrl"></span>/</a>
                             <button class="btn btn-default btn-sm btn-flat" id="btn_input_postUrl">编辑</button>
                             <button class="btn btn-default btn-sm btn-flat" id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
                         </span>
@@ -130,6 +130,7 @@
         </section>
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
+        <script src="/static/plugins/editor.md/editormd.min.js"></script>
         <script>
             function openAttach() {
                 layer.open({
@@ -144,27 +145,20 @@
             }
             var editor;
             function loadEditor() {
-                $.getScript("/static/plugins/editor.md/editormd.min.js",function () {
-                    editor = editormd("markdown-editor", {
-                        width: "100%",
-                        height: 620,
-                        syncScrolling: "single",
-                        path: "/static/plugins/editor.md/lib/",
-                        saveHTMLToTextarea: true,
-                        toolbarIcons : function () {
-                            return editormd.toolbarModes["simple"];
-                        }
-                    });
+                editor = editormd("markdown-editor", {
+                    width: "100%",
+                    height: 620,
+                    syncScrolling: "single",
+                    path: "/static/plugins/editor.md/lib/",
+                    saveHTMLToTextarea: true,
+                    toolbarIcons : function () {
+                        return editormd.toolbarModes["simple"];
+                    }
                 });
             }
             $(document).ready(function () {
                 loadEditor();
             });
-            <#if options.admin_pjax?default("true") == "true">
-            $(document).on('pjax:complete',function () {
-                loadEditor();
-            });
-            </#if>
             function TitleOnBlurAuto() {
                 $('#postUrl').html($('#post_title').val());
             }

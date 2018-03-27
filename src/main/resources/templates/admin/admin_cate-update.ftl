@@ -16,8 +16,8 @@
             <h1>分类目录<small></small>
             </h1>
             <ol class="breadcrumb">
-                <li><a href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
-                <li><a href="/admin/category"><i class="fa fa-dashboard"></i> 分类目录</a></li>
+                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a data-pjax="true" href="/admin/category"><i class="fa fa-dashboard"></i> 分类目录</a></li>
                 <li class="active">修改</li>
             </ol>
         </section>

@@ -12,9 +12,9 @@
             <h1 style="display: inline-block;">主题编辑</h1>
             <ol class="breadcrumb">
                 <li>
-                    <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a href="#">外观</a></li>
+                <li><a data-pjax="true" href="#">外观</a></li>
                 <li class="active">主题编辑</li>
             </ol>
         </section>
@@ -77,34 +77,28 @@
             </div>
         </section>
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
+        <script src="/static/plugins/editor.md/editormd.min.js"></script>
         <script>
             var editor;
             function loadEditor() {
-                $.getScript("/static/plugins/editor.md/editormd.min.js",function () {
-                    editor = editormd("theme-editor", {
-                        width: "100%",
-                        height: 620,
-                        syncScrolling: "single",
-                        path: "/static/plugins/editor.md/lib/",
-                        watch            : false,
-                        toolbar          : false,
-                        codeFold         : true,
-                        searchReplace    : true,
-                        placeholder      : "Enjoy coding!",
-                        value            : (localStorage.mode) ? $("#"+localStorage.mode.replace("text/", "")+"-code").val() : $("#html-code").val(),
-                        theme            : (localStorage.theme) ? localStorage.theme : "default",
-                        mode             : (localStorage.mode) ? localStorage.mode : "text/html"
-                    });
+                editor = editormd("theme-editor", {
+                    width: "100%",
+                    height: 620,
+                    syncScrolling: "single",
+                    path: "/static/plugins/editor.md/lib/",
+                    watch            : false,
+                    toolbar          : false,
+                    codeFold         : true,
+                    searchReplace    : true,
+                    placeholder      : "Enjoy coding!",
+                    value            : (localStorage.mode) ? $("#"+localStorage.mode.replace("text/", "")+"-code").val() : $("#html-code").val(),
+                    theme            : (localStorage.theme) ? localStorage.theme : "default",
+                    mode             : (localStorage.mode) ? localStorage.mode : "text/html"
                 });
             }
             $(document).ready(function () {
                 loadEditor();
             });
-            <#if options.admin_pjax?default("true") == "true">
-            $(document).on('pjax:complete',function () {
-                loadEditor();
-            });
-            </#if>
             function loadContent(tplName) {
                 if (tplName && tplName != '') {
                     $.ajax({

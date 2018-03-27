@@ -22,7 +22,7 @@
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i>上传
             </a>
             <ol class="breadcrumb">
-                <li><a href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
                 <li class="active">附件</li>
             </ol>
         </section>

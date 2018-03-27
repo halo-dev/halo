@@ -94,7 +94,7 @@
                         attachId : ${attachment.attachId}
                     },
                     success: function (data) {
-                        if(data=="success"){
+                        if(data==true){
                             $.toast({
                                 text: "删除成功！",
                                 heading: '提示',

@@ -31,7 +31,7 @@ public interface AttachmentService {
     List<Attachment> findAllAttachments();
 
     /**
-     * 查询所有附件，分类
+     * 查询所有附件，分页
      *
      * @param pageable pageable
      * @return page

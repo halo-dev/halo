@@ -33,7 +33,7 @@
 <script>
     $(document).ajaxStart(function() {Pace.restart();});
     <#if options.admin_pjax?default("true") == "true">
-    $(document).pjax('a[target!=_blank]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});
+    $(document).pjax('a[data-pjax=true]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});
     </#if>
     $(function () {
         if($(window).width()<1024){

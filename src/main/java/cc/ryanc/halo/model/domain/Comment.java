@@ -83,4 +83,9 @@ public class Comment implements Serializable {
      * 评论状态，0：正常，1：待审核，2：回收站
      */
     private Integer commentStatus=1;
+
+    /**
+     * 是否是博主的评论 0:不是 1:是
+     */
+    private Integer isAdmin;
 }

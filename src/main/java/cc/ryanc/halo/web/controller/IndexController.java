@@ -499,6 +499,7 @@ public class IndexController extends BaseController{
         comment.setPost(post);
         comment.setCommentDate(new Date());
         comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
+        comment.setIsAdmin(0);
         commentService.saveByComment(comment);
 
         if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("new_comment_notice"))){

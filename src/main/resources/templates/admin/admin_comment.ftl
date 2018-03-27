@@ -13,7 +13,7 @@
             <h1>评论<small></small></h1>
             <ol class="breadcrumb">
                 <li>
-                    <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
                 <li class="active">评论</li>
             </ol>
@@ -21,13 +21,13 @@
         <section class="content container-fluid">
             <ul style="list-style: none;padding-left: 0">
                 <li class="publish">
-                    <a href="/admin/comments">已发布<span class="count">(${publicCount?default("0")})</span></a>&nbsp;|&nbsp;
+                    <a data-pjax="true" href="/admin/comments">已发布<span class="count">(${publicCount?default("0")})</span></a>&nbsp;|&nbsp;
                 </li>
                 <li class="draft">
-                    <a href="/admin/comments?status=1">待审核<span class="count">(${checkCount?default("0")})</span></a>&nbsp;|&nbsp;
+                    <a data-pjax="true" href="/admin/comments?status=1">待审核<span class="count">(${checkCount?default("0")})</span></a>&nbsp;|&nbsp;
                 </li>
                 <li class="trash">
-                    <a href="/admin/comments?status=2">回收站<span class="count">(${trashCount?default("0")})</span></a>
+                    <a data-pjax="true" href="/admin/comments?status=2">回收站<span class="count">(${trashCount?default("0")})</span></a>
                 </li>
             </ul>
             <div class="row">
@@ -56,16 +56,16 @@
                                             <td>
                                                 <#switch comment.commentStatus>
                                                     <#case 0>
-                                                    <button class="btn btn-info btn-sm btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')">回复</button>
+                                                    <button class="btn btn-primary btn-sm btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
                                                     <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 1>
-                                                    <a class="btn btn-info btn-sm btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
-                                                    <a class="btn btn-primary btn-sm btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</a>
+                                                    <a class="btn btn-primary btn-sm btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
+                                                    <a class="btn btn-info btn-sm btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</a>
                                                     <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 2>
-                                                    <a class="btn btn-info btn-sm btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
+                                                    <a class="btn btn-primary btn-sm btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
                                                     <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId}&status=2','确定要永久删除？')">删除</button>
                                                     <#break >
                                                 </#switch>

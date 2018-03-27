@@ -202,6 +202,7 @@ public class CommentController extends BaseController{
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
             comment.setCommentStatus(0);
+            comment.setIsAdmin(1);
             commentService.saveByComment(comment);
 
             //正则表达式判断对方的邮箱是否是正确的格式

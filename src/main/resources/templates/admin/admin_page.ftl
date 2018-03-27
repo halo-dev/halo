@@ -19,9 +19,9 @@
             </a>
             <ol class="breadcrumb">
                 <li>
-                    <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a href="#">页面</a></li>
+                <li><a data-pjax="true" href="#">页面</a></li>
                 <li class="active">所有页面</li>
             </ol>
         </section>
