@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,7 +19,7 @@ import java.util.List;
  */
 @Slf4j
 @Controller
-@RequestMapping(value = "/admin/menu")
+@RequestMapping(value = "/admin/menus")
 public class MenuController {
 
     @Autowired
@@ -35,17 +32,17 @@ public class MenuController {
      * @return string
      */
     @GetMapping
-    public String menu(Model model){
+    public String menus(Model model){
         List<Menu> menus = menuService.findAllMenus();
         model.addAttribute("menus",menus);
-
+        model.addAttribute("statusName","添加");
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
         return "/admin/admin_menu";
     }
 
     /**
-     * 新增菜单
+     * 新增/修改菜单
      *
      * @param menu menu
      * @return string
@@ -57,6 +54,24 @@ public class MenuController {
         }catch (Exception e){
             log.error("保存菜单失败："+e.getMessage());
         }
-        return "redirect:/admin/menu";
+        return "redirect:/admin/menus";
+    }
+
+    /**
+     * 跳转到修改页面
+     * @param id id
+     * @param model model
+     * @return string
+     */
+    @GetMapping(value = "/edit")
+    public String updateMenu(@RequestParam("menuId") Long menuId,Model model){
+        List<Menu> menus = menuService.findAllMenus();
+        Menu menu = menuService.findByMenuId(menuId).get();
+        model.addAttribute("statusName","修改");
+        model.addAttribute("updateMenu",menu);
+        model.addAttribute("menus",menus);
+        //设置选项
+        model.addAttribute("options", HaloConst.OPTIONS);
+        return "/admin/admin_menu";
     }
 }

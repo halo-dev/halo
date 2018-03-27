@@ -27,30 +27,56 @@
                 <div class="col-md-5">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">添加分类目录</h3>
+                            <h3 class="box-title">${statusName}分类目录<#if updateCategory??>[${updateCategory.cateName}]</#if></h3>
                         </div>
-                        <form action="/admin/category/save" method="post" role="form" id="cateAddForm" onsubmit="return checkCate()">
-                            <div class="box-body">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">名称</label>
-                                    <input type="text" class="form-control" id="cateName" name="cateName" placeholder="">
-                                    <small>页面上所显示的名称</small>
+                        <#if updateCategory??>
+                            <form action="/admin/category/save" method="post" role="form" id="cateAddForm">
+                                <input type="hidden" name="cateId" value="${updateCategory.cateId}">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">名称</label>
+                                        <input type="text" class="form-control" id="cateName" name="cateName" value="${updateCategory.cateName}">
+                                        <small>页面上所显示的名称</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">路径名称</label>
+                                        <input type="text" class="form-control" id="cateUrl" name="cateUrl" value="${updateCategory.cateUrl}">
+                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cateDesc" class="control-label">描述</label>
+                                        <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none">${updateCategory.cateDesc}</textarea>
+                                        <small>*添加描述，部分主题可显示</small>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">路径名称</label>
-                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl" placeholder="">
-                                    <small>*这是文章路径上显示的名称，最好为英文</small>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
                                 </div>
-                                <div class="form-group">
-                                    <label for="cateDesc" class="control-label">描述</label>
-                                    <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none"></textarea>
-                                    <small>*添加描述，部分主题可显示</small>
+                            </form>
+                            <#else >
+                            <form action="/admin/category/save" method="post" role="form" id="cateAddForm" onsubmit="return checkCate()">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">名称</label>
+                                        <input type="text" class="form-control" id="cateName" name="cateName" placeholder="">
+                                        <small>页面上所显示的名称</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">路径名称</label>
+                                        <input type="text" class="form-control" id="cateUrl" name="cateUrl" placeholder="">
+                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cateDesc" class="control-label">描述</label>
+                                        <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none"></textarea>
+                                        <small>*添加描述，部分主题可显示</small>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-flat">确定添加</button>
-                            </div>
-                        </form>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
+                                </div>
+                            </form>
+                        </#if>
                     </div>
                 </div>
                 <div class="col-md-7">
@@ -77,7 +103,11 @@
                                         <td>${(cate.cateDesc)!}</td>
                                         <td>2</td>
                                         <td>
-                                            <a href="/admin/category/edit?cateId=${cate.cateId}" class="btn btn-primary btn-xs btn-flat">修改</a>
+                                            <#if updateCategory?? && updateCategory.cateId==cate.cateId>
+                                                <a href="#" class="btn btn-primary btn-xs btn-flat" disabled>正在修改</a>
+                                                <#else >
+                                                <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId}" class="btn btn-primary btn-xs btn-flat">修改</a>
+                                            </#if>
                                             <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/category/remove?cateId=${cate.cateId}')">删除</button>
                                         </td>
                                     </tr>

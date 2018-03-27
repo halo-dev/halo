@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface CategoryService {
 
     /**
-     * 新增分类目录
+     * 新增/修改分类目录
      *
      * @param category 分类目录
      * @return 如果插入成功，返回分类目录对象
@@ -28,14 +28,6 @@ public interface CategoryService {
      * @return category
      */
     Category removeByCateId(Long cateId);
-
-    /**
-     * 修改分类目录信息
-     *
-     * @param category 分类目录对象
-     * @return 如果修改成功 返回当前分类目录对象
-     */
-    Category updateByCategory(Category category);
 
     /**
      * 获取所有分类目录

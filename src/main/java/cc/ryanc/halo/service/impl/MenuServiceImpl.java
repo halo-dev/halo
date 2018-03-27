@@ -32,7 +32,7 @@ public class MenuServiceImpl implements MenuService{
     }
 
     /**
-     * 新增菜单
+     * 新增/修改菜单
      *
      * @param menu menu
      * @return Menu
@@ -53,17 +53,6 @@ public class MenuServiceImpl implements MenuService{
         Optional<Menu> menu = this.findByMenuId(menuId);
         menuRepository.delete(menu.get());
         return menu.get();
-    }
-
-    /**
-     * 修改菜单
-     *
-     * @param menu menu
-     * @return Menu
-     */
-    @Override
-    public Menu updateByMenu(Menu menu) {
-        return menuRepository.save(menu);
     }
 
     /**

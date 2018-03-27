@@ -32,7 +32,7 @@
             <div class="row">
                 <div class="col-md-9">
                     <#if post??>
-                        <input type="hidden" id="postId" name="postId" value="${post.postId?if_exists}">
+                        <input type="hidden" id="postId" name="postId" value="${post.postId}">
                     </#if>
                     <div style="margin-bottom: 10px;">
                         <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" value="<#if post??>${post.postTitle}</#if>" onblur="TitleOnBlurAuto()">

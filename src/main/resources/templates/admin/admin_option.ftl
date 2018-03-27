@@ -64,13 +64,13 @@
                                 <form method="post" class="form-horizontal" id="commonOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="siteTitle" class="col-sm-2 control-label">网站标题：</label>
+                                            <label for="siteTitle" class="col-sm-2 control-label">博客标题：</label>
                                             <div class="col-sm-4">
                                                 <input type="text" class="form-control" id="siteTitle" name="site_title" value="${options.site_title?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="siteUrl" class="col-sm-2 control-label">网站链接：</label>
+                                            <label for="siteUrl" class="col-sm-2 control-label">博客地址：</label>
                                             <div class="col-sm-4">
                                                 <input type="text" class="form-control" id="siteUrl" name="site_url" value="${options.site_url?default('http://localhost:8080')}">
                                             </div>
@@ -85,7 +85,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="siteLogo" name="site_logo" value="${options.site_logo?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default btn-flat" type="button" onclick="openAttach()">选择</button>
+                                                        <button class="btn btn-default btn-flat" type="button" onclick="openAttach('siteLogo')">选择</button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -260,6 +260,17 @@
                                                     <label class="radio-inline">
                                                         <input type="radio" name="comment_reply_notice" value="false" ${((options.comment_reply_notice?if_exists)=='false')?string('checked','')}> 禁用
                                                     </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="nativeCss" class="col-sm-2 control-label">自定义CSS：
+                                                    <span data-toggle="tooltip" data-placement="top" title="对评论框自定义样式，如边距等" style="cursor: pointer">
+                                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                                    </span>
+                                                </label>
+                                                <div class="col-sm-4">
+                                                    <textarea class="form-control" rows="5" id="nativeCss" name="native_css" style="resize: none">${options.native_css?if_exists}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -541,14 +552,14 @@
                 $('[data-toggle="tooltip"]').tooltip();
                 checkCommentOption();
             });
-            function openAttach() {
+            function openAttach(id) {
                 layer.open({
                     type: 2,
                     title: '所有附件',
                     shadeClose: true,
                     shade: 0.5,
                     area: ['90%', '90%'],
-                    content: '/admin/attachments/select',
+                    content: '/admin/attachments/select?id='+id,
                     scrollbar: false
                 });
             }
