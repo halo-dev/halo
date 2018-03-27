@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface MenuService {
 
     /**
-     * 新增菜单
+     * 新增/修改菜单
      *
      * @param menu menu
      * @return Menu
@@ -35,13 +35,6 @@ public interface MenuService {
      * @return menu
      */
     Menu removeByMenuId(Long menuId);
-
-    /**
-     * 修改菜单
-     * @param menu menu
-     * @return Menu
-     */
-    Menu updateByMenu(Menu menu);
 
     /**
      * 根据编号查询菜单

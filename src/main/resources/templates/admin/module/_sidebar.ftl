@@ -79,7 +79,7 @@
                 </a>
                 <ul class="treeview-menu">
                     <li><a data-pjax="true" href="/admin/themes"><i class="fa fa-circle-o"></i>主题</a></li>
-                    <li><a data-pjax="true" href="/admin/menu"><i class="fa fa-circle-o"></i>菜单</a></li>
+                    <li><a data-pjax="true" href="/admin/menus"><i class="fa fa-circle-o"></i>菜单</a></li>
                     <li><a data-pjax="false" href="/admin/themes/editor"><i class="fa fa-circle-o"></i>自定义</a></li>
                 </ul>
             </li>

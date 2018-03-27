@@ -37,14 +37,14 @@ public class CategoryController {
     public String categories(Model model){
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories",categories);
-
+        model.addAttribute("statusName","添加");
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_category";
     }
 
     /**
-     * 新增分类目录
+     * 新增/修改分类目录
      *
      * @param category category对象
      * @return freemarker页面
@@ -94,24 +94,6 @@ public class CategoryController {
     }
 
     /**
-     * 处理修改分类的请求
-     *
-     * @param category category
-     * @return redirect
-     */
-    @PostMapping(value = "/update")
-    public String updateCategory(@ModelAttribute Category category){
-        try{
-            Optional<Category> beforeCate = categoryService.findByCateId(category.getCateId());
-            log.info("修改之前的数据："+beforeCate.get()+"，修改之后的数据："+category);
-            categoryService.updateByCategory(category);
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
-        }
-        return "redirect:/admin/category";
-    }
-
-    /**
      * 跳转到修改页面
      *
      * @param cateId cateId
@@ -120,11 +102,13 @@ public class CategoryController {
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model,@PathParam("cateId") Long cateId){
+        List<Category> categories = categoryService.findAllCategories();
         Optional<Category> category = categoryService.findByCateId(cateId);
-        model.addAttribute("category",category.get());
-
+        model.addAttribute("updateCategory",category.get());
+        model.addAttribute("categories",categories);
+        model.addAttribute("statusName","修改");
         //设置选项
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/admin_cate-update";
+        return "admin/admin_category";
     }
 }

@@ -131,8 +131,7 @@
         color: #ef2f11;
         cursor: pointer;
     }
-
-
+    ${options.native_css?if_exists}
     @media screen and (max-width:560px){
         .comment-input-who,.comment-input-email,.comment-input-website{
             width: 100%;
@@ -190,7 +189,7 @@
                     var date = new Date(timestamp).toLocaleDateString();
                     var content = element.commentContent;
                     var authorPic = md5(authorEmail);
-                    $('.native-list').append("<li class=\"native-list-one\"><img class=\"native-list-one-img\" src=\"http://www.gravatar.com/avatar/"+authorPic+"?s=256&d=${options.native_comment_avatar?default('default')}\"><section><div class=\"native-list-one-head\"><a class=\"native-list-one-head-name\" rel=\"nofollow\" href=\""+authorUrl+"\" target=\"_blank\">"+author+"</a> <span class=\"ua\">"+browser+"</span> <span class=\"ua\">"+os+"</span></div><div class=\"native-list-one-content\"><p>"+content+"</p></div><div class=\"native-list-one-footer\"><span class=\"native-list-one-footer-time\">"+date+"</span> <span rid=\"5a58569744d904006a970794\" at=\"@舍的研习室\" mail=\"veganshe@163.com\" class=\"native-list-one-footer-reback\">回复</span></div></section></li>");
+                    $('.native-list').append("<li class=\"native-list-one\"><img class=\"native-list-one-img\" src=\"http://www.gravatar.com/avatar/"+authorPic+"?s=256&d=${options.native_comment_avatar?default('default')}\"><section><div class=\"native-list-one-head\"><a class=\"native-list-one-head-name\" rel=\"nofollow\" href=\""+authorUrl+"\" target=\"_blank\">"+author+"</a> <span class=\"ua\">"+browser+"</span> <span class=\"ua\">"+os+"</span></div><div class=\"native-list-one-content\"><p>"+content+"</p></div><div class=\"native-list-one-footer\"><span class=\"native-list-one-footer-time\">"+date+"</span> <span rid=\"\" at=\"@"+author+"\" mail=\""+authorEmail+"\" class=\"native-list-one-footer-reback\">回复</span></div></section></li>");
                 });
             }
         });

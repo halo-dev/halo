@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService{
     private static final String CATEGORY_CACHE_NAME = "cate_cache";
 
     /**
-     * 保存分类目录 清除缓存
+     * 保存/修改分类目录 清除缓存
      *
      * @param category 分类目录
      * @return ategory
@@ -52,19 +52,6 @@ public class CategoryServiceImpl implements CategoryService{
         Optional<Category> category = this.findByCateId(cateId);
         categoryRepository.delete(category.get());
         return category.get();
-    }
-
-    /**
-     * 修改分类目录 缓存
-     *
-     * @param category 分类目录对象
-     * @return Category
-     */
-    @CachePut(value = CATEGORY_CACHE_NAME,key = "#category.cateId+'cate'")
-    @CacheEvict(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
-    @Override
-    public Category updateByCategory(Category category) {
-        return categoryRepository.save(category);
     }
 
     /**

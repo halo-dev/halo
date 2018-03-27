@@ -21,7 +21,7 @@
 **Halo** [ˈheɪloʊ]<br>
 Fast,simple,powerful blog system powered by Java.
 
-**Halo** [ˈheɪloʊ]，意为光环。当然，你也可以读拼音(哈喽)。<br>
+**Halo** [ˈheɪloʊ]，意为光环。当然，你也可以当成拼音读(哈喽)。<br>
 轻快，简洁，功能强大，使用Java开发的博客系统。
 
 ## Demo 演示

@@ -1,36 +1,24 @@
-# 端口配置
 server:
   port: 8090
 spring:
-  # 数据源配置 使用druid数据源
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     # H2database 配置
     driver-class-name: org.h2.Driver
     url: jdbc:h2:file:~/halo/halo_db
-    # url: jdbc:h2:mem:halo_db
     username: admin
     password: 123456
-    # MySQL配置
-    #driver-class-name: com.mysql.jdbc.Driver
-    #url: jdbc:mysql://localhost:3306/halodb?useUnicode=true&characterEncoding=utf8&useSSL=false
-    #username: root
-    #password: 123456
   h2:
     console:
       settings:
         web-allow-others: true
       path: /h2-console
       enabled: true
-
-  # jpa配置
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     database-platform: org.hibernate.dialect.H2Dialect
-
-  # freemarker配置
   freemarker:
     allow-request-override: false
     cache: false
@@ -44,7 +32,6 @@ spring:
   cache:
     ehcache:
       config: ehcache.xml
-# 设置日志输出路径
 logging:
   file: ./logs/log.log
 
