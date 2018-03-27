@@ -15,15 +15,15 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;">文章</h1>
-            <a id="btnNewPost" href="/admin/posts/new">
+            <a data-pjax="false" id="btnNewPost" href="/admin/posts/new">
                 写文章
             </a>
             <ol class="breadcrumb">
                 <li>
-                    <a href="/admin">
+                    <a data-pjax="true" href="/admin">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a href="#">文章</a></li>
+                <li><a data-pjax="true" href="#">文章</a></li>
                 <li class="active">所有文章</li>
             </ol>
         </section>
@@ -32,13 +32,13 @@
                 <div class="col-xs-12">
                     <ul style="list-style: none;padding-left: 0">
                         <li class="publish">
-                            <a href="/admin/posts">已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/posts">已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
                         </li>
                         <li class="draft">
-                            <a href="/admin/posts?status=1">草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/posts?status=1">草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
                         </li>
                         <li class="trash">
-                            <a href="/admin/posts?status=2">回收站<span class="count">(${trashCount})</span></a>
+                            <a data-pjax="true" href="/admin/posts?status=2">回收站<span class="count">(${trashCount})</span></a>
                         </li>
                     </ul>
                 </div>
@@ -79,17 +79,17 @@
                                             <td>
                                                 <#switch post.postStatus>
                                                     <#case 0>
-                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
-                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-primary btn-sm btn-flat">修改</a>
+                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-sm btn-flat" target="_blank">预览</a>
+                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-sm btn-flat">修改</a>
                                                         <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
                                                         <#break >
                                                     <#case 1>
-                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
-                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-primary btn-sm btn-flat">修改</a>
+                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-sm btn-flat" target="_blank">预览</a>
+                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-sm btn-flat">修改</a>
                                                         <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
                                                         <#break >
                                                     <#case 2>
-                                                        <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-info btn-sm btn-flat">还原</a>
+                                                        <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-primary btn-sm btn-flat">还原</a>
                                                         <button class="btn btn-danger btn-sm btn-flat" onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
                                                         <#break >
                                                 </#switch>

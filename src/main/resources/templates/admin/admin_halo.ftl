@@ -18,7 +18,7 @@
             <h1 style="display: inline-block;">关于Halo</h1>
             <ol class="breadcrumb">
                 <li>
-                    <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
                 <li class="active">关于Halo</li>
             </ol>

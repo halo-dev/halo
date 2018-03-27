@@ -18,8 +18,8 @@
             <h1>标签<small></small>
             </h1>
             <ol class="breadcrumb">
-                <li><a href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
-                <li><a href="/admin/category"><i class="fa fa-dashboard"></i> 标签</a></li>
+                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a data-pjax="true" href="/admin/category"><i class="fa fa-dashboard"></i> 标签</a></li>
                 <li class="active">修改</li>
             </ol>
         </section>

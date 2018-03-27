@@ -248,7 +248,17 @@
                                                     <a href="/article/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
                                                 </td>
                                                 <td>
-                                                    <a href="/admin/comments">${comment.commentContent}</a>
+                                                    <#switch comment.commentStatus>
+                                                        <#case 0>
+                                                        <a href="/admin/comments">${comment.commentContent}</a>
+                                                        <#break>
+                                                        <#case 1>
+                                                        <a href="/admin/comments?status=1">${comment.commentContent}</a>
+                                                        <#break>
+                                                        <#case 2>
+                                                        <a href="/admin/comments?status=2">${comment.commentContent}</a>
+                                                        <#break>
+                                                    </#switch>
                                                 </td>
                                                 <td>
                                                     <#switch comment.commentStatus>

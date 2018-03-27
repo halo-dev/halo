@@ -12,8 +12,8 @@
         <section class="content-header">
             <h1>友情链接<small>#</small></h1>
             <ol class="breadcrumb">
-                <li><a href="/admin"><i class="fa fa-dashboard"></i>首页</a></li>
-                <li><a href="/admin/page">页面</a></li>
+                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i>首页</a></li>
+                <li><a data-pjax="true" href="/admin/page">页面</a></li>
                 <li class="active">友情链接</li>
             </ol>
         </section>

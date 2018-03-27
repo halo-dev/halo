@@ -65,8 +65,8 @@
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i>上传
             </a>
             <ol class="breadcrumb">
-                <li><a href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
-                <li><a href="#">外观</a></li>
+                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
+                <li><a data-pjax="true" href="#">外观</a></li>
                 <li class="active">主题设置</li>
             </ol>
         </section>
@@ -124,7 +124,7 @@
                             allowedFileExtensions: ['zip','jpg'],
                             maxFileCount: 1,
                             enctype: 'multipart/form-data',
-                            dropZoneTitle: '拖拽文件到这里 &hellip;<br>此模式不支持多文件同时上传',
+                            dropZoneTitle: '拖拽主题压缩包到这里 &hellip;<br>不支持多个主题同时上传',
                             showClose: false
                         }).on("fileuploaded",function (event,data,previewId,index) {
                             var data = data.jqXHR.responseJSON;
