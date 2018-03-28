@@ -26,7 +26,7 @@ public class TagServiceImpl implements TagService {
     private static final String CATEGORY_CACHE_NAME = "cateCache";
 
     /**
-     * 新增标签
+     * 新增/修改标签
      *
      * @param tag tag
      * @return Tag
@@ -47,17 +47,6 @@ public class TagServiceImpl implements TagService {
         Optional<Tag> tag = findByTagId(tagId);
         tagRepository.delete(tag.get());
         return tag.get();
-    }
-
-    /**
-     * 更新标签
-     *
-     * @param tag tag
-     * @return tag
-     */
-    @Override
-    public Tag updateByTag(Tag tag) {
-        return tagRepository.save(tag);
     }
 
     /**

@@ -29,7 +29,7 @@ public class LinkServiceImpl implements LinkService {
     private static final String LINK_CACHE_NAME = "link_cache";
 
     /**
-     * 保存友情链接 清除缓存
+     * 新增/修改友情链接 清除缓存
      *
      * @param link link
      * @return Link
@@ -52,19 +52,6 @@ public class LinkServiceImpl implements LinkService {
         Optional<Link> link = this.findByLinkId(linkId);
         linkRepository.delete(link.get());
         return link.get();
-    }
-
-    /**
-     * 修改友情链接 清除缓存
-     *
-     * @param link link
-     * @return Link
-     */
-    @CachePut(value = LINK_CACHE_NAME,key = "#link.linkId+'link'")
-    @CacheEvict(value = LINK_CACHE_NAME,key = LINK_KEY)
-    @Override
-    public Link updateByLink(Link link) {
-        return linkRepository.save(link);
     }
 
     /**

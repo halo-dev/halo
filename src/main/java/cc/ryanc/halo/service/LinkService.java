@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface LinkService {
 
     /**
-     * 新增友情链接
+     * 新增/修改友情链接
      *
      * @param link link
      * @return Link
@@ -28,14 +28,6 @@ public interface LinkService {
      * @return Link
      */
     Link removeByLinkId(Long linkId);
-
-    /**
-     * 修改
-     *
-     * @param link link
-     * @return Link
-     */
-    Link updateByLink(Link link);
 
     /**
      * 查询所有

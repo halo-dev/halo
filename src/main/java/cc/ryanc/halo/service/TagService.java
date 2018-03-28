@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface TagService {
 
     /**
-     * 新增标签
+     * 新增/修改标签
      *
      * @param tag tag
      * @return Tag
@@ -28,14 +28,6 @@ public interface TagService {
      * @return Tag
      */
     Tag removeByTagId(Long tagId);
-
-    /**
-     * 更新标签
-     *
-     * @param tag tag
-     * @return tag
-     */
-    Tag updateByTag(Tag tag);
 
     /**
      * 获取所有标签
