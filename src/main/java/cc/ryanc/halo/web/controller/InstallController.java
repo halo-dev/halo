@@ -48,6 +48,9 @@ public class InstallController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private MenuService menuService;
+
     /**
      * 渲染安装页面
      *
@@ -92,9 +95,6 @@ public class InstallController {
             }else{
                 installFile.createNewFile();
             }
-            //保存title设置
-            optionsService.saveOption("site_title",siteTitle);
-            optionsService.saveOption("site_url",siteUrl);
 
             //创建新的用户
             User user=  new User();
@@ -144,6 +144,10 @@ public class InstallController {
             comment.setIsAdmin(0);
             commentService.saveByComment(comment);
 
+            //保存博客标题和博客地址设置
+            optionsService.saveOption("site_title",siteTitle);
+            optionsService.saveOption("site_url",siteUrl);
+
             //设置默认主题
             optionsService.saveOption("theme","halo");
 
@@ -170,6 +174,20 @@ public class InstallController {
                             HaloUtil.getDate()
                     )
             );
+
+            Menu menuIndex = new Menu();
+            menuIndex.setMenuName("首页");
+            menuIndex.setMenuUrl("/");
+            menuIndex.setMenuSort(1);
+            menuIndex.setMenuIcon("");
+            menuService.saveByMenu(menuIndex);
+
+            Menu menuArchive = new Menu();
+            menuArchive.setMenuName("归档");
+            menuArchive.setMenuUrl("/archives");
+            menuArchive.setMenuSort(2);
+            menuArchive.setMenuIcon("");
+            menuService.saveByMenu(menuArchive);
 
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();

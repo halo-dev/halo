@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 /**
@@ -73,5 +74,20 @@ public class MenuController {
         //设置选项
         model.addAttribute("options", HaloConst.OPTIONS);
         return "/admin/admin_menu";
+    }
+
+    /**
+     * 删除菜单
+     * @param menuId menuId
+     * @return String
+     */
+    @GetMapping(value = "/remove")
+    public String removeMenu(@PathParam("menuId") Long menuId){
+        try {
+            menuService.removeByMenuId(menuId);
+        }catch (Exception e){
+            log.error("删除菜单失败：{0}",e.getMessage());
+        }
+        return "redirect:/admin/menus";
     }
 }

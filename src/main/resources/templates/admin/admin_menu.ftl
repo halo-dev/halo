@@ -105,7 +105,7 @@
                                                 <#else>
                                                 <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId}" class="btn btn-primary btn-xs btn-flat">修改</a>
                                             </#if>
-                                            <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow()">删除</button>
+                                            <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId}')">删除</button>
                                         </td>
                                     </tr>
                                     </#list>
@@ -116,6 +116,33 @@
                 </div>
             </div>
         </section>
+        <!-- 删除确认弹出层 -->
+        <div class="modal fade" id="removeMenuModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">提示信息</h4>
+                    </div>
+                    <div class="modal-body"><p>您确认要删除吗？</p></div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="url"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function modelShow(url) {
+                $('#url').val(url);
+                $('#removeMenuModal').modal();
+            }
+            function removeIt(){
+                var url=$.trim($("#url").val());
+                window.location.href=url;
+            }
+        </script>
     </div>
     <#include "module/_footer.ftl">
 </div>
