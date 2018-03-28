@@ -28,25 +28,46 @@
                 <div class="col-md-5">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">添加新标签</h3>
+                            <h3 class="box-title">${statusName}标签<#if tag??>[${updateTag.tagName}]</#if></h3>
                         </div>
-                        <form action="/admin/tag/save" method="post" role="form" onsubmit="return checkTag()">
-                            <div class="box-body">
-                                <div class="form-group">
-                                    <label for="tagName">名称</label>
-                                    <input type="text" class="form-control" id="tagName" name="tagName">
-                                    <small>页面上所显示的名称</small>
+                        <#if updateTag??>
+                            <form action="/admin/tag/save" method="post" role="form">
+                                <input type="hidden" name="tagId" value="${updateTag.tagId}">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="tagName">名称</label>
+                                        <input type="text" class="form-control" id="tagName" name="tagName" value="${updateTag.tagName}">
+                                        <small>页面上所显示的名称</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tagUrl">路径名称</label>
+                                        <input type="text" class="form-control" id="tagUrl" name="tagUrl" value="${updateTag.tagUrl}">
+                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="tagUrl">路径名称</label>
-                                    <input type="text" class="form-control" id="tagUrl" name="tagUrl">
-                                    <small>*这是文章路径上显示的名称，最好为英文</small>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
                                 </div>
-                            </div>
-                            <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-flat">添加新标签</button>
-                            </div>
-                        </form>
+                            </form>
+                        <#else >
+                            <form action="/admin/tag/save" method="post" role="form" onsubmit="return checkTag()">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="tagName">名称</label>
+                                        <input type="text" class="form-control" id="tagName" name="tagName">
+                                        <small>页面上所显示的名称</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="tagUrl">路径名称</label>
+                                        <input type="text" class="form-control" id="tagUrl" name="tagUrl">
+                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                    </div>
+                                </div>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
+                                </div>
+                            </form>
+                        </#if>
                     </div>
                 </div>
                 <div class="col-md-7">
@@ -71,8 +92,12 @@
                                         <td>${tag.tagUrl}</td>
                                         <td>2</td>
                                         <td>
-                                            <a class="btn btn-danger btn-xs btn-flat" href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>
-                                            <button class="btn btn-primary btn-xs btn-flat" onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>
+                                            <#if updateTag ?? && tag.tagId==updateTag.tagId>
+                                                <a class="btn btn-primary btn-xs btn-flat" href="#" disabled>正在修改</a>
+                                            <#else >
+                                            <a data-pjax="true" class="btn btn-primary btn-xs btn-flat" href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>
+                                            </#if>
+                                            <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>
                                         </td>
                                     </tr>
                                 </#list>

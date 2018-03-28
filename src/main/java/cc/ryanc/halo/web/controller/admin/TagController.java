@@ -37,13 +37,14 @@ public class TagController {
     public String tags(Model model){
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("tags",tags);
+        model.addAttribute("statusName","新增");
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_tag";
     }
 
     /**
-     * 新增标签
+     * 新增/修改标签
      *
      * @param tag tag
      * @return string
@@ -51,8 +52,7 @@ public class TagController {
     @PostMapping(value = "/save")
     public String saveTag(@ModelAttribute Tag tag){
         try{
-            Tag backTag = tagService.saveByTag(tag);
-            log.info("新添加的标签为："+backTag);
+            tagService.saveByTag(tag);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
@@ -102,33 +102,12 @@ public class TagController {
      */
     @GetMapping(value = "/edit")
     public String toEditTag(Model model,@PathParam("tagId") Long tagId){
-        try{
-            Optional<Tag> tag = tagService.findByTagId(tagId);
-            model.addAttribute("tag",tag.get());
-            //设置选项
-            model.addAttribute("options",HaloConst.OPTIONS);
-            log.info("tagId为"+tagId+"的数据为："+tag.get());
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
-        }
-        return "admin/admin_tag-update";
-    }
-
-    /**
-     * 处理修改标签的请求
-     *
-     * @param tag tag
-     * @return string
-     */
-    @PostMapping(value = "/update")
-    public String updateTag(@ModelAttribute Tag tag){
-        try {
-            Optional<Tag> beforeTag = tagService.findByTagId(tag.getTagId());
-            log.info("修改之前的数据："+beforeTag.get()+"，修改之后的数据："+tag);
-            tagService.updateByTag(tag);
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
-        }
-        return "redirect:/admin/tag";
+        List<Tag> tags = tagService.findAllTags();
+        Tag tag = tagService.findByTagId(tagId).get();
+        model.addAttribute("statusName","修改");
+        model.addAttribute("updateTag",tag);
+        model.addAttribute("tags",tags);
+        model.addAttribute("options",HaloConst.OPTIONS);
+        return "admin/admin_tag";
     }
 }

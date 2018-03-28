@@ -10,7 +10,7 @@
     <div class="content-wrapper">
         <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <section class="content-header">
-            <h1>友情链接<small>#</small></h1>
+            <h1>友情链接<small></small></h1>
             <ol class="breadcrumb">
                 <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i>首页</a></li>
                 <li><a data-pjax="true" href="/admin/page">页面</a></li>
@@ -21,32 +21,61 @@
             <div class="row">
                 <div class="col-md-5">
                     <div class="box box-primary">
-                        <div class="box-header with-border"><h3 class="box-title">添加友情链接</h3></div>
-                        <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
-                            <div class="box-body">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">网站名称</label>
-                                    <input type="text" class="form-control" id="linkName" name="linkName" placeholder="">
-                                    <small>好友的网站名称</small>
+                        <div class="box-header with-border"><h3 class="box-title">${statusName}友情链接</h3></div>
+                        <#if updateLink??>
+                            <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
+                                <input type="hidden" name="linkId" value="${updateLink.linkId}">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">网站名称</label>
+                                        <input type="text" class="form-control" id="linkName" name="linkName" value="${updateLink.linkName}">
+                                        <small>好友的网站名称</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">网址</label>
+                                        <input type="text" class="form-control" id="linkUrl" name="linkUrl" value="${updateLink.linkUrl}">
+                                        <small>*需要加上http://或https://</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">LOGO</label>
+                                        <input type="text" class="form-control" id="linkPic" name="linkPic" value="${updateLink.linkPic}">
+                                        <small>*LOGO链接地址，需要加上http://或https://，在部分主题可显示</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">描述</label>
+                                        <textarea class="form-control" rows="3" id="linkDesc" name="linkDesc" style="resize: none">${updateLink.linkDesc}</textarea>
+                                        <small>*网站的描述，部分主题可显示</small>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">网址</label>
-                                    <input type="text" class="form-control" id="linkUrl" name="linkUrl" placeholder="">
-                                    <small>*需要加上http://或https://</small>
+                                <div class="box-footer"><button type="submit" class="btn btn-primary">确定${statusName}</button></div>
+                            </form>
+                        <#else>
+                            <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">网站名称</label>
+                                        <input type="text" class="form-control" id="linkName" name="linkName" placeholder="">
+                                        <small>好友的网站名称</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">网址</label>
+                                        <input type="text" class="form-control" id="linkUrl" name="linkUrl" placeholder="">
+                                        <small>*需要加上http://或https://</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">LOGO</label>
+                                        <input type="text" class="form-control" id="linkPic" name="linkPic" placeholder="">
+                                        <small>*LOGO链接地址，需要加上http://或https://，在部分主题可显示</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputPassword1">描述</label>
+                                        <textarea class="form-control" rows="3" id="linkDesc" name="linkDesc" style="resize: none"></textarea>
+                                        <small>*网站的描述，部分主题可显示</small>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">LOGO</label>
-                                    <input type="text" class="form-control" id="linkPic" name="linkPic" placeholder="">
-                                    <small>*LOGO链接地址，需要加上http://或https://，在部分主题可显示</small>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">描述</label>
-                                    <textarea class="form-control" rows="3" id="linkDesc" name="linkDesc" style="resize: none"></textarea>
-                                    <small>*网站的描述，部分主题可显示</small>
-                                </div>
-                            </div>
-                            <div class="box-footer"><button type="submit" class="btn btn-primary">确定添加</button></div>
-                        </form>
+                                <div class="box-footer"><button type="submit" class="btn btn-primary">确定${statusName}</button></div>
+                            </form>
+                        </#if>
                     </div>
                 </div>
                 <div class="col-md-7">
@@ -63,8 +92,14 @@
                                         <td>${link.linkName}</td>
                                         <td>${link.linkUrl}</td>
                                         <td>${link.linkDesc}</td>
-                                        <td><a class="btn btn-primary btn-xs" href="/admin/page/links/edit?linkId=${link.linkId}">修改</a>
-                                            <button class="btn btn-danger btn-xs" onclick="modelShow('/admin/page/links/remove?linkId=${link.linkId}')">删除</></td>
+                                        <td>
+                                            <#if updateLink?? && updateLink.linkId==link.linkId>
+                                                <a class="btn btn-primary btn-xs" href="#" disabled>正在修改</a>
+                                            <#else >
+                                            <a data-pjax="true" class="btn btn-primary btn-xs" href="/admin/page/links/edit?linkId=${link.linkId}">修改</a>
+                                            </#if>
+                                            <button class="btn btn-danger btn-xs" onclick="modelShow('/admin/page/links/remove?linkId=${link.linkId}')">删除</>
+                                        </td>
                                     </tr>
                                     </#list>
                                 </tbody>

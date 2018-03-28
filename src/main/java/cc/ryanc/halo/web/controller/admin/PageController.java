@@ -52,6 +52,7 @@ public class PageController {
     public String links(Model model){
         List<Link> links = linkService.findAllLinks();
         model.addAttribute("links",links);
+        model.addAttribute("statusName","添加");
 
         //设置选项
         model.addAttribute("options", HaloConst.OPTIONS);
@@ -67,16 +68,18 @@ public class PageController {
      */
     @GetMapping("/links/edit")
     public String toEditLink(Model model,@PathParam("linkId") Long linkId){
+        List<Link> links = linkService.findAllLinks();
         Optional<Link> link = linkService.findByLinkId(linkId);
-        model.addAttribute("link",link.get());
-
+        model.addAttribute("updateLink",link.get());
+        model.addAttribute("statusName","修改");
+        model.addAttribute("links",links);
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
-        return "admin/admin_link-update";
+        return "admin/admin_link";
     }
 
     /**
-     * 处理添加友链的请求并渲染页面
+     * 处理添加/修改友链的请求并渲染页面
      *
      * @param link Link
      * @return freemarker
@@ -103,24 +106,6 @@ public class PageController {
         try{
             Link link = linkService.removeByLinkId(linkId);
             log.info("删除的友情链接："+link);
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
-        }
-        return "redirect:/admin/page/links";
-    }
-
-    /**
-     * 处理修改的请求并重定向
-     *
-     * @param link Link
-     * @return freemarker
-     */
-    @PostMapping(value = "/links/update")
-    public String updateLink(@ModelAttribute Link link){
-        try {
-            Optional<Link> beforeLink = linkService.findByLinkId(link.getLinkId());
-            linkService.updateByLink(link);
-            log.info("修改友情链接页面：修改之前的数据："+beforeLink.get()+"，修改之后的数据："+link);
         }catch (Exception e){
             log.error("未知错误："+e.getMessage());
         }
