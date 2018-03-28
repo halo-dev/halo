@@ -9,6 +9,64 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
+        <style>
+            .tag-cloud .label{
+                padding: .3em .9em .45em;
+                font-size: 100%;
+                font-weight: 400;
+            }
+            .tag-cloud{
+                margin-bottom: 11px;
+                margin-right: 3px;
+                display: inline-block;
+                float: left;
+            }
+            .bg-color-1{
+                background-color: #3c8dbc;
+            }
+            .bg-color-2{
+                background-color: #00a65a;
+            }
+            .bg-color-3{
+                background-color: #001f3f;
+            }
+            .bg-color-4{
+                background-color: #39cccc;
+            }
+            .bg-color-5{
+                background-color: #3d9970;
+            }
+            .bg-color-6{
+                background-color: #01ff70;
+            }
+            .bg-color-7{
+                background-color: #ff851b;
+            }
+            .bg-color-8{
+                background-color: #f012be;
+            }
+            .bg-color-9{
+                background-color: #605ca8;
+            }
+            .bg-color-10{
+                background-color: #d81b60;
+            }
+            .bg-color-11{
+                background-color: #dd4b39;
+            }
+            .bg-color-12{
+                background-color: #f39c12;
+            }
+            .bg-color-13{
+                background-color: #00c0ef;
+            }
+            .bg-color-14{
+                background-color: #0073b7;
+            }
+            .bg-color-15{
+                background-color: #111111;
+            }
+        </style>
         <section class="content-header">
             <h1>
                 标签
@@ -76,40 +134,56 @@
                             <h3 class="box-title">所有标签</h3>
                         </div>
                         <div class="box-body table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>名称</th>
-                                    <th>路径</th>
-                                    <th>总数</th>
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <#list tags as tag>
-                                    <tr>
-                                        <td>${tag.tagName}</td>
-                                        <td>${tag.tagUrl}</td>
-                                        <td>2</td>
-                                        <td>
-                                            <#if updateTag ?? && tag.tagId==updateTag.tagId>
-                                                <a class="btn btn-primary btn-xs btn-flat" href="#" disabled>正在修改</a>
-                                            <#else >
-                                            <a data-pjax="true" class="btn btn-primary btn-xs btn-flat" href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>
-                                            </#if>
-                                            <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>
-                                        </td>
-                                    </tr>
-                                </#list>
-                                </tbody>
-                            </table>
+                            <#--<table class="table table-hover">-->
+                                <#--<thead>-->
+                                <#--<tr>-->
+                                    <#--<th>名称</th>-->
+                                    <#--<th>路径</th>-->
+                                    <#--<th>总数</th>-->
+                                    <#--<th>操作</th>-->
+                                <#--</tr>-->
+                                <#--</thead>-->
+                                <#--<tbody>-->
+                                <#--<#list tags as tag>-->
+                                    <#--<tr>-->
+                                        <#--<td>${tag.tagName}</td>-->
+                                        <#--<td>${tag.tagUrl}</td>-->
+                                        <#--<td>2</td>-->
+                                        <#--<td>-->
+                                            <#--<#if updateTag ?? && tag.tagId==updateTag.tagId>-->
+                                                <#--<a class="btn btn-primary btn-xs btn-flat" href="#" disabled>正在修改</a>-->
+                                            <#--<#else >-->
+                                            <#--<a data-pjax="true" class="btn btn-primary btn-xs btn-flat" href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>-->
+                                            <#--</#if>-->
+                                            <#--<button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>-->
+                                        <#--</td>-->
+                                    <#--</tr>-->
+                                <#--</#list>-->
+                                <#--</tbody>-->
+                            <#--</table>-->
+                            <#list tags as tag>
+                                <div class="tag-cloud">
+                                    <a class="tag-link" data-pjax="true" href="/admin/tag/edit?tagId=${tag.tagId}">
+                                        <span class="label">${tag.tagName}(2)</span>
+                                    </a>
+                                </div>
+                            </#list>
+                            <script>
+                                var randomNum;
+                                var tagLabel = $('.tag-link');
+                                for(var i = 0; i < ${tags?size}; i++) {
+                                    randomNum = Math.floor(Math. random() * 15 + 1);
+                                    tagLabel.children('.label').addClass("bg-color-"+randomNum);
+                                    tagLabel = tagLabel.next();
+                                }
+                            </script>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         <!-- 删除确认弹出层 -->
-        <div class="modal fade" id="removeCateModal">
+        <div class="modal fade label-primary" id="removeCateModal">
             <div class="modal-dialog">
                 <div class="modal-content message_align">
                     <div class="modal-header">

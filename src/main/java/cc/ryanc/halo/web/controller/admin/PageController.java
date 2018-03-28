@@ -56,7 +56,7 @@ public class PageController {
 
         //设置选项
         model.addAttribute("options", HaloConst.OPTIONS);
-        return "admin/admin_link";
+        return "admin/admin_page_link";
     }
 
     /**
@@ -75,7 +75,7 @@ public class PageController {
         model.addAttribute("links",links);
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
-        return "admin/admin_link";
+        return "admin/admin_page_link";
     }
 
     /**
