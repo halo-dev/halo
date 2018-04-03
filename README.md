@@ -2,8 +2,9 @@
 
 > Halo may be the best Java blog system. | Halo可能是最好的Java博客系统。
 
+[![JDK](https://img.shields.io/badge/JDK-1.8-yellow.svg)](#)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.0.0-green.svg)](https://github.com/spring-projects/spring-boot)
 [![GitHub release](https://img.shields.io/github/release/ruibaby/halo.svg)](https://github.com/ruibaby/halo/releases)
-[![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
 
 ------------------------------
 
@@ -44,7 +45,7 @@ Fast,simple,powerful blog system powered by Java.
 
 ## License 许可证
 
-[GPL-3.0](https://github.com/ruibaby/halo/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
 
 ## Thanks 感谢
 

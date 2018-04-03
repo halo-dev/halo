@@ -118,7 +118,8 @@ public class PageController {
      * @return String
      */
     @GetMapping(value = "/gallery")
-    public String gallery(){
-        return "";
+    public String gallery(Model model){
+        model.addAttribute("options",HaloConst.OPTIONS);
+        return "admin/admin_page_gallery";
     }
 }
