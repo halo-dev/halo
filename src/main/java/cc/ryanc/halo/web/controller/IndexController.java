@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -209,7 +210,7 @@ public class IndexController extends BaseController{
      * @param postId postId
      * @return page
      */
-    @GetMapping(value = "/getComment/{postId}",produces = { "application/json;charset=UTF-8" })
+    @GetMapping(value = "/getComment/{postId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public List<Comment> getComment(@PathVariable Long postId){
         Optional<Post> post = postService.findByPostId(postId);
@@ -452,7 +453,7 @@ public class IndexController extends BaseController{
      *
      * @return rss
      */
-    @GetMapping(value = {"feed","feed.xml","atom.xml"},produces = { "application/xml;charset=UTF-8" })
+    @GetMapping(value = {"feed","feed.xml","atom.xml"},produces = {MediaType.APPLICATION_ATOM_XML_VALUE,MediaType.APPLICATION_RSS_XML_VALUE})
     @ResponseBody
     public String feed(){
         String rssPosts = HaloConst.OPTIONS.get("rss_posts");
@@ -472,7 +473,7 @@ public class IndexController extends BaseController{
      *
      * @return sitemap
      */
-    @GetMapping(value = {"sitemap","sitemap.xml"},produces = { "application/xml;charset=UTF-8" })
+    @GetMapping(value = {"sitemap","sitemap.xml"},produces = MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
     public String siteMap(){
         //获取文章列表并根据时间排序

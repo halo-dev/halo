@@ -48,7 +48,7 @@
                             <p>${user_session.userDisplayName?if_exists}</p>
                         </li>
                         <li class="user-footer">
-                            <div class="pull-left"><a href="/admin/profile" class="btn btn-default btn-flat">个人资料</a></div>
+                            <div class="pull-left"><a data-pjax="true" href="/admin/profile" class="btn btn-default btn-flat">个人资料</a></div>
                             <div class="pull-right"><a href="/admin/logOut" class="btn btn-default btn-flat">退出登录</a></div>
                         </li>
                     </ul>

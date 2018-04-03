@@ -59,7 +59,7 @@
                                         </tr>
                                         <tr>
                                             <td>图库页面</td>
-                                            <td>/about</td>
+                                            <td>/gallery</td>
                                             <td>
                                                 <a href="/gallery" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
                                                 <a data-pjax="true" href="/admin/page/gallery" class="btn btn-primary btn-sm btn-flat">配置</a>
