@@ -1,0 +1,113 @@
+@charset "UTF-8";
+
+#{$prefix}menu {
+    margin: 0;
+    padding: 0;       
+    list-style: none;
+    
+    > li {
+        margin: 0;
+        padding: 5px 1px;
+        display: inline-block;
+        position: relative;
+
+        &.divider {
+            display: inline-block;
+            text-indent: -9999px;
+            margin: 0 5px; 
+            height: 65%;
+            border-right: 1px solid $borderColor;
+        }
+
+        > a {
+            outline: 0;
+            color: $color;
+            display: inline-block;
+            min-width: 24px;
+            font-size: 16px;
+            text-decoration: none;
+            text-align: center;
+            @include border-radius(2px);
+            border: 1px solid #fff;
+            @include transition(all 300ms ease-out);
+
+            &:hover, &.active {
+                border: 1px solid $borderColor;
+                background: #eee;
+            }
+
+            > .fa { 
+                text-align: center;
+                display: block;
+                padding: 5px;
+            }
+
+            > #{$prefix}bold {
+                padding: 5px 2px; 
+                display: inline-block;
+                font-weight: bold;
+            }
+        }
+
+        &:hover #{$prefix}dropdown-menu {
+            display: block;
+        }
+    }
+
+    > li + li > a {
+        margin-left: 3px;
+    }
+}
+
+#{$prefix}dropdown-menu { 
+    display: none;
+    background: #fff;
+    border: 1px solid $borderColor;
+    width: 148px;
+    list-style: none;
+    position: absolute;
+    top: 33px;
+    left: 0;
+    z-index: 100;
+    @include box-shadow(1px 2px 6px rgba(0, 0, 0, 0.15));
+
+    &:before, &:after {
+        width: 0;
+        height: 0;
+        display: block;
+        content: "";
+        position: absolute;
+        top: -11px;
+        left: 8px;
+        border: 5px solid transparent;
+    }
+
+    &:before { 
+        border-bottom-color: #ccc;   
+    }
+
+    &:after { 
+        border-bottom-color: #ffffff;  
+        top: -10px;
+    }
+
+
+    > li {
+        
+        > a {
+            color: $color;
+            display: block;
+            text-decoration: none;
+            padding: 8px 10px;
+
+            &:hover {
+                background: #f6f6f6;
+                @include transition(all 300ms ease-out);
+            }
+        }
+    }
+
+    > li + li {
+        border-top: 1px solid $borderColor;
+    }
+}

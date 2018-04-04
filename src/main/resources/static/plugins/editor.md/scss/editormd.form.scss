@@ -1,0 +1,130 @@
+@charset "UTF-8";
+
+// Form
+            
+#{$prefix}form {
+    color: $color;
+    
+    label {
+        float: left;
+        display: block;
+        width: 75px;
+        text-align: left;
+        padding: 7px 0 15px 5px;
+        margin: 0 0 2px;
+        font-weight: normal;
+    }
+
+    br {
+        clear: both;
+    }
+
+    iframe {
+        display: none;
+    }
+
+    input:focus {
+        outline: 0;
+    }
+
+    input[type="text"], input[type="number"] {
+        color: #999;
+        padding: 8px;
+        border: 1px solid $borderColor;
+    }
+            
+    input[type="number"] {
+        width: 40px;
+        display: inline-block;
+        padding: 6px 8px;
+    }
+
+    input[type="text"] {
+        display: inline-block;
+        width: 264px;
+    }
+    
+    .fa-btns {
+        display: inline-block;
+
+        a {
+            color: #999;
+            padding: 7px 10px 0 0;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .fa {
+            font-size: 1.3em;
+        }
+
+        label {
+            float: none;
+            display: inline-block;
+            width: auto;
+            text-align: left;
+            padding: 0 0 0 5px;
+            cursor: pointer;
+        }
+    }
+}
+
+#{$prefix}form,
+#{$prefix}dialog-container,
+#{$prefix}dialog-footer {
+
+    input[type="submit"], #{$prefix}btn, button {
+        color: $color;
+        min-width: 75px;
+        cursor: pointer;
+        background: #fff;
+        padding: 7px 10px;
+        border: 1px solid #ddd;
+        @include border-radius(3px);
+        @include transition(background 300ms ease-out);
+
+        &:hover {
+            background: #eee;
+        }
+    }
+
+    #{$prefix}btn {
+        padding: 5px 8px 4px\0;
+    }
+
+    #{$prefix}btn + #{$prefix}btn {
+        margin-left: 8px;
+    }
+}
+
+#{$prefix}file-input {
+    width: 75px;
+    height: 32px;
+    margin-left: 8px;
+    position: relative;
+    display: inline-block;
+
+    input[type="file"] {
+        width: 75px;
+        height: 32px;
+        opacity: 0;
+        cursor: pointer;
+        background: #000;
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        &::-webkit-file-upload-button {
+            visibility: hidden;
+        }
+    }
+
+    input[type="submit"]  {
+    }
+
+    &:hover input[type="submit"]  {
+        background: #eee;
+    }
+}

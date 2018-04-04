@@ -48,7 +48,7 @@
                     <div class="box box-primary">
                         <!-- Editor.md编辑器 -->
                         <div class="box-body pad">
-                            <div id="markdown-editor" style="z-index: 9999;">
+                            <div id="markdown-editor">
                                 <textarea style="display:none;"><#if post??>${post.postContentMd?if_exists}</#if></textarea>
                             </div>
                         </div>
@@ -151,9 +151,12 @@
                     syncScrolling: "single",
                     path: "/static/plugins/editor.md/lib/",
                     saveHTMLToTextarea: true,
-                    toolbarIcons : function () {
-                        return editormd.toolbarModes["simple"];
-                    }
+                    imageUpload : true,
+                    imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                    imageUploadURL : "/admin/attachments/upload"
+                    // toolbarIcons : function () {
+                    //     return editormd.toolbarModes["simple"];
+                    // }
                 });
             }
             $(document).ready(function () {
