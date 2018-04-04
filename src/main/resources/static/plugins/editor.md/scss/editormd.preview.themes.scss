@@ -1,0 +1,131 @@
+/* Preview dark theme */
+            
+#{$prefix}preview-theme-dark {
+    color: #777;
+    background:#2C2827;
+    
+    #{$prefix}preview-container {
+        color: #888;
+        background-color: #2C2827;  
+        //font-family: "Meiryo UI", "Helvetica Neue", "Microsoft YaHei";
+
+        pre.prettyprint {
+            border: none;
+        }
+
+        blockquote {
+            color: #555;
+            padding: 0.5em;
+            background: #222;
+            border-color: #333;
+        }
+
+        abbr {
+            color: #fff;
+            padding: 1px 3px;
+            @include border-radius(3px); 
+            background:#ff9900;
+        }
+
+        code {
+            color: #fff;
+            border: none;
+            padding: 1px 3px;
+            @include border-radius(3px); 
+            background: #5A9600;
+        }
+
+        table {
+            border: none;
+        }
+
+        .fa-emoji {
+            color: #B4BF42;
+        }
+
+        .katex {
+            color: #FEC93F;
+        }
+    }
+
+    .editormd-toc-menu {
+        > .markdown-toc {
+            background:#fff;
+            border:none;
+
+            h1 {
+                border-color:#ddd;
+            }
+        }
+    }
+    
+    .markdown-body {
+        h1, h2, hr {
+            border-color: #222;      
+        }    
+    }
+    
+    pre {
+        color: #999;
+        background-color: #111;
+        background-color: rgba(0,0,0,.4);
+
+        /* plain text */
+        .pln { 
+            color: #999;
+        } 
+    }
+
+    li.L1, li.L3, li.L5, li.L7, li.L9 { 
+        background: none;
+    }
+
+    [class*=editormd-logo] {
+        color: #2196F3;
+    }
+
+    .sequence-diagram {
+        text {
+            fill: #fff;
+        }
+
+        rect, path {
+            color:#fff;
+            fill : #64D1CB;
+            stroke : #64D1CB;
+        }
+    }
+    
+    .flowchart {
+        rect, path {
+            stroke : #A6C6FF;
+        }
+
+        rect {
+            fill: #A6C6FF;
+        }
+
+        text {
+            fill: #5879B4;
+        }
+    }
+}
+
+@media screen {
+    
+    #{$prefix}preview-theme-dark {
+        .str { color: #080 }  /* string content */
+        .kwd { color: #ff9900; }  /* a keyword */
+        .com { color: #444444; }  /* a comment */
+        .typ { color: #606 }  /* a type name */
+        .lit { color: #066 }  /* a literal value */
+        /* punctuation, lisp open bracket, lisp close bracket */
+        .pun, .opn, .clo { color: #660 }
+        .tag { color: #ff9900; }  /* a markup tag name */
+        .atn { color: #6C95F5; }  /* a markup attribute name */
+        .atv { color: #080 }  /* a markup attribute value */
+        .dec, .var { color: #008BA7; }  /* a declaration; a variable name */
+        .fun { color: red }  /* a function name */
+    }
+    
+}

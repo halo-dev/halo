@@ -65,6 +65,7 @@ Halo的诞生离不开下面这些项目：
 - [Bootstrap](https://github.com/twbs/bootstrap.git)：使用最广泛的前端ui框架
 - [Animate](https://github.com/daneden/animate.css.git)：非常好用的css动效库
 - [Editor.md](https://github.com/pandao/editor.md.git)：Markdown前端编辑器，遗憾作者弃坑了
+- [Editor.md](https://github.com/hawtim/editor.md)：Editor.md，hawtim接过来维护的版本
 - [Bootstrap-FileInput](https://github.com/kartik-v/bootstrap-fileinput.git)：个人认为最好用的上传组件，没有之一
 - [Font-awesome](https://github.com/FortAwesome/Font-Awesome.git)：使用最广泛的字体图标库
 - [Jquery](https://github.com/jquery/jquery.git)：使用最广泛的JavaScript框架

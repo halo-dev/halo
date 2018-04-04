@@ -25,6 +25,8 @@ import javax.websocket.server.PathParam;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -102,8 +104,9 @@ public class AttachmentController {
      */
     @PostMapping(value = "/upload",produces = { "application/json;charset=UTF-8" })
     @ResponseBody
-    public boolean uploadAttachment(@RequestParam("file") MultipartFile file,
+    public Map uploadAttachment(@RequestParam("file") MultipartFile file,
                                     HttpServletRequest request){
+        Map<String,String> result = new HashMap<>();
         if(!file.isEmpty()){
             try{
                 File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
@@ -143,14 +146,19 @@ public class AttachmentController {
                 logsService.saveByLogs(
                         new Logs(LogsRecord.UPLOAD_FILE,file.getOriginalFilename(),HaloUtil.getIpAddr(request),HaloUtil.getDate())
                 );
-                return true;
+
+                result.put("success","1");
+                result.put("message","上传成功！");
+                result.put("url",attachment.getAttachPath());
             }catch (Exception e){
                 log.error("未知错误："+e.getMessage());
+                result.put("success","0");
+                result.put("message","上传失败！");
             }
         }else {
             log.error("文件不能为空");
         }
-        return false;
+        return result;
     }
 
     /**

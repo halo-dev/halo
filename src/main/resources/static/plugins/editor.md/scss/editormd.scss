@@ -1,0 +1,137 @@
+@charset "UTF-8";
+
+@import "lib/variables";
+@import "lib/prefixes";
+        
+.editormd {
+    width: 90%;
+    height: 640px;
+    margin: 0 auto;
+    text-align: left;
+    overflow: hidden;  
+    position: relative;
+    margin-bottom: 15px;
+    border: 1px solid $borderColor;
+    font-family: "Meiryo UI", "Microsoft YaHei", "Malgun Gothic", "Segoe UI", "Trebuchet MS", Helvetica, "Monaco", monospace, Tahoma, STXihei, "华文细黑", STHeiti, "Helvetica Neue", "Droid Sans", "wenquanyi micro hei", FreeSans, Arimo, Arial, SimSun, "宋体", Heiti, "黑体", sans-serif;
+
+    *, *:before, *:after {
+        @include box-sizing(border-box);
+    }
+    
+    a {
+        text-decoration: none;
+    }
+
+    img {
+        border: none;
+        vertical-align: middle;
+    }            
+
+    > textarea,
+    #{$prefix}html-textarea,
+    #{$prefix}markdown-textarea {
+        width: 0;
+        height: 0;
+        outline: 0;
+        resize:none;
+    }
+    
+    #{$prefix}html-textarea,
+    #{$prefix}markdown-textarea {
+        display : none;
+    }
+
+    input[type="text"], 
+    input[type="button"], 
+    input[type="submit"], 
+    select, textarea, button {
+        @include appearance(none);
+    }
+            
+    ::-webkit-scrollbar {
+        height: 10px;
+        width: 7px;
+        background: rgba(0, 0, 0, .1);
+
+        &:hover {
+            background: rgba(0, 0, 0, .2);
+        }
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.3);
+        @include border-radius(6px);
+
+        &:hover {
+            @include box-shadow(inset 1px 1px 1px rgba(0, 0, 0, .25));
+            background-color: rgba(0, 0, 0, .4);
+        }
+    }
+}
+            
+#{$prefix}user-unselect { 
+    @include user-select(none); 
+}
+
+#{$prefix}toolbar {
+    width: 100%;
+    min-height: 37px;
+    background: #fff;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    border-bottom: 1px solid $borderColor;
+}
+
+#{$prefix}toolbar-container {
+    padding: 0 8px;
+    min-height: 35px;
+    @include user-select(none);
+}
+
+@import "editormd.menu";
+
+#{$prefix}container {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 35px 0 0;
+    position: relative;   
+    background: #fff;
+    @include box-sizing(border-box);
+}
+
+@import "editormd.dialog"; 
+@import "editormd.grid"; 
+@import "editormd.tab"; 
+@import "editormd.form"; 
+@import "editormd.codemirror"; 
+@import "editormd.preview";
+@import "editormd.preview.themes";
+
+#{$prefix}onlyread {
+    #{$prefix}toolbar {
+        display: none;
+    }
+
+    .CodeMirror {
+        margin-top: 0;
+    }
+
+    #{$prefix}preview {
+        top: 0;
+    }
+}
+
+#{$prefix}fullscreen {
+    position: fixed; 
+    top   : 0; 
+    left  : 0; 
+    border: none;
+    margin: 0 auto;
+}
+
+@import "editormd.themes";

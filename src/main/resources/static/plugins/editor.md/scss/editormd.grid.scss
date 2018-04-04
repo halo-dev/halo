@@ -1,0 +1,36 @@
+@charset "utf-8";
+
+.editormd-grid-table {
+    width: 99%;
+    display: table;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+}
+
+.editormd-grid-table-row {
+    width: 100%;
+    display: table-row;
+
+    a {
+        font-size: 1.4em;
+        width: 5%;
+        height: 36px;
+        color: #999;
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle;
+        border: 1px solid #ddd;
+        text-decoration: none;
+        @include transition(background-color 300ms ease-out, color 100ms ease-in);
+
+        &.selected {
+            color: #666;
+            background-color: #eee;                
+        }
+
+        &:hover {
+            color: #777;
+            background-color: #f6f6f6;
+        }
+    }
+}
