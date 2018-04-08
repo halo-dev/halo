@@ -66,6 +66,7 @@
                     title: '附件详情',
                     shadeClose: true,
                     shade: 0.5,
+                    maxmin: true,
                     area: ['90%', '90%'],
                     content: '/admin/attachments/attachment?attachId='+id,
                     scrollbar: false
