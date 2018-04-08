@@ -352,6 +352,7 @@
                     title: '所有日志',
                     shadeClose: true,
                     shade: 0.5,
+                    maxmin: true,
                     area: ['90%', '90%'],
                     content: '/admin/logs',
                     scrollbar: false

@@ -145,6 +145,7 @@
                     title: '所有附件',
                     shadeClose: true,
                     shade: 0.5,
+                    maxmin: true,
                     area: ['90%', '90%'],
                     content: '/admin/attachments/select?id='+id,
                     scrollbar: false

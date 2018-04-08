@@ -197,6 +197,7 @@
                     title: theme+'主题设置',
                     shadeClose: true,
                     shade: 0.5,
+                    maxmin: true,
                     area: ['90%', '90%'],
                     content: '/admin/themes/options?theme='+theme,
                     scrollbar: false

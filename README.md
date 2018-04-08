@@ -33,13 +33,13 @@ Fast,simple,powerful blog system powered by Java.
 
 ## Download 下载
 
-### [Download](https://github.com/ruibaby/halo/releases)
+[Download](https://github.com/ruibaby/halo/releases)
 
 > 目前并未打包成可使用版本，因为目前bug还有点多，需要花点时间才行。
 
 ## Docs 文档
 
-### [Halo Document](https://halo-doc.ryanc.cc)
+[Halo Document](https://halo-doc.ryanc.cc)
 
 >文档正在整理中。
 
