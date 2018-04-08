@@ -33,7 +33,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="exampleInputPassword1">网址</label>
-                                        <input type="text" class="form-control" id="linkUrl" name="linkUrl" value="${updateLink.linkUrl}">
+                                        <input type="url" class="form-control" id="linkUrl" name="linkUrl" value="${updateLink.linkUrl}">
                                         <small>*需要加上http://或https://</small>
                                     </div>
                                     <div class="form-group">

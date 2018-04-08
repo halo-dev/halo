@@ -3,7 +3,7 @@
 > Halo may be the best Java blog system. | Halo可能是最好的Java博客系统。
 
 [![JDK](https://img.shields.io/badge/JDK-1.8-yellow.svg)](#)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.0.0-green.svg)](https://github.com/spring-projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.0.1-green.svg)](https://github.com/spring-projects/spring-boot)
 [![GitHub release](https://img.shields.io/github/release/ruibaby/halo.svg)](https://github.com/ruibaby/halo/releases)
 
 ------------------------------
@@ -39,7 +39,7 @@ Fast,simple,powerful blog system powered by Java.
 
 ## Docs 文档
 
-### [Halo Document]()
+### [Halo Document](https://halo-doc.ryanc.cc)
 
 >文档正在整理中。
 
@@ -51,7 +51,7 @@ Fast,simple,powerful blog system powered by Java.
 
 Halo的诞生离不开下面这些项目：
 
-- [IntelliJ IDEA](https://www.jetbrains.com/idea/)：个人认为强大的Java IDE，没有之一
+- [IntelliJ IDEA](https://www.jetbrains.com/idea/)：个人认为最强大的Java IDE，没有之一
 - [Spring Boot](https://github.com/spring-projects/spring-boot)：Spring的微服务框架
 - [Freemarker](https://freemarker.apache.org/)：模板引擎，使页面静态化
 - [H2 Database](https://github.com/h2database/h2database)：嵌入式数据库，无需安装

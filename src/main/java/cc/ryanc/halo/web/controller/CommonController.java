@@ -27,15 +27,39 @@ public class CommonController implements ErrorController{
      * @return string
      */
     @GetMapping(value = ERROR_PATH)
-    public String handleError(HttpServletRequest request, Model model){
+    public String handleError(HttpServletRequest request){
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        if(statusCode==404) {
+            return "redirect:/404";
+        }else{
+            return "redirect:/500";
+        }
+    }
+
+    /**
+     * 渲染404页面
+     *
+     * @param model model
+     * @return string
+     */
+    @GetMapping(value = "/404")
+    public String fourZeroFour(Model model){
         //设置选项
         model.addAttribute("options", HaloConst.OPTIONS);
-        if(statusCode==404) {
-            return "common/404";
-        }else{
-            return "common/500";
-        }
+        return "common/404";
+    }
+
+    /**
+     * 渲染500页面
+     *
+     * @param model model
+     * @return string
+     */
+    @GetMapping(value = "/500")
+    public String fiveZeroZero(Model model){
+        //设置选项
+        model.addAttribute("options", HaloConst.OPTIONS);
+        return "common/500";
     }
 
     /**

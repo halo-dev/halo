@@ -104,10 +104,10 @@
                                 第${posts.number+1}/${posts.totalPages}页
                             </div>
                             <ul class="pagination no-margin pull-right">
-                                <li><a class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}">首页</a> </li>
-                                <li><a class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}">上页</a></li>
-                                <li><a class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}">下页</a></li>
-                                <li><a class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}">尾页</a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}">首页</a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}">上页</a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}">下页</a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}">尾页</a> </li>
                             </ul>
                         </div>
                     </div>

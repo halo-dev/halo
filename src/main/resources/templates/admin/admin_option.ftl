@@ -72,7 +72,7 @@
                                         <div class="form-group">
                                             <label for="siteUrl" class="col-sm-2 control-label">博客地址：</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="siteUrl" name="site_url" value="${options.site_url?default('http://localhost:8080')}">
+                                                <input type="url" class="form-control" id="siteUrl" name="site_url" value="${options.site_url?default('http://localhost:8080')}">
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -153,20 +153,20 @@
                                                 </span>
                                             </label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="indexPosts" name="index_posts" value="${options.index_posts?default('10')}">
+                                                <input type="number" class="form-control" id="indexPosts" name="index_posts" value="${options.index_posts?default('10')}">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="rssPosts" class="col-sm-2 control-label">RSS显示条数：</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="rssPosts" name="rss_posts" value="${options.rss_posts?if_exists}">
+                                                <input type="number" class="form-control" id="rssPosts" name="rss_posts" value="${options.rss_posts?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="postSummary" class="col-sm-2 control-label">文章摘要字数：</label>
                                             <div class="col-sm-4">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" id="postSummary" name="post_summary" value="${options.post_summary?default('50')}">
+                                                    <input type="number" class="form-control" id="postSummary" name="post_summary" value="${options.post_summary?default('50')}">
                                                     <span class="input-group-btn">
                                                         <button class="btn btn-default btn-flat" id="btn_update_summary" onclick="updateAllSummary()" type="button">更新</button>
                                                     </span>
@@ -498,7 +498,7 @@
                                         <div class="form-group">
                                             <label for="emailSmtpUserName" class="col-sm-2 control-label">邮箱账号：</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="emailSmtpUserName" name="mail_smtp_username" value="${options.mail_smtp_username?if_exists}">
+                                                <input type="email" class="form-control" id="emailSmtpUserName" name="mail_smtp_username" value="${options.mail_smtp_username?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">

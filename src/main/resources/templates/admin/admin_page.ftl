@@ -62,7 +62,7 @@
                                             <td>/gallery</td>
                                             <td>
                                                 <a href="/gallery" class="btn btn-info btn-xs btn-flat" target="_blank">预览</a>
-                                                <a data-pjax="true" href="/admin/page/gallery" class="btn btn-primary btn-xs btn-flat">配置</a>
+                                                <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs btn-flat">配置</a>
                                             </td>
                                         </tr>
                                         <tr>
