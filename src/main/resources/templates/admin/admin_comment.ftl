@@ -80,10 +80,10 @@
                                 第${comments.number+1}/${comments.totalPages}页
                             </div>
                             <ul class="pagination no-margin pull-right">
-                                <li><a class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}">首页</a> </li>
-                                <li><a class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number-1}">上页</a></li>
-                                <li><a class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number+1}">下页</a></li>
-                                <li><a class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.totalPages-1}">尾页</a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}">首页</a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number-1}">上页</a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number+1}">下页</a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.totalPages-1}">尾页</a> </li>
                             </ul>
                         </div>
                     </div>

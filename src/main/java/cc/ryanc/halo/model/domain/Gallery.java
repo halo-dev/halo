@@ -43,7 +43,7 @@ public class Gallery implements Serializable {
     /**
      * 图片日期/拍摄日期
      */
-    private Date galleryDate;
+    private String galleryDate;
 
     /**
      * 图片拍摄地点

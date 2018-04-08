@@ -39,7 +39,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="menuSort">排序编号</label>
-                                        <input type="text" class="form-control" id="menuSort" name="menuSort" value="${updateMenu.menuSort}">
+                                        <input type="number" class="form-control" id="menuSort" name="menuSort" value="${updateMenu.menuSort}">
                                     </div>
                                     <div class="form-group">
                                         <label for="menuIcon">图标</label>
