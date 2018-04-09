@@ -222,7 +222,7 @@
                         </#if>
                         'postStatus': status,
                         'postTitle': Title,
-                        'postUrl' : $('#postUrl').html(),
+                        'postUrl' : $('#postUrl').html().toString(),
                         'postContentMd': editor.getMarkdown(),
                         'postContent': editor.getTextareaSavedHTML(),
                         'cateList' : cateList.toString()

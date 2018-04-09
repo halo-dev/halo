@@ -29,7 +29,9 @@ Fast,simple,powerful blog system powered by Java.
 
 [界面预览](PREVIEW.md)
 
-[http://halo.ryanc.cc](http://halo.ryanc.cc)
+[首页演示](http://halo.ryanc.cc)
+
+[后台演示](http://halo.ryanc.cc/admin)(用户名：admin，密码：123456)
 
 ## Download 下载
 
