@@ -93,7 +93,7 @@ public class CommentController extends BaseController{
             commentService.updateCommentStatus(commentId,2);
             this.getNewComments(session);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/comments";
     }
@@ -131,7 +131,7 @@ public class CommentController extends BaseController{
                             "您在" + HaloConst.OPTIONS.get("site_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
                 }
             } catch (Exception e) {
-                log.error("邮件服务器未配置：" + e.getMessage());
+                log.error("邮件服务器未配置：{0}",e.getMessage());
             }
         }
         this.getNewComments(session);
@@ -154,7 +154,7 @@ public class CommentController extends BaseController{
             commentService.removeByCommentId(commentId);
             this.getNewComments(session);
         }catch (Exception e){
-            log.error("删除评论失败："+e.getMessage());
+            log.error("删除评论失败：{0}",e.getMessage());
         }
         return "redirect:/admin/comments?status="+status;
     }
@@ -225,7 +225,7 @@ public class CommentController extends BaseController{
                 }
             }
         }catch (Exception e){
-            log.error("回复评论失败！"+e.getMessage());
+            log.error("回复评论失败！{0}",e.getMessage());
         }
         return "redirect:/admin/comments";
     }

@@ -56,7 +56,7 @@ public class BackupController {
             String savePath = path.getAbsolutePath()+"/backup/database";
             HaloUtil.exportDatabase("localhost","root","123456",savePath,fileName,"testdb");
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/backup";
     }

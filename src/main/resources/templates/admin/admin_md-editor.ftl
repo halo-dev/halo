@@ -9,6 +9,7 @@
     <div class="content-wrapper">
         <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <link rel="stylesheet" href="/static/plugins/editor.md/css/editormd.min.css">
+        <link rel="stylesheet" href="/static/plugins/jquery-tageditor/jquery.tag-editor.css">
         <style type="text/css">
             #post_title{
                 font-weight: 400;
@@ -40,7 +41,7 @@
                     <div style="display: block;margin-bottom: 10px;">
                         <span>
                             永久链接：
-                            <a href="#">${options.site_url}/article/<span id="postUrl"></span>/</a>
+                            <a href="#">${options.site_url}/article/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
                             <button class="btn btn-default btn-sm btn-flat" id="btn_input_postUrl">编辑</button>
                             <button class="btn btn-default btn-sm btn-flat" id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
                         </span>
@@ -77,7 +78,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title">分类目录</h3>
                             <div class="box-tools">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" title="Collapse">
                                     <i class="fa fa-minus"></i>
                                 </button>
                             </div>
@@ -100,13 +101,13 @@
                         <div class="box-header with-border">
                             <h3 class="box-title">标签</h3>
                             <div class="box-tools">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse" title="Collapse">
                                     <i class="fa fa-minus"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="box-body">
-                            <div>标签设置</div>
+                            <input type="text" class="form-control input-lg" id="tagList" name=""/>
                         </div>
                     </div>
                     <div class="box box-primary">
@@ -131,7 +132,25 @@
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
         <script src="/static/plugins/editor.md/editormd.min.js"></script>
+        <script src="/static/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
+        <script src="/static/plugins/jquery-tageditor/jquery.caret.min.js"></script>
         <script>
+            $('#tagList').tagEditor({
+                //initialTags: ['Hello', 'World', 'Example', 'Tags'],
+                delimiter: ',',
+                placeholder: '请输入标签'
+            });
+
+            <#if post??>
+                <#if post.tags?size gt 0>
+                    <#list post.tags as tag>
+                    $('#tagList').tagEditor('addTag','${tag.tagName}');
+                    </#list>
+                </#if>
+            </#if>
+            /**
+             * 打开附件
+             */
             function openAttach() {
                 layer.open({
                     type: 2,
@@ -166,6 +185,11 @@
             function TitleOnBlurAuto() {
                 $('#postUrl').html($('#post_title').val());
             }
+
+            /**
+             * 检测是否已经存在该链接
+             * @constructor
+             */
             function UrlOnBlurAuto() {
                 if($('#newPostUrl').val()===""){
                     showMsg("固定链接不能为空！","info",2000);
@@ -197,7 +221,13 @@
             });
             var postTitle = $("#post_title");
             var cateList = new Array();
+
+            /**
+             * 提交文章
+             * @param status 文章状态
+             */
             function push(status) {
+                alert( $('#tagList').tagEditor('getTags')[0].tags );
                 var Title = "";
                 if(postTitle.val()){
                     Title = postTitle.val();
@@ -225,7 +255,8 @@
                         'postUrl' : $('#postUrl').html().toString(),
                         'postContentMd': editor.getMarkdown(),
                         'postContent': editor.getTextareaSavedHTML(),
-                        'cateList' : cateList.toString()
+                        'cateList' : cateList.toString(),
+                        'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString()
                     },
                     success: function (data) {
                         $.toast({
@@ -247,6 +278,10 @@
                     }
                 });
             }
+
+            /**
+             * Ctrl+C保存
+             */
             $(document).keydown(function (event) {
                 if(event.ctrlKey&&event.keyCode === 83){
                     push(1);

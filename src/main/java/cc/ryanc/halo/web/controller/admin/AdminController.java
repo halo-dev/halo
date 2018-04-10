@@ -149,7 +149,7 @@ public class AdminController extends BaseController{
             }
             userService.updateUserLoginLast(new Date());
             logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_ERROR,HaloUtil.getIpAddr(request),new Date()));
-            log.error("登录失败！："+e.getMessage());
+            log.error("登录失败！：{0}",e.getMessage());
         }
         return status;
     }

@@ -69,7 +69,15 @@
                                                     无分类
                                                 </#if>
                                             </td>
-                                            <td>无标签</td>
+                                            <td>
+                                                <#if post.tags?size gt 0>
+                                                    <#list post.tags as tag>
+                                                        ${tag.tagName}
+                                                    </#list>
+                                                    <#else >
+                                                    无标签
+                                                </#if>
+                                            </td>
                                             <td>
                                                 <#if post.getComments()??>
                                                     ${post.getComments()?size}

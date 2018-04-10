@@ -170,7 +170,7 @@ public class IndexController extends BaseController{
                 model.addAttribute("afterPost",afterPosts.get(afterPosts.size()-1));
             }
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         model.addAttribute("post",post);
 
@@ -514,7 +514,7 @@ public class IndexController extends BaseController{
                 map.put("commentContent",comment.getCommentContent());
                 mailService.sendTemplateMail(userService.findUser().getUserEmail(),"有新的评论",map,"common/mail/mail_admin.ftl");
             }catch (Exception e){
-                log.error("邮件服务器未配置："+e.getMessage());
+                log.error("邮件服务器未配置：{0}",e.getMessage());
             }
         }
         return true;
