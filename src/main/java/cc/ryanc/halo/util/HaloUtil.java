@@ -94,7 +94,7 @@ public class HaloUtil {
                 in.close();
             }
         } catch (Exception e) {
-            log.error("解压失败："+e.getMessage());
+            log.error("解压失败：{0}",e.getMessage());
         }finally{
             try {
                 if(zip!=null)
@@ -104,7 +104,7 @@ public class HaloUtil {
                 if(out!=null)
                     out.close();
             } catch (IOException e) {
-                log.error("未知错误："+e.getMessage());
+                log.error("未知错误：{0}",e.getMessage());
             }
         }
     }
@@ -174,7 +174,7 @@ public class HaloUtil {
             BufferedImage bi = reader.read(0,param);
             ImageIO.write(bi, suffix, new File(dest));
         }catch (Exception e){
-            log.error("剪裁失败，图片本身尺寸小于需要修剪的尺寸："+e.getMessage());
+            log.error("剪裁失败，图片本身尺寸小于需要修剪的尺寸：{0}",e.getMessage());
         }
     }
 
@@ -200,7 +200,7 @@ public class HaloUtil {
                 }
             }
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return FILE_LIST;
     }
@@ -234,7 +234,7 @@ public class HaloUtil {
                 }
             }
         }catch (Exception e){
-            log.error("主题获取失败："+e.getMessage());
+            log.error("主题获取失败：{0}",e.getMessage());
         }
         return themes;
     }
@@ -273,7 +273,7 @@ public class HaloUtil {
                 }
             }
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return tpls;
     }
@@ -293,7 +293,7 @@ public class HaloUtil {
             inputStream.close();
             return new String(fileContent,"UTF-8");
         }catch (Exception e){
-            log.error("读取模板文件错误："+e.getMessage());
+            log.error("读取模板文件错误：{0}",e.getMessage());
         }
         return null;
     }

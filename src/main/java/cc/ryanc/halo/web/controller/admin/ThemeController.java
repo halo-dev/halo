@@ -111,7 +111,7 @@ public class ThemeController extends BaseController{
                 log.error("上传失败，没有选择文件");
             }
         }catch (Exception e){
-            log.error("上传失败："+e.getMessage());
+            log.error("上传失败：{0}",e.getMessage());
         }
         return false;
     }
@@ -159,7 +159,7 @@ public class ThemeController extends BaseController{
             File themesPath = new File(basePath.getAbsolutePath(),new StringBuffer("templates/themes/").append(BaseController.THEME).append("/").append(tplName).toString());
             tplContent = HaloUtil.getFileContent(themesPath.getAbsolutePath());
         }catch (Exception e){
-            log.error("获取模板文件错误："+e.getMessage());
+            log.error("获取模板文件错误：{0}",e.getMessage());
         }
         return tplContent;
     }
@@ -186,7 +186,7 @@ public class ThemeController extends BaseController{
             byte[] tplContentByte = tplContent.getBytes("UTF-8");
             Files.write(Paths.get(tplPath.getAbsolutePath()),tplContentByte);
         }catch (Exception e){
-            log.error("文件保存失败："+e.getMessage());
+            log.error("文件保存失败：{0}",e.getMessage());
             return false;
         }
         return true;

@@ -6,6 +6,7 @@ import cc.ryanc.halo.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,5 +80,41 @@ public class TagServiceImpl implements TagService {
     @Override
     public Tag findByTagUrl(String tagUrl) {
         return tagRepository.findTagByTagUrl(tagUrl);
+    }
+
+    /**
+     * 根据标签名称查询
+     *
+     * @param tagName tagName
+     * @return tag
+     */
+    @Override
+    public Tag findTagByTagName(String tagName) {
+        return tagRepository.findTagByTagName(tagName);
+    }
+
+    /**
+     * 转换标签字符串为实体集合
+     *
+     * @param tagList tagList
+     * @return list
+     */
+    @Override
+    public List<Tag> strListToTagList(String tagList) {
+        String [] tags = tagList.split(",");
+        List<Tag> tagsList = new ArrayList<>();
+        for(String tag:tags){
+            Tag t = findTagByTagName(tag);
+            Tag nt = null;
+            if(null!=t){
+                tagsList.add(t);
+            }else{
+                nt = new Tag();
+                nt.setTagName(tag);
+                nt.setTagUrl(tag);
+                tagsList.add(saveByTag(nt));
+            }
+        }
+        return tagsList;
     }
 }

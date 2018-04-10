@@ -54,7 +54,7 @@ public class CategoryController {
         try{
             categoryService.saveByCategory(category);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -88,7 +88,7 @@ public class CategoryController {
             Category category = categoryService.removeByCateId(cateId);
             log.info("删除的分类目录："+category);
         } catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/category";
     }

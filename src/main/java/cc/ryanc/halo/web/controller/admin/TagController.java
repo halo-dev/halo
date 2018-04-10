@@ -53,7 +53,7 @@ public class TagController {
         try{
             tagService.saveByTag(tag);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/tag";
     }
@@ -87,7 +87,7 @@ public class TagController {
             Tag tag = tagService.removeByTagId(tagId);
             log.info("删除的标签："+tag);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/tag";
     }

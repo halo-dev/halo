@@ -51,4 +51,20 @@ public interface TagService {
      * @return tag
      */
     Tag findByTagUrl(String tagUrl);
+
+    /**
+     * 根据标签名称查询
+     *
+     * @param tagName tagName
+     * @return tag
+     */
+    Tag findTagByTagName(String tagName);
+
+    /**
+     * 转换标签字符串为实体集合
+     *
+     * @param tagList tagList
+     * @return list
+     */
+    List<Tag> strListToTagList(String tagList);
 }

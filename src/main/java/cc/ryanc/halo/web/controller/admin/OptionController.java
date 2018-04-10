@@ -50,7 +50,7 @@ public class OptionController {
             log.info("所保存的设置选项列表："+options);
             return true;
         }catch (Exception e){
-            log.error("未知错误：",e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
             return false;
         }
     }

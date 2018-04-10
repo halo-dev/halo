@@ -1,14 +1,12 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.Category;
-import cc.ryanc.halo.model.domain.Logs;
-import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +41,9 @@ public class PostController extends BaseController{
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private TagService tagService;
 
     @Autowired
     private LogsService logsService;
@@ -98,7 +99,7 @@ public class PostController extends BaseController{
             Pageable pageable = new PageRequest(page,size,sort);
             model.addAttribute("posts",postService.searchPosts(keyword,pageable));
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "admin/admin_post";
     }
@@ -133,7 +134,7 @@ public class PostController extends BaseController{
             //设置选项
             model.addAttribute("options",HaloConst.OPTIONS);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "admin/admin_editor";
     }
@@ -145,7 +146,7 @@ public class PostController extends BaseController{
      */
     @PostMapping(value = "/new/push")
     @ResponseBody
-    public void pushPost(@ModelAttribute Post post,@RequestParam("cateList") List<String> cateList, HttpSession session){
+    public void pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session){
         try{
             //提取摘要
             int postSummary = 50;
@@ -162,11 +163,13 @@ public class PostController extends BaseController{
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
+            List<Tag> tags = tagService.strListToTagList(tagList);
+            post.setTags(tags);
             postService.saveByPost(post);
             log.info("已发表新文章："+post.getPostTitle());
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
     }
 
@@ -182,7 +185,7 @@ public class PostController extends BaseController{
             postService.updatePostStatus(postId,2);
             log.info("编号为"+postId+"的文章已被移到回收站");
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/posts";
     }
@@ -200,7 +203,7 @@ public class PostController extends BaseController{
             postService.updatePostStatus(postId,0);
             log.info("编号为"+postId+"的文章已改变为发布状态");
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/posts?status="+status;
     }
@@ -218,7 +221,7 @@ public class PostController extends BaseController{
             postService.removeByPostId(postId);
             logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/posts?status=2";
     }
@@ -241,7 +244,7 @@ public class PostController extends BaseController{
             //设置选项
             model.addAttribute("options",HaloConst.OPTIONS);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "admin/admin_editor";
     }
@@ -259,7 +262,7 @@ public class PostController extends BaseController{
             postService.updateAllSummary(postSummary);
             return true;
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
             return false;
         }
     }

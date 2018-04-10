@@ -96,7 +96,7 @@ public class PageController {
             Link backLink = linkService.saveByLink(link);
             log.info("保存成功，数据为："+backLink);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -113,7 +113,7 @@ public class PageController {
             Link link = linkService.removeByLinkId(linkId);
             log.info("删除的友情链接："+link);
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
         }
         return "redirect:/admin/page/links";
     }

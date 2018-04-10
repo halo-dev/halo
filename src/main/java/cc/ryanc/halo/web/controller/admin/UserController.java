@@ -53,11 +53,10 @@ public class UserController {
                 userService.saveByUser(user);
                 session.invalidate();
             }else{
-                log.error("用户信息不能为空值");
                 return false;
             }
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("未知错误：{0}",e.getMessage());
             return false;
         }
         return true;
@@ -81,14 +80,12 @@ public class UserController {
             if(null!=user){
                 user.setUserPass(HaloUtil.getMD5(newPass));
                 userService.saveByUser(user);
-                log.info("修改密码：成功");
                 session.invalidate();
             }else{
-                log.error("修改密码：原密码错误！");
                 return false;
             }
         }catch (Exception e){
-            log.error("修改密码：未知错误，"+e.getMessage());
+            log.error("修改密码：未知错误，{0}",e.getMessage());
             return false;
         }
         return true;

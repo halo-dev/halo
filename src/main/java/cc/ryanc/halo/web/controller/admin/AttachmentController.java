@@ -151,7 +151,7 @@ public class AttachmentController {
                 result.put("message","上传成功！");
                 result.put("url",attachment.getAttachPath());
             }catch (Exception e){
-                log.error("未知错误："+e.getMessage());
+                log.error("未知错误：{0}",e.getMessage());
                 result.put("success","0");
                 result.put("message","上传失败！");
             }
@@ -222,7 +222,7 @@ public class AttachmentController {
                 }
             }
         }catch (Exception e){
-            log.error("删除附件["+delFileName+"]失败！"+e.getMessage());
+            log.error("删除附件["+delFileName+"]失败！:",e.getMessage());
             return false;
         }
         return true;
