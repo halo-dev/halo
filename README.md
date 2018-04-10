@@ -5,6 +5,7 @@
 [![JDK](https://img.shields.io/badge/JDK-1.8-yellow.svg)](#)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.0.1-green.svg)](https://github.com/spring-projects/spring-boot)
 [![GitHub release](https://img.shields.io/github/release/ruibaby/halo.svg)](https://github.com/ruibaby/halo/releases)
+[![Travis CI](https://img.shields.io/travis/ruibaby/halo.svg)](https://travis-ci.org/ruibaby/halo)
 
 ------------------------------
 

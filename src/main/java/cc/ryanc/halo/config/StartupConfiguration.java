@@ -50,7 +50,7 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
                 BaseController.THEME = themeValue;
             }
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("加载主题设置失败：{0}",e.getMessage());
         }
     }
 
@@ -64,7 +64,7 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
                 HaloConst.OPTIONS = options;
             }
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("加载设置选项失败：{0}",e.getMessage());
         }
     }
 
@@ -78,7 +78,7 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
                 HaloConst.ATTACHMENTS = attachments;
             }
         }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+            log.error("加载所有文件失败：{0}",e.getMessage());
         }
     }
 
@@ -93,7 +93,7 @@ public class StartupConfiguration implements ApplicationListener<ContextRefreshe
                 HaloConst.THEMES = themes;
             }
         }catch (Exception e){
-            log.error("加载主题失败："+e.getMessage());
+            log.error("加载主题失败：{0}",e.getMessage());
         }
     }
 }
