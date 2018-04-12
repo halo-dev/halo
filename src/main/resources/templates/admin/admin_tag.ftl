@@ -164,18 +164,23 @@
                             <#list tags as tag>
                                 <div class="tag-cloud">
                                     <a class="tag-link" data-pjax="true" href="/admin/tag/edit?tagId=${tag.tagId}">
-                                        <span class="label">${tag.tagName}(2)</span>
+                                        <span class="label">${tag.tagName}( ${tag.posts?size} )</span>
                                     </a>
                                 </div>
                             </#list>
                             <script>
                                 var randomNum;
                                 var tagLabel = $('.tag-link');
-                                for(var i = 0; i < ${tags?size}; i++) {
+                                <#--for(var i = 0; i < ${tags?size}; i++) {-->
+                                    <#--randomNum = Math.floor(Math. random() * 15 + 1);-->
+                                    <#--tagLabel.children('.label').addClass("bg-color-"+randomNum);-->
+                                    <#--tagLabel = tagLabel.next();-->
+                                <#--}-->
+
+                                $(".label").each(function () {
                                     randomNum = Math.floor(Math. random() * 15 + 1);
-                                    tagLabel.children('.label').addClass("bg-color-"+randomNum);
-                                    tagLabel = tagLabel.next();
-                                }
+                                    $(this).addClass("bg-color-"+randomNum);
+                                });
                             </script>
                         </div>
                     </div>

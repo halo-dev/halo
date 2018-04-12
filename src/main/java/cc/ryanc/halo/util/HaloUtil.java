@@ -3,6 +3,8 @@ package cc.ryanc.halo.util;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Content;
 import com.sun.syndication.feed.rss.Item;
@@ -21,6 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -370,9 +375,6 @@ public class HaloUtil {
         return md5;
     }
 
-    public static void main(String[] args){
-        System.out.println(getMD5("123456"));
-    }
 
     /**
      * 2进制转16进制
@@ -584,4 +586,41 @@ public class HaloUtil {
 //            System.out.println(StringUtils.substringBetween("title","\n","\n"));
 //        }
 //    }
+
+    /**
+     * 访问路径获取json数据
+     * @param url
+     * @return
+     */
+    public static String getHttpResponse(String enterUrl) {
+        BufferedReader in = null;
+        StringBuffer result = null;
+        try {
+            URI uri = new URI(enterUrl);
+            URL url = uri.toURL();
+            URLConnection connection = url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("Charset", "utf-8");
+            connection.connect();
+            result = new StringBuffer();
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result.append(line);
+            }
+            return result.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

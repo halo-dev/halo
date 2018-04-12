@@ -129,7 +129,9 @@ public class PostController extends BaseController{
     public String newPost(Model model){
         try {
             List<Category> categories = categoryService.findAllCategories();
+            List<Tag> tags = tagService.findAllTags();
             model.addAttribute("categories",categories);
+            model.addAttribute("tags",tags);
             model.addAttribute("btnPush","发布");
             //设置选项
             model.addAttribute("options",HaloConst.OPTIONS);

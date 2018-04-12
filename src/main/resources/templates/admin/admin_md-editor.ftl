@@ -107,7 +107,17 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <input type="text" class="form-control input-lg" id="tagList" name=""/>
+                            <input type="text" class="form-control input-lg" id="tagList" name=""/><br>
+                            <select class="form-control" id="chooseTag" name="chooseTag">
+                                <#if tags??>
+                                    <option value="">选择添加</option>
+                                    <#list tags as tag>
+                                        <option value="${tag.tagName}">${tag.tagName}</option>
+                                    </#list>
+                                <#else>
+                                    <option>暂无标签</option>
+                                </#if>
+                            </select>
                         </div>
                     </div>
                     <div class="box box-primary">
@@ -148,6 +158,11 @@
                     </#list>
                 </#if>
             </#if>
+
+            $('#chooseTag').change(function () {
+                $('#tagList').tagEditor('addTag',$(this).val());
+            });
+
             /**
              * 打开附件
              */
@@ -227,7 +242,6 @@
              * @param status 文章状态
              */
             function push(status) {
-                alert( $('#tagList').tagEditor('getTags')[0].tags );
                 var Title = "";
                 if(postTitle.val()){
                     Title = postTitle.val();
