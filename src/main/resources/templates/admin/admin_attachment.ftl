@@ -49,10 +49,10 @@
                         第${attachments.number+1}/${attachments.totalPages}页
                     </div>
                     <ul class="pagination no-margin pull-right">
-                        <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments" >首页</a> </li>
-                        <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments?page=${attachments.number-1}" >上页</a></li>
-                        <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.number+1}">下页</a></li>
-                        <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.totalPages-1}">尾页</a> </li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments" >首页</a> </li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments?page=${attachments.number-1}" >上页</a></li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.number+1}">下页</a></li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.totalPages-1}">尾页</a> </li>
                     </ul>
                 </div>
             </div>

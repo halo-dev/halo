@@ -19,3 +19,18 @@ function showMsg(text,icon,hideAfter) {
         loaderBg: '#ffffff'
     });
 }
+
+/**
+ * 转义
+ * @param str str
+ * @returns {string}
+ */
+function stringEncode(str){
+    var div=document.createElement('div');
+    if(div.innerText){
+        div.innerText=str;
+    }else{
+        div.textContent=str;
+    }
+    return div.innerHTML;
+}
