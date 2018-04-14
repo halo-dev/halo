@@ -33,7 +33,7 @@ public class BackupController {
      * 渲染备份页面
      *
      * @param model model
-     * @return return
+     * @return 模板路径admin/admin_backup
      */
     @GetMapping
     public String backup(Model model){
@@ -46,7 +46,7 @@ public class BackupController {
     /**
      * 备份数据库
      *
-     * @return return
+     * @return 重定向到/admin/backup
      */
     @GetMapping(value = "/backupDb")
     public String backupDatabase(){
@@ -74,7 +74,7 @@ public class BackupController {
     /**
      * 备份文章，导出markdown文件
      *
-     * @return return
+     * @return 重定向到/admin/backup
      */
     @GetMapping(value = "/backupPost")
     public String backupPosts(){

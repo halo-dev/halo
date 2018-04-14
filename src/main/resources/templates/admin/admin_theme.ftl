@@ -58,6 +58,9 @@
                 background: #3c8dbc;
                 color: #fff;
             }
+            .btn-delete:hover{
+                color: red;
+            }
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;">主题设置</h1>
@@ -85,7 +88,9 @@
                     <#list themes as theme>
                         <div class="col-md-3">
                             <div class="box box-solid">
-                                <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName?if_exists}/screenshot.png)"></div>
+                                <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName?if_exists}/screenshot.png)">
+                                    <div class="pull-right btn-delete" style="display: none" onclick="modelShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
+                                </div>
                                 <div class="box-footer">
                                     <span class="theme-title">${theme.themeName?if_exists?upper_case}</span>
                                     <#if theme.hasOptions==true>
@@ -112,6 +117,25 @@
                 </#if>
             </div>
         </section>
+        <!-- 删除确认弹出层 -->
+        <div class="modal fade" id="removeThemeModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">提示信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="message">你确定要删除该主题？</p>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="url"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
         <script type="application/javascript">
@@ -202,6 +226,20 @@
                     content: '/admin/themes/options?theme='+theme,
                     scrollbar: false
                 });
+            }
+            $('.theme-thumbnail').mouseover(function () {
+                $(this).children('.btn-delete').show();
+            });
+            $('.theme-thumbnail').mouseleave(function () {
+                $(this).children('.btn-delete').hide();
+            });
+            function modelShow(url) {
+                $('#url').val(url);
+                $('#removeThemeModal').modal();
+            }
+            function removeIt(){
+                var url=$.trim($("#url").val());
+                window.location.href=url;
             }
         </script>
     </div>

@@ -112,7 +112,7 @@
                                 <#if tags??>
                                     <option value="">选择添加</option>
                                     <#list tags as tag>
-                                        <option value="${tag.tagName}">${tag.tagName}</option>
+                                        <option value="${tag.tagName}">${tag.tagName}(${tag.posts?size})</option>
                                     </#list>
                                 <#else>
                                     <option>暂无标签</option>

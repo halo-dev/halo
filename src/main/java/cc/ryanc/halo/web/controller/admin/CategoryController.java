@@ -31,7 +31,7 @@ public class CategoryController {
      * 查询所有分类并渲染category页面
      *
      * @param model model
-     * @return freemarker页面
+     * @return 模板路径admin/admin_category
      */
     @GetMapping
     public String categories(Model model){
@@ -47,7 +47,7 @@ public class CategoryController {
      * 新增/修改分类目录
      *
      * @param category category对象
-     * @return freemarker页面
+     * @return 重定向到/admin/category
      */
     @PostMapping(value = "/save")
     public String saveCategory(@ModelAttribute Category category){
@@ -62,8 +62,8 @@ public class CategoryController {
     /**
      * 验证分类目录路径是否已经存在
      *
-     * @param cateUrl cateUrl
-     * @return string
+     * @param cateUrl 分类路径
+     * @return true：不存在，false：存在
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
@@ -80,7 +80,7 @@ public class CategoryController {
      * 处理删除分类目录的请求
      *
      * @param cateId cateId
-     * @return freemarker
+     * @return 重定向到/admin/category
      */
     @GetMapping(value = "/remove")
     public String removeCategory(@PathParam("cateId") Long cateId){
@@ -98,7 +98,7 @@ public class CategoryController {
      *
      * @param cateId cateId
      * @param model model
-     * @return String
+     * @return 模板路径admin/admin_category
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model,@PathParam("cateId") Long cateId){

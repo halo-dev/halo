@@ -26,7 +26,8 @@ public class OptionController {
     /**
      * 请求跳转到option页面并完成渲染
      *
-     * @return freemarker
+     * @param model model
+     * @return 模板路径admin/admin_option
      */
     @GetMapping
     public String options(Model model){
@@ -39,6 +40,7 @@ public class OptionController {
      * 保存设置选项
      *
      * @param options options
+     * @return true：保存成功，false：保存失败
      */
     @PostMapping(value = "/save")
     @ResponseBody

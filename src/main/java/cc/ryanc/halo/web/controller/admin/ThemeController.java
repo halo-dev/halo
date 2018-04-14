@@ -43,7 +43,8 @@ public class ThemeController extends BaseController{
     /**
      * 渲染主题设置页面
      *
-     * @return String
+     * @param model model
+     * @return 模板路径admin/admin_theme
      */
     @GetMapping
     public String themes(Model model){
@@ -59,7 +60,9 @@ public class ThemeController extends BaseController{
     /**
      * 激活主题
      *
-     * @param siteTheme siteTheme
+     * @param siteTheme 主题名称
+     * @param request request
+     * @return true：激活成功，false：激活失败
      */
     @GetMapping(value = "/set")
     @ResponseBody
@@ -85,8 +88,8 @@ public class ThemeController extends BaseController{
     /**
      * 上传主题
      *
-     * @param file file
-     * @return String
+     * @param file 文件
+     * @return boolean true：上传成功，false：上传失败
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
@@ -108,12 +111,32 @@ public class ThemeController extends BaseController{
                 HaloConst.THEMES = HaloUtil.getThemes();
                 return true;
             }else{
-                log.error("上传失败，没有选择文件");
+                log.error("上传主题失败，没有选择文件");
             }
         }catch (Exception e){
-            log.error("上传失败：{0}",e.getMessage());
+            log.error("上传主题失败：{0}",e.getMessage());
         }
         return false;
+    }
+
+    /**
+     * 删除主题
+     *
+     * @param themeName 主题文件夹名
+     * @return string 重定向到/admin/themes
+     */
+    @GetMapping(value = "/remove")
+    public String removeTheme(@RequestParam("themeName") String themeName){
+        try{
+            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            File themePath = new File(basePath.getAbsolutePath(),"templates/themes/"+themeName);
+            HaloUtil.removeDir(themePath);
+            HaloConst.THEMES.clear();
+            HaloConst.THEMES = HaloUtil.getThemes();
+        }catch (Exception e){
+            log.error("删除主题失败：{0}",e.getMessage());
+        }
+        return "redirect:/admin/themes";
     }
 
     /**
@@ -132,7 +155,8 @@ public class ThemeController extends BaseController{
     /**
      * 编辑主题
      *
-     * @return string
+     * @param model model
+     * @return 模板路径admin/admin_theme-editor
      */
     @GetMapping(value = "/editor")
     public String editor(Model model){
@@ -146,7 +170,8 @@ public class ThemeController extends BaseController{
     /**
      * 获取模板文件内容
      *
-     * @return string
+     * @param tplName 模板文件名
+     * @return 模板内容
      */
     @GetMapping(value = "/getTpl",produces = "text/text;charset=UTF-8")
     @ResponseBody
@@ -167,9 +192,9 @@ public class ThemeController extends BaseController{
     /**
      * 保存修改模板
      *
-     * @param tplName tplName
-     * @param tplContent tplContent
-     * @return string
+     * @param tplName 模板名称
+     * @param tplContent 模板内容
+     * @return boolean true：修改成功，false：修改失败
      */
     @PostMapping(value = "/editor/save")
     @ResponseBody

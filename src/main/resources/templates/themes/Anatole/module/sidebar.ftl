@@ -6,7 +6,7 @@
                 <a href="/">${options.site_title?default("ANATOLE")}</a>
             </h3>
             <div class="description">
-                <p>${user.userDesc?default("A other farbox theme")}</p>
+                <p>${user.userDesc?default("A other Halo theme")}</p>
             </div>
         </div>
     </div>
