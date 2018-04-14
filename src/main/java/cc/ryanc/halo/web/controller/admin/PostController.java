@@ -54,10 +54,10 @@ public class PostController extends BaseController{
     /**
      * 处理后台获取文章列表的请求
      *
-     * @param model Model
-     * @param page Page
-     * @param size Size
-     * @return String
+     * @param model model
+     * @param page 当前页码
+     * @param size 每页显示的条数
+     * @return 模板路径admin/admin_post
      */
     @GetMapping
     public String posts(Model model,
@@ -83,10 +83,10 @@ public class PostController extends BaseController{
      * 模糊查询文章
      *
      * @param model Model
-     * @param keyword keyword
-     * @param page page
-     * @param size size
-     * @return freemarker
+     * @param keyword keyword 关键字
+     * @param page page 当前页码
+     * @param size size 每页显示条数
+     * @return 模板路径admin/admin_post
      */
     @PostMapping(value="/search")
     public String searchPost(Model model,
@@ -107,9 +107,9 @@ public class PostController extends BaseController{
     /**
      * 处理预览文章的请求
      *
-     * @param postId postId
+     * @param postId 文章编号
      * @param model model
-     * @return freemarker
+     * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "/view")
     public String viewPost(@PathParam("postId") Long postId,Model model){
@@ -123,7 +123,8 @@ public class PostController extends BaseController{
     /**
      * 处理跳转到新建文章页面
      *
-     * @return freemarker
+     * @param model model
+     * @return 模板路径admin/admin_editor
      */
     @GetMapping(value = "/new")
     public String newPost(Model model){
@@ -144,7 +145,10 @@ public class PostController extends BaseController{
     /**
      * 添加文章
      *
-     * @param post Post
+     * @param post Post实体
+     * @param cateList 分类列表
+     * @param tagList 标签列表
+     * @param session session
      */
     @PostMapping(value = "/new/push")
     @ResponseBody
@@ -178,8 +182,8 @@ public class PostController extends BaseController{
     /**
      * 处理移至回收站的请求
      *
-     * @param postId postId
-     * @return String
+     * @param postId 文章编号
+     * @return 重定向到/admin/posts
      */
     @GetMapping("/throw")
     public String moveToTrash(@RequestParam("postId") Long postId){
@@ -195,8 +199,8 @@ public class PostController extends BaseController{
     /**
      * 处理文章为发布的状态
      *
-     * @param postId postId
-     * @return String
+     * @param postId 文章编号
+     * @return 重定向到/admin/posts
      */
     @GetMapping("/revert")
     public String moveToPublish(@RequestParam("postId") Long postId,
@@ -213,8 +217,8 @@ public class PostController extends BaseController{
     /**
      * 处理删除文章的请求
      *
-     * @param postId postId
-     * @return 转发
+     * @param postId 文章编号
+     * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/remove")
     public String removePost(@PathParam("postId") Long postId){
@@ -231,9 +235,9 @@ public class PostController extends BaseController{
     /**
      * 跳转到编辑文章页面
      *
-     * @param postId postId
-     * @param model Model
-     * @return String
+     * @param postId 文章编号
+     * @param model model
+     * @return 模板路径admin/admin_editor
      */
     @GetMapping(value = "/edit")
     public String editPost(@PathParam("postId") Long postId, Model model){
@@ -254,8 +258,8 @@ public class PostController extends BaseController{
     /**
      * 更新所有摘要
      *
-     * @param postSummary postSummary
-     * @return string
+     * @param postSummary 文章摘要字数
+     * @return true：更新成功，false：更新失败
      */
     @GetMapping(value = "/updateSummary")
     @ResponseBody
@@ -272,8 +276,8 @@ public class PostController extends BaseController{
     /**
      * 验证文章路径是否已经存在
      *
-     * @param postUrl postUrl
-     * @return String
+     * @param postUrl 文章路径
+     * @return true：不存在，false：已存在
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody

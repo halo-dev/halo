@@ -56,10 +56,10 @@ public class CommentController extends BaseController{
      * 渲染评论管理页面
      *
      * @param model model
-     * @param status status
-     * @param page page
-     * @param size size
-     * @return string
+     * @param status status 评论状态
+     * @param page page 当前页码
+     * @param size size 每页显示条数
+     * @return 模板路径admin/admin_comment
      */
     @GetMapping
     public String comments(Model model,
@@ -83,8 +83,9 @@ public class CommentController extends BaseController{
     /**
      * 将评论移到回收站
      *
-     * @param commentId commentId
-     * @return string
+     * @param commentId 评论编号
+     * @param session session
+     * @return 重定向到/admin/comments
      */
     @GetMapping(value = "/throw")
     public String moveToTrash(@PathParam("commentId") Long commentId,
@@ -101,9 +102,10 @@ public class CommentController extends BaseController{
     /**
      * 将评论改变为发布状态
      *
-     * @param commentId commentId
-     * @param status status
-     * @return string
+     * @param commentId 评论编号
+     * @param status 评论状态
+     * @param session session
+     * @return 重定向到/admin/comments
      */
     @GetMapping("/revert")
     public String moveToPublish(@PathParam("commentId") Long commentId,
@@ -141,10 +143,10 @@ public class CommentController extends BaseController{
     /**
      * 删除评论
      *
-     * @param commentId commentId
-     * @param status status
-     * @param session session
-     * @return string
+     * @param commentId commentId 评论编号
+     * @param status status 评论状态
+     * @param session session session
+     * @return string 重定向到/admin/comments
      */
     @GetMapping("/remove")
     public String moveToAway(@PathParam("commentId") Long commentId,
@@ -165,7 +167,7 @@ public class CommentController extends BaseController{
      *
      * @param commentId 被回复的评论
      * @param commentContent 回复的内容
-     * @return string
+     * @return 重定向到/admin/comments
      */
     @PostMapping("/reply")
     public String replyComment(@RequestParam("commentId") Long commentId,

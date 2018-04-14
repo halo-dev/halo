@@ -54,7 +54,8 @@ public class InstallController {
     /**
      * 渲染安装页面
      *
-     * @return string
+     * @param model model
+     * @return 模板路径
      */
     @GetMapping
     public String install(Model model){
@@ -75,7 +76,14 @@ public class InstallController {
     /**
      * 执行安装
      *
-     * @return boolean
+     * @param siteTitle 博客标题
+     * @param siteUrl 博客网址
+     * @param userName 用户名
+     * @param userDisplayName 用户名显示名
+     * @param userEmail 用户邮箱
+     * @param userPwd 用户密码
+     * @param request request
+     * @return true：安装成功，false：安装失败
      */
     @PostMapping(value = "/do")
     @ResponseBody

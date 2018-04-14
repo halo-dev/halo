@@ -29,7 +29,8 @@ public class UserController {
     /**
      * 获取用户信息并跳转
      *
-     * @return string
+     * @param model model
+     * @return 模板路径admin/admin_profile
      */
     @GetMapping
     public String profile(Model model){
@@ -43,7 +44,8 @@ public class UserController {
      * 处理修改用户资料的请求
      *
      * @param user user
-     * @return String
+     * @param session session
+     * @return true：修改成功，false：修改失败
      */
     @PostMapping(value = "save")
     @ResponseBody
@@ -65,9 +67,11 @@ public class UserController {
     /**
      * 处理修改密码的请求
      *
-     * @param beforePass 之前的密码
+     * @param beforePass 旧密码
      * @param newPass 新密码
-     * @return String
+     * @param userId 用户编号
+     * @param session session
+     * @return true：修改密码成功，false：修改密码失败
      */
     @PostMapping(value = "changePass")
     @ResponseBody

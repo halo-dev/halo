@@ -58,7 +58,9 @@ public class AdminController extends BaseController{
     /**
      * 请求后台页面
      *
-     * @return freemarker
+     * @param model model
+     * @param session session
+     * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"","/index"})
     public String index(Model model,HttpSession session){
@@ -93,7 +95,8 @@ public class AdminController extends BaseController{
     /**
      * 处理跳转到登录页的请求
      *
-     * @return freemarker
+     * @param session session
+     * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
     public String login(HttpSession session){
@@ -108,10 +111,10 @@ public class AdminController extends BaseController{
     /**
      * 验证登录信息
      *
-     * @param loginName loginName
-     * @param loginPwd loginPwd
-     * @param session session
-     * @return String
+     * @param loginName 登录名：邮箱／用户名
+     * @param loginPwd loginPwd 密码
+     * @param session session session
+     * @return String 登录状态
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
@@ -158,7 +161,7 @@ public class AdminController extends BaseController{
      * 退出登录 销毁session
      *
      * @param session session
-     * @return string
+     * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session){
@@ -172,10 +175,10 @@ public class AdminController extends BaseController{
     /**
      * 查看所有日志
      *
-     * @param model model
-     * @param page page
-     * @param size size
-     * @return string
+     * @param model model model
+     * @param page page 当前页码
+     * @param size size 每页条数
+     * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
     public String logs(Model model,
@@ -191,7 +194,7 @@ public class AdminController extends BaseController{
     /**
      * 清除所有日志
      *
-     * @return return
+     * @return 重定向到/admin
      */
     @GetMapping(value = "/logs/clear")
     public String logsClear(){
@@ -207,7 +210,7 @@ public class AdminController extends BaseController{
      * 不可描述的页面
      *
      * @param model model
-     * @return string
+     * @return 模板路径admin/admin_halo
      */
     @GetMapping(value = "/halo")
     public String halo(Model model){

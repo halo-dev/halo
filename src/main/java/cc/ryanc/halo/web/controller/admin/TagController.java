@@ -30,7 +30,7 @@ public class TagController {
      * 渲染标签管理页面
      *
      * @param model model
-     * @return string
+     * @return 模板路径admin/admin_tag
      */
     @GetMapping
     public String tags(Model model){
@@ -46,7 +46,7 @@ public class TagController {
      * 新增/修改标签
      *
      * @param tag tag
-     * @return string
+     * @return 重定向到/admin/tag
      */
     @PostMapping(value = "/save")
     public String saveTag(@ModelAttribute Tag tag){
@@ -61,8 +61,8 @@ public class TagController {
     /**
      * 验证是否存在该路径
      *
-     * @param tagUrl tagUrl
-     * @return string
+     * @param tagUrl 标签路径名
+     * @return true：不存在，false：已存在
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
@@ -78,8 +78,8 @@ public class TagController {
     /**
      * 处理删除标签的请求
      *
-     * @param tagId tagId
-     * @return string
+     * @param tagId 标签编号
+     * @return 重定向到/admin/tag
      */
     @GetMapping(value = "/remove")
     public String removeTag(@PathParam("tagId") Long tagId){
@@ -96,8 +96,8 @@ public class TagController {
      * 跳转到修改标签页面
      *
      * @param model model
-     * @param tagId tagId
-     * @return string
+     * @param tagId 标签编号
+     * @return 模板路径admin/admin_tag
      */
     @GetMapping(value = "/edit")
     public String toEditTag(Model model,@PathParam("tagId") Long tagId){

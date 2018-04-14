@@ -40,7 +40,7 @@ public class PageController {
      * 页面管理页面
      *
      * @param model model
-     * @return string
+     * @return 模板路径admin/admin_page
      */
     @GetMapping
     public String pages(Model model){
@@ -51,8 +51,8 @@ public class PageController {
     /**
      * 获取友情链接列表并渲染页面
      *
-     * @param map ModelMap
-     * @return String
+     * @param model model
+     * @return 模板路径admin/admin_page_link
      */
     @GetMapping(value = "/links")
     public String links(Model model){
@@ -69,8 +69,8 @@ public class PageController {
      * 跳转到修改页面
      *
      * @param model model
-     * @param linkId linkId
-     * @return String
+     * @param linkId linkId 友情链接编号
+     * @return String 模板路径admin/admin_page_link
      */
     @GetMapping("/links/edit")
     public String toEditLink(Model model,@PathParam("linkId") Long linkId){
@@ -87,8 +87,8 @@ public class PageController {
     /**
      * 处理添加/修改友链的请求并渲染页面
      *
-     * @param link Link
-     * @return freemarker
+     * @param link Link实体
+     * @return 重定向到/admin/page/links
      */
     @PostMapping(value = "/links/save")
     public String saveLink(@ModelAttribute Link link){
@@ -104,8 +104,8 @@ public class PageController {
     /**
      * 处理删除友情链接的请求并重定向
      *
-     * @param linkId linkId
-     * @return String
+     * @param linkId 友情链接编号
+     * @return 重定向到/admin/page/links
      */
     @GetMapping(value = "/links/remove")
     public String removeLink(@PathParam("linkId") Long linkId){
@@ -121,7 +121,10 @@ public class PageController {
     /**
      * 图库管理
      *
-     * @return String
+     * @param model model
+     * @param page 当前页码
+     * @param size 每页显示的条数
+     * @return 模板路径admin/admin_page_gallery
      */
     @GetMapping(value = "/galleries")
     public String gallery(Model model,
@@ -139,7 +142,7 @@ public class PageController {
      * 保存图片
      *
      * @param gallery gallery
-     * @return string
+     * @return 重定向到/admin/page/gallery
      */
     @PostMapping(value = "/gallery/save")
     public String saveGallery(@ModelAttribute Gallery gallery){
@@ -158,8 +161,8 @@ public class PageController {
      * 处理获取图片详情的请求
      *
      * @param model model
-     * @param galleryId galleryId
-     * @return string
+     * @param galleryId 图片编号
+     * @return 模板路径admin/widget/_gallery-detail
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model,@PathParam("galleryId") Long galleryId){
@@ -173,8 +176,8 @@ public class PageController {
     /**
      * 删除图库中的图片
      *
-     * @param galleryId galleryId
-     * @return string
+     * @param galleryId 图片编号
+     * @return true：删除成功，false：删除失败
      */
     @GetMapping(value = "/gallery/remove")
     @ResponseBody

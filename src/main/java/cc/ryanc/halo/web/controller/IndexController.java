@@ -64,7 +64,7 @@ public class IndexController extends BaseController{
      * 请求首页
      *
      * @param model model
-     * @return freemarker
+     * @return 模板路径
      */
     @GetMapping
     public String index(Model model){
@@ -76,9 +76,9 @@ public class IndexController extends BaseController{
      * 首页分页
      *
      * @param model model
-     * @param page page
-     * @param size size
-     * @return freemarker
+     * @param page 当前页码
+     * @param size 每页数量
+     * @return 模板路径/themes/{theme}/index
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,
@@ -124,8 +124,8 @@ public class IndexController extends BaseController{
     /**
      * ajax分页
      *
-     * @param page page
-     * @return list
+     * @param page page 当前页码
+     * @return List<Post>集合</>
      */
     @GetMapping(value = "next")
     @ResponseBody
@@ -147,9 +147,9 @@ public class IndexController extends BaseController{
     /**
      * 渲染文章详情
      *
-     * @param postId postId
+     * @param postUrl 文章路径名
      * @param model model
-     * @return String
+     * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = {"archives/{postUrl}","post/{postUrl}","article/{postUrl}"})
     public String getPost(@PathVariable String postUrl, Model model){
@@ -207,8 +207,9 @@ public class IndexController extends BaseController{
 
     /**
      * 获取文章的评论
-     * @param postId postId
-     * @return page
+     *
+     * @param postId postId 文章编号
+     * @return List<Comment>集合</>
      */
     @GetMapping(value = "/getComment/{postId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
@@ -227,7 +228,7 @@ public class IndexController extends BaseController{
      * 渲染关于页面
      *
      * @param model model
-     * @return string
+     * @return 模板路径/themes/{theme}/about
      */
     @GetMapping(value = "/about")
     public String about(Model model){
@@ -243,7 +244,7 @@ public class IndexController extends BaseController{
     /**
      * 跳转到图库页面
      *
-     * @return String
+     * @return 模板路径/themes/{theme}/gallery
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model){
@@ -258,7 +259,8 @@ public class IndexController extends BaseController{
     /**
      * 友情链接
      *
-     * @return string
+     * @param model model
+     * @return 模板路径/themes/{theme}/links
      */
     @GetMapping(value = "/links")
     public String links(Model model){
@@ -297,7 +299,7 @@ public class IndexController extends BaseController{
      * 标签
      *
      * @param model model
-     * @return string
+     * @return 模板路径/themes/{theme}/tags
      */
     @GetMapping(value = "/tags")
     public String tags(Model model){
@@ -347,7 +349,7 @@ public class IndexController extends BaseController{
      * 文章归档
      *
      * @param model model
-     * @return string
+     * @return 模板路径
      */
     @GetMapping(value = "/archives")
     public String archives(Model model){
@@ -358,8 +360,8 @@ public class IndexController extends BaseController{
      * 文章归档分页
      *
      * @param model model
-     * @param page page
-     * @return string
+     * @param page page 当前页码
+     * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "/archives/page/{page}")
     public String archives(Model model,
@@ -404,9 +406,9 @@ public class IndexController extends BaseController{
      * 文章归档，根据年月
      *
      * @param model model
-     * @param year year
-     * @param month month
-     * @return string
+     * @param year year 年份
+     * @param month month 月份
+     * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "/archives/{year}/{month}")
     public String archives(Model model,
@@ -488,14 +490,19 @@ public class IndexController extends BaseController{
     /**
      * 提交新评论
      *
-     * @param comment comment
-     * @return string
+     * @param comment comment实体
+     * @param post post实体
+     * @param request request
+     * @return true：评论成功，false：评论失败
      */
     @PostMapping(value = "/newComment")
     @ResponseBody
     public boolean newComment(@ModelAttribute("comment") Comment comment,
                              @ModelAttribute("post") Post post,
                              HttpServletRequest request){
+        if(""==comment.getCommentAuthor() || "".equals(comment.getCommentAuthor())){
+            comment.setCommentAuthor("小猪佩琪");
+        }
         comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
         comment.setPost(post);
         comment.setCommentDate(new Date());

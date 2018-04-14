@@ -58,7 +58,7 @@ public class AttachmentController {
      * 获取upload的所有图片资源并渲染页面
      *
      * @param model model
-     * @return String
+     * @return 模板路径admin/admin_attachment
      */
     @GetMapping
     public String attachments(Model model,
@@ -78,8 +78,8 @@ public class AttachmentController {
      * 跳转选择附件页面
      *
      * @param model model
-     * @param page page
-     * @return string
+     * @param page page 当前页码
+     * @return 模板路径admin/widget/_attachment-select
      */
     @GetMapping(value = "/select")
     public String selectAttachment(Model model,
@@ -100,7 +100,9 @@ public class AttachmentController {
     /**
      * 上传文件
      *
-     * @param file file
+     * @param file 文件
+     * @param request request
+     * @return Map
      */
     @PostMapping(value = "/upload",produces = { "application/json;charset=UTF-8" })
     @ResponseBody
@@ -164,8 +166,9 @@ public class AttachmentController {
     /**
      * 处理获取附件详情的请求
      *
-     * @param attachId attachId
-     * @return string
+     * @param model model
+     * @param attachId 附件编号
+     * @return 模板路径admin/widget/_attachment-detail
      */
     @GetMapping(value = "/attachment")
     public String attachmentDetail(Model model,@PathParam("attachId") Long attachId){
@@ -180,8 +183,9 @@ public class AttachmentController {
     /**
      * 移除附件的请求
      *
-     * @param attachId attachId
-     * @return string
+     * @param attachId 附件编号
+     * @param request request
+     * @return true：移除附件成功，false：移除附件失败
      */
     @GetMapping(value = "/remove")
     @ResponseBody

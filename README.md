@@ -12,6 +12,7 @@
 ## 目录
 
 - [Introduction 简介](#Introduction-简介)
+- [Quickstart 快速开始](#Quickstart-快速开始)
 - [Demo 演示](#Demo-演示)
 - [Download 下载](#Download-下载)
 - [Docs 文档](#Docs-文档)
@@ -25,6 +26,14 @@ Fast,simple,powerful blog system powered by Java.
 
 **Halo** [ˈheɪloʊ]，意为光环。当然，你也可以当成拼音读(哈喽)。<br>
 轻快，简洁，功能强大，使用Java开发的博客系统。
+
+## Quickstart 快速开始
+
+```bash
+git clone https://github.com/ruibaby/halo.git
+cd halo
+mvn clean package
+```
 
 ## Demo 演示
 
