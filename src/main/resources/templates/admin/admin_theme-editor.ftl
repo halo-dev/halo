@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-主题编辑"></@head>
+<@head title="${options.blog_title} | 后台管理：主题编辑"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -31,7 +31,7 @@
                             </div>
                         </div>
                         <div class="box-footer">
-                            <button type="button" class="btn btn-primary btn-flat" onclick="saveTpl()">确定修改</button>
+                            <button type="button" class="btn btn-primary " onclick="saveTpl()">确定修改</button>
                         </div>
                     </div>
                 </div>

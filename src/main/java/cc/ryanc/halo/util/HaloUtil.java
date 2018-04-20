@@ -512,15 +512,15 @@ public class HaloUtil {
      */
     public static String getRss(List<Post> posts) throws FeedException {
         Channel channel = new Channel("rss_2.0");
-        if(null==HaloConst.OPTIONS.get("site_title")){
+        if(null==HaloConst.OPTIONS.get("blog_title")){
             channel.setTitle("");
         }else{
-            channel.setTitle(HaloConst.OPTIONS.get("site_title"));
+            channel.setTitle(HaloConst.OPTIONS.get("blog_title"));
         }
-        if(null==HaloConst.OPTIONS.get("site_url")){
+        if(null==HaloConst.OPTIONS.get("blog_url")){
             channel.setLink("");
         }else {
-            channel.setLink(HaloConst.OPTIONS.get("site_url"));
+            channel.setLink(HaloConst.OPTIONS.get("blog_url"));
         }
         if(null==HaloConst.OPTIONS.get("seo_desc")){
             channel.setDescription("");
@@ -545,7 +545,7 @@ public class HaloUtil {
             value = new String(xmlChar);
             content.setValue(value);
             item.setContent(content);
-            item.setLink(HaloConst.OPTIONS.get("site_url")+"/article/"+post.getPostUrl());
+            item.setLink(HaloConst.OPTIONS.get("blog_url")+"/article/"+post.getPostUrl());
             item.setPubDate(post.getPostDate());
             items.add(item);
         }
@@ -563,7 +563,7 @@ public class HaloUtil {
         String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
         String urlBody="";
         String urlItem;
-        String urlPath = HaloConst.OPTIONS.get("site_url")+"/article/";
+        String urlPath = HaloConst.OPTIONS.get("blog_url")+"/article/";
         for(Post post:posts){
             urlItem = "<url><loc>"+urlPath+post.getPostUrl()+"</loc><lastmod>"+post.getPostDate()+"</lastmod>"+"</url>";
             urlBody+=urlItem;

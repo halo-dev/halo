@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-文章">
+<@head title="${options.blog_title} | 后台管理：文章">
 </@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
@@ -48,7 +48,7 @@
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
-                                    <th width="40%">标题</th>
+                                    <th>标题</th>
                                     <th>分类目录</th>
                                     <th>标签</th>
                                     <th>评论</th>
@@ -87,18 +87,18 @@
                                             <td>
                                                 <#switch post.postStatus>
                                                     <#case 0>
-                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs btn-flat" target="_blank">预览</a>
-                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs btn-flat">修改</a>
-                                                        <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
+                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs " target="_blank">预览</a>
+                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
                                                         <#break >
                                                     <#case 1>
-                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs btn-flat" target="_blank">预览</a>
-                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs btn-flat">修改</a>
-                                                        <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
+                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs " target="_blank">预览</a>
+                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
                                                         <#break >
                                                     <#case 2>
-                                                        <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-primary btn-xs btn-flat">还原</a>
-                                                        <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
+                                                        <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-primary btn-xs ">还原</a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
                                                         <#break >
                                                 </#switch>
                                             </td>

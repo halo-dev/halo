@@ -1,0 +1,79 @@
+@import '../libs/vars';
+@import '../libs/functions';
+@import '../libs/mixins';
+
+///
+/// Lens by HTML5 UP
+/// html5up.net | @ajlkn
+/// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+///
+
+/* Thumbnails */
+
+	#thumbnails {
+		@include vendor('display', 'flex');
+		@include vendor('flex-wrap', 'wrap');
+		padding: 0 0.75em;
+
+		article {
+			position: relative;
+			width: #{100% / _misc(thumbnails-per-row)};
+			background: #101010;
+			outline: 0;
+
+			.thumbnail {
+				-webkit-tap-highlight-color: rgba(0,0,0,0);
+				display: block;
+				position: relative;
+				border: 0;
+				outline: 0;
+
+				img {
+					display: block;
+					width: 100%;
+				}
+
+				&:before {
+					@include vendor('pointer-events', 'none');
+					@include vendor('transition', 'opacity 0.25s ease');
+					content: '';
+					position: absolute;
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+					box-shadow: inset 0 0 0 2px _palette(accent), inset 0 0 0px 3px rgba(0,0,0,0.15);
+					opacity: 0;
+					z-index: 1;
+				}
+
+				&:focus {
+					&:before {
+						opacity: 0.5;
+					}
+				}
+			}
+
+			h2, p {
+				display: none;
+			}
+
+			&.active {
+				.thumbnail {
+					&:before {
+						opacity: 1;
+					}
+				}
+			}
+		}
+
+		@include breakpoint(xsmall) {
+			article {
+				.thumbnail {
+					&:before {
+						display: none;
+					}
+				}
+			}
+		}
+	}

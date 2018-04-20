@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-评论管理"></@head>
+<@head title="${options.blog_title} | 后台管理：评论"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -56,17 +56,17 @@
                                             <td>
                                                 <#switch comment.commentStatus>
                                                     <#case 0>
-                                                    <button class="btn btn-primary btn-xs btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
-                                                    <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
+                                                    <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 1>
-                                                    <a class="btn btn-primary btn-xs btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
-                                                    <a class="btn btn-info btn-xs btn-flat" onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</a>
-                                                    <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
+                                                    <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
+                                                    <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
                                                     <#break >
                                                     <#case 2>
-                                                    <a class="btn btn-primary btn-xs btn-flat" href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
-                                                    <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId}&status=2','确定要永久删除？')">删除</button>
+                                                    <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId}&status=2','确定要永久删除？')">删除</button>
                                                     <#break >
                                                 </#switch>
                                             </td>

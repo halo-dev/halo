@@ -1,5 +1,5 @@
 #!/bin/bash
-APP_NAME=halo-*.jar
+APP_NAME=halo-beta.jar
 
 usage() {
     echo "用法: sh halo.sh [start(启动)|stop(停止)|restart(重启)|status(状态)]"
@@ -20,7 +20,7 @@ start(){
   if [ $? -eq "0" ]; then
     echo "${APP_NAME} 正在运行。 pid=${pid} ."
   else
-    nohup java -jar $APP_NAME > /dev/null 2>&1 &
+    nohup java -Xms512m -Xmx768m -jar $APP_NAME > /dev/null 2>&1 &
     echo "${APP_NAME}启动成功，请查看日志确保运行正常。"
     fi
 }

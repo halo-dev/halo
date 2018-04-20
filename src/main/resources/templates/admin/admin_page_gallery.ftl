@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-图库">
+<@head title="${options.blog_title} | 后台管理：图库">
 </@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
@@ -69,7 +69,7 @@
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="galleryUrl" name="galleryUrl">
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('galleryUrl')">选择</button>
+                                                <button class="btn btn-default " type="button" onclick="openAttach('galleryUrl')">选择</button>
                                             </span>
                                         </div>
                                     </div>

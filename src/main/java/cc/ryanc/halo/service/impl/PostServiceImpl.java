@@ -6,8 +6,6 @@ import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.util.HaloUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -30,29 +28,23 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private PostRepository postRepository;
 
-    private static final String POST_KEY = "'post_key'";
-
-    private static final String POST_CACHE_NAME = "post_cache";
-
     /**
-     * 保存文章 清除缓存
+     * 保存文章
      *
      * @param post Post
      * @return Post
      */
-    @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public Post saveByPost(Post post) {
         return postRepository.save(post);
     }
 
     /**
-     * 根据编号移除文章 清除缓存
+     * 根据编号移除文章
      *
      * @param postId postId
      * @return Post
      */
-    @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public Post removeByPostId(Long postId) {
         Optional<Post> post = this.findByPostId(postId);
@@ -61,25 +53,23 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 修改文章 清除缓存
+     * 修改文章
      *
      * @param post Post
      * @return post
      */
-    @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public Post updateByPost(Post post) {
         return postRepository.save(post);
     }
 
     /**
-     * 修改文章状态 清除缓存
+     * 修改文章状态
      *
      * @param postId postId
      * @param status status
      * @return Post
      */
-    @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public Post updatePostStatus(Long postId, Integer status) {
         Optional<Post> post = this.findByPostId(postId);
@@ -92,7 +82,6 @@ public class PostServiceImpl implements PostService {
      *
      * @param postSummary postSummary
      */
-    @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public void updateAllSummary(Integer postSummary) {
         List<Post> posts = this.findAllPosts();
@@ -116,11 +105,10 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 查询所有文章 不分页 缓存
+     * 查询所有文章 不分页
      *
      * @return List
      */
-    @Cacheable(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public List<Post> findAllPosts() {
         return postRepository.findAll();
@@ -139,13 +127,12 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 根据状态分页查询文章 清除缓存
+     * 根据状态分页查询文章
      *
      * @param status status
      * @param pageable pageable
      * @return page
      */
-    @CacheEvict(value = POST_CACHE_NAME,key = POST_KEY)
     @Override
     public Page<Post> findPostByStatus(Integer status, Pageable pageable) {
         return postRepository.findPostsByPostStatus(status,pageable);
@@ -163,26 +150,23 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 根据编号查询文章 缓存
+     * 根据编号查询文章
      *
      * @param postId postId
      * @return post
      */
-    @Cacheable(value = POST_CACHE_NAME,key = "#postId+'post'")
     @Override
     public Optional<Post> findByPostId(Long postId) {
         return postRepository.findById(postId);
     }
 
     /**
-     * 根据文章路径查询 缓存
+     * 根据文章路径查询
      *
      * @param postUrl postUrl
      * @return post
      */
     @Override
-    @CacheEvict(value = POST_CACHE_NAME)
-    @Cacheable(value = POST_CACHE_NAME,key = "#postUrl+'post'")
     public Post findByPostUrl(String postUrl) {
         return postRepository.findPostByPostUrl(postUrl);
     }
@@ -198,10 +182,10 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 查询Id之后的文章
+     * 查询之后的文章
      *
-     * @param postId postId
-     * @return post
+     * @param postDate 发布时间
+     * @return List
      */
     @Override
     public List<Post> findByPostDateAfter(Date postDate) {
@@ -211,7 +195,7 @@ public class PostServiceImpl implements PostService {
     /**
      * 查询Id之前的文章
      *
-     * @param postId
+     * @param postDate 发布时间
      * @return list
      */
     @Override

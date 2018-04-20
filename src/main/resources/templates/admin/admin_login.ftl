@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>Halo后台登录</title>
+    <title>${options.blog_title} | 后台登录</title>
     <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/plugins/animate/animate.min.css">
     <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
@@ -27,15 +27,15 @@
             <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
                 <input type="password" class="form-control" name="loginPwd" id="login-pwd" placeholder="密码">
             </div>
-            <div class="row control animated fadeInUp" style="animation-delay: 0.3s">
-                <div class="col-xs-6">
-                    <label for="remember"><input type="checkbox" id="remember">  <span style="color: #000;font-weight: lighter">记住我</span></label>
-                </div>
-                <div class="col-xs-6 pull-right text-right">
-                    <a href="#" style="color: #000;">忘记密码？</a>
-                </div>
-            </div>
-            <button type="button" id="btn-login" data-loading-text="登录中..." class="btn btn-block login-button animated fadeInUp" onclick="btn_login()"  style="animation-delay: 0.4s">登录</button>
+            <#--<div class="row control animated fadeInUp" style="animation-delay: 0.3s">-->
+                <#--<div class="col-xs-6">-->
+                    <#--<label for="remember"><input type="checkbox" id="remember">  <span style="color: #000;font-weight: lighter">记住我</span></label>-->
+                <#--</div>-->
+                <#--<div class="col-xs-6 pull-right text-right">-->
+                    <#--<a href="#" style="color: #000;">忘记密码？</a>-->
+                <#--</div>-->
+            <#--</div>-->
+            <button type="button" id="btn-login" data-loading-text="登录中..." class="btn btn-block login-button animated fadeInUp" onclick="btn_login()"  style="animation-delay: 0.4s;outline: none;">登录</button>
         </form>
     </div>
 </div>

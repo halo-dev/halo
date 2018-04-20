@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-媒体库">
+<@head title="${options.blog_title} | 后台管理：媒体库">
 </@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
@@ -85,7 +85,7 @@
                             showClose: false
                         }).on("fileuploaded",function (event,data,previewId,index) {
                             var data = data.jqXHR.responseJSON;
-                            if(data.success='1'){
+                            if(data.success==='1'){
                                 $("#uploadForm").hide(400);
                                 $.toast({
                                     text: "上传成功！",

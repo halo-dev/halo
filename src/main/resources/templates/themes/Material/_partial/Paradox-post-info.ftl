@@ -2,11 +2,11 @@
 
     <!-- Author Avatar -->
     <div id="author-avatar">
-        <img src="/material/source/img/avatar.png" width="44px" height="44px" alt="Author Avatar"/>
+        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" width="44px" height="44px" alt="Author Avatar"/>
     </div>
     <!-- Author Name & Date -->
     <div>
-        <strong>RYAN0UP</strong>
+        <strong>${user.userDisplayName?default('halo')}</strong>
         <span>${post.postDate?string("MM月 dd,yyyy")}</span>
     </div>
 
@@ -32,8 +32,13 @@
         <span class="visuallyhidden">bookmark</span>
     </button>
     <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="article-functions-viewtags-button">
-        <li class="mdl-menu__item">
-            <a class="post_tag-link" href="/tags/Java/">Java</a></li><li class="mdl-menu__item"><a class="post_tag-link" href="/tags/SpringBoot/">SpringBoot</a>
+        <#if post.tags??>
+            <#list post.tags as tag>
+                <li class="mdl-menu__item">
+                    <a class="post_tag-link" href="/tags/${tag.tagUrl}/">${tag.tagName}</a>
+                </li>
+            </#list>
+        </#if>
     </ul>
 
     <!-- Share -->

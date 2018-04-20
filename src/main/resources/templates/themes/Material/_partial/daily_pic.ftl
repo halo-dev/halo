@@ -11,7 +11,7 @@
     <div class="mdl-card__supporting-text meta mdl-color-text--grey-600">
         <!-- Author Avatar -->
         <div id="author-avatar">
-            <img src="/material/source/img/avatar.png" width="32px" height="32px" alt="avatar">
+            <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" width="32px" height="32px" alt="avatar">
         </div>
         <div>
             <strong>${user.userDisplayName?default('Material')}</strong>

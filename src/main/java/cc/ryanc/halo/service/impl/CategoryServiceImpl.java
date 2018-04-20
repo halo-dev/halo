@@ -24,29 +24,23 @@ public class CategoryServiceImpl implements CategoryService{
     @Autowired
     private CategoryRepository categoryRepository;
 
-    private static final String CATEGORY_KEY = "'category_key'";
-
-    private static final String CATEGORY_CACHE_NAME = "cate_cache";
-
     /**
-     * 保存/修改分类目录 清除缓存
+     * 保存/修改分类目录
      *
      * @param category 分类目录
      * @return ategory
      */
-    @CacheEvict(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
     @Override
     public Category saveByCategory(Category category) {
         return categoryRepository.save(category);
     }
 
     /**
-     * 根据编号移除分类目录 清除缓存
+     * 根据编号移除分类目录
      *
      * @param cateId 分类目录编号
      * @return Category
      */
-    @CacheEvict(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
     @Override
     public Category removeByCateId(Long cateId) {
         Optional<Category> category = this.findByCateId(cateId);
@@ -55,23 +49,21 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     /**
-     * 查询所有分类目录 缓存
+     * 查询所有分类目录
      *
      * @return list
      */
-    @Cacheable(value = CATEGORY_CACHE_NAME,key = CATEGORY_KEY)
     @Override
     public List<Category> findAllCategories() {
         return categoryRepository.findAll();
     }
 
     /**
-     * 根据编号查询分类目录 缓存
+     * 根据编号查询分类目录
      *
      * @param cateId 分类编号
      * @return Category
      */
-    @Cacheable(value = CATEGORY_CACHE_NAME,key = "#cateId+'cate'")
     @Override
     public Optional<Category> findByCateId(Long cateId) {
         return categoryRepository.findById(cateId);

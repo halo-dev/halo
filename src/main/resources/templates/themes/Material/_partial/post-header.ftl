@@ -8,14 +8,14 @@
             $('.post_thumbnail-random').addClass('lazy');
         </script>
         <p class="article-headline-p">
-            ${post.postTitle?if_exists}
+            ${post.postTitle}
         </p>
     </div>
 </#if>
 <#if options.theme_material_scheme?if_exists == "Isolation">
     <div class="post-header_info without-thumbnail">
         <!-- Author Avatar & Name -->
-        <img src="/material/source/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="RYAN0UP's avatar">
-        <span class="name-span">RYAN0UP</span>
+        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName?default('halo')}'s avatar">
+        <span class="name-span">${user.userDisplayName?default('halo')}</span>
     </div>
 </#if>

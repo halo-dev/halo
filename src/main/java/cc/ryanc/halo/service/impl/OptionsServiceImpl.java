@@ -25,16 +25,11 @@ public class OptionsServiceImpl implements OptionsService {
     @Autowired
     private OptionsRepository optionsRepository;
 
-    private static final String OPTIONS_KEY = "'options_key'";
-
-    private static final String OPTIONS_CACHE_NAME = "options_cache";
-
     /**
      * 批量保存设置
      *
      * @param options options
      */
-    @CacheEvict(value = OPTIONS_CACHE_NAME,key = OPTIONS_KEY)
     @Override
     public void saveOptions(Map<String,String> options){
         if(null != options && !options.isEmpty()){
@@ -48,7 +43,6 @@ public class OptionsServiceImpl implements OptionsService {
      * @param key key
      * @param value value
      */
-    @CacheEvict(value = OPTIONS_CACHE_NAME,key = OPTIONS_KEY)
     @Override
     public void saveOption(String key,String value){
         Options options = null;
@@ -78,7 +72,6 @@ public class OptionsServiceImpl implements OptionsService {
      *
      * @param options options
      */
-    @CacheEvict(value = OPTIONS_CACHE_NAME,key = OPTIONS_KEY)
     @Override
     public void removeOption(Options options) {
         optionsRepository.delete(options);
@@ -89,7 +82,6 @@ public class OptionsServiceImpl implements OptionsService {
      *
      * @return map
      */
-    @Cacheable(value = OPTIONS_CACHE_NAME,key = OPTIONS_KEY)
     @Override
     public Map<String, String> findAllOptions() {
         Map<String,String> options = new HashMap<String,String>();
@@ -106,7 +98,6 @@ public class OptionsServiceImpl implements OptionsService {
      * @param key key
      * @return String
      */
-    @Cacheable(value = OPTIONS_CACHE_NAME,key = "#key+'options'")
     @Override
     public String findOneOption(String key) {
         Options options = optionsRepository.findOptionsByOptionName(key);

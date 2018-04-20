@@ -61,7 +61,7 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 查询所有评论，不分页
      *
-     * @return
+     * @return List<Comment></>
      */
     @Override
     public List<Comment> findAllComments() {

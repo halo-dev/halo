@@ -4,6 +4,9 @@ import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,10 +25,6 @@ public class AttachmentServiceImpl implements AttachmentService{
 
     @Autowired
     private AttachmentRepository attachmentRepository;
-
-    private static final String CATEGORY_KEY = "'category_key'";
-
-    private static final String CATEGORY_CACHE_NAME = "cateCache";
 
     /**
      * 新增附件信息

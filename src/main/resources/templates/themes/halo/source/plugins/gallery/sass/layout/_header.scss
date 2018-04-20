@@ -1,0 +1,20 @@
+@import '../libs/vars';
+@import '../libs/functions';
+@import '../libs/mixins';
+
+///
+/// Lens by HTML5 UP
+/// html5up.net | @ajlkn
+/// Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+///
+
+/* Header */
+
+	#header {
+		@include padding(3em, 2.25em);
+
+		h1 {
+			font-size: 2.25em;
+			font-weight: _font(weight-bold);
+		}
+	}

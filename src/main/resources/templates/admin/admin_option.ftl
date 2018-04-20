@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-系统设置"></@head>
+<@head title="${options.blog_title} | 后台管理：系统设置"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -64,45 +64,45 @@
                                 <form method="post" class="form-horizontal" id="commonOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="siteTitle" class="col-sm-2 control-label">博客标题：</label>
+                                            <label for="blogTitle" class="col-sm-2 control-label">博客标题：</label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="siteTitle" name="site_title" value="${options.site_title?if_exists}">
+                                                <input type="text" class="form-control" id="blogTitle" name="blog_title" value="${options.blog_title?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="siteUrl" class="col-sm-2 control-label">博客地址：</label>
+                                            <label for="blogUrl" class="col-sm-2 control-label">博客地址：</label>
                                             <div class="col-sm-4">
-                                                <input type="url" class="form-control" id="siteUrl" name="site_url" value="${options.site_url?default('http://localhost:8080')}">
+                                                <input type="url" class="form-control" id="blogUrl" name="blog_url" value="${options.blog_url?default('http://localhost:8080')}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="siteLogo" class="col-sm-2 control-label">LOGO：
+                                            <label for="blogLogo" class="col-sm-2 control-label">LOGO：
                                                 <span data-toggle="tooltip" data-placement="top" title="如果不设置图片Logo，将使用网站标题作为Logo" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
                                             <div class="col-sm-4">
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control selectData" id="siteLogo" name="site_logo" value="${options.site_logo?if_exists}">
+                                                    <input type="text" class="form-control selectData" id="blogLogo" name="blog_logo" value="${options.blog_logo?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default btn-flat" type="button" onclick="openAttach('siteLogo')">选择</button>
+                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogLogo')">选择</button>
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="siteFooter" class="col-sm-2 control-label">页脚信息：
+                                            <label for="blogFooterInfo" class="col-sm-2 control-label">页脚信息：
                                                 <span data-toggle="tooltip" data-placement="top" title="支持HTML" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
                                             <div class="col-sm-4">
-                                                <textarea class="form-control" rows="5" id="siteFooter" name="site_footer" style="resize: none">${options.site_footer?if_exists}</textarea>
+                                                <textarea class="form-control" rows="5" id="blogFooterInfo" name="blog_footer_info" style="resize: none">${options.blog_footer_info?if_exists}</textarea>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('commonOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('commonOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -138,7 +138,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('seoOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('seoOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -168,14 +168,14 @@
                                                 <div class="input-group">
                                                     <input type="number" class="form-control" id="postSummary" name="post_summary" value="${options.post_summary?default('50')}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default btn-flat" id="btn_update_summary" onclick="updateAllSummary()" type="button">更新</button>
+                                                        <button class="btn btn-default " id="btn_update_summary" onclick="updateAllSummary()" type="button">更新</button>
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('postOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('postOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -380,7 +380,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('commentOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('commentOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -397,6 +397,17 @@
                                                 </label>
                                                 <label class="radio-inline">
                                                     <input type="radio" name="admin_pjax" value="false" ${((options.admin_pjax?if_exists)=='false')?string('checked','')}> 禁用
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">后台加载动画：</label>
+                                            <div class="col-sm-4">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="admin_loading" value="true" ${((options.admin_loading?default('true'))=='true')?string('checked','')}> 启用
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="admin_loading" value="false" ${((options.admin_loading?if_exists)=='false')?string('checked','')}> 禁用
                                                 </label>
                                             </div>
                                         </div>
@@ -469,7 +480,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('adminOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('adminOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -515,7 +526,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('emailOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('emailOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>
@@ -535,7 +546,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm btn-flat" onclick="saveOptions('otherOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('otherOptions')">保存</button>
                                     </div>
                                 </form>
                             </div>

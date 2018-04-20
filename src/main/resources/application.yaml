@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8090
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -29,12 +29,11 @@ spring:
     expose-session-attributes: false
     expose-spring-macro-helpers: false
     suffix: .ftl
-  cache:
-    ehcache:
-      config: ehcache.xml
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 logging:
   file: ./logs/log.log
-
-
 
 

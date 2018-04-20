@@ -12,7 +12,7 @@
             <ul>
                 <li>
                     <a href="#footer" class="icon fa-info-circle">
-                        ©&nbsp;RYAN0UP
+                        ©&nbsp;${user.userDisplayName?default('none')}
                     </a>
                 </li>
             </ul>
@@ -30,44 +30,6 @@
                 <p>${gallery.galleryDate?string("yyyy-MM-dd")}</p>
             </article>
         </#list>
-
-        <!--
-        <article class="thumb">
-            <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_2.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_2.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_2.jpeg" alt="2016日落" /></a>
-            <h2>2016日落</h2>
-            <p>2016-04-04</p>
-        </article>
-
-        <article class="thumb">
-            <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_3.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_3.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_3.jpeg" alt="2015黄昏" /></a>
-            <h2>2015黄昏</h2>
-            <p>2015-7-7</p>
-        </article>
-
-        <article class="thumb">
-            <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_4.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_4.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_4.jpeg" alt="2016南山" /></a>
-            <h2>2016南山</h2>
-            <p>南山</p>
-        </article>
-
-        <article class="thumb">
-            <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_5.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_5.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_5.jpeg" alt="2016成都" /></a>
-            <h2>2016成都</h2>
-            <p>成都动物园</p>
-        </article>
-
-        <article class="thumb">
-            <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_6.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_6.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_6.jpeg" alt="2017重庆A" /></a>
-            <h2>2017重庆A</h2>
-            <p>2017-5-4</p>
-        </article>
-
-        <article class="thumb">
-            <a href="https://cdn.ryanc.cc/img/blog/gallery/Photo_7.jpeg" class="image lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_7.jpeg"><img class="lazy" data-original="https://cdn.ryanc.cc/img/blog/gallery/Photo_7.jpeg" alt="2017重庆B" /></a>
-            <h2>2017重庆B</h2>
-            <p>2017-5-4</p>
-        </article>
-        -->
     </div>
     <!-- Footer -->
     <!--

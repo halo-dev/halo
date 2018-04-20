@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-页面">
+<@head title="${options.blog_title} | 后台管理：页面">
 </@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
@@ -53,24 +53,24 @@
                                             <td>友情链接</td>
                                             <td>/links</td>
                                             <td>
-                                                <a href="/links" class="btn btn-info btn-xs btn-flat" target="_blank">预览</a>
-                                                <a data-pjax="true" href="/admin/page/links" class="btn btn-primary btn-xs btn-flat">配置</a>
+                                                <a href="/links" class="btn btn-info btn-xs " target="_blank">预览</a>
+                                                <a data-pjax="true" href="/admin/page/links" class="btn btn-primary btn-xs ">配置</a>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>图库页面</td>
                                             <td>/gallery</td>
                                             <td>
-                                                <a href="/gallery" class="btn btn-info btn-xs btn-flat" target="_blank">预览</a>
-                                                <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs btn-flat">配置</a>
+                                                <a href="/gallery" class="btn btn-info btn-xs " target="_blank">预览</a>
+                                                <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs ">配置</a>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>关于页面</td>
                                             <td>/about</td>
                                             <td>
-                                                <a href="/about" class="btn btn-info btn-xs btn-flat" target="_blank">预览</a>
-                                                <a data-pjax="true" href="/admin/page/about" class="btn btn-primary btn-xs btn-flat">配置</a>
+                                                <a href="/about" class="btn btn-info btn-xs " target="_blank">预览</a>
+                                                <a data-pjax="true" href="/admin/page/about" class="btn btn-primary btn-xs ">配置</a>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -94,8 +94,8 @@
                                             <td>/link</td>
                                             <th>日期</th>
                                             <td>
-                                                <a href="/links" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
-                                                <a href="/admin/page/links" class="btn btn-primary btn-sm btn-flat">配置</a>
+                                                <a href="/links" class="btn btn-info btn-sm " target="_blank">预览</a>
+                                                <a href="/admin/page/links" class="btn btn-primary btn-sm ">配置</a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -103,8 +103,8 @@
                                             <td>/about</td>
                                             <th>日期</th>
                                             <td>
-                                                <a href="#" class="btn btn-info btn-sm btn-flat" target="_blank">预览</a>
-                                                <a href="/admin/page/about" class="btn btn-primary btn-sm btn-flat">配置</a>
+                                                <a href="#" class="btn btn-info btn-sm " target="_blank">预览</a>
+                                                <a href="/admin/page/about" class="btn btn-primary btn-sm ">配置</a>
                                             </td>
                                         </tr>
                                         </tbody>

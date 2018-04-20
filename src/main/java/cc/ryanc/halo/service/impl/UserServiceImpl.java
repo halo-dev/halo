@@ -68,8 +68,8 @@ public class UserServiceImpl implements UserService {
     /**
      * 验证修改密码时，密码是否正确
      *
-     * @param userId userid
-     * @param userPass userpass
+     * @param userId userId
+     * @param userPass userPass
      * @return User
      */
     @Override

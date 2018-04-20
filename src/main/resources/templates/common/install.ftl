@@ -39,15 +39,15 @@
                         <div class="box box-solid animated" id="installFirst">
                             <div class="box-body" style="padding: 30px;">
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
-                                    <label for="siteTitle" class="col-sm-4 control-label">网站标题：</label>
+                                    <label for="blogTitle" class="col-sm-4 control-label">网站标题：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="siteTitle" name="siteTitle" value="">
+                                        <input type="text" class="form-control" id="blogTitle" name="blogTitle" value="">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
-                                    <label for="siteUrl" class="col-sm-4 control-label">网站地址：</label>
+                                    <label for="blogUrl" class="col-sm-4 control-label">网站地址：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="siteUrl" name="siteUrl" value="">
+                                        <input type="text" class="form-control" id="blogUrl" name="blogUrl" value="">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
@@ -228,7 +228,7 @@
             $('[data-toggle="tooltip"]').tooltip()
         });
         $(document).ready(function () {
-            $('#siteUrl').val("http://"+domain);
+            $('#blogUrl').val("http://"+domain);
             $('#installForm')
                 .bootstrapValidator({
                     message: '安装表单验证失败',
@@ -238,7 +238,7 @@
                         validating: 'glyphicon glyphicon-refresh'
                     },
                     fields: {
-                        siteTitle: {
+                        blogTitle: {
                             message: '网站标题验证失败',
                             validators: {
                                 notEmpty: {
