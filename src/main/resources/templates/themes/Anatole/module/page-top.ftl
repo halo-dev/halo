@@ -13,7 +13,7 @@
             </li>
         </div>
         <div class="avatar">
-            <img src="/anatole/source/images/favicon.png" />
+            <img src="${options.blog_logo?default("/anatole/source/images/logo@2x.png")}" />
         </div>
     </div>
 </div>

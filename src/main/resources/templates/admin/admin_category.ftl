@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-分类目录"></@head>
+<@head title="${options.blog_title} | 后台管理：分类目录"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -50,7 +50,7 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
                                 </div>
                             </form>
                             <#else >
@@ -73,7 +73,7 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
                                 </div>
                             </form>
                         </#if>
@@ -104,11 +104,11 @@
                                         <td>2</td>
                                         <td>
                                             <#if updateCategory?? && updateCategory.cateId==cate.cateId>
-                                                <a href="#" class="btn btn-primary btn-xs btn-flat" disabled>正在修改</a>
+                                                <a href="#" class="btn btn-primary btn-xs " disabled>正在修改</a>
                                                 <#else >
-                                                <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId}" class="btn btn-primary btn-xs btn-flat">修改</a>
+                                                <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId}" class="btn btn-primary btn-xs ">修改</a>
                                             </#if>
-                                            <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/category/remove?cateId=${cate.cateId}')">删除</button>
+                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId}')">删除</button>
                                         </td>
                                     </tr>
                                     </#list>
@@ -132,8 +132,8 @@
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger btn-flat" data-dismiss="modal">确定</a>
+                        <button type="button" class="btn btn-default " data-dismiss="modal">取消</button>
+                        <a onclick="removeIt()" class="btn btn-danger " data-dismiss="modal">确定</a>
                     </div>
                 </div>
             </div>

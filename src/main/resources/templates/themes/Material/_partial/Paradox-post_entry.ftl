@@ -5,14 +5,14 @@
     <!-- Random Thumbnail -->
     <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/article/${post.postUrl}">${post.postTitle?if_exists}</a></p>
+        <p class="article-headline-p"><a href="/archives/${post.postUrl}">${post.postTitle?if_exists}</a></p>
     </div>
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         ${post.postSummary?if_exists}
         &nbsp;&nbsp;&nbsp;
         <span>
-            <a href="/article/${post.postUrl}" target="_self">阅读全文</a>
+            <a href="/archives/${post.postUrl}" target="_self">阅读全文</a>
         </span>
     </div>
     <!-- Post_entry Info-->
@@ -20,8 +20,8 @@
         <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
             <!-- Author Avatar -->
             <div id="author-avatar">
-                <img src="/material/source/img/avatar.png" width="44px" height="44px"
-                     alt="RYAN0UP's avatar">
+                <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" width="44px" height="44px"
+                     alt="${user.userDisplayName?default('none')}'s avatar">
             </div>
             <div>
                 <strong>${user.userDisplayName?default('Material')}</strong>

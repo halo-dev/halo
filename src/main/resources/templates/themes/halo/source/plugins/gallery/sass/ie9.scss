@@ -1,0 +1,42 @@
+@import 'libs/vars';
+@import 'libs/functions';
+@import 'libs/mixins';
+@import 'libs/skel';
+
+/*
+	Lens by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+*/
+
+/* Thumbnails */
+
+	#thumbnails {
+		&:after {
+			content: '';
+			display: block;
+			clear: both;
+		}
+
+		article {
+			float: left;
+		}
+	}
+
+/* Viewer */
+
+	#viewer {
+		.inner {
+			box-shadow: inset 0 0 9em 2em rgba(16,16,16,0.2);
+
+			&:before {
+				display: none;
+			}
+		}
+
+		.slide {
+			.caption {
+				background-color: rgba(16,16,16,0.5);
+			}
+		}
+	}

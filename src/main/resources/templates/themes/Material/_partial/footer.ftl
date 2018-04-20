@@ -6,9 +6,9 @@
 
     <!--Copyright-->
     <div id="copyright">
-        Copyright&nbsp;©&nbsp;2016&nbsp;-<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>${options.site_title?if_exists}
+        Copyright&nbsp;©&nbsp;2016&nbsp;-<script type="text/javascript">var fd = new Date();document.write("&nbsp;" + fd.getFullYear() + "&nbsp;");</script>${options.blog_title?if_exists}
         <br>
-        ${options.site_footer?if_exists}
+        ${options.blog_footer?if_exists}
     </div>
 
     <!-- Paradox Footer Right Section -->

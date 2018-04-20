@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-主题"></@head>
+<@head title="${options.blog_title} | 后台管理：主题"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -24,9 +24,6 @@
                 background-size:cover;
                 cursor: pointer;
                 transition: all .2s ease-in-out;
-            }
-            .theme-thumbnail:hover{
-                opacity: .8;
             }
             .box-footer{
                 padding: 5px;
@@ -86,7 +83,7 @@
             <div class="row">
                 <#if themes?? && (themes?size>0)>
                     <#list themes as theme>
-                        <div class="col-md-3">
+                        <div class="col-md-3 theme-body">
                             <div class="box box-solid">
                                 <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName?if_exists}/screenshot.png)">
                                     <div class="pull-right btn-delete" style="display: none" onclick="modelShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
@@ -94,12 +91,12 @@
                                 <div class="box-footer">
                                     <span class="theme-title">${theme.themeName?if_exists?upper_case}</span>
                                     <#if theme.hasOptions==true>
-                                        <button class="btn btn-primary btn-sm pull-right btn-flat" onclick="openSetting('${theme.themeName?if_exists}')">设置</button>
+                                        <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}')" style="display: none">设置</button>
                                     </#if>
-                                    <#if activeTheme == "${theme.themeName}">
-                                        <button class="btn btn-primary btn-sm pull-right btn-flat" disabled>已启用</button>
-                                    <#else>
-                                        <button onclick="setTheme('${theme.themeName?if_exists}')" class="btn btn-primary btn-sm pull-right btn-flat">启用</button>
+                                    <#if activeTheme != "${theme.themeName}">
+                                        <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px">启用</button>
+                                        <#else>
+                                        <button class="btn btn-default btn-sm pull-right btn-theme-enable" style="display: none;margin-right: 3px" disabled>已启用</button>
                                     </#if>
                                 </div>
                             </div>
@@ -232,6 +229,14 @@
             });
             $('.theme-thumbnail').mouseleave(function () {
                 $(this).children('.btn-delete').hide();
+            });
+            $('.theme-body').mouseover(function () {
+                $(this).find(".theme-thumbnail").css("opacity","0.8");
+                $(this).find(".btn-theme-setting,.btn-theme-enable").show();
+            });
+            $('.theme-body').mouseleave(function () {
+                $(this).find(".theme-thumbnail").css("opacity","1");
+                $(this).find(".btn-theme-setting,.btn-theme-enable").hide();
             });
             function modelShow(url) {
                 $('#url').val(url);

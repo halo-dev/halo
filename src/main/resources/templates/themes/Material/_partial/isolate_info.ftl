@@ -2,13 +2,13 @@
     <div class="header-wrapper">
         <!-- Header Copyright -->
         <div class="header-copyright">
-            <div class="header-site">
+            <div class="header-blog">
                 ©&nbsp;
                 <script type="text/javascript">
                     var fd = new Date();
                     document.write(fd.getFullYear());
                 </script>
-                &nbsp;${options.site_title?if_exists}
+                &nbsp;${options.blog_title?if_exists}
             </div>
             <!--
             I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright.
@@ -27,7 +27,7 @@
         <!-- Header Title -->
         <span class="header-title header-item">
             <a href="/" title="<%= config.title %>">
-                ${options.site_title?if_exists}
+                ${options.blog_title?if_exists}
             </a>
         </span>
 

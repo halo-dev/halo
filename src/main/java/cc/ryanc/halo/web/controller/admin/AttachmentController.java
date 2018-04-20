@@ -96,19 +96,44 @@ public class AttachmentController {
         return "admin/widget/_attachment-select";
     }
 
+    /**
+     * 上传附件
+     *
+     * @param file file
+     * @param request request
+     * @return Map<String,Object></>
+     */
+    @PostMapping(value = "/upload",produces = {"application/json;charset=UTF-8"})
+    @ResponseBody
+    public Map<String,Object> upload(@RequestParam("file") MultipartFile file,
+                                     HttpServletRequest request){
+        return uploadAttachment(file,request);
+    }
 
     /**
-     * 上传文件
+     * editor.md上传图片
      *
-     * @param file 文件
+     * @param file file
      * @param request request
-     * @return Map
+     * @return Map<String,Object></>
      */
-    @PostMapping(value = "/upload",produces = { "application/json;charset=UTF-8" })
+    @PostMapping(value = "/upload/editor",produces = {"application/json;charset=UTF-8"})
     @ResponseBody
-    public Map uploadAttachment(@RequestParam("file") MultipartFile file,
-                                    HttpServletRequest request){
-        Map<String,String> result = new HashMap<>();
+    public Map<String,Object> editorUpload(@RequestParam("editormd-image-file") MultipartFile file,
+                                           HttpServletRequest request){
+        return uploadAttachment(file,request);
+    }
+
+
+    /**
+     * 上传图片
+     *
+     * @param file file
+     * @param request request
+     * @return Map<String,Object></>
+     */
+    public Map<String,Object> uploadAttachment( MultipartFile file, HttpServletRequest request){
+        Map<String,Object> result = new HashMap<String,Object>();
         if(!file.isEmpty()){
             try{
                 File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
@@ -149,12 +174,12 @@ public class AttachmentController {
                         new Logs(LogsRecord.UPLOAD_FILE,file.getOriginalFilename(),HaloUtil.getIpAddr(request),HaloUtil.getDate())
                 );
 
-                result.put("success","1");
+                result.put("success",1);
                 result.put("message","上传成功！");
                 result.put("url",attachment.getAttachPath());
             }catch (Exception e){
                 log.error("未知错误：{0}",e.getMessage());
-                result.put("success","0");
+                result.put("success",0);
                 result.put("message","上传失败！");
             }
         }else {

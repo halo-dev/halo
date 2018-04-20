@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-关于Halo"></@head>
+<@head title="关于Halo"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">

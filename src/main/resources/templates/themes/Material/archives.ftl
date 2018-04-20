@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@layout title="归档 | ${options.site_title?default('Material')}" keywords="${options.seo_keywords?default('Material')}" description="${options.seo_desc?default('Material')}">
+<@layout title="归档 | ${options.blog_title?default('Material')}" keywords="${options.seo_keywords?default('Material')}" description="${options.seo_desc?default('Material')}">
     <!-- Index Module -->
     <div class="material-index mdl-grid">
         <#if options.theme_material_scheme?if_exists == "Paradox" && posts.number==0 && !isArchives??>

@@ -27,9 +27,9 @@ public class MailServiceImpl implements MailService{
     /**
      * 发送邮件
      *
-     * @param to to
-     * @param subject subject
-     * @param content content
+     * @param to to 接收者
+     * @param subject subject 标题
+     * @param content content 内容
      */
     @Override
     public void sendMail (String to, String subject, String content){

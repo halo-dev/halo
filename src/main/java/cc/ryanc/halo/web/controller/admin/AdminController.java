@@ -99,7 +99,8 @@ public class AdminController extends BaseController{
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
-    public String login(HttpSession session){
+    public String login(HttpSession session,Model model){
+        model.addAttribute("options",HaloConst.OPTIONS);
         User user = (User) session.getAttribute("user");
         //如果session存在，跳转到后台首页
         if(null!=user){
@@ -151,7 +152,7 @@ public class AdminController extends BaseController{
                 userService.updateUserLoginEnable("false");
             }
             userService.updateUserLoginLast(new Date());
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_ERROR,HaloUtil.getIpAddr(request),new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_ERROR+"["+loginName+","+loginPwd+"]",HaloUtil.getIpAddr(request),new Date()));
             log.error("登录失败！：{0}",e.getMessage());
         }
         return status;

@@ -6,8 +6,8 @@
 
     <!-- LOGO -->
     <div class="something-else-logo mdl-color--white mdl-color-text--grey-600">
-        <a href="/material/source/img/logo.png" target="_blank">
-            <img src="/material/source/img/logo.png" alt="logo" />
+        <a href="#" target="_blank">
+            <img src="${options.blog_logo?default('/material/source/img/avatar.png')}" alt="logo" />
         </a>
     </div>
 
@@ -15,7 +15,7 @@
     <div class="mdl-card__supporting-text meta meta--fill mdl-color-text--grey-600">
         <!-- Blog Title -->
         <div>
-            <strong>${options.site_title?if_exists}</strong>
+            <strong>${options.blog_title?if_exists}</strong>
         </div>
         <div class="section-spacer"></div>
 

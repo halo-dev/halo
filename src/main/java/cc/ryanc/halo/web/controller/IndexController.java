@@ -151,7 +151,7 @@ public class IndexController extends BaseController{
      * @param model model
      * @return 模板路径/themes/{theme}/post
      */
-    @GetMapping(value = {"archives/{postUrl}","post/{postUrl}","article/{postUrl}"})
+    @GetMapping(value = "archives/{postUrl}")
     public String getPost(@PathVariable String postUrl, Model model){
         Post post = postService.findByPostUrl(postUrl);
         //获得当前文章的发布日期
@@ -191,12 +191,6 @@ public class IndexController extends BaseController{
         //菜单列表
         List<Menu> menus = menuService.findAllMenus();
         model.addAttribute("menus",menus);
-
-//        //该文章的评论
-//        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
-//        Pageable pageable = new PageRequest(0,10,sort);
-//        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
-//        model.addAttribute("comments",comments);
 
         model.addAttribute("archives",archives);
 
@@ -250,6 +244,10 @@ public class IndexController extends BaseController{
     public String gallery(Model model){
         List<Gallery> galleries = galleryService.findAllGalleries();
         model.addAttribute("galleries",galleries);
+
+        //用户信息
+        User user = userService.findUser();
+        model.addAttribute("user",user);
 
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
@@ -516,7 +514,7 @@ public class IndexController extends BaseController{
                 Map<String,Object> map = new HashMap<>();
                 map.put("author",userService.findUser().getUserDisplayName());
                 map.put("pageName",postService.findByPostId(post.getPostId()).get().getPostTitle());
-                map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
+                map.put("blogUrl",HaloConst.OPTIONS.get("blog_url"));
                 map.put("visitor",comment.getCommentAuthor());
                 map.put("commentContent",comment.getCommentContent());
                 mailService.sendTemplateMail(userService.findUser().getUserEmail(),"有新的评论",map,"common/mail/mail_admin.ftl");

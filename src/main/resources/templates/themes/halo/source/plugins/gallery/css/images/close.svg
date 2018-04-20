@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64px" height="64px" viewBox="0 0 64 64" zoomAndPan="disable">
+	<style>
+		line {
+			stroke: #fff;
+			stroke-width: 1.5px;
+		}
+	</style>
+	<line x1="20" y1="20" x2="44" y2="44" />
+	<line x1="20" y1="44" x2="44" y2="20" />
+</svg>

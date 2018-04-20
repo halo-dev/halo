@@ -125,12 +125,12 @@ public class CommentController extends BaseController{
                     map.put("pageUrl", comment.getPost().getPostUrl());
                     map.put("pageName", comment.getPost().getPostTitle());
                     map.put("commentContent", comment.getCommentContent());
-                    map.put("siteUrl", HaloConst.OPTIONS.get("site_url"));
-                    map.put("siteTitle", HaloConst.OPTIONS.get("site_title"));
+                    map.put("blogUrl", HaloConst.OPTIONS.get("blog_url"));
+                    map.put("blogTitle", HaloConst.OPTIONS.get("blog_title"));
                     map.put("author", userService.findUser().getUserDisplayName());
                     mailService.sendTemplateMail(
                             comment.getCommentAuthorEmail(),
-                            "您在" + HaloConst.OPTIONS.get("site_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
+                            "您在" + HaloConst.OPTIONS.get("blog_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
                 }
             } catch (Exception e) {
                 log.error("邮件服务器未配置：{0}",e.getMessage());
@@ -195,7 +195,7 @@ public class CommentController extends BaseController{
             comment.setPost(post);
             comment.setCommentAuthor(user.getUserDisplayName());
             comment.setCommentAuthorEmail(user.getUserEmail());
-            comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("site_url"));
+            comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("blog_url"));
             comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
             comment.setCommentAuthorAvatarMd5(HaloUtil.getMD5(userService.findUser().getUserEmail()));
             comment.setCommentDate(new Date());
@@ -215,15 +215,15 @@ public class CommentController extends BaseController{
             if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("comment_reply_notice"))) {
                 if(matcher.find()){
                     Map<String, Object> map = new HashMap<>();
-                    map.put("siteTitle",HaloConst.OPTIONS.get("site_title"));
+                    map.put("blogTitle",HaloConst.OPTIONS.get("blog_title"));
                     map.put("commentAuthor",lastComment.getCommentAuthor());
                     map.put("pageName",lastComment.getPost().getPostTitle());
                     map.put("commentContent",lastComment.getCommentContent());
                     map.put("replyAuthor",user.getUserDisplayName());
                     map.put("replyContent",commentContent);
-                    map.put("siteUrl",HaloConst.OPTIONS.get("site_url"));
+                    map.put("blogUrl",HaloConst.OPTIONS.get("blog_url"));
                     mailService.sendTemplateMail(
-                            lastComment.getCommentAuthorEmail(),"您在"+HaloConst.OPTIONS.get("site_title")+"的评论有了新回复",map,"common/mail/mail_reply.ftl");
+                            lastComment.getCommentAuthorEmail(),"您在"+HaloConst.OPTIONS.get("blog_title")+"的评论有了新回复",map,"common/mail/mail_reply.ftl");
                 }
             }
         }catch (Exception e){

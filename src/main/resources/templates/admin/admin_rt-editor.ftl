@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-文章编辑">
+<@head title="${options.blog_title} | 后台管理：文章编辑">
 </@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->

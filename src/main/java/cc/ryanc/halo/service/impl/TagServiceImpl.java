@@ -22,10 +22,6 @@ public class TagServiceImpl implements TagService {
     @Autowired
     private TagRepository tagRepository;
 
-    private static final String CATEGORY_KEY = "'category_key'";
-
-    private static final String CATEGORY_CACHE_NAME = "cateCache";
-
     /**
      * 新增/修改标签
      *

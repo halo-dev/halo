@@ -4,7 +4,7 @@
     <!-- Post Header Info -->
     <div class="post_entry-header_info without-thumbnail">
         <!-- Author Avatar & Name -->
-        <img src="/material/source/img/avatar.png" class="avatar-img" width="44px" height="44px" alt="RYAN0UP's avatar">
+        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName?default('halo')}'s avatar">
         <span class="name-span">RYAN0UP</span>
     </div>
     <!-- Null Thumbnail -->
@@ -25,7 +25,15 @@
             </span>
         </p>
         <!-- Post Tags -->
-        <ul class="post_entry-tags-list"><li class="post_entry-tags-list-item"><a class="post_entry-tags-list-link" href="/tags/SQL/">SQL</a></li></ul>
+        <ul class="post_entry-tags-list">
+            <#if post.tags??>
+                <#list post.tags as tag>
+                    <li class="post_entry-tags-list-item">
+                        <a class="post_entry-tags-list-link" href="/tags/${tag.tagUrl}/">${tag.tagName}</a>
+                    </li>
+                </#list>
+            </#if>
+        </ul>
     </div>
     <!-- Post_entry Footer -->
     <div class="post_entry-footer">

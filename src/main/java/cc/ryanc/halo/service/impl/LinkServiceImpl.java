@@ -23,29 +23,23 @@ public class LinkServiceImpl implements LinkService {
     @Autowired
     private LinkRepository linkRepository;
 
-    private static final String LINK_KEY = "'link_key'";
-
-    private static final String LINK_CACHE_NAME = "link_cache";
-
     /**
-     * 新增/修改友情链接 清除缓存
+     * 新增/修改友情链接
      *
      * @param link link
      * @return Link
      */
-    @CacheEvict(value = LINK_CACHE_NAME,key = LINK_KEY)
     @Override
     public Link saveByLink(Link link) {
         return linkRepository.save(link);
     }
 
     /**
-     * 移除友情链接 清除缓存
+     * 移除友情链接
      *
      * @param linkId linkId
      * @return link
      */
-    @CacheEvict(value = LINK_CACHE_NAME,key = LINK_KEY)
     @Override
     public Link removeByLinkId(Long linkId) {
         Optional<Link> link = this.findByLinkId(linkId);
@@ -54,23 +48,21 @@ public class LinkServiceImpl implements LinkService {
     }
 
     /**
-     * 查询所有友情链接 缓存
+     * 查询所有友情链接
      *
      * @return list
      */
-    @Cacheable(value = LINK_CACHE_NAME,key = LINK_KEY)
     @Override
     public List<Link> findAllLinks() {
         return linkRepository.findAll();
     }
 
     /**
-     * 根据编号查询友情链接 缓存
+     * 根据编号查询友情链接
      *
      * @param linkId linkId
      * @return Link
      */
-    @Cacheable(value = LINK_CACHE_NAME,key = "#linkId+'link'")
     @Override
     public Optional<Link> findByLinkId(Long linkId) {
         return linkRepository.findById(linkId);

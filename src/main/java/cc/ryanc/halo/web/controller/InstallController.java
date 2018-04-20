@@ -87,8 +87,8 @@ public class InstallController {
      */
     @PostMapping(value = "/do")
     @ResponseBody
-    public boolean doInstall(@RequestParam("siteTitle") String siteTitle,
-                            @RequestParam("siteUrl") String siteUrl,
+    public boolean doInstall(@RequestParam("blogTitle") String blogTitle,
+                            @RequestParam("blogUrl") String blogUrl,
                             @RequestParam("userName") String userName,
                             @RequestParam("userDisplayName") String userDisplayName,
                             @RequestParam("userEmail") String userEmail,
@@ -153,14 +153,14 @@ public class InstallController {
             commentService.saveByComment(comment);
 
             //保存博客标题和博客地址设置
-            optionsService.saveOption("site_title",siteTitle);
-            optionsService.saveOption("site_url",siteUrl);
+            optionsService.saveOption("blog_title",blogTitle);
+            optionsService.saveOption("blog_url",blogUrl);
 
             //设置默认主题
             optionsService.saveOption("theme","halo");
 
             //建立网站时间
-            optionsService.saveOption("site_start",HaloUtil.getStringDate("yyyy-MM-dd"));
+            optionsService.saveOption("blog_start",HaloUtil.getStringDate("yyyy-MM-dd"));
 
             //默认评论系统
             optionsService.saveOption("comment_system","native");

@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@layout title="${post.postTitle?if_exists} | ${options.site_title?if_exists}" keywords="${options.seo_keywords?if_exists}" description="${options.seo_desc?if_exists}">
+<@layout title="${post.postTitle?if_exists} | ${options.blog_title?if_exists}" keywords="${options.seo_keywords?if_exists}" description="${options.seo_desc?if_exists}">
     <!-- Post Module -->
     <div class="material-post_container">
         <div class="material-post mdl-grid">

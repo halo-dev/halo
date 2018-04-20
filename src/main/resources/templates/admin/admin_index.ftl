@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理"></@head>
+<@head title="${options.blog_title} | 后台管理"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -119,7 +119,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="button" class="btn btn-info pull-right" onclick="saveOptions('widgetsOption')">保存</button>
+                                <button type="button" class="btn btn-primary pull-right" onclick="saveOptions('widgetsOption')">保存</button>
                             </div>
                         </form>
                     </div>
@@ -160,7 +160,7 @@
                 <div class="col-lg-3 col-xs-6" id="widgetDayCountBody">
                     <!-- small box -->
                     <div class="small-box bg-red">
-                        <div class="inner"><h3 id="siteStart">1</h3><p>成立天数</p></div>
+                        <div class="inner"><h3 id="blogStart">1</h3><p>成立天数</p></div>
                         <div class="icon"><i class="ion ion-pie-graph"></i></div>
                         <a href="#" class="small-box-footer">${options.site_start?default('0000-00-00')} <i class="fa fa-star"></i></a>
                     </div>
@@ -340,11 +340,11 @@
         <script src="/static/plugins/layer/layer.js"></script>
         <script type="application/javascript">
             $(document).ready(function () {
-                var dateBegin = new Date("${options.site_start?default('0000-00-00')}");
+                var dateBegin = new Date("${options.blog_start?default('0000-00-00')}");
                 var dateEnd = new Date();
                 var parseDate = dateEnd.getTime() - dateBegin.getTime();
                 var days = Math.floor(parseDate/(24*3600*1000));
-                $('#siteStart').html(days+1);
+                $('#blogStart').html(days+1);
             });
             function openAllLogs() {
                 layer.open({

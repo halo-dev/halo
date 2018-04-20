@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-标签">
+<@head title="${options.blog_title} | 后台管理：标签">
 </@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
@@ -104,7 +104,10 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <#if updateTag.posts?size = 0>
+                                    <button type="submit" class="btn btn-danger btn-sm  pull-right">删除</button>
+                                    </#if>
                                 </div>
                             </form>
                         <#else >
@@ -122,7 +125,7 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
                                 </div>
                             </form>
                         </#if>
@@ -151,11 +154,11 @@
                                         <#--<td>2</td>-->
                                         <#--<td>-->
                                             <#--<#if updateTag ?? && tag.tagId==updateTag.tagId>-->
-                                                <#--<a class="btn btn-primary btn-xs btn-flat" href="#" disabled>正在修改</a>-->
+                                                <#--<a class="btn btn-primary btn-xs " href="#" disabled>正在修改</a>-->
                                             <#--<#else >-->
-                                            <#--<a data-pjax="true" class="btn btn-primary btn-xs btn-flat" href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>-->
+                                            <#--<a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>-->
                                             <#--</#if>-->
-                                            <#--<button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>-->
+                                            <#--<button class="btn btn-danger btn-xs " onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>-->
                                         <#--</td>-->
                                     <#--</tr>-->
                                 <#--</#list>-->
@@ -200,8 +203,8 @@
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger btn-flat" data-dismiss="modal">确定</a>
+                        <button type="button" class="btn btn-default " data-dismiss="modal">取消</button>
+                        <a onclick="removeIt()" class="btn btn-danger " data-dismiss="modal">确定</a>
                     </div>
                 </div>
             </div>

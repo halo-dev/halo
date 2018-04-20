@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-友情链接">
+<@head title="${options.blog_title} | 后台管理：友情链接">
 </@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
@@ -47,7 +47,7 @@
                                         <small>*网站的描述，部分主题可显示</small>
                                     </div>
                                 </div>
-                                <div class="box-footer"><button type="submit" class="btn btn-primary">确定${statusName}</button></div>
+                                <div class="box-footer"><button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button></div>
                             </form>
                         <#else>
                             <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
@@ -73,7 +73,7 @@
                                         <small>*网站的描述，部分主题可显示</small>
                                     </div>
                                 </div>
-                                <div class="box-footer"><button type="submit" class="btn btn-primary">确定${statusName}</button></div>
+                                <div class="box-footer"><button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button></div>
                             </form>
                         </#if>
                     </div>

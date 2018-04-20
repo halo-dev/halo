@@ -35,7 +35,7 @@
                     </div>
                     <div class="footer">
                         <span>Copyright © 2018</span>
-                        <a href="https://ryanc.cc">${options.site_title?default('Halo')}</a>
+                        <a href="${options.blog_url}">${options.blog_title?default('Halo')}</a>
                         <span style="float: right">
                                 Background image from <a href="https://cn.bing.com/" target="_blank">Bing</a>.
                         </span>

@@ -5,7 +5,7 @@
                 留言审核通过通知
             </h1>
             <div class="emailtext" style="background:#fff;padding:20px 32px 40px;">
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">您在${siteTitle}《
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">您在${blogTitle}《
                     <a href="${pageUrl}">${pageName}</a>》发表的评论：</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;padding:10px 20px;background:#f8f8f8;margin:0px">${commentContent}</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">已通过管理员审核并显示。
@@ -15,7 +15,7 @@
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">(此邮件由系统自动发出, 请勿回复。)</p>
             </div>
             <p style="color: #6e6e6e;font-size:13px;line-height:24px;text-align:right;padding:0 32px">邮件发自：
-                <a href="${siteUrl}" style="color:#51a0e3;text-decoration:none">${author}</a>
+                <a href="${blogUrl}" style="color:#51a0e3;text-decoration:none">${author}</a>
             </p>
         </div>
     </div>

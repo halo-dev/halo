@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head title="Halo后台管理-菜单设置"></@head>
+<@head title="${options.blog_title} | 后台管理：菜单设置"></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -71,7 +71,7 @@
                                 </div>
                             </#if>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-flat">确定${statusName}</button>
+                                <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
                             </div>
                         </form>
                     </div>
@@ -101,11 +101,11 @@
                                         <td>${menu.menuIcon}</td>
                                         <td>
                                             <#if updateMenu?? && menu.menuId==updateMenu.menuId>
-                                                <a href="#" class="btn btn-primary btn-xs btn-flat" disabled="">正在修改</a>
+                                                <a href="#" class="btn btn-primary btn-xs " disabled="">正在修改</a>
                                                 <#else>
-                                                <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId}" class="btn btn-primary btn-xs btn-flat">修改</a>
+                                                <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId}" class="btn btn-primary btn-xs ">修改</a>
                                             </#if>
-                                            <button class="btn btn-danger btn-xs btn-flat" onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId}')">删除</button>
+                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId}')">删除</button>
                                         </td>
                                     </tr>
                                     </#list>

@@ -1,0 +1,46 @@
+@import 'libs/vars';
+@import 'libs/functions';
+@import 'libs/mixins';
+@import 'libs/skel';
+
+/*
+	Lens by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+*/
+
+/* Main */
+
+	#main {
+		opacity: 1 !important;
+
+		@if _misc(main-side) == 'left' {
+			left: 0 !important;
+		}
+		@else {
+			right: 0 !important;
+		}
+	}
+
+	body:before {
+		content: 'Javascript is disabled :(';
+		display: block;
+		position: absolute;
+		top: 50%;
+		width: calc(100% - #{_size(main)} * 0.333333333);
+		height: 4em;
+		margin-top: -2em;
+		color: mix(_palette(page-bg), #fff, 90%);
+		cursor: default;
+		font-size: 3em;
+		line-height: 4em;
+		text-align: center;
+		white-space: nowrap;
+
+		@if _misc(main-side) == 'left' {
+			right: 0;
+		}
+		@else {
+			left: 0;
+		}
+	}

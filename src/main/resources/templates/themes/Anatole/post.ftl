@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="${post.postTitle} · ${options.site_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
+<@head title="${post.postTitle} · ${options.blog_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <#include "module/page-top.ftl">
@@ -21,7 +21,7 @@
                                 <i class="fa fa-sun-o"></i>
                                 <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="/post/${post.postUrl}#comment_widget">Comments</a>
+                                <a href="/archives/${post.postUrl}#comment_widget">Comments</a>
                                 <if post.tags??>
                                     <i class="fa fa-tag"></i>
                                     <#list post.tags as tag>
@@ -50,12 +50,12 @@
                     <ul class="clearfix">
                         <#if afterPost??>
                         <li class="pre pagbuttons">
-                            <a class="btn" role="navigation" href="/post/${afterPost.postUrl}" title="${afterPost.postTitle}">上一篇</a>
+                            <a class="btn" role="navigation" href="/archives/${afterPost.postUrl}" title="${afterPost.postTitle}">上一篇</a>
                         </li>
                         </#if>
                         <#if beforePost??>
                         <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="/post/${beforePost.postUrl}" title="${beforePost.postTitle}">下一篇</a>
+                            <a class="btn" role="navigation" href="/archives/${beforePost.postUrl}" title="${beforePost.postTitle}">下一篇</a>
                         </li>
                         </#if>
                     </ul>
