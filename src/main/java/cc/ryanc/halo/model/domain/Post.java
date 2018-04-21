@@ -95,6 +95,11 @@ public class Post implements Serializable{
     private List<Comment> comments = new ArrayList<>();
 
     /**
+     * 缩略图
+     */
+    private String postThumbnail;
+
+    /**
      * 发表日期
      */
     private Date postDate;

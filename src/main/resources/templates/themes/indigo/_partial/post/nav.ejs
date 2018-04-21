@@ -1,0 +1,25 @@
+<% if (post.prev || post.next){ %>
+<nav class="post-nav flex-row flex-justify-between<% if(!post.prev){ %> flex-row-reverse<% } %>">
+  <% if (post.prev){
+    var prevTitle = post.prev.title || '[no title]';
+    %>
+    <div class="waves-block waves-effect prev">
+      <a href="<%- url_for(post.prev.path) %>" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title"><%=prevTitle %></h4>
+      </a>
+    </div>
+  <% } %>
+
+  <% if (post.next){
+      var nextTitle = post.next.title || '[no title]';
+    %>
+    <div class="waves-block waves-effect next">
+      <a href="<%- url_for(post.next.path) %>" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title"><%=nextTitle %></h4>
+      </a>
+    </div>
+  <% } %>
+</nav>
+<% } %>

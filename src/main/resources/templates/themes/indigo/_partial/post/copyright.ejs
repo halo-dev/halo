@@ -1,0 +1,16 @@
+<blockquote class="post-copyright">
+    <% if(theme.postMessage || theme.show_last_updated) { %>
+    <div class="content">
+        <%- partial('updated') %>
+        <% if(theme.postMessage) {%>
+        <%- _.template(theme.postMessage)(locals) %>
+        <% } %>
+    </div>
+    <% } %>
+    <footer>
+        <a href="<%- config.url %>">
+            <img src="<%- url_for(theme.avatar) %>" alt="<%- config.author %>">
+            <%- config.author %>
+        </a>
+    </footer>
+</blockquote>

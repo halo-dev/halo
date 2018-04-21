@@ -1,0 +1,34 @@
+<%- partial('_partial/header', {
+    title: locals.title || theme.tags_title,
+    hdClass: 'tags-header'
+}) %>
+<div class="container body-wrap fade">
+    <%
+        if(is_tag()) { %>
+            <div class="waterfall">
+          <% page.posts.each(function(post){ %>
+
+            <%- partial('_partial/archive', {post: post, date_format: config.date_format}) %>
+
+        <% }) %>
+            </div>
+        <% } else {
+            site.tags.each(function(tag){
+                if(tag.length){
+            %>
+
+            <h3 class="archive-separator" id="tag-<%=tag.name %>"><%=tag.name %></h3>
+
+            <div class="waterfall">
+            <% tag.posts.each(function(post){  %>
+
+                <%- partial('_partial/archive', {post: post, date_format: config.date_format}) %>
+
+            <% }) %>
+            </div>
+            <% }
+            })
+        }
+    %>
+    <%- partial('_partial/paginator') %>
+</div>
