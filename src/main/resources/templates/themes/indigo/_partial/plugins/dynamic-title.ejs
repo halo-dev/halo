@@ -1,0 +1,18 @@
+<% if (theme.title_change) { %>
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '<%- theme.title_change.leave %>';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '<%- theme.title_change.normal %>';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+<% } %>

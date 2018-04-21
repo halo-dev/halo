@@ -98,6 +98,7 @@
     });
     function doTransport(url) {
         parent.$('#${id}').val(url);
+        parent.$('#${id}').attr("src",url);
         parent.layer.closeAll();
     }
 </script>

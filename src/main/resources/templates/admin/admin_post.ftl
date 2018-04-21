@@ -32,13 +32,13 @@
                 <div class="col-xs-12">
                     <ul style="list-style: none;padding-left: 0">
                         <li class="publish">
-                            <a data-pjax="true" href="/admin/posts">已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/posts" <#if status==0>style="color: #000" </#if>>已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
                         </li>
                         <li class="draft">
-                            <a data-pjax="true" href="/admin/posts?status=1">草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/posts?status=1" <#if status==1>style="color: #000" </#if>>草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
                         </li>
                         <li class="trash">
-                            <a data-pjax="true" href="/admin/posts?status=2">回收站<span class="count">(${trashCount})</span></a>
+                            <a data-pjax="true" href="/admin/posts?status=2" <#if status==2>style="color: #000" </#if>>回收站<span class="count">(${trashCount})</span></a>
                         </li>
                     </ul>
                 </div>
@@ -87,7 +87,7 @@
                                             <td>
                                                 <#switch post.postStatus>
                                                     <#case 0>
-                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs " target="_blank">预览</a>
+                                                        <a href="/archives/${post.postUrl}" class="btn btn-primary btn-xs " target="_blank">查看</a>
                                                         <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
                                                         <#break >

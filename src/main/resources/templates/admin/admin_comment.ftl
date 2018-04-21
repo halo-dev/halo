@@ -21,13 +21,13 @@
         <section class="content container-fluid">
             <ul style="list-style: none;padding-left: 0">
                 <li class="publish">
-                    <a data-pjax="true" href="/admin/comments">已发布<span class="count">(${publicCount?default("0")})</span></a>&nbsp;|&nbsp;
+                    <a data-pjax="true" href="/admin/comments" <#if status==0>style="color: #000" </#if>>已发布<span class="count">(${publicCount?default("0")})</span></a>&nbsp;|&nbsp;
                 </li>
                 <li class="draft">
-                    <a data-pjax="true" href="/admin/comments?status=1">待审核<span class="count">(${checkCount?default("0")})</span></a>&nbsp;|&nbsp;
+                    <a data-pjax="true" href="/admin/comments?status=1" <#if status==1>style="color: #000" </#if>>待审核<span class="count">(${checkCount?default("0")})</span></a>&nbsp;|&nbsp;
                 </li>
                 <li class="trash">
-                    <a data-pjax="true" href="/admin/comments?status=2">回收站<span class="count">(${trashCount?default("0")})</span></a>
+                    <a data-pjax="true" href="/admin/comments?status=2" <#if status==2>style="color: #000" </#if>>回收站<span class="count">(${trashCount?default("0")})</span></a>
                 </li>
             </ul>
             <div class="row">
@@ -45,33 +45,39 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                    <#list comments.content as comment>
+                                    <#if comments.content?size gt 0>
+                                        <#list comments.content as comment>
+                                            <tr>
+                                                <td><a href="${comment.commentAuthorUrl}" target="_blank">${comment.commentAuthor}</a></td>
+                                                <td>${comment.commentContent}</td>
+                                                <td>
+                                                    <a target="_blank" href="/article/${comment.post.postUrl}">${comment.post.postTitle}</a>
+                                                </td>
+                                                <td>${comment.commentDate}</td>
+                                                <td>
+                                                    <#switch comment.commentStatus>
+                                                        <#case 0>
+                                                        <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
+                                                        <#break >
+                                                        <#case 1>
+                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
+                                                        <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
+                                                        <#break >
+                                                        <#case 2>
+                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId}&status=2','确定要永久删除？')">删除</button>
+                                                        <#break >
+                                                    </#switch>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    <#else >
                                         <tr>
-                                            <td><a href="${comment.commentAuthorUrl}" target="_blank">${comment.commentAuthor}</a></td>
-                                            <td>${comment.commentContent}</td>
-                                            <td>
-                                                <a target="_blank" href="/article/${comment.post.postUrl}">${comment.post.postTitle}</a>
-                                            </td>
-                                            <td>${comment.commentDate}</td>
-                                            <td>
-                                                <#switch comment.commentStatus>
-                                                    <#case 0>
-                                                    <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
-                                                    <#break >
-                                                    <#case 1>
-                                                    <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
-                                                    <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</button>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}','确定移动到回收站？')">丢弃</button>
-                                                    <#break >
-                                                    <#case 2>
-                                                    <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId}&status=2','确定要永久删除？')">删除</button>
-                                                    <#break >
-                                                </#switch>
-                                            </td>
+                                            <td colspan="5" style="text-align: center">暂无评论</td>
                                         </tr>
-                                    </#list>
+                                    </#if>
                                 </tbody>
                             </table>
                         </div>

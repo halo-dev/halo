@@ -1,0 +1,15 @@
+<% if(theme.toc){
+    var topic = toc(post.content, {
+            class: 'post-toc',
+            list_number: theme.toc.list_number
+        })
+    if(topic) {
+%>
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <%- topic %>
+        </nav>
+    </aside>
+<% }
+} %>

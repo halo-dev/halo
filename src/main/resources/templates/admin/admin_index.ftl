@@ -195,7 +195,11 @@
                                         <tr>
                                             <#list postTopFive as post>
                                                 <tr>
-                                                    <td><a target="_blank" href="/article/${post.postUrl}">${post.postTitle}</a></td>
+                                                    <#if post.postStatus == 0>
+                                                        <td><a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a></td>
+                                                    <#else >
+                                                        <td>${post.postTitle}</td>
+                                                    </#if>
                                                     <td class="text-center">
                                                         <#if post.postStatus==0>
                                                             <span class="label bg-green">已发布</span>
@@ -245,7 +249,7 @@
                                             <tr>
                                                 <td>${comment.commentAuthor}</td>
                                                 <td>
-                                                    <a href="/article/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                                    <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
                                                 </td>
                                                 <td>
                                                     <#switch comment.commentStatus>

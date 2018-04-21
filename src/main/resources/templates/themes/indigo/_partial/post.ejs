@@ -1,0 +1,31 @@
+<%- partial('post/toc', { post: post}) %>
+<article id="<%= post.layout %>-<%= post.slug %>"
+  class="post-article article-type-<%= post.layout %> fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title"><%- post.title %></h1>
+        <div class="post-meta">
+            <%- partial('post/date', {date_format: config.date_format}) %>
+            <%- partial('post/category') %>
+            <%- partial('plugins/page-visit') %>
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <%- post.content %>
+        </div>
+
+        <%- partial('post/copyright') %>
+        <%- partial('post/reward-btn') %>
+
+        <div class="post-footer">
+            <%- partial('post/tag') %>
+
+            <%- partial('post/share-fab') %>
+
+        </div>
+    </div>
+
+    <%- partial('post/nav') %>
+
+    <%- partial('post/comment') %>
+</article>
+<%- partial('post/reward') %>

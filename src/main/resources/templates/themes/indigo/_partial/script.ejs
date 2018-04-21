@@ -1,0 +1,22 @@
+<script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '<%= config.root %>', SHARE: <%- theme.share %>, REWARD: <%- Boolean(page.reward) %> };
+
+<% if (theme.cnzz){ %>
+lazyScripts.push('//s95.cnzz.com/z_stat.php?id=<%-theme.cnzz %>&web_id=<%-theme.cnzz %>')
+<% } %>
+</script>
+
+<script src="<%- url_for(theme_js('/js/main', cache)) %>"></script>
+<% if (theme.search){ %>
+<%- partial('search') %>
+<script src="<%- url_for(theme_js('/js/search', cache)) %>" async></script>
+<% } %>
+
+<%- partial('plugins/mathjax') %>
+
+<% if (theme.visit_counter) { %>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<% } %>
+
+<%- partial('plugins/dynamic-title') %>

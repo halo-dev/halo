@@ -131,8 +131,7 @@
                         </div>
                         <div class="box-body">
                             <div>
-                                <img class="img-responsive selectData">
-                                <button class="btn btn-primary btn-sm " onclick="openAttach()">选择</button>
+                                <img src="/static/images/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
                             </div>
                         </div>
                     </div>
@@ -166,7 +165,7 @@
             /**
              * 打开附件
              */
-            function openAttach() {
+            function openAttach(e) {
                 layer.open({
                     type: 2,
                     title: '所有附件',
@@ -174,7 +173,7 @@
                     shade: 0.5,
                     maxmin: true,
                     area: ['90%', '90%'],
-                    content: '/admin/attachments/select',
+                    content: '/admin/attachments/select?id='+e,
                     scrollbar: false
                 });
             }
@@ -269,6 +268,7 @@
                         'postUrl' : $('#postUrl').html().toString(),
                         'postContentMd': editor.getMarkdown(),
                         'postContent': editor.getTextareaSavedHTML(),
+                        'postThumbnail': $('#selectImg')[0].src,
                         'cateList' : cateList.toString(),
                         'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString()
                     },
