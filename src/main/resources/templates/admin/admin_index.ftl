@@ -162,7 +162,7 @@
                     <div class="small-box bg-red">
                         <div class="inner"><h3 id="blogStart">1</h3><p>成立天数</p></div>
                         <div class="icon"><i class="ion ion-pie-graph"></i></div>
-                        <a href="#" class="small-box-footer">${options.site_start?default('0000-00-00')} <i class="fa fa-star"></i></a>
+                        <a href="#" class="small-box-footer">${options.blog_start?default('0000-00-00')} <i class="fa fa-star"></i></a>
                     </div>
                 </div>
                 </#if>
