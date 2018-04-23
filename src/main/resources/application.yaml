@@ -1,5 +1,9 @@
 server:
   port: 8090
+  tomcat:
+    min-spare-threads: 20
+    max-threads: 100
+    max-connections: 5000
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

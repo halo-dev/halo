@@ -339,7 +339,7 @@
                                     <label for="materialSnsShareTwitter" class="col-sm-4 control-label">分享到Twitter：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">
-                                            <input type="radio" name="theme_material_sns_share_twitter" id="materialSnsShareTwitter" value="true" ${((options.theme_material_sns_share_twitter?if_exists)=='true')?string('checked','')}> 开启
+                                            <input type="radio" name="theme_material_sns_share_twitter" id="materialSnsShareTwitter" value="true" ${((options.theme_material_sns_share_twitter?default('true'))=='true')?string('checked','')}> 开启
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_sns_share_twitter" id="materialSnsShareTwitter" value="false" ${((options.theme_material_sns_share_twitter?if_exists)=='false')?string('checked','')}> 关闭
@@ -350,7 +350,7 @@
                                     <label for="materialSnsShareFaceBook" class="col-sm-4 control-label">分享到Facebook：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">
-                                            <input type="radio" name="theme_material_sns_share_facebook" id="materialSnsShareFaceBook" value="true" ${((options.theme_material_sns_share_facebook?if_exists)=='true')?string('checked','')}> 开启
+                                            <input type="radio" name="theme_material_sns_share_facebook" id="materialSnsShareFaceBook" value="true" ${((options.theme_material_sns_share_facebook?default('true'))=='true')?string('checked','')}> 开启
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_sns_share_facebook" id="materialSnsShareFaceBook" value="false" ${((options.theme_material_sns_share_facebook?if_exists)=='false')?string('checked','')}> 关闭
@@ -362,7 +362,7 @@
                                     <label for="materialSnsShareGoogleplus" class="col-sm-4 control-label">分享到GooglePlus：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">
-                                            <input type="radio" name="theme_material_sns_share_googleplus" id="materialSnsShareGoogleplus" value="true" ${((options.theme_material_sns_share_googleplus?if_exists)=='true')?string('checked','')}> 开启
+                                            <input type="radio" name="theme_material_sns_share_googleplus" id="materialSnsShareGoogleplus" value="true" ${((options.theme_material_sns_share_googleplus?default('true'))=='true')?string('checked','')}> 开启
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_sns_share_googleplus" id="materialSnsShareGoogleplus" value="false" ${((options.theme_material_sns_share_googleplus?if_exists)=='false')?string('checked','')}> 关闭
@@ -374,7 +374,7 @@
                                     <label for="materialSnsShareWeibo" class="col-sm-4 control-label">分享到Weibo：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">
-                                            <input type="radio" name="theme_material_sns_share_weibo" id="materialSnsShareWeibo" value="true" ${((options.theme_material_sns_share_weibo?if_exists)=='true')?string('checked','')}> 开启
+                                            <input type="radio" name="theme_material_sns_share_weibo" id="materialSnsShareWeibo" value="true" ${((options.theme_material_sns_share_weibo?default('true'))=='true')?string('checked','')}> 开启
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_sns_share_weibo" id="materialSnsShareWeibo" value="false" ${((options.theme_material_sns_share_weibo?if_exists)=='false')?string('checked','')}> 关闭
@@ -386,7 +386,7 @@
                                     <label for="materialSnsShareLinkedin" class="col-sm-4 control-label">分享到Linkedin：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">
-                                            <input type="radio" name="theme_material_sns_share_linkedin" id="materialSnsShareLinkedin" value="true" ${((options.theme_material_sns_share_linkedin?if_exists)=='true')?string('checked','')}> 开启
+                                            <input type="radio" name="theme_material_sns_share_linkedin" id="materialSnsShareLinkedin" value="true" ${((options.theme_material_sns_share_linkedin?default('true'))=='true')?string('checked','')}> 开启
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_sns_share_linkedin" id="materialSnsShareLinkedin" value="false" ${((options.theme_material_sns_share_linkedin?if_exists)=='false')?string('checked','')}> 关闭
@@ -398,7 +398,7 @@
                                     <label for="materialSnsShareqq" class="col-sm-4 control-label">分享到QQ：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">
-                                            <input type="radio" name="theme_material_sns_share_qq" id="materialSnsShareqq" value="true" ${((options.theme_material_sns_share_qq?if_exists)=='true')?string('checked','')}> 开启
+                                            <input type="radio" name="theme_material_sns_share_qq" id="materialSnsShareqq" value="true" ${((options.theme_material_sns_share_qq?default('true'))=='true')?string('checked','')}> 开启
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_sns_share_qq" id="materialSnsShareqq" value="false" ${((options.theme_material_sns_share_qq?if_exists)=='false')?string('checked','')}> 关闭
@@ -410,7 +410,7 @@
                                     <label for="materialSnsShareelegram" class="col-sm-4 control-label">分享到Telegram：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">
-                                            <input type="radio" name="theme_material_sns_share_telegram" id="materialSnsShareTelegram" value="true" ${((options.theme_material_sns_share_telegram?if_exists)=='true')?string('checked','')}> 开启
+                                            <input type="radio" name="theme_material_sns_share_telegram" id="materialSnsShareTelegram" value="true" ${((options.theme_material_sns_share_telegram?default('true'))=='true')?string('checked','')}> 开启
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_sns_share_telegram" id="materialSnsShareTelegram" value="false" ${((options.theme_material_sns_share_telegram?if_exists)=='false')?string('checked','')}> 关闭
