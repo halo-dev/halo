@@ -126,39 +126,33 @@
                 </div>
                 <#if options.widget_postcount?default("true")=="true">
                 <div class="col-lg-3 col-xs-6" id="widgetPostCountBody">
-                    <!-- small box -->
                     <div class="small-box bg-aqua">
                         <div class="inner"><h3>${postCount?default(0)}</h3><p>文章</p></div>
                         <div class="icon"><i class="ion ion-bag"></i></div>
-                        <a href="/admin/posts" class="small-box-footer">查看所有 <i class="fa fa-arrow-circle-right"></i></a>
+                        <a data-pjax="true" href="/admin/posts" class="small-box-footer">查看所有 <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 </#if>
                 <#if options.widget_commentcount?default("true")=="true">
                 <div class="col-lg-3 col-xs-6" id="widgetCommentCountBody">
-                    <!-- small box -->
                     <div class="small-box bg-green">
                         <div class="inner"><h3>${commentCount?default(0)}</h3><p>评论</p></div>
                         <div class="icon"><i class="ion ion-stats-bars"></i></div>
-                        <a href="/admin/comments" class="small-box-footer">查看所有 <i class="fa fa-arrow-circle-right"></i></a>
+                        <a data-pjax="true" href="/admin/comments" class="small-box-footer">查看所有 <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 </#if>
-                <!-- ./col -->
                 <#if options.widget_attachmentcount?default("true")=="true">
                 <div class="col-lg-3 col-xs-6" id="widgetAttachmentCountBody">
-                    <!-- small box -->
                     <div class="small-box bg-yellow">
                         <div class="inner"><h3>${mediaCount?default(0)}</h3><p>媒体库</p></div>
                         <div class="icon"><i class="ion ion-person-add"></i></div>
-                        <a href="/admin/attachments" class="small-box-footer">上传图片 <i class="fa fa-arrow-circle-right"></i></a>
+                        <a data-pjax="true" href="/admin/attachments" class="small-box-footer">上传图片 <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
                 </#if>
-                <!-- ./col -->
                 <#if options.widget_daycount?default("true")=="true">
                 <div class="col-lg-3 col-xs-6" id="widgetDayCountBody">
-                    <!-- small box -->
                     <div class="small-box bg-red">
                         <div class="inner"><h3 id="blogStart">1</h3><p>成立天数</p></div>
                         <div class="icon"><i class="ion ion-pie-graph"></i></div>
@@ -166,7 +160,6 @@
                     </div>
                 </div>
                 </#if>
-                <!-- ./col -->
             </div>
 
             <div class="row">
@@ -192,27 +185,25 @@
                                 </thead>
                                 <tbody>
                                     <#if postTopFive??>
-                                        <tr>
-                                            <#list postTopFive as post>
-                                                <tr>
-                                                    <#if post.postStatus == 0>
-                                                        <td><a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a></td>
-                                                    <#else >
-                                                        <td>${post.postTitle}</td>
+                                        <#list postTopFive as post>
+                                            <tr>
+                                                <#if post.postStatus == 0>
+                                                    <td><a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a></td>
+                                                <#else >
+                                                    <td>${post.postTitle}</td>
+                                                </#if>
+                                                <td class="text-center">
+                                                    <#if post.postStatus==0>
+                                                        <span class="label bg-green">已发布</span>
+                                                    <#elseif post.postStatus==1>
+                                                        <span class="label bg-yellow">草&emsp;稿</span>
+                                                    <#else>
+                                                        <span class="label bg-red">回收站</span>
                                                     </#if>
-                                                    <td class="text-center">
-                                                        <#if post.postStatus==0>
-                                                            <span class="label bg-green">已发布</span>
-                                                        <#elseif post.postStatus==1>
-                                                            <span class="label bg-yellow">草&emsp;稿</span>
-                                                        <#else>
-                                                            <span class="label bg-red">回收站</span>
-                                                        </#if>
-                                                    </td>
-                                                    <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
-                                                </tr>
-                                            </#list>
-                                        </tr>
+                                                </td>
+                                                <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
+                                            </tr>
+                                        </#list>
                                     <#else>
                                         <tr><td>暂无数据</td></tr>
                                     </#if>
@@ -236,51 +227,51 @@
                         <div class="box-body table-responsive">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
-                                <th>评论者</th>
-                                <th>评论页面</th>
-                                <th>内容</th>
-                                <th>状态</th>
-                                <th>时间</th>
+                                <tr>
+                                    <th>评论者</th>
+                                    <th>评论页面</th>
+                                    <th>内容</th>
+                                    <th>状态</th>
+                                    <th>时间</th>
+                                </tr>
                                 </thead>
                                 <tbody>
                                     <#if comments??>
-                                    <tr>
-                                        <#list comments as comment>
-                                            <tr>
-                                                <td>${comment.commentAuthor}</td>
-                                                <td>
-                                                    <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
-                                                </td>
-                                                <td>
-                                                    <#switch comment.commentStatus>
-                                                        <#case 0>
-                                                        <a href="/admin/comments">${comment.commentContent}</a>
-                                                        <#break>
-                                                        <#case 1>
-                                                        <a href="/admin/comments?status=1">${comment.commentContent}</a>
-                                                        <#break>
-                                                        <#case 2>
-                                                        <a href="/admin/comments?status=2">${comment.commentContent}</a>
-                                                        <#break>
-                                                    </#switch>
-                                                </td>
-                                                <td>
-                                                    <#switch comment.commentStatus>
+                                    <#list comments as comment>
+                                        <tr>
+                                            <td>${comment.commentAuthor}</td>
+                                            <td>
+                                                <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                            </td>
+                                            <td>
+                                                <#switch comment.commentStatus>
                                                     <#case 0>
-                                                    <span class="label bg-green">已发布</span>
-                                                    <#break >
+                                                    <a href="/admin/comments">${comment.commentContent}</a>
+                                                    <#break>
                                                     <#case 1>
-                                                    <span class="label bg-yellow">待审核</span>
-                                                    <#break >
+                                                    <a href="/admin/comments?status=1">${comment.commentContent}</a>
+                                                    <#break>
                                                     <#case 2>
-                                                    <span class="label bg-red">回收站</span>
-                                                    <#break >
-                                                    </#switch>
-                                                </td>
-                                                <td>${comment.commentDate?string("yyyy-MM-dd HH:mm")}</td>
-                                            </tr>
-                                        </#list>
-                                    </tr>
+                                                    <a href="/admin/comments?status=2">${comment.commentContent}</a>
+                                                    <#break>
+                                                </#switch>
+                                            </td>
+                                            <td>
+                                                <#switch comment.commentStatus>
+                                                <#case 0>
+                                                <span class="label bg-green">已发布</span>
+                                                <#break >
+                                                <#case 1>
+                                                <span class="label bg-yellow">待审核</span>
+                                                <#break >
+                                                <#case 2>
+                                                <span class="label bg-red">回收站</span>
+                                                <#break >
+                                                </#switch>
+                                            </td>
+                                            <td>${comment.commentDate?string("yyyy-MM-dd HH:mm")}</td>
+                                        </tr>
+                                    </#list>
                                     <#else>
                                         <tr><td>暂无数据</td></tr>
                                     </#if>
@@ -312,23 +303,23 @@
                         <div class="box-body table-responsive">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
-                                    <th>事件</th>
-                                    <th>结果</th>
-                                    <th>IP</th>
-                                    <th>时间</th>
+                                    <tr>
+                                        <th>事件</th>
+                                        <th>结果</th>
+                                        <th>IP</th>
+                                        <th>时间</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     <#if logs??>
-                                    <tr>
-                                        <#list logs as log>
-                                            <tr>
-                                                <td>${log.logTitle}</td>
-                                                <td>${log.logContent}</td>
-                                                <td>${log.logIp}</td>
-                                                <td>${log.logCreated?string("yyyy-MM-dd HH:mm")}</td>
-                                            </tr>
-                                        </#list>
-                                    </tr>
+                                    <#list logs as log>
+                                        <tr>
+                                            <td>${log.logTitle}</td>
+                                            <td>${log.logContent}</td>
+                                            <td>${log.logIp}</td>
+                                            <td>${log.logCreated?string("yyyy-MM-dd HH:mm")}</td>
+                                        </tr>
+                                    </#list>
                                     <#else>
                                         <tr><td>暂无数据</td></tr>
                                     </#if>
