@@ -249,6 +249,8 @@ public class IndexController extends BaseController{
         User user = userService.findUser();
         model.addAttribute("user",user);
 
+        model.addAttribute("is_gallery",true);
+
         //设置选项
         model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("gallery");

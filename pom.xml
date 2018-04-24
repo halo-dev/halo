@@ -13,7 +13,7 @@
 
 	<developers>
 		<developer>
-			<id>RYAN0UP</id>
+			<id>ruibaby</id>
 			<name>Ryan Wang</name>
 			<email>i@ryanc.cc</email>
 			<url>https://ryanc.cc</url>
@@ -94,12 +94,12 @@
 		</dependency>
 
 		<!-- Lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
 		<!-- ehCache -->
 		<dependency>
