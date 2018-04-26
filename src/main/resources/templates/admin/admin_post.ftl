@@ -57,53 +57,59 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                    <#list posts.content as post>
+                                    <#if posts.content?size gt 0>
+                                        <#list posts.content as post>
+                                            <tr>
+                                                <td>${post.postTitle}</td>
+                                                <td>
+                                                    <#if post.categories?size gt 0>
+                                                        <#list post.categories as cate>
+                                                            <label>${cate.cateName}</label>
+                                                        </#list>
+                                                    <#else >
+                                                        <label>无分类</label>
+                                                    </#if>
+                                                </td>
+                                                <td>
+                                                    <#if post.tags?size gt 0>
+                                                        <#list post.tags as tag>
+                                                            <label>${tag.tagName}</label>
+                                                        </#list>
+                                                    <#else >
+                                                        <label>无标签</label>
+                                                    </#if>
+                                                </td>
+                                                <td>
+                                                    <#if post.getComments()??>
+                                                        ${post.getComments()?size}
+                                                    </#if>
+                                                </td>
+                                                <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
+                                                <td>
+                                                    <#switch post.postStatus>
+                                                        <#case 0>
+                                                            <a href="/archives/${post.postUrl}" class="btn btn-primary btn-xs " target="_blank">查看</a>
+                                                            <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
+                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
+                                                            <#break >
+                                                        <#case 1>
+                                                            <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs " target="_blank">预览</a>
+                                                            <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
+                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
+                                                            <#break >
+                                                        <#case 2>
+                                                            <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-primary btn-xs ">还原</a>
+                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
+                                                            <#break >
+                                                    </#switch>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                        <#else>
                                         <tr>
-                                            <td>${post.postTitle}</td>
-                                            <td>
-                                                <#if post.categories?size gt 0>
-                                                    <#list post.categories as cate>
-                                                        ${cate.cateName}
-                                                    </#list>
-                                                    <#else >
-                                                    无分类
-                                                </#if>
-                                            </td>
-                                            <td>
-                                                <#if post.tags?size gt 0>
-                                                    <#list post.tags as tag>
-                                                        ${tag.tagName}
-                                                    </#list>
-                                                    <#else >
-                                                    无标签
-                                                </#if>
-                                            </td>
-                                            <td>
-                                                <#if post.getComments()??>
-                                                    ${post.getComments()?size}
-                                                </#if>
-                                            </td>
-                                            <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
-                                            <td>
-                                                <#switch post.postStatus>
-                                                    <#case 0>
-                                                        <a href="/archives/${post.postUrl}" class="btn btn-primary btn-xs " target="_blank">查看</a>
-                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
-                                                        <#break >
-                                                    <#case 1>
-                                                        <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs " target="_blank">预览</a>
-                                                        <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
-                                                        <#break >
-                                                    <#case 2>
-                                                        <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-primary btn-xs ">还原</a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
-                                                        <#break >
-                                                </#switch>
-                                            </td>
+                                            <th colspan="6" style="text-align: center">暂无文章</th>
                                         </tr>
-                                    </#list>
+                                    </#if>
                                 </tbody>
                             </table>
                         </div>

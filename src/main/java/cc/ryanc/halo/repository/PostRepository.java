@@ -90,12 +90,19 @@ public interface PostRepository extends JpaRepository<Post,Long>{
     List<Post> findByPostDateBeforeAndPostStatusOrderByPostDateAsc(Date postDate,Integer postStatus);
 
     /**
-     * 查询文章归档信息
+     * 查询文章归档信息 根据年份和月份
      *
      * @return list
      */
-    @Query(value = "select year(post_date) as year,month(post_date) as month,count(*) as count from halo_post where post_status=0 group by year(post_date),month(post_date)",nativeQuery = true)
-    List<Object[]> findPostGroupByDate();
+    @Query(value = "select year(post_date) as year,month(post_date) as month,count(*) as count from halo_post where post_status=0 group by year(post_date),month(post_date) order by year desc,month desc",nativeQuery = true)
+    List<Object[]> findPostGroupByYearAndMonth();
+
+    /**
+     * 查询文章归档信息 根据年份
+     * @return
+     */
+    @Query(value = "select year(post_date) as year,count(*) as count from halo_post where post_status=0 group by year(post_date) order by year desc",nativeQuery = true)
+    List<Object[]> findPostGroupByYear();
 
     /**
      * 根据年份和月份查询文章
@@ -106,6 +113,15 @@ public interface PostRepository extends JpaRepository<Post,Long>{
      */
     @Query(value = "select *,year(post_date) as year,month(post_date) as month from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by post_date",nativeQuery = true)
     List<Post> findPostByYearAndMonth(@Param("year") String year,@Param("month") String month);
+
+    /**
+     * 根据年份查询文章
+     *
+     * @param year year
+     * @return list
+     */
+    @Query(value = "select *,year(post_date) as year from halo_post where post_status=0 and year(post_date)=:year order by post_date",nativeQuery = true)
+    List<Post> findPostByYear(@Param("year") String year);
 
     /**
      * 根据年份和月份查询文章 分页

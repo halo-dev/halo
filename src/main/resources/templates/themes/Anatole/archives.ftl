@@ -7,10 +7,10 @@
         <div class="content">
             <div class="archive animated fadeInDown">
                 <ul class="list-with-title">
-                    <#list archives as archive>
-                        <div class="listing-title">${archive.year}.${archive.month}</div>
+                    <#list archivesLess as archive>
+                        <div class="listing-title">${archive.year}</div>
                         <ul class="listing">
-                            <#list archive.posts as post>
+                            <#list archive.posts?sort_by("postDate")?reverse as post>
                                 <div class="listing-item">
                                     <div class="listing-post">
                                         <a href="/archives/${post.postUrl}" title="${post.postTitle}">${post.postTitle}</a>

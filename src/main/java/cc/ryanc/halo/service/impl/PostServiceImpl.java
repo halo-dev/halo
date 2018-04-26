@@ -205,13 +205,13 @@ public class PostServiceImpl implements PostService {
 
 
     /**
-     * 查询归档信息
+     * 查询归档信息 根据年份和月份
      *
      * @return List
      */
     @Override
-    public List<Archive> findPostGroupByPostDate() {
-        List<Object[]> objects = postRepository.findPostGroupByDate();
+    public List<Archive> findPostGroupByYearAndMonth() {
+        List<Object[]> objects = postRepository.findPostGroupByYearAndMonth();
         List<Archive> archives = new ArrayList<>();
         Archive archive = null;
         for(Object[] obj : objects){
@@ -220,6 +220,26 @@ public class PostServiceImpl implements PostService {
             archive.setMonth(obj[1].toString());
             archive.setCount(obj[2].toString());
             archive.setPosts(this.findPostByYearAndMonth(obj[0].toString(),obj[1].toString()));
+            archives.add(archive);
+        }
+        return archives;
+    }
+
+    /**
+     * 查询归档信息 根据年份
+     *
+     * @return list
+     */
+    @Override
+    public List<Archive> findPostGroupByYear() {
+        List<Object[]> objects = postRepository.findPostGroupByYear();
+        List<Archive> archives = new ArrayList<>();
+        Archive archive = null;
+        for(Object[] obj : objects){
+            archive = new Archive();
+            archive.setYear(obj[0].toString());
+            archive.setCount(obj[1].toString());
+            archive.setPosts(this.findPostByYear(obj[0].toString()));
             archives.add(archive);
         }
         return archives;
@@ -235,6 +255,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> findPostByYearAndMonth(String year, String month) {
         return postRepository.findPostByYearAndMonth(year,month);
+    }
+
+    /**
+     * 根据年份查询文章
+     *
+     * @param year year
+     * @return list
+     */
+    @Override
+    public List<Post> findPostByYear(String year) {
+        return postRepository.findPostByYear(year);
     }
 
     /**

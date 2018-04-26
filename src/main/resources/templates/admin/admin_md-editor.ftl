@@ -131,7 +131,11 @@
                         </div>
                         <div class="box-body">
                             <div>
-                                <img src="/static/images/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
+                                <#if post??>
+                                    <img src="${post.postThumbnail?default("/static/images/thumbnail.png")}" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
+                                <#else >
+                                    <img src="/static/images/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
+                                </#if>
                             </div>
                         </div>
                     </div>
