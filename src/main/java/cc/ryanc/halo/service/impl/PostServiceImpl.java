@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
@@ -278,6 +279,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable) {
         return postRepository.findPostByYearAndMonth(year,month,pageable);
+    }
+
+    /**
+     * 根据标签查询文章
+     *
+     * @param tag      tag
+     * @param pageable pageable
+     * @return page
+     */
+    @Override
+    public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
+        return postRepository.findPostsByTags(tag,pageable);
     }
 
     /**

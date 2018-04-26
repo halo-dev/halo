@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -178,6 +179,15 @@ public interface PostService {
      * @return list
      */
     List<Post> findPostByYear(String year);
+
+    /**
+     * 根据标签查询文章
+     *
+     * @param tag tag
+     * @param pageable pageable
+     * @return page
+     */
+    Page<Post> findPostsByTags(Tag tag,Pageable pageable);
 
     /**
      * 生成rss
