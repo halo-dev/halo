@@ -48,33 +48,39 @@
             <b class="caret"></b>
         </a>
         <ul class="dropdown-menu">
-            <#list categories as cate>
-                <li>
-                    <a class="sidebar_archives-link" href="/categories/${cate.cateUrl}/">${cate.cateName}<span class="sidebar_archives-count">4</span></a>
-                </li>
-            </#list>
+            <@commonTag method="categories">
+                <#list categories as cate>
+                    <li>
+                        <a class="sidebar_archives-link" href="/categories/${cate.cateUrl}/">${cate.cateName}<span class="sidebar_archives-count">4</span></a>
+                    </li>
+                </#list>
+            </@commonTag>
         </ul>
     </li>
     </#if>
 
     <!-- Pages  -->
-    <#list menus?sort_by("menuSort") as menu>
-        <li>
-            <a href="${menu.menuUrl}" title="${menu.menuName}">
-                <#if menu.menuIcon!="">
-                    <i class="material-icons sidebar-material-icons">${menu.menuIcon}</i>
-                </#if>
-                ${menu.menuName}
-            </a>
-        </li>
-    </#list>
+    <@commonTag method="menus">
+        <#list menus?sort_by("menuSort") as menu>
+            <li>
+                <a href="${menu.menuUrl}" title="${menu.menuName}">
+                    <#if menu.menuIcon!="">
+                        <i class="material-icons sidebar-material-icons">${menu.menuIcon}</i>
+                    </#if>
+                    ${menu.menuName}
+                </a>
+            </li>
+        </#list>
+    </@commonTag>
 
     <#if options.theme_material_other_sidebar_postcount?default('true') == 'true'>
     <!-- Article Number  -->
     <li>
         <a href="/archives">
             文章总数
-            <span class="sidebar-badge">${postsCount}</span>
+            <@articleTag method="postsCount">
+                <span class="sidebar-badge">${postsCount}</span>
+            </@articleTag>
         </a>
     </li>
     </#if>

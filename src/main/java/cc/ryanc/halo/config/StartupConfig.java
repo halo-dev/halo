@@ -24,7 +24,7 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-public class StartupConfiguration implements ApplicationListener<ContextRefreshedEvent>{
+public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>{
 
     @Autowired
     private OptionsService optionsService;

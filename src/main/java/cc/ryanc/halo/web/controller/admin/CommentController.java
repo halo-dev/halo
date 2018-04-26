@@ -73,9 +73,6 @@ public class CommentController extends BaseController{
         model.addAttribute("checkCount",commentService.findAllComments(1,pageable).getTotalElements());
         model.addAttribute("trashCount",commentService.findAllComments(2,pageable).getTotalElements());
         model.addAttribute("status",status);
-
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_comment";
     }
 

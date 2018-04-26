@@ -93,22 +93,24 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                <@commonTag method="menus">
                                     <#list menus as menu>
-                                    <tr>
-                                        <td>${menu.menuName}</td>
-                                        <td>${menu.menuUrl}</td>
-                                        <td>${(menu.menuSort)!}</td>
-                                        <td>${menu.menuIcon}</td>
-                                        <td>
-                                            <#if updateMenu?? && menu.menuId==updateMenu.menuId>
-                                                <a href="#" class="btn btn-primary btn-xs " disabled="">正在修改</a>
+                                        <tr>
+                                            <td>${menu.menuName}</td>
+                                            <td>${menu.menuUrl}</td>
+                                            <td>${(menu.menuSort)!}</td>
+                                            <td>${menu.menuIcon}</td>
+                                            <td>
+                                                <#if updateMenu?? && menu.menuId==updateMenu.menuId>
+                                                    <a href="#" class="btn btn-primary btn-xs " disabled="">正在修改</a>
                                                 <#else>
-                                                <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId}" class="btn btn-primary btn-xs ">修改</a>
-                                            </#if>
-                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId}')">删除</button>
-                                        </td>
-                                    </tr>
+                                                    <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId}" class="btn btn-primary btn-xs ">修改</a>
+                                                </#if>
+                                                <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId}')">删除</button>
+                                            </td>
+                                        </tr>
                                     </#list>
+                                </@commonTag>
                                 </tbody>
                             </table>
                         </div>

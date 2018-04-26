@@ -96,22 +96,24 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                <@commonTag method="categories">
                                     <#list categories as cate>
-                                    <tr>
-                                        <td>${cate.cateName}</td>
-                                        <td>${cate.cateUrl}</td>
-                                        <td>${(cate.cateDesc)!}</td>
-                                        <td>2</td>
-                                        <td>
-                                            <#if updateCategory?? && updateCategory.cateId==cate.cateId>
-                                                <a href="#" class="btn btn-primary btn-xs " disabled>正在修改</a>
+                                        <tr>
+                                            <td>${cate.cateName}</td>
+                                            <td>${cate.cateUrl}</td>
+                                            <td>${(cate.cateDesc)!}</td>
+                                            <td>2</td>
+                                            <td>
+                                                <#if updateCategory?? && updateCategory.cateId==cate.cateId>
+                                                    <a href="#" class="btn btn-primary btn-xs " disabled>正在修改</a>
                                                 <#else >
-                                                <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId}" class="btn btn-primary btn-xs ">修改</a>
-                                            </#if>
-                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId}')">删除</button>
-                                        </td>
-                                    </tr>
+                                                    <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId}" class="btn btn-primary btn-xs ">修改</a>
+                                                </#if>
+                                                <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId}')">删除</button>
+                                            </td>
+                                        </tr>
                                     </#list>
+                                </@commonTag>
                                 </tbody>
                             </table>
                         </div>

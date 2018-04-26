@@ -86,8 +86,6 @@ public class AdminController extends BaseController{
 
         model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
 
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         this.getNewComments(session);
         return "admin/admin_index";
     }
@@ -99,9 +97,8 @@ public class AdminController extends BaseController{
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
-    public String login(HttpSession session,Model model){
-        model.addAttribute("options",HaloConst.OPTIONS);
-        User user = (User) session.getAttribute("user");
+    public String login(HttpSession session){
+        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
         if(null!=user){
             return "redirect:/admin";
@@ -210,12 +207,10 @@ public class AdminController extends BaseController{
     /**
      * 不可描述的页面
      *
-     * @param model model
      * @return 模板路径admin/admin_halo
      */
     @GetMapping(value = "/halo")
-    public String halo(Model model){
-        model.addAttribute("options",HaloConst.OPTIONS);
+    public String halo(){
         return "admin/admin_halo";
     }
 }

@@ -29,7 +29,7 @@ import java.util.Map;
 @EnableWebMvc
 @ComponentScan(basePackages = "cc.ryanc.halo.web.controller")
 @PropertySource(value = "classpath:application.yaml",ignoreResourceNotFound = true,encoding = "UTF-8")
-public class MvcConfiguration implements WebMvcConfigurer {
+public class MvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private LoginInterceptor loginInterceptor;

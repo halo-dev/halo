@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -29,14 +28,10 @@ public class UserController {
     /**
      * 获取用户信息并跳转
      *
-     * @param model model
      * @return 模板路径admin/admin_profile
      */
     @GetMapping
-    public String profile(Model model){
-        model.addAttribute("user",userService.findUser());
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
+    public String profile(){
         return "admin/admin_profile";
     }
 
