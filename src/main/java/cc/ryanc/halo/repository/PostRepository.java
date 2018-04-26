@@ -2,6 +2,7 @@ package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -135,4 +136,13 @@ public interface PostRepository extends JpaRepository<Post,Long>{
     Page<Post> findPostByYearAndMonth(@Param("year") String year,@Param("month") String month,Pageable pageable);
 
     List<Post> findPostByCategories(Category category);
+
+    /**
+     * 根据标签查询文章
+     *
+     * @param tag tag
+     * @param pageable pageable
+     * @return page
+     */
+    Page<Post> findPostsByTags(Tag tag,Pageable pageable);
 }

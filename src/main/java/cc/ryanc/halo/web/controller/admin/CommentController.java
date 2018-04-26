@@ -8,7 +8,7 @@ import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
-import cc.ryanc.halo.web.controller.BaseController;
+import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,6 @@ import javax.websocket.server.PathParam;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

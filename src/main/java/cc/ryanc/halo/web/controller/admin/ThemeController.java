@@ -6,7 +6,7 @@ import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.util.HaloUtil;
-import cc.ryanc.halo.web.controller.BaseController;
+import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;

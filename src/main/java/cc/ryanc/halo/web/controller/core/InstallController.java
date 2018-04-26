@@ -1,4 +1,4 @@
-package cc.ryanc.halo.web.controller;
+package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
