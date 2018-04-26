@@ -37,7 +37,7 @@
                                 <a href="#pages" data-toggle="tab">自定义页面</a>
                             </li>
                         </ul>
-                        <div class="tab-content">
+                        <div class="tab-content" style="padding: 0;">
                             <div class="tab-pane active" id="internal">
                                 <div class="box-body table-responsive">
                                     <table class="table table-bordered table-hover">
@@ -79,36 +79,37 @@
                             </div>
                             <div class="tab-pane" id="pages">
                                 <div class="box-body table-responsive">
-                                    <table class="table table-bordered table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th>标题</th>
-                                            <th>路径</th>
-                                            <th>日期</th>
-                                            <th>操作</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>友情链接</td>
-                                            <td>/link</td>
-                                            <th>日期</th>
-                                            <td>
-                                                <a href="/links" class="btn btn-info btn-sm " target="_blank">预览</a>
-                                                <a href="/admin/page/links" class="btn btn-primary btn-sm ">配置</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>关于页面</td>
-                                            <td>/about</td>
-                                            <th>日期</th>
-                                            <td>
-                                                <a href="#" class="btn btn-info btn-sm " target="_blank">预览</a>
-                                                <a href="/admin/page/about" class="btn btn-primary btn-sm ">配置</a>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    开发中...
+                                    <#--<table class="table table-bordered table-hover">-->
+                                        <#--<thead>-->
+                                        <#--<tr>-->
+                                            <#--<th>标题</th>-->
+                                            <#--<th>路径</th>-->
+                                            <#--<th>日期</th>-->
+                                            <#--<th>操作</th>-->
+                                        <#--</tr>-->
+                                        <#--</thead>-->
+                                        <#--<tbody>-->
+                                        <#--<tr>-->
+                                            <#--<td>友情链接</td>-->
+                                            <#--<td>/link</td>-->
+                                            <#--<th>日期</th>-->
+                                            <#--<td>-->
+                                                <#--<a href="/links" class="btn btn-info btn-xs " target="_blank">预览</a>-->
+                                                <#--<a href="/admin/page/links" class="btn btn-primary btn-xs ">配置</a>-->
+                                            <#--</td>-->
+                                        <#--</tr>-->
+                                        <#--<tr>-->
+                                            <#--<td>关于页面</td>-->
+                                            <#--<td>/about</td>-->
+                                            <#--<th>日期</th>-->
+                                            <#--<td>-->
+                                                <#--<a href="#" class="btn btn-info btn-xs " target="_blank">预览</a>-->
+                                                <#--<a href="/admin/page/about" class="btn btn-primary btn-xs ">配置</a>-->
+                                            <#--</td>-->
+                                        <#--</tr>-->
+                                        <#--</tbody>-->
+                                    <#--</table>-->
                                 </div>
                             </div>
                         </div>

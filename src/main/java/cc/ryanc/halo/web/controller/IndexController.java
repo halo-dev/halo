@@ -113,7 +113,7 @@ public class IndexController extends BaseController{
         model.addAttribute("menus",menus);
 
         //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByPostDate();
+        List<Archive> archives = postService.findPostGroupByYearAndMonth();
         model.addAttribute("archives",archives);
 
         //设置选项
@@ -186,7 +186,7 @@ public class IndexController extends BaseController{
         model.addAttribute("categories",categories);
 
         //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByPostDate();
+        List<Archive> archives = postService.findPostGroupByYearAndMonth();
 
         //菜单列表
         List<Menu> menus = menuService.findAllMenus();
@@ -287,7 +287,7 @@ public class IndexController extends BaseController{
         model.addAttribute("categories",categories);
 
         //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByPostDate();
+        List<Archive> archives = postService.findPostGroupByYearAndMonth();
         model.addAttribute("archives",archives);
 
         //设置选项
@@ -322,7 +322,7 @@ public class IndexController extends BaseController{
         model.addAttribute("menus",menus);
 
         //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByPostDate();
+        List<Archive> archives = postService.findPostGroupByYearAndMonth();
         model.addAttribute("archives",archives);
 
 
@@ -379,8 +379,12 @@ public class IndexController extends BaseController{
         model.addAttribute("is_archives",true);
 
         //包含[List<Post>,year,month,count]
-        List<Archive> archives = postService.findPostGroupByPostDate();
+        List<Archive> archives = postService.findPostGroupByYearAndMonth();
         model.addAttribute("archives",archives);
+
+        //包含[List<Post>,year,count]
+        List<Archive> archivesLess = postService.findPostGroupByYear();
+        model.addAttribute("archivesLess",archivesLess);
 
         //用户信息
         User user = userService.findUser();
@@ -439,7 +443,7 @@ public class IndexController extends BaseController{
         model.addAttribute("menus",menus);
 
         //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByPostDate();
+        List<Archive> archives = postService.findPostGroupByYearAndMonth();
         model.addAttribute("archives",archives);
 
         //是否是归档页，用于判断输出链接

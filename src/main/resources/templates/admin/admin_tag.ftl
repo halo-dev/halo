@@ -10,61 +10,131 @@
     <div class="content-wrapper">
         <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <style>
-            .tag-cloud .label{
-                padding: .3em .9em .45em;
-                font-size: 100%;
-                font-weight: 400;
+            .tags {
+                zoom: 1;
+                margin: 0;
+                padding: 0;
             }
-            .tag-cloud{
-                margin-bottom: 11px;
-                margin-right: 3px;
-                display: inline-block;
+            .tags:before, .tags:after {
+                content: '';
+                display: table;
+            }
+            .tags:after {
+                clear: both;
+            }
+            .tags li {
+                position: relative;
                 float: left;
+                margin: 0 0 8px 12px;
+                list-style: none;
             }
-            .bg-color-1{
-                background-color: #3c8dbc;
+            .tags li:active {
+                margin-top: 1px;
+                margin-bottom: 7px;
             }
-            .bg-color-2{
-                background-color: #00a65a;
+            .tags li:after {
+                content: '';
+                z-index: 2;
+                position: absolute;
+                top: 10px;
+                right: -2px;
+                width: 5px;
+                height: 6px;
+                opacity: .95;
+                background: #eb6b22;
+                border-radius: 3px 0 0 3px;
+                -webkit-box-shadow: inset 1px 0 #99400e;
+                box-shadow: inset 1px 0 #99400e;
             }
-            .bg-color-3{
-                background-color: #001f3f;
+            .tags a, .tags span {
+                display: block;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
             }
-            .bg-color-4{
-                background-color: #39cccc;
+            .tags a {
+                height: 26px;
+                line-height: 23px;
+                padding: 0 9px 0 8px;
+                font-size: 12px;
+                color: #555;
+                text-decoration: none;
+                text-shadow: 0 1px white;
+                background: #fafafa;
+                border-width: 1px 0 1px 1px;
+                border-style: solid;
+                border-color: #dadada #d2d2d2 #c5c5c5;
+                border-radius: 3px 0 0 3px;
+                background-image: -webkit-linear-gradient(top, #fcfcfc, #f0f0f0);
+                background-image: -moz-linear-gradient(top, #fcfcfc, #f0f0f0);
+                background-image: -o-linear-gradient(top, #fcfcfc, #f0f0f0);
+                background-image: linear-gradient(to bottom, #fcfcfc, #f0f0f0);
+                -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(0, 0, 0, 0.05);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7), 0 1px 2px rgba(0, 0, 0, 0.05);
             }
-            .bg-color-5{
-                background-color: #3d9970;
+            .tags a:hover span {
+                padding: 0 7px 0 6px;
+                max-width: 40px;
+                -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15), 1px 1px 2px rgba(0, 0, 0, 0.2);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15), 1px 1px 2px rgba(0, 0, 0, 0.2);
             }
-            .bg-color-6{
-                background-color: #01ff70;
+            .tags span {
+                position: absolute;
+                top: 1px;
+                left: 100%;
+                z-index: 2;
+                overflow: hidden;
+                max-width: 0;
+                height: 24px;
+                line-height: 21px;
+                padding: 0 0 0 2px;
+                color: white;
+                text-shadow: 0 -1px rgba(0, 0, 0, 0.3);
+                background: #eb6b22;
+                border: 1px solid;
+                border-color: #d15813 #c85412 #bf5011;
+                border-radius: 0 2px 2px 0;
+                opacity: .95;
+                background-image: -webkit-linear-gradient(top, #ed7b39, #df5e14);
+                background-image: -moz-linear-gradient(top, #ed7b39, #df5e14);
+                background-image: -o-linear-gradient(top, #ed7b39, #df5e14);
+                background-image: linear-gradient(to bottom, #ed7b39, #df5e14);
+                -webkit-transition: 0.3s ease-out;
+                -moz-transition: 0.3s ease-out;
+                -o-transition: 0.3s ease-out;
+                transition: 0.3s ease-out;
+                -webkit-transition-property: padding, max-width;
+                -moz-transition-property: padding, max-width;
+                -o-transition-property: padding, max-width;
+                transition-property: padding, max-width;
             }
-            .bg-color-7{
-                background-color: #ff851b;
+
+            .green li:after {
+                background: #65bb34;
+                -webkit-box-shadow: inset 1px 0 #3a6b1e;
+                box-shadow: inset 1px 0 #3a6b1e;
             }
-            .bg-color-8{
-                background-color: #f012be;
+            .green span {
+                background: #65bb34;
+                border-color: #549b2b #4f9329 #4b8b27;
+                background-image: -webkit-linear-gradient(top, #71ca3f, #5aa72e);
+                background-image: -moz-linear-gradient(top, #71ca3f, #5aa72e);
+                background-image: -o-linear-gradient(top, #71ca3f, #5aa72e);
+                background-image: linear-gradient(to bottom, #71ca3f, #5aa72e);
             }
-            .bg-color-9{
-                background-color: #605ca8;
+
+            .blue li:after {
+                background: #56a3d5;
+                -webkit-box-shadow: inset 1px 0 #276f9e;
+                box-shadow: inset 1px 0 #276f9e;
             }
-            .bg-color-10{
-                background-color: #d81b60;
-            }
-            .bg-color-11{
-                background-color: #dd4b39;
-            }
-            .bg-color-12{
-                background-color: #f39c12;
-            }
-            .bg-color-13{
-                background-color: #00c0ef;
-            }
-            .bg-color-14{
-                background-color: #0073b7;
-            }
-            .bg-color-15{
-                background-color: #111111;
+            .blue span {
+                background: #56a3d5;
+                border-color: #3591cd #318cc7 #2f86be;
+                background-image: -webkit-linear-gradient(top, #6aaeda, #4298d0);
+                background-image: -moz-linear-gradient(top, #6aaeda, #4298d0);
+                background-image: -o-linear-gradient(top, #6aaeda, #4298d0);
+                background-image: linear-gradient(to bottom, #6aaeda, #4298d0);
             }
         </style>
         <section class="content-header">
@@ -106,7 +176,7 @@
                                 <div class="box-footer">
                                     <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
                                     <#if updateTag.posts?size = 0>
-                                    <button type="submit" class="btn btn-danger btn-sm  pull-right">删除</button>
+                                    <a data-pjax="true" href="/admin/tag/remove?tagId=${updateTag.tagId}" class="btn btn-danger btn-sm  pull-right">删除</a>
                                     </#if>
                                 </div>
                             </form>
@@ -137,54 +207,16 @@
                             <h3 class="box-title">所有标签</h3>
                         </div>
                         <div class="box-body table-responsive">
-                            <#--<table class="table table-hover">-->
-                                <#--<thead>-->
-                                <#--<tr>-->
-                                    <#--<th>名称</th>-->
-                                    <#--<th>路径</th>-->
-                                    <#--<th>总数</th>-->
-                                    <#--<th>操作</th>-->
-                                <#--</tr>-->
-                                <#--</thead>-->
-                                <#--<tbody>-->
-                                <#--<#list tags as tag>-->
-                                    <#--<tr>-->
-                                        <#--<td>${tag.tagName}</td>-->
-                                        <#--<td>${tag.tagUrl}</td>-->
-                                        <#--<td>2</td>-->
-                                        <#--<td>-->
-                                            <#--<#if updateTag ?? && tag.tagId==updateTag.tagId>-->
-                                                <#--<a class="btn btn-primary btn-xs " href="#" disabled>正在修改</a>-->
-                                            <#--<#else >-->
-                                            <#--<a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/tag/edit?tagId=${tag.tagId}">修改</a>-->
-                                            <#--</#if>-->
-                                            <#--<button class="btn btn-danger btn-xs " onclick="modelShow('/admin/tag/remove?tagId=${tag.tagId}')">删除</button>-->
-                                        <#--</td>-->
-                                    <#--</tr>-->
-                                <#--</#list>-->
-                                <#--</tbody>-->
-                            <#--</table>-->
-                            <#list tags as tag>
-                                <div class="tag-cloud">
-                                    <a class="tag-link" data-pjax="true" href="/admin/tag/edit?tagId=${tag.tagId}">
-                                        <span class="label">${tag.tagName}( ${tag.posts?size} )</span>
-                                    </a>
-                                </div>
-                            </#list>
-                            <script>
-                                var randomNum;
-                                var tagLabel = $('.tag-link');
-                                <#--for(var i = 0; i < ${tags?size}; i++) {-->
-                                    <#--randomNum = Math.floor(Math. random() * 15 + 1);-->
-                                    <#--tagLabel.children('.label').addClass("bg-color-"+randomNum);-->
-                                    <#--tagLabel = tagLabel.next();-->
-                                <#--}-->
-
-                                $(".label").each(function () {
-                                    randomNum = Math.floor(Math. random() * 15 + 1);
-                                    $(this).addClass("bg-color-"+randomNum);
-                                });
-                            </script>
+                            <ul class="tags blue">
+                                <#list tags as tag>
+                                    <li>
+                                        <a data-pjax="true" href="/admin/tag/edit?tagId=${tag.tagId}">
+                                            ${tag.tagName}
+                                            <span>${tag.posts?size}</span>
+                                        </a>
+                                    </li>
+                                </#list>
+                            </ul>
                         </div>
                     </div>
                 </div>

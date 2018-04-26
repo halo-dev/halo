@@ -139,11 +139,18 @@ public interface PostService {
     List<Post> findByPostDateBefore(Date postDate);
 
     /**
-     * 查询归档信息
+     * 查询归档信息 根据年份和月份
      *
      * @return List
      */
-    List<Archive> findPostGroupByPostDate();
+    List<Archive> findPostGroupByYearAndMonth();
+
+    /**
+     * 查询归档信息 根据年份
+     *
+     * @return list
+     */
+    List<Archive> findPostGroupByYear();
 
     /**
      * 根据年份和月份查询文章
@@ -162,7 +169,15 @@ public interface PostService {
      * @param pageable pageable
      * @return page
      */
-    Page<Post> findPostByYearAndMonth(@Param("year") String year, @Param("month") String month, Pageable pageable);
+    Page<Post> findPostByYearAndMonth(String year,String month, Pageable pageable);
+
+    /**
+     * 根据年份查询文章
+     *
+     * @param year year
+     * @return list
+     */
+    List<Post> findPostByYear(String year);
 
     /**
      * 生成rss
