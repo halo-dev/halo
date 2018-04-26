@@ -72,10 +72,6 @@ public class PostController extends BaseController{
         model.addAttribute("draftCount",postService.findPostByStatus(1,pageable).getTotalElements());
         model.addAttribute("trashCount",postService.findPostByStatus(2,pageable).getTotalElements());
         model.addAttribute("status",status);
-
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
-
         return "admin/admin_post";
     }
 
@@ -115,8 +111,6 @@ public class PostController extends BaseController{
     public String viewPost(@PathParam("postId") Long postId,Model model){
         Optional<Post> post = postService.findByPostId(postId);
         model.addAttribute("post",post.get());
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("post");
     }
 
@@ -134,8 +128,6 @@ public class PostController extends BaseController{
             model.addAttribute("categories",categories);
             model.addAttribute("tags",tags);
             model.addAttribute("btnPush","发布");
-            //设置选项
-            model.addAttribute("options",HaloConst.OPTIONS);
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
@@ -247,8 +239,6 @@ public class PostController extends BaseController{
             List<Category> categories = categoryService.findAllCategories();
             model.addAttribute("categories",categories);
             model.addAttribute("btnPush","更新");
-            //设置选项
-            model.addAttribute("options",HaloConst.OPTIONS);
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }

@@ -1,10 +1,12 @@
 <div class="page-top animated fadeInDown">
     <div class="nav">
-        <#list menus?sort_by('menuSort') as menu>
-            <li>
-                <a href="${menu.menuUrl}">${menu.menuName} </a>
-            </li>
-        </#list>
+        <@commonTag method="menus">
+            <#list menus?sort_by('menuSort') as menu>
+                <li>
+                    <a href="${menu.menuUrl}">${menu.menuName} </a>
+                </li>
+            </#list>
+        </@commonTag>
     </div>
     <div class="information">
         <div class="back_btn">

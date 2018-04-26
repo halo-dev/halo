@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Menu;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.MenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
-import java.util.List;
 
 /**
  * @author : RYAN0UP
@@ -34,11 +32,7 @@ public class MenuController {
      */
     @GetMapping
     public String menus(Model model){
-        List<Menu> menus = menuService.findAllMenus();
-        model.addAttribute("menus",menus);
         model.addAttribute("statusName","添加");
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "/admin/admin_menu";
     }
 
@@ -67,13 +61,9 @@ public class MenuController {
      */
     @GetMapping(value = "/edit")
     public String updateMenu(@RequestParam("menuId") Long menuId,Model model){
-        List<Menu> menus = menuService.findAllMenus();
         Menu menu = menuService.findByMenuId(menuId).get();
         model.addAttribute("statusName","修改");
         model.addAttribute("updateMenu",menu);
-        model.addAttribute("menus",menus);
-        //设置选项
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "/admin/admin_menu";
     }
 

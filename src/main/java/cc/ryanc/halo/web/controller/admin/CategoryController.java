@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Category;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,11 +33,7 @@ public class CategoryController {
      */
     @GetMapping
     public String categories(Model model){
-        List<Category> categories = categoryService.findAllCategories();
-        model.addAttribute("categories",categories);
         model.addAttribute("statusName","添加");
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_category";
     }
 
@@ -102,13 +96,9 @@ public class CategoryController {
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model,@PathParam("cateId") Long cateId){
-        List<Category> categories = categoryService.findAllCategories();
         Optional<Category> category = categoryService.findByCateId(cateId);
         model.addAttribute("updateCategory",category.get());
-        model.addAttribute("categories",categories);
         model.addAttribute("statusName","修改");
-        //设置选项
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_category";
     }
 }

@@ -69,8 +69,6 @@ public class AttachmentController {
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments",attachments);
 
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_attachment";
     }
 
@@ -90,9 +88,6 @@ public class AttachmentController {
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments",attachments);
         model.addAttribute("id",id);
-
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/widget/_attachment-select";
     }
 

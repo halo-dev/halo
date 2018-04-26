@@ -1,15 +1,8 @@
 package cc.ryanc.halo.web.controller.front;
 
-import cc.ryanc.halo.model.domain.Category;
-import cc.ryanc.halo.model.domain.Menu;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.Archive;
-import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.service.CategoryService;
-import cc.ryanc.halo.service.MenuService;
 import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +32,6 @@ public class ArchivesController extends BaseController {
     @Autowired
     private PostService postService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private MenuService menuService;
 
     /**
      * 文章归档
@@ -76,9 +61,6 @@ public class ArchivesController extends BaseController {
         Page<Post> posts = postService.findPostByStatus(0,pageable);
         model.addAttribute("posts",posts);
 
-        //文章总数
-        model.addAttribute("postsCount",postService.findAllPosts().size());
-
         model.addAttribute("is_archives",true);
 
         //包含[List<Post>,year,month,count]
@@ -89,23 +71,9 @@ public class ArchivesController extends BaseController {
         List<Archive> archivesLess = postService.findPostGroupByYear();
         model.addAttribute("archivesLess",archivesLess);
 
-        //用户信息
-        User user = userService.findUser();
-        model.addAttribute("user",user);
-
-        //菜单列表
-        List<Menu> menus = menuService.findAllMenus();
-        model.addAttribute("menus",menus);
-
-        //所有分类目录
-        List<Category> categories = categoryService.findAllCategories();
-        model.addAttribute("categories",categories);
-
         //是否是归档页，用于判断输出链接
         model.addAttribute("isArchives","true");
 
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("archives");
     }
 
@@ -130,21 +98,6 @@ public class ArchivesController extends BaseController {
         Page<Post> posts = postService.findPostByYearAndMonth(year,month,pageable);
         model.addAttribute("posts",posts);
 
-        //文章总数
-        model.addAttribute("postsCount",postService.findAllPosts().size());
-
-        //用户信息
-        User user = userService.findUser();
-        model.addAttribute("user",user);
-
-        //分类目录
-        List<Category> categories = categoryService.findAllCategories();
-        model.addAttribute("categories",categories);
-
-        //菜单列表
-        List<Menu> menus = menuService.findAllMenus();
-        model.addAttribute("menus",menus);
-
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByYearAndMonth();
         model.addAttribute("archives",archives);
@@ -152,8 +105,6 @@ public class ArchivesController extends BaseController {
         //是否是归档页，用于判断输出链接
         model.addAttribute("isArchives","true");
 
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("archives");
     }
 
@@ -187,28 +138,11 @@ public class ArchivesController extends BaseController {
         }
         model.addAttribute("post",post);
 
-        //文章总数
-        model.addAttribute("postsCount",postService.findAllPosts().size());
-
-        //用户信息
-        User user = userService.findUser();
-        model.addAttribute("user",user);
-
-        //所有分类目录
-        List<Category> categories = categoryService.findAllCategories();
-        model.addAttribute("categories",categories);
-
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByYearAndMonth();
 
-        //菜单列表
-        List<Menu> menus = menuService.findAllMenus();
-        model.addAttribute("menus",menus);
-
         model.addAttribute("archives",archives);
 
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("post");
     }
 }

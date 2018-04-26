@@ -1,9 +1,11 @@
 package cc.ryanc.halo.web.controller.front;
 
-import cc.ryanc.halo.model.domain.*;
+import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +34,7 @@ public class TagsController extends BaseController {
     private TagService tagService;
 
     @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
     private PostService postService;
-
-    @Autowired
-    private MenuService menuService;
 
     /**
      * 标签
@@ -55,27 +48,10 @@ public class TagsController extends BaseController {
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("tags",tags);
 
-        //所有分类目录
-        List<Category> categories = categoryService.findAllCategories();
-        model.addAttribute("categories",categories);
-
-        User user = userService.findUser();
-        model.addAttribute("user",user);
-
-        //文章总数
-        model.addAttribute("postsCount",postService.findAllPosts().size());
-
-        //菜单列表
-        List<Menu> menus = menuService.findAllMenus();
-        model.addAttribute("menus",menus);
-
         //归档数据，包含[year,month,count,List<Post>]
         List<Archive> archives = postService.findPostGroupByYearAndMonth();
         model.addAttribute("archives",archives);
 
-
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("tags");
     }
 
@@ -112,13 +88,6 @@ public class TagsController extends BaseController {
         Pageable pageable = new PageRequest(page-1,size,sort);
         Page<Post> posts = postService.findPostsByTags(tag,pageable);
         model.addAttribute("posts",posts);
-        User user = userService.findUser();
-        model.addAttribute("user",user);
-        //菜单列表
-        List<Menu> menus = menuService.findAllMenus();
-        model.addAttribute("menus",menus);
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return this.render("index");
     }
 }

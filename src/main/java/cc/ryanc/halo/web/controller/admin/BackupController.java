@@ -1,13 +1,11 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,10 +34,7 @@ public class BackupController {
      * @return 模板路径admin/admin_backup
      */
     @GetMapping
-    public String backup(Model model){
-
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
+    public String backup(){
         return "admin/admin_backup";
     }
 

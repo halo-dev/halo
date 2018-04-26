@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,6 @@ public class TagController {
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("tags",tags);
         model.addAttribute("statusName","新增");
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_tag";
     }
 
@@ -106,7 +103,6 @@ public class TagController {
         model.addAttribute("statusName","修改");
         model.addAttribute("updateTag",tag);
         model.addAttribute("tags",tags);
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_tag";
     }
 }

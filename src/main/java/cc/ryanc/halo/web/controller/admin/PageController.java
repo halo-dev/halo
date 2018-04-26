@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Link;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +42,7 @@ public class PageController {
      * @return 模板路径admin/admin_page
      */
     @GetMapping
-    public String pages(Model model){
-        model.addAttribute("options",HaloConst.OPTIONS);
+    public String pages(){
         return "admin/admin_page";
     }
 
@@ -59,9 +57,6 @@ public class PageController {
         List<Link> links = linkService.findAllLinks();
         model.addAttribute("links",links);
         model.addAttribute("statusName","添加");
-
-        //设置选项
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/admin_page_link";
     }
 
@@ -79,8 +74,6 @@ public class PageController {
         model.addAttribute("updateLink",link.get());
         model.addAttribute("statusName","修改");
         model.addAttribute("links",links);
-        //设置选项
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_page_link";
     }
 
@@ -134,7 +127,6 @@ public class PageController {
         Pageable pageable = new PageRequest(page,size,sort);
         Page<Gallery> galleries = galleryService.findAllGalleries(pageable);
         model.addAttribute("galleries",galleries);
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/admin_page_gallery";
     }
 
@@ -168,8 +160,6 @@ public class PageController {
     public String gallery(Model model,@PathParam("galleryId") Long galleryId){
         Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
         model.addAttribute("gallery",gallery.get());
-
-        model.addAttribute("options",HaloConst.OPTIONS);
         return "admin/widget/_gallery-detail";
     }
 
