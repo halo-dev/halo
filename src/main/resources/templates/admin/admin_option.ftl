@@ -219,13 +219,13 @@
                                                 </label>
                                                 <div class="col-sm-4">
                                                     <select class="form-control" id="nativeCommentAvatar" name="native_comment_avatar">
-                                                        <option value="default" ${((options.native_comment_avatar?default('default'))=='default')?string('selected','')}>神秘人</option>
-                                                        <option value="gravatar" ${((options.native_comment_avatar?default('default'))=='gravatar')?string('selected','')}>Gravatar标志</option>
+                                                        <option value="mm" ${((options.native_comment_avatar?default('default'))=='mm')?string('selected','')}>默认</option>
                                                         <option value="identicon" ${((options.native_comment_avatar?default('default'))=='identicon')?string('selected','')}>抽象几何图形</option>
                                                         <option value="monsterid" ${((options.native_comment_avatar?default('default'))=='monsterid')?string('selected','')}>小怪物</option>
                                                         <option value="wavatar" ${((options.native_comment_avatar?default('default'))=='wavatar')?string('selected','')}>Wavatar</option>
                                                         <option value="retro" ${((options.native_comment_avatar?default('default'))=='retro')?string('selected','')}>复古</option>
-                                                        <option value="hide" ${((options.native_comment_avatar?default('default'))=='hide')?string('selected','')}>不显示头像</option>
+                                                        <option value="robohash" ${((options.native_comment_avatar?default('default'))=='robohash')?string('selected','')}>机器人</option>
+                                                        <option value="blank" ${((options.native_comment_avatar?default('default'))=='blank')?string('selected','')}>不显示头像</option>
                                                     </select>
                                                 </div>
                                             </div>

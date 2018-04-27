@@ -4,18 +4,20 @@
 <#include "module/header.ftl">
     <div class="main-content">
         <section class="container">
-            <#if archives ??>
-                <#list archives as archive>
+            <@articleTag method="archives">
+                <#if archives ??>
+                    <#list archives as archive>
                     <h1 class="animated fadeInDown">${archive.year}年${archive.month}月 (${archive.count})</h1>
                     <ul>
                         <#list archive.posts as post>
                             <li class="animated fadeInDown">
-                                <a href="/article/${post.postUrl}">${post.postTitle}</a>
+                                <a href="/archives/${post.postUrl}">${post.postTitle}</a>
                             </li>
                         </#list>
                     </ul>
-                </#list>
-            </#if>
+                    </#list>
+                </#if>
+            </@articleTag>
         </section>
     </div>
 <@footer></@footer>

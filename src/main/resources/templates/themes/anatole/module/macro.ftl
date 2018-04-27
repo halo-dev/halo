@@ -3,16 +3,16 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <title>${title?default("Anatole")}</title>
-    <meta content="yes" name="apple-mobile-web-app-capable" />
-    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
-    <meta content="telephone=no" name="format-detection" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="renderer" content="webkit">
-    <meta name="author" content="" />
+    <meta name="author" content="${user.userDisplayName?if_exists}" />
     <meta name="keywords" content="${keywords?default("Anatole")}"/>
     <meta name="description" content="${description?default("Anatole")}" />
-    <link rel="shortcut icon" href="/anatole/source/images/favicon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="${options.anatole_style_favicon?default("/anatole/source/images/favicon.png")}" type="image/x-icon" />
     <link href="/anatole/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="/anatole/source/css/blog_basic.css?version=88107691fe">
     <link href="/anatole/source/css/style.css" type="text/css" rel="stylesheet" />
@@ -38,6 +38,19 @@
     if (!urlstatus) {
         $(".nav li a").eq(0).addClass('current');
     }
+
+    <#if options.anatole_style_hitokoto?default("false")=="true">
+	  var xhr = new XMLHttpRequest();
+	  xhr.open('get', 'https://v1.hitokoto.cn');
+	  xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+              var data = JSON.parse(xhr.responseText);
+              var yiyan = document.getElementById('yiyan');
+              yiyan.innerText = data.hitokoto+"        -「"+data.from+"」";
+          }
+      };
+	  xhr.send();
+    </#if>
 </script>
 </body>
 </html>

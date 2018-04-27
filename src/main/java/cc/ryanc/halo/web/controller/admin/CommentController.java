@@ -88,7 +88,6 @@ public class CommentController extends BaseController{
                               HttpSession session){
         try {
             commentService.updateCommentStatus(commentId,2);
-            this.getNewComments(session);
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
@@ -132,7 +131,6 @@ public class CommentController extends BaseController{
                 log.error("邮件服务器未配置：{0}",e.getMessage());
             }
         }
-        this.getNewComments(session);
         return "redirect:/admin/comments?status="+status;
     }
 
@@ -150,7 +148,6 @@ public class CommentController extends BaseController{
                              HttpSession session){
         try{
             commentService.removeByCommentId(commentId);
-            this.getNewComments(session);
         }catch (Exception e){
             log.error("删除评论失败：{0}",e.getMessage());
         }

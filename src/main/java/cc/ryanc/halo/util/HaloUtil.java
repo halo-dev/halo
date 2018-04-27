@@ -3,8 +3,6 @@ package cc.ryanc.halo.util;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Content;
 import com.sun.syndication.feed.rss.Item;
@@ -12,7 +10,6 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
@@ -261,19 +258,15 @@ public class HaloUtil {
             File[] moduleFiles = modulePath.listFiles();
             if(null!=moduleFiles) {
                 for (File file : moduleFiles) {
-                    if (file.isFile()) {
-                        if (file.getName().endsWith(".ftl")) {
-                            tpls.add("module/" + file.getName());
-                        }
+                    if (file.isFile() && file.getName().endsWith(".ftl")) {
+                        tpls.add("module/" + file.getName());
                     }
                 }
             }
             if(null!=baseFiles){
                 for (File file:baseFiles){
-                    if(file.isFile()) {
-                        if (file.getName().endsWith(".ftl")) {
-                            tpls.add(file.getName());
-                        }
+                    if(file.isFile() && file.getName().endsWith(".ftl")) {
+                        tpls.add(file.getName());
                     }
                 }
             }

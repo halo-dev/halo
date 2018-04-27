@@ -69,12 +69,6 @@ public class IndexController extends BaseController {
         Page<Post> posts = postService.findPostByStatus(0,pageable);
         model.addAttribute("posts",posts);
 
-        model.addAttribute("is_home",true);
-
-        //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        model.addAttribute("archives",archives);
-
         return this.render("index");
     }
 

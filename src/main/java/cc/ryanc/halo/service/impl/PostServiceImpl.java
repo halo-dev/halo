@@ -278,7 +278,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable) {
-        return postRepository.findPostByYearAndMonth(year,month,pageable);
+        return postRepository.findPostByYearAndMonth(year,month,null);
     }
 
     /**

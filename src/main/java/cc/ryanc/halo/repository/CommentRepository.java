@@ -18,13 +18,21 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
     /**
-     * 根据评论状态查询所有评论
+     * 根据评论状态查询所有评论 分页
      *
-     * @param status Status 文章状态
-     * @param pageable pageable 分页信息
+     * @param status 文章状态
+     * @param pageable 分页信息
      * @return page
      */
     Page<Comment> findCommentsByCommentStatus(Integer status, Pageable pageable);
+
+    /**
+     * 根据评论状态查询所有评论 不分页
+     *
+     * @param status 文章状态
+     * @return list
+     */
+    List<Comment> findCommentsByCommentStatus(Integer status);
 
     /**
      * 根据文章查询评论

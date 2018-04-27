@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -60,20 +59,6 @@ public class ArchivesController extends BaseController {
         Pageable pageable = new PageRequest(page-1,5,sort);
         Page<Post> posts = postService.findPostByStatus(0,pageable);
         model.addAttribute("posts",posts);
-
-        model.addAttribute("is_archives",true);
-
-        //包含[List<Post>,year,month,count]
-        List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        model.addAttribute("archives",archives);
-
-        //包含[List<Post>,year,count]
-        List<Archive> archivesLess = postService.findPostGroupByYear();
-        model.addAttribute("archivesLess",archivesLess);
-
-        //是否是归档页，用于判断输出链接
-        model.addAttribute("isArchives","true");
-
         return this.render("archives");
     }
 
@@ -92,18 +77,8 @@ public class ArchivesController extends BaseController {
         log.info(year);
         log.info(month);
 
-        //根据年月查出的文章数据，分页
-        Sort sort = new Sort(Sort.Direction.DESC,"post_date");
-        Pageable pageable = new PageRequest(0,5,sort);
-        Page<Post> posts = postService.findPostByYearAndMonth(year,month,pageable);
+        Page<Post> posts = postService.findPostByYearAndMonth(year,month,null);
         model.addAttribute("posts",posts);
-
-        //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        model.addAttribute("archives",archives);
-
-        //是否是归档页，用于判断输出链接
-        model.addAttribute("isArchives","true");
 
         return this.render("archives");
     }
@@ -137,11 +112,6 @@ public class ArchivesController extends BaseController {
             log.error("未知错误：{0}",e.getMessage());
         }
         model.addAttribute("post",post);
-
-        //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByYearAndMonth();
-
-        model.addAttribute("archives",archives);
 
         return this.render("post");
     }

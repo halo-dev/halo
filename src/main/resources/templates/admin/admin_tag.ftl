@@ -175,6 +175,7 @@
                                 </div>
                                 <div class="box-footer">
                                     <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <a data-pjax="true" href="/admin/tag" class="btn btn-info btn-sm ">返回添加</a>
                                     <#if updateTag.posts?size = 0>
                                     <a data-pjax="true" href="/admin/tag/remove?tagId=${updateTag.tagId}" class="btn btn-danger btn-sm  pull-right">删除</a>
                                     </#if>

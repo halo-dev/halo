@@ -8,11 +8,13 @@
             </div>
             <div class="navbar-menu pull-right hidden-xs">
                 <ul>
-                    <#list menus?sort_by('menuSort') as menu>
-                        <li>
-                            <a href="${menu.menuUrl}">${menu.menuName}</a>
-                        </li>
-                    </#list>
+                    <@commonTag method="menus">
+                        <#list menus?sort_by('menuSort') as menu>
+                            <li>
+                                <a href="${menu.menuUrl}">${menu.menuName}</a>
+                            </li>
+                        </#list>
+                    </@commonTag>
                 </ul>
             </div>
         </div>

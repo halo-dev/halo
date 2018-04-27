@@ -7,21 +7,23 @@
         <div class="content">
             <div class="archive animated fadeInDown">
                 <ul class="list-with-title">
-                    <#list archivesLess as archive>
-                        <div class="listing-title">${archive.year}</div>
-                        <ul class="listing">
-                            <#list archive.posts?sort_by("postDate")?reverse as post>
-                                <div class="listing-item">
-                                    <div class="listing-post">
-                                        <a href="/archives/${post.postUrl}" title="${post.postTitle}">${post.postTitle}</a>
-                                        <div class="post-time">
-                                            <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
+                    <@articleTag method="archivesLess">
+                        <#list archivesLess as archive>
+                            <div class="listing-title">${archive.year}</div>
+                            <ul class="listing">
+                                <#list archive.posts?sort_by("postDate")?reverse as post>
+                                    <div class="listing-item">
+                                        <div class="listing-post">
+                                            <a href="/archives/${post.postUrl}" title="${post.postTitle}">${post.postTitle}</a>
+                                            <div class="post-time">
+                                                <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </#list>
-                        </ul>
-                    </#list>
+                                </#list>
+                            </ul>
+                        </#list>
+                    </@articleTag>
                 </ul>
             </div>
         </div>

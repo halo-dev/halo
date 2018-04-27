@@ -20,12 +20,12 @@
                     <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
                     <i class="fa fa-comment-o"></i>
                     <a href="/archives/${post.postUrl}#comment_widget">Comments</a>
-                    <if post.tags??>
+                    <#if post.tags?size gt 0>
                         <i class="fa fa-tag"></i>
                         <#list post.tags as tag>
                             <a href="/tags/${tag.tagUrl}" class="tag">&nbsp;${tag.tagName}</a>
                         </#list>
-                    </if>
+                    </#if>
                 </div>
             </div>
         </div>

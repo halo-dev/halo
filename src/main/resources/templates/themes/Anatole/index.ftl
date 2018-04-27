@@ -1,5 +1,9 @@
 <#include "module/macro.ftl">
-<@head title="${options.blog_title?default('Anatole')}" keywords="${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
+<#if tag??>
+    <@head title="${tag.tagName} · ${options.blog_title?default('Anatole')}" keywords="${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
+<#else>
+    <@head title="${options.blog_title?default('Anatole')}" keywords="${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
+</#if>
 <#include "module/sidebar.ftl">
 <div class="main">
     <#include "module/page-top.ftl">

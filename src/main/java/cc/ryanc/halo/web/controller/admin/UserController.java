@@ -3,10 +3,10 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
+import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -24,6 +24,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private Configuration configuration;
 
     /**
      * 获取用户信息并跳转
@@ -48,6 +51,7 @@ public class UserController {
         try{
             if(null!=user){
                 userService.saveByUser(user);
+                configuration.setSharedVariable("user",userService.findUser());
                 session.invalidate();
             }else{
                 return false;

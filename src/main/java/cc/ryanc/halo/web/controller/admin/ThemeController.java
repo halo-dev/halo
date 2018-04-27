@@ -67,7 +67,7 @@ public class ThemeController extends BaseController{
     public boolean activeTheme(@PathParam("siteTheme") String siteTheme,
                               HttpServletRequest request){
         try {
-            //保存主题设置项在数据库
+            //保存主题设置项
             optionsService.saveOption("theme",siteTheme);
             //设置主题
             BaseController.THEME = siteTheme;
@@ -77,7 +77,7 @@ public class ThemeController extends BaseController{
             );
             return true;
         }catch (Exception e){
-            log.error("主题设置失败，当前主题为："+BaseController.THEME);
+            log.error("主题设置失败，当前主题为："+siteTheme);
             return false;
         }
     }

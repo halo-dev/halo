@@ -1,6 +1,7 @@
 package cc.ryanc.halo.model.tag;
 
 import cc.ryanc.halo.service.CategoryService;
+import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MenuService;
 import freemarker.core.Environment;
 import freemarker.template.*;
@@ -26,6 +27,9 @@ public class CommonTagDirective implements TemplateDirectiveModel {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private CommentService commentService;
+
     @Override
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
         DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
@@ -37,6 +41,9 @@ public class CommonTagDirective implements TemplateDirectiveModel {
                     break;
                 case "categories":
                     environment.setVariable("categories",builder.build().wrap(categoryService.findAllCategories()));
+                    break;
+                case "newComments":
+                    environment.setVariable("newComments",builder.build().wrap(commentService.findAllComments(1)));
                     break;
                 default:
                     break;
