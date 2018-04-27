@@ -47,11 +47,6 @@ public class TagsController extends BaseController {
         //所有标签
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("tags",tags);
-
-        //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        model.addAttribute("archives",archives);
-
         return this.render("tags");
     }
 
@@ -88,6 +83,7 @@ public class TagsController extends BaseController {
         Pageable pageable = new PageRequest(page-1,size,sort);
         Page<Post> posts = postService.findPostsByTags(tag,pageable);
         model.addAttribute("posts",posts);
+        model.addAttribute("tag",tag);
         return this.render("index");
     }
 }

@@ -122,15 +122,11 @@ public class PostController extends BaseController{
      */
     @GetMapping(value = "/new")
     public String newPost(Model model){
-        try {
-            List<Category> categories = categoryService.findAllCategories();
-            List<Tag> tags = tagService.findAllTags();
-            model.addAttribute("categories",categories);
-            model.addAttribute("tags",tags);
-            model.addAttribute("btnPush","发布");
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
-        }
+        List<Category> categories = categoryService.findAllCategories();
+        List<Tag> tags = tagService.findAllTags();
+        model.addAttribute("categories",categories);
+        model.addAttribute("tags",tags);
+        model.addAttribute("btnPush","发布");
         return "admin/admin_editor";
     }
 
@@ -161,7 +157,7 @@ public class PostController extends BaseController{
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
-            List<Tag> tags = tagService.strListToTagList(tagList);
+            List<Tag> tags = tagService.strListToTagList(tagList.replaceAll(" ",""));
             post.setTags(tags);
             postService.saveByPost(post);
             log.info("已发表新文章："+post.getPostTitle());

@@ -28,13 +28,15 @@
             <b class="caret"></b>
         </a>
         <ul class="dropdown-menu">
-            <#if archives??>
-                <#list archives?sort_by("year")?reverse as archive>
-                    <li>
-                        <a class="sidebar_archives-link" href="/archives/${archive.year}/${archive.month}/">${archive.month}月 ${archive.year}<span class="sidebar_archives-count">${archive.count}</span></a>
-                    </li>
-                </#list>
-            </#if>
+            <@articleTag method="archives">
+                <#if archives??>
+                    <#list archives?sort_by("year")?reverse as archive>
+                        <li>
+                            <a class="sidebar_archives-link" href="/archives/${archive.year}/${archive.month}/">${archive.month}月 ${archive.year}<span class="sidebar_archives-count">${archive.count}</span></a>
+                        </li>
+                    </#list>
+                </#if>
+            </@articleTag>
         </ul>
     </li>
     </#if>

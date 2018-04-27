@@ -6,10 +6,7 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.UserService;
+import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -85,8 +82,6 @@ public class AdminController extends BaseController{
         model.addAttribute("comments",comments);
 
         model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
-
-        this.getNewComments(session);
         return "admin/admin_index";
     }
 
@@ -164,9 +159,9 @@ public class AdminController extends BaseController{
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session){
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        log.info("用户["+user.getUserName()+"]退出登录");
         logsService.saveByLogs(new Logs(LogsRecord.LOGOUT,user.getUserName(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         session.invalidate();
+        log.info("用户["+user.getUserName()+"]退出登录");
         return "redirect:/admin/login";
     }
 

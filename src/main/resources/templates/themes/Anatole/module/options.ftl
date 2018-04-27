@@ -30,6 +30,9 @@
                         <a href="#sns" data-toggle="tab">社交资料</a>
                     </li>
                     <li>
+                        <a href="#style" data-toggle="tab">样式设置</a>
+                    </li>
+                    <li>
                         <a href="#about" data-toggle="tab">关于</a>
                     </li>
                 </ul>
@@ -86,6 +89,38 @@
                             </div>
                         </form>
                     </div>
+                    <!--样式设置-->
+                    <div class="tab-pane" id="style">
+                        <form method="post" class="form-horizontal" id="anatoleStyleOptions">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <label for="anatoleStyleFavicon" class="col-sm-4 control-label">Favicon：</label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="anatoleStyleFavicon" name="anatole_style_favicon" value="${options.anatole_style_favicon?default("/anatole/source/images/favicon.png")}" >
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('anatoleStyleFavicon')">选择</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="anatoleStyleHitokoto" class="col-sm-4 control-label">博客描述开启一言：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_hitokoto" id="anatoleStyleHitokoto" value="true" ${((options.anatole_style_hitokoto?if_exists)=='true')?string('checked','')}> 开启
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_hitokoto" id="anatoleStyleHitokoto" value="false" ${((options.anatole_style_hitokoto?default('false'))=='false')?string('checked','')}> 关闭
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                <button type="button" class="btn btn-primary btn-sm pull-right" onclick="saveThemeOptions('anatoleStyleOptions')">保存设置</button>
+                            </div>
+                        </form>
+                    </div>
                     <!-- 关于该主题 -->
                     <div class="tab-pane" id="about">
                         <div class="box box-widget widget-user-2">
@@ -125,6 +160,17 @@
             success: function (data) {
                 showMsg("保存成功！","success",1000);
             }
+        });
+    }
+    function openAttach(id) {
+        layer.open({
+            type: 2,
+            title: '所有附件',
+            shadeClose: true,
+            shade: 0.5,
+            area: ['90%', '90%'],
+            content: '/admin/attachments/select?id='+id,
+            scrollbar: false
         });
     }
 </script>

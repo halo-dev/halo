@@ -112,7 +112,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
      * @param month month
      * @return list
      */
-    @Query(value = "select *,year(post_date) as year,month(post_date) as month from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by post_date",nativeQuery = true)
+    @Query(value = "select *,year(post_date) as year,month(post_date) as month from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by post_date desc",nativeQuery = true)
     List<Post> findPostByYearAndMonth(@Param("year") String year,@Param("month") String month);
 
     /**
@@ -121,7 +121,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
      * @param year year
      * @return list
      */
-    @Query(value = "select *,year(post_date) as year from halo_post where post_status=0 and year(post_date)=:year order by post_date",nativeQuery = true)
+    @Query(value = "select *,year(post_date) as year from halo_post where post_status=0 and year(post_date)=:year order by post_date desc",nativeQuery = true)
     List<Post> findPostByYear(@Param("year") String year);
 
     /**
@@ -132,7 +132,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
      * @param pageable pageable
      * @return page
      */
-    @Query(value = "select * from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by ?#{#pageable}",countQuery = "select count(*) from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month",nativeQuery = true)
+    @Query(value = "select * from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month order by post_date desc",countQuery = "select count(*) from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month",nativeQuery = true)
     Page<Post> findPostByYearAndMonth(@Param("year") String year,@Param("month") String month,Pageable pageable);
 
     List<Post> findPostByCategories(Category category);

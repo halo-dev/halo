@@ -40,6 +40,13 @@ public interface CommentService {
      */
     Page<Comment> findAllComments(Integer status, Pageable pageable);
 
+    /**
+     * 根据评论状态查询评论
+     *
+     * @param status 评论状态
+     * @return list
+     */
+    List<Comment> findAllComments(Integer status);
 
     /**
      * 查询所有评论，不分页

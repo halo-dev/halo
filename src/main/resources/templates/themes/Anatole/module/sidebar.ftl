@@ -6,7 +6,11 @@
                 <a href="/">${options.blog_title?default("ANATOLE")}</a>
             </h3>
             <div class="description">
-                <p>${user.userDesc?default("A other Halo theme")}</p>
+                <#if options.anatole_style_hitokoto?default("false")=="true">
+                    <p id="yiyan">获取中...</p>
+                <#else >
+                    <p>${user.userDesc?default("A other Halo theme")}</p>
+                </#if>
             </div>
         </div>
     </div>

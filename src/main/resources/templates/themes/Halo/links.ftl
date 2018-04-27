@@ -53,7 +53,6 @@
                     </div>
                 </div>
             </div>
-            <#include "module/comment.ftl">
         </section>
     </div>
 <@footer></@footer>

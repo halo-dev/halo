@@ -72,6 +72,9 @@
                             </#if>
                             <div class="box-footer">
                                 <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                <#if updateMenu??>
+                                    <a data-pjax="true" href="/admin/menus" class="btn btn-info btn-sm ">返回添加</a>
+                                </#if>
                             </div>
                         </form>
                     </div>

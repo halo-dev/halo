@@ -59,6 +59,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
+     * 根据评论状态查询评论
+     *
+     * @param status 评论状态
+     * @return list
+     */
+    @Override
+    public List<Comment> findAllComments(Integer status) {
+        return commentRepository.findCommentsByCommentStatus(status);
+    }
+
+    /**
      * 查询所有评论，不分页
      *
      * @return List<Comment></>

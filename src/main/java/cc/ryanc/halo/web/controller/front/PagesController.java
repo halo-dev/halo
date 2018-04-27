@@ -53,9 +53,6 @@ public class PagesController extends BaseController {
     public String gallery(Model model){
         List<Gallery> galleries = galleryService.findAllGalleries();
         model.addAttribute("galleries",galleries);
-
-        model.addAttribute("is_gallery",true);
-
         return this.render("gallery");
     }
 
@@ -67,17 +64,9 @@ public class PagesController extends BaseController {
      */
     @GetMapping(value = "/links")
     public String links(Model model){
-
         //所有友情链接
         List<Link> links = linkService.findAllLinks();
         model.addAttribute("links",links);
-
-        model.addAttribute("is_links",true);
-
-        //归档数据，包含[year,month,count,List<Post>]
-        List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        model.addAttribute("archives",archives);
-
         return this.render("links");
     }
 }

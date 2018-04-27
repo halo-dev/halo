@@ -47,7 +47,10 @@
                                         <small>*网站的描述，部分主题可显示</small>
                                     </div>
                                 </div>
-                                <div class="box-footer"><button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button></div>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <a data-pjax="true" href="/admin/page/links" class="btn btn-info btn-sm ">返回添加</a>
+                                </div>
                             </form>
                         <#else>
                             <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
@@ -73,7 +76,9 @@
                                         <small>*网站的描述，部分主题可显示</small>
                                     </div>
                                 </div>
-                                <div class="box-footer"><button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button></div>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                </div>
                             </form>
                         </#if>
                     </div>

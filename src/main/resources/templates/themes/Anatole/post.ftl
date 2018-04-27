@@ -42,7 +42,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=http://anatole.cai-cai.me/post/2015-05-22 ,Anatole,更轻量的Evernote第三方客户端－Alternote！,;"
+                        <a href="http://twitter.com/home?status=${options.blog_url}/archives/${post.postUrl} ,${options.blog_title?if_exists},${post.postTitle},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
