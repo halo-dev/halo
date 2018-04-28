@@ -6,7 +6,7 @@
     <!-- Header -->
     <header id="header">
         <h1>
-            <a href="/"><strong>Ryan0up'S Blog</strong></a> - 图库
+            <a href="/"><strong>${options.blog_title?if_exists}</strong></a> - 图库
         </h1>
         <nav>
             <ul>

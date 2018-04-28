@@ -9,6 +9,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -73,7 +74,7 @@ public class CommentsController {
     public boolean newComment(@ModelAttribute("comment") Comment comment,
                               @ModelAttribute("post") Post post,
                               HttpServletRequest request){
-        if(""==comment.getCommentAuthor() || "".equals(comment.getCommentAuthor())){
+        if(StringUtils.isBlank(comment.getCommentAuthor())){
             comment.setCommentAuthor("小猪佩琪");
         }
         comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
@@ -83,7 +84,7 @@ public class CommentsController {
         comment.setIsAdmin(0);
         commentService.saveByComment(comment);
 
-        if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("new_comment_notice"))){
+        if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("new_comment_notice"),"true")){
             try {
                 //发送邮件到博主
                 Map<String,Object> map = new HashMap<>();

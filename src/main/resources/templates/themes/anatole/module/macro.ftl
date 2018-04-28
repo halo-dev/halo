@@ -52,6 +52,7 @@
 	  xhr.send();
     </#if>
 </script>
+${options.statistics_code?if_exists}
 </body>
 </html>
 </#macro>

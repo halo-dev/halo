@@ -62,7 +62,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User findUser() {
-        return userRepository.findAll().get(0);
+        List<User> users = userRepository.findAll();
+        if(users.size()>0){
+            return users.get(0);
+        }else{
+            return new User();
+        }
     }
 
     /**

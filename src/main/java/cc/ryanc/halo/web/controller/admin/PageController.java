@@ -5,6 +5,8 @@ import cc.ryanc.halo.model.domain.Link;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -139,7 +141,7 @@ public class PageController {
     @PostMapping(value = "/gallery/save")
     public String saveGallery(@ModelAttribute Gallery gallery){
         try {
-            if("".equals(gallery.getGalleryThumbnailUrl()) || ""==gallery.getGalleryThumbnailUrl()){
+            if(StringUtils.isEmpty(gallery.getGalleryThumbnailUrl())){
                 gallery.setGalleryThumbnailUrl(gallery.getGalleryUrl());
             }
             galleryService.saveByGallery(gallery);

@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -104,8 +105,7 @@ public class CommentController extends BaseController{
      */
     @GetMapping("/revert")
     public String moveToPublish(@PathParam("commentId") Long commentId,
-                                @PathParam("status") Integer status,
-                                HttpSession session){
+                                @PathParam("status") Integer status){
         Comment comment = commentService.updateCommentStatus(commentId,0);
 
         //判断评论者的邮箱是否符合规则
@@ -113,7 +113,7 @@ public class CommentController extends BaseController{
         Matcher matcher = patternEmail.matcher(comment.getCommentAuthorEmail());
 
         //判断是否启用邮件服务
-        if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("comment_pass_notice"))) {
+        if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_pass_notice"),"true")) {
             try {
                 if (status == 1 && matcher.find()) {
                     Map<String, Object> map = new HashMap<>();
@@ -144,8 +144,7 @@ public class CommentController extends BaseController{
      */
     @GetMapping("/remove")
     public String moveToAway(@PathParam("commentId") Long commentId,
-                             @PathParam("status") Integer status,
-                             HttpSession session){
+                             @PathParam("status") Integer status){
         try{
             commentService.removeByCommentId(commentId);
         }catch (Exception e){
@@ -205,7 +204,7 @@ public class CommentController extends BaseController{
             Matcher matcher = patternEmail.matcher(lastComment.getCommentAuthorEmail());
 
             //邮件通知
-            if("true".equals(HaloConst.OPTIONS.get("smtp_email_enable")) && "true".equals(HaloConst.OPTIONS.get("comment_reply_notice"))) {
+            if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_reply_notice"),"true")) {
                 if(matcher.find()){
                     Map<String, Object> map = new HashMap<>();
                     map.put("blogTitle",HaloConst.OPTIONS.get("blog_title"));

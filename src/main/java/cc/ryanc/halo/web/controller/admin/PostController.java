@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,7 +65,7 @@ public class PostController extends BaseController{
                         @RequestParam(value = "status",defaultValue = "0") Integer status,
                         @RequestParam(value = "page",defaultValue = "0") Integer page,
                         @RequestParam(value = "size",defaultValue = "10") Integer size){
-        Sort sort = new Sort(Sort.Direction.DESC,"postId");
+        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
         Pageable pageable = new PageRequest(page,size,sort);
         Page<Post> posts = postService.findPostByStatus(status,pageable);
         model.addAttribute("posts",posts);
@@ -157,7 +158,7 @@ public class PostController extends BaseController{
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
-            List<Tag> tags = tagService.strListToTagList(tagList.replaceAll(" ",""));
+            List<Tag> tags = tagService.strListToTagList(StringUtils.trim(tagList));
             post.setTags(tags);
             postService.saveByPost(post);
             log.info("已发表新文章："+post.getPostTitle());

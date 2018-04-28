@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -118,7 +119,7 @@ public class AdminController extends BaseController{
         try {
             User aUser = userService.findUser();
             User user = null;
-            if("false".equals(aUser.getLoginEnable())){
+            if(StringUtils.equals(aUser.getLoginEnable(),"false")){
                 status = "disable";
             }else{
                 //验证是否是邮箱登录
