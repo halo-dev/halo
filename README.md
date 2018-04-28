@@ -32,7 +32,10 @@ Fast,simple,powerful blog system powered by Java.
 git clone https://github.com/ruibaby/halo.git
 cd halo
 mvn clean package
+java -jar target/dist/halo/halo-beta.jar
 ```
+
+Let's start: http://localhost:8090
 
 ## Demo 演示
 
