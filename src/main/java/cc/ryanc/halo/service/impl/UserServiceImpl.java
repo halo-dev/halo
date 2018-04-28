@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<User> userLoginByName(String userName, String userPass) {
-        return userRepository.findByUserNameAndUserPass(userName,userPass);
+        return userRepository.findByUserNameAndUserPass(userName, userPass);
     }
 
     /**
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<User> userLoginByEmail(String userEmail, String userPass) {
-        return userRepository.findByUserEmailAndUserPass(userEmail,userPass);
+        return userRepository.findByUserEmailAndUserPass(userEmail, userPass);
     }
 
     /**
@@ -63,9 +63,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUser() {
         List<User> users = userRepository.findAll();
-        if(users.size()>0){
+        if (users != null && users.size() > 0) {
             return users.get(0);
-        }else{
+        } else {
             return new User();
         }
     }
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User findByUserIdAndUserPass(Long userId, String userPass) {
-        return userRepository.findByUserIdAndUserPass(userId,userPass);
+        return userRepository.findByUserIdAndUserPass(userId, userPass);
     }
 
     /**
@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Integer updateUserLoginError() {
         User user = this.findUser();
-        user.setLoginError(user.getLoginError()+1);
+        user.setLoginError((user.getLoginError() == null ? 0 : user.getLoginError()) + 1);
         userRepository.save(user);
         return user.getLoginError();
     }
