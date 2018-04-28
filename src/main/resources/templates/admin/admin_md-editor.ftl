@@ -36,12 +36,12 @@
                         <input type="hidden" id="postId" name="postId" value="${post.postId}">
                     </#if>
                     <div style="margin-bottom: 10px;">
-                        <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" value="<#if post??>${post.postTitle}</#if>" onblur="TitleOnBlurAuto()">
+                        <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" value="<#if post??>${post.postTitle}</#if>">
                     </div>
                     <div style="display: block;margin-bottom: 10px;">
                         <span>
                             永久链接：
-                            <a href="#">${options.blog_url}/article/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
+                            <a href="#">${options.blog_url}/archives/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
                             <button class="btn btn-default btn-sm " id="btn_input_postUrl">编辑</button>
                             <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
                         </span>
@@ -200,9 +200,6 @@
             $(document).ready(function () {
                 loadEditor();
             });
-            function TitleOnBlurAuto() {
-                $('#postUrl').html($('#post_title').val());
-            }
 
             /**
              * 检测是否已经存在该链接

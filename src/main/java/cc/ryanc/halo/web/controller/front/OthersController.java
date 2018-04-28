@@ -32,7 +32,7 @@ public class OthersController {
      *
      * @return rss
      */
-    @GetMapping(value = {"feed","feed.xml","atom.xml"},produces = {MediaType.APPLICATION_ATOM_XML_VALUE,MediaType.APPLICATION_RSS_XML_VALUE})
+    @GetMapping(value = {"feed","feed.xml","atom","atom.xml"},produces = "application/rss+xml;charset=UTF-8")
     @ResponseBody
     public String feed(){
         String rssPosts = HaloConst.OPTIONS.get("rss_posts");
@@ -52,7 +52,7 @@ public class OthersController {
      *
      * @return sitemap
      */
-    @GetMapping(value = {"sitemap","sitemap.xml"},produces = MediaType.APPLICATION_XML_VALUE)
+    @GetMapping(value = {"sitemap","sitemap.xml"},produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String siteMap(){
         //获取文章列表并根据时间排序

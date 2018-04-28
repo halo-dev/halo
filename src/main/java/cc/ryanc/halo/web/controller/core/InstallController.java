@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.util.HaloUtil;
+import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class InstallController {
 
     @Autowired
     private MenuService menuService;
+
+    @Autowired
+    private Configuration configuration;
 
     /**
      * 渲染安装页面
@@ -199,6 +203,9 @@ public class InstallController {
 
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
+
+            configuration.setSharedVariable("options",optionsService.findAllOptions());
+            configuration.setSharedVariable("user",userService.findUser());
         }catch (Exception e){
             log.error(e.getMessage());
             return false;

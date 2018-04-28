@@ -38,9 +38,7 @@ mvn clean package
 
 [界面预览](PREVIEW.md)
 
-[首页演示](http://halo.ryanc.cc)
-
-[后台演示](http://halo.ryanc.cc/admin)(admin:123456)
+[首页演示](https://ryanc.cc)
 
 ## Download 下载
 

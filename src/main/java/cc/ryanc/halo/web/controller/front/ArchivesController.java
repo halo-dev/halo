@@ -31,7 +31,6 @@ public class ArchivesController extends BaseController {
     @Autowired
     private PostService postService;
 
-
     /**
      * 文章归档
      *
@@ -74,12 +73,8 @@ public class ArchivesController extends BaseController {
     public String archives(Model model,
                            @PathVariable(value = "year") String year,
                            @PathVariable(value = "month") String month){
-        log.info(year);
-        log.info(month);
-
         Page<Post> posts = postService.findPostByYearAndMonth(year,month,null);
         model.addAttribute("posts",posts);
-
         return this.render("archives");
     }
 

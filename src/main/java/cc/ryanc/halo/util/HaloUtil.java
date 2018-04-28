@@ -24,7 +24,11 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.MessageDigest;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -338,6 +342,11 @@ public class HaloUtil {
         return dateString;
     }
 
+    public static String getStringDate(Date date,String format){
+        Long unixTime = Long.parseLong(String.valueOf(date.getTime() / 1000));
+        return Instant.ofEpochSecond(unixTime).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(format));
+    }
+
     /**
      * 获取当前时间
      * @return 日期类型
@@ -538,7 +547,7 @@ public class HaloUtil {
             value = new String(xmlChar);
             content.setValue(value);
             item.setContent(content);
-            item.setLink(HaloConst.OPTIONS.get("blog_url")+"/article/"+post.getPostUrl());
+            item.setLink(HaloConst.OPTIONS.get("blog_url")+"/archives/"+post.getPostUrl());
             item.setPubDate(post.getPostDate());
             items.add(item);
         }
@@ -556,9 +565,9 @@ public class HaloUtil {
         String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
         String urlBody="";
         String urlItem;
-        String urlPath = HaloConst.OPTIONS.get("blog_url")+"/article/";
+        String urlPath = HaloConst.OPTIONS.get("blog_url")+"/archives/";
         for(Post post:posts){
-            urlItem = "<url><loc>"+urlPath+post.getPostUrl()+"</loc><lastmod>"+post.getPostDate()+"</lastmod>"+"</url>";
+            urlItem = "<url><loc>"+urlPath+post.getPostUrl()+"</loc><lastmod>"+getStringDate(post.getPostDate(),"yyyy-MM-dd'T'HH:mm:ss.SSSXXX")+"</lastmod>"+"</url>";
             urlBody+=urlItem;
         }
         return head+urlBody+"</urlset>";

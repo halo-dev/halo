@@ -163,7 +163,7 @@
         <img src="/static/images/tail-spin.svg" width="36" alt="">
     </div>
 </div>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
 <script src="//cdn.bootcss.com/UAParser.js/0.7.7/ua-parser.min.js"></script>
 <script>
@@ -178,10 +178,12 @@
                     $('.native-loading').hide();
                 },1000);
                 $.each(data,function(i,element){
-                    $.ua.set(element.commentAgent);
-                    var uua = $.ua;
-                    var browser = uua.browser.name+' '+uua.browser.version;
-                    var os = uua.os.name + ' ' + uua.os.version;
+                    // $.ua.set(element.commentAgent);
+                    // var uua = $.ua;
+                    // var browser = uua.browser.name+' '+uua.browser.version;
+                    // var os = uua.os.name + ' ' + uua.os.version;
+                    var browser = "";
+                    var os = "";
                     var author = element.commentAuthor;
                     var authorEmail = element.commentAuthorEmail;
                     var authorUrl = element.commentAuthorUrl;

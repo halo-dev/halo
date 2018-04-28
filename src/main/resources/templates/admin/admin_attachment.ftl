@@ -85,7 +85,7 @@
                             showClose: false
                         }).on("fileuploaded",function (event,data,previewId,index) {
                             var data = data.jqXHR.responseJSON;
-                            if(data.success==='1'){
+                            if(data.success=="1"){
                                 $("#uploadForm").hide(400);
                                 $.toast({
                                     text: "上传成功！",

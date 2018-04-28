@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.tag.CommonTagDirective;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.service.UserService;
 import freemarker.template.TemplateModelException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,7 @@ import javax.annotation.PostConstruct;
  * @version : 1.0
  * @date : 2018/4/26
  */
+@Slf4j
 @Configuration
 public class FreeMarkerConfig {
 
