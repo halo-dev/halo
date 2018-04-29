@@ -142,12 +142,12 @@
     <div class="native-wrap">
         <div class="comment-header">
             <input type="hidden" name="postId" value="${post.postId}">
-            <input type="text" class="comment-input comment-input-who" name="commentAuthor" placeholder="昵称">
+            <input type="text" class="comment-input comment-input-who" name="commentAuthor" id="commentAuthor" placeholder="昵称">
             <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" placeholder="邮箱">
             <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" placeholder="网址(https/http)">
         </div>
         <div class="comment-content">
-            <textarea class="comment-input-content" name="commentContent" placeholder="come on"></textarea>
+            <textarea class="comment-input comment-input-content" name="commentContent" id="commentContent" placeholder="come on"></textarea>
         </div>
         <div class="comment-footer">
             <button type="button" class="comment-submit" id="btn-push">提交</button>
@@ -165,7 +165,7 @@
 </div>
 <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
-<script src="//cdn.bootcss.com/UAParser.js/0.7.7/ua-parser.min.js"></script>
+<script src="//cdn.bootcss.com/UAParser.js/0.7.17/ua-parser.min.js"></script>
 <script>
     $(document).ready(function(){
         $.ajax({
@@ -177,13 +177,12 @@
                 setTimeout(function(){
                     $('.native-loading').hide();
                 },1000);
+                var parser = new UAParser();
                 $.each(data,function(i,element){
-                    // $.ua.set(element.commentAgent);
-                    // var uua = $.ua;
-                    // var browser = uua.browser.name+' '+uua.browser.version;
-                    // var os = uua.os.name + ' ' + uua.os.version;
-                    var browser = "";
-                    var os = "";
+                    parser.setUA(element.commentAgent);
+                    var result = parser.getResult();
+                    var browser = result.browser.name+' '+result.browser.version;
+                    var os = result.os.name + ' ' + result.os.version;
                     var author = element.commentAuthor;
                     var authorEmail = element.commentAuthorEmail;
                     var authorUrl = element.commentAuthorUrl;
@@ -197,6 +196,16 @@
         });
     });
     $('#btn-push').click(function () {
+        var author = $("#commentAuthor");
+        if(author.val()==''){
+            $(author).css("border-bottom","1px dashed red");
+            return;
+        }
+        var content = $("#commentContent");
+        if(content.val()==''){
+            $(content).css("border-bottom","1px dashed red");
+            return;
+        }
         $.ajax({
             type: 'POST',
             url: '/newComment',

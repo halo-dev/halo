@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class ArchivesController extends BaseController {
         //所有文章数据，分页，material主题适用
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
         Pageable pageable = new PageRequest(page-1,5,sort);
-        Page<Post> posts = postService.findPostByStatus(0,pageable);
+        Page<Post> posts = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
         model.addAttribute("posts",posts);
         return this.render("archives");
     }

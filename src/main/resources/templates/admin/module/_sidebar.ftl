@@ -49,7 +49,7 @@
                 </a>
                 <ul class="treeview-menu">
                     <li><a data-pjax="true" href="/admin/page"><i class="fa fa-circle-o"></i>所有页面</a></li>
-                    <li><a data-pjax="false" href="#"><i class="fa fa-circle-o"></i>新建页面</a></li>
+                    <li><a data-pjax="false" href="/admin/page/new"><i class="fa fa-circle-o"></i>新建页面</a></li>
                 </ul>
             </li>
             <li>

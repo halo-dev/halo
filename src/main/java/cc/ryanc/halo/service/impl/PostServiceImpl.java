@@ -3,6 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.util.HaloUtil;
@@ -54,17 +55,6 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 修改文章
-     *
-     * @param post Post
-     * @return post
-     */
-    @Override
-    public Post updateByPost(Post post) {
-        return postRepository.save(post);
-    }
-
-    /**
      * 修改文章状态
      *
      * @param postId postId
@@ -85,7 +75,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public void updateAllSummary(Integer postSummary) {
-        List<Post> posts = this.findAllPosts();
+        List<Post> posts = this.findAllPosts(HaloConst.POST_TYPE_POST);
         for(Post post:posts){
             if(!(HaloUtil.htmlToText(post.getPostContent()).length()<postSummary)){
                 post.setPostSummary(HaloUtil.getSummary(post.getPostContent(),postSummary));
@@ -95,24 +85,26 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 查询所有文章 分页
+     * 获取文章列表 分页
      *
-     * @param pageable Pageable
-     * @return Page
+     * @param postType post or page
+     * @param pageable 分页信息
+     * @return Page<Post></>
      */
     @Override
-    public Page<Post> findAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable);
+    public Page<Post> findAllPosts(String postType,Pageable pageable) {
+        return postRepository.findPostsByPostType(postType,pageable);
     }
 
     /**
-     * 查询所有文章 不分页
+     * 获取文章列表 不分页
      *
-     * @return List
+     * @param postType post or page
+     * @return List<Post></>
      */
     @Override
-    public List<Post> findAllPosts() {
-        return postRepository.findAll();
+    public List<Post> findAllPosts(String postType) {
+        return postRepository.findPostsByPostType(postType);
     }
 
     /**
@@ -128,26 +120,28 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 根据状态分页查询文章
+     * 根据文章状态查询 分页
      *
-     * @param status status
-     * @param pageable pageable
-     * @return page
+     * @param status 0，1，2
+     * @param postType post or page
+     * @param pageable 分页信息
+     * @return Page<Post></>
      */
     @Override
-    public Page<Post> findPostByStatus(Integer status, Pageable pageable) {
-        return postRepository.findPostsByPostStatus(status,pageable);
+    public Page<Post> findPostByStatus(Integer status,String postType, Pageable pageable) {
+        return postRepository.findPostsByPostStatusAndPostType(status,postType,pageable);
     }
 
     /**
-     * 根据状态查询文章
+     * 根据文章状态查询
      *
-     * @param status status
-     * @return list
+     * @param status 0，1，2
+     * @param postType post or page
+     * @return List<Post></>
      */
     @Override
-    public List<Post> findPostByStatus(Integer status) {
-        return postRepository.findPostsByPostStatus(status);
+    public List<Post> findPostByStatus(Integer status,String postType) {
+        return postRepository.findPostsByPostStatusAndPostType(status,postType);
     }
 
     /**
@@ -190,7 +184,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public List<Post> findByPostDateAfter(Date postDate) {
-        return postRepository.findByPostDateAfterAndPostStatusOrderByPostDateDesc(postDate,0);
+        return postRepository.findByPostDateAfterAndPostStatusAndPostTypeOrderByPostDateDesc(postDate,0,HaloConst.POST_TYPE_POST);
     }
 
     /**
@@ -201,7 +195,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public List<Post> findByPostDateBefore(Date postDate) {
-        return postRepository.findByPostDateBeforeAndPostStatusOrderByPostDateAsc(postDate,0);
+        return postRepository.findByPostDateBeforeAndPostStatusAndPostTypeOrderByPostDateAsc(postDate,0,HaloConst.POST_TYPE_POST);
     }
 
 

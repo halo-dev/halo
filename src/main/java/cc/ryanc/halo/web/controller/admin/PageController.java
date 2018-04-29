@@ -1,12 +1,15 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.Gallery;
-import cc.ryanc.halo.model.domain.Link;
+import cc.ryanc.halo.model.domain.*;
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
+import cc.ryanc.halo.service.LogsService;
+import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +42,15 @@ public class PageController {
     @Autowired
     private GalleryService galleryService;
 
+    @Autowired
+    private PostService postService;
+
+    @Autowired
+    private LogsService logsService;
+
+    @Autowired
+    private HttpServletRequest request;
+
     /**
      * 页面管理页面
      *
@@ -44,7 +58,9 @@ public class PageController {
      * @return 模板路径admin/admin_page
      */
     @GetMapping
-    public String pages(){
+    public String pages(Model model){
+        List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_PAGE);
+        model.addAttribute("pages",posts);
         return "admin/admin_page";
     }
 
@@ -181,5 +197,37 @@ public class PageController {
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * 跳转到新建页面
+     *
+     * @return 模板路径
+     */
+    @GetMapping(value = "/new")
+    public String newPage(Model model){
+        return "admin/admin_page_md_editor";
+    }
+
+    /**
+     * 发表页面
+     * @param post post
+     * @param session session
+     */
+    @PostMapping(value = "/new/push")
+    @ResponseBody
+    public void pushPage(@ModelAttribute Post post, HttpSession session){
+        try{
+            post.setPostDate(HaloUtil.getDate());
+            //发表用户
+            User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
+            post.setUser(user);
+            post.setPostType(HaloConst.POST_TYPE_PAGE);
+            postService.saveByPost(post);
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
+        }catch (Exception e){
+            log.error("未知错误：{0}",e.getMessage());
+        }
     }
 }

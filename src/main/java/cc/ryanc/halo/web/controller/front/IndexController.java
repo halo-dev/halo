@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -66,7 +65,7 @@ public class IndexController extends BaseController {
         }
         //所有文章数据，分页
         Pageable pageable = new PageRequest(page-1,size,sort);
-        Page<Post> posts = postService.findPostByStatus(0,pageable);
+        Page<Post> posts = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
         model.addAttribute("posts",posts);
 
         return this.render("index");
@@ -91,7 +90,7 @@ public class IndexController extends BaseController {
 
         //文章数据，只获取文章，没有分页
         Pageable pageable = new PageRequest(page-1,size,sort);
-        List<Post> posts = postService.findPostByStatus(0,pageable).getContent();
+        List<Post> posts = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable).getContent();
         return posts;
     }
 }

@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.tag;
 
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.PostService;
 import freemarker.core.Environment;
 import freemarker.template.*;
@@ -29,7 +30,7 @@ public class ArticleTagDirective implements TemplateDirectiveModel {
             String method = map.get(METHOD_KEY).toString();
             switch (method){
                 case "postsCount":
-                    environment.setVariable("postsCount",builder.build().wrap(postService.findAllPosts().size()));
+                    environment.setVariable("postsCount",builder.build().wrap(postService.findAllPosts(HaloConst.POST_TYPE_POST).size()));
                     break;
                 case "archives":
                     environment.setVariable("archives",builder.build().wrap(postService.findPostGroupByYearAndMonth()));
