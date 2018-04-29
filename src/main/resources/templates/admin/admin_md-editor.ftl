@@ -151,7 +151,8 @@
             $('#tagList').tagEditor({
                 //initialTags: ['Hello', 'World', 'Example', 'Tags'],
                 delimiter: ',',
-                placeholder: '请输入标签'
+                placeholder: '请输入标签',
+                forceLowercase: false
             });
 
             <#if post??>
