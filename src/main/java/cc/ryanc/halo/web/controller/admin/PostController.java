@@ -158,8 +158,10 @@ public class PostController extends BaseController{
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
-            List<Tag> tags = tagService.strListToTagList(StringUtils.trim(tagList));
-            post.setTags(tags);
+            if(StringUtils.isNotEmpty(tagList)){
+                List<Tag> tags = tagService.strListToTagList(StringUtils.trim(tagList));
+                post.setTags(tags);
+            }
             postService.saveByPost(post);
             log.info("已发表新文章："+post.getPostTitle());
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
