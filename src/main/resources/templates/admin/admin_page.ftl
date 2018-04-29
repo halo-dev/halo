@@ -14,7 +14,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;">页面<small></small></h1>
-            <a id="btnNewPage" href="/admin/posts/new">
+            <a id="btnNewPage" href="/admin/page/new">
                 新建页面
             </a>
             <ol class="breadcrumb">
@@ -79,37 +79,33 @@
                             </div>
                             <div class="tab-pane" id="pages">
                                 <div class="box-body table-responsive">
-                                    开发中...
-                                    <#--<table class="table table-bordered table-hover">-->
-                                        <#--<thead>-->
-                                        <#--<tr>-->
-                                            <#--<th>标题</th>-->
-                                            <#--<th>路径</th>-->
-                                            <#--<th>日期</th>-->
-                                            <#--<th>操作</th>-->
-                                        <#--</tr>-->
-                                        <#--</thead>-->
-                                        <#--<tbody>-->
-                                        <#--<tr>-->
-                                            <#--<td>友情链接</td>-->
-                                            <#--<td>/link</td>-->
-                                            <#--<th>日期</th>-->
-                                            <#--<td>-->
-                                                <#--<a href="/links" class="btn btn-info btn-xs " target="_blank">预览</a>-->
-                                                <#--<a href="/admin/page/links" class="btn btn-primary btn-xs ">配置</a>-->
-                                            <#--</td>-->
-                                        <#--</tr>-->
-                                        <#--<tr>-->
-                                            <#--<td>关于页面</td>-->
-                                            <#--<td>/about</td>-->
-                                            <#--<th>日期</th>-->
-                                            <#--<td>-->
-                                                <#--<a href="#" class="btn btn-info btn-xs " target="_blank">预览</a>-->
-                                                <#--<a href="/admin/page/about" class="btn btn-primary btn-xs ">配置</a>-->
-                                            <#--</td>-->
-                                        <#--</tr>-->
-                                        <#--</tbody>-->
-                                    <#--</table>-->
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>标题</th>
+                                                <th>路径</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <#if pages?size gt 0>
+                                            <#list pages as page>
+                                                <tr>
+                                                    <td>${page.postTitle}</td>
+                                                    <td>${page.postUrl}</td>
+                                                    <td>
+                                                        <a href="/${page.postUrl}" class="btn btn-info btn-xs " target="_blank">预览</a>
+                                                        <a data-pjax="true" href="#" class="btn btn-primary btn-xs ">编辑</a>
+                                                    </td>
+                                                </tr>
+                                            </#list>
+                                            <#else>
+                                            <tr>
+                                                <td colspan="3" style="text-align: center;">暂无页面</td>
+                                            </tr>
+                                        </#if>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

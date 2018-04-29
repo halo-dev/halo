@@ -36,14 +36,6 @@ public interface PostService {
     Post removeByPostId(Long postId);
 
     /**
-     * 修改文章
-     *
-     * @param post Post
-     * @return Post
-     */
-    Post updateByPost(Post post);
-
-    /**
      * 修改文章状态
      *
      * @param postId postId
@@ -62,17 +54,19 @@ public interface PostService {
     /**
      * 获取文章列表 分页
      *
-     * @param pageable Pageable
-     * @return Page
+     * @param postType post or page
+     * @param pageable 分页信息
+     * @return Page<Post></>
      */
-    Page<Post> findAllPosts(Pageable pageable);
+    Page<Post> findAllPosts(String postType,Pageable pageable);
 
     /**
      * 获取文章列表 不分页
      *
-     * @return List
+     * @param postType post or page
+     * @return List<Post></>
      */
-    List<Post> findAllPosts();
+    List<Post> findAllPosts(String postType);
 
     /**
      * 模糊查询文章
@@ -86,19 +80,21 @@ public interface PostService {
     /**
      * 根据文章状态查询 分页
      *
-     * @param status status
-     * @param pageable pageable
-     * @return page
+     * @param status 0，1，2
+     * @param postType post or page
+     * @param pageable 分页信息
+     * @return Page<Post></>
      */
-    Page<Post> findPostByStatus(Integer status,Pageable pageable);
+    Page<Post> findPostByStatus(Integer status,String postType,Pageable pageable);
 
     /**
      * 根据文章状态查询
      *
-     * @param status status
-     * @return list
+     * @param status 0，1，2
+     * @param postType post or page
+     * @return List<Post></>
      */
-    List<Post> findPostByStatus(Integer status);
+    List<Post> findPostByStatus(Integer status,String postType);
 
     /**
      * 根据编号查询文章

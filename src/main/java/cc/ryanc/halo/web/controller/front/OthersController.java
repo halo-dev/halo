@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -42,7 +41,7 @@ public class OthersController {
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
         Pageable pageable = new PageRequest(0,Integer.parseInt(rssPosts),sort);
-        Page<Post> postsPage = postService.findPostByStatus(0,pageable);
+        Page<Post> postsPage = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildRss(posts);
     }
@@ -58,7 +57,7 @@ public class OthersController {
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
         Pageable pageable = new PageRequest(0,999,sort);
-        Page<Post> postsPage = postService.findPostByStatus(0,pageable);
+        Page<Post> postsPage = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildSiteMap(posts);
     }

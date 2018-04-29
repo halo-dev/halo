@@ -67,11 +67,11 @@ public class PostController extends BaseController{
                         @RequestParam(value = "size",defaultValue = "10") Integer size){
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
         Pageable pageable = new PageRequest(page,size,sort);
-        Page<Post> posts = postService.findPostByStatus(status,pageable);
+        Page<Post> posts = postService.findPostByStatus(status,HaloConst.POST_TYPE_POST,pageable);
         model.addAttribute("posts",posts);
-        model.addAttribute("publishCount",postService.findPostByStatus(0,pageable).getTotalElements());
-        model.addAttribute("draftCount",postService.findPostByStatus(1,pageable).getTotalElements());
-        model.addAttribute("trashCount",postService.findPostByStatus(2,pageable).getTotalElements());
+        model.addAttribute("publishCount",postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable).getTotalElements());
+        model.addAttribute("draftCount",postService.findPostByStatus(1,HaloConst.POST_TYPE_POST,pageable).getTotalElements());
+        model.addAttribute("trashCount",postService.findPostByStatus(2,HaloConst.POST_TYPE_POST,pageable).getTotalElements());
         model.addAttribute("status",status);
         return "admin/admin_post";
     }
@@ -127,8 +127,7 @@ public class PostController extends BaseController{
         List<Tag> tags = tagService.findAllTags();
         model.addAttribute("categories",categories);
         model.addAttribute("tags",tags);
-        model.addAttribute("btnPush","发布");
-        return "admin/admin_editor";
+        return "admin/admin_post_md_editor";
     }
 
     /**
@@ -237,11 +236,10 @@ public class PostController extends BaseController{
             model.addAttribute("post",post.get());
             List<Category> categories = categoryService.findAllCategories();
             model.addAttribute("categories",categories);
-            model.addAttribute("btnPush","更新");
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
-        return "admin/admin_editor";
+        return "admin/admin_post_md_editor";
     }
 
     /**

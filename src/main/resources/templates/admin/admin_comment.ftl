@@ -51,7 +51,7 @@
                                                 <td><a href="${comment.commentAuthorUrl}" target="_blank">${comment.commentAuthor}</a></td>
                                                 <td>${comment.commentContent}</td>
                                                 <td>
-                                                    <a target="_blank" href="/article/${comment.post.postUrl}">${comment.post.postTitle}</a>
+                                                    <a target="_blank" href="/archives/${comment.post.postUrl}">${comment.post.postTitle}</a>
                                                 </td>
                                                 <td>${comment.commentDate}</td>
                                                 <td>

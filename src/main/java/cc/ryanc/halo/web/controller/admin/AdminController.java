@@ -63,7 +63,7 @@ public class AdminController extends BaseController{
     @GetMapping(value = {"","/index"})
     public String index(Model model,HttpSession session){
         //查询文章条数
-        Integer postCount = postService.findAllPosts().size();
+        Integer postCount = postService.findAllPosts(HaloConst.POST_TYPE_POST).size();
         model.addAttribute("postCount",postCount);
 
         //查询评论的条数

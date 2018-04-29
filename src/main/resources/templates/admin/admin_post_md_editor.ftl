@@ -71,7 +71,13 @@
                         </div>
                         <div class="box-footer">
                             <button onclick="push(1)" class="btn btn-default btn-sm ">保存草稿</button>
-                            <button onclick="push(0)" class="btn btn-primary btn-sm pull-right " data-loading-text="发布中...">${btnPush}</button>
+                            <button onclick="push(0)" class="btn btn-primary btn-sm pull-right " data-loading-text="发布中...">
+                            <#if post??>
+                                更新
+                                <#else>
+                                发布
+                            </#if>
+                            </button>
                         </div>
                     </div>
                     <div class="box box-primary">

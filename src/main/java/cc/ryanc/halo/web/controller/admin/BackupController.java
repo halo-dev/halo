@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.util.HaloUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +74,7 @@ public class BackupController {
      */
     @GetMapping(value = "/backupPost")
     public String backupPosts(){
-        List<Post> posts = postService.findAllPosts();
+        List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
         try {
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
             String savePath = path.getAbsolutePath()+"/backup/posts/posts_backup_"+HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss");
