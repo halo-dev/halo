@@ -211,7 +211,7 @@ public class PostController extends BaseController{
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/remove")
-    public String removePost(@PathParam("postId") Long postId){
+    public String removePost(@PathParam("postId") Long postId,@PathParam("postType") String postType){
         try{
             Optional<Post> post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
@@ -219,7 +219,10 @@ public class PostController extends BaseController{
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
-        return "redirect:/admin/posts?status=2";
+        if(StringUtils.equals(HaloConst.POST_TYPE_POST,postType)){
+            return "redirect:/admin/posts?status=2";
+        }
+        return "redirect:/admin/page";
     }
 
     /**
@@ -231,14 +234,10 @@ public class PostController extends BaseController{
      */
     @GetMapping(value = "/edit")
     public String editPost(@PathParam("postId") Long postId, Model model){
-        try {
-            Optional<Post> post = postService.findByPostId(postId);
-            model.addAttribute("post",post.get());
-            List<Category> categories = categoryService.findAllCategories();
-            model.addAttribute("categories",categories);
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
-        }
+        Optional<Post> post = postService.findByPostId(postId);
+        model.addAttribute("post",post.get());
+        List<Category> categories = categoryService.findAllCategories();
+        model.addAttribute("categories",categories);
         return "admin/admin_post_md_editor";
     }
 
@@ -269,7 +268,7 @@ public class PostController extends BaseController{
     @GetMapping(value = "/checkUrl")
     @ResponseBody
     public boolean checkUrlExists(@PathParam("postUrl") String postUrl){
-        Post post = postService.findByPostUrl(postUrl);
+        Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
         if(null!=post){
             return true;
         }else{

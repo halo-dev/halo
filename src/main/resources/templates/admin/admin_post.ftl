@@ -80,9 +80,7 @@
                                                     </#if>
                                                 </td>
                                                 <td>
-                                                    <#if post.getComments()??>
-                                                        ${post.getComments()?size}
-                                                    </#if>
+                                                    ${post.getComments()?size}
                                                 </td>
                                                 <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
                                                 <td>
@@ -99,7 +97,7 @@
                                                             <#break >
                                                         <#case 2>
                                                             <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-primary btn-xs ">还原</a>
-                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId}','确定永久删除？(不可逆)')">永久删除</button>
+                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId}&postType=${post.postType}','确定永久删除？(不可逆)')">永久删除</button>
                                                             <#break >
                                                     </#switch>
                                                 </td>

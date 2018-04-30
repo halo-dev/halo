@@ -26,6 +26,8 @@ Fast,simple,powerful blog system powered by Java.
 **Halo** [ˈheɪloʊ]，意为光环。当然，你也可以当成拼音读(哈喽)。<br>
 轻快，简洁，功能强大，使用Java开发的博客系统。
 
+**Halo交流群:** 162747721
+
 ## Quickstart 快速开始
 
 ```bash

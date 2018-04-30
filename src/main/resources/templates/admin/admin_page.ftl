@@ -84,6 +84,8 @@
                                             <tr>
                                                 <th>标题</th>
                                                 <th>路径</th>
+                                                <th>评论</th>
+                                                <th>日期</th>
                                                 <th>操作</th>
                                             </tr>
                                         </thead>
@@ -92,10 +94,13 @@
                                             <#list pages as page>
                                                 <tr>
                                                     <td>${page.postTitle}</td>
-                                                    <td>${page.postUrl}</td>
+                                                    <td>/p/${page.postUrl}</td>
+                                                    <td>${page.comments?size}</td>
+                                                    <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>
-                                                        <a href="/${page.postUrl}" class="btn btn-info btn-xs " target="_blank">预览</a>
-                                                        <a data-pjax="true" href="#" class="btn btn-primary btn-xs ">编辑</a>
+                                                        <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank">预览</a>
+                                                        <a href="/admin/page/edit?pageId=${page.postId}" class="btn btn-primary btn-xs ">编辑</a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId}&postType=${page.postType}','确定永久删除？(不可逆)')">永久删除</button>
                                                     </td>
                                                 </tr>
                                             </#list>
@@ -113,6 +118,36 @@
                 </div>
             </div>
         </section>
+        <!-- 删除确认弹出层 -->
+        <div class="modal fade" id="removePostModal">
+            <div class="modal-dialog">
+                <div class="modal-content message_align">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">提示信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="message"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="url"/>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function modelShow(url,message) {
+                $('#url').val(url);
+                $('#message').html(message);
+                $('#removePostModal').modal();
+            }
+            function removeIt(){
+                var url=$.trim($("#url").val());
+                window.location.href=url;
+            }
+        </script>
     </div>
     <#include "module/_footer.ftl">
 </div>

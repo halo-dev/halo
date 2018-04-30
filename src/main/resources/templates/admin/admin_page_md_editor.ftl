@@ -40,7 +40,7 @@
                     <div style="display: block;margin-bottom: 10px;">
                         <span>
                             永久链接：
-                            <a href="#">${options.blog_url}/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
+                            <a href="#">${options.blog_url}/p/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
                             <button class="btn btn-default btn-sm " id="btn_input_postUrl">编辑</button>
                             <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
                         </span>
@@ -152,7 +152,7 @@
                 }
                 $.ajax({
                     type: 'GET',
-                    url: '/admin/posts/checkUrl',
+                    url: '/admin/page/checkUrl',
                     async: false,
                     data: {
                         'postUrl': $('#newPostUrl').val()
