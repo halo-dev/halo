@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Link;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.PostService;
@@ -31,19 +32,6 @@ public class PagesController extends BaseController {
 
     @Autowired
     private LinkService linkService;
-
-
-    /**
-     * 渲染关于页面
-     *
-     * @param model model
-     * @return 模板路径/themes/{theme}/about
-     */
-    @GetMapping(value = "/about")
-    public String about(Model model){
-        model.addAttribute("about","709831589");
-        return this.render("about");
-    }
 
     /**
      * 跳转到图库页面
@@ -78,9 +66,9 @@ public class PagesController extends BaseController {
      * @param model model
      * @return 模板路径/themes/{theme}/post
      */
-    @GetMapping(value = "/{postUrl}")
-    public String getPage(@PathVariable String postUrl,Model model){
-        Post post = postService.findByPostUrl(postUrl);
+    @GetMapping(value = "/p/{postUrl}")
+    public String getPage(@PathVariable(value = "postUrl") String postUrl,Model model){
+        Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_PAGE);
         model.addAttribute("post",post);
         return this.render("post");
     }

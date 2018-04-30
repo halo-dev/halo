@@ -107,10 +107,11 @@ public interface PostService {
     /**
      * 根据文章路径查询
      *
-     * @param postUrl postUrl
-     * @return post
+     * @param postUrl 路径
+     * @param postType post or page
+     * @return Post
      */
-    Post findByPostUrl(String postUrl);
+    Post findByPostUrl(String postUrl,String postType);
 
     /**
      * 查询前五条数据

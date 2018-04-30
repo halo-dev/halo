@@ -203,7 +203,7 @@ public class PageController {
     /**
      * 跳转到新建页面
      *
-     * @return 模板路径
+     * @return 模板路径admin/admin_page_md_editor
      */
     @GetMapping(value = "/new")
     public String newPage(Model model){
@@ -229,5 +229,36 @@ public class PageController {
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
+    }
+
+    /**
+     * 跳转到修改页面
+     *
+     * @param pageId 页面编号
+     * @param model model
+     * @return admin/admin_page_md_editor
+     */
+    @GetMapping(value = "/edit")
+    public String editPage(@PathParam("pageId") Long pageId,Model model){
+        Optional<Post> post = postService.findByPostId(pageId);
+        model.addAttribute("post",post.get());
+        return "admin/admin_page_md_editor";
+    }
+
+    /**
+     * 检查该路径是否已经存在
+     *
+     * @param postUrl postUrl
+     * @return true or false
+     */
+    @GetMapping(value = "/checkUrl")
+    @ResponseBody
+    public boolean checkUrlExists(@PathParam("postUrl") String postUrl){
+        Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_PAGE);
+        // TODO 还没写完
+        if(null!=post || StringUtils.equals("archives",postUrl) || StringUtils.equals("galleries",postUrl)){
+            return true;
+        }
+        return false;
     }
 }

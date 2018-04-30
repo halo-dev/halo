@@ -158,12 +158,13 @@ public class PostServiceImpl implements PostService {
     /**
      * 根据文章路径查询
      *
-     * @param postUrl postUrl
-     * @return post
+     * @param postUrl 路径
+     * @param postType post or page
+     * @return Post
      */
     @Override
-    public Post findByPostUrl(String postUrl) {
-        return postRepository.findPostByPostUrl(postUrl);
+    public Post findByPostUrl(String postUrl,String postType) {
+        return postRepository.findPostByPostUrlAndPostType(postUrl,postType);
     }
 
     /**

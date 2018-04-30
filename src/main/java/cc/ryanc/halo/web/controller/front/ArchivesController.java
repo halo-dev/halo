@@ -88,7 +88,7 @@ public class ArchivesController extends BaseController {
      */
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl, Model model){
-        Post post = postService.findByPostUrl(postUrl);
+        Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
         //获得当前文章的发布日期
         Date postDate = post.getPostDate();
         try {
