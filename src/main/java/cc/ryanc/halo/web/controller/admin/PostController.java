@@ -269,10 +269,6 @@ public class PostController extends BaseController{
     @ResponseBody
     public boolean checkUrlExists(@PathParam("postUrl") String postUrl){
         Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
-        if(null!=post){
-            return true;
-        }else{
-            return false;
-        }
+        return null!=post;
     }
 }
