@@ -63,11 +63,7 @@ public class CategoryController {
     @ResponseBody
     public boolean checkCateUrlExists(@RequestParam("cateUrl") String cateUrl){
         Category category = categoryService.findByCateUrl(cateUrl);
-        if(null!=category){
-            return true;
-        }else{
-            return false;
-        }
+        return null!=category;
     }
 
     /**

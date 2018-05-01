@@ -65,11 +65,7 @@ public class TagController {
     @ResponseBody
     public boolean checkTagUrlExists(@RequestParam("tagUrl") String tagUrl){
         Tag tag = tagService.findByTagUrl(tagUrl);
-        if(null!=tag){
-            return true;
-        }else{
-            return false;
-        }
+        return null!=tag;
     }
 
     /**
