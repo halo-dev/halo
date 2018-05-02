@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cc.ryanc</groupId>
 	<artifactId>halo</artifactId>
-	<version>beta</version>
+	<version>0.0.1</version>
 	<name>halo</name>
 
 	<description>
@@ -133,75 +133,93 @@
 			<version>18.0</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<!-- 生产环境打包配置 -->
+		<profile>
+			<id>prod</id>
+			<build>
+				<finalName>halo</finalName>
+				<resources>
+					<resource>
+						<directory>src/main/java</directory>
+						<filtering>false</filtering>
+						<excludes>
+							<exclude>**/*.java</exclude>
+						</excludes>
+					</resource>
+				</resources>
+				<plugins>
+					<!-- 跳过单元测试，不然打包的时候会因为加载不了application.yaml报错 -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</plugin>
 
-	<build>
-		<finalName>halo</finalName>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<filtering>false</filtering>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</resource>
-		</resources>
-		<plugins>
-			<!-- 跳过单元测试，不然打包的时候会因为加载不了application.yaml报错 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
+					<plugin>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+							<encoding>UTF-8</encoding>
+						</configuration>
+					</plugin>
 
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>assembly.xml</descriptor>
+							</descriptors>
+							<outputDirectory>${project.build.directory}/dist/</outputDirectory>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<appendAssemblyId>false</appendAssemblyId>
-					<descriptors>
-						<descriptor>assembly.xml</descriptor>
-					</descriptors>
-					<outputDirectory>${project.build.directory}/dist/</outputDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+					<!-- 打包成jar文件，并指定lib文件夹以及resources资源文件夹 -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>2.4</version>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>cc.ryanc.halo.Application</mainClass>
+									<classpathPrefix>lib/</classpathPrefix>
+									<addClasspath>true</addClasspath>
+								</manifest>
+								<manifestEntries>
+									<Class-Path>resources/</Class-Path>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 
-			<!-- 打包成jar文件，并指定lib文件夹以及resources资源文件夹 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>cc.ryanc.halo.Application</mainClass>
-							<classpathPrefix>lib/</classpathPrefix>
-							<addClasspath>true</addClasspath>
-						</manifest>
-						<manifestEntries>
-							<Class-Path>resources/</Class-Path>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+		<!-- 开发环境 -->
+		<profile>
+			<id>dev</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
