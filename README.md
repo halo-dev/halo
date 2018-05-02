@@ -33,8 +33,8 @@ Fast,simple,powerful blog system powered by Java.
 ```bash
 git clone https://github.com/ruibaby/halo.git
 cd halo
-mvn clean package
-java -jar target/dist/halo/halo-beta.jar
+mvn clean package -Pprod
+java -jar target/dist/halo/halo-xxx.jar
 ```
 
 Let's start: http://localhost:8090
@@ -43,13 +43,13 @@ Let's start: http://localhost:8090
 
 [界面预览](PREVIEW.md)
 
-[首页演示](https://ryanc.cc)
+[Ryan0up'S Blog](https://ryanc.cc)
+
+[SNAIL BLOG](https://slogc.cc)
 
 ## Download 下载
 
 [Download](https://github.com/ruibaby/halo/releases)
-
-> 目前并未打包成可使用版本，因为目前bug还有点多，需要花点时间才行。
 
 ## Docs 文档
 
