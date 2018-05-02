@@ -1,5 +1,5 @@
 #!/bin/bash
-APP_NAME=halo-beta.jar
+APP_NAME=halo-0.0.1.jar
 
 usage() {
     echo "用法: sh halo.sh [start(启动)|stop(停止)|restart(重启)|status(状态)]"
