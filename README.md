@@ -10,13 +10,14 @@
 
 ## 目录
 
-- [Introduction 简介](#Introduction-简介)
-- [Quickstart 快速开始](#Quickstart-快速开始)
-- [Demo 演示](#Demo-演示)
-- [Download 下载](#Download-下载)
-- [Docs 文档](#Docs-文档)
-- [License 许可证](#License-许可证)
-- [Thanks 感谢](#Thanks-感谢)
+- [Introduction 简介](#introduction-简介)
+- [Quickstart 快速开始](#quickstart-快速开始)
+- [Demo 演示](#demo-演示)
+- [Download 下载](#download-下载)
+- [Docs 文档](#docs-文档)
+- [License 许可证](#license-许可证)
+- [Todo 后续功能](#todo-后续功能)
+- [Thanks 感谢](#thanks-感谢)
 
 ## Introduction 简介
 
@@ -47,6 +48,8 @@ Let's start: http://localhost:8090
 
 [SNAIL BLOG](https://slogc.cc)
 
+[宋浩志博客](http://songhaozhi.com/)
+
 ## Download 下载
 
 [Download](https://github.com/ruibaby/halo/releases)
@@ -60,6 +63,12 @@ Let's start: http://localhost:8090
 ## License 许可证
 
 [![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
+
+## Todo 后续功能
+
+- [ ] 文章阅读统计
+- [ ] 文章顶置
+- [ ] 集成又拍云，七牛云等云服务
 
 ## Thanks 感谢
 

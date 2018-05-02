@@ -105,6 +105,17 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="anatoleStylePostTitleLower" class="col-sm-4 control-label">文章标题大写：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_post_title_lower" id="anatoleStylePostTitleLower" value="true" ${((options.anatole_style_post_title_lower?default('true'))=='true')?string('checked','')}> 开启
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_post_title_lower" id="anatoleStylePostTitleLower" value="false" ${((options.anatole_style_post_title_lower?if_exists)=='false')?string('checked','')}> 关闭
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label for="anatoleStyleHitokoto" class="col-sm-4 control-label">博客描述开启一言：</label>
                                     <div class="col-sm-8">
                                         <label class="radio-inline">

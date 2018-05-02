@@ -22,6 +22,9 @@
             <div class="by_halo">
                 <a href="https://github.com/ruibaby/halo" target="_blank">Proudly published with Halo&#65281;</a>
             </div>
+            <div class="footer_text">
+                ${options.blog_footer_info?if_exists}
+            </div>
         </a>
     </div>
 </div>

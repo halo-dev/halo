@@ -1,49 +1,61 @@
 # Halo界面预览
 
-## 安装界面
+## 安装页
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-install.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-install.png)
 
-## 后台登录界面
+## 后台登录
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-login.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-login.png)
 
 ## 后台首页
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-admin-index.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-index.png)
 
-## 文章管理
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-index-2.png)
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-admin-post.png)
+## 文章列表
 
-## 文章编写
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-posts.png)
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-admin-edit.png)
+## 文章编辑
 
-## 附件管理
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-edit.png)
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-admin-attach.png)
+## 标签列表
+
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-tags.png)
+
+## 预设页面
+
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-pages.png)
+
+## 附件页面
+
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-attach.png)
 
 ## 评论管理
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-admin-comment.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-comments.png)
 
-## 评论系统
+## 菜单管理
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-admin-comment-system.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-menus.png)
+
+## 系统设置
+
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-options.png)
 
 ## 主题管理
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-admin-theme.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-themes.png)
 
-## 默认主题
-
-![](https://cdn.ryanc.cc/img/github/halo/halo-theme-default.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-admin-themes-options.png)
 
 ## Material主题(感谢[Viosey](https://viosey.com))
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-theme-material.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-index-material.png)
 
 ## Anatole主题(感谢[Caicai](https://www.caicai.me/))
 
-![](https://cdn.ryanc.cc/img/github/halo/halo-theme-anatole.png)
+![](https://cdn.ryanc.cc/img/github/halo-blog/halo-index-anatole.png)

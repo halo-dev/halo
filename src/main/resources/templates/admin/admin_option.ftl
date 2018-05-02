@@ -133,7 +133,12 @@
                                                 </span>
                                             </label>
                                             <div class="col-sm-4">
-                                                <input type="text" class="form-control" id="baiduToken" name="seo_baidu_token" value="${options.seo_baidu_token?if_exists}">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="baiduToken" name="seo_baidu_token" value="${options.seo_baidu_token?if_exists}">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default " id="btn_push_baidu" onclick="pushAllToBaidu()" type="button">推送</button>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -598,6 +603,22 @@
                             showMsg("所有文章摘要更新成功！","success",1000);
                         }else{
                             showMsg("更新失败！","success",2000);
+                        }
+                    }
+                });
+            }
+            function pushAllToBaidu() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/admin/posts/pushAllToBaidu',
+                    data: {
+                        baiduToken : $('#baiduToken').val()
+                    },
+                    success: function (data) {
+                        if(data==true){
+                            showMsg("推送所有文章成功！","success",1000);
+                        }else{
+                            showMsg("推送失败！","success",2000);
                         }
                     }
                 });

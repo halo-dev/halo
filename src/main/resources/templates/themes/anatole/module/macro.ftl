@@ -17,6 +17,13 @@
     <link rel="stylesheet" href="/anatole/source/css/blog_basic.css?version=88107691fe">
     <link href="/anatole/source/css/style.css" type="text/css" rel="stylesheet" />
     <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/feed.xml">
+    <#if options.anatole_style_post_title_lower?default("true") == "false">
+    <style>
+        .post .post-title h3 {
+            text-transform: none;
+        }
+    </style>
+    </#if>
 </head>
 <body>
 </#macro>

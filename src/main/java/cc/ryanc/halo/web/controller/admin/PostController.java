@@ -3,10 +3,7 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.service.CategoryService;
-import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.TagService;
+import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -48,6 +46,9 @@ public class PostController extends BaseController{
 
     @Autowired
     private LogsService logsService;
+
+    @Autowired
+    private OptionsService optionsService;
 
     @Autowired
     private HttpServletRequest request;
@@ -162,7 +163,6 @@ public class PostController extends BaseController{
                 post.setTags(tags);
             }
             postService.saveByPost(post);
-            log.info("已发表新文章："+post.getPostTitle());
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
@@ -270,5 +270,27 @@ public class PostController extends BaseController{
     public boolean checkUrlExists(@PathParam("postUrl") String postUrl){
         Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
         return null!=post;
+    }
+
+    /**
+     * 将所有文章推送到百度
+     * @param baiduToken baiduToken
+     * @return true or false
+     */
+    @GetMapping(value = "/pushAllToBaidu")
+    @ResponseBody
+    public boolean pushAllToBaidu(@PathParam("baiduToken") String baiduToken){
+        if(StringUtils.isEmpty(baiduToken)){
+            return false;
+        }
+        String blogUrl = optionsService.findOneOption("blog_url");
+        List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
+        String urls = "";
+        for(Post post:posts){
+            urls+=blogUrl+"/archives/"+post.getPostUrl()+"\n";
+        }
+        String result = HaloUtil.baiduPost(blogUrl,baiduToken,urls);
+        log.info(result);
+        return true;
     }
 }
