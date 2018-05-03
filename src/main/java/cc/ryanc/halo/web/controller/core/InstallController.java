@@ -11,11 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,9 +62,7 @@ public class InstallController {
     @GetMapping
     public String install(Model model){
         try{
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File installFile = new File(basePath.getAbsolutePath(), "install.lock");
-            if(installFile.exists()){
+            if(StringUtils.equals("true",HaloConst.OPTIONS.get("is_install"))){
                 model.addAttribute("isInstall",true);
             }else{
                 model.addAttribute("isInstall",false);
@@ -99,15 +95,9 @@ public class InstallController {
                             @RequestParam("userPwd") String userPwd,
                             HttpServletRequest request){
         try{
-            //创建install.lock文件
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File installFile = new File(basePath.getAbsolutePath(), "install.lock");
-            if(installFile.exists()){
+            if(StringUtils.equals("true",HaloConst.OPTIONS.get("is_install"))){
                 return false;
-            }else{
-                installFile.createNewFile();
             }
-
             //创建新的用户
             User user=  new User();
             user.setUserName(userName);
@@ -156,12 +146,14 @@ public class InstallController {
             comment.setIsAdmin(0);
             commentService.saveByComment(comment);
 
+            optionsService.saveOption("is_install","true");
+
             //保存博客标题和博客地址设置
             optionsService.saveOption("blog_title",blogTitle);
             optionsService.saveOption("blog_url",blogUrl);
 
             //设置默认主题
-            optionsService.saveOption("theme","halo");
+            optionsService.saveOption("theme","anatole");
 
             //建立网站时间
             optionsService.saveOption("blog_start",HaloUtil.getStringDate("yyyy-MM-dd"));

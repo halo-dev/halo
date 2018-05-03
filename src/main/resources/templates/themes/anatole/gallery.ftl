@@ -41,5 +41,6 @@
 <script src="anatole/source/plugins/gallery/js/jquery.min.js"></script>
 <script src="anatole/source/plugins/gallery/js/skel.min.js"></script>
 <script src="anatole/source/plugins/gallery/js/main.js"></script>
+${options.statistics_code?if_exists}
 </body>
 </html>

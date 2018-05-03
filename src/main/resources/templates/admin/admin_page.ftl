@@ -65,14 +65,6 @@
                                                 <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs ">配置</a>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>关于页面</td>
-                                            <td>/about</td>
-                                            <td>
-                                                <a href="/about" class="btn btn-info btn-xs " target="_blank">预览</a>
-                                                <a data-pjax="true" href="/admin/page/about" class="btn btn-primary btn-xs ">配置</a>
-                                            </td>
-                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>

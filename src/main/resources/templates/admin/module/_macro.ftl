@@ -21,7 +21,7 @@
     <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme?default('skin-blue')} ${options.admin_layout?default('')} ${options.sidebar_style?default('')}">
-<#if options.admin_loading?default("true") == "true">
+<#if options.admin_loading?default("false") == "true">
 <!-- 页面加载动画 -->
 <div id="loading">
     <div id="loading-center">
@@ -49,7 +49,7 @@
     <#if options.admin_pjax?default("true") == "true">
         $(document).pjax('a[data-pjax=true]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});
     </#if>
-    <#if options.admin_loading?default("true") == "true">
+    <#if options.admin_loading?default("false") == "true">
         $(window).on('load', function(){
             $('body').addClass('loaded');
             setTimeout(function () {

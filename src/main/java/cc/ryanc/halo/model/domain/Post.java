@@ -105,6 +105,11 @@ public class Post implements Serializable{
     private Date postDate;
 
     /**
+     * 最后一次更新时间
+     */
+    private Date postUpdate;
+
+    /**
      * 0 已发布
      * 1 草稿
      * 2 回收站
