@@ -42,6 +42,17 @@
                         <form method="post" class="form-horizontal" id="anatoleSnsOptions">
                             <div class="box-body">
                                 <div class="form-group">
+                                    <label for="anatoleSnsRss" class="col-sm-4 control-label">RSS：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_anatole_sns_rss" id="anatoleSnsRss" value="true" ${((options.theme_anatole_sns_rss?default('true'))=='true')?string('checked','')}> 显示
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_anatole_sns_rss" id="anatoleSnsRss" value="false" ${((options.theme_anatole_sns_rss?if_exists)=='false')?string('checked','')}> 隐藏
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label for="anatoleSnsTwitter" class="col-sm-4 control-label">Twitter：</label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="anatoleSnsTwitter" name="theme_anatole_sns_twitter" value="${options.theme_anatole_sns_twitter?if_exists}" >
@@ -83,6 +94,18 @@
                                         <input type="text" class="form-control" id="anatoleSnsGithub" name="theme_anatole_sns_github" value="${options.theme_anatole_sns_github?if_exists}" >
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="anatoleSnsQQ" class="col-sm-4 control-label">QQ：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="anatoleSnsQQ" name="theme_anatole_sns_qq" value="${options.theme_anatole_sns_qq?if_exists}" >
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="anatoleSnsTelegram" class="col-sm-4 control-label">Telegram：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="anatoleSnsTelegram" name="theme_anatole_sns_telegram" value="${options.theme_anatole_sns_telegram?if_exists}" >
+                                    </div>
+                                </div>
                             </div>
                             <div class="box-footer">
                                 <button type="button" class="btn btn-primary btn-sm pull-right" onclick="saveThemeOptions('anatoleSnsOptions')">保存设置</button>
@@ -112,6 +135,17 @@
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="anatole_style_post_title_lower" id="anatoleStylePostTitleLower" value="false" ${((options.anatole_style_post_title_lower?if_exists)=='false')?string('checked','')}> 关闭
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="anatoleStyleAvatarCircle" class="col-sm-4 control-label">圆形头像：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_avatar_circle" id="anatoleStyleAvatarCircle" value="true" ${((options.anatole_style_avatar_circle?if_exists)=='true')?string('checked','')}> 开启
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="anatole_style_avatar_circle" id="anatoleStyleAvatarCircle" value="false" ${((options.anatole_style_avatar_circle?default('false'))=='false')?string('checked','')}> 关闭
                                         </label>
                                     </div>
                                 </div>

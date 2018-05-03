@@ -1,13 +1,15 @@
 package cc.ryanc.halo.web.interceptor;
 
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.service.OptionsService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 
 /**
  * @author : RYAN0UP
@@ -17,11 +19,13 @@ import java.io.File;
  */
 @Component
 public class InstallInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    private OptionsService optionsService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
-        File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-        File installFile = new File(basePath.getAbsolutePath(), "install.lock");
-        if(installFile.exists()){
+        if(StringUtils.equals("true",HaloConst.OPTIONS.get("is_install"))){
             return true;
         }
         response.sendRedirect("/install");

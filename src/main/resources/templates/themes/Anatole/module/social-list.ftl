@@ -1,4 +1,13 @@
 <ul class="social-links">
+
+    <#if options.theme_anatole_sns_rss?default('true')=='true'>
+    <li>
+        <a target="_blank" href="/atom.xml">
+            <i class="fa fa-rss"></i>
+        </a>
+    </li>
+    </#if>
+
     <#if options.theme_anatole_sns_twitter??>
     <li>
         <a target="_blank" href="${options.theme_anatole_sns_twitter}">
@@ -39,19 +48,35 @@
     </li>
     </#if>
 
+    <#if options.theme_anatole_sns_qq??>
+        <li>
+            <a target="_blank" href="${options.theme_anatole_sns_qq}">
+                <i class="fa fa-qq"></i>
+            </a>
+        </li>
+    </#if>
+
+    <#if options.theme_anatole_sns_telegram??>
+        <li>
+            <a target="_blank" href="${options.theme_anatole_sns_telegram}">
+                <i class="fa fa-telegram"></i>
+            </a>
+        </li>
+    </#if>
+
     <#if options.theme_anatole_sns_email??>
-    <li>
-        <a target="_blank" href="mailto:${options.theme_anatole_sns_email}">
-            <i class="fa fa-envelope"></i>
-        </a>
-    </li>
+        <li>
+            <a target="_blank" href="mailto:${options.theme_anatole_sns_email}">
+                <i class="fa fa-envelope"></i>
+            </a>
+        </li>
     </#if>
 
     <#if options.theme_anatole_sns_github??>
-    <li>
-        <a target="_blank" href="${options.theme_anatole_sns_github}">
-            <i class="fa fa-github"></i>
-        </a>
-    </li>
+        <li>
+            <a target="_blank" href="${options.theme_anatole_sns_github}">
+                <i class="fa fa-github"></i>
+            </a>
+        </li>
     </#if>
 </ul>

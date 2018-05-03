@@ -409,10 +409,10 @@
                                             <label class="col-sm-2 control-label">后台加载动画：</label>
                                             <div class="col-sm-4">
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_loading" value="true" ${((options.admin_loading?default('true'))=='true')?string('checked','')}> 启用
+                                                    <input type="radio" name="admin_loading" value="true" ${((options.admin_loading?if_exists)=='true')?string('checked','')}> 启用
                                                 </label>
                                                 <label class="radio-inline">
-                                                    <input type="radio" name="admin_loading" value="false" ${((options.admin_loading?if_exists)=='false')?string('checked','')}> 禁用
+                                                    <input type="radio" name="admin_loading" value="false" ${((options.admin_loading?default('false'))=='false')?string('checked','')}> 禁用
                                                 </label>
                                             </div>
                                         </div>

@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.OptionsService;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,8 @@ public class OptionController {
             optionsService.saveOptions(options);
             //刷新options
             configuration.setSharedVariable("options",optionsService.findAllOptions());
+            HaloConst.OPTIONS.clear();
+            HaloConst.OPTIONS = optionsService.findAllOptions();
             log.info("所保存的设置选项列表："+options);
             return true;
         }catch (Exception e){

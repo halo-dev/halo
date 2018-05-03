@@ -31,7 +31,7 @@ public class OthersController {
      *
      * @return rss
      */
-    @GetMapping(value = {"feed","feed.xml","atom","atom.xml"},produces = "application/rss+xml;charset=UTF-8")
+    @GetMapping(value = {"feed","feed.xml","atom","atom.xml"},produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String feed(){
         String rssPosts = HaloConst.OPTIONS.get("rss_posts");

@@ -144,9 +144,7 @@
             function isNull() {
                 var name = $('#linkName').val();
                 var url = $('#linkUrl').val();
-                var pic = $('#linkPic').val();
-                var desc = $('#linkDesc').val();
-                if(name==""||url==""||pic==""){
+                if(name==""||url==""){
                     showMsg("请输入完整信息！","info",2000);
                     return false;
                 }

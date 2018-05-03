@@ -79,8 +79,10 @@ public class PostServiceImpl implements PostService {
         for(Post post:posts){
             if(!(HaloUtil.htmlToText(post.getPostContent()).length()<postSummary)){
                 post.setPostSummary(HaloUtil.getSummary(post.getPostContent(),postSummary));
-                postRepository.save(post);
+            }else{
+                post.setPostSummary(HaloUtil.htmlToText(post.getPostContent()));
             }
+            postRepository.save(post);
         }
     }
 
