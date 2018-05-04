@@ -11,9 +11,8 @@ import java.util.Date;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/19
  * @version : 1.0
- * description : 操作日志实体类
+ * @date : 2018/1/19
  */
 @Data
 @Entity
@@ -49,7 +48,8 @@ public class Logs implements Serializable {
      */
     private Date logCreated;
 
-    public Logs() { }
+    public Logs() {
+    }
 
     public Logs(String logTitle, String logContent, String logIp, Date logCreated) {
         this.logTitle = logTitle;

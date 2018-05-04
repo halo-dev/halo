@@ -42,13 +42,13 @@ Let's start: http://localhost:8090
 
 ## Demo 演示
 
-[界面预览](PREVIEW.md)
+[界面预览](https://halo-doc.ryanc.cc/preview)
 
 [Ryan0up'S Blog](https://ryanc.cc)
 
 [SNAIL BLOG](https://slogc.cc)
 
-[宋浩志博客](http://songhaozhi.com/)
+[宋浩志博客](http://songhaozhi.com)
 
 ## Download 下载
 

@@ -333,6 +333,7 @@
         </section>
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
+        <script src="/static/js/app.js"></script>
         <script type="application/javascript">
             $(document).ready(function () {
                 var dateBegin = new Date("${options.blog_start?default('0000-00-00')}");
@@ -356,32 +357,6 @@
             $('#btnWidgetsOption').click(function () {
                 $('#widgetOptionsPanel').slideToggle(400);
             });
-            function saveOptions(option) {
-                var param = $('#'+option).serialize();
-                $.ajax({
-                    type: 'post',
-                    url: '/admin/option/save',
-                    data: param,
-                    success: function (result) {
-                        $.toast({
-                            text: '保存成功',
-                            heading: '提示',
-                            icon: 'success',
-                            showHideTransition: 'fade',
-                            allowToastClose: true,
-                            hideAfter: 1000,
-                            stack: 1,
-                            position: 'top-center',
-                            textAlign: 'left',
-                            loader: true,
-                            loaderBg: '#ffffff',
-                            afterHidden: function () {
-                                window.location.reload();
-                            }
-                        });
-                    }
-                });
-            }
         </script>
     </div>
     <#include "module/_footer.ftl">

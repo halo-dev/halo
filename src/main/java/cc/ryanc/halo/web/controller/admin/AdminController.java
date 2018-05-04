@@ -6,7 +6,10 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.service.CommentService;
+import cc.ryanc.halo.service.LogsService;
+import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +39,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @Controller
 @RequestMapping(value = "/admin")
-public class AdminController extends BaseController{
+public class AdminController extends BaseController {
 
     @Autowired
     private PostService postService;
@@ -56,33 +59,33 @@ public class AdminController extends BaseController{
     /**
      * 请求后台页面
      *
-     * @param model model
+     * @param model   model
      * @param session session
      * @return 模板路径admin/admin_index
      */
-    @GetMapping(value = {"","/index"})
-    public String index(Model model,HttpSession session){
+    @GetMapping(value = {"", "/index"})
+    public String index(Model model, HttpSession session) {
         //查询文章条数
         Integer postCount = postService.findAllPosts(HaloConst.POST_TYPE_POST).size();
-        model.addAttribute("postCount",postCount);
+        model.addAttribute("postCount", postCount);
 
         //查询评论的条数
         Integer commentCount = commentService.findAllComments().size();
-        model.addAttribute("commentCount",commentCount);
+        model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
         List<Post> postsLatest = postService.findPostLatest();
-        model.addAttribute("postTopFive",postsLatest);
+        model.addAttribute("postTopFive", postsLatest);
 
         //查询最新的日志
         List<Logs> logsLatest = logsService.findLogsLatest();
-        model.addAttribute("logs",logsLatest);
+        model.addAttribute("logs", logsLatest);
 
         //查询最新的评论
         List<Comment> comments = commentService.findCommentsLatest();
-        model.addAttribute("comments",comments);
+        model.addAttribute("comments", comments);
 
-        model.addAttribute("mediaCount",HaloConst.ATTACHMENTS.size());
+        model.addAttribute("mediaCount", HaloConst.ATTACHMENTS.size());
         return "admin/admin_index";
     }
 
@@ -93,10 +96,10 @@ public class AdminController extends BaseController{
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
-    public String login(HttpSession session){
+    public String login(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
-        if(null!=user){
+        if (null != user) {
             return "redirect:/admin";
         }
         return "admin/admin_login";
@@ -106,47 +109,47 @@ public class AdminController extends BaseController{
      * 验证登录信息
      *
      * @param loginName 登录名：邮箱／用户名
-     * @param loginPwd loginPwd 密码
-     * @param session session session
+     * @param loginPwd  loginPwd 密码
+     * @param session   session session
      * @return String 登录状态
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
     public String getLogin(@ModelAttribute("loginName") String loginName,
                            @ModelAttribute("loginPwd") String loginPwd,
-                           HttpSession session){
+                           HttpSession session) {
         String status = "false";
         try {
             User aUser = userService.findUser();
             User user = null;
-            if(StringUtils.equals(aUser.getLoginEnable(),"false")){
+            if (StringUtils.equals(aUser.getLoginEnable(), "false")) {
                 status = "disable";
-            }else{
+            } else {
                 //验证是否是邮箱登录
                 Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
                 Matcher matcher = patternEmail.matcher(loginName);
-                if(matcher.find()){
-                    user = userService.userLoginByEmail(loginName,HaloUtil.getMD5(loginPwd)).get(0);
-                }else{
-                    user = userService.userLoginByName(loginName,HaloUtil.getMD5(loginPwd)).get(0);
+                if (matcher.find()) {
+                    user = userService.userLoginByEmail(loginName, HaloUtil.getMD5(loginPwd)).get(0);
+                } else {
+                    user = userService.userLoginByName(loginName, HaloUtil.getMD5(loginPwd)).get(0);
                 }
-                if(aUser==user){
+                if (aUser == user) {
                     session.setAttribute(HaloConst.USER_SESSION_KEY, user);
                     //重置用户的登录状态为正常
                     userService.updateUserNormal();
                     userService.updateUserLoginLast(new Date());
-                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_SUCCESS,HaloUtil.getIpAddr(request), HaloUtil.getDate()));
+                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtil.getIpAddr(request), HaloUtil.getDate()));
                     status = "true";
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Integer errorCount = userService.updateUserLoginError();
-            if(errorCount>=5){
+            if (errorCount >= 5) {
                 userService.updateUserLoginEnable("false");
             }
             userService.updateUserLoginLast(new Date());
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN,LogsRecord.LOGIN_ERROR+"["+loginName+","+loginPwd+"]",HaloUtil.getIpAddr(request),new Date()));
-            log.error("登录失败！：{0}",e.getMessage());
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + loginName + "," + loginPwd + "]", HaloUtil.getIpAddr(request), new Date()));
+            log.error("登录失败！：{0}", e.getMessage());
         }
         return status;
     }
@@ -158,11 +161,11 @@ public class AdminController extends BaseController{
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
-    public String logOut(HttpSession session){
+    public String logOut(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT,user.getUserName(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
+        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtil.getIpAddr(request), HaloUtil.getDate()));
         session.invalidate();
-        log.info("用户["+user.getUserName()+"]退出登录");
+        log.info("用户[" + user.getUserName() + "]退出登录");
         return "redirect:/admin/login";
     }
 
@@ -170,18 +173,18 @@ public class AdminController extends BaseController{
      * 查看所有日志
      *
      * @param model model model
-     * @param page page 当前页码
-     * @param size size 每页条数
+     * @param page  page 当前页码
+     * @param size  size 每页条数
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
     public String logs(Model model,
-                       @RequestParam(value = "page",defaultValue = "0") Integer page,
-                       @RequestParam(value = "size",defaultValue = "10") Integer size){
-        Sort sort = new Sort(Sort.Direction.DESC,"logId");
-        Pageable pageable = new PageRequest(page,size,sort);
+                       @RequestParam(value = "page", defaultValue = "0") Integer page,
+                       @RequestParam(value = "size", defaultValue = "10") Integer size) {
+        Sort sort = new Sort(Sort.Direction.DESC, "logId");
+        Pageable pageable = new PageRequest(page, size, sort);
         Page<Logs> logs = logsService.findAllLogs(pageable);
-        model.addAttribute("logs",logs);
+        model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
 
@@ -191,11 +194,11 @@ public class AdminController extends BaseController{
      * @return 重定向到/admin
      */
     @GetMapping(value = "/logs/clear")
-    public String logsClear(){
+    public String logsClear() {
         try {
             logsService.removeAllLogs();
-        }catch (Exception e){
-            log.error("未知错误："+e.getMessage());
+        } catch (Exception e) {
+            log.error("未知错误：" + e.getMessage());
         }
         return "redirect:/admin";
     }
@@ -206,7 +209,7 @@ public class AdminController extends BaseController{
      * @return 模板路径admin/admin_halo
      */
     @GetMapping(value = "/halo")
-    public String halo(){
+    public String halo() {
         return "admin/admin_halo";
     }
 }

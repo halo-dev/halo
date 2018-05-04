@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
+import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.util.HaloUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -52,6 +53,9 @@ public class CommentController extends BaseController{
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PostService postService;
+
     /**
      * 渲染评论管理页面
      *
@@ -81,18 +85,18 @@ public class CommentController extends BaseController{
      * 将评论移到回收站
      *
      * @param commentId 评论编号
-     * @param session session
+     * @param status 评论状态
      * @return 重定向到/admin/comments
      */
     @GetMapping(value = "/throw")
     public String moveToTrash(@PathParam("commentId") Long commentId,
-                              HttpSession session){
+                              @PathParam("status") String status){
         try {
             commentService.updateCommentStatus(commentId,2);
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
-        return "redirect:/admin/comments";
+        return "redirect:/admin/comments?status="+status;
     }
 
     /**
@@ -117,7 +121,7 @@ public class CommentController extends BaseController{
             try {
                 if (status == 1 && matcher.find()) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("pageUrl", comment.getPost().getPostUrl());
+                    map.put("pageUrl", HaloConst.OPTIONS.get("blog_url")+"/archives/"+comment.getPost().getPostUrl()+"#comment-id-"+comment.getCommentId());
                     map.put("pageName", comment.getPost().getPostTitle());
                     map.put("commentContent", comment.getCommentContent());
                     map.put("blogUrl", HaloConst.OPTIONS.get("blog_url"));
@@ -169,8 +173,7 @@ public class CommentController extends BaseController{
                                HttpServletRequest request,
                                HttpSession session){
         try {
-            Post post = new Post();
-            post.setPostId(postId);
+            Post post = postService.findByPostId(postId).get();
 
             //博主信息
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
@@ -191,7 +194,7 @@ public class CommentController extends BaseController{
             comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
             comment.setCommentAuthorAvatarMd5(HaloUtil.getMD5(userService.findUser().getUserEmail()));
             comment.setCommentDate(new Date());
-            String lastContent = " //<a href='#'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
+            String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
             comment.setCommentContent(commentContent+lastContent);
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
@@ -210,6 +213,7 @@ public class CommentController extends BaseController{
                     map.put("blogTitle",HaloConst.OPTIONS.get("blog_title"));
                     map.put("commentAuthor",lastComment.getCommentAuthor());
                     map.put("pageName",lastComment.getPost().getPostTitle());
+                    map.put("pageUrl",HaloConst.OPTIONS.get("blog_url")+"/archives/"+post.getPostUrl()+"#comment-id-"+comment.getCommentId());
                     map.put("commentContent",lastComment.getCommentContent());
                     map.put("replyAuthor",user.getUserDisplayName());
                     map.put("replyContent",commentContent);

@@ -10,7 +10,6 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2018/1/19
  * @version : 1.0
- * description :
  */
 public interface LogsRepository extends JpaRepository<Logs,Long> {
 

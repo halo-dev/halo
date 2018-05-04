@@ -7,9 +7,8 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/24
  * @version : 1.0
- * description :
+ * @date : 2018/1/24
  */
 public interface MenuService {
 
@@ -38,6 +37,7 @@ public interface MenuService {
 
     /**
      * 根据编号查询菜单
+     *
      * @param menuId menuId
      * @return Menu
      */

@@ -12,12 +12,11 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2018/1/12
  * @version : 1.0
- * description : 文章标签实体类
  */
 @Data
 @Entity
 @Table(name = "halo_tag")
-public class Tag implements Serializable{
+public class Tag implements Serializable {
 
     private static final long serialVersionUID = -7501342327884372194L;
 

@@ -2,20 +2,22 @@ package cc.ryanc.halo.model.domain;
 
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author : RYAN0UP
- * @date : 2017/11/14
  * @version : 1.0
- * description : 用户实体类
+ * @date : 2017/11/14
  */
 @Data
 @Entity
 @Table(name = "halo_user")
-public class User implements Serializable{
+public class User implements Serializable {
 
     private static final long serialVersionUID = -5144055068797033748L;
 

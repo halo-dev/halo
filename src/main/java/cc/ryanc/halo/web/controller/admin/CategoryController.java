@@ -32,8 +32,8 @@ public class CategoryController {
      * @return 模板路径admin/admin_category
      */
     @GetMapping
-    public String categories(Model model){
-        model.addAttribute("statusName","添加");
+    public String categories(Model model) {
+        model.addAttribute("statusName", "添加");
         return "admin/admin_category";
     }
 
@@ -44,11 +44,11 @@ public class CategoryController {
      * @return 重定向到/admin/category
      */
     @PostMapping(value = "/save")
-    public String saveCategory(@ModelAttribute Category category){
-        try{
+    public String saveCategory(@ModelAttribute Category category) {
+        try {
             categoryService.saveByCategory(category);
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -61,9 +61,9 @@ public class CategoryController {
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public boolean checkCateUrlExists(@RequestParam("cateUrl") String cateUrl){
+    public boolean checkCateUrlExists(@RequestParam("cateUrl") String cateUrl) {
         Category category = categoryService.findByCateUrl(cateUrl);
-        return null!=category;
+        return null != category;
     }
 
     /**
@@ -73,12 +73,12 @@ public class CategoryController {
      * @return 重定向到/admin/category
      */
     @GetMapping(value = "/remove")
-    public String removeCategory(@PathParam("cateId") Long cateId){
-        try{
+    public String removeCategory(@PathParam("cateId") Long cateId) {
+        try {
             Category category = categoryService.removeByCateId(cateId);
-            log.info("删除的分类目录："+category);
-        } catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            log.info("删除的分类目录：" + category);
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -87,14 +87,14 @@ public class CategoryController {
      * 跳转到修改页面
      *
      * @param cateId cateId
-     * @param model model
+     * @param model  model
      * @return 模板路径admin/admin_category
      */
     @GetMapping(value = "/edit")
-    public String toEditCategory(Model model,@PathParam("cateId") Long cateId){
+    public String toEditCategory(Model model, @PathParam("cateId") Long cateId) {
         Optional<Category> category = categoryService.findByCateId(cateId);
-        model.addAttribute("updateCategory",category.get());
-        model.addAttribute("statusName","修改");
+        model.addAttribute("updateCategory", category.get());
+        model.addAttribute("statusName", "修改");
         return "admin/admin_category";
     }
 }

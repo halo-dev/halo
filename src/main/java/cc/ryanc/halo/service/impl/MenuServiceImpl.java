@@ -11,12 +11,11 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/24
  * @version : 1.0
- * description :
+ * @date : 2018/1/24
  */
 @Service
-public class MenuServiceImpl implements MenuService{
+public class MenuServiceImpl implements MenuService {
 
     @Autowired
     private MenuRepository menuRepository;

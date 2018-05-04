@@ -26,17 +26,17 @@ public class ArticleTagDirective implements TemplateDirectiveModel {
     @Override
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
         DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
-        if(map.containsKey(METHOD_KEY)){
+        if (map.containsKey(METHOD_KEY)) {
             String method = map.get(METHOD_KEY).toString();
-            switch (method){
+            switch (method) {
                 case "postsCount":
-                    environment.setVariable("postsCount",builder.build().wrap(postService.findAllPosts(HaloConst.POST_TYPE_POST).size()));
+                    environment.setVariable("postsCount", builder.build().wrap(postService.findAllPosts(HaloConst.POST_TYPE_POST).size()));
                     break;
                 case "archives":
-                    environment.setVariable("archives",builder.build().wrap(postService.findPostGroupByYearAndMonth()));
+                    environment.setVariable("archives", builder.build().wrap(postService.findPostGroupByYearAndMonth()));
                     break;
                 case "archivesLess":
-                    environment.setVariable("archivesLess",builder.build().wrap(postService.findPostGroupByYear()));
+                    environment.setVariable("archivesLess", builder.build().wrap(postService.findPostGroupByYear()));
                     break;
                 default:
                     break;

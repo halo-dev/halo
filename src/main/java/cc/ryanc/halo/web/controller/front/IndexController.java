@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Slf4j
 @Controller
-@RequestMapping(value = {"/","index"})
+@RequestMapping(value = {"/", "index"})
 public class IndexController extends BaseController {
 
     @Autowired
@@ -42,34 +42,33 @@ public class IndexController extends BaseController {
      * @return 模板路径
      */
     @GetMapping
-    public String index(Model model){
+    public String index(Model model) {
         //调用方法渲染首页
-        return this.index(model,1);
+        return this.index(model, 1);
     }
 
     /**
      * 首页分页
      *
      * @param model model
-     * @param page 当前页码
-     * @param size 每页数量
+     * @param page  当前页码
+     * @param size  每页数量
      * @return 模板路径/themes/{theme}/index
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,
-                        @PathVariable(value = "page") Integer page){
-        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
+                        @PathVariable(value = "page") Integer page) {
+        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         //默认显示10条
         Integer size = 10;
         //尝试加载设置选项，用于设置显示条数
-        if(!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))){
+        if (!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
         //所有文章数据，分页
-        Pageable pageable = new PageRequest(page-1,size,sort);
-        Page<Post> posts = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
-        model.addAttribute("posts",posts);
-
+        Pageable pageable = new PageRequest(page - 1, size, sort);
+        Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
+        model.addAttribute("posts", posts);
         return this.render("index");
     }
 
@@ -81,18 +80,18 @@ public class IndexController extends BaseController {
      */
     @GetMapping(value = "next")
     @ResponseBody
-    public List<Post> ajaxIndex(@PathParam(value = "page") Integer page){
-        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
+    public List<Post> ajaxIndex(@PathParam(value = "page") Integer page) {
+        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         //默认显示10条
         Integer size = 10;
         //尝试加载设置选项，用于设置显示条数
-        if(!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))){
+        if (!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
 
         //文章数据，只获取文章，没有分页
-        Pageable pageable = new PageRequest(page-1,size,sort);
-        List<Post> posts = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable).getContent();
+        Pageable pageable = new PageRequest(page - 1, size, sort);
+        List<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable).getContent();
         return posts;
     }
 }

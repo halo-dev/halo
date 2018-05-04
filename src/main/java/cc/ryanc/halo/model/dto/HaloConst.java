@@ -1,7 +1,6 @@
 package cc.ryanc.halo.model.dto;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.domain.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +11,7 @@ import java.util.Map;
  * @author : RYAN0UP
  * @date : 2017/12/29
  * @version : 1.0
- * description: 环境常量
+ * description: 常量
  */
 public class HaloConst {
 

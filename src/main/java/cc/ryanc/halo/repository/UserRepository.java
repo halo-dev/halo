@@ -9,7 +9,6 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2017/11/14
  * @version : 1.0
- * description:
  */
 public interface UserRepository extends JpaRepository<User,Long>{
 

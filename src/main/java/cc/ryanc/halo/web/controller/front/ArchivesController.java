@@ -1,7 +1,9 @@
 package cc.ryanc.halo.web.controller.front;
 
+import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,9 @@ public class ArchivesController extends BaseController {
     @Autowired
     private PostService postService;
 
+    @Autowired
+    private CommentService commentService;
+
     /**
      * 文章归档
      *
@@ -39,26 +44,26 @@ public class ArchivesController extends BaseController {
      * @return 模板路径
      */
     @GetMapping
-    public String archives(Model model){
-        return this.archives(model,1);
+    public String archives(Model model) {
+        return this.archives(model, 1);
     }
 
     /**
      * 文章归档分页
      *
      * @param model model
-     * @param page page 当前页码
+     * @param page  page 当前页码
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "page/{page}")
     public String archives(Model model,
-                           @PathVariable(value = "page") Integer page){
+                           @PathVariable(value = "page") Integer page) {
 
         //所有文章数据，分页，material主题适用
-        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
-        Pageable pageable = new PageRequest(page-1,5,sort);
-        Page<Post> posts = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
-        model.addAttribute("posts",posts);
+        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        Pageable pageable = new PageRequest(page - 1, 5, sort);
+        Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
+        model.addAttribute("posts", posts);
         return this.render("archives");
     }
 
@@ -66,16 +71,16 @@ public class ArchivesController extends BaseController {
      * 文章归档，根据年月
      *
      * @param model model
-     * @param year year 年份
+     * @param year  year 年份
      * @param month month 月份
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "{year}/{month}")
     public String archives(Model model,
                            @PathVariable(value = "year") String year,
-                           @PathVariable(value = "month") String month){
-        Page<Post> posts = postService.findPostByYearAndMonth(year,month,null);
-        model.addAttribute("posts",posts);
+                           @PathVariable(value = "month") String month) {
+        Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
+        model.addAttribute("posts", posts);
         return this.render("archives");
     }
 
@@ -83,31 +88,32 @@ public class ArchivesController extends BaseController {
      * 渲染文章详情
      *
      * @param postUrl 文章路径名
-     * @param model model
+     * @param model   model
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "{postUrl}")
-    public String getPost(@PathVariable String postUrl, Model model){
-        Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
+    public String getPost(@PathVariable String postUrl, Model model) {
+        Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_POST);
         //获得当前文章的发布日期
         Date postDate = post.getPostDate();
-        try {
-            //查询当前文章日期之前的所有文章
-            List<Post> beforePosts = postService.findByPostDateBefore(postDate);
+        //查询当前文章日期之前的所有文章
+        List<Post> beforePosts = postService.findByPostDateBefore(postDate);
 
-            //查询当前文章日期之后的所有文章
-            List<Post> afterPosts = postService.findByPostDateAfter(postDate);
+        //查询当前文章日期之后的所有文章
+        List<Post> afterPosts = postService.findByPostDateAfter(postDate);
 
-            if(null!=beforePosts&&beforePosts.size()>0){
-                model.addAttribute("beforePost",beforePosts.get(beforePosts.size()-1));
-            }
-            if(null!=afterPosts&&afterPosts.size()>0){
-                model.addAttribute("afterPost",afterPosts.get(afterPosts.size()-1));
-            }
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+        if (null != beforePosts && beforePosts.size() > 0) {
+            model.addAttribute("beforePost", beforePosts.get(beforePosts.size() - 1));
         }
-        model.addAttribute("post",post);
+        if (null != afterPosts && afterPosts.size() > 0) {
+            model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
+        }
+        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
+        Pageable pageable = new PageRequest(0,999,sort);
+        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
+
+        model.addAttribute("post", post);
+        model.addAttribute("comments",comments);
 
         return this.render("post");
     }

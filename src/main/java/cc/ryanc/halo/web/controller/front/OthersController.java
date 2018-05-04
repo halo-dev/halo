@@ -31,17 +31,17 @@ public class OthersController {
      *
      * @return rss
      */
-    @GetMapping(value = {"feed","feed.xml","atom","atom.xml"},produces = "application/xml;charset=UTF-8")
+    @GetMapping(value = {"feed", "feed.xml", "atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
-    public String feed(){
+    public String feed() {
         String rssPosts = HaloConst.OPTIONS.get("rss_posts");
-        if(StringUtils.isBlank(rssPosts)){
+        if (StringUtils.isBlank(rssPosts)) {
             rssPosts = "20";
         }
         //获取文章列表并根据时间排序
-        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
-        Pageable pageable = new PageRequest(0,Integer.parseInt(rssPosts),sort);
-        Page<Post> postsPage = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
+        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        Pageable pageable = new PageRequest(0, Integer.parseInt(rssPosts), sort);
+        Page<Post> postsPage = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildRss(posts);
     }
@@ -51,13 +51,13 @@ public class OthersController {
      *
      * @return sitemap
      */
-    @GetMapping(value = {"sitemap","sitemap.xml"},produces = "application/xml;charset=UTF-8")
+    @GetMapping(value = {"sitemap", "sitemap.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
-    public String siteMap(){
+    public String siteMap() {
         //获取文章列表并根据时间排序
-        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
-        Pageable pageable = new PageRequest(0,999,sort);
-        Page<Post> postsPage = postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable);
+        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        Pageable pageable = new PageRequest(0, 999, sort);
+        Page<Post> postsPage = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildSiteMap(posts);
     }

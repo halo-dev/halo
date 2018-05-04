@@ -141,11 +141,12 @@ public class PostController extends BaseController{
     @PostMapping(value = "/new/push")
     @ResponseBody
     public void pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session){
-        //发表用户
+        //判断博主是否登录
         User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
         if(null==user){
             return;
         }
+        //判断是否为更新文章操作
         if(null!=post.getPostId()){
             post = postService.findByPostId(post.getPostId()).get();
         }
@@ -299,11 +300,17 @@ public class PostController extends BaseController{
         }
         String blogUrl = HaloConst.OPTIONS.get("blog_url");
         List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
-        String urls = "";
+        StringBuilder urls = new StringBuilder();
         for(Post post:posts){
-            urls+=blogUrl+"/archives/"+post.getPostUrl()+"\n";
+            urls.append(blogUrl);
+            urls.append("/archives/");
+            urls.append(post.getPostUrl());
+            urls.append("\n");
         }
-        HaloUtil.baiduPost(blogUrl,baiduToken,urls);
+        String result = HaloUtil.baiduPost(blogUrl, baiduToken, urls.toString());
+        if (StringUtils.isEmpty(result)) {
+            return false;
+        }
         return true;
     }
 }

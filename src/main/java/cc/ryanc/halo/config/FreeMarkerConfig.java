@@ -36,13 +36,13 @@ public class FreeMarkerConfig {
     private ArticleTagDirective articleTagDirective;
 
     @PostConstruct
-    public void setSharedVariable(){
-        configuration.setSharedVariable("commonTag",commonTagDirective);
-        configuration.setSharedVariable("articleTag",articleTagDirective);
-        try{
-            configuration.setSharedVariable("options",optionsService.findAllOptions());
-            configuration.setSharedVariable("user",userService.findUser());
-        }catch (TemplateModelException e){
+    public void setSharedVariable() {
+        configuration.setSharedVariable("commonTag", commonTagDirective);
+        configuration.setSharedVariable("articleTag", articleTagDirective);
+        try {
+            configuration.setSharedVariable("options", optionsService.findAllOptions());
+            configuration.setSharedVariable("user", userService.findUser());
+        } catch (TemplateModelException e) {
             e.printStackTrace();
         }
     }

@@ -14,12 +14,11 @@ import java.util.Map;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/23
  * @version : 1.0
- * description :
+ * @date : 2018/1/23
  */
 @Service
-public class MailServiceImpl implements MailService{
+public class MailServiceImpl implements MailService {
 
     @Autowired
     private FreeMarkerConfigurer freeMarker;
@@ -27,12 +26,12 @@ public class MailServiceImpl implements MailService{
     /**
      * 发送邮件
      *
-     * @param to to 接收者
+     * @param to      to 接收者
      * @param subject subject 标题
      * @param content content 内容
      */
     @Override
-    public void sendMail (String to, String subject, String content){
+    public void sendMail(String to, String subject, String content) {
         //配置邮件服务器
         HaloUtil.configMail(
                 HaloConst.OPTIONS.get("mail_smtp_host"),
@@ -44,7 +43,7 @@ public class MailServiceImpl implements MailService{
                     .to(to)
                     .text(content)
                     .send();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -52,28 +51,28 @@ public class MailServiceImpl implements MailService{
     /**
      * 发送模板邮件
      *
-     * @param to 接收者
-     * @param subject 主题
-     * @param content 内容
+     * @param to           接收者
+     * @param subject      主题
+     * @param content      内容
      * @param templateName 模板路径
      */
     @Override
-    public void sendTemplateMail(String to, String subject, Map<String, Object> content,String templateName) {
+    public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         //配置邮件服务器
         HaloUtil.configMail(
                 HaloConst.OPTIONS.get("mail_smtp_host"),
                 HaloConst.OPTIONS.get("mail_smtp_username"),
                 HaloConst.OPTIONS.get("mail_smtp_password"));
         String text = "";
-        try{
+        try {
             Template template = freeMarker.getConfiguration().getTemplate(templateName);
-            text = FreeMarkerTemplateUtils.processTemplateIntoString(template,content);
+            text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
             OhMyEmail.subject(subject)
                     .from(HaloConst.OPTIONS.get("mail_from_name"))
                     .to(to)
                     .html(text)
                     .send();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

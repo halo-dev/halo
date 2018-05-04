@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping(value = "/tags")
-public class TagsController extends BaseController {
+public class  TagsController extends BaseController {
 
     @Autowired
     private TagService tagService;
@@ -42,10 +42,10 @@ public class TagsController extends BaseController {
      * @return 模板路径/themes/{theme}/tags
      */
     @GetMapping
-    public String tags(Model model){
+    public String tags(Model model) {
         //所有标签
         List<Tag> tags = tagService.findAllTags();
-        model.addAttribute("tags",tags);
+        model.addAttribute("tags", tags);
         return this.render("tags");
     }
 
@@ -53,36 +53,37 @@ public class TagsController extends BaseController {
      * 根据标签路径查询所有文章
      *
      * @param tagUrl 标签路径
-     * @param model model
+     * @param model  model
      * @return string
      */
     @GetMapping(value = "{tagUrl}")
     public String tags(Model model,
-                       @PathVariable("tagUrl") String tagUrl){
-        return this.tags(model,tagUrl,1);
+                       @PathVariable("tagUrl") String tagUrl) {
+        return this.tags(model, tagUrl, 1);
     }
 
     /**
      * 根据标签路径查询所有文章 分页
-     * @param model model
+     *
+     * @param model  model
      * @param tagUrl 标签路径
-     * @param page 页码
+     * @param page   页码
      * @return string
      */
     @GetMapping(value = "{tagUrl}/page/{page}")
     public String tags(Model model,
                        @PathVariable("tagUrl") String tagUrl,
-                       @PathVariable("page") Integer page){
+                       @PathVariable("page") Integer page) {
         Tag tag = tagService.findByTagUrl(tagUrl);
-        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
+        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;
-        if(!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))){
+        if (!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
-        Pageable pageable = new PageRequest(page-1,size,sort);
-        Page<Post> posts = postService.findPostsByTags(tag,pageable);
-        model.addAttribute("posts",posts);
-        model.addAttribute("tag",tag);
+        Pageable pageable = new PageRequest(page - 1, size, sort);
+        Page<Post> posts = postService.findPostsByTags(tag, pageable);
+        model.addAttribute("posts", posts);
+        model.addAttribute("tag", tag);
         return this.render("index");
     }
 }

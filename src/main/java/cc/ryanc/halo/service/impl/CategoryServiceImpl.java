@@ -4,8 +4,6 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.repository.CategoryRepository;
 import cc.ryanc.halo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,12 +12,11 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
+ * @version : 1.0=
  * @date : 2017/11/30
- * @version : 1.0
- * description: Category业务层实现
  */
 @Service
-public class CategoryServiceImpl implements CategoryService{
+public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -83,12 +80,12 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public List<Category> strListToCateList(List<String> strings) {
-        if(null==strings){
+        if (null == strings) {
             return null;
         }
         List<Category> categories = new ArrayList<>();
         Optional<Category> category = null;
-        for(String str:strings){
+        for (String str : strings) {
             category = findByCateId(Long.parseLong(str));
             categories.add(category.get());
         }

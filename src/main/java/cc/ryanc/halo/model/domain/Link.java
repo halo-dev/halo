@@ -12,7 +12,6 @@ import java.io.Serializable;
  * @author : RYAN0UP
  * @date : 2017/11/14
  * @version : 1.0
- * description : 友情链接的实体类
  */
 @Data
 @Entity

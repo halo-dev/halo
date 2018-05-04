@@ -7,22 +7,28 @@ server:
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
+
     # H2database 配置
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/halo/halo
-    username: admin
+    #driver-class-name: org.h2.Driver
+    #url: jdbc:h2:file:~/halo/halo
+    #username: admin
+    #password: 123456
+
+    # MySql配置
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false
+    username: root
     password: 123456
-  h2:
-    console:
-      settings:
-        web-allow-others: true
-      path: /h2-console
-      enabled: true
+  #h2:
+    #console:
+      #settings:
+        #web-allow-others: true
+      #path: /h2-console
+      #enabled: true
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
-    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
   freemarker:
     allow-request-override: false
     cache: false

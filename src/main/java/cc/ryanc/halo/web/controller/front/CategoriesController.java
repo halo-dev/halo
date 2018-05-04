@@ -21,13 +21,13 @@ public class CategoriesController {
     /**
      * 根据分类路径查询文章
      *
-     * @param model model
+     * @param model   model
      * @param cateUrl cateUrl
      * @return string
      */
     @GetMapping(value = "{cateUrl}")
     public String categories(Model model,
-                             @PathVariable("cateUrl") String cateUrl){
+                             @PathVariable("cateUrl") String cateUrl) {
         List<Post> posts;
         return null;
     }

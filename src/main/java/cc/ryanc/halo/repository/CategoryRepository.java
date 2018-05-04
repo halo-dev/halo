@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author : RYAN0UP
  * @date : 2017/11/30
  * @version : 1.0
- * description: 分类目录持久层
  */
 public interface CategoryRepository extends JpaRepository<Category,Long>{
 

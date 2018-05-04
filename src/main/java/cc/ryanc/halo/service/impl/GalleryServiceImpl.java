@@ -13,12 +13,11 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/2/26
  * @version : 1.0
- * description :
+ * @date : 2018/2/26
  */
 @Service
-public class GalleryServiceImpl implements GalleryService{
+public class GalleryServiceImpl implements GalleryService {
 
     @Autowired
     private GalleryRepository galleryRepository;

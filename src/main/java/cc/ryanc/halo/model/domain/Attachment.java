@@ -11,14 +11,13 @@ import java.util.Date;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/10
  * @version : 1.0
- * description :
+ * @date : 2018/1/10
  */
 @Data
 @Entity
 @Table(name = "halo_attachment")
-public class Attachment implements Serializable{
+public class Attachment implements Serializable {
 
     private static final long serialVersionUID = 3060117944880138064L;
 

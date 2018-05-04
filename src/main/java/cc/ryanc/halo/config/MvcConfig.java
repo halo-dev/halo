@@ -16,7 +16,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author : RYAN0UP
  * @date : 2018/1/2
  * @version : 1.0
- * description:
  */
 @Slf4j
 @Configuration

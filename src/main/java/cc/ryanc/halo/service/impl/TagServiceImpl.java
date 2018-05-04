@@ -12,9 +12,8 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/12
  * @version : 1.0
- * description :
+ * @date : 2018/1/12
  */
 @Service
 public class TagServiceImpl implements TagService {
@@ -97,14 +96,14 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public List<Tag> strListToTagList(String tagList) {
-        String [] tags = tagList.split(",");
+        String[] tags = tagList.split(",");
         List<Tag> tagsList = new ArrayList<>();
-        for(String tag:tags){
+        for (String tag : tags) {
             Tag t = findTagByTagName(tag);
             Tag nt = null;
-            if(null!=t){
+            if (null != t) {
                 tagsList.add(t);
-            }else{
+            } else {
                 nt = new Tag();
                 nt.setTagName(tag);
                 nt.setTagUrl(tag);
