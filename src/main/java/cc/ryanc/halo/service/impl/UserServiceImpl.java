@@ -11,9 +11,8 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @date : 2017/11/14
  * @version : 1.0
- * description:
+ * @date : 2017/11/14
  */
 @Service
 public class UserServiceImpl implements UserService {
@@ -73,7 +72,7 @@ public class UserServiceImpl implements UserService {
     /**
      * 验证修改密码时，密码是否正确
      *
-     * @param userId userId
+     * @param userId   userId
      * @param userPass userPass
      * @return User
      */

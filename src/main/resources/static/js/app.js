@@ -34,3 +34,18 @@ function stringEncode(str){
     }
     return div.innerHTML;
 }
+
+/**
+ * 保存设置选项
+ */
+function saveOptions(option) {
+    var param = $('#'+option).serialize();
+    $.ajax({
+        type: 'post',
+        url: '/admin/option/save',
+        data: param,
+        success: function (result) {
+            showMsg("保存成功！","success",1000);
+        }
+    });
+}

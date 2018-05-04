@@ -9,15 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/22
  * @version : 1.0
- * description :
+ * @date : 2018/1/22
  */
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -55,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public Page<Comment> findAllComments(Integer status, Pageable pageable) {
-        return commentRepository.findCommentsByCommentStatus(status,pageable);
+        return commentRepository.findCommentsByCommentStatus(status, pageable);
     }
 
     /**
@@ -107,13 +105,13 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 根据文章查询评论
      *
-     * @param post post
+     * @param post     post
      * @param pageable pageable
      * @return page
      */
     @Override
-    public Page<Comment> findCommentsByPost(Post post,Pageable pageable) {
-        return commentRepository.findCommentsByPost(post,pageable);
+    public Page<Comment> findCommentsByPost(Post post, Pageable pageable) {
+        return commentRepository.findCommentsByPost(post, pageable);
     }
 
     /**
@@ -126,7 +124,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status) {
-        return commentRepository.findCommentsByPostAndCommentStatusNot(post,pageable,status);
+        return commentRepository.findCommentsByPostAndCommentStatusNot(post, pageable, status);
     }
 
     /**

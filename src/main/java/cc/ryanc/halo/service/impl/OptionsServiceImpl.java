@@ -3,7 +3,6 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Options;
 import cc.ryanc.halo.repository.OptionsRepository;
 import cc.ryanc.halo.service.OptionsService;
-import cc.ryanc.halo.util.HaloUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,8 @@ import java.util.Map;
 
 /**
  * @author : RYAN0UP
- * @date : 2017/11/14
  * @version : 1.0
- * description:
+ * @date : 2017/11/14
  */
 @Service
 public class OptionsServiceImpl implements OptionsService {
@@ -30,26 +28,26 @@ public class OptionsServiceImpl implements OptionsService {
      * @param options options
      */
     @Override
-    public void saveOptions(Map<String,String> options){
-        if(null != options && !options.isEmpty()){
-            options.forEach((k,v) -> saveOption(k,v));
+    public void saveOptions(Map<String, String> options) {
+        if (null != options && !options.isEmpty()) {
+            options.forEach((k, v) -> saveOption(k, v));
         }
     }
 
     /**
      * 保存单个设置选项
      *
-     * @param key key
+     * @param key   key
      * @param value value
      */
     @Override
-    public void saveOption(String key,String value){
+    public void saveOption(String key, String value) {
         Options options = null;
-        if(StringUtils.equals(value,"")){
+        if (StringUtils.equals(value, "")) {
             options = new Options();
             options.setOptionName(key);
             this.removeOption(options);
-        }else {
+        } else {
             if (StringUtils.isNotEmpty(key)) {
                 //如果查询到有该设置选项则做更新操作，反之保存新的设置选项
                 if (null == optionsRepository.findOptionsByOptionName(key)) {
@@ -83,10 +81,10 @@ public class OptionsServiceImpl implements OptionsService {
      */
     @Override
     public Map<String, String> findAllOptions() {
-        Map<String,String> options = new HashMap<String,String>();
+        Map<String, String> options = new HashMap<String, String>();
         List<Options> optionsList = optionsRepository.findAll();
-        if(null != optionsList){
-            optionsList.forEach(option -> options.put(option.getOptionName(),option.getOptionValue()));
+        if (null != optionsList) {
+            optionsList.forEach(option -> options.put(option.getOptionName(), option.getOptionValue()));
         }
         return options;
     }
@@ -100,7 +98,7 @@ public class OptionsServiceImpl implements OptionsService {
     @Override
     public String findOneOption(String key) {
         Options options = optionsRepository.findOptionsByOptionName(key);
-        if(null!=options){
+        if (null != options) {
             return options.getOptionValue();
         }
         return null;

@@ -7,15 +7,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author : RYAN0UP
  * @date : 2018/2/26
  * @version : 1.0
- * description :
  */
-
 @Data
 @Entity
 @Table(name = "halo_gallery")

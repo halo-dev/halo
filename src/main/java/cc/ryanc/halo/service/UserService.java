@@ -7,9 +7,8 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @date : 2017/11/14
  * @version : 1.0
- * description:
+ * @date : 2017/11/14
  */
 public interface UserService {
 
@@ -27,15 +26,16 @@ public interface UserService {
      * @param userPass userPass
      * @return User
      */
-    List<User> userLoginByName(String userName,String userPass);
+    List<User> userLoginByName(String userName, String userPass);
 
     /**
      * 根据邮箱和密码查询，用户登录
+     *
      * @param userEmail userEmail
-     * @param userPass userPass
+     * @param userPass  userPass
      * @return list
      */
-    List<User> userLoginByEmail(String userEmail,String userPass);
+    List<User> userLoginByEmail(String userEmail, String userPass);
 
     /**
      * 查询所有用户
@@ -47,11 +47,11 @@ public interface UserService {
     /**
      * 根据用户编号和密码查询
      *
-     * @param userId userid
+     * @param userId   userid
      * @param userPass userpass
      * @return user
      */
-    User findByUserIdAndUserPass(Long userId,String userPass);
+    User findByUserIdAndUserPass(Long userId, String userPass);
 
     /**
      * 修改禁用状态

@@ -33,7 +33,7 @@ public class OptionController {
      * @return 模板路径admin/admin_option
      */
     @GetMapping
-    public String options(){
+    public String options() {
         return "admin/admin_option";
     }
 
@@ -45,17 +45,17 @@ public class OptionController {
      */
     @PostMapping(value = "/save")
     @ResponseBody
-    public boolean saveOptions(@RequestParam Map<String,String> options){
+    public boolean saveOptions(@RequestParam Map<String, String> options) {
         try {
             optionsService.saveOptions(options);
             //刷新options
-            configuration.setSharedVariable("options",optionsService.findAllOptions());
+            configuration.setSharedVariable("options", optionsService.findAllOptions());
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
-            log.info("所保存的设置选项列表："+options);
+            log.info("所保存的设置选项列表：" + options);
             return true;
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
             return false;
         }
     }

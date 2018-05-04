@@ -34,30 +34,30 @@ public class UserController {
      * @return 模板路径admin/admin_profile
      */
     @GetMapping
-    public String profile(){
+    public String profile() {
         return "admin/admin_profile";
     }
 
     /**
      * 处理修改用户资料的请求
      *
-     * @param user user
+     * @param user    user
      * @param session session
      * @return true：修改成功，false：修改失败
      */
     @PostMapping(value = "save")
     @ResponseBody
-    public boolean saveProfile(@ModelAttribute User user,HttpSession session){
-        try{
-            if(null!=user){
+    public boolean saveProfile(@ModelAttribute User user, HttpSession session) {
+        try {
+            if (null != user) {
                 userService.saveByUser(user);
-                configuration.setSharedVariable("user",userService.findUser());
+                configuration.setSharedVariable("user", userService.findUser());
                 session.invalidate();
-            }else{
+            } else {
                 return false;
             }
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
             return false;
         }
         return true;
@@ -67,28 +67,28 @@ public class UserController {
      * 处理修改密码的请求
      *
      * @param beforePass 旧密码
-     * @param newPass 新密码
-     * @param userId 用户编号
-     * @param session session
+     * @param newPass    新密码
+     * @param userId     用户编号
+     * @param session    session
      * @return true：修改密码成功，false：修改密码失败
      */
     @PostMapping(value = "changePass")
     @ResponseBody
     public boolean changePass(@ModelAttribute("beforePass") String beforePass,
-                             @ModelAttribute("newPass") String newPass,
-                             @ModelAttribute("userId") Long userId,
-                             HttpSession session){
+                              @ModelAttribute("newPass") String newPass,
+                              @ModelAttribute("userId") Long userId,
+                              HttpSession session) {
         try {
-            User user = userService.findByUserIdAndUserPass(userId,HaloUtil.getMD5(beforePass));
-            if(null!=user){
+            User user = userService.findByUserIdAndUserPass(userId, HaloUtil.getMD5(beforePass));
+            if (null != user) {
                 user.setUserPass(HaloUtil.getMD5(newPass));
                 userService.saveByUser(user);
                 session.invalidate();
-            }else{
+            } else {
                 return false;
             }
-        }catch (Exception e){
-            log.error("修改密码：未知错误，{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("修改密码：未知错误，{0}", e.getMessage());
             return false;
         }
         return true;

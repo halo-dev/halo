@@ -10,7 +10,6 @@ import java.util.Date;
  * @author : RYAN0UP
  * @date : 2018/1/22
  * @version : 1.0
- * description : 评论实体类
  */
 @Data
 @Entity

@@ -33,17 +33,17 @@ public class CommonTagDirective implements TemplateDirectiveModel {
     @Override
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
         DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
-        if(map.containsKey(METHOD_KEY)){
+        if (map.containsKey(METHOD_KEY)) {
             String method = map.get(METHOD_KEY).toString();
-            switch (method){
+            switch (method) {
                 case "menus":
-                    environment.setVariable("menus",builder.build().wrap(menuService.findAllMenus()));
+                    environment.setVariable("menus", builder.build().wrap(menuService.findAllMenus()));
                     break;
                 case "categories":
-                    environment.setVariable("categories",builder.build().wrap(categoryService.findAllCategories()));
+                    environment.setVariable("categories", builder.build().wrap(categoryService.findAllCategories()));
                     break;
                 case "newComments":
-                    environment.setVariable("newComments",builder.build().wrap(commentService.findAllComments(1)));
+                    environment.setVariable("newComments", builder.build().wrap(commentService.findAllComments(1)));
                     break;
                 default:
                     break;

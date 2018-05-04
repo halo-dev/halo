@@ -31,7 +31,9 @@
                                             <div class="pull-left">
                                                 <img src="http://www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?default("hash")}?s=256&d=${options.native_comment_avatar?default("mm")}" class="img-circle" alt="User Image">
                                             </div>
-                                            <h5>${comment.commentAuthor}<small> ${comment.commentDate}</small></h5>
+                                            <h4>${comment.commentAuthor}
+                                                <small> ${comment.commentDate?string("yyyy/MM/dd HH:mm")}</small>
+                                            </h4>
                                             <p>${comment.commentContent}</p>
                                         </a>
                                     </li>

@@ -12,7 +12,7 @@
                 ${visitor}：${commentContent}
                 </p>
                 <br />
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">你可以点击<a href="${blogUrl}">查看完整内容</a></p>
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">你可以点击<a href="${pageUrl}">查看完整内容</a></p>
             </div>
         </div>
     </div>

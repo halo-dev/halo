@@ -65,15 +65,14 @@
 			<version>${oh-my-email.version}</version>
 		</dependency>
 
-		<!-- mysql -->
-		<!--
+		<!-- mysql-->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		-->
 
+		<!-- H2Database -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>

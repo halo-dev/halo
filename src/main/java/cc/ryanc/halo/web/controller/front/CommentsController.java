@@ -48,14 +48,14 @@ public class CommentsController {
      * @param postId postId 文章编号
      * @return List<Comment>集合</>
      */
-    @GetMapping(value = "/getComment/{postId}",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(value = "/getComment/{postId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public List<Comment> getComment(@PathVariable Long postId){
+    public List<Comment> getComment(@PathVariable Long postId) {
         Optional<Post> post = postService.findByPostId(postId);
-        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
-        Pageable pageable = new PageRequest(0,10,sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(),pageable,2).getContent();
-        if(null==comments){
+        Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
+        Pageable pageable = new PageRequest(0, 10, sort);
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, 2).getContent();
+        if (null == comments) {
             return null;
         }
         return comments;
@@ -65,7 +65,7 @@ public class CommentsController {
      * 提交新评论
      *
      * @param comment comment实体
-     * @param post post实体
+     * @param post    post实体
      * @param request request
      * @return true：评论成功，false：评论失败
      */
@@ -73,8 +73,8 @@ public class CommentsController {
     @ResponseBody
     public boolean newComment(@ModelAttribute("comment") Comment comment,
                               @ModelAttribute("post") Post post,
-                              HttpServletRequest request){
-        if(StringUtils.isBlank(comment.getCommentAuthor())){
+                              HttpServletRequest request) {
+        if (StringUtils.isBlank(comment.getCommentAuthor())) {
             comment.setCommentAuthor("小猪佩琪");
         }
         comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
@@ -84,18 +84,18 @@ public class CommentsController {
         comment.setIsAdmin(0);
         commentService.saveByComment(comment);
 
-        if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("new_comment_notice"),"true")){
+        if (StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"), "true") && StringUtils.equals(HaloConst.OPTIONS.get("new_comment_notice"), "true")) {
             try {
                 //发送邮件到博主
-                Map<String,Object> map = new HashMap<>();
-                map.put("author",userService.findUser().getUserDisplayName());
-                map.put("pageName",postService.findByPostId(post.getPostId()).get().getPostTitle());
-                map.put("blogUrl",HaloConst.OPTIONS.get("blog_url"));
-                map.put("visitor",comment.getCommentAuthor());
-                map.put("commentContent",comment.getCommentContent());
-                mailService.sendTemplateMail(userService.findUser().getUserEmail(),"有新的评论",map,"common/mail/mail_admin.ftl");
-            }catch (Exception e){
-                log.error("邮件服务器未配置：{0}",e.getMessage());
+                Map<String, Object> map = new HashMap<>();
+                map.put("author", userService.findUser().getUserDisplayName());
+                map.put("pageName", postService.findByPostId(post.getPostId()).get().getPostTitle());
+                map.put("pageUrl", HaloConst.OPTIONS.get("blog_url")+"/archives/"+post.getPostUrl()+"#comment-id-"+comment.getCommentId());
+                map.put("visitor", comment.getCommentAuthor());
+                map.put("commentContent", comment.getCommentContent());
+                mailService.sendTemplateMail(userService.findUser().getUserEmail(), "有新的评论", map, "common/mail/mail_admin.ftl");
+            } catch (Exception e) {
+                log.error("邮件服务器未配置：{0}", e.getMessage());
             }
         }
         return true;

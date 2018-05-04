@@ -5,7 +5,6 @@ import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -13,9 +12,8 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2017/11/14
  * @version : 1.0
- * description :
+ * @date : 2017/11/14
  */
 public interface PostService {
 
@@ -42,7 +40,7 @@ public interface PostService {
      * @param status status
      * @return Post
      */
-    Post updatePostStatus(Long postId,Integer status);
+    Post updatePostStatus(Long postId, Integer status);
 
     /**
      * 批量修改摘要
@@ -58,7 +56,7 @@ public interface PostService {
      * @param pageable 分页信息
      * @return Page<Post></>
      */
-    Page<Post> findAllPosts(String postType,Pageable pageable);
+    Page<Post> findAllPosts(String postType, Pageable pageable);
 
     /**
      * 获取文章列表 不分页
@@ -71,30 +69,30 @@ public interface PostService {
     /**
      * 模糊查询文章
      *
-     * @param keyWord keyword
+     * @param keyWord  keyword
      * @param pageable pageable
      * @return list
      */
-    List<Post> searchPosts(String keyWord,Pageable pageable);
+    List<Post> searchPosts(String keyWord, Pageable pageable);
 
     /**
      * 根据文章状态查询 分页
      *
-     * @param status 0，1，2
+     * @param status   0，1，2
      * @param postType post or page
      * @param pageable 分页信息
      * @return Page<Post></>
      */
-    Page<Post> findPostByStatus(Integer status,String postType,Pageable pageable);
+    Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable);
 
     /**
      * 根据文章状态查询
      *
-     * @param status 0，1，2
+     * @param status   0，1，2
      * @param postType post or page
      * @return List<Post></>
      */
-    List<Post> findPostByStatus(Integer status,String postType);
+    List<Post> findPostByStatus(Integer status, String postType);
 
     /**
      * 根据编号查询文章
@@ -107,11 +105,11 @@ public interface PostService {
     /**
      * 根据文章路径查询
      *
-     * @param postUrl 路径
+     * @param postUrl  路径
      * @param postType post or page
      * @return Post
      */
-    Post findByPostUrl(String postUrl,String postType);
+    Post findByPostUrl(String postUrl, String postType);
 
     /**
      * 查询前五条数据
@@ -153,21 +151,21 @@ public interface PostService {
     /**
      * 根据年份和月份查询文章
      *
-     * @param year year
+     * @param year  year
      * @param month month
      * @return list
      */
-    List<Post> findPostByYearAndMonth(String year,String month);
+    List<Post> findPostByYearAndMonth(String year, String month);
 
     /**
      * 根据年份和月份查询文章 分页
      *
-     * @param year year
-     * @param month month
+     * @param year     year
+     * @param month    month
      * @param pageable pageable
      * @return page
      */
-    Page<Post> findPostByYearAndMonth(String year,String month, Pageable pageable);
+    Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable);
 
     /**
      * 根据年份查询文章
@@ -180,11 +178,11 @@ public interface PostService {
     /**
      * 根据标签查询文章
      *
-     * @param tag tag
+     * @param tag      tag
      * @param pageable pageable
      * @return page
      */
-    Page<Post> findPostsByTags(Tag tag,Pageable pageable);
+    Page<Post> findPostsByTags(Tag tag, Pageable pageable);
 
     /**
      * 生成rss

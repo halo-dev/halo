@@ -76,11 +76,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="blogLogo" class="col-sm-2 control-label">LOGO：
-                                                <span data-toggle="tooltip" data-placement="top" title="如果不设置图片Logo，将使用网站标题作为Logo" style="cursor: pointer">
-                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                </span>
-                                            </label>
+                                            <label for="blogLogo" class="col-sm-2 control-label">LOGO：</label>
                                             <div class="col-sm-4">
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="blogLogo" name="blog_logo" value="${options.blog_logo?if_exists}">
@@ -121,14 +117,14 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="desc" class="col-sm-2 control-label">站点描述：</label>
+                                            <label for="desc" class="col-sm-2 control-label">博客描述：</label>
                                             <div class="col-sm-4">
                                                 <input type="text" class="form-control" id="desc" name="seo_desc" value="${options.seo_desc?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="baiduToken" class="col-sm-2 control-label">百度推送token：
-                                                <span data-toggle="tooltip" data-placement="top" title="自行百度获取" style="cursor: pointer">
+                                                <span data-toggle="tooltip" data-placement="top" title="百度站长平台获取" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
@@ -432,17 +428,17 @@
                                             <div class="col-sm-4">
                                                 <select class="form-control" id="adminTheme" name="admin_theme">
                                                     <option value="skin-blue" ${((options.admin_theme?default('skin-blue'))=='skin-blue')?string('selected','')}>默认主题</option>
-                                                    <option value="skin-blue-light" ${((options.admin_theme?default('skin-blue'))=='skin-blue-light')?string('selected','')}>上蓝左白</option>
-                                                    <option value="skin-black" ${((options.admin_theme?default('skin-blue'))=='skin-black')?string('selected','')}>上白左黑</option>
-                                                    <option value="skin-black-light" ${((options.admin_theme?default('skin-blue'))=='skin-black-light')?string('selected','')}>上白左白</option>
-                                                    <option value="skin-green" ${((options.admin_theme?default('skin-blue'))=='skin-green')?string('selected','')}>上绿左黑</option>
-                                                    <option value="skin-green-light" ${((options.admin_theme?default('skin-blue'))=='skin-green-light')?string('selected','')}>上绿左白</option>
-                                                    <option value="skin-purple" ${((options.admin_theme?default('skin-blue'))=='skin-purple')?string('selected','')}>上紫左黑</option>
-                                                    <option value="skin-purple-light" ${((options.admin_theme?default('skin-blue'))=='skin-purple-light')?string('selected','')}>上紫左白</option>
-                                                    <option value="skin-red" ${((options.admin_theme?default('skin-blue'))=='skin-red')?string('selected','')}>上红左黑</option>
-                                                    <option value="skin-red-light" ${((options.admin_theme?default('skin-blue'))=='skin-red-light')?string('selected','')}>上红左白</option>
-                                                    <option value="skin-yellow" ${((options.admin_theme?default('skin-blue'))=='skin-yellow')?string('selected','')}>上黄左黑</option>
-                                                    <option value="skin-yellow-light" ${((options.admin_theme?default('skin-blue'))=='skin-yellow-light')?string('selected','')}>上黄左白</option>
+                                                    <option value="skin-blue-light" ${((options.admin_theme?if_exists)=='skin-blue-light')?string('selected','')}>上蓝左白</option>
+                                                    <option value="skin-black" ${((options.admin_theme?if_exists)=='skin-black')?string('selected','')}>上白左黑</option>
+                                                    <option value="skin-black-light" ${((options.admin_theme?if_exists)=='skin-black-light')?string('selected','')}>上白左白</option>
+                                                    <option value="skin-green" ${((options.admin_theme?if_exists)=='skin-green')?string('selected','')}>上绿左黑</option>
+                                                    <option value="skin-green-light" ${((options.admin_theme?if_exists)=='skin-green-light')?string('selected','')}>上绿左白</option>
+                                                    <option value="skin-purple" ${((options.admin_theme?if_exists)=='skin-purple')?string('selected','')}>上紫左黑</option>
+                                                    <option value="skin-purple-light" ${((options.admin_theme?if_exists)=='skin-purple-light')?string('selected','')}>上紫左白</option>
+                                                    <option value="skin-red" ${((options.admin_theme?if_exists)=='skin-red')?string('selected','')}>上红左黑</option>
+                                                    <option value="skin-red-light" ${((options.admin_theme?if_exists)=='skin-red-light')?string('selected','')}>上红左白</option>
+                                                    <option value="skin-yellow" ${((options.admin_theme?if_exists)=='skin-yellow')?string('selected','')}>上黄左黑</option>
+                                                    <option value="skin-yellow-light" ${((options.admin_theme?if_exists)=='skin-yellow-light')?string('selected','')}>上黄左白</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -457,32 +453,32 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="postEditor" class="col-sm-2 control-label">文章编辑器：
-                                                <span data-toggle="tooltip" data-placement="top" title="请勿将它们混用" style="cursor: pointer">
-                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                </span>
-                                            </label>
-                                            <div class="col-sm-4">
-                                                <select class="form-control" id="postEditor" name="post_editor">
-                                                    <option value="editor.md" ${((options.post_editor?default('editor.md'))=='editor.md')?string('selected','')}>Markdown</option>
-                                                    <option value="ckeditor" ${((options.post_editor?default('editor.md'))=='ckeditor')?string('selected','')}>富文本</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="pageEditor" class="col-sm-2 control-label">页面编辑器：
-                                                <span data-toggle="tooltip" data-placement="top" title="请勿将它们混用" style="cursor: pointer">
-                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                </span>
-                                            </label>
-                                            <div class="col-sm-4">
-                                                <select class="form-control" id="pageEditor" name="page_editor">
-                                                    <option value="editor.md" ${((options.page_editor?default('editor.md'))=='editor.md')?string('selected','')}>Markdown</option>
-                                                    <option value="ckeditor" ${((options.page_editor?default('editor.md'))=='ckeditor')?string('selected','')}>富文本</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                        <#--<div class="form-group">-->
+                                            <#--<label for="postEditor" class="col-sm-2 control-label">文章编辑器：-->
+                                                <#--<span data-toggle="tooltip" data-placement="top" title="请勿将它们混用" style="cursor: pointer">-->
+                                                    <#--<i class="fa fa-question-circle" aria-hidden="true"></i>-->
+                                                <#--</span>-->
+                                            <#--</label>-->
+                                            <#--<div class="col-sm-4">-->
+                                                <#--<select class="form-control" id="postEditor" name="post_editor">-->
+                                                    <#--<option value="editor.md" ${((options.post_editor?default('editor.md'))=='editor.md')?string('selected','')}>Markdown</option>-->
+                                                    <#--<option value="ckeditor" ${((options.post_editor?default('editor.md'))=='ckeditor')?string('selected','')}>富文本</option>-->
+                                                <#--</select>-->
+                                            <#--</div>-->
+                                        <#--</div>-->
+                                        <#--<div class="form-group">-->
+                                            <#--<label for="pageEditor" class="col-sm-2 control-label">页面编辑器：-->
+                                                <#--<span data-toggle="tooltip" data-placement="top" title="请勿将它们混用" style="cursor: pointer">-->
+                                                    <#--<i class="fa fa-question-circle" aria-hidden="true"></i>-->
+                                                <#--</span>-->
+                                            <#--</label>-->
+                                            <#--<div class="col-sm-4">-->
+                                                <#--<select class="form-control" id="pageEditor" name="page_editor">-->
+                                                    <#--<option value="editor.md" ${((options.page_editor?default('editor.md'))=='editor.md')?string('selected','')}>Markdown</option>-->
+                                                    <#--<option value="ckeditor" ${((options.page_editor?default('editor.md'))=='ckeditor')?string('selected','')}>富文本</option>-->
+                                                <#--</select>-->
+                                            <#--</div>-->
+                                        <#--</div>-->
                                     </div>
                                     <div class="box-footer">
                                         <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('adminOptions')">保存</button>
@@ -562,12 +558,17 @@
         </section>
         <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
+        <script src="/static/js/app.js"></script>
         <@compress single_line=true>
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
                 checkCommentOption();
             });
+
+            /**
+             * 打开附件
+             */
             function openAttach(id) {
                 layer.open({
                     type: 2,
@@ -580,17 +581,10 @@
                     scrollbar: false
                 });
             }
-            function saveOptions(option) {
-                var param = $('#'+option).serialize();
-                $.ajax({
-                    type: 'post',
-                    url: '/admin/option/save',
-                    data: param,
-                    success: function (result) {
-                        showMsg("保存成功！","success",1000);
-                    }
-                });
-            }
+
+            /**
+             * 更新所有文章的摘要
+             */
             function updateAllSummary() {
                 $.ajax({
                     type: 'GET',
@@ -607,6 +601,10 @@
                     }
                 });
             }
+
+            /**
+             * 主动提交文章到百度
+             */
             function pushAllToBaidu() {
                 $.ajax({
                     type: 'GET',
@@ -623,6 +621,10 @@
                     }
                 });
             }
+
+            /**
+             * 评论切换
+             */
             function checkCommentOption() {
                 var native = $('input:radio[value=native]:checked').val();
                 var valine = $('input:radio[value=valine]:checked').val();
@@ -655,6 +657,10 @@
                     $('.changyan-options').hide();
                 }
             }
+
+            /**
+             * 后台布局切换
+             */
             function viewLayout() {
                 var layout = $('input:radio[value=layout-boxed]:checked').val();
                 if(layout!=null){
@@ -663,6 +669,10 @@
                     $('body').removeClass('layout-boxed');
                 }
             }
+
+            /**
+             * 预览侧边栏
+             */
             function viewSideBar() {
                 var layout = $('input:radio[value=sidebar-collapse]:checked').val();
                 if(layout!=null){
@@ -680,6 +690,10 @@
             $('input[name=sidebar_style]').click(function () {
                 viewSideBar();
             });
+
+            /**
+             * 预览后台样式切换
+             */
             $(function () {
                 var beforeTheme;
                 $('#adminTheme').change(function () {

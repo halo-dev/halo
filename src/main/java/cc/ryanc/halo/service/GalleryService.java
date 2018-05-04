@@ -9,9 +9,8 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/2/26
  * @version : 1.0
- * description :
+ * @date : 2018/2/26
  */
 public interface GalleryService {
 
@@ -48,12 +47,14 @@ public interface GalleryService {
 
     /**
      * 查询所有图片 不分页
+     *
      * @return list
      */
     List<Gallery> findAllGalleries();
 
     /**
      * 根据编号查询图片信息
+     *
      * @param galleryId galleryId
      * @return gallery
      */

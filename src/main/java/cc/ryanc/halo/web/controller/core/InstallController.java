@@ -60,14 +60,14 @@ public class InstallController {
      * @return 模板路径
      */
     @GetMapping
-    public String install(Model model){
-        try{
-            if(StringUtils.equals("true",HaloConst.OPTIONS.get("is_install"))){
-                model.addAttribute("isInstall",true);
-            }else{
-                model.addAttribute("isInstall",false);
+    public String install(Model model) {
+        try {
+            if (StringUtils.equals("true", HaloConst.OPTIONS.get("is_install"))) {
+                model.addAttribute("isInstall", true);
+            } else {
+                model.addAttribute("isInstall", false);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         return "common/install";
@@ -76,32 +76,32 @@ public class InstallController {
     /**
      * 执行安装
      *
-     * @param siteTitle 博客标题
-     * @param siteUrl 博客网址
-     * @param userName 用户名
+     * @param siteTitle       博客标题
+     * @param siteUrl         博客网址
+     * @param userName        用户名
      * @param userDisplayName 用户名显示名
-     * @param userEmail 用户邮箱
-     * @param userPwd 用户密码
-     * @param request request
+     * @param userEmail       用户邮箱
+     * @param userPwd         用户密码
+     * @param request         request
      * @return true：安装成功，false：安装失败
      */
     @PostMapping(value = "/do")
     @ResponseBody
     public boolean doInstall(@RequestParam("blogTitle") String blogTitle,
-                            @RequestParam("blogUrl") String blogUrl,
-                            @RequestParam("userName") String userName,
-                            @RequestParam("userDisplayName") String userDisplayName,
-                            @RequestParam("userEmail") String userEmail,
-                            @RequestParam("userPwd") String userPwd,
-                            HttpServletRequest request){
-        try{
-            if(StringUtils.equals("true",HaloConst.OPTIONS.get("is_install"))){
+                             @RequestParam("blogUrl") String blogUrl,
+                             @RequestParam("userName") String userName,
+                             @RequestParam("userDisplayName") String userDisplayName,
+                             @RequestParam("userEmail") String userEmail,
+                             @RequestParam("userPwd") String userPwd,
+                             HttpServletRequest request) {
+        try {
+            if (StringUtils.equals("true", HaloConst.OPTIONS.get("is_install"))) {
                 return false;
             }
             //创建新的用户
-            User user=  new User();
+            User user = new User();
             user.setUserName(userName);
-            if(StringUtils.isBlank(userDisplayName)){
+            if (StringUtils.isBlank(userDisplayName)) {
                 userDisplayName = userName;
             }
             user.setUserDisplayName(userDisplayName);
@@ -146,28 +146,28 @@ public class InstallController {
             comment.setIsAdmin(0);
             commentService.saveByComment(comment);
 
-            optionsService.saveOption("is_install","true");
+            optionsService.saveOption("is_install", "true");
 
             //保存博客标题和博客地址设置
-            optionsService.saveOption("blog_title",blogTitle);
-            optionsService.saveOption("blog_url",blogUrl);
+            optionsService.saveOption("blog_title", blogTitle);
+            optionsService.saveOption("blog_url", blogUrl);
 
             //设置默认主题
-            optionsService.saveOption("theme","anatole");
+            optionsService.saveOption("theme", "anatole");
 
             //建立网站时间
-            optionsService.saveOption("blog_start",HaloUtil.getStringDate("yyyy-MM-dd"));
+            optionsService.saveOption("blog_start", HaloUtil.getStringDate("yyyy-MM-dd"));
 
             //默认评论系统
-            optionsService.saveOption("comment_system","native");
+            optionsService.saveOption("comment_system", "native");
 
             //默认不配置邮件系统
-            optionsService.saveOption("smtp_email_enable","false");
+            optionsService.saveOption("smtp_email_enable", "false");
 
             //新评论，审核通过，回复，默认不通知
-            optionsService.saveOption("new_comment_notice","false");
-            optionsService.saveOption("comment_pass_notice","false");
-            optionsService.saveOption("comment_reply_notice","false");
+            optionsService.saveOption("new_comment_notice", "false");
+            optionsService.saveOption("comment_pass_notice", "false");
+            optionsService.saveOption("comment_reply_notice", "false");
 
             //更新日志
             logsService.saveByLogs(
@@ -196,9 +196,9 @@ public class InstallController {
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
 
-            configuration.setSharedVariable("options",optionsService.findAllOptions());
-            configuration.setSharedVariable("user",userService.findUser());
-        }catch (Exception e){
+            configuration.setSharedVariable("options", optionsService.findAllOptions());
+            configuration.setSharedVariable("user", userService.findUser());
+        } catch (Exception e) {
             log.error(e.getMessage());
             return false;
         }

@@ -4,9 +4,6 @@ import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,12 +13,11 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @date : 2018/1/10
  * @version : 1.0
- * description :
+ * @date : 2018/1/10
  */
 @Service
-public class AttachmentServiceImpl implements AttachmentService{
+public class AttachmentServiceImpl implements AttachmentService {
 
     @Autowired
     private AttachmentRepository attachmentRepository;

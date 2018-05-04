@@ -5,18 +5,19 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @date : 2017/11/14
  * @version : 1.0
- * description : 文章实体类
+ * @date : 2017/11/14
  */
 @Data
 @Entity
 @Table(name = "halo_post")
-public class Post implements Serializable{
+public class Post implements Serializable {
 
     private static final long serialVersionUID = -6019684584665869629L;
 
@@ -72,25 +73,25 @@ public class Post implements Serializable{
     /**
      * 文章所属分类
      */
-    @ManyToMany(cascade = {CascadeType.PERSIST},fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinTable(name = "halo_posts_categories",
-            joinColumns = {@JoinColumn(name = "post_id",nullable = false)},
-            inverseJoinColumns = {@JoinColumn(name = "cate_id",nullable = false)})
+            joinColumns = {@JoinColumn(name = "post_id", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "cate_id", nullable = false)})
     private List<Category> categories = new ArrayList<>();
 
     /**
      * 文章所属标签
      */
-    @ManyToMany(cascade = {CascadeType.PERSIST},fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinTable(name = "halo_posts_tags",
-            joinColumns = {@JoinColumn(name = "post_id",nullable = false)},
-            inverseJoinColumns = {@JoinColumn(name = "tag_id",nullable = false)})
+            joinColumns = {@JoinColumn(name = "post_id", nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id", nullable = false)})
     private List<Tag> tags = new ArrayList<>();
 
     /**
      * 文章的评论
      */
-    @OneToMany(mappedBy = "post",cascade = {CascadeType.REMOVE},fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
 

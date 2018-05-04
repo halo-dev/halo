@@ -20,7 +20,6 @@ import java.util.Map;
  * @author : RYAN0UP
  * @date : 2017/12/22
  * @version : 1.0
- * description: Springboot启动后
  */
 @Slf4j
 @Configuration

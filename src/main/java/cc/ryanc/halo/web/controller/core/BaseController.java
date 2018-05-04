@@ -19,7 +19,7 @@ public abstract class BaseController {
      * @param pageName pageName
      * @return 返回拼接好的模板路径
      */
-    public String render(String pageName){
+    public String render(String pageName) {
         StringBuffer themeStr = new StringBuffer("themes/");
         themeStr.append(THEME);
         themeStr.append("/");

@@ -31,8 +31,8 @@ public class MenuController {
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping
-    public String menus(Model model){
-        model.addAttribute("statusName","添加");
+    public String menus(Model model) {
+        model.addAttribute("statusName", "添加");
         return "/admin/admin_menu";
     }
 
@@ -43,11 +43,11 @@ public class MenuController {
      * @return 重定向到/admin/menus
      */
     @PostMapping(value = "/save")
-    public String saveMenu(@ModelAttribute Menu menu){
-        try{
+    public String saveMenu(@ModelAttribute Menu menu) {
+        try {
             menuService.saveByMenu(menu);
-        }catch (Exception e){
-            log.error("保存菜单失败："+e.getMessage());
+        } catch (Exception e) {
+            log.error("保存菜单失败：" + e.getMessage());
         }
         return "redirect:/admin/menus";
     }
@@ -56,14 +56,14 @@ public class MenuController {
      * 跳转到修改页面
      *
      * @param menuId 菜单编号
-     * @param model model
+     * @param model  model
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping(value = "/edit")
-    public String updateMenu(@RequestParam("menuId") Long menuId,Model model){
+    public String updateMenu(@RequestParam("menuId") Long menuId, Model model) {
         Menu menu = menuService.findByMenuId(menuId).get();
-        model.addAttribute("statusName","修改");
-        model.addAttribute("updateMenu",menu);
+        model.addAttribute("statusName", "修改");
+        model.addAttribute("updateMenu", menu);
         return "/admin/admin_menu";
     }
 
@@ -74,11 +74,11 @@ public class MenuController {
      * @return 重定向到/admin/menus
      */
     @GetMapping(value = "/remove")
-    public String removeMenu(@PathParam("menuId") Long menuId){
+    public String removeMenu(@PathParam("menuId") Long menuId) {
         try {
             menuService.removeByMenuId(menuId);
-        }catch (Exception e){
-            log.error("删除菜单失败：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("删除菜单失败：{0}", e.getMessage());
         }
         return "redirect:/admin/menus";
     }

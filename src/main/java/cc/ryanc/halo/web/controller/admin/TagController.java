@@ -32,10 +32,10 @@ public class TagController {
      * @return 模板路径admin/admin_tag
      */
     @GetMapping
-    public String tags(Model model){
+    public String tags(Model model) {
         List<Tag> tags = tagService.findAllTags();
-        model.addAttribute("tags",tags);
-        model.addAttribute("statusName","新增");
+        model.addAttribute("tags", tags);
+        model.addAttribute("statusName", "新增");
         return "admin/admin_tag";
     }
 
@@ -46,11 +46,11 @@ public class TagController {
      * @return 重定向到/admin/tag
      */
     @PostMapping(value = "/save")
-    public String saveTag(@ModelAttribute Tag tag){
-        try{
+    public String saveTag(@ModelAttribute Tag tag) {
+        try {
             tagService.saveByTag(tag);
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return "redirect:/admin/tag";
     }
@@ -63,9 +63,9 @@ public class TagController {
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public boolean checkTagUrlExists(@RequestParam("tagUrl") String tagUrl){
+    public boolean checkTagUrlExists(@RequestParam("tagUrl") String tagUrl) {
         Tag tag = tagService.findByTagUrl(tagUrl);
-        return null!=tag;
+        return null != tag;
     }
 
     /**
@@ -75,12 +75,12 @@ public class TagController {
      * @return 重定向到/admin/tag
      */
     @GetMapping(value = "/remove")
-    public String removeTag(@PathParam("tagId") Long tagId){
-        try{
+    public String removeTag(@PathParam("tagId") Long tagId) {
+        try {
             Tag tag = tagService.removeByTagId(tagId);
-            log.info("删除的标签："+tag);
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            log.info("删除的标签：" + tag);
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return "redirect:/admin/tag";
     }
@@ -93,12 +93,12 @@ public class TagController {
      * @return 模板路径admin/admin_tag
      */
     @GetMapping(value = "/edit")
-    public String toEditTag(Model model,@PathParam("tagId") Long tagId){
+    public String toEditTag(Model model, @PathParam("tagId") Long tagId) {
         List<Tag> tags = tagService.findAllTags();
         Tag tag = tagService.findByTagId(tagId).get();
-        model.addAttribute("statusName","修改");
-        model.addAttribute("updateTag",tag);
-        model.addAttribute("tags",tags);
+        model.addAttribute("statusName", "修改");
+        model.addAttribute("updateTag", tag);
+        model.addAttribute("tags", tags);
         return "admin/admin_tag";
     }
 }

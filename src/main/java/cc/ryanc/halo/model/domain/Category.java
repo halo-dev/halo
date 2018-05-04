@@ -10,14 +10,13 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @date : 2017/11/30
  * @version : 1.0
- * description : 分类目录实体类
+ * @date : 2017/11/30
  */
 @Data
 @Entity
 @Table(name = "halo_category")
-public class Category implements Serializable{
+public class Category implements Serializable {
 
     private static final long serialVersionUID = 8383678847517271505L;
 

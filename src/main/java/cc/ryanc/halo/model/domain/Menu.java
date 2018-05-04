@@ -12,7 +12,6 @@ import java.io.Serializable;
  * @author : RYAN0UP
  * @date : 2018/1/24
  * @version : 1.0
- * description :
  */
 @Data
 @Entity

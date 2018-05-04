@@ -58,9 +58,9 @@ public class PageController {
      * @return 模板路径admin/admin_page
      */
     @GetMapping
-    public String pages(Model model){
+    public String pages(Model model) {
         List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_PAGE);
-        model.addAttribute("pages",posts);
+        model.addAttribute("pages", posts);
         return "admin/admin_page";
     }
 
@@ -71,27 +71,27 @@ public class PageController {
      * @return 模板路径admin/admin_page_link
      */
     @GetMapping(value = "/links")
-    public String links(Model model){
+    public String links(Model model) {
         List<Link> links = linkService.findAllLinks();
-        model.addAttribute("links",links);
-        model.addAttribute("statusName","添加");
+        model.addAttribute("links", links);
+        model.addAttribute("statusName", "添加");
         return "admin/admin_page_link";
     }
 
     /**
      * 跳转到修改页面
      *
-     * @param model model
+     * @param model  model
      * @param linkId linkId 友情链接编号
      * @return String 模板路径admin/admin_page_link
      */
     @GetMapping("/links/edit")
-    public String toEditLink(Model model,@PathParam("linkId") Long linkId){
+    public String toEditLink(Model model, @PathParam("linkId") Long linkId) {
         List<Link> links = linkService.findAllLinks();
         Optional<Link> link = linkService.findByLinkId(linkId);
-        model.addAttribute("updateLink",link.get());
-        model.addAttribute("statusName","修改");
-        model.addAttribute("links",links);
+        model.addAttribute("updateLink", link.get());
+        model.addAttribute("statusName", "修改");
+        model.addAttribute("links", links);
         return "admin/admin_page_link";
     }
 
@@ -102,12 +102,12 @@ public class PageController {
      * @return 重定向到/admin/page/links
      */
     @PostMapping(value = "/links/save")
-    public String saveLink(@ModelAttribute Link link){
-        try{
+    public String saveLink(@ModelAttribute Link link) {
+        try {
             Link backLink = linkService.saveByLink(link);
-            log.info("保存成功，数据为："+backLink);
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            log.info("保存成功，数据为：" + backLink);
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -119,12 +119,12 @@ public class PageController {
      * @return 重定向到/admin/page/links
      */
     @GetMapping(value = "/links/remove")
-    public String removeLink(@PathParam("linkId") Long linkId){
-        try{
+    public String removeLink(@PathParam("linkId") Long linkId) {
+        try {
             Link link = linkService.removeByLinkId(linkId);
-            log.info("删除的友情链接："+link);
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            log.info("删除的友情链接：" + link);
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -133,18 +133,18 @@ public class PageController {
      * 图库管理
      *
      * @param model model
-     * @param page 当前页码
-     * @param size 每页显示的条数
+     * @param page  当前页码
+     * @param size  每页显示的条数
      * @return 模板路径admin/admin_page_gallery
      */
     @GetMapping(value = "/galleries")
     public String gallery(Model model,
-                          @RequestParam(value = "page",defaultValue = "0") Integer page,
-                          @RequestParam(value = "size",defaultValue = "18") Integer size){
-        Sort sort = new Sort(Sort.Direction.DESC,"galleryId");
-        Pageable pageable = new PageRequest(page,size,sort);
+                          @RequestParam(value = "page", defaultValue = "0") Integer page,
+                          @RequestParam(value = "size", defaultValue = "18") Integer size) {
+        Sort sort = new Sort(Sort.Direction.DESC, "galleryId");
+        Pageable pageable = new PageRequest(page, size, sort);
         Page<Gallery> galleries = galleryService.findAllGalleries(pageable);
-        model.addAttribute("galleries",galleries);
+        model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
     }
 
@@ -155,13 +155,13 @@ public class PageController {
      * @return 重定向到/admin/page/gallery
      */
     @PostMapping(value = "/gallery/save")
-    public String saveGallery(@ModelAttribute Gallery gallery){
+    public String saveGallery(@ModelAttribute Gallery gallery) {
         try {
-            if(StringUtils.isEmpty(gallery.getGalleryThumbnailUrl())){
+            if (StringUtils.isEmpty(gallery.getGalleryThumbnailUrl())) {
                 gallery.setGalleryThumbnailUrl(gallery.getGalleryUrl());
             }
             galleryService.saveByGallery(gallery);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "redirect:/admin/page/gallery";
@@ -170,14 +170,14 @@ public class PageController {
     /**
      * 处理获取图片详情的请求
      *
-     * @param model model
+     * @param model     model
      * @param galleryId 图片编号
      * @return 模板路径admin/widget/_gallery-detail
      */
     @GetMapping(value = "/gallery")
-    public String gallery(Model model,@PathParam("galleryId") Long galleryId){
+    public String gallery(Model model, @PathParam("galleryId") Long galleryId) {
         Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
-        model.addAttribute("gallery",gallery.get());
+        model.addAttribute("gallery", gallery.get());
         return "admin/widget/_gallery-detail";
     }
 
@@ -189,11 +189,11 @@ public class PageController {
      */
     @GetMapping(value = "/gallery/remove")
     @ResponseBody
-    public boolean removeGallery(@RequestParam("galleryId") Long galleryId){
+    public boolean removeGallery(@RequestParam("galleryId") Long galleryId) {
         try {
             galleryService.removeByGalleryId(galleryId);
-        }catch (Exception e){
-            log.error("删除图片失败：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("删除图片失败：{0}", e.getMessage());
             return false;
         }
         return true;
@@ -206,28 +206,29 @@ public class PageController {
      * @return 模板路径admin/admin_page_md_editor
      */
     @GetMapping(value = "/new")
-    public String newPage(Model model){
+    public String newPage(Model model) {
         return "admin/admin_page_md_editor";
     }
 
     /**
      * 发表页面
-     * @param post post
+     *
+     * @param post    post
      * @param session session
      */
     @PostMapping(value = "/new/push")
     @ResponseBody
-    public void pushPage(@ModelAttribute Post post, HttpSession session){
-        try{
+    public void pushPage(@ModelAttribute Post post, HttpSession session) {
+        try {
             post.setPostDate(HaloUtil.getDate());
             //发表用户
-            User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
+            User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
             post.setPostType(HaloConst.POST_TYPE_PAGE);
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), HaloUtil.getIpAddr(request), HaloUtil.getDate()));
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
     }
 
@@ -235,13 +236,13 @@ public class PageController {
      * 跳转到修改页面
      *
      * @param pageId 页面编号
-     * @param model model
+     * @param model  model
      * @return admin/admin_page_md_editor
      */
     @GetMapping(value = "/edit")
-    public String editPage(@PathParam("pageId") Long pageId,Model model){
+    public String editPage(@PathParam("pageId") Long pageId, Model model) {
         Optional<Post> post = postService.findByPostId(pageId);
-        model.addAttribute("post",post.get());
+        model.addAttribute("post", post.get());
         return "admin/admin_page_md_editor";
     }
 
@@ -253,10 +254,10 @@ public class PageController {
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public boolean checkUrlExists(@PathParam("postUrl") String postUrl){
-        Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_PAGE);
+    public boolean checkUrlExists(@PathParam("postUrl") String postUrl) {
+        Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_PAGE);
         // TODO 还没写完
-        if(null!=post || StringUtils.equals("archives",postUrl) || StringUtils.equals("galleries",postUrl)){
+        if (null != post || StringUtils.equals("archives", postUrl) || StringUtils.equals("galleries", postUrl)) {
             return true;
         }
         return false;

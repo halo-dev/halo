@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author : RYAN0UP
  * @date : 2017/12/26
@@ -16,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Slf4j
 @Controller
-public class CommonController implements ErrorController{
+public class CommonController implements ErrorController {
 
     private static final String ERROR_PATH = "/error";
 
@@ -27,11 +28,11 @@ public class CommonController implements ErrorController{
      * @return string
      */
     @GetMapping(value = ERROR_PATH)
-    public String handleError(HttpServletRequest request){
+    public String handleError(HttpServletRequest request) {
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-        if(statusCode==404) {
+        if (statusCode == 404) {
             return "redirect:/404";
-        }else{
+        } else {
             return "redirect:/500";
         }
     }
@@ -43,7 +44,7 @@ public class CommonController implements ErrorController{
      * @return string
      */
     @GetMapping(value = "/404")
-    public String fourZeroFour(Model model){
+    public String fourZeroFour(Model model) {
         //设置选项
         model.addAttribute("options", HaloConst.OPTIONS);
         return "common/404";
@@ -56,7 +57,7 @@ public class CommonController implements ErrorController{
      * @return string
      */
     @GetMapping(value = "/500")
-    public String fiveZeroZero(Model model){
+    public String fiveZeroZero(Model model) {
         //设置选项
         model.addAttribute("options", HaloConst.OPTIONS);
         return "common/500";

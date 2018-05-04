@@ -8,7 +8,6 @@ import java.io.Serializable;
  * @author : RYAN0UP
  * @date : 2018/1/3
  * @version : 1.0
- * description : 主题数据
  */
 @Data
 public class Theme implements Serializable {

@@ -35,7 +35,7 @@ public class BackupController {
      * @return 模板路径admin/admin_backup
      */
     @GetMapping
-    public String backup(){
+    public String backup() {
         return "admin/admin_backup";
     }
 
@@ -45,14 +45,14 @@ public class BackupController {
      * @return 重定向到/admin/backup
      */
     @GetMapping(value = "/backupDb")
-    public String backupDatabase(){
-        String fileName = "db_backup_"+HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss")+".sql";
+    public String backupDatabase() {
+        String fileName = "db_backup_" + HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss") + ".sql";
         try {
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            String savePath = path.getAbsolutePath()+"/backup/database";
-            HaloUtil.exportDatabase("localhost","root","123456",savePath,fileName,"testdb");
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            String savePath = path.getAbsolutePath() + "/backup/database";
+            HaloUtil.exportDatabase("localhost", "root", "123456", savePath, fileName, "testdb");
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return "redirect:/admin/backup";
     }
@@ -63,7 +63,7 @@ public class BackupController {
      * @return return
      */
     @GetMapping(value = "/backupRe")
-    public String backupResources(){
+    public String backupResources() {
         return null;
     }
 
@@ -73,15 +73,15 @@ public class BackupController {
      * @return 重定向到/admin/backup
      */
     @GetMapping(value = "/backupPost")
-    public String backupPosts(){
+    public String backupPosts() {
         List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
         try {
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            String savePath = path.getAbsolutePath()+"/backup/posts/posts_backup_"+HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss");
-            for(Post post : posts){
-                HaloUtil.dbToFile(post.getPostContentMd(),savePath,post.getPostTitle()+".md");
+            String savePath = path.getAbsolutePath() + "/backup/posts/posts_backup_" + HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss");
+            for (Post post : posts) {
+                HaloUtil.dbToFile(post.getPostContentMd(), savePath, post.getPostTitle() + ".md");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "redirect:/admin/backup";
