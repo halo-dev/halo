@@ -84,6 +84,6 @@ public class  TagsController extends BaseController {
         Page<Post> posts = postService.findPostsByTags(tag, pageable);
         model.addAttribute("posts", posts);
         model.addAttribute("tag", tag);
-        return this.render("index");
+        return this.render("tags");
     }
 }
