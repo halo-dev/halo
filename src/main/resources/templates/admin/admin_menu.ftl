@@ -46,6 +46,13 @@
                                         <input type="text" class="form-control" id="menuIcon" name="menuIcon" value="${updateMenu.menuIcon}">
                                         <small>*可选项，支持部分字体图标</small>
                                     </div>
+                                    <div class="form-group">
+                                        <label for="menuIcon">打开方式</label>
+                                        <select class="form-control" id="menuTarget" name="menuTarget">
+                                            <option value="_self" ${((updateMenu.menuTarget?default("_self")=="_self")?string('selected',''))}>当前窗口</option>
+                                            <option value="_blank" ${((updateMenu.menuTarget?if_exists=="_blank")?string('selected',''))}>新窗口</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <#else >
                                 <div class="box-body">
@@ -67,6 +74,13 @@
                                         <label for="menuIcon">图标</label>
                                         <input type="text" class="form-control" id="menuIcon" name="menuIcon">
                                         <small>*可选项，支持部分字体图标</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="menuIcon">打开方式</label>
+                                        <select class="form-control" id="menuTarget" name="menuTarget">
+                                            <option value="_self">当前窗口</option>
+                                            <option value="_blank">新窗口</option>
+                                        </select>
                                     </div>
                                 </div>
                             </#if>

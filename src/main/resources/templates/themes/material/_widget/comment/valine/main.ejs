@@ -1,0 +1,21 @@
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    var GUEST_INFO = ['nick','mail','link'];
+    var guest_info = '<%= theme.comment.valine_guest_info %>'.split(',').filter(function(item){
+        return GUEST_INFO.indexOf(item) > -1
+    });
+    var notify = '<%= theme.comment.valine_notify %>' == true;
+    var verify = '<%= theme.comment.valine_verify %>' == true;
+    new Valine({
+        el: '.vcomment',
+        notify: notify,
+        verify: verify,
+        appId: "<%= theme.comment.valine_leancloud_appId %>",
+        appKey: "<%= theme.comment.valine_leancloud_appKey %>",
+        placeholder: "<%= theme.comment.valine_placeholder %>",
+        pageSize:'<%= theme.comment.valine_pageSize %>',
+        avatar:'<%= theme.comment.valine_avatar %>',
+        lang:'<%= theme.comment.valine_lang %>'
+    });
+</script>

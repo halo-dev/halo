@@ -46,4 +46,9 @@ public class Menu implements Serializable {
      * 图标，可选，部分主题可显示
      */
     private String menuIcon;
+
+    /**
+     * 打开方式
+     */
+    private String menuTarget;
 }
