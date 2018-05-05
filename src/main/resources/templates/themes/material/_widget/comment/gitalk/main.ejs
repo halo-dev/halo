@@ -1,0 +1,19 @@
+<!-- Gitalk 评论框 -->
+<div id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<script>
+    var gitalk = new Gitalk({
+            clientID: '<%= theme.comment.gitalk_client_id %>',
+            clientSecret: '<%= theme.comment.gitalk_client_secret %>',
+            repo: '<%= theme.comment.gitalk_repo %>',
+            owner: '<%= theme.comment.gitalk_owner %>',
+            admin: ['<%= theme.comment.gitalk_owner %>'],
+            // facebook-like distraction free mode
+            distractionFreeMode: false
+        })
+   gitalk.render('gitalk-container')
+</script>
