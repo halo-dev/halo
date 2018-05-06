@@ -164,7 +164,7 @@ public class PageController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "redirect:/admin/page/gallery";
+        return "redirect:/admin/page/galleries";
     }
 
     /**

@@ -28,7 +28,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
   freemarker:
     allow-request-override: false
     cache: false

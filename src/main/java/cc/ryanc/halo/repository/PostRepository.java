@@ -147,14 +147,33 @@ public interface PostRepository extends JpaRepository<Post,Long>{
     @Query(value = "select * from halo_post where post_status=0 and post_type='post' and year(post_date)=:year and month(post_date)=:month order by post_date desc",countQuery = "select count(*) from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month",nativeQuery = true)
     Page<Post> findPostByYearAndMonth(@Param("year") String year,@Param("month") String month,Pageable pageable);
 
-    List<Post> findPostByCategories(Category category);
+    /**
+     * 根据分类目录查询文章
+     *
+     * @param category category
+     * @param pageable pageable
+     * @return Page<Post></>
+     */
+    Page<Post> findPostByCategories(Category category,Pageable pageable);
 
     /**
      * 根据标签查询文章
      *
      * @param tag tag
      * @param pageable pageable
-     * @return page
+     * @return Page<Post></>
      */
     Page<Post> findPostsByTags(Tag tag,Pageable pageable);
+
+    /**
+     * 模糊查询文章
+     *
+     * @param postType   文章类型，post or page
+     * @param postStatus 0，1，2
+     * @param keyword   关键词
+     * @param pageable   分页信息
+     * @return Page<Post></>
+     */
+    @Query(value = "select * from halo_post where post_status = 0 and post_type='post' and post_title like '%=:keyword%' or post_content like '%=:keyword%'",nativeQuery = true)
+    Page<Post> findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(String keyword,Pageable pageable);
 }

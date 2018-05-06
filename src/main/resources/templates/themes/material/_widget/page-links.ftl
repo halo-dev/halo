@@ -69,7 +69,7 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
-    .md-links-item a:hover{
+    .md-links-item a:hover {
         cursor: pointer;
     }
 
@@ -78,10 +78,11 @@
         line-height: 50px;
     }
 
-    #scheme-Paradox .mdl-mini-footer{
+    #scheme-Paradox .mdl-mini-footer {
         clear: left;
     }
-    #bottom{
+
+    #bottom {
         position: relative;
     }
 </style>
@@ -91,7 +92,7 @@
         <li class="md-links-item">
             <a href="${link.linkUrl}" title="${link.linkName}" target="_blank">
                 <img src="${link.linkPic}" alt="${link.linkName}" height="72px"/>
-                <span class="md-links-title">${link.linkName}</span><br />
+                <span class="md-links-title">${link.linkName}</span><br/>
                 <span>${link.linkDesc?if_exists}</span>
             </a>
         </li>
@@ -108,4 +109,5 @@
     $(document).ready(function() {
         adjustFooter();
     });
+
 </script>

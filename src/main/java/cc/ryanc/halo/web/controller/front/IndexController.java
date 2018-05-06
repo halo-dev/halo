@@ -94,4 +94,18 @@ public class IndexController extends BaseController {
         List<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable).getContent();
         return posts;
     }
+
+    /**
+     * 搜索文章
+     *
+     * @param keyword keyword
+     * @param model model
+     * @return 模板路径/themes/{theme}/index
+     */
+    @GetMapping(value = "search")
+    public String search(@PathParam("keyword") String keyword,Model model){
+        Page<Post> posts = postService.searchByKeywords(keyword,null);
+        model.addAttribute("posts",posts);
+        return this.render("index");
+    }
 }

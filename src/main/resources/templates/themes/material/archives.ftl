@@ -2,11 +2,6 @@
 <@layout title="归档 | ${options.blog_title?default('Material')}" keywords="${options.seo_keywords?default('Material')}" description="${options.seo_desc?default('Material')}">
     <!-- Index Module -->
     <div class="material-index mdl-grid">
-        <#if options.theme_material_scheme?if_exists == "Paradox" && posts.number==0 && !isArchives??>
-        <!-- Paradox Header -->
-        <#include "_partial/daily_pic.ftl">
-        <#include "_partial/blog_info.ftl">
-        </#if>
         <div class="locate-thumbnail-symbol"></div>
         <!-- Pin on top -->
 
