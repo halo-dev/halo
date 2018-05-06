@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
@@ -278,6 +279,18 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * 根据分类目录查询文章
+     *
+     * @param category category
+     * @param pageable pageable
+     * @return Page<Post></>
+     */
+    @Override
+    public Page<Post> findPostByCategories(Category category, Pageable pageable) {
+        return postRepository.findPostByCategories(category,pageable);
+    }
+
+    /**
      * 根据标签查询文章
      *
      * @param tag      tag
@@ -287,6 +300,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
         return postRepository.findPostsByTags(tag, pageable);
+    }
+
+    /**
+     * 搜索文章
+     *
+     * @param keyword 关键词
+     * @param pageable 分页信息
+     * @return List<Post></>
+     */
+    @Override
+    public Page<Post> searchByKeywords(String keyword,Pageable pageable) {
+        return postRepository.findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(keyword,pageable);
     }
 
     /**

@@ -77,7 +77,7 @@
                                 <div class="form-group">
                                     <label for="galleryThumbnailUrl" class="col-sm-2 control-label">缩略图地址：</label>
                                     <div class="col-sm-4">
-                                        <input type="url" class="form-control" id="galleryThumbnailUrl" name="galleryThumbnailUrl">
+                                        <input type="text" class="form-control" id="galleryThumbnailUrl" name="galleryThumbnailUrl">
                                     </div>
                                 </div>
                             </div>

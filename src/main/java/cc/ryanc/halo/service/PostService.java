@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service;
 
+import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
@@ -176,6 +177,15 @@ public interface PostService {
     List<Post> findPostByYear(String year);
 
     /**
+     * 根据分类目录查询文章
+     *
+     * @param category category
+     * @param pageable pageable
+     * @return Page<Post></>
+     */
+    Page<Post> findPostByCategories(Category category,Pageable pageable);
+
+    /**
      * 根据标签查询文章
      *
      * @param tag      tag
@@ -183,6 +193,15 @@ public interface PostService {
      * @return page
      */
     Page<Post> findPostsByTags(Tag tag, Pageable pageable);
+
+    /**
+     * 搜索文章
+     *
+     * @param keyword 关键词
+     * @param pageable 分页信息
+     * @return Page<Post></>
+     */
+    Page<Post> searchByKeywords(String keyword,Pageable pageable);
 
     /**
      * 生成rss

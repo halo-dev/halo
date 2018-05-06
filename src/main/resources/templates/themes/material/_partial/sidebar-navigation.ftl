@@ -53,7 +53,7 @@
             <@commonTag method="categories">
                 <#list categories as cate>
                     <li>
-                        <a class="sidebar_archives-link" href="/categories/${cate.cateUrl}/">${cate.cateName}<span class="sidebar_archives-count">4</span></a>
+                        <a class="sidebar_archives-link" href="/categories/${cate.cateUrl}/">${cate.cateName}<span class="sidebar_archives-count">${cate.posts?size}</span></a>
                     </li>
                 </#list>
             </@commonTag>

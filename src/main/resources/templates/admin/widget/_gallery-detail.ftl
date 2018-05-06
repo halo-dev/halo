@@ -35,25 +35,31 @@
                         <div class="form-group">
                             <label for="galleryDesc" class="col-sm-2 control-label">图片描述：</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="galleryDesc" name="galleryDesc" value="${gallery.galleryDesc}" >
+                                <input type="text" class="form-control" id="galleryDesc" name="galleryDesc" value="${gallery.galleryDesc?if_exists}" >
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="galleryDate" class="col-sm-2 control-label">图片日期：</label>
                             <div class="col-sm-10">
-                                <input type="date" class="form-control" id="galleryDate" name="galleryDate" value="${gallery.galleryDate}">
+                                <input type="date" class="form-control" id="galleryDate" name="galleryDate" value="${gallery.galleryDate?if_exists}">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="galleryLocation" class="col-sm-2 control-label">拍摄地点：</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="galleryLocation" name="galleryLocation" value="${gallery.galleryLocation}" >
+                                <input type="text" class="form-control" id="galleryLocation" name="galleryLocation" value="${gallery.galleryLocation?if_exists}" >
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="galleryUrl" class="col-sm-2 control-label">图片地址：</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="galleryUrl" name="galleryUrl" value="${gallery.galleryUrl}" disabled>
+                                <input type="text" class="form-control" id="galleryUrl" name="galleryUrl" value="${gallery.galleryUrl}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="galleryUrl" class="col-sm-2 control-label">缩略图地址：</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="galleryThumbnailUrl" name="galleryThumbnailUrl" value="${gallery.galleryThumbnailUrl}">
                             </div>
                         </div>
                     </div>
@@ -115,6 +121,7 @@
     }
     function btn_save() {
         $('#galleryForm').submit();
+        parent.location.reload();
     }
 </script>
 </html>
