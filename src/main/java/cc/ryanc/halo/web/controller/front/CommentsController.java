@@ -53,7 +53,7 @@ public class CommentsController {
     public List<Comment> getComment(@PathVariable Long postId) {
         Optional<Post> post = postService.findByPostId(postId);
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        Pageable pageable = new PageRequest(0, 10, sort);
+        Pageable pageable = PageRequest.of(0, 10, sort);
         List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, 2).getContent();
         if (null == comments) {
             return null;

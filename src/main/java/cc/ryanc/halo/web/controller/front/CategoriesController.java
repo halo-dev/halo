@@ -71,7 +71,7 @@ public class CategoriesController extends BaseController {
         if(!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))){
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
-        Pageable pageable = new PageRequest(page-1,size,sort);
+        Pageable pageable = PageRequest.of(page-1,size,sort);
         Page<Post> posts = postService.findPostByCategories(category,pageable);
         model.addAttribute("posts",posts);
         model.addAttribute("category",category);

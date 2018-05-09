@@ -80,7 +80,7 @@ public class PagesController extends BaseController {
         Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_PAGE);
 
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
-        Pageable pageable = new PageRequest(0,999,sort);
+        Pageable pageable = PageRequest.of(0,999,sort);
         Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
 
         model.addAttribute("comments",comments);

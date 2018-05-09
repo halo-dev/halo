@@ -142,7 +142,7 @@ public class PageController {
                           @RequestParam(value = "page", defaultValue = "0") Integer page,
                           @RequestParam(value = "size", defaultValue = "18") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "galleryId");
-        Pageable pageable = new PageRequest(page, size, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Gallery> galleries = galleryService.findAllGalleries(pageable);
         model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
