@@ -66,7 +66,7 @@ public class PostController extends BaseController{
                         @RequestParam(value = "page",defaultValue = "0") Integer page,
                         @RequestParam(value = "size",defaultValue = "10") Integer size){
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
-        Pageable pageable = new PageRequest(page,size,sort);
+        Pageable pageable = PageRequest.of(page,size,sort);
         Page<Post> posts = postService.findPostByStatus(status,HaloConst.POST_TYPE_POST,pageable);
         model.addAttribute("posts",posts);
         model.addAttribute("publishCount",postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable).getTotalElements());
@@ -93,7 +93,7 @@ public class PostController extends BaseController{
         try {
             //排序规则
             Sort sort = new Sort(Sort.Direction.DESC,"postId");
-            Pageable pageable = new PageRequest(page,size,sort);
+            Pageable pageable = PageRequest.of(page,size,sort);
             model.addAttribute("posts",postService.searchPosts(keyword,pageable));
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());

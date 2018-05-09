@@ -80,7 +80,7 @@ public class  TagsController extends BaseController {
         if (!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
-        Pageable pageable = new PageRequest(page - 1, size, sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostsByTags(tag, pageable);
         model.addAttribute("posts", posts);
         model.addAttribute("tag", tag);
