@@ -71,7 +71,7 @@ public class CommentController extends BaseController{
                            @RequestParam(value = "page",defaultValue = "0") Integer page,
                            @RequestParam(value = "size",defaultValue = "10") Integer size){
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
-        Pageable pageable = new PageRequest(page,size,sort);
+        Pageable pageable = PageRequest.of(page,size,sort);
         Page<Comment> comments = commentService.findAllComments(status,pageable);
         model.addAttribute("comments",comments);
         model.addAttribute("publicCount",commentService.findAllComments(0,pageable).getTotalElements());

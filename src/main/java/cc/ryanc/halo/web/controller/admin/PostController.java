@@ -66,7 +66,7 @@ public class PostController extends BaseController{
                         @RequestParam(value = "page",defaultValue = "0") Integer page,
                         @RequestParam(value = "size",defaultValue = "10") Integer size){
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
-        Pageable pageable = new PageRequest(page,size,sort);
+        Pageable pageable = PageRequest.of(page,size,sort);
         Page<Post> posts = postService.findPostByStatus(status,HaloConst.POST_TYPE_POST,pageable);
         model.addAttribute("posts",posts);
         model.addAttribute("publishCount",postService.findPostByStatus(0,HaloConst.POST_TYPE_POST,pageable).getTotalElements());
@@ -93,7 +93,7 @@ public class PostController extends BaseController{
         try {
             //排序规则
             Sort sort = new Sort(Sort.Direction.DESC,"postId");
-            Pageable pageable = new PageRequest(page,size,sort);
+            Pageable pageable = PageRequest.of(page,size,sort);
             model.addAttribute("posts",postService.searchPosts(keyword,pageable));
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
@@ -176,12 +176,24 @@ public class PostController extends BaseController{
                 List<Tag> tags = tagService.strListToTagList(StringUtils.trim(tagList));
                 post.setTags(tags);
             }
+            post.setPostUrl(urlFilter(post.getPostUrl()));
             postService.saveByPost(post);
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
     }
+
+    private static String urlFilter(String url) {
+        if (null != url) {
+            final boolean urlEndsWithHtmlPostFix = url.endsWith(".html") || url.endsWith(".htm");
+            if (urlEndsWithHtmlPostFix) {
+                return url.substring(0, url.lastIndexOf("."));
+            }
+        }
+        return url;
+    }
+
 
     /**
      * 处理移至回收站的请求
@@ -282,6 +294,7 @@ public class PostController extends BaseController{
     @GetMapping(value = "/checkUrl")
     @ResponseBody
     public boolean checkUrlExists(@PathParam("postUrl") String postUrl){
+        postUrl = urlFilter(postUrl);
         Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
         return null!=post;
     }

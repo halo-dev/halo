@@ -40,7 +40,7 @@ public class OthersController {
         }
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Pageable pageable = new PageRequest(0, Integer.parseInt(rssPosts), sort);
+        Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
         Page<Post> postsPage = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildRss(posts);
@@ -56,7 +56,7 @@ public class OthersController {
     public String siteMap() {
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Pageable pageable = new PageRequest(0, 999, sort);
+        Pageable pageable = PageRequest.of(0, 999, sort);
         Page<Post> postsPage = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildSiteMap(posts);

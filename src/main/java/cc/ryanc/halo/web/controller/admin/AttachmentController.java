@@ -65,7 +65,7 @@ public class AttachmentController {
                               @RequestParam(value = "page", defaultValue = "0") Integer page,
                               @RequestParam(value = "size", defaultValue = "18") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        Pageable pageable = new PageRequest(page, size, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
 
@@ -84,7 +84,7 @@ public class AttachmentController {
                                    @RequestParam(value = "page", defaultValue = "0") Integer page,
                                    @RequestParam(value = "id") String id) {
         Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        Pageable pageable = new PageRequest(page, 18, sort);
+        Pageable pageable = PageRequest.of(page, 18, sort);
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
