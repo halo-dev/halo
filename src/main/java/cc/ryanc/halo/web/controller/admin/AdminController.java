@@ -182,7 +182,7 @@ public class AdminController extends BaseController {
                        @RequestParam(value = "page", defaultValue = "0") Integer page,
                        @RequestParam(value = "size", defaultValue = "10") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "logId");
-        Pageable pageable = new PageRequest(page, size, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Logs> logs = logsService.findAllLogs(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";

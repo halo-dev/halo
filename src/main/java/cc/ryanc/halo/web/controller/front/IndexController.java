@@ -66,7 +66,7 @@ public class IndexController extends BaseController {
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
         //所有文章数据，分页
-        Pageable pageable = new PageRequest(page - 1, size, sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         model.addAttribute("posts", posts);
         return this.render("index");
@@ -90,7 +90,7 @@ public class IndexController extends BaseController {
         }
 
         //文章数据，只获取文章，没有分页
-        Pageable pageable = new PageRequest(page - 1, size, sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         List<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable).getContent();
         return posts;
     }

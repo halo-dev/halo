@@ -61,7 +61,7 @@ public class ArchivesController extends BaseController {
 
         //所有文章数据，分页，material主题适用
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Pageable pageable = new PageRequest(page - 1, 5, sort);
+        Pageable pageable = PageRequest.of(page - 1, 5, sort);
         Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         model.addAttribute("posts", posts);
         return this.render("archives");
@@ -109,7 +109,7 @@ public class ArchivesController extends BaseController {
             model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
         }
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
-        Pageable pageable = new PageRequest(0,999,sort);
+        Pageable pageable = PageRequest.of(0,999,sort);
         Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
 
         model.addAttribute("post", post);
