@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/static/css/skins/_all-skins.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/loader.css">
+    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -42,6 +43,7 @@
 </#if>
 <script src="/static/plugins/pace/pace.min.js"></script>
 <script src="/static/js/adminlte.min.js"></script>
+<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script src="/static/js/app.js"></script>
 <@compress single_line=true>
 <script>

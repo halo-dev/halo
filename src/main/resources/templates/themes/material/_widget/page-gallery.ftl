@@ -27,7 +27,7 @@
                     <img class="lazy" data-original="${gallery.galleryUrl}" alt="${gallery.galleryDesc}" />
                 </a>
                 <h2>${gallery.galleryName}</h2>
-                <p>${gallery.galleryDate?string("yyyy-MM-dd")}</p>
+                <p>${gallery.galleryDate?if_exists}</p>
             </article>
         </#list>
     </div>

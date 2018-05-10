@@ -7,7 +7,6 @@
     <#include "module/_sidebar.ftl">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <link rel="stylesheet" href="/static/plugins/editor.md/css/editormd.min.css">
         <style type="text/css">
             #post_title{
@@ -101,7 +100,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
         <script src="/static/plugins/editor.md/editormd.min.js"></script>
         <script>

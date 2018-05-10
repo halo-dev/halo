@@ -38,7 +38,7 @@
                                 <thead>
                                 <tr>
                                     <th>评论者</th>
-                                    <th>评论内容</th>
+                                    <th width="50%">评论内容</th>
                                     <th>评论页面</th>
                                     <th>日期</th>
                                     <th>操作</th>

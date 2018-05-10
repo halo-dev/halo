@@ -8,7 +8,6 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <section class="content-header">
             <h1>友情链接<small></small></h1>
             <ol class="breadcrumb">
@@ -96,7 +95,7 @@
                                     <tr>
                                         <td>${link.linkName}</td>
                                         <td>${link.linkUrl}</td>
-                                        <td>${link.linkDesc}</td>
+                                        <td width="30%">${link.linkDesc}</td>
                                         <td>
                                             <#if updateLink?? && updateLink.linkId==link.linkId>
                                                 <a class="btn btn-primary btn-xs" href="#" disabled>正在修改</a>
@@ -131,7 +130,6 @@
                 </div>
             </div>
         </div>
-        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script>
             function modelShow(url) {
                 $('#url').val(url);

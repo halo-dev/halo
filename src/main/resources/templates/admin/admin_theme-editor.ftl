@@ -6,7 +6,6 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <link rel="stylesheet" href="/static/plugins/editor.md/css/editormd.min.css">
         <section class="content-header">
             <h1 style="display: inline-block;">主题编辑</h1>
@@ -76,7 +75,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/editor.md/editormd.min.js"></script>
         <script>
             var editor;
