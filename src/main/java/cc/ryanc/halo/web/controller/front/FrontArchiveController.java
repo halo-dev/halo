@@ -29,7 +29,7 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequestMapping(value = "/archives")
-public class ArchivesController extends BaseController {
+public class FrontArchiveController extends BaseController {
 
     @Autowired
     private PostService postService;

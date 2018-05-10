@@ -29,7 +29,7 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequestMapping(value = {"/", "index"})
-public class IndexController extends BaseController {
+public class FrontIndexController extends BaseController {
 
     @Autowired
     private PostService postService;

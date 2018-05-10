@@ -28,7 +28,7 @@ import java.util.*;
  */
 @Slf4j
 @Controller
-public class CommentsController {
+public class FrontCommentController {
 
     @Autowired
     private CommentService commentService;

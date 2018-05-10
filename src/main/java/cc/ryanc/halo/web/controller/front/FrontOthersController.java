@@ -21,7 +21,7 @@ import java.util.List;
  * @date : 2018/4/26
  */
 @Controller
-public class OthersController {
+public class FrontOthersController {
 
     @Autowired
     private PostService postService;
