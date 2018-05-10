@@ -131,6 +131,22 @@ public class PostController extends BaseController{
     }
 
     /**
+     * 去除html，htm后缀
+     *
+     * @param url url
+     * @return String
+     */
+    private static String urlFilter(String url) {
+        if (null != url) {
+            final boolean urlEndsWithHtmlPostFix = url.endsWith(".html") || url.endsWith(".htm");
+            if (urlEndsWithHtmlPostFix) {
+                return url.substring(0, url.lastIndexOf("."));
+            }
+        }
+        return url;
+    }
+
+    /**
      * 添加文章
      *
      * @param post Post实体
@@ -141,15 +157,7 @@ public class PostController extends BaseController{
     @PostMapping(value = "/new/push")
     @ResponseBody
     public void pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session){
-        //判断博主是否登录
         User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
-        if(null==user){
-            return;
-        }
-        //判断是否为更新文章操作
-        if(null!=post.getPostId()){
-            post = postService.findByPostId(post.getPostId()).get();
-        }
         try{
             //提取摘要
             int postSummary = 50;
@@ -164,6 +172,7 @@ public class PostController extends BaseController{
                 post.setPostSummary(summaryText);
             }
             if(null!=post.getPostId()){
+                post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
                 post.setPostUpdate(HaloUtil.getDate());
             }else{
                 post.setPostDate(HaloUtil.getDate());
@@ -180,18 +189,8 @@ public class PostController extends BaseController{
             postService.saveByPost(post);
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
         }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
-    }
-
-    private static String urlFilter(String url) {
-        if (null != url) {
-            final boolean urlEndsWithHtmlPostFix = url.endsWith(".html") || url.endsWith(".htm");
-            if (urlEndsWithHtmlPostFix) {
-                return url.substring(0, url.lastIndexOf("."));
-            }
-        }
-        return url;
     }
 
 

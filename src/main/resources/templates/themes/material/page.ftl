@@ -22,8 +22,6 @@
 
                 <#include "_partial/comment.ftl">
             </div>
-            <!-- Post Prev & Next Nav -->
-            <#include "_partial/post-nav.ftl">
         </div>
     </div>
 </@layout>

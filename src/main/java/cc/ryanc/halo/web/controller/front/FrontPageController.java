@@ -28,7 +28,7 @@ import java.util.List;
  * @date : 2018/4/26
  */
 @Controller
-public class PagesController extends BaseController {
+public class FrontPageController extends BaseController {
 
     @Autowired
     private GalleryService galleryService;
@@ -85,6 +85,6 @@ public class PagesController extends BaseController {
 
         model.addAttribute("comments",comments);
         model.addAttribute("post", post);
-        return this.render("post");
+        return this.render("page");
     }
 }

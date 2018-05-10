@@ -150,7 +150,7 @@ public class AttachmentController {
                 System.out.println(mediaPath.getAbsolutePath() + "/" + fileName);
                 //判断图片大小，如果长宽都小于500，则保存原始图片路径
                 BufferedImage sourceImg = ImageIO.read(new FileInputStream(mediaPath.getPath() + "/" + fileName));
-                if (sourceImg.getWidth() < 500 && sourceImg.getHeight() < 500) {
+                if (sourceImg.getWidth() < 500 || sourceImg.getHeight() < 500) {
                     attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(fileName).toString());
                 } else {
                     attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
