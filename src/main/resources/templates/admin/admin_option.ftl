@@ -7,7 +7,6 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <style type="text/css" rel="stylesheet">
             .form-horizontal .control-label{
                 text-align: left;
@@ -47,6 +46,9 @@
                             </li>
                             <li>
                                 <a href="#comment" data-toggle="tab">评论设置</a>
+                            </li>
+                            <li>
+                                <a href="#attach" data-toggle="tab">附件设置</a>
                             </li>
                             <li>
                                 <a href="#admin" data-toggle="tab">后台设置</a>
@@ -385,7 +387,20 @@
                                     </div>
                                 </form>
                             </div>
-
+                            <!-- 附件设置 -->
+                            <div class="tab-pane" id="attach">
+                                <form method="post" class="form-horizontal" id="attachOptions">
+                                    <div class="box-body">
+                                        <p>
+                                            开发中...<br/>
+                                            可选图片存储在本地或者七牛云等云...
+                                        </p>
+                                    </div>
+                                    <div class="box-footer">
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('attachOptions')">保存</button>
+                                    </div>
+                                </form>
+                            </div>
                             <!-- 后台设置 -->
                             <div class="tab-pane" id="admin">
                                 <form method="post" class="form-horizontal" id="adminOptions">
@@ -453,32 +468,6 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <#--<div class="form-group">-->
-                                            <#--<label for="postEditor" class="col-sm-2 control-label">文章编辑器：-->
-                                                <#--<span data-toggle="tooltip" data-placement="top" title="请勿将它们混用" style="cursor: pointer">-->
-                                                    <#--<i class="fa fa-question-circle" aria-hidden="true"></i>-->
-                                                <#--</span>-->
-                                            <#--</label>-->
-                                            <#--<div class="col-sm-4">-->
-                                                <#--<select class="form-control" id="postEditor" name="post_editor">-->
-                                                    <#--<option value="editor.md" ${((options.post_editor?default('editor.md'))=='editor.md')?string('selected','')}>Markdown</option>-->
-                                                    <#--<option value="ckeditor" ${((options.post_editor?default('editor.md'))=='ckeditor')?string('selected','')}>富文本</option>-->
-                                                <#--</select>-->
-                                            <#--</div>-->
-                                        <#--</div>-->
-                                        <#--<div class="form-group">-->
-                                            <#--<label for="pageEditor" class="col-sm-2 control-label">页面编辑器：-->
-                                                <#--<span data-toggle="tooltip" data-placement="top" title="请勿将它们混用" style="cursor: pointer">-->
-                                                    <#--<i class="fa fa-question-circle" aria-hidden="true"></i>-->
-                                                <#--</span>-->
-                                            <#--</label>-->
-                                            <#--<div class="col-sm-4">-->
-                                                <#--<select class="form-control" id="pageEditor" name="page_editor">-->
-                                                    <#--<option value="editor.md" ${((options.page_editor?default('editor.md'))=='editor.md')?string('selected','')}>Markdown</option>-->
-                                                    <#--<option value="ckeditor" ${((options.page_editor?default('editor.md'))=='ckeditor')?string('selected','')}>富文本</option>-->
-                                                <#--</select>-->
-                                            <#--</div>-->
-                                        <#--</div>-->
                                     </div>
                                     <div class="box-footer">
                                         <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('adminOptions')">保存</button>
@@ -556,7 +545,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
         <script src="/static/js/app.js"></script>
         <@compress single_line=true>

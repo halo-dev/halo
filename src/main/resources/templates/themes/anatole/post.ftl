@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="${post.postTitle} · ${options.blog_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
+<@head title="${post.postTitle} · ${options.blog_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')}" description="${post.postSummary?if_exists}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <link href="/anatole/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />

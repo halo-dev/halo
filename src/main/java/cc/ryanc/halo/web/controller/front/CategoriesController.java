@@ -62,6 +62,7 @@ public class CategoriesController extends BaseController {
      * @param page 页码
      * @return string
      */
+    @GetMapping("{cateUrl}/page/{page}")
     public String categories(Model model,
                              @PathVariable("cateUrl") String cateUrl,
                              @PathVariable("page") Integer page){

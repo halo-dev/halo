@@ -7,7 +7,6 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <section class="content-header">
             <h1>
                 分类目录
@@ -141,7 +140,6 @@
                 </div>
             </div>
         </div>
-        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script>
             function modelShow(url) {
                 $('#url').val(url);

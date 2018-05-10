@@ -1,3 +1,4 @@
+<link type="text/css" rel="stylesheet" href="/static/plugins/loaders/loaders.css">
 <style>
     * {
         box-sizing: border-box;
@@ -140,6 +141,15 @@
         color: #ef2f11;
         cursor: pointer;
     }
+
+    .native-load{
+        text-align: center;
+    }
+    .native-load-btn{
+        text-align: center;
+        border: none;
+        border-radius: 25%;
+    }
     ${options.native_css?if_exists}
     @media screen and (max-width: 560px) {
         .comment-input-who, .comment-input-email, .comment-input-website {
@@ -192,6 +202,16 @@
             </li>
         </#list>
     </ul>
+    <#--<div class="loader" style="background-color: #0a001f">-->
+        <#--<div class="loader-inner ball-pulse-sync">-->
+            <#--<div></div>-->
+            <#--<div></div>-->
+            <#--<div></div>-->
+        <#--</div>-->
+    <#--</div>-->
+    <#--<div class="native-load">-->
+        <#--<button type="button" class="native-load-btn">加载更多</button>-->
+    <#--</div>-->
 </div>
 <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>

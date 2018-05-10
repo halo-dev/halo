@@ -6,7 +6,6 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
         <style type="text/css" rel="stylesheet">
             .theme-thumbnail{
@@ -133,7 +132,6 @@
                 </div>
             </div>
         </div>
-        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
         <script type="application/javascript">
             function loadFileInput() {

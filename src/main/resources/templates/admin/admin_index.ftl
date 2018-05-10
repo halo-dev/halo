@@ -6,7 +6,6 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
         <style type="text/css" rel="stylesheet">
             #btnWidgetsOption{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
             #btnWidgetsOption:hover{background:#3c8dbc;color:#fff}
@@ -331,7 +330,6 @@
                 </#if>
             </div>
         </section>
-        <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
         <script src="/static/plugins/layer/layer.js"></script>
         <script src="/static/js/app.js"></script>
         <script type="application/javascript">
