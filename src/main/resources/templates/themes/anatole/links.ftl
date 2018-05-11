@@ -11,9 +11,13 @@
                         <h3><a>links</a></h3>
                     </div>
                     <div class="post-content">
-                        <#list links as link>
-                        <p><a href="${link.linkUrl}" target="_blank" rel="external">${link.linkName}</a> – ${link.linkDesc}</p>
-                        </#list>
+                        <@commonTag method="links">
+                            <#if links?? && links?size gt 0>
+                                <#list links as link>
+                                <p><a href="${link.linkUrl}" target="_blank" rel="external">${link.linkName}</a> – ${link.linkDesc}</p>
+                                </#list>
+                            </#if>
+                        </@commonTag>
                     </div>
                 </div>
             </div>

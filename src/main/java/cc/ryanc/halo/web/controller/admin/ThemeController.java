@@ -5,7 +5,8 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
+import cc.ryanc.halo.utils.ZipUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import javax.websocket.server.PathParam;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -73,7 +75,7 @@ public class ThemeController extends BaseController {
             BaseController.THEME = siteTheme;
             log.info("已将主题改变为：" + siteTheme);
             logsService.saveByLogs(
-                    new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, HaloUtil.getIpAddr(request), HaloUtil.getDate())
+                    new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, HaloUtils.getIpAddr(request), new Date())
             );
             return true;
         } catch (Exception e) {
@@ -101,12 +103,12 @@ public class ThemeController extends BaseController {
                 file.transferTo(themePath);
                 log.info("上传主题成功，路径：" + themePath.getAbsolutePath());
                 logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), HaloUtil.getIpAddr(request), HaloUtil.getDate())
+                        new Logs(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), HaloUtils.getIpAddr(request), new Date())
                 );
-                HaloUtil.unZip(themePath.getAbsolutePath(), new File(basePath.getAbsolutePath(), "templates/themes/").getAbsolutePath());
-                HaloUtil.removeFile(themePath.getAbsolutePath());
+                ZipUtils.unZip(themePath.getAbsolutePath(), new File(basePath.getAbsolutePath(), "templates/themes/").getAbsolutePath());
+                HaloUtils.removeFile(themePath.getAbsolutePath());
                 HaloConst.THEMES.clear();
-                HaloConst.THEMES = HaloUtil.getThemes();
+                HaloConst.THEMES = HaloUtils.getThemes();
                 return true;
             } else {
                 log.error("上传主题失败，没有选择文件");
@@ -128,9 +130,9 @@ public class ThemeController extends BaseController {
         try {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + themeName);
-            HaloUtil.removeDir(themePath);
+            HaloUtils.removeDir(themePath);
             HaloConst.THEMES.clear();
-            HaloConst.THEMES = HaloUtil.getThemes();
+            HaloConst.THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
             log.error("删除主题失败：{0}", e.getMessage());
         }
@@ -156,7 +158,7 @@ public class ThemeController extends BaseController {
      */
     @GetMapping(value = "/editor")
     public String editor(Model model) {
-        List<String> tpls = HaloUtil.getTplName(BaseController.THEME);
+        List<String> tpls = HaloUtils.getTplName(BaseController.THEME);
         model.addAttribute("tpls", tpls);
         return "admin/admin_theme-editor";
     }
@@ -176,7 +178,7 @@ public class ThemeController extends BaseController {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取主题路径
             File themesPath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(BaseController.THEME).append("/").append(tplName).toString());
-            tplContent = HaloUtil.getFileContent(themesPath.getAbsolutePath());
+            tplContent = HaloUtils.getFileContent(themesPath.getAbsolutePath());
         } catch (Exception e) {
             log.error("获取模板文件错误：{0}", e.getMessage());
         }

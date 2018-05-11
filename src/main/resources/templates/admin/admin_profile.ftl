@@ -100,7 +100,7 @@
                             </div>
                             <div class="tab-pane" id="pass">
                                 <form method="post" class="form-horizontal" id="passForm">
-                                    <input type="hidden" name="userId" value="${user.userId}">
+                                    <input type="hidden" name="userId" value="${user.userId?c}">
                                     <div class="box-body">
                                         <div class="form-group">
                                             <label for="beforePass" class="col-sm-2 control-label">原密码：</label>

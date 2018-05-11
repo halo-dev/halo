@@ -32,7 +32,7 @@
             <div class="row">
                 <div class="col-md-9">
                     <#if post??>
-                        <input type="hidden" id="postId" name="postId" value="${post.postId}">
+                        <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
                     </#if>
                     <div style="margin-bottom: 10px;">
                         <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" value="<#if post??>${post.postTitle}</#if>">
@@ -91,13 +91,15 @@
                         <div class="box-body" style="display: block">
                             <div class="form-group">
                                 <ul style="list-style: none;padding: 0px;margin: 0px;">
-                                    <#list categories as cate>
-                                        <li style="padding: 0;margin: 0px;list-style: none">
-                                            <label>
-                                                <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId}"> ${cate.cateName}
-                                            </label>
-                                        </li>
-                                    </#list>
+                                    <@commonTag method="categories">
+                                        <#list categories as cate>
+                                            <li style="padding: 0;margin: 0px;list-style: none">
+                                                <label>
+                                                    <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId}"> ${cate.cateName}
+                                                </label>
+                                            </li>
+                                        </#list>
+                                    </@commonTag>
                                 </ul>
                             </div>
                         </div>
@@ -114,14 +116,16 @@
                         <div class="box-body">
                             <input type="text" class="form-control input-lg" id="tagList" name=""/><br>
                             <select class="form-control" id="chooseTag" name="chooseTag">
-                                <#if tags??>
-                                    <option value="">选择添加</option>
-                                    <#list tags as tag>
-                                        <option value="${tag.tagName}">${tag.tagName}(${tag.posts?size})</option>
-                                    </#list>
-                                <#else>
-                                    <option>暂无标签</option>
-                                </#if>
+                                <@commonTag method="tags">
+                                    <#if tags??>
+                                        <option value="">选择添加</option>
+                                        <#list tags as tag>
+                                            <option value="${tag.tagName}">${tag.tagName}(${tag.posts?size})</option>
+                                        </#list>
+                                    <#else>
+                                        <option>暂无标签</option>
+                                    </#if>
+                                </@commonTag>
                             </select>
                         </div>
                     </div>
@@ -196,7 +200,8 @@
                     saveHTMLToTextarea: true,
                     imageUpload : true,
                     imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                    imageUploadURL : "/admin/attachments/upload/editor"
+                    imageUploadURL : "/admin/attachments/upload/editor",
+                    htmlDecode: "script"
                     // toolbarIcons : function () {
                     //     return editormd.toolbarModes["simple"];
                     // }
@@ -273,7 +278,7 @@
                         'postTitle': Title,
                         'postUrl' : $('#postUrl').html().toString(),
                         'postContentMd': editor.getMarkdown(),
-                        'postContent': editor.getTextareaSavedHTML(),
+                        'postContent': editor.getHTML(),
                         'postThumbnail': $('#selectImg')[0].src,
                         'cateList' : cateList.toString(),
                         'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString()

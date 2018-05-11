@@ -1,4 +1,4 @@
-package cc.ryanc.halo.util;
+package cc.ryanc.halo.utils;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
@@ -30,9 +30,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 /**
  * @author : RYAN0UP
@@ -41,7 +38,7 @@ import java.util.zip.ZipOutputStream;
  * description:常用的方法
  */
 @Slf4j
-public class HaloUtil {
+public class HaloUtils {
 
     private final static Calendar NOW = Calendar.getInstance();
 
@@ -52,112 +49,8 @@ public class HaloUtil {
     private static ArrayList<String> FILE_LIST = new ArrayList<>();
 
     /**
-     * 验证字符串是否为空
-     * @param str str
-     * @return boolean
-     */
-    public static boolean isNotNull(String str){
-        return null !=str && ! "".equals(str.trim());
-    }
-
-    /**
-     * 解压Zip文件
-     * @param zipFilePath 压缩文件的路径
-     * @param descDir 解压的路径
-     */
-    public static void unZip(String zipFilePath,String descDir){
-        File zipFile=new File(zipFilePath);
-        File pathFile=new File(descDir);
-        if(!pathFile.exists()){
-            pathFile.mkdirs();
-        }
-        ZipFile zip=null;
-        InputStream in=null;
-        OutputStream out=null;
-        try {
-            zip=new ZipFile(zipFile);
-            Enumeration<?> entries=zip.entries();
-            while(entries.hasMoreElements()){
-                ZipEntry entry=(ZipEntry) entries.nextElement();
-                String zipEntryName=entry.getName();
-                in=zip.getInputStream(entry);
-
-                String outPath=(descDir+"/"+zipEntryName).replace("\\*", "/");
-                File file=new File(outPath.substring(0, outPath.lastIndexOf('/')));
-                if(!file.exists()){
-                    file.mkdirs();
-                }
-                if(new File(outPath).isDirectory()){
-                    continue;
-                }
-                out=new FileOutputStream(outPath);
-                byte[] buf=new byte[4*1024];
-                int len;
-                while((len=in.read(buf))>=0){
-                    out.write(buf, 0, len);
-                }
-                in.close();
-            }
-        } catch (Exception e) {
-            log.error("解压失败：{0}",e.getMessage());
-        }finally{
-            try {
-                if(zip!=null)
-                    zip.close();
-                if(in!=null)
-                    in.close();
-                if(out!=null)
-                    out.close();
-            } catch (IOException e) {
-                log.error("未知错误：{0}",e.getMessage());
-            }
-        }
-    }
-
-    public static void zipFolder(String folder,String outPutFile){
-        ZipOutputStream zip = null;
-        FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(outPutFile);
-            zip = new ZipOutputStream(fileOutputStream);
-            addFolderToZip("", folder, zip);
-            zip.flush();
-            zip.close();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    public static void addFileToZip(String path,String srcFile,ZipOutputStream zip) throws Exception{
-        File folder = new File(srcFile);
-        if (folder.isDirectory()) {
-            addFolderToZip(path, srcFile, zip);
-        } else {
-            byte[] buf = new byte[1024];
-            int len;
-            FileInputStream in = new FileInputStream(srcFile);
-            zip.putNextEntry(new ZipEntry(path + "/" + folder.getName()));
-            while ((len = in.read(buf)) > 0) {
-                zip.write(buf, 0, len);
-            }
-        }
-    }
-
-    public static void addFolderToZip(String path, String srcFolder, ZipOutputStream zip) throws Exception {
-        File folder = new File(srcFolder);
-        if (null != path && folder.isDirectory()) {
-            for (String fileName : folder.list()) {
-                if ("".equals(path)) {
-                    addFileToZip(folder.getName(), srcFolder + "/" + fileName, zip);
-                } else {
-                    addFileToZip(path + "/" + folder.getName(), srcFolder + "/" + fileName, zip);
-                }
-            }
-        }
-    }
-
-    /**
      * 截取图片
+     *
      * @param src 输入路径
      * @param dest 输出路径
      * @param w 宽度
@@ -185,6 +78,7 @@ public class HaloUtil {
 
     /**
      * 获取所有附件
+     *
      * @param filePath filePath
      * @return Map
      */
@@ -212,6 +106,7 @@ public class HaloUtil {
 
     /**
      * 获取所有主题
+     *
      * @return list
      */
     public static List<Theme> getThemes(){
@@ -246,6 +141,7 @@ public class HaloUtil {
 
     /**
      * 获取主题下的模板文件名
+     *
      * @param theme theme
      * @return list
      */
@@ -281,6 +177,7 @@ public class HaloUtil {
 
     /**
      * 获取文件内容
+     *
      * @param filePath filePath
      * @return string
      */
@@ -301,6 +198,7 @@ public class HaloUtil {
 
     /**
      * 移除文件
+     *
      * @param fileName fileName
      * @return true or false
      */
@@ -314,6 +212,7 @@ public class HaloUtil {
 
     /**
      * 移除非空文件夹
+     *
      * @param dir dir
      * @return boolean
      */
@@ -333,6 +232,7 @@ public class HaloUtil {
 
     /**
      * 获取当前时间
+     *
      * @return 字符串
      */
     public static String getStringDate(String format) {
@@ -347,16 +247,8 @@ public class HaloUtil {
     }
 
     /**
-     * 获取当前时间
-     * @return 日期类型
-     */
-    public static Date getDate() {
-        Date date = new Date();
-        return date;
-    }
-
-    /**
      * 提取html中的文字
+     *
      * @param html html
      * @return string
      */
@@ -369,6 +261,7 @@ public class HaloUtil {
 
     /**
      * 提取文章摘要
+     *
      * @param html html
      * @param summary summary
      * @return string
@@ -379,6 +272,7 @@ public class HaloUtil {
 
     /**
      * md5加密字符串
+     *
      * @param str str
      * @return MD5
      */
@@ -398,6 +292,7 @@ public class HaloUtil {
 
     /**
      * 2进制转16进制
+     *
      * @param bytes bytes
      * @return string
      */
@@ -419,6 +314,7 @@ public class HaloUtil {
 
     /**
      * 获取客户端ip地址
+     *
      * @param request request
      * @return string
      */
@@ -438,6 +334,7 @@ public class HaloUtil {
 
     /**
      * 备份数据库
+     *
      * @param hostIp ip
      * @param userName 用户名
      * @param password 密码
@@ -507,6 +404,7 @@ public class HaloUtil {
 
     /**
      * 生成rss
+     *
      * @param posts posts
      * @return string
      * @throws FeedException
@@ -557,6 +455,7 @@ public class HaloUtil {
 
     /**
      * 获取sitemap
+     *
      * @param posts posts
      * @return string
      */
@@ -574,6 +473,7 @@ public class HaloUtil {
 
     /**
      * 配置邮件
+     *
      * @param smtpHost smtpHost
      * @param userName 邮件地址
      * @param password 密码
@@ -584,33 +484,11 @@ public class HaloUtil {
         OhMyEmail.config(properties,userName,password);
     }
 
-//    public static String importMarkdowns(String filePath) throws Exception{
-//        File file = new File(filePath);
-//        FileReader reader = new FileReader(file);
-//        BufferedReader bufferedReader = new BufferedReader(reader);
-//        StringBuffer stringBuffer = new StringBuffer();
-//        String s = "";
-//        while ((s = bufferedReader.readLine())!=null){
-//            stringBuffer.append(s+"\n");
-//        }
-//        bufferedReader.close();
-//        String str = stringBuffer.toString();
-//        return str;
-//    }
-//
-//    public static void main(String[] args) throws Exception{
-//        String content = importMarkdowns("/Users/ryan0up/Desktop/hello-hexo.md");
-//        String matter = StringUtils.substringBetween(content,"---","---");
-//        String[] strs =  matter.split("\n");
-//        for(String str:strs){
-//            System.out.println(StringUtils.substringBetween("title","\n","\n"));
-//        }
-//    }
-
     /**
      * 访问路径获取json数据
-     * @param url
-     * @return
+     *
+     * @param enterUrl 路径
+     * @return string
      */
     public static String getHttpResponse(String enterUrl) {
         BufferedReader in = null;
@@ -645,7 +523,7 @@ public class HaloUtil {
     }
 
     /**
-     * 百度实时推送
+     * 百度主动推送
      *
      * @param blogUrl 博客地址
      * @param token 百度推送token

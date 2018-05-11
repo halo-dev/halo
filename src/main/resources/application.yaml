@@ -27,7 +27,7 @@ spring:
       settings:
         web-allow-others: true
       path: /h2-console
-      enabled: true
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: update

@@ -25,12 +25,12 @@
             <div class="row">
                 <div class="col-md-5">
                     <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">${statusName}分类目录<#if updateCategory??>[${updateCategory.cateName}]</#if></h3>
-                        </div>
                         <#if updateCategory??>
+                            <div class="box-header with-border">
+                                <h3 class="box-title">修改分类目录<#if updateCategory??>[${updateCategory.cateName}]</#if></h3>
+                            </div>
                             <form action="/admin/category/save" method="post" role="form" id="cateAddForm">
-                                <input type="hidden" name="cateId" value="${updateCategory.cateId}">
+                                <input type="hidden" name="cateId" value="${updateCategory.cateId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">名称</label>
@@ -49,11 +49,14 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定修改</button>
                                     <a data-pjax="true" href="/admin/category" class="btn btn-info btn-sm ">返回添加</a>
                                 </div>
                             </form>
-                            <#else >
+                        <#else >
+                            <div class="box-header with-border">
+                                <h3 class="box-title">添加分类目录</h3>
+                            </div>
                             <form action="/admin/category/save" method="post" role="form" id="cateAddForm" onsubmit="return checkCate()">
                                 <div class="box-body">
                                     <div class="form-group">
@@ -73,7 +76,7 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定添加</button>
                                 </div>
                             </form>
                         </#if>
@@ -97,22 +100,24 @@
                                 </thead>
                                 <tbody>
                                 <@commonTag method="categories">
-                                    <#list categories as cate>
-                                        <tr>
-                                            <td>${cate.cateName}</td>
-                                            <td>${cate.cateUrl}</td>
-                                            <td>${(cate.cateDesc)!}</td>
-                                            <td>2</td>
-                                            <td>
-                                                <#if updateCategory?? && updateCategory.cateId==cate.cateId>
-                                                    <a href="#" class="btn btn-primary btn-xs " disabled>正在修改</a>
-                                                <#else >
-                                                    <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId}" class="btn btn-primary btn-xs ">修改</a>
-                                                </#if>
-                                                <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId}')">删除</button>
-                                            </td>
-                                        </tr>
-                                    </#list>
+                                    <#if categories?? && categories?size gt 0>
+                                        <#list categories as cate>
+                                            <tr>
+                                                <td>${cate.cateName}</td>
+                                                <td>${cate.cateUrl}</td>
+                                                <td>${(cate.cateDesc)!}</td>
+                                                <td>${cate.posts?size}</td>
+                                                <td>
+                                                    <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
+                                                        <a href="#" class="btn btn-primary btn-xs " disabled>正在修改</a>
+                                                    <#else >
+                                                        <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs ">修改</a>
+                                                    </#if>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId?c}')">删除</button>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    </#if>
                                 </@commonTag>
                                 </tbody>
                             </table>

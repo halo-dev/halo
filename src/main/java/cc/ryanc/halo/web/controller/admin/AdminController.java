@@ -10,7 +10,7 @@ import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -129,16 +129,16 @@ public class AdminController extends BaseController {
                 Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
                 Matcher matcher = patternEmail.matcher(loginName);
                 if (matcher.find()) {
-                    user = userService.userLoginByEmail(loginName, HaloUtil.getMD5(loginPwd)).get(0);
+                    user = userService.userLoginByEmail(loginName, HaloUtils.getMD5(loginPwd)).get(0);
                 } else {
-                    user = userService.userLoginByName(loginName, HaloUtil.getMD5(loginPwd)).get(0);
+                    user = userService.userLoginByName(loginName, HaloUtils.getMD5(loginPwd)).get(0);
                 }
                 if (aUser == user) {
                     session.setAttribute(HaloConst.USER_SESSION_KEY, user);
                     //重置用户的登录状态为正常
                     userService.updateUserNormal();
                     userService.updateUserLoginLast(new Date());
-                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtil.getIpAddr(request), HaloUtil.getDate()));
+                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtils.getIpAddr(request), new Date()));
                     status = "true";
                 }
             }
@@ -148,7 +148,7 @@ public class AdminController extends BaseController {
                 userService.updateUserLoginEnable("false");
             }
             userService.updateUserLoginLast(new Date());
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + loginName + "," + loginPwd + "]", HaloUtil.getIpAddr(request), new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + loginName + "," + loginPwd + "]", HaloUtils.getIpAddr(request), new Date()));
             log.error("登录失败！：{0}", e.getMessage());
         }
         return status;
@@ -163,7 +163,7 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtil.getIpAddr(request), HaloUtil.getDate()));
+        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtils.getIpAddr(request), new Date()));
         session.invalidate();
         log.info("用户[" + user.getUserName() + "]退出登录");
         return "redirect:/admin/login";

@@ -7,7 +7,7 @@ import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,10 +76,10 @@ public class PostServiceImpl implements PostService {
     public void updateAllSummary(Integer postSummary) {
         List<Post> posts = this.findAllPosts(HaloConst.POST_TYPE_POST);
         for (Post post : posts) {
-            if (!(HaloUtil.htmlToText(post.getPostContent()).length() < postSummary)) {
-                post.setPostSummary(HaloUtil.getSummary(post.getPostContent(), postSummary));
+            if (!(HaloUtils.htmlToText(post.getPostContent()).length() < postSummary)) {
+                post.setPostSummary(HaloUtils.getSummary(post.getPostContent(), postSummary));
             } else {
-                post.setPostSummary(HaloUtil.htmlToText(post.getPostContent()));
+                post.setPostSummary(HaloUtils.htmlToText(post.getPostContent()));
             }
             postRepository.save(post);
         }
@@ -324,7 +324,7 @@ public class PostServiceImpl implements PostService {
     public String buildRss(List<Post> posts) {
         String rss = "";
         try {
-            rss = HaloUtil.getRss(posts);
+            rss = HaloUtils.getRss(posts);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -339,6 +339,6 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public String buildSiteMap(List<Post> posts) {
-        return HaloUtil.getSiteMap(posts);
+        return HaloUtils.getSiteMap(posts);
     }
 }

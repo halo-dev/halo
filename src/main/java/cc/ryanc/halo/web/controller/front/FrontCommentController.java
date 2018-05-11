@@ -7,7 +7,7 @@ import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,13 +74,14 @@ public class FrontCommentController {
     public boolean newComment(@ModelAttribute("comment") Comment comment,
                               @ModelAttribute("post") Post post,
                               HttpServletRequest request) {
+        post = postService.findByPostId(post.getPostId()).get();
         if (StringUtils.isBlank(comment.getCommentAuthor())) {
             comment.setCommentAuthor("小猪佩琪");
         }
         comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
         comment.setPost(post);
         comment.setCommentDate(new Date());
-        comment.setCommentAuthorIp(HaloUtil.getIpAddr(request));
+        comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
         comment.setIsAdmin(0);
         commentService.saveByComment(comment);
 
@@ -89,7 +90,7 @@ public class FrontCommentController {
                 //发送邮件到博主
                 Map<String, Object> map = new HashMap<>();
                 map.put("author", userService.findUser().getUserDisplayName());
-                map.put("pageName", postService.findByPostId(post.getPostId()).get().getPostTitle());
+                map.put("pageName", post.getPostTitle());
                 map.put("pageUrl", HaloConst.OPTIONS.get("blog_url")+"/archives/"+post.getPostUrl()+"#comment-id-"+comment.getCommentId());
                 map.put("visitor", comment.getCommentAuthor());
                 map.put("commentContent", comment.getCommentContent());

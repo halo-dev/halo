@@ -4,7 +4,7 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.*;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -106,7 +106,7 @@ public class InstallController {
             }
             user.setUserDisplayName(userDisplayName);
             user.setUserEmail(userEmail);
-            user.setUserPass(HaloUtil.getMD5(userPwd));
+            user.setUserPass(HaloUtils.getMD5(userPwd));
             userService.saveByUser(user);
 
             //默认分类
@@ -157,7 +157,7 @@ public class InstallController {
             optionsService.saveOption("theme", "anatole");
 
             //建立网站时间
-            optionsService.saveOption("blog_start", HaloUtil.getStringDate("yyyy-MM-dd"));
+            optionsService.saveOption("blog_start", HaloUtils.getStringDate("yyyy-MM-dd"));
 
             //默认评论系统
             optionsService.saveOption("comment_system", "native");
@@ -175,8 +175,8 @@ public class InstallController {
                     new Logs(
                             LogsRecord.INSTALL,
                             "安装成功，欢迎使用Halo。",
-                            HaloUtil.getIpAddr(request),
-                            HaloUtil.getDate()
+                            HaloUtils.getIpAddr(request),
+                            new Date()
                     )
             );
 

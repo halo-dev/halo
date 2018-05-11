@@ -7,7 +7,7 @@ import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,15 +119,10 @@ public class PostController extends BaseController{
     /**
      * 处理跳转到新建文章页面
      *
-     * @param model model
      * @return 模板路径admin/admin_editor
      */
     @GetMapping(value = "/new")
-    public String newPost(Model model){
-        List<Category> categories = categoryService.findAllCategories();
-        List<Tag> tags = tagService.findAllTags();
-        model.addAttribute("categories",categories);
-        model.addAttribute("tags",tags);
+    public String newPost(){
         return "admin/admin_post_md_editor";
     }
 
@@ -161,22 +157,22 @@ public class PostController extends BaseController{
         try{
             //提取摘要
             int postSummary = 50;
-            if(HaloUtil.isNotNull(HaloConst.OPTIONS.get("post_summary"))){
+            if(StringUtils.isNotEmpty(HaloConst.OPTIONS.get("post_summary"))){
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get("post_summary"));
             }
-            String summaryText = HaloUtil.htmlToText(post.getPostContent());
+            String summaryText = HaloUtils.htmlToText(post.getPostContent());
             if(summaryText.length()>postSummary){
-                String summary = HaloUtil.getSummary(post.getPostContent(), postSummary);
+                String summary = HaloUtils.getSummary(post.getPostContent(), postSummary);
                 post.setPostSummary(summary);
             }else{
                 post.setPostSummary(summaryText);
             }
             if(null!=post.getPostId()){
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
-                post.setPostUpdate(HaloUtil.getDate());
+                post.setPostUpdate(new Date());
             }else{
-                post.setPostDate(HaloUtil.getDate());
-                post.setPostUpdate(HaloUtil.getDate());
+                post.setPostDate(new Date());
+                post.setPostUpdate(new Date());
             }
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
@@ -187,7 +183,7 @@ public class PostController extends BaseController{
             }
             post.setPostUrl(urlFilter(post.getPostUrl()));
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtils.getIpAddr(request),new Date()));
         }catch (Exception e){
             log.error("未知错误：", e.getMessage());
         }
@@ -240,7 +236,7 @@ public class PostController extends BaseController{
         try{
             Optional<Post> post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
-            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),HaloUtil.getIpAddr(request),HaloUtil.getDate()));
+            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),HaloUtils.getIpAddr(request),new Date()));
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
@@ -261,8 +257,6 @@ public class PostController extends BaseController{
     public String editPost(@PathParam("postId") Long postId, Model model){
         Optional<Post> post = postService.findByPostId(postId);
         model.addAttribute("post",post.get());
-        List<Category> categories = categoryService.findAllCategories();
-        model.addAttribute("categories",categories);
         return "admin/admin_post_md_editor";
     }
 
@@ -319,7 +313,7 @@ public class PostController extends BaseController{
             urls.append(post.getPostUrl());
             urls.append("\n");
         }
-        String result = HaloUtil.baiduPost(blogUrl, baiduToken, urls.toString());
+        String result = HaloUtils.baiduPost(blogUrl, baiduToken, urls.toString());
         if (StringUtils.isEmpty(result)) {
             return false;
         }

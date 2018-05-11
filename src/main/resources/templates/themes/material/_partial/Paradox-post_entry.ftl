@@ -33,7 +33,7 @@
             <#if post.categories??>
             <#list post.categories as cate>
                 <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/学习笔记/">${cate.cateName}</a>
+                  <a class="post_category-link" href="/categories/${cate.cateUrl}/">${cate.cateName}</a>
                 </span>
             </#list>
             </#if>

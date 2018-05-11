@@ -20,12 +20,12 @@
             <div class="row">
                 <div class="col-md-5">
                     <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">${statusName}菜单<#if updateMenu??>[${updateMenu.menuName}]</#if></h3>
-                        </div>
-                        <form action="/admin/menus/save" method="post" role="form" id="menuAddForm">
-                            <#if updateMenu??>
-                                <input type="hidden" name="menuId" value="${updateMenu.menuId}">
+                        <#if updateMenu??>
+                            <div class="box-header with-border">
+                                <h3 class="box-title">修改菜单<#if updateMenu??>[${updateMenu.menuName}]</#if></h3>
+                            </div>
+                            <form action="/admin/menus/save" method="post" role="form" id="menuAddForm">
+                                <input type="hidden" name="menuId" value="${updateMenu.menuId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
                                         <label for="menuName">名称</label>
@@ -54,7 +54,16 @@
                                         </select>
                                     </div>
                                 </div>
-                                <#else >
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定修改</button>
+                                    <a data-pjax="true" href="/admin/menus" class="btn btn-info btn-sm ">返回添加</a>
+                                </div>
+                            </form>
+                        <#else >
+                            <div class="box-header with-border">
+                                <h3 class="box-title">添加菜单</h3>
+                            </div>
+                            <form action="/admin/menus/save" method="post" role="form" id="menuAddForm">
                                 <div class="box-body">
                                     <div class="form-group">
                                         <label for="menuName">名称</label>
@@ -83,14 +92,11 @@
                                         </select>
                                     </div>
                                 </div>
-                            </#if>
-                            <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
-                                <#if updateMenu??>
-                                    <a data-pjax="true" href="/admin/menus" class="btn btn-info btn-sm ">返回添加</a>
-                                </#if>
-                            </div>
-                        </form>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定添加</button>
+                                </div>
+                            </form>
+                        </#if>
                     </div>
                 </div>
                 <div class="col-md-7">
@@ -111,22 +117,24 @@
                                 </thead>
                                 <tbody>
                                 <@commonTag method="menus">
-                                    <#list menus as menu>
-                                        <tr>
-                                            <td>${menu.menuName}</td>
-                                            <td>${menu.menuUrl}</td>
-                                            <td>${(menu.menuSort)!}</td>
-                                            <td>${menu.menuIcon}</td>
-                                            <td>
-                                                <#if updateMenu?? && menu.menuId==updateMenu.menuId>
-                                                    <a href="#" class="btn btn-primary btn-xs " disabled="">正在修改</a>
-                                                <#else>
-                                                    <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId}" class="btn btn-primary btn-xs ">修改</a>
-                                                </#if>
-                                                <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId}')">删除</button>
-                                            </td>
-                                        </tr>
-                                    </#list>
+                                    <#if menus?? && menus?size gt 0>
+                                        <#list menus as menu>
+                                            <tr>
+                                                <td>${menu.menuName}</td>
+                                                <td>${menu.menuUrl}</td>
+                                                <td>${(menu.menuSort)!}</td>
+                                                <td>${menu.menuIcon}</td>
+                                                <td>
+                                                    <#if updateMenu?? && menu.menuId?c==updateMenu.menuId?c>
+                                                        <a href="#" class="btn btn-primary btn-xs " disabled="">正在修改</a>
+                                                    <#else>
+                                                        <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId?c}" class="btn btn-primary btn-xs ">修改</a>
+                                                    </#if>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId?c}')">删除</button>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    </#if>
                                 </@commonTag>
                                 </tbody>
                             </table>

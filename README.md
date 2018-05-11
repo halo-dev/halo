@@ -13,21 +13,20 @@
 - [Introduction 简介](#introduction-简介)
 - [Quickstart 快速开始](#quickstart-快速开始)
 - [Demo 演示](#demo-演示)
-- [Download 下载](#download-下载)
+- [Download 下载部署](#download-下载部署)
 - [Docs 文档](#docs-文档)
+- [Themes 主题](#themes-主题)
 - [License 许可证](#license-许可证)
 - [Todo 后续功能](#todo-后续功能)
 - [Thanks 感谢](#thanks-感谢)
 
 ## Introduction 简介
 
-**Halo** [ˈheɪloʊ]<br>
-Fast,simple,powerful blog system powered by Java.
+**Halo** [ˈheɪloʊ]，意为光环。当然，你也可以当成拼音读(哈喽)。
 
-**Halo** [ˈheɪloʊ]，意为光环。当然，你也可以当成拼音读(哈喽)。<br>
 轻快，简洁，功能强大，使用Java开发的博客系统。
 
-**Halo交流群:** 162747721
+> **Halo交流群:** 162747721
 
 ## Quickstart 快速开始
 
@@ -37,6 +36,8 @@ cd halo
 mvn clean package -Pprod
 java -jar target/dist/halo/halo-xxx.jar
 ```
+
+> **注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件。**
 
 Let's start: http://localhost:8090
 
@@ -50,19 +51,30 @@ Let's start: http://localhost:8090
 
 [宋浩志博客](http://songhaozhi.com)
 
-## Download 下载
+## Download 下载部署
 
-[Download](https://github.com/ruibaby/halo/releases)
+[下载](https://github.com/ruibaby/halo/releases)最新的压缩包，解压之后进入根目录执行`java -jar halo-xxx.jar`即可运行。
+
+> **如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run)。**
 
 ## Docs 文档
 
 [Halo Document](https://halo-doc.ryanc.cc)
 
->文档正在整理中。
+> **文档正在不断完善中。**
+
+## Themes 主题
+
+除了内置的[Anatole](https://github.com/hi-caicai/farbox-theme-Anatole)和[Material](https://github.com/viosey/hexo-theme-material)，还有下列主题没有集成在项目里，如有需要，请自行下载之后通过后台上传上去使用。
+
+- [Vno](https://github.com/ruibaby/vno-halo) - 来自Jekyll的一款主题，作者[Wei Wang](https://onevcat.com/)。
+- [Hux](https://github.com/ruibaby/hux-halo) - 来自Jekyll的一款主题，作者[Xuan Huang](https://huangxuan.me/)。
 
 ## License 许可证
 
 [![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
+
+> **Halo使用GPL-v3.0协议开源，请尽量遵守开源协议，即便是在中国。**
 
 ## Todo 后续功能
 
@@ -95,3 +107,4 @@ Halo的诞生离不开下面这些项目：
 - [Layer](https://github.com/sentsin/layer.git)：个人认为最实用最好看的弹出层组件，没有之一
 - [Jquery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：消息提示组件
 - [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
+
