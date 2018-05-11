@@ -28,12 +28,10 @@ public class CategoryController {
     /**
      * 查询所有分类并渲染category页面
      *
-     * @param model model
      * @return 模板路径admin/admin_category
      */
     @GetMapping
-    public String categories(Model model) {
-        model.addAttribute("statusName", "添加");
+    public String categories() {
         return "admin/admin_category";
     }
 
@@ -94,7 +92,6 @@ public class CategoryController {
     public String toEditCategory(Model model, @PathParam("cateId") Long cateId) {
         Optional<Category> category = categoryService.findByCateId(cateId);
         model.addAttribute("updateCategory", category.get());
-        model.addAttribute("statusName", "修改");
         return "admin/admin_category";
     }
 }

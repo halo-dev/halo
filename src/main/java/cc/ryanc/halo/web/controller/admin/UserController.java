@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.service.UserService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +79,9 @@ public class UserController {
                               @ModelAttribute("userId") Long userId,
                               HttpSession session) {
         try {
-            User user = userService.findByUserIdAndUserPass(userId, HaloUtil.getMD5(beforePass));
+            User user = userService.findByUserIdAndUserPass(userId, HaloUtils.getMD5(beforePass));
             if (null != user) {
-                user.setUserPass(HaloUtil.getMD5(newPass));
+                user.setUserPass(HaloUtils.getMD5(newPass));
                 userService.saveByUser(user);
                 session.invalidate();
             } else {

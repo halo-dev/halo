@@ -2,7 +2,7 @@ package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.MailService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import freemarker.template.Template;
 import io.github.biezhi.ome.OhMyEmail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendMail(String to, String subject, String content) {
         //配置邮件服务器
-        HaloUtil.configMail(
+        HaloUtils.configMail(
                 HaloConst.OPTIONS.get("mail_smtp_host"),
                 HaloConst.OPTIONS.get("mail_smtp_username"),
                 HaloConst.OPTIONS.get("mail_smtp_password"));
@@ -59,7 +59,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         //配置邮件服务器
-        HaloUtil.configMail(
+        HaloUtils.configMail(
                 HaloConst.OPTIONS.get("mail_smtp_host"),
                 HaloConst.OPTIONS.get("mail_smtp_username"),
                 HaloConst.OPTIONS.get("mail_smtp_password"));

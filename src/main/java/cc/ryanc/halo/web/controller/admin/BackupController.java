@@ -3,7 +3,7 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,11 +46,11 @@ public class BackupController {
      */
     @GetMapping(value = "/backupDb")
     public String backupDatabase() {
-        String fileName = "db_backup_" + HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss") + ".sql";
+        String fileName = "db_backup_" + HaloUtils.getStringDate("yyyy_MM_dd_HH_mm_ss") + ".sql";
         try {
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
             String savePath = path.getAbsolutePath() + "/backup/database";
-            HaloUtil.exportDatabase("localhost", "root", "123456", savePath, fileName, "testdb");
+            HaloUtils.exportDatabase("localhost", "root", "123456", savePath, fileName, "testdb");
         } catch (Exception e) {
             log.error("未知错误：{0}", e.getMessage());
         }
@@ -77,9 +77,9 @@ public class BackupController {
         List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
         try {
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            String savePath = path.getAbsolutePath() + "/backup/posts/posts_backup_" + HaloUtil.getStringDate("yyyy_MM_dd_HH_mm_ss");
+            String savePath = path.getAbsolutePath() + "/backup/posts/posts_backup_" + HaloUtils.getStringDate("yyyy_MM_dd_HH_mm_ss");
             for (Post post : posts) {
-                HaloUtil.dbToFile(post.getPostContentMd(), savePath, post.getPostTitle() + ".md");
+                HaloUtils.dbToFile(post.getPostContentMd(), savePath, post.getPostTitle() + ".md");
             }
         } catch (Exception e) {
             e.printStackTrace();

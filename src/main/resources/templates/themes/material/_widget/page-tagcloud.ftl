@@ -29,11 +29,13 @@
 
 <div class=" material-tagscloud">
     <div class="material-post mdl-grid">
-        <#if tags??>
-            <#list tags as tag>
-                <a href="/tags/${tag.tagUrl}/" style="font-size: 22.33px; color: #757575">${tag.tagName}</a>
-            </#list>
-        </#if>
+        <@commonTag method="tags">
+            <#if tags?? && tags?size gt 0>
+                <#list tags as tag>
+                    <a href="/tags/${tag.tagUrl}/" style="font-size: 22.33px; color: #757575">${tag.tagName}</a>
+                </#list>
+            </#if>
+        </@commonTag>
     </div>
 </div>
 

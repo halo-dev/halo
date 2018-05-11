@@ -154,12 +154,12 @@
             <div class="row">
                 <div class="col-md-5">
                     <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">${statusName}标签<#if tag??>[${updateTag.tagName}]</#if></h3>
-                        </div>
                         <#if updateTag??>
+                            <div class="box-header with-border">
+                                <h3 class="box-title">修改标签<#if tag??>[${updateTag.tagName}]</#if></h3>
+                            </div>
                             <form action="/admin/tag/save" method="post" role="form">
-                                <input type="hidden" name="tagId" value="${updateTag.tagId}">
+                                <input type="hidden" name="tagId" value="${updateTag.tagId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
                                         <label for="tagName">名称</label>
@@ -173,14 +173,17 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定修改</button>
                                     <a data-pjax="true" href="/admin/tag" class="btn btn-info btn-sm ">返回添加</a>
                                     <#if updateTag.posts?size = 0>
-                                    <a data-pjax="true" href="/admin/tag/remove?tagId=${updateTag.tagId}" class="btn btn-danger btn-sm  pull-right">删除</a>
+                                    <a data-pjax="true" href="/admin/tag/remove?tagId=${updateTag.tagId?c}" class="btn btn-danger btn-sm  pull-right">删除</a>
                                     </#if>
                                 </div>
                             </form>
                         <#else >
+                            <div class="box-header with-border">
+                                <h3 class="box-title">添加标签</h3>
+                            </div>
                             <form action="/admin/tag/save" method="post" role="form" onsubmit="return checkTag()">
                                 <div class="box-body">
                                     <div class="form-group">
@@ -195,7 +198,7 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定添加</button>
                                 </div>
                             </form>
                         </#if>
@@ -208,14 +211,18 @@
                         </div>
                         <div class="box-body table-responsive">
                             <ul class="tags blue">
-                                <#list tags as tag>
-                                    <li>
-                                        <a data-pjax="true" href="/admin/tag/edit?tagId=${tag.tagId}">
-                                            ${tag.tagName}
-                                            <span>${tag.posts?size}</span>
-                                        </a>
-                                    </li>
-                                </#list>
+                                <@commonTag method="tags">
+                                    <#if tags?? && tags?size gt 0>
+                                        <#list tags as tag>
+                                            <li>
+                                                <a data-pjax="true" href="/admin/tag/edit?tagId=${tag.tagId?c}">
+                                                    ${tag.tagName}
+                                                    <span>${tag.posts?size}</span>
+                                                </a>
+                                            </li>
+                                        </#list>
+                                    </#if>
+                                </@commonTag>
                             </ul>
                         </div>
                     </div>

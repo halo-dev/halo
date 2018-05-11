@@ -2,12 +2,10 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Gallery;
-import cc.ryanc.halo.model.domain.Link;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.GalleryService;
-import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +35,6 @@ public class FrontPageController extends BaseController {
     private PostService postService;
 
     @Autowired
-    private LinkService linkService;
-
-    @Autowired
     private CommentService commentService;
 
     /**
@@ -57,14 +52,10 @@ public class FrontPageController extends BaseController {
     /**
      * 友情链接
      *
-     * @param model model
      * @return 模板路径/themes/{theme}/links
      */
     @GetMapping(value = "/links")
-    public String links(Model model) {
-        //所有友情链接
-        List<Link> links = linkService.findAllLinks();
-        model.addAttribute("links", links);
+    public String links() {
         return this.render("links");
     }
 

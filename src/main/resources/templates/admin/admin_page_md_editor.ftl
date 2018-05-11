@@ -31,7 +31,7 @@
             <div class="row">
                 <div class="col-md-9">
                     <#if post??>
-                        <input type="hidden" id="postId" name="postId" value="${post.postId}">
+                        <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
                     </#if>
                     <div style="margin-bottom: 10px;">
                         <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入页面标题" value="<#if post??>${post.postTitle}</#if>">
@@ -129,7 +129,8 @@
                     saveHTMLToTextarea: true,
                     imageUpload : true,
                     imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                    imageUploadURL : "/admin/attachments/upload/editor"
+                    imageUploadURL : "/admin/attachments/upload/editor",
+                    htmlDecode: "script"
                     // toolbarIcons : function () {
                     //     return editormd.toolbarModes["simple"];
                     // }
@@ -206,7 +207,7 @@
                         'postUrl' : $('#postUrl').html().toString(),
                         'postContentMd': editor.getMarkdown(),
                         'postContent': editor.getTextareaSavedHTML(),
-                        'postThumbnail': $('#selectImg')[0].src
+                        'postThumbnail': $('#selectImg')[0].src,
                     },
                     success: function (data) {
                         $.toast({

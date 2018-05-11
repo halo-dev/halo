@@ -91,8 +91,8 @@
                                                     <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>
                                                         <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank">预览</a>
-                                                        <a href="/admin/page/edit?pageId=${page.postId}" class="btn btn-primary btn-xs ">编辑</a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId}&postType=${page.postType}','确定永久删除？(不可逆)')">永久删除</button>
+                                                        <a href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs ">编辑</a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','确定永久删除？(不可逆)')">永久删除</button>
                                                     </td>
                                                 </tr>
                                             </#list>

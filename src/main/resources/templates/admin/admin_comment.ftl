@@ -57,17 +57,17 @@
                                                 <td>
                                                     <#switch comment.commentStatus>
                                                         <#case 0>
-                                                        <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
+                                                        <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}&status=1','确定移动到回收站？')">丢弃</button>
                                                         <#break >
                                                         <#case 1>
-                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=1">通过</a>
-                                                        <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId}','${comment.post.postId}')">通过并回复</button>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId}&status=1','确定移动到回收站？')">丢弃</button>
+                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=1">通过</a>
+                                                        <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')">通过并回复</button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=1','确定移动到回收站？')">丢弃</button>
                                                         <#break >
                                                         <#case 2>
-                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId}&status=2">还原</a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId}&status=2','确定要永久删除？')">删除</button>
+                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=2">还原</a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId?c}&status=2','确定要永久删除？')">删除</button>
                                                         <#break >
                                                     </#switch>
                                                 </td>

@@ -1,9 +1,5 @@
 <#include "module/macro.ftl">
-<#if tag??>
-    <@head title="${tag.tagName} · ${options.blog_title?default('Anatole')}" keywords="${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
-<#else>
-    <@head title="${options.blog_title?default('Anatole')}" keywords="${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
-</#if>
+<@head title="${tag.tagName} · ${options.blog_title?default('Anatole')}" keywords="${options.seo_keywords?default('Anatole')}" description="${options.seo_desc?default('Anatole')}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <#include "module/page-top.ftl">
@@ -16,17 +12,17 @@
                         <#if posts.hasPrevious()>
                             <#if posts.number == 1>
                                 <li class="pre pagbuttons">
-                                    <a class="btn" role="navigation" href="/">上一页</a>
+                                    <a class="btn" role="navigation" href="/tags/${tag.tagUrl}">上一页</a>
                                 </li>
                             <#else >
                                 <li class="pre pagbuttons">
-                                    <a class="btn" role="navigation" href="/page/${posts.number}">上一页</a>
+                                    <a class="btn" role="navigation" href="/tags/${tag.tagUrl}/page/${posts.number}">上一页</a>
                                 </li>
                             </#if>
                         </#if>
                         <#if posts.hasNext()>
                         <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="/page/${posts.number+2}">下一页</a>
+                            <a class="btn" role="navigation" href="/tags/${tag.tagUrl}/page/${posts.number+2}">下一页</a>
                         </li>
                         </#if>
                     </ul>

@@ -6,7 +6,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +25,7 @@ import javax.websocket.server.PathParam;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -133,7 +134,7 @@ public class AttachmentController {
             try {
                 File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
                 StringBuffer sbMedia = new StringBuffer("upload/");
-                sbMedia.append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/");
+                sbMedia.append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/");
                 File mediaPath = new File(basePath.getAbsolutePath(), sbMedia.toString());
                 if (!mediaPath.exists()) {
                     mediaPath.mkdirs();
@@ -146,27 +147,27 @@ public class AttachmentController {
                 //保存在数据库
                 Attachment attachment = new Attachment();
                 attachment.setAttachName(fileName);
-                attachment.setAttachPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(fileName).toString());
+                attachment.setAttachPath(new StringBuffer("/upload/").append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/").append(fileName).toString());
                 System.out.println(mediaPath.getAbsolutePath() + "/" + fileName);
                 //判断图片大小，如果长宽都小于500，则保存原始图片路径
                 BufferedImage sourceImg = ImageIO.read(new FileInputStream(mediaPath.getPath() + "/" + fileName));
                 if (sourceImg.getWidth() < 500 || sourceImg.getHeight() < 500) {
-                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(fileName).toString());
+                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/").append(fileName).toString());
                 } else {
-                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
+                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
                     //剪裁图片
-                    HaloUtil.cutCenterImage(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString(), new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString(), 500, 500, fileSuffix);
+                    HaloUtils.cutCenterImage(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString(), new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString(), 500, 500, fileSuffix);
                 }
 
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
-                attachment.setAttachCreated(HaloUtil.getDate());
+                attachment.setAttachCreated(new Date());
                 attachmentService.saveByAttachment(attachment);
 
                 updateConst();
                 log.info("上传文件[" + file.getOriginalFilename() + "]到[" + mediaPath.getAbsolutePath() + "]成功");
                 logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_FILE, file.getOriginalFilename(), HaloUtil.getIpAddr(request), HaloUtil.getDate())
+                        new Logs(LogsRecord.UPLOAD_FILE, file.getOriginalFilename(), HaloUtils.getIpAddr(request), new Date())
                 );
 
                 result.put("success", 1);
@@ -238,7 +239,7 @@ public class AttachmentController {
                     updateConst();
                     log.info("删除文件[" + delFileName + "]成功！");
                     logsService.saveByLogs(
-                            new Logs(LogsRecord.REMOVE_FILE, delFileName, HaloUtil.getIpAddr(request), HaloUtil.getDate())
+                            new Logs(LogsRecord.REMOVE_FILE, delFileName, HaloUtils.getIpAddr(request), new Date())
                     );
                 } else {
                     log.error("删除附件[" + delFileName + "]失败！");

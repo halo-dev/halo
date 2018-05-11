@@ -5,9 +5,10 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.OptionsService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +46,7 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     private void loadActiveTheme(){
         try {
             String themeValue = optionsService.findOneOption("theme");
-            if(HaloUtil.isNotNull(themeValue)){
+            if(StringUtils.isNotEmpty("themeValue")){
                 BaseController.THEME = themeValue;
             }
         }catch (Exception e){
@@ -87,7 +88,7 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     private void loadThemes(){
         try{
             HaloConst.THEMES.clear();
-            List<Theme> themes = HaloUtil.getThemes();
+            List<Theme> themes = HaloUtils.getThemes();
             if(null!=themes){
                 HaloConst.THEMES = themes;
             }

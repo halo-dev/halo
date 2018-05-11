@@ -25,7 +25,7 @@
                 </div>
                 <form action="/admin/page/gallery/save" method="post" class="form-horizontal" id="galleryForm">
                     <div class="box-body">
-                        <input type="hidden" value="${gallery.galleryId}" name="galleryId">
+                        <input type="hidden" value="${gallery.galleryId?c}" name="galleryId">
                         <div class="form-group">
                             <label for="galleryName" class="col-sm-2 control-label">图片名称：</label>
                             <div class="col-sm-10">

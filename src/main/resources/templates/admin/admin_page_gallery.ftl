@@ -90,7 +90,7 @@
             </div>
             <div class="row">
                 <#list galleries.content as gallery>
-                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="openDetail(${gallery.galleryId})">
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="openDetail(${gallery.galleryId?c})">
                         <a href="#" class="thumbnail">
                             <img src="${gallery.galleryThumbnailUrl?if_exists}" class="img-responsive">
                         </a>

@@ -20,10 +20,10 @@
             <div class="row">
                 <div class="col-md-5">
                     <div class="box box-primary">
-                        <div class="box-header with-border"><h3 class="box-title">${statusName}友情链接</h3></div>
                         <#if updateLink??>
+                            <div class="box-header with-border"><h3 class="box-title">修改友情链接</h3></div>
                             <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
-                                <input type="hidden" name="linkId" value="${updateLink.linkId}">
+                                <input type="hidden" name="linkId" value="${updateLink.linkId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">网站名称</label>
@@ -47,11 +47,12 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定修改</button>
                                     <a data-pjax="true" href="/admin/page/links" class="btn btn-info btn-sm ">返回添加</a>
                                 </div>
                             </form>
                         <#else>
+                            <div class="box-header with-border"><h3 class="box-title">添加友情链接</h3></div>
                             <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
                                 <div class="box-body">
                                     <div class="form-group">
@@ -76,7 +77,7 @@
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定${statusName}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm ">确定添加</button>
                                 </div>
                             </form>
                         </#if>
@@ -91,21 +92,25 @@
                                 <tr><th>名称</th><th>网址</th><th>描述</th><th>操作</th></tr>
                                 </thead>
                                 <tbody>
-                                    <#list links as link>
-                                    <tr>
-                                        <td>${link.linkName}</td>
-                                        <td>${link.linkUrl}</td>
-                                        <td width="30%">${link.linkDesc}</td>
-                                        <td>
-                                            <#if updateLink?? && updateLink.linkId==link.linkId>
-                                                <a class="btn btn-primary btn-xs" href="#" disabled>正在修改</a>
-                                            <#else >
-                                            <a data-pjax="true" class="btn btn-primary btn-xs" href="/admin/page/links/edit?linkId=${link.linkId}">修改</a>
-                                            </#if>
-                                            <button class="btn btn-danger btn-xs" onclick="modelShow('/admin/page/links/remove?linkId=${link.linkId}')">删除</>
-                                        </td>
-                                    </tr>
-                                    </#list>
+                                    <@commonTag method="links">
+                                        <#if links?? && links?size gt 0>
+                                            <#list links as link>
+                                                <tr>
+                                                    <td>${link.linkName}</td>
+                                                    <td>${link.linkUrl}</td>
+                                                    <td width="30%">${link.linkDesc}</td>
+                                                    <td>
+                                                        <#if updateLink?? && updateLink.linkId?c==link.linkId?c>
+                                                            <a class="btn btn-primary btn-xs" href="#" disabled>正在修改</a>
+                                                        <#else >
+                                                        <a data-pjax="true" class="btn btn-primary btn-xs" href="/admin/page/links/edit?linkId=${link.linkId?c}">修改</a>
+                                                        </#if>
+                                                        <button class="btn btn-danger btn-xs" onclick="modelShow('/admin/page/links/remove?linkId=${link.linkId?c}')">删除</>
+                                                    </td>
+                                                </tr>
+                                            </#list>
+                                        </#if>
+                                    </@commonTag>
                                 </tbody>
                             </table>
                         </div>

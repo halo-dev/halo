@@ -7,7 +7,7 @@ import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.HaloUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,14 +68,10 @@ public class PageController {
     /**
      * 获取友情链接列表并渲染页面
      *
-     * @param model model
      * @return 模板路径admin/admin_page_link
      */
     @GetMapping(value = "/links")
-    public String links(Model model) {
-        List<Link> links = linkService.findAllLinks();
-        model.addAttribute("links", links);
-        model.addAttribute("statusName", "添加");
+    public String links() {
         return "admin/admin_page_link";
     }
 
@@ -87,11 +84,8 @@ public class PageController {
      */
     @GetMapping("/links/edit")
     public String toEditLink(Model model, @PathParam("linkId") Long linkId) {
-        List<Link> links = linkService.findAllLinks();
         Optional<Link> link = linkService.findByLinkId(linkId);
         model.addAttribute("updateLink", link.get());
-        model.addAttribute("statusName", "修改");
-        model.addAttribute("links", links);
         return "admin/admin_page_link";
     }
 
@@ -206,7 +200,7 @@ public class PageController {
      * @return 模板路径admin/admin_page_md_editor
      */
     @GetMapping(value = "/new")
-    public String newPage(Model model) {
+    public String newPage() {
         return "admin/admin_page_md_editor";
     }
 
@@ -220,13 +214,13 @@ public class PageController {
     @ResponseBody
     public void pushPage(@ModelAttribute Post post, HttpSession session) {
         try {
-            post.setPostDate(HaloUtil.getDate());
+            post.setPostDate(new Date());
             //发表用户
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
             post.setPostType(HaloConst.POST_TYPE_PAGE);
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), HaloUtil.getIpAddr(request), HaloUtil.getDate()));
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), HaloUtils.getIpAddr(request), new Date()));
         } catch (Exception e) {
             log.error("未知错误：{0}", e.getMessage());
         }

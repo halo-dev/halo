@@ -38,14 +38,10 @@ public class FrontTagController extends BaseController {
     /**
      * 标签
      *
-     * @param model model
      * @return 模板路径/themes/{theme}/tags
      */
     @GetMapping
-    public String tags(Model model) {
-        //所有标签
-        List<Tag> tags = tagService.findAllTags();
-        model.addAttribute("tags", tags);
+    public String tags() {
         return this.render("tags");
     }
 

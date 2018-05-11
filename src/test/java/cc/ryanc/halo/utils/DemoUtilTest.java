@@ -1,4 +1,4 @@
-package cc.ryanc.halo.util;
+package cc.ryanc.halo.utils;
 
 import org.junit.Test;
 
@@ -12,6 +12,6 @@ public class DemoUtilTest {
 
     @Test
     public void testZip(){
-        HaloUtil.unZip("/Users/ryan0up/Desktop/adminlog.html.zip","/Users/ryan0up/Desktop/");
+        ZipUtils.unZip("/Users/ryan0up/Desktop/adminlog.html.zip","/Users/ryan0up/Desktop/");
     }
 }
