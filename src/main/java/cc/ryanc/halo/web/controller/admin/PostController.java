@@ -178,7 +178,7 @@ public class PostController extends BaseController{
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
             if(StringUtils.isNotEmpty(tagList)){
-                List<Tag> tags = tagService.strListToTagList(StringUtils.trim(tagList));
+                List<Tag> tags = tagService.strListToTagList(StringUtils.deleteWhitespace(tagList));
                 post.setTags(tags);
             }
             post.setPostUrl(urlFilter(post.getPostUrl()));

@@ -265,7 +265,12 @@
                                                     </label>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group">
+                                                <label for="nativeCommentPlaceholder" class="col-sm-2 control-label">占位提示：</label>
+                                                <div class="col-sm-4">
+                                                    <input type="url" class="form-control" id="nativeCommentPlaceholder" name="native_comment_placeholder" value="${options.native_comment_placeholder?default('赶快评论一个吧！')}">
+                                                </div>
+                                            </div>
                                             <div class="form-group">
                                                 <label for="nativeCss" class="col-sm-2 control-label">自定义CSS：
                                                     <span data-toggle="tooltip" data-placement="top" title="对评论框自定义样式，如边距等" style="cursor: pointer">
