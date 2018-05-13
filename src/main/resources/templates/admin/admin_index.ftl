@@ -229,7 +229,7 @@
                                 <tr>
                                     <th>评论者</th>
                                     <th>评论页面</th>
-                                    <th>内容</th>
+                                    <th width="30%">内容</th>
                                     <th>状态</th>
                                     <th>时间</th>
                                 </tr>
@@ -240,7 +240,11 @@
                                         <tr>
                                             <td>${comment.commentAuthor}</td>
                                             <td>
-                                                <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                                <#if comment.post.postType=="post">
+                                                    <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                                <#else>
+                                                    <a target="_blank" href="/p/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                                </#if>
                                             </td>
                                             <td>
                                                 <#switch comment.commentStatus>

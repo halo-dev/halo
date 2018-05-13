@@ -19,46 +19,63 @@
         outline: none;
     }
 
+    .comment-submit,.native-list-one-img,.native-list-one-footer-time,.native-list-one-footer-reback,.native-info,.native-nav,.ua{
+        -webkit-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
+    }
+
     .comment-header {
         width: 100%;
         line-height: 1.8;
     }
 
     .comment-input-who, .comment-input-email, .comment-input-website {
-        width: 33.33%;
-        padding: 10px 0;
-        font-size: .8rem;
-        float: left;
-        border: none;
-        border-bottom: 1px dashed #dedede;
+        width: 33.33% !important;
+        padding: 10px 0 !important;
+        font-size: .9rem !important;
+        float: left !important;
+        border: none !important;
+        border-bottom: 1px dashed #dedede !important;
     }
 
     .comment-input:focus {
-        border-bottom: 1px dashed red;
+        border-bottom: 1px dashed red !important;
     }
 
     .comment-input-content {
-        width: 100%;
-        min-height: 120px;
-        resize: vertical;
-        border: none;
-        padding: 10px 0;
+        width: 100% !important;
+        min-height: 120px !important;
+        resize: vertical!important;
+        border: none!important;
+        font-size: .9rem !important;
+        padding: 10px 0!important;
     }
 
     .comment-footer {
         text-align: right;
         vertical-align: middle;
+        padding-top: 10px;
     }
 
     .comment-submit {
-        border-radius: 0;
-        vertical-align: middle;
-        padding: 7px 14px;
-        font-size: .9rem;
-        cursor: pointer;
-        border: 1px solid #ededed;
-        background: #ededed;
-        color: #313131;
+        border-radius: 0 !important;
+        vertical-align: middle!important;
+        padding: 7px 14px!important;
+        font-size: .9rem!important;
+        cursor: pointer!important;
+        border: 1px solid #ededed!important;
+        background: #ededed!important;
+        color: #313131!important;
+        transition: all .3s ease-in-out;
+    }
+
+    .comment-submit:hover{
+        background-color: #fff !important;
+        border-radius: 1.9rem !important;
+        border-color: #859cff !important;
+        color: #859cff !important;
     }
 
     .native-list {
@@ -141,121 +158,100 @@
         color: #ef2f11;
         cursor: pointer;
     }
+    .native-info{
+        padding-top: 10px;
+        font-size: 12px;
+        color: #555;
+    }
 
-    .native-load{
+    .native-nav{
+        padding: 10px 0;
+    }
+    .page-nav{
+        margin: 20px 0;
+        padding: 0 10px;
+        list-style: none;
         text-align: center;
     }
-    .native-load-btn{
-        text-align: center;
-        border: none;
-        border-radius: 25%;
+    .page-nav li{
+        display: inline-block;
     }
     ${options.native_css?if_exists}
     @media screen and (max-width: 560px) {
         .comment-input-who, .comment-input-email, .comment-input-website {
-            width: 100%;
+            width: 100% !important;
         }
     }
 </style>
 <div class="native-comment">
     <div class="native-wrap">
         <div class="comment-header">
-            <input type="hidden" name="postId" value="${post.postId}">
-            <input type="text" class="comment-input comment-input-who" name="commentAuthor" id="commentAuthor"
-                   placeholder="昵称">
-            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" placeholder="邮箱">
-            <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl"
-                   placeholder="网址(https/http)">
+            <input type="hidden" name="postId" value="${post.postId?c}">
+            <input type="hidden" name="commentParent" id="commentParent" value="0">
+            <input type="text" class="comment-input comment-input-who" name="commentAuthor" id="commentAuthor" placeholder="昵称(必填)">
+            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" placeholder="邮箱(选填)">
+            <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" placeholder="网址(选填)">
         </div>
         <div class="comment-content">
-            <textarea class="comment-input comment-input-content" name="commentContent" id="commentContent"
-                      placeholder="come on"></textarea>
+            <textarea class="comment-input-content" name="commentContent" id="commentContent"
+                      placeholder="${options.native_comment_placeholder?default('赶快评论一个吧！')}"></textarea>
         </div>
         <div class="comment-footer">
             <button type="button" class="comment-submit" id="btn-push">提交</button>
         </div>
     </div>
-    <div class="native-info" style="padding-top: 5px;font-size: 12px;color: #0F192A;">
-        <span id="native-info-total">${comments.getTotalElements()}</span>条评论
+    <div class="native-info">
+        <span id="native-info-total" style="font-weight: 600">${comments.getTotalElements()}</span>评论
     </div>
     <ul class="native-list">
         <#list comments.content as comment>
-            <li class="native-list-one" id="comment-id-${comment.commentId}">
+            <li class="native-list-one" id="comment-id-${comment.commentId?c}">
                 <img class="native-list-one-img" src="//www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                 <section>
                     <div class="native-list-one-head">
                         <a class="native-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>
+                        <span class="native-comment-ua-info" style="display: none">${comment.commentAgent?if_exists}</span>
                         <#if comment.isAdmin==1>
                             <label class="native-list-one-head-admin">博主</label>
                         </#if>
-                        <#--<span class="ua"></span>-->
-                        <#--<span class="ua"></span>-->
                     </div>
                     <div class="native-list-one-content">
                         <p>${comment.commentContent?if_exists}</p>
                     </div>
                     <div class="native-list-one-footer">
                         <span class="native-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
-                        <span rid="" at="@${comment.commentAuthor?if_exists}" class="native-list-one-footer-reback">回复</span>
+                        <span at="${comment.commentId?c}" class="native-list-one-footer-reback">回复</span>
                     </div>
                 </section>
             </li>
         </#list>
     </ul>
-    <#--<div class="loader" style="background-color: #0a001f">-->
-        <#--<div class="loader-inner ball-pulse-sync">-->
-            <#--<div></div>-->
-            <#--<div></div>-->
-            <#--<div></div>-->
-        <#--</div>-->
-    <#--</div>-->
-    <#--<div class="native-load">-->
-        <#--<button type="button" class="native-load-btn">加载更多</button>-->
+    <#--<div class="native-nav">-->
+        <#--<ol class="page-nav">-->
+            <#--<li>←</li>-->
+            <#--<li>1</li>-->
+            <#--<li>→</li>-->
+        <#--</ol>-->
     <#--</div>-->
 </div>
 <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
 <script src="//cdn.bootcss.com/UAParser.js/0.7.17/ua-parser.min.js"></script>
 <script>
-    <#--$(document).ready(function () {-->
-        <#--$.ajax({-->
-            <#--type: "get",-->
-            <#--async: true,-->
-            <#--url: "/getComment/${post.postId}",-->
-            <#--dataType: "json",-->
-            <#--success: function (data) {-->
-                <#--setTimeout(function () {-->
-                    <#--$('.native-loading').hide();-->
-                <#--}, 1000);-->
-                <#--var parser = new UAParser();-->
-                <#--$.each(data, function (i, element) {-->
-                    <#--parser.setUA(element.commentAgent);-->
-                    <#--var result = parser.getResult();-->
-                    <#--var browser = result.browser.name + ' ' + result.browser.version;-->
-                    <#--var os = result.os.name + ' ' + result.os.version;-->
-                    <#--var author = element.commentAuthor;-->
-                    <#--var authorEmail = element.commentAuthorEmail;-->
-                    <#--var authorUrl = element.commentAuthorUrl;-->
-                    <#--var timestamp = element.commentDate;-->
-                    <#--var date = new Date(timestamp).toLocaleDateString();-->
-                    <#--var content = element.commentContent;-->
-                    <#--var authorPic = md5(authorEmail);-->
-                    <#--$('.native-list').append("<li class=\"native-list-one\"><img class=\"native-list-one-img\" src=\"//www.gravatar.com/avatar/" + authorPic + "?s=256&d=${options.native_comment_avatar?default('default')}\"><section><div class=\"native-list-one-head\"><a class=\"native-list-one-head-name\" rel=\"nofollow\" href=\"" + authorUrl + "\" target=\"_blank\">" + author + "</a> <span class=\"ua\">" + browser + "</span> <span class=\"ua\">" + os + "</span></div><div class=\"native-list-one-content\"><p>" + content + "</p></div><div class=\"native-list-one-footer\"><span class=\"native-list-one-footer-time\">" + date + "</span> <span rid=\"\" at=\"@" + author + "\" mail=\"" + authorEmail + "\" class=\"native-list-one-footer-reback\">回复</span></div></section></li>");-->
-                <#--});-->
-            <#--}-->
-        <#--});-->
-    <#--});-->
+    $(document).ready(function () {
+        $(".native-list-one-head").each(function (i) {
+            var uaInfo = $(this).children(".native-comment-ua-info").html();
+            $(this).append(show_ua(uaInfo));
+        });
+    });
     $('#btn-push').click(function () {
         var author = $("#commentAuthor");
-        if (author.val() == '') {
-            $(author).css("border-bottom", "1px dashed red");
-            return;
-        }
         var content = $("#commentContent");
-        if (content.val() == '') {
-            $(content).css("border-bottom", "1px dashed red");
+        if (author.val() == '' || content.val() == '') {
             return;
         }
+        $(this).attr("disabled","disabled");
+        $(this).html("提交中...");
         $.ajax({
             type: 'POST',
             url: '/newComment',
@@ -267,7 +263,8 @@
                 'commentAuthorEmail': $('input[name=commentAuthorEmail]').val(),
                 'commentAuthorUrl': $('input[name=commentAuthorUrl]').val(),
                 'commentAgent': navigator.userAgent,
-                'commentAuthorAvatarMd5': md5($('input[name=commentAuthorEmail]').val())
+                'commentAuthorAvatarMd5': md5($('input[name=commentAuthorEmail]').val()),
+                'commentParent': $('input[name=commentParent]').val()
             },
             success: function (data) {
                 if (data == true) {
@@ -276,4 +273,22 @@
             }
         });
     });
+    $('.native-list-one-footer-reback').click(function () {
+        var at = $(this).attr("at");
+        var commentParentAuthor = $('#comment-id-'+at).find(".native-list-one-head-name").html();
+        $('#commentParent').val(at);
+        $('#commentContent').val("@"+commentParentAuthor+": ");
+        $('#commentContent').focus();
+    });
+    var parser = new UAParser();
+    function show_ua(string){
+        parser.setUA(string);
+        var uua = parser.getResult();
+        if(uua.os.version=='x86_64') {
+            uua.os.version = 'x64';
+        }
+        var browser = uua.browser.name+' '+uua.browser.version;
+        var os = uua.os.name + ' ' + uua.os.version;
+        return '<span class="ua">'+browser+'</span><span class="ua">'+os+'</span>';
+    }
 </script>

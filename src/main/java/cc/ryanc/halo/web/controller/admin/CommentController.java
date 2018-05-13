@@ -111,6 +111,7 @@ public class CommentController extends BaseController{
     public String moveToPublish(@PathParam("commentId") Long commentId,
                                 @PathParam("status") Integer status){
         Comment comment = commentService.updateCommentStatus(commentId,0);
+        Post post = comment.getPost();
 
         //判断评论者的邮箱是否符合规则
         Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
@@ -121,8 +122,12 @@ public class CommentController extends BaseController{
             try {
                 if (status == 1 && matcher.find()) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("pageUrl", HaloConst.OPTIONS.get("blog_url")+"/archives/"+comment.getPost().getPostUrl()+"#comment-id-"+comment.getCommentId());
-                    map.put("pageName", comment.getPost().getPostTitle());
+                    if (StringUtils.equals(post.getPostType(), HaloConst.POST_TYPE_POST)) {
+                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                    } else {
+                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                    }
+                    map.put("pageName", post.getPostTitle());
                     map.put("commentContent", comment.getCommentContent());
                     map.put("blogUrl", HaloConst.OPTIONS.get("blog_url"));
                     map.put("blogTitle", HaloConst.OPTIONS.get("blog_title"));
@@ -213,7 +218,11 @@ public class CommentController extends BaseController{
                     map.put("blogTitle",HaloConst.OPTIONS.get("blog_title"));
                     map.put("commentAuthor",lastComment.getCommentAuthor());
                     map.put("pageName",lastComment.getPost().getPostTitle());
-                    map.put("pageUrl",HaloConst.OPTIONS.get("blog_url")+"/archives/"+post.getPostUrl()+"#comment-id-"+comment.getCommentId());
+                    if (StringUtils.equals(post.getPostType(), HaloConst.POST_TYPE_POST)) {
+                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                    } else {
+                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                    }
                     map.put("commentContent",lastComment.getCommentContent());
                     map.put("replyAuthor",user.getUserDisplayName());
                     map.put("replyContent",commentContent);
