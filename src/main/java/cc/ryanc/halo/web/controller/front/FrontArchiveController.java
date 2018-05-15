@@ -63,6 +63,9 @@ public class FrontArchiveController extends BaseController {
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(page - 1, 5, sort);
         Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
+        if(null==posts){
+            return "redirect:/404";
+        }
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -80,6 +83,9 @@ public class FrontArchiveController extends BaseController {
                            @PathVariable(value = "year") String year,
                            @PathVariable(value = "month") String month) {
         Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
+        if(null==posts){
+            return "redirect:/404";
+        }
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -94,11 +100,13 @@ public class FrontArchiveController extends BaseController {
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl, Model model) {
         Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_POST);
+        if(null==post){
+            return "redirect:/404";
+        }
         //获得当前文章的发布日期
         Date postDate = post.getPostDate();
         //查询当前文章日期之前的所有文章
         List<Post> beforePosts = postService.findByPostDateBefore(postDate);
-
         //查询当前文章日期之后的所有文章
         List<Post> afterPosts = postService.findByPostDateAfter(postDate);
 
