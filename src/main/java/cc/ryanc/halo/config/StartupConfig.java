@@ -46,8 +46,11 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     private void loadActiveTheme(){
         try {
             String themeValue = optionsService.findOneOption("theme");
-            if(StringUtils.isNotEmpty("themeValue")){
+            if(StringUtils.isNotEmpty("themeValue") && !StringUtils.equals(themeValue,null)){
                 BaseController.THEME = themeValue;
+            }else{
+                //以防万一
+                BaseController.THEME = "anatole";
             }
         }catch (Exception e){
             log.error("加载主题设置失败：{0}",e.getMessage());
