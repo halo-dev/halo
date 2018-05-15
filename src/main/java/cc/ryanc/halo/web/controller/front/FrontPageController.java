@@ -73,7 +73,9 @@ public class FrontPageController extends BaseController {
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = PageRequest.of(0,999,sort);
         Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
-
+        if(null==post){
+            return "redirect:/404";
+        }
         model.addAttribute("comments",comments);
         model.addAttribute("post", post);
         return this.render("page");

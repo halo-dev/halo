@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
 /**
  * @author : RYAN0UP
  * @version : 1.0
@@ -71,6 +69,9 @@ public class FrontTagController extends BaseController {
                        @PathVariable("tagUrl") String tagUrl,
                        @PathVariable("page") Integer page) {
         Tag tag = tagService.findByTagUrl(tagUrl);
+        if(null==tag){
+            return "redirect:/404";
+        }
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;
         if (!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))) {
