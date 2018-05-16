@@ -70,7 +70,7 @@ public class FrontTagController extends BaseController {
                        @PathVariable("page") Integer page) {
         Tag tag = tagService.findByTagUrl(tagUrl);
         if(null==tag){
-            return "redirect:/404";
+            return this.renderNotFound();
         }
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;

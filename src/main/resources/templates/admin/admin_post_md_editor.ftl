@@ -35,14 +35,14 @@
                         <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
                     </#if>
                     <div style="margin-bottom: 10px;">
-                        <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" value="<#if post??>${post.postTitle}</#if>">
+                        <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" onblur="autoComplateUrl();" value="<#if post??>${post.postTitle}</#if>">
                     </div>
                     <div style="display: block;margin-bottom: 10px;">
                         <span>
                             永久链接：
                             <a href="#">${options.blog_url}/archives/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
                             <button class="btn btn-default btn-sm " id="btn_input_postUrl">编辑</button>
-                            <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
+                            <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="urlOnBlurAuto()" style="display: none;">确定</button>
                         </span>
                     </div>
                     <div class="box box-primary">
@@ -155,6 +155,7 @@
         <script src="/static/plugins/editor.md/editormd.min.js"></script>
         <script src="/static/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
         <script src="/static/plugins/jquery-tageditor/jquery.caret.min.js"></script>
+        <script src="/static/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
         <script>
             $('#tagList').tagEditor({
                 //initialTags: ['Hello', 'World', 'Example', 'Tags'],
@@ -163,6 +164,9 @@
                 forceLowercase: false
             });
 
+            /**
+             * 加载该文章已有的标签
+             */
             <#if post??>
                 <#if post.tags?size gt 0>
                     <#list post.tags as tag>
@@ -190,7 +194,11 @@
                     scrollbar: false
                 });
             }
+
             var editor;
+            /**
+             * 加载编辑器
+             */
             function loadEditor() {
                 editor = editormd("markdown-editor", {
                     width: "100%",
@@ -212,10 +220,21 @@
             });
 
             /**
+             * 自动填充路径，并且将汉字转化成拼音以-隔开
+             */
+            function autoComplateUrl() {
+                var titleVal = $("#post_title").val();
+                if(titleVal!="" && titleVal!=null){
+                    var result = $("#post_title").toPinyin().toLowerCase();
+                    $("#postUrl").html(result.substring(0,result.length-1));
+                }
+            }
+
+            /**
              * 检测是否已经存在该链接
              * @constructor
              */
-            function UrlOnBlurAuto() {
+            function urlOnBlurAuto() {
                 if($('#newPostUrl').val()===""){
                     showMsg("固定链接不能为空！","info",2000);
                     return;
@@ -240,7 +259,7 @@
                 });
             }
             $('#btn_input_postUrl').click(function () {
-                $('#postUrl').html("<input type='text' id='newPostUrl' onblur='UrlOnBlurAuto()' value=''>");
+                $('#postUrl').html("<input type='text' id='newPostUrl' onblur='urlOnBlurAuto()' value=''>");
                 $(this).hide();
                 $('#btn_change_postUrl').show();
             });

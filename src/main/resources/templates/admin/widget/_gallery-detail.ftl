@@ -91,7 +91,7 @@
                     url: '/admin/page/gallery/remove',
                     async: false,
                     data:{
-                        galleryId : ${gallery.galleryId}
+                        galleryId : ${gallery.galleryId?c}
                     },
                     success: function (data) {
                         if(data==true){

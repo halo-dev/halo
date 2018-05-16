@@ -68,7 +68,7 @@ public class FrontCategoryController extends BaseController {
                              @PathVariable("page") Integer page){
         Category category = categoryService.findByCateUrl(cateUrl);
         if(null==category){
-            return "redirect:/404";
+            return this.renderNotFound();
         }
         Sort sort = new Sort(Sort.Direction.DESC,"postDate");
         Integer size = 10;

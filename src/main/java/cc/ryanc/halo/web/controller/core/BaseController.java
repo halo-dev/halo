@@ -25,4 +25,12 @@ public abstract class BaseController {
         themeStr.append("/");
         return themeStr.append(pageName).toString();
     }
+
+    /**
+     * 渲染404页面
+     * @return redirect:/404
+     */
+    public String renderNotFound(){
+        return "redirect:/404";
+    }
 }
