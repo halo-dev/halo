@@ -127,7 +127,7 @@ public class PostController extends BaseController{
     }
 
     /**
-     * 去除html，htm后缀
+     * 去除html，htm后缀，以及将空格替换成-
      *
      * @param url url
      * @return String
@@ -139,7 +139,7 @@ public class PostController extends BaseController{
                 return url.substring(0, url.lastIndexOf("."));
             }
         }
-        return url;
+        return StringUtils.replaceAll(url," ","-");
     }
 
     /**
@@ -160,6 +160,7 @@ public class PostController extends BaseController{
             if(StringUtils.isNotEmpty(HaloConst.OPTIONS.get("post_summary"))){
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get("post_summary"));
             }
+            //文章摘要
             String summaryText = HaloUtils.htmlToText(post.getPostContent());
             if(summaryText.length()>postSummary){
                 String summary = HaloUtils.getSummary(post.getPostContent(), postSummary);
@@ -167,6 +168,7 @@ public class PostController extends BaseController{
             }else{
                 post.setPostSummary(summaryText);
             }
+            //添加文章时，添加文章时间和修改文章时间为当前时间，修改文章时，只更新修改文章时间
             if(null!=post.getPostId()){
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
                 post.setPostUpdate(new Date());

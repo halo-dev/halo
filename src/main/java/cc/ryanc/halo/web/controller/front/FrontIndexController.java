@@ -69,7 +69,7 @@ public class FrontIndexController extends BaseController {
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         if(null==posts){
-            return "redirect:/404";
+            return this.renderNotFound();
         }
         model.addAttribute("posts", posts);
         return this.render("index");

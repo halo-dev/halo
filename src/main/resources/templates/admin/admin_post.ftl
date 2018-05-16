@@ -52,6 +52,7 @@
                                     <th>分类目录</th>
                                     <th>标签</th>
                                     <th>评论</th>
+                                    <th>访问量</th>
                                     <th>日期</th>
                                     <th>操作</th>
                                 </tr>
@@ -81,6 +82,9 @@
                                                 </td>
                                                 <td>
                                                     ${post.getComments()?size}
+                                                </td>
+                                                <td>
+                                                    ${post.postViews}
                                                 </td>
                                                 <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
                                                 <td>

@@ -91,7 +91,7 @@
                     url: '/admin/attachments/remove',
                     async: false,
                     data:{
-                        attachId : ${attachment.attachId}
+                        attachId : ${attachment.attachId?c}
                     },
                     success: function (data) {
                         if(data==true){

@@ -35,7 +35,7 @@
                                     <div class="form-group">
                                         <label for="menuUrl">路径</label>
                                         <input type="text" class="form-control" id="menuUrl" name="menuUrl" value="${updateMenu.menuUrl}">
-                                        <small>*菜单的路径，最好为英文</small>
+                                        <small>*菜单的路径</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="menuSort">排序编号</label>
@@ -44,7 +44,7 @@
                                     <div class="form-group">
                                         <label for="menuIcon">图标</label>
                                         <input type="text" class="form-control" id="menuIcon" name="menuIcon" value="${updateMenu.menuIcon}">
-                                        <small>*可选项，支持部分字体图标</small>
+                                        <small>*请根据主题的支持选填</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="menuIcon">打开方式</label>
@@ -73,7 +73,7 @@
                                     <div class="form-group">
                                         <label for="menuUrl">路径</label>
                                         <input type="text" class="form-control" id="menuUrl" name="menuUrl">
-                                        <small>*菜单的路径，最好为英文</small>
+                                        <small>*菜单的路径</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="menuSort">排序编号</label>
@@ -82,7 +82,7 @@
                                     <div class="form-group">
                                         <label for="menuIcon">图标</label>
                                         <input type="text" class="form-control" id="menuIcon" name="menuIcon">
-                                        <small>*可选项，支持部分字体图标</small>
+                                        <small>*请根据主题的支持选填</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="menuIcon">打开方式</label>

@@ -15,7 +15,7 @@
             </li>
         </div>
         <div class="avatar">
-            <img src="${options.blog_logo?default("/anatole/source/images/logo@2x.png")}" />
+            <img src="${options.anatole_style_right_icon?default("/anatole/source/images/logo.png")}" />
         </div>
     </div>
 </div>

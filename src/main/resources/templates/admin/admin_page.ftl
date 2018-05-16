@@ -77,6 +77,7 @@
                                                 <th>标题</th>
                                                 <th>路径</th>
                                                 <th>评论</th>
+                                                <td>访问量</td>
                                                 <th>日期</th>
                                                 <th>操作</th>
                                             </tr>
@@ -88,6 +89,7 @@
                                                     <td>${page.postTitle}</td>
                                                     <td>/p/${page.postUrl}</td>
                                                     <td>${page.comments?size}</td>
+                                                    <td>${page.postViews}</td>
                                                     <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>
                                                         <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank">预览</a>

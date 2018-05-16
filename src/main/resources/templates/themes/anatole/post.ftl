@@ -38,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="share">
+                <div class="share" style="display: inline-flex">
                     <div class="evernote">
                         <a href="javascript:(function(){EN_CLIP_HOST='http://www.evernote.com';try{var%20x=document.createElement('SCRIPT');x.type='text/javascript';x.src=EN_CLIP_HOST+'/public/bookmarkClipper.js?'+(new%20Date().getTime()/100000);document.getElementsByTagName('head')[0].appendChild(x);}catch(e){location.href=EN_CLIP_HOST+'/clip.action?url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title);}})();"
                            ref="nofollow" target="_blank" class="fa fa-bookmark"></a>

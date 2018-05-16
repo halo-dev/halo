@@ -74,10 +74,12 @@ public class FrontPageController extends BaseController {
         Pageable pageable = PageRequest.of(0,999,sort);
         Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
         if(null==post){
-            return "redirect:/404";
+            return this.renderNotFound();
         }
         model.addAttribute("comments",comments);
         model.addAttribute("post", post);
+        post.setPostViews(post.getPostViews()+1);
+        postService.saveByPost(post);
         return this.render("page");
     }
 }

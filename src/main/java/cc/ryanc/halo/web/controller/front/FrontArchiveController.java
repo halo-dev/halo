@@ -64,7 +64,7 @@ public class FrontArchiveController extends BaseController {
         Pageable pageable = PageRequest.of(page - 1, 5, sort);
         Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
         if(null==posts){
-            return "redirect:/404";
+            return this.renderNotFound();
         }
         model.addAttribute("posts", posts);
         return this.render("archives");
@@ -84,7 +84,7 @@ public class FrontArchiveController extends BaseController {
                            @PathVariable(value = "month") String month) {
         Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
         if(null==posts){
-            return "redirect:/404";
+            return this.renderNotFound();
         }
         model.addAttribute("posts", posts);
         return this.render("archives");
@@ -101,7 +101,7 @@ public class FrontArchiveController extends BaseController {
     public String getPost(@PathVariable String postUrl, Model model) {
         Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_POST);
         if(null==post){
-            return "redirect:/404";
+            return this.renderNotFound();
         }
         //获得当前文章的发布日期
         Date postDate = post.getPostDate();
@@ -119,10 +119,10 @@ public class FrontArchiveController extends BaseController {
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = PageRequest.of(0,999,sort);
         Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
-
         model.addAttribute("post", post);
         model.addAttribute("comments",comments);
-
+        post.setPostViews(post.getPostViews()+1);
+        postService.saveByPost(post);
         return this.render("post");
     }
 }

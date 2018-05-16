@@ -116,4 +116,9 @@ public class Post implements Serializable {
      * 2 回收站
      */
     private Integer postStatus = 0;
+
+    /**
+     * 文章访问量
+     */
+    private Long postViews = 0L;
 }

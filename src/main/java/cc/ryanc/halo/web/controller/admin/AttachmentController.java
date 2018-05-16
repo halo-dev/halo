@@ -25,10 +25,8 @@ import javax.websocket.server.PathParam;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author : RYAN0UP
@@ -132,23 +130,26 @@ public class AttachmentController {
         Map<String, Object> result = new HashMap<String, Object>();
         if (!file.isEmpty()) {
             try {
+                //程序根路径，也就是/resources
                 File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+                //upload的路径
                 StringBuffer sbMedia = new StringBuffer("upload/");
+                //获取当前年月以创建目录，如果没有该目录则创建
                 sbMedia.append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/");
                 File mediaPath = new File(basePath.getAbsolutePath(), sbMedia.toString());
                 if (!mediaPath.exists()) {
                     mediaPath.mkdirs();
                 }
-                file.transferTo(new File(mediaPath.getAbsoluteFile(), file.getOriginalFilename()));
-                String fileName = file.getOriginalFilename();
-                String nameWithOutSuffix = fileName.substring(0, fileName.lastIndexOf('.'));
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                String nameWithOutSuffix = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ","_").replaceAll(",","")+dateFormat.format(new Date())+new Random().nextInt(1000);
                 String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+                String fileName = nameWithOutSuffix+"."+fileSuffix;
+                file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName));
 
                 //保存在数据库
                 Attachment attachment = new Attachment();
                 attachment.setAttachName(fileName);
                 attachment.setAttachPath(new StringBuffer("/upload/").append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/").append(fileName).toString());
-                System.out.println(mediaPath.getAbsolutePath() + "/" + fileName);
                 //判断图片大小，如果长宽都小于500，则保存原始图片路径
                 BufferedImage sourceImg = ImageIO.read(new FileInputStream(mediaPath.getPath() + "/" + fileName));
                 if (sourceImg.getWidth() < 500 || sourceImg.getHeight() < 500) {
@@ -165,9 +166,9 @@ public class AttachmentController {
                 attachmentService.saveByAttachment(attachment);
 
                 updateConst();
-                log.info("上传文件[" + file.getOriginalFilename() + "]到[" + mediaPath.getAbsolutePath() + "]成功");
+                log.info("上传文件[" + fileName + "]到[" + mediaPath.getAbsolutePath() + "]成功");
                 logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_FILE, file.getOriginalFilename(), HaloUtils.getIpAddr(request), new Date())
+                        new Logs(LogsRecord.UPLOAD_FILE, fileName, HaloUtils.getIpAddr(request), new Date())
                 );
 
                 result.put("success", 1);
