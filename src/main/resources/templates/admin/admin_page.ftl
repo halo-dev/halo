@@ -100,7 +100,7 @@
                                             </#list>
                                             <#else>
                                             <tr>
-                                                <td colspan="5" style="text-align: center;">暂无页面</td>
+                                                <td colspan="6" style="text-align: center;">暂无页面</td>
                                             </tr>
                                         </#if>
                                         </tbody>

@@ -8,6 +8,7 @@ import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -81,12 +82,16 @@ public class AttachmentController {
     @GetMapping(value = "/select")
     public String selectAttachment(Model model,
                                    @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                   @RequestParam(value = "id") String id) {
+                                   @RequestParam(value = "id",defaultValue = "none") String id,
+                                   @RequestParam(value = "type",defaultValue = "normal") String type) {
         Sort sort = new Sort(Sort.Direction.DESC, "attachId");
         Pageable pageable = PageRequest.of(page, 18, sort);
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
+        if(StringUtils.equals(type,"post")){
+            return "admin/widget/_attachment-select-post";
+        }
         return "admin/widget/_attachment-select";
     }
 

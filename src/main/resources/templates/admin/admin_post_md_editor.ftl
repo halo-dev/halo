@@ -13,11 +13,17 @@
             #post_title{
                 font-weight: 400;
             }
+            #btnOpenAttach{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
+            #btnOpenAttach:hover{background:#3c8dbc;color:#fff}
+            .form-horizontal .control-label{
+                text-align: left;
+            }
         </style>
         <section class="content-header">
-            <h1>
-                新建文章
-            </h1>
+            <h1 style="display: inline-block;">新建文章</h1>
+            <a id="btnOpenAttach" href="#" onclick="openAttachCopy()">
+                附件库
+            </a>
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> 首页</a>
@@ -191,6 +197,19 @@
                     maxmin: true,
                     area: ['90%', '90%'],
                     content: '/admin/attachments/select?id='+e,
+                    scrollbar: false
+                });
+            }
+            
+            function openAttachCopy() {
+                layer.open({
+                    type: 2,
+                    title: '所有附件',
+                    shadeClose: true,
+                    shade: 0.5,
+                    maxmin: true,
+                    area: ['90%', '90%'],
+                    content: '/admin/attachments/select?type=post',
                     scrollbar: false
                 });
             }
