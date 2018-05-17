@@ -61,7 +61,11 @@
                                     <#if posts.content?size gt 0>
                                         <#list posts.content as post>
                                             <tr>
-                                                <td>${post.postTitle}</td>
+                                                <#if post.postTitle?length gt 20>
+                                                    <td>${post.postTitle?substring(0,20)}...</td>
+                                                <#else >
+                                                    <td>${post.postTitle}</td>
+                                                </#if>
                                                 <td>
                                                     <#if post.categories?size gt 0>
                                                         <#list post.categories as cate>
@@ -109,7 +113,7 @@
                                         </#list>
                                         <#else>
                                         <tr>
-                                            <th colspan="6" style="text-align: center">暂无文章</th>
+                                            <th colspan="7" style="text-align: center">暂无文章</th>
                                         </tr>
                                     </#if>
                                 </tbody>

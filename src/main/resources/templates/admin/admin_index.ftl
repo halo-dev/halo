@@ -177,7 +177,7 @@
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
                                     <tr>
-                                        <th>标题</th>
+                                        <th width="50%">标题</th>
                                         <th>状态</th>
                                         <th>日期</th>
                                     </tr>
