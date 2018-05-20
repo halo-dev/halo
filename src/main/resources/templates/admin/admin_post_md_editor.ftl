@@ -228,7 +228,8 @@
                     imageUpload : true,
                     imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
                     imageUploadURL : "/admin/attachments/upload/editor",
-                    htmlDecode: "script"
+                    htmlDecode: "script",
+                    tocStartLevel : 1
                     // toolbarIcons : function () {
                     //     return editormd.toolbarModes["simple"];
                     // }

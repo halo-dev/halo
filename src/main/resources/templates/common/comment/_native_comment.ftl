@@ -234,9 +234,9 @@
         <#--</ol>-->
     <#--</div>-->
 </div>
-<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
-<script src="//cdn.bootcss.com/UAParser.js/0.7.17/ua-parser.min.js"></script>
+<script src="/static/plugins/jquery/jquery.min.js"></script>
+<script src="/static/plugins/md5/md5.min.js"></script>
+<script src="/static/plugins/ua-parser/ua-parser.min.js"></script>
 <script>
     $(document).ready(function () {
         $(".native-list-one-head").each(function (i) {
