@@ -3,7 +3,16 @@
     * {
         box-sizing: border-box;
     }
-
+    .native-list-one-head a, .native-list-one-content a{
+        opacity: 1;!important;
+        -webkit-transition: all .15s linear;
+        -moz-transition: all .15s linear;
+        -o-transition: all .15s linear;
+        -ms-transition: all .15s linear;
+        transition: all .15s linear;
+        /* color: #424242; */
+        color: #7575d0;!important;
+    }
     .native-comment {
         padding: 10px;
     }
