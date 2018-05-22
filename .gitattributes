@@ -1,2 +1,3 @@
 *.js linguist-language=Java
 *.css linguist-language=Java
+*.ftl linguist-language=FreeMarker
