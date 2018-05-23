@@ -28,7 +28,7 @@
         outline: none;
     }
 
-    .comment-submit,.native-list-one-img,.native-list-one-footer-time,.native-list-one-footer-reback,.native-info,.native-nav,.ua{
+    .comment-submit,.native-list-one-img,.native-list-one-footer-time,.native-list-one-footer-reback,.native-info,.native-nav,.ua,.native-message{
         -webkit-user-select:none;
         -moz-user-select:none;
         -ms-user-select:none;
@@ -209,31 +209,34 @@
             <button type="button" class="comment-submit" id="btn-push">提交</button>
         </div>
     </div>
+    <div class="native-message" style="text-align: center;padding: 20px;display: none"></div>
     <div class="native-info">
         <span id="native-info-total" style="font-weight: 600">${comments.getTotalElements()}</span>评论
     </div>
     <ul class="native-list">
-        <#list comments.content as comment>
-            <li class="native-list-one" id="comment-id-${comment.commentId?c}">
-                <img class="native-list-one-img" src="//www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
-                <section>
-                    <div class="native-list-one-head">
-                        <a class="native-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>
-                        <span class="native-comment-ua-info" style="display: none">${comment.commentAgent?if_exists}</span>
-                        <#if comment.isAdmin==1>
-                            <label class="native-list-one-head-admin">博主</label>
-                        </#if>
-                    </div>
-                    <div class="native-list-one-content">
-                        <p>${comment.commentContent?if_exists}</p>
-                    </div>
-                    <div class="native-list-one-footer">
-                        <span class="native-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
-                        <span at="${comment.commentId?c}" class="native-list-one-footer-reback">回复</span>
-                    </div>
-                </section>
-            </li>
-        </#list>
+        <#if comments.content?? && comments.content?size gt 0>
+            <#list comments.content as comment>
+                <li class="native-list-one" id="comment-id-${comment.commentId?c}">
+                    <img class="native-list-one-img" src="//www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
+                    <section>
+                        <div class="native-list-one-head">
+                            <a class="native-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>
+                            <span class="native-comment-ua-info" style="display: none">${comment.commentAgent?if_exists}</span>
+                            <#if comment.isAdmin==1>
+                                <label class="native-list-one-head-admin">博主</label>
+                            </#if>
+                        </div>
+                        <div class="native-list-one-content">
+                            <p>${comment.commentContent?if_exists}</p>
+                        </div>
+                        <div class="native-list-one-footer">
+                            <span class="native-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
+                            <span at="${comment.commentId?c}" class="native-list-one-footer-reback">回复</span>
+                        </div>
+                    </section>
+                </li>
+            </#list>
+        </#if>
     </ul>
     <#--<div class="native-nav">-->
         <#--<ol class="page-nav">-->
@@ -257,6 +260,11 @@
         var author = $("#commentAuthor");
         var content = $("#commentContent");
         if (author.val() == '' || content.val() == '') {
+            $(".native-message").html("<span style='color:red'>请输入必填项！</span>");
+            $(".native-message").fadeIn(1000);
+            setTimeout(function () {
+                $(".native-message").fadeOut(1000);
+            },1500);
             return;
         }
         $(this).attr("disabled","disabled");
@@ -277,7 +285,11 @@
             },
             success: function (data) {
                 if (data == true) {
-                    window.location.reload();
+                    $(".native-message").html("<span>你的评论已经提交，待博主审核之后可显示。</span>");
+                    $(".native-message").fadeIn(1000);
+                    setTimeout(function () {
+                        window.location.reload();
+                    },1500);
                 }
             }
         });

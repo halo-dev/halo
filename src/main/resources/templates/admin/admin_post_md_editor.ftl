@@ -342,13 +342,50 @@
                     }
                 });
             }
+            //setInterval("autoPush()","5000");
+            /**
+             * 自动保存文章
+             */
+            function autoPush() {
+                var Title = "";
+                if(postTitle.val()){
+                    Title = postTitle.val();
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/posts/new/autoPush',
+                    async: false,
+                    data: {
+                        <#--<#if post??>-->
+                        <#--'postId': $('#postId').val(),-->
+                        <#--</#if>-->
+                        'postStatus': 1,
+                        'postTitle': Title,
+                        'postUrl' : $('#postUrl').html().toString(),
+                        'postContentMd': editor.getMarkdown(),
+                        'postContent': editor.getHTML(),
+                        'postThumbnail': $('#selectImg')[0].src
+                    },
+                    success: function (data) {
+                        if(!$("#post_title").val()){
+                            $("#post_title").val(data.postTitle);
+                        }
+                        if(!$("#postId").val()){
+                            $("#postId").val(data.postId);
+                        }
+                        if($("#postUrl").html()==null || $("#postUrl").html()==""){
+                            $("#postUrl").val(data.postUrl);
+                        }
+                    }
+                });
+            }
 
             /**
              * Ctrl+C保存
              */
             $(document).keydown(function (event) {
                 if(event.ctrlKey&&event.keyCode === 83){
-                    push(1);
+                    //autoPush();
                 }
             });
         </script>
