@@ -72,7 +72,7 @@ public class FrontPageController extends BaseController {
 
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = PageRequest.of(0,999,sort);
-        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
+        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
         if(null==post){
             return this.renderNotFound();
         }

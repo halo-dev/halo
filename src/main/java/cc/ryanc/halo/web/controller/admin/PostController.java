@@ -11,7 +11,6 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.omg.PortableServer.POA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -174,6 +173,7 @@ public class PostController extends BaseController{
             if(null!=post.getPostId()){
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
                 post.setPostUpdate(new Date());
+                post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
             }else{
                 post.setPostDate(new Date());
                 post.setPostUpdate(new Date());
