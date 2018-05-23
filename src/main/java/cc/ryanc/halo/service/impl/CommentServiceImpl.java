@@ -124,7 +124,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status) {
-        return commentRepository.findCommentsByPostAndCommentStatusNot(post, pageable, status);
+        return commentRepository.findCommentsByPostAndCommentStatus(post, pageable, status);
     }
 
     /**

@@ -11,6 +11,7 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.omg.PortableServer.POA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.websocket.server.PathParam;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -189,6 +191,35 @@ public class PostController extends BaseController{
         }catch (Exception e){
             log.error("未知错误：", e.getMessage());
         }
+    }
+
+
+    /**
+     * 自动保存文章为草稿
+     * @param post post
+     * @param session session
+     * @return 文章的编号
+     */
+    @PostMapping(value = "/new/autoPush")
+    @ResponseBody
+    public Post autoPushPost(@ModelAttribute Post post, HttpSession session){
+        User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
+        try{
+            if(StringUtils.isEmpty(post.getPostTitle())){
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                post.setPostTitle("草稿："+dateFormat.format(new Date()));
+            }
+            if(StringUtils.isEmpty(post.getPostUrl())){
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                post.setPostTitle(dateFormat.format(new Date()));
+            }
+            post.setPostDate(new Date());
+            post.setPostUpdate(new Date());
+            post.setUser(user);
+        }catch (Exception e){
+            log.error("未知错误：", e.getMessage());
+        }
+        return postService.saveByPost(post);
     }
 
 

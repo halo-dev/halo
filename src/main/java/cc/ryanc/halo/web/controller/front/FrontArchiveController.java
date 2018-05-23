@@ -118,7 +118,7 @@ public class FrontArchiveController extends BaseController {
         }
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = PageRequest.of(0,999,sort);
-        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2);
+        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
         model.addAttribute("post", post);
         model.addAttribute("comments",comments);
         post.setPostViews(post.getPostViews()+1);
