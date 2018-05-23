@@ -356,9 +356,9 @@
                     url: '/admin/posts/new/autoPush',
                     async: false,
                     data: {
-                        <#--<#if post??>-->
-                        <#--'postId': $('#postId').val(),-->
-                        <#--</#if>-->
+                        <#if post??>
+                        'postId': $('#postId').val(),
+                        </#if>
                         'postStatus': 1,
                         'postTitle': Title,
                         'postUrl' : $('#postUrl').html().toString(),
