@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.service.OptionsService;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class OptionController {
      */
     @PostMapping(value = "/save")
     @ResponseBody
-    public boolean saveOptions(@RequestParam Map<String, String> options) {
+    public JsonResult saveOptions(@RequestParam Map<String, String> options) {
         try {
             optionsService.saveOptions(options);
             //刷新options
@@ -53,10 +54,10 @@ public class OptionController {
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
             log.info("所保存的设置选项列表：" + options);
-            return true;
+            return new JsonResult(1,"保存成功！");
         } catch (Exception e) {
             log.error("未知错误：{0}", e.getMessage());
-            return false;
+            return new JsonResult(0,"保存失败！");
         }
     }
 }

@@ -127,9 +127,9 @@
                         'tplContent': editor.getValue()
                     },
                     success: function (data) {
-                        if(data==true){
+                        if(data.code==1){
                             $.toast({
-                                text: "保存成功！",
+                                text: data.msg,
                                 heading: '提示',
                                 icon: 'success',
                                 showHideTransition: 'fade',
@@ -143,7 +143,7 @@
                             });
                         }else{
                             $.toast({
-                                text: "保存失败！",
+                                text: data.msg,
                                 heading: '提示',
                                 icon: 'error',
                                 showHideTransition: 'fade',

@@ -43,7 +43,7 @@ Let's start: http://localhost:8090
 
 ## Demo 演示
 
-[界面预览](https://halo-doc.ryanc.cc/preview)
+[测试地址](http://39.105.26.52)，[测试后台(admin,123456)](http://39.105.26.52/admin)
 
 [Ryan0up'S Blog](https://ryanc.cc)
 

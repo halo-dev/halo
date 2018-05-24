@@ -44,8 +44,12 @@ function saveOptions(option) {
         type: 'post',
         url: '/admin/option/save',
         data: param,
-        success: function (result) {
-            showMsg("保存成功！","success",1000);
+        success: function (data) {
+            if(data.code==1){
+                showMsg(data.msg,"success",1000);
+            }else {
+                showMsg(data.msg,"error",1000);
+            }
         }
     });
 }

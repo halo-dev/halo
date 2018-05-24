@@ -284,13 +284,14 @@
                 'commentParent': $('input[name=commentParent]').val()
             },
             success: function (data) {
-                if (data == true) {
-                    $(".native-message").html("<span>你的评论已经提交，待博主审核之后可显示。</span>");
-                    $(".native-message").fadeIn(1000);
-                    setTimeout(function () {
-                        window.location.reload();
-                    },1500);
+                if(data.code==1){
+                    $('.comment-input-content').val("");
                 }
+                $(".native-message").html("<span>"+data.msg+"</span>");
+                $(".native-message").fadeIn(1000);
+                setTimeout(function () {
+                    window.location.reload();
+                },1500);
             }
         });
     });

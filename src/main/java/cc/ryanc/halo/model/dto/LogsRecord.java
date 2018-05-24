@@ -19,6 +19,8 @@ public interface LogsRecord {
 
     String PUSH_POST = "发表文章";
 
+    String PUSH_PAGE = "发表页面";
+
     String REMOVE_POST = "删除文章";
 
     String CHANGE_THEME = "更换主题";

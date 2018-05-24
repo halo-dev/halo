@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
@@ -68,7 +69,6 @@ public class AttachmentController {
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
-
         return "admin/admin_attachment";
     }
 
@@ -216,8 +216,8 @@ public class AttachmentController {
      */
     @GetMapping(value = "/remove")
     @ResponseBody
-    public boolean removeAttachment(@PathParam("attachId") Long attachId,
-                                    HttpServletRequest request) {
+    public JsonResult removeAttachment(@PathParam("attachId") Long attachId,
+                                       HttpServletRequest request) {
         Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
         String delFileName = attachment.get().getAttachName();
         String delSmallFileName = delFileName.substring(0, delFileName.lastIndexOf('.')) + "_small" + attachment.get().getAttachSuffix();
@@ -249,13 +249,13 @@ public class AttachmentController {
                     );
                 } else {
                     log.error("删除附件[" + delFileName + "]失败！");
-                    return false;
+                    return new JsonResult(0,"删除失败！");
                 }
             }
         } catch (Exception e) {
             log.error("删除附件[" + delFileName + "]失败！:", e.getMessage());
-            return false;
+            return new JsonResult(0,"删除失败！");
         }
-        return true;
+        return new JsonResult(1,"删除成功！");
     }
 }

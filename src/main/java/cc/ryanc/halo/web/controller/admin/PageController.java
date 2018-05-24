@@ -219,8 +219,16 @@ public class PageController {
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
             post.setPostType(HaloConst.POST_TYPE_PAGE);
+            if(null!=post.getPostId()){
+                post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
+                post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
+                post.setPostUpdate(new Date());
+            }else{
+                post.setPostDate(new Date());
+                post.setPostUpdate(new Date());
+            }
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), HaloUtils.getIpAddr(request), new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), HaloUtils.getIpAddr(request), new Date()));
         } catch (Exception e) {
             log.error("未知错误：{0}", e.getMessage());
         }

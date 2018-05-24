@@ -232,7 +232,11 @@
                     },
                     success: function (data) {
                         $.toast({
-                            text: "发布成功！",
+                            <#if post??>
+                                text: "更新成功！",
+                            <#else>
+                                text: "发表成功！",
+                            </#if>
                             heading: '提示',
                             icon: 'success',
                             showHideTransition: 'fade',
