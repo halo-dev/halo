@@ -94,9 +94,9 @@
                         attachId : ${attachment.attachId?c}
                     },
                     success: function (data) {
-                        if(data==true){
+                        if(data.code==1){
                             $.toast({
-                                text: "删除成功！",
+                                text: data.msg,
                                 heading: '提示',
                                 icon: 'success',
                                 showHideTransition: 'fade',
@@ -112,7 +112,7 @@
                                 }
                             });
                         }else{
-                            showMsg("删除失败","error",2000);
+                            showMsg(data.msg,"error",2000);
                         }
                     }
                 });

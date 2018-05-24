@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
@@ -66,8 +67,8 @@ public class ThemeController extends BaseController {
      */
     @GetMapping(value = "/set")
     @ResponseBody
-    public boolean activeTheme(@PathParam("siteTheme") String siteTheme,
-                               HttpServletRequest request) {
+    public JsonResult activeTheme(@PathParam("siteTheme") String siteTheme,
+                                  HttpServletRequest request) {
         try {
             //保存主题设置项
             optionsService.saveOption("theme", siteTheme);
@@ -77,10 +78,10 @@ public class ThemeController extends BaseController {
             logsService.saveByLogs(
                     new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, HaloUtils.getIpAddr(request), new Date())
             );
-            return true;
+            return new JsonResult(1,"主题已设置为"+siteTheme);
         } catch (Exception e) {
             log.error("主题设置失败，当前主题为：" + siteTheme);
-            return false;
+            return new JsonResult(0,"主题设置失败");
         }
     }
 
@@ -93,7 +94,7 @@ public class ThemeController extends BaseController {
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
-    public boolean uploadTheme(@RequestParam("file") MultipartFile file,
+    public JsonResult uploadTheme(@RequestParam("file") MultipartFile file,
                                HttpServletRequest request) {
         try {
             if (!file.isEmpty()) {
@@ -109,14 +110,15 @@ public class ThemeController extends BaseController {
                 HaloUtils.removeFile(themePath.getAbsolutePath());
                 HaloConst.THEMES.clear();
                 HaloConst.THEMES = HaloUtils.getThemes();
-                return true;
             } else {
                 log.error("上传主题失败，没有选择文件");
+                return new JsonResult(0,"请选择上传的主题！");
             }
         } catch (Exception e) {
             log.error("上传主题失败：{0}", e.getMessage());
+            return new JsonResult(0,"主题上传失败！");
         }
-        return false;
+        return new JsonResult(1,"主题上传成功！");
     }
 
     /**
@@ -194,10 +196,10 @@ public class ThemeController extends BaseController {
      */
     @PostMapping(value = "/editor/save")
     @ResponseBody
-    public boolean saveTpl(@RequestParam("tplName") String tplName,
+    public JsonResult saveTpl(@RequestParam("tplName") String tplName,
                            @RequestParam("tplContent") String tplContent) {
         if (StringUtils.isBlank(tplContent)) {
-            return false;
+            return new JsonResult(0,"模板不能为空！");
         }
         try {
             //获取项目根路径
@@ -207,9 +209,9 @@ public class ThemeController extends BaseController {
             byte[] tplContentByte = tplContent.getBytes("UTF-8");
             Files.write(Paths.get(tplPath.getAbsolutePath()), tplContentByte);
         } catch (Exception e) {
-            log.error("文件保存失败：{0}", e.getMessage());
-            return false;
+            log.error("模板保存失败：{0}", e.getMessage());
+            return new JsonResult(0,"模板保存失败！");
         }
-        return true;
+        return new JsonResult(1,"模板保存成功！");
     }
 }

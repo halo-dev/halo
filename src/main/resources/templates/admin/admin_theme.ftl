@@ -146,11 +146,10 @@
                             dropZoneTitle: '拖拽主题压缩包到这里 &hellip;<br>不支持多个主题同时上传',
                             showClose: false
                         }).on("fileuploaded",function (event,data,previewId,index) {
-                            var data = data.jqXHR.responseJSON;
-                            if(data==true){
+                            if(data.code==1){
                                 $("#uploadForm").hide(400);
                                 $.toast({
-                                    text: "上传成功！",
+                                    text: data.msg,
                                     heading: '提示',
                                     icon: 'success',
                                     showHideTransition: 'fade',
@@ -164,6 +163,20 @@
                                     afterHidden: function () {
                                         window.location.reload();
                                     }
+                                });
+                            }else{
+                                $.toast({
+                                    text: data.msg,
+                                    heading: '提示',
+                                    icon: 'error',
+                                    showHideTransition: 'fade',
+                                    allowToastClose: true,
+                                    hideAfter: 1000,
+                                    stack: 1,
+                                    position: 'top-center',
+                                    textAlign: 'left',
+                                    loader: true,
+                                    loaderBg: '#ffffff'
                                 });
                             }
                         });
@@ -189,11 +202,11 @@
                         'siteTheme': site_theme
                     },
                     success: function (data) {
-                        if(data==true){
+                        if(data.code==1){
                             $.toast({
-                                text: "设置中...",
+                                text: data.msg,
                                 heading: '提示',
-                                icon: 'info',
+                                icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
                                 hideAfter: 1000,
@@ -205,6 +218,20 @@
                                 afterHidden: function () {
                                     window.location.reload();
                                 }
+                            });
+                        }else{
+                            $.toast({
+                                text: data.msg,
+                                heading: '提示',
+                                icon: 'error',
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: 2000,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff'
                             });
                         }
                     }

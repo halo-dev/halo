@@ -155,10 +155,10 @@
                     type: 'post',
                     url: '/admin/profile/save',
                     data: param,
-                    success: function (result) {
-                        if(result==true){
+                    success: function (data) {
+                        if(data.code==1){
                             $.toast({
-                                text: "保存成功！",
+                                text: data.msg,
                                 heading: '提示',
                                 icon: 'success',
                                 showHideTransition: 'fade',
@@ -174,7 +174,7 @@
                                 }
                             });
                         }else{
-                            showMsg("保存失败！","error",2000);
+                            showMsg(data.msg,"error",2000);
                         }
                     }
                 });
@@ -196,10 +196,10 @@
                     type: 'post',
                     url: '/admin/profile/changePass',
                     data: param,
-                    success: function (result) {
-                        if(result==true){
+                    success: function (data) {
+                        if(data.code==1){
                             $.toast({
-                                text: "修改密码成功！",
+                                text: data.msg,
                                 heading: '提示',
                                 icon: 'success',
                                 showHideTransition: 'fade',
@@ -215,7 +215,7 @@
                                 }
                             });
                         }else{
-                            showMsg("原密码错误！","error",2000);
+                            showMsg(data.msg,"error",2000);
                         }
                     }
                 });

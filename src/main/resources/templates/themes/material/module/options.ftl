@@ -543,7 +543,11 @@
             url: '/admin/option/save',
             data: param,
             success: function (data) {
-                showMsg("保存成功！","success",1000);
+                if(data.code==1){
+                    showMsg(data.msg,"success",1000);
+                }else{
+                    showMsg(data.msg,"error",1000);
+                }
             }
         });
     }

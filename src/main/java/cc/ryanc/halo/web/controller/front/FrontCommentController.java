@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
@@ -90,33 +91,37 @@ public class FrontCommentController {
      */
     @PostMapping(value = "/newComment")
     @ResponseBody
-    public boolean newComment(@ModelAttribute("comment") Comment comment,
+    public JsonResult newComment(@ModelAttribute("comment") Comment comment,
                               @ModelAttribute("post") Post post,
                               HttpServletRequest request) {
-        Comment lastComment = null;
-        post = postService.findByPostId(post.getPostId()).get();
-        comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
-        comment.setPost(post);
-        comment.setCommentDate(new Date());
-        comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
-        comment.setIsAdmin(0);
-        if(comment.getCommentParent()>0){
-            lastComment = commentService.findCommentById(comment.getCommentParent()).get();
-            String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
-            comment.setCommentContent(StringUtils.substringAfter(comment.getCommentContent(),":")+lastContent);
-        }
-        if(StringUtils.isNotEmpty(comment.getCommentAuthorUrl())){
-            if(!StringUtils.containsAny(comment.getCommentAuthorUrl(),"https://") || !StringUtils.containsAny(comment.getCommentAuthorUrl(),"http://")){
-                comment.setCommentAuthorUrl("http://"+comment.getCommentAuthorUrl());
+        try{
+            Comment lastComment = null;
+            post = postService.findByPostId(post.getPostId()).get();
+            comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
+            comment.setPost(post);
+            comment.setCommentDate(new Date());
+            comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
+            comment.setIsAdmin(0);
+            if(comment.getCommentParent()>0){
+                lastComment = commentService.findCommentById(comment.getCommentParent()).get();
+                String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
+                comment.setCommentContent(StringUtils.substringAfter(comment.getCommentContent(),":")+lastContent);
             }
+            if(StringUtils.isNotEmpty(comment.getCommentAuthorUrl())){
+                if(!StringUtils.containsAny(comment.getCommentAuthorUrl(),"https://") || !StringUtils.containsAny(comment.getCommentAuthorUrl(),"http://")){
+                    comment.setCommentAuthorUrl("http://"+comment.getCommentAuthorUrl());
+                }
+            }
+            commentService.saveByComment(comment);
+            if(comment.getCommentParent()>0){
+                //new EmailToParent(comment,lastComment,post).start();
+            }else{
+                new EmailToAdmin(comment,post).start();
+            }
+            return new JsonResult(1,"你的评论已经提交，待博主审核之后可显示。");
+        }catch (Exception e){
+            return new JsonResult(0,"评论失败！");
         }
-        commentService.saveByComment(comment);
-        if(comment.getCommentParent()>0){
-            //new EmailToParent(comment,lastComment,post).start();
-        }else{
-            new EmailToAdmin(comment,post).start();
-        }
-        return true;
     }
 
     /**

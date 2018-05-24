@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import freemarker.template.Configuration;
@@ -47,20 +48,20 @@ public class UserController {
      */
     @PostMapping(value = "save")
     @ResponseBody
-    public boolean saveProfile(@ModelAttribute User user, HttpSession session) {
+    public JsonResult saveProfile(@ModelAttribute User user, HttpSession session) {
         try {
             if (null != user) {
                 userService.saveByUser(user);
                 configuration.setSharedVariable("user", userService.findUser());
                 session.invalidate();
             } else {
-                return false;
+                return new JsonResult(0,"修改失败！");
             }
         } catch (Exception e) {
             log.error("未知错误：{0}", e.getMessage());
-            return false;
+            return new JsonResult(0,"修改失败！");
         }
-        return true;
+        return new JsonResult(1,"修改成功！");
     }
 
     /**
@@ -74,7 +75,7 @@ public class UserController {
      */
     @PostMapping(value = "changePass")
     @ResponseBody
-    public boolean changePass(@ModelAttribute("beforePass") String beforePass,
+    public JsonResult changePass(@ModelAttribute("beforePass") String beforePass,
                               @ModelAttribute("newPass") String newPass,
                               @ModelAttribute("userId") Long userId,
                               HttpSession session) {
@@ -85,12 +86,12 @@ public class UserController {
                 userService.saveByUser(user);
                 session.invalidate();
             } else {
-                return false;
+                return new JsonResult(0,"原密码错误！");
             }
         } catch (Exception e) {
             log.error("修改密码：未知错误，{0}", e.getMessage());
-            return false;
+            return new JsonResult(0,"密码修改失败！");
         }
-        return true;
+        return new JsonResult(1,"修改密码成功！");
     }
 }
