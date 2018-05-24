@@ -27,6 +27,7 @@ public class JsonResult {
 
     /**
      * 不返回数据的构造方法
+     *
      * @param code 状态码
      * @param msg 信息
      */
@@ -37,6 +38,7 @@ public class JsonResult {
 
     /**
      * 返回数据的构造方法
+     *
      * @param code 状态码
      * @param msg 信息
      * @param result 数据
@@ -44,6 +46,17 @@ public class JsonResult {
     public JsonResult(Integer code, String msg, Object result) {
         this.code = code;
         this.msg = msg;
+        this.result = result;
+    }
+
+    /**
+     * 返回状态码和数据
+     *
+     * @param code 状态码
+     * @param result 数据
+     */
+    public JsonResult(Integer code, Object result) {
+        this.code = code;
         this.result = result;
     }
 }

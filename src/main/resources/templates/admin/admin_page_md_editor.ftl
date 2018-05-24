@@ -40,6 +40,8 @@
                 <div class="col-md-9">
                     <#if post??>
                         <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
+                    <#else >
+                        <input type="hidden" id="postId" name="postId" value="">
                     </#if>
                     <div style="margin-bottom: 10px;">
                         <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入页面标题" value="<#if post??>${post.postTitle}</#if>">
@@ -220,9 +222,7 @@
                     url: '/admin/page/new/push',
                     async: false,
                     data: {
-                        <#if post??>
                         'postId': $('#postId').val(),
-                        </#if>
                         'postStatus': status,
                         'postTitle': Title,
                         'postUrl' : $('#postUrl').html().toString(),
@@ -255,12 +255,46 @@
                 });
             }
 
+            setInterval("autoPush()","30000");
+            /**
+             * 自动保存文章
+             */
+            function autoPush() {
+                var Title = "";
+                if(postTitle.val()){
+                    Title = postTitle.val();
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/posts/new/autoPush',
+                    async: false,
+                    data: {
+                        'postId': $('#postId').val(),
+                        'postTitle': Title,
+                        'postUrl' : $('#postUrl').html().toString(),
+                        'postContentMd': editor.getMarkdown(),
+                        'postType' : "page"
+                    },
+                    success: function (data) {
+                        if(!$("#post_title").val()){
+                            $("#post_title").val(data.result.postTitle);
+                        }
+                        if(!$("#postId").val()){
+                            $("#postId").val(data.result.postId);
+                        }
+                        if($("#postUrl").html()==''){
+                            $("#postUrl").html(data.result.postUrl);
+                        }
+                    }
+                });
+            }
+
             /**
              * Ctrl+C保存
              */
             $(document).keydown(function (event) {
                 if(event.ctrlKey&&event.keyCode === 83){
-                    push(1);
+                    autoPush();
                 }
             });
         </script>

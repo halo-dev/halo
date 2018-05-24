@@ -19,7 +19,7 @@
                         </h3>
                     </div>
                     <div class="post-content">
-                        ${post.postContent}
+                        ${post.postContent?if_exists}
                     </div>
                     <div class="post-footer">
                         <div class="meta">

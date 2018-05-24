@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
@@ -9,6 +10,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,30 +198,51 @@ public class PostController extends BaseController{
 
     /**
      * 自动保存文章为草稿
+     *
      * @param post post
      * @param session session
      * @return 文章的编号
      */
     @PostMapping(value = "/new/autoPush")
     @ResponseBody
-    public Post autoPushPost(@ModelAttribute Post post, HttpSession session){
+    public JsonResult autoPushPost(@RequestParam(value = "postId",defaultValue = "0") Long postId,
+                                   @RequestParam(value = "postTitle") String postTitle,
+                                   @RequestParam(value = "postUrl") String postUrl,
+                                   @RequestParam(value = "postContentMd") String postContentMd,
+                                   @RequestParam(value = "postType",defaultValue = "post") String postType,
+                                   HttpSession session){
+        Post post=null;
         User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
+        if(postId==0) {
+            post = new Post();
+        }else{
+            post = postService.findByPostId(postId).get();
+        }
         try{
-            if(StringUtils.isEmpty(post.getPostTitle())){
+            if(StringUtils.isEmpty(postTitle)){
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 post.setPostTitle("草稿："+dateFormat.format(new Date()));
+            }else{
+                post.setPostTitle(postTitle);
             }
-            if(StringUtils.isEmpty(post.getPostUrl())){
+            if(StringUtils.isEmpty(postUrl)){
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                post.setPostTitle(dateFormat.format(new Date()));
+                post.setPostUrl(dateFormat.format(new Date()));
+            }else{
+                post.setPostUrl(postUrl);
             }
+            post.setPostId(postId);
+            post.setPostStatus(1);
+            post.setPostContentMd(postContentMd);
+            post.setPostType(postType);
             post.setPostDate(new Date());
             post.setPostUpdate(new Date());
             post.setUser(user);
         }catch (Exception e){
             log.error("未知错误：", e.getMessage());
+            return new JsonResult(0,"保存失败");
         }
-        return postService.saveByPost(post);
+        return new JsonResult(1,postService.saveByPost(post));
     }
 
 
