@@ -39,6 +39,8 @@
                 <div class="col-md-9">
                     <#if post??>
                         <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
+                    <#else>
+                        <input type="hidden" id="postId" name="postId" value="">
                     </#if>
                     <div style="margin-bottom: 10px;">
                         <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" onblur="autoComplateUrl();" value="<#if post??>${post.postTitle}</#if>">
@@ -310,9 +312,7 @@
                     url: '/admin/posts/new/push',
                     async: false,
                     data: {
-                        <#if post??>
                         'postId': $('#postId').val(),
-                        </#if>
                         'postStatus': status,
                         'postTitle': Title,
                         'postUrl' : $('#postUrl').html().toString(),
@@ -346,7 +346,7 @@
                     }
                 });
             }
-            //setInterval("autoPush()","5000");
+            setInterval("autoPush()","30000");
             /**
              * 自动保存文章
              */
@@ -360,25 +360,20 @@
                     url: '/admin/posts/new/autoPush',
                     async: false,
                     data: {
-                        <#if post??>
                         'postId': $('#postId').val(),
-                        </#if>
-                        'postStatus': 1,
                         'postTitle': Title,
                         'postUrl' : $('#postUrl').html().toString(),
-                        'postContentMd': editor.getMarkdown(),
-                        'postContent': editor.getHTML(),
-                        'postThumbnail': $('#selectImg')[0].src
+                        'postContentMd': editor.getMarkdown()
                     },
                     success: function (data) {
                         if(!$("#post_title").val()){
-                            $("#post_title").val(data.postTitle);
+                            $("#post_title").val(data.result.postTitle);
                         }
                         if(!$("#postId").val()){
-                            $("#postId").val(data.postId);
+                            $("#postId").val(data.result.postId);
                         }
-                        if($("#postUrl").html()==null || $("#postUrl").html()==""){
-                            $("#postUrl").val(data.postUrl);
+                        if($("#postUrl").html()==''){
+                            $("#postUrl").html(data.result.postUrl);
                         }
                     }
                 });
@@ -389,7 +384,7 @@
              */
             $(document).keydown(function (event) {
                 if(event.ctrlKey&&event.keyCode === 83){
-                    //autoPush();
+                    autoPush();
                 }
             });
         </script>
