@@ -88,8 +88,12 @@
                                                 <tr>
                                                     <td>${page.postTitle}</td>
                                                     <td>/p/${page.postUrl}</td>
-                                                    <td>${page.comments?size}</td>
-                                                    <td>${page.postViews}</td>
+                                                    <td>
+                                                        <span class="label" style="background-color: #d6cdcd;">${page.comments?size}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="label" style="background-color: #d6cdcd;">${page.postViews}</span>
+                                                    </td>
                                                     <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>
                                                         <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank">预览</a>

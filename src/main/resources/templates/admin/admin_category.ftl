@@ -106,7 +106,9 @@
                                                 <td>${cate.cateName}</td>
                                                 <td>${cate.cateUrl}</td>
                                                 <td>${(cate.cateDesc)!}</td>
-                                                <td>${cate.posts?size}</td>
+                                                <td>
+                                                    <span class="label" style="background-color: #d6cdcd;">${cate.posts?size}</span>
+                                                </td>
                                                 <td>
                                                     <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
                                                         <a href="#" class="btn btn-primary btn-xs " disabled>正在修改</a>
