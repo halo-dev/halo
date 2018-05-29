@@ -9,6 +9,7 @@ import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,9 +109,7 @@ public class FrontCommentController {
                 comment.setCommentContent(StringUtils.substringAfter(comment.getCommentContent(),":")+lastContent);
             }
             if(StringUtils.isNotEmpty(comment.getCommentAuthorUrl())){
-                if(!StringUtils.containsAny(comment.getCommentAuthorUrl(),"https://") || !StringUtils.containsAny(comment.getCommentAuthorUrl(),"http://")){
-                    comment.setCommentAuthorUrl("http://"+comment.getCommentAuthorUrl());
-                }
+                comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));
             }
             commentService.saveByComment(comment);
             if(comment.getCommentParent()>0){

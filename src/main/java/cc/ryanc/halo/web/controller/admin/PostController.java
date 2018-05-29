@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.http.HtmlUtil;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -164,18 +165,19 @@ public class PostController extends BaseController{
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get("post_summary"));
             }
             //文章摘要
-            String summaryText = HaloUtils.htmlToText(post.getPostContent());
+            String summaryText = HtmlUtil.cleanHtmlTag(post.getPostContent());
             if(summaryText.length()>postSummary){
-                String summary = HaloUtils.getSummary(post.getPostContent(), postSummary);
+                String summary = summaryText.substring(0,postSummary);
                 post.setPostSummary(summary);
             }else{
                 post.setPostSummary(summaryText);
             }
             //添加文章时，添加文章时间和修改文章时间为当前时间，修改文章时，只更新修改文章时间
             if(null!=post.getPostId()){
-                post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
+                Post oldPost = postService.findByPostId(post.getPostId()).get();
+                post.setPostDate(oldPost.getPostDate());
                 post.setPostUpdate(new Date());
-                post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
+                post.setPostViews(oldPost.getPostViews());
             }else{
                 post.setPostDate(new Date());
                 post.setPostUpdate(new Date());
@@ -329,7 +331,7 @@ public class PostController extends BaseController{
             postService.updateAllSummary(postSummary);
             return true;
         }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            log.error("未知错误：",e.getMessage());
             return false;
         }
     }

@@ -10,7 +10,6 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.ZipUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +18,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.io.File;
 import java.nio.file.Files;
@@ -115,7 +115,7 @@ public class ThemeController extends BaseController {
                 return new JsonResult(0,"请选择上传的主题！");
             }
         } catch (Exception e) {
-            log.error("上传主题失败：{0}", e.getMessage());
+            log.error("上传主题失败：", e.getMessage());
             return new JsonResult(0,"主题上传失败！");
         }
         return new JsonResult(1,"主题上传成功！");
