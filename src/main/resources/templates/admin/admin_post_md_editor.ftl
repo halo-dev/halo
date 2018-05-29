@@ -246,7 +246,7 @@
              */
             function autoComplateUrl() {
                 var titleVal = $("#post_title").val();
-                if(titleVal!="" && titleVal!=null){
+                if(titleVal!="" && titleVal!=null && $("#postUrl").html()==''){
                     var result = $("#post_title").toPinyin().toLowerCase();
                     $("#postUrl").html(result.substring(0,result.length-1));
                 }
