@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.crypto.SecureUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -106,7 +107,7 @@ public class InstallController {
             }
             user.setUserDisplayName(userDisplayName);
             user.setUserEmail(userEmail);
-            user.setUserPass(HaloUtils.getMD5(userPwd));
+            user.setUserPass(SecureUtil.md5(userPwd));
             userService.saveByUser(user);
 
             //默认分类

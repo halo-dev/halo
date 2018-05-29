@@ -12,6 +12,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,9 +130,9 @@ public class AdminController extends BaseController {
                 Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
                 Matcher matcher = patternEmail.matcher(loginName);
                 if (matcher.find()) {
-                    user = userService.userLoginByEmail(loginName, HaloUtils.getMD5(loginPwd)).get(0);
+                    user = userService.userLoginByEmail(loginName, SecureUtil.md5(loginPwd)).get(0);
                 } else {
-                    user = userService.userLoginByName(loginName, HaloUtils.getMD5(loginPwd)).get(0);
+                    user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd)).get(0);
                 }
                 if (aUser == user) {
                     session.setAttribute(HaloConst.USER_SESSION_KEY, user);

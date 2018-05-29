@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,7 +138,7 @@ public class CommentController extends BaseController{
                             "您在" + HaloConst.OPTIONS.get("blog_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
                 }
             } catch (Exception e) {
-                log.error("邮件服务器未配置：{0}",e.getMessage());
+                log.error("邮件服务器未配置：",e.getMessage());
             }
         }
         return "redirect:/admin/comments?status="+status;
@@ -157,7 +158,7 @@ public class CommentController extends BaseController{
         try{
             commentService.removeByCommentId(commentId);
         }catch (Exception e){
-            log.error("删除评论失败：{0}",e.getMessage());
+            log.error("删除评论失败：",e.getMessage());
         }
         return "redirect:/admin/comments?status="+status;
     }
@@ -197,7 +198,7 @@ public class CommentController extends BaseController{
             comment.setCommentAuthorEmail(user.getUserEmail());
             comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("blog_url"));
             comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
-            comment.setCommentAuthorAvatarMd5(HaloUtils.getMD5(userService.findUser().getUserEmail()));
+            comment.setCommentAuthorAvatarMd5(SecureUtil.md5(userService.findUser().getUserEmail()));
             comment.setCommentDate(new Date());
             String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
             comment.setCommentContent(commentContent+lastContent);
