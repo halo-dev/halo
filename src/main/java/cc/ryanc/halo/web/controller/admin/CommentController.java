@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,8 +32,6 @@ import javax.websocket.server.PathParam;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author : RYAN0UP
@@ -110,18 +109,16 @@ public class CommentController extends BaseController{
      */
     @GetMapping("/revert")
     public String moveToPublish(@PathParam("commentId") Long commentId,
-                                @PathParam("status") Integer status){
+                                @PathParam("status") Integer status,
+                                HttpSession session){
         Comment comment = commentService.updateCommentStatus(commentId,0);
         Post post = comment.getPost();
-
-        //判断评论者的邮箱是否符合规则
-        Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-        Matcher matcher = patternEmail.matcher(comment.getCommentAuthorEmail());
+        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
         //判断是否启用邮件服务
         if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_pass_notice"),"true")) {
             try {
-                if (status == 1 && matcher.find()) {
+                if (status == 1 && Validator.isEmail(comment.getCommentAuthorEmail())) {
                     Map<String, Object> map = new HashMap<>();
                     if (StringUtils.equals(post.getPostType(), HaloConst.POST_TYPE_POST)) {
                         map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
@@ -132,7 +129,7 @@ public class CommentController extends BaseController{
                     map.put("commentContent", comment.getCommentContent());
                     map.put("blogUrl", HaloConst.OPTIONS.get("blog_url"));
                     map.put("blogTitle", HaloConst.OPTIONS.get("blog_title"));
-                    map.put("author", userService.findUser().getUserDisplayName());
+                    map.put("author", user.getUserDisplayName());
                     mailService.sendTemplateMail(
                             comment.getCommentAuthorEmail(),
                             "您在" + HaloConst.OPTIONS.get("blog_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
@@ -198,7 +195,7 @@ public class CommentController extends BaseController{
             comment.setCommentAuthorEmail(user.getUserEmail());
             comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("blog_url"));
             comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
-            comment.setCommentAuthorAvatarMd5(SecureUtil.md5(userService.findUser().getUserEmail()));
+            comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
             comment.setCommentDate(new Date());
             String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
             comment.setCommentContent(commentContent+lastContent);
@@ -208,13 +205,9 @@ public class CommentController extends BaseController{
             comment.setIsAdmin(1);
             commentService.saveByComment(comment);
 
-            //正则表达式判断对方的邮箱是否是正确的格式
-            Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-            Matcher matcher = patternEmail.matcher(lastComment.getCommentAuthorEmail());
-
             //邮件通知
             if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_reply_notice"),"true")) {
-                if(matcher.find()){
+                if(Validator.isEmail(lastComment.getCommentAuthorEmail())){
                     Map<String, Object> map = new HashMap<>();
                     map.put("blogTitle",HaloConst.OPTIONS.get("blog_title"));
                     map.put("commentAuthor",lastComment.getCommentAuthor());

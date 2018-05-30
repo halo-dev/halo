@@ -62,7 +62,7 @@
                                                     <#switch comment.commentStatus>
                                                         <#case 0>
                                                         <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=1','确定移动到回收站？')">丢弃</button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=0','确定移动到回收站？')">丢弃</button>
                                                         <#break >
                                                         <#case 1>
                                                         <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=1">通过</a>

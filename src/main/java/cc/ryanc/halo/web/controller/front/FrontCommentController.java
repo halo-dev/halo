@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,15 +99,19 @@ public class FrontCommentController {
         try{
             Comment lastComment = null;
             post = postService.findByPostId(post.getPostId()).get();
-            comment.setCommentAuthorEmail(comment.getCommentAuthorEmail().toLowerCase());
+            comment.setCommentAuthorEmail(HtmlUtil.encode(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
             comment.setCommentDate(new Date());
             comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
             comment.setIsAdmin(0);
+            comment.setCommentAuthor(HtmlUtil.encode(comment.getCommentAuthor()));
             if(comment.getCommentParent()>0){
                 lastComment = commentService.findCommentById(comment.getCommentParent()).get();
                 String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
-                comment.setCommentContent(StringUtils.substringAfter(comment.getCommentContent(),":")+lastContent);
+                comment.setCommentContent(StringUtils.substringAfter(HtmlUtil.encode(comment.getCommentContent()),":")+lastContent);
+            }else{
+                //将评论内容的字符专为安全字符
+                comment.setCommentContent(HtmlUtil.encode(comment.getCommentContent()));
             }
             if(StringUtils.isNotEmpty(comment.getCommentAuthorUrl())){
                 comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));

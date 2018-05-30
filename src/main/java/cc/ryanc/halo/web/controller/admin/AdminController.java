@@ -12,6 +12,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,8 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author : RYAN0UP
@@ -126,10 +125,7 @@ public class AdminController extends BaseController {
             if (StringUtils.equals(aUser.getLoginEnable(), "false")) {
                 status = "disable";
             } else {
-                //验证是否是邮箱登录
-                Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-                Matcher matcher = patternEmail.matcher(loginName);
-                if (matcher.find()) {
+                if (Validator.isEmail(loginName)) {
                     user = userService.userLoginByEmail(loginName, SecureUtil.md5(loginPwd)).get(0);
                 } else {
                     user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd)).get(0);

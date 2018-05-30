@@ -52,17 +52,32 @@
                                                         首页
                                                         <#break >
                                                         <#case "post.ftl">
-                                                        文章内容
+                                                        文章页面
                                                         <#break >
                                                         <#case "archives.ftl">
-                                                        文章归档
+                                                        文章归档页面
                                                         <#break >
                                                         <#case "links.ftl">
-                                                        友情链接
+                                                        友情链接页面
                                                         <#break >
                                                         <#case "module/macro.ftl">
                                                         宏模板
                                                         <#break >
+                                                        <#case "tag.ftl">
+                                                        单个标签页面
+                                                        <#break >
+                                                        <#case "tags.ftl">
+                                                        标签列表页面
+                                                        <#break>
+                                                        <#case "category.ftl">
+                                                        单个分类页面
+                                                        <#break >
+                                                        <#case "page.ftl">
+                                                        自定义页面
+                                                        <#break>
+                                                        <#case "gallery.ftl">
+                                                        图库页面
+                                                        <#break>
                                                     </#switch>
                                                 </td>
                                             </tr>
