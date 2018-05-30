@@ -146,6 +146,7 @@
                             dropZoneTitle: '拖拽主题压缩包到这里 &hellip;<br>不支持多个主题同时上传',
                             showClose: false
                         }).on("fileuploaded",function (event,data,previewId,index) {
+                            var data = data.jqXHR.responseJSON;
                             if(data.code==1){
                                 $("#uploadForm").hide(400);
                                 $.toast({

@@ -7,8 +7,9 @@ import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
-import cc.ryanc.halo.utils.ZipUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,8 +107,8 @@ public class ThemeController extends BaseController {
                 logsService.saveByLogs(
                         new Logs(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), HaloUtils.getIpAddr(request), new Date())
                 );
-                ZipUtils.unZip(themePath.getAbsolutePath(), new File(basePath.getAbsolutePath(), "templates/themes/").getAbsolutePath());
-                HaloUtils.removeFile(themePath.getAbsolutePath());
+                ZipUtil.unzip(themePath,new File(basePath.getAbsolutePath(), "templates/themes/"));
+                FileUtil.del(themePath);
                 HaloConst.THEMES.clear();
                 HaloConst.THEMES = HaloUtils.getThemes();
             } else {
@@ -132,7 +133,7 @@ public class ThemeController extends BaseController {
         try {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + themeName);
-            HaloUtils.removeDir(themePath);
+            FileUtil.del(themePath);
             HaloConst.THEMES.clear();
             HaloConst.THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
