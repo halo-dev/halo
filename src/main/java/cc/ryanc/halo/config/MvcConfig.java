@@ -61,5 +61,7 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/robots.txt");
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations("classpath:/upload/");
+        registry.addResourceHandler("/favicon.ico")
+                .addResourceLocations("classpath:/static/images/favicon.ico");
     }
 }
