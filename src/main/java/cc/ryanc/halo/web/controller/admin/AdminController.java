@@ -14,6 +14,7 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,7 @@ public class AdminController extends BaseController {
                 userService.updateUserLoginEnable("false");
             }
             userService.updateUserLoginLast(new Date());
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + loginName + "," + loginPwd + "]", HaloUtils.getIpAddr(request), new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.encode(loginName) + "," + HtmlUtil.encode(loginPwd) + "]", HaloUtils.getIpAddr(request), new Date()));
             log.error("登录失败！：{0}", e.getMessage());
         }
         return status;
