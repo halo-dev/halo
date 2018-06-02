@@ -127,7 +127,8 @@ public class AdminController extends BaseController {
         User aUser = userService.findUser();
         //首先判断是否已经被禁用已经是否已经过了10分钟
         Date loginLast = aUser.getLoginLast();
-        Long between = DateUtil.between(loginLast, new Date(), DateUnit.MINUTE);
+        Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
+        log.info(between+"");
         if (StringUtils.equals(aUser.getLoginEnable(), "false") && (between < 10)) {
             return new JsonResult(0, "已禁止登录，请10分钟后再试");
         }
@@ -138,13 +139,13 @@ public class AdminController extends BaseController {
         } else {
             user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd));
         }
-        userService.updateUserLoginLast(new Date());
+        userService.updateUserLoginLast(DateUtil.date());
         //判断User对象是否相等
         if (ObjectUtil.equal(aUser, user)) {
             session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
             //重置用户的登录状态为正常
             userService.updateUserNormal();
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtils.getIpAddr(request), new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtils.getIpAddr(request), DateUtil.date()));
             return new JsonResult(1, "登录成功！");
         } else {
             //更新失败次数
@@ -158,7 +159,7 @@ public class AdminController extends BaseController {
                             LogsRecord.LOGIN,
                             LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.encode(loginName) + "," + HtmlUtil.encode(loginPwd) + "]",
                             HaloUtils.getIpAddr(request),
-                            new Date()
+                            DateUtil.date()
                     )
             );
             return new JsonResult(0, "登录失败，你还有" + (5 - errorCount) + "次机会。");
@@ -174,7 +175,7 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtils.getIpAddr(request), new Date()));
+        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtils.getIpAddr(request), DateUtil.date()));
         session.invalidate();
         log.info("用户[" + user.getUserName() + "]退出登录");
         return "redirect:/admin/login";

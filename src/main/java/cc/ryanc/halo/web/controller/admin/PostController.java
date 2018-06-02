@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -155,8 +156,9 @@ public class PostController extends BaseController{
      */
     @PostMapping(value = "/new/push")
     @ResponseBody
-    public void pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session){
+    public JsonResult pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session){
         User user = (User)session.getAttribute(HaloConst.USER_SESSION_KEY);
+        String msg = "发表成功";
         try{
             //提取摘要
             int postSummary = 50;
@@ -175,11 +177,12 @@ public class PostController extends BaseController{
             if(null!=post.getPostId()){
                 Post oldPost = postService.findByPostId(post.getPostId()).get();
                 post.setPostDate(oldPost.getPostDate());
-                post.setPostUpdate(new Date());
+                post.setPostUpdate(DateUtil.date());
                 post.setPostViews(oldPost.getPostViews());
+                msg = "更新成功";
             }else{
-                post.setPostDate(new Date());
-                post.setPostUpdate(new Date());
+                post.setPostDate(DateUtil.date());
+                post.setPostUpdate(DateUtil.date());
             }
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
@@ -190,9 +193,11 @@ public class PostController extends BaseController{
             }
             post.setPostUrl(urlFilter(post.getPostUrl()));
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtils.getIpAddr(request),new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtils.getIpAddr(request),DateUtil.date()));
+            return new JsonResult(1,msg);
         }catch (Exception e){
             log.error("未知错误：", e.getMessage());
+            return new JsonResult(0,"保存失败");
         }
     }
 
@@ -222,13 +227,13 @@ public class PostController extends BaseController{
         try{
             if(StringUtils.isEmpty(postTitle)){
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                post.setPostTitle("草稿："+dateFormat.format(new Date()));
+                post.setPostTitle("草稿："+dateFormat.format(DateUtil.date()));
             }else{
                 post.setPostTitle(postTitle);
             }
             if(StringUtils.isEmpty(postUrl)){
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                post.setPostUrl(dateFormat.format(new Date()));
+                post.setPostUrl(dateFormat.format(DateUtil.date()));
             }else{
                 post.setPostUrl(postUrl);
             }
@@ -236,14 +241,14 @@ public class PostController extends BaseController{
             post.setPostStatus(1);
             post.setPostContentMd(postContentMd);
             post.setPostType(postType);
-            post.setPostDate(new Date());
-            post.setPostUpdate(new Date());
+            post.setPostDate(DateUtil.date());
+            post.setPostUpdate(DateUtil.date());
             post.setUser(user);
         }catch (Exception e){
             log.error("未知错误：", e.getMessage());
             return new JsonResult(0,"保存失败");
         }
-        return new JsonResult(1,postService.saveByPost(post));
+        return new JsonResult(1,"保存成功",postService.saveByPost(post));
     }
 
 
@@ -293,7 +298,7 @@ public class PostController extends BaseController{
         try{
             Optional<Post> post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
-            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),HaloUtils.getIpAddr(request),new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),HaloUtils.getIpAddr(request),DateUtil.date()));
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }

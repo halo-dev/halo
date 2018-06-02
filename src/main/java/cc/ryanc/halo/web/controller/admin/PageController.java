@@ -2,12 +2,14 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,9 +214,10 @@ public class PageController {
      */
     @PostMapping(value = "/new/push")
     @ResponseBody
-    public void pushPage(@ModelAttribute Post post, HttpSession session) {
+    public JsonResult pushPage(@ModelAttribute Post post, HttpSession session) {
+        String msg = "发表成功";
         try {
-            post.setPostDate(new Date());
+            post.setPostDate(DateUtil.date());
             //发表用户
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
@@ -222,15 +225,18 @@ public class PageController {
             if(null!=post.getPostId()){
                 post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
-                post.setPostUpdate(new Date());
+                post.setPostUpdate(DateUtil.date());
+                msg = "更新成功";
             }else{
-                post.setPostDate(new Date());
-                post.setPostUpdate(new Date());
+                post.setPostDate(DateUtil.date());
+                post.setPostUpdate(DateUtil.date());
             }
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), HaloUtils.getIpAddr(request), new Date()));
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), HaloUtils.getIpAddr(request), DateUtil.date()));
+            return new JsonResult(1,msg);
         } catch (Exception e) {
             log.error("未知错误：{0}", e.getMessage());
+            return new JsonResult(0,"保存失败");
         }
     }
 

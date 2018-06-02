@@ -9,6 +9,7 @@ import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -101,7 +102,7 @@ public class FrontCommentController {
             post = postService.findByPostId(post.getPostId()).get();
             comment.setCommentAuthorEmail(HtmlUtil.encode(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
-            comment.setCommentDate(new Date());
+            comment.setCommentDate(DateUtil.date());
             comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
             comment.setIsAdmin(0);
             comment.setCommentAuthor(HtmlUtil.encode(comment.getCommentAuthor()));
