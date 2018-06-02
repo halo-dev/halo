@@ -14,10 +14,10 @@ function btn_login() {
                 'loginName': name,
                 'loginPwd': pwd
             },
-            success: function (status) {
-                if(status=="true"){
+            success: function (data) {
+                if(data.code==1){
                     $.toast({
-                        text: "登录成功！",
+                        text: data.msg,
                         heading: '提示',
                         icon: 'success',
                         showHideTransition: 'fade',
@@ -32,29 +32,10 @@ function btn_login() {
                             window.location.href="/admin";
                         }
                     });
-                }else if(status=="disable"){
-                    $('.login-body').addClass('animate shake');
-                    $.toast({
-                        text: "密码错误已达到5次，请10分钟后再试！",
-                        heading: '提示',
-                        icon: 'error',
-                        showHideTransition: 'fade',
-                        allowToastClose: true,
-                        hideAfter: 2000,
-                        stack: 1,
-                        position: 'top-center',
-                        textAlign: 'left',
-                        loader: true,
-                        loaderBg: '#ffffff',
-                        afterHidden: function () {
-                            $('.login-body').removeClass('animate shake');
-                        }
-                    });
-                    $('#btn-login').button('reset');
                 }else{
                     $('.login-body').addClass('animate shake');
                     $.toast({
-                        text: "用户名或者密码错误！",
+                        text: data.msg,
                         heading: '提示',
                         icon: 'error',
                         showHideTransition: 'fade',
