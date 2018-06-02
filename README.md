@@ -19,6 +19,7 @@
 - [License 许可证](#license-许可证)
 - [Todo 后续功能](#todo-后续功能)
 - [Thanks 感谢](#thanks-感谢)
+- [Donate 捐赠](#donate-捐赠)
 
 ## Introduction 简介
 
@@ -26,7 +27,7 @@
 
 轻快，简洁，功能强大，使用Java开发的博客系统。
 
-> **Halo交流群:** 162747721
+> Halo交流群: 162747721
 
 ## Quickstart 快速开始
 
@@ -37,7 +38,7 @@ mvn clean package -Pprod
 java -jar target/dist/halo/halo-xxx.jar
 ```
 
-> **注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件。**
+> 注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件。
 
 Let's start: http://localhost:8090
 
@@ -55,13 +56,13 @@ Let's start: http://localhost:8090
 
 [下载](https://github.com/ruibaby/halo/releases)最新的压缩包，解压之后进入根目录执行`java -jar halo-xxx.jar`即可运行。
 
-> **如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run)。**
+> 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run)。
 
 ## Docs 文档
 
 [Halo Document](https://halo-doc.ryanc.cc)
 
-> **文档正在不断完善中。**
+> 文档正在不断完善中。
 
 ## Themes 主题
 
@@ -74,7 +75,7 @@ Let's start: http://localhost:8090
 
 [![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
 
-> **Halo使用GPL-v3.0协议开源，请尽量遵守开源协议，即便是在中国。**
+> Halo使用GPL-v3.0协议开源，请尽量遵守开源协议，即便是在中国。
 
 ## Todo 后续功能
 
@@ -96,6 +97,7 @@ Halo的诞生离不开下面这些项目：
 - [Lombok](https://www.projectlombok.org/)：让代码更简洁
 - [Apache Commons](http://commons.apache.org/)：非常好用的Java工具库
 - [oh-my-email](https://github.com/biezhi/oh-my-email)：可能是最小的Java邮件发送库了，支持抄送、附件、模板等
+- [Hutool](https://github.com/looly/hutool)：一个Java基础工具类
 - [AdminLTE](https://github.com/almasaeed2010/AdminLTE)：基于Bootstrap的后台模板
 - [Bootstrap](https://github.com/twbs/bootstrap.git)：使用最广泛的前端ui框架
 - [Animate](https://github.com/daneden/animate.css.git)：非常好用的css动效库
@@ -108,3 +110,10 @@ Halo的诞生离不开下面这些项目：
 - [Jquery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：消息提示组件
 - [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
 
+## Donate 捐赠
+
+> 如果Halo对你有帮助，可以请作者喝瓶娃哈哈哈哈哈哈哈哈哈哈。
+
+| 支付宝  | 微信  |
+| :------------: | :------------: |
+| <img src="https://cdn.ryanc.cc/img/github/donate/alipay.png" width="150"/>  | <img src="https://cdn.ryanc.cc/img/github/donate/wechat.png" width="150" />  |
