@@ -8,6 +8,7 @@ import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +147,7 @@ public class AttachmentController {
                     mediaPath.mkdirs();
                 }
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                String nameWithOutSuffix = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ","_").replaceAll(",","")+dateFormat.format(new Date())+new Random().nextInt(1000);
+                String nameWithOutSuffix = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ","_").replaceAll(",","")+dateFormat.format(DateUtil.date())+new Random().nextInt(1000);
                 String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
                 String fileName = nameWithOutSuffix+"."+fileSuffix;
                 file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName));
@@ -167,13 +168,13 @@ public class AttachmentController {
 
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
-                attachment.setAttachCreated(new Date());
+                attachment.setAttachCreated(DateUtil.date());
                 attachmentService.saveByAttachment(attachment);
 
                 updateConst();
                 log.info("上传文件[" + fileName + "]到[" + mediaPath.getAbsolutePath() + "]成功");
                 logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_FILE, fileName, HaloUtils.getIpAddr(request), new Date())
+                        new Logs(LogsRecord.UPLOAD_FILE, fileName, HaloUtils.getIpAddr(request), DateUtil.date())
                 );
 
                 result.put("success", 1);
@@ -245,7 +246,7 @@ public class AttachmentController {
                     updateConst();
                     log.info("删除文件[" + delFileName + "]成功！");
                     logsService.saveByLogs(
-                            new Logs(LogsRecord.REMOVE_FILE, delFileName, HaloUtils.getIpAddr(request), new Date())
+                            new Logs(LogsRecord.REMOVE_FILE, delFileName, HaloUtils.getIpAddr(request), DateUtil.date())
                     );
                 } else {
                     log.error("删除附件[" + delFileName + "]失败！");

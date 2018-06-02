@@ -8,6 +8,7 @@ import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +78,7 @@ public class ThemeController extends BaseController {
             BaseController.THEME = siteTheme;
             log.info("已将主题改变为：" + siteTheme);
             logsService.saveByLogs(
-                    new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, HaloUtils.getIpAddr(request), new Date())
+                    new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, HaloUtils.getIpAddr(request), DateUtil.date())
             );
             return new JsonResult(1,"主题已设置为"+siteTheme);
         } catch (Exception e) {
@@ -105,7 +106,7 @@ public class ThemeController extends BaseController {
                 file.transferTo(themePath);
                 log.info("上传主题成功，路径：" + themePath.getAbsolutePath());
                 logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), HaloUtils.getIpAddr(request), new Date())
+                        new Logs(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), HaloUtils.getIpAddr(request), DateUtil.date())
                 );
                 ZipUtil.unzip(themePath,new File(basePath.getAbsolutePath(), "templates/themes/"));
                 FileUtil.del(themePath);

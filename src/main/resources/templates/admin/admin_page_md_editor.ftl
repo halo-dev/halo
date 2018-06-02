@@ -231,26 +231,38 @@
                         'postThumbnail': $('#selectImg')[0].src
                     },
                     success: function (data) {
-                        $.toast({
-                            <#if post??>
-                                text: "更新成功！",
-                            <#else>
-                                text: "发表成功！",
-                            </#if>
-                            heading: '提示',
-                            icon: 'success',
-                            showHideTransition: 'fade',
-                            allowToastClose: true,
-                            hideAfter: 1000,
-                            stack: 1,
-                            position: 'top-center',
-                            textAlign: 'left',
-                            loader: true,
-                            loaderBg: '#ffffff',
-                            afterHidden: function () {
-                                window.location.href="/admin/page";
-                            }
-                        });
+                        if(data.code==1){
+                            $.toast({
+                                text: data.msg,
+                                heading: '提示',
+                                icon: 'success',
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: 1000,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff',
+                                afterHidden: function () {
+                                    window.location.href="/admin/page";
+                                }
+                            });
+                        }else{
+                            $.toast({
+                                text: data.msg,
+                                heading: '提示',
+                                icon: 'error',
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: 1000,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff'
+                            });
+                        }
                     }
                 });
             }

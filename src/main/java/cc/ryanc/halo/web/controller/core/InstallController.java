@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.SecureUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
@@ -127,7 +128,7 @@ public class InstallController {
             post.setPostContent("<h1 id=\"h1-hello-halo-\"><a name=\"Hello Halo!\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>Hello Halo!</h1><p>欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。</p>\n");
             post.setPostSummary("欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
             post.setPostStatus(0);
-            post.setPostDate(new Date());
+            post.setPostDate(DateUtil.date());
             post.setPostUrl("hello-halo");
             post.setUser(user);
             post.setCategories(categories);
@@ -141,7 +142,7 @@ public class InstallController {
             comment.setCommentAuthorUrl("https://ryanc.cc");
             comment.setCommentAuthorIp("127.0.0.1");
             comment.setCommentAuthorAvatarMd5("7cc7f29278071bd4dce995612d428834");
-            comment.setCommentDate(new Date());
+            comment.setCommentDate(DateUtil.date());
             comment.setCommentContent("欢迎，欢迎！");
             comment.setCommentStatus(0);
             comment.setCommentAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
@@ -177,7 +178,7 @@ public class InstallController {
                             LogsRecord.INSTALL,
                             "安装成功，欢迎使用Halo。",
                             HaloUtils.getIpAddr(request),
-                            new Date()
+                            DateUtil.date()
                     )
             );
 

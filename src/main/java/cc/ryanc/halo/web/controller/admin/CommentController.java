@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -196,7 +197,7 @@ public class CommentController extends BaseController{
             comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("blog_url"));
             comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
-            comment.setCommentDate(new Date());
+            comment.setCommentDate(DateUtil.date());
             String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
             comment.setCommentContent(commentContent+lastContent);
             comment.setCommentAgent(userAgent);
