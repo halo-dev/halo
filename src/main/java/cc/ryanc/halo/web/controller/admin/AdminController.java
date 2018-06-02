@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogsService;
@@ -12,7 +13,10 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -116,40 +120,49 @@ public class AdminController extends BaseController {
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
-    public String getLogin(@ModelAttribute("loginName") String loginName,
-                           @ModelAttribute("loginPwd") String loginPwd,
-                           HttpSession session) {
-        String status = "false";
-        try {
-            User aUser = userService.findUser();
-            User user = null;
-            if (StringUtils.equals(aUser.getLoginEnable(), "false")) {
-                status = "disable";
-            } else {
-                if (Validator.isEmail(loginName)) {
-                    user = userService.userLoginByEmail(loginName, SecureUtil.md5(loginPwd)).get(0);
-                } else {
-                    user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd)).get(0);
-                }
-                if (aUser == user) {
-                    session.setAttribute(HaloConst.USER_SESSION_KEY, user);
-                    //重置用户的登录状态为正常
-                    userService.updateUserNormal();
-                    userService.updateUserLoginLast(new Date());
-                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtils.getIpAddr(request), new Date()));
-                    status = "true";
-                }
-            }
-        } catch (Exception e) {
+    public JsonResult getLogin(@ModelAttribute("loginName") String loginName,
+                               @ModelAttribute("loginPwd") String loginPwd,
+                               HttpSession session) {
+        //已注册账号，单用户，只有一个
+        User aUser = userService.findUser();
+        //首先判断是否已经被禁用已经是否已经过了10分钟
+        Date loginLast = aUser.getLoginLast();
+        Long between = DateUtil.between(loginLast, new Date(), DateUnit.MINUTE);
+        if (StringUtils.equals(aUser.getLoginEnable(), "false") && (between < 10)) {
+            return new JsonResult(0, "已禁止登录，请10分钟后再试");
+        }
+        //验证用户名和密码
+        User user = null;
+        if (Validator.isEmail(loginName)) {
+            user = userService.userLoginByEmail(loginName, SecureUtil.md5(loginPwd));
+        } else {
+            user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd));
+        }
+        userService.updateUserLoginLast(new Date());
+        //判断User对象是否相等
+        if (ObjectUtil.equal(aUser, user)) {
+            session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
+            //重置用户的登录状态为正常
+            userService.updateUserNormal();
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtils.getIpAddr(request), new Date()));
+            return new JsonResult(1, "登录成功！");
+        } else {
+            //更新失败次数
             Integer errorCount = userService.updateUserLoginError();
+            //超过五次禁用账户
             if (errorCount >= 5) {
                 userService.updateUserLoginEnable("false");
             }
-            userService.updateUserLoginLast(new Date());
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.encode(loginName) + "," + HtmlUtil.encode(loginPwd) + "]", HaloUtils.getIpAddr(request), new Date()));
-            log.error("登录失败！：{0}", e.getMessage());
+            logsService.saveByLogs(
+                    new Logs(
+                            LogsRecord.LOGIN,
+                            LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.encode(loginName) + "," + HtmlUtil.encode(loginPwd) + "]",
+                            HaloUtils.getIpAddr(request),
+                            new Date()
+                    )
+            );
+            return new JsonResult(0, "登录失败，你还有" + (5 - errorCount) + "次机会。");
         }
-        return status;
     }
 
     /**

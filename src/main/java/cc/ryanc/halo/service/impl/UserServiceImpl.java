@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
      * @return user
      */
     @Override
-    public List<User> userLoginByName(String userName, String userPass) {
+    public User userLoginByName(String userName, String userPass) {
         return userRepository.findByUserNameAndUserPass(userName, userPass);
     }
 
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
      * @return list
      */
     @Override
-    public List<User> userLoginByEmail(String userEmail, String userPass) {
+    public User userLoginByEmail(String userEmail, String userPass) {
         return userRepository.findByUserEmailAndUserPass(userEmail, userPass);
     }
 
@@ -96,7 +96,8 @@ public class UserServiceImpl implements UserService {
     /**
      * 修改最后登录时间
      *
-     * @param lastDate lastDate
+     * @param lastDate 最后登录时间
+     * @return User
      */
     @Override
     public User updateUserLoginLast(Date lastDate) {
@@ -107,9 +108,9 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 修改登录错误次数
+     * 增加登录错误次数
      *
-     * @param error error
+     * @return 登录错误次数
      */
     @Override
     public Integer updateUserLoginError() {
@@ -121,6 +122,8 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 修改用户的状态为正常
+     *
+     * @return User
      */
     @Override
     public User updateUserNormal() {
