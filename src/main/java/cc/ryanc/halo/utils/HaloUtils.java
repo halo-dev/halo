@@ -10,6 +10,7 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
@@ -23,7 +24,6 @@ import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -121,6 +121,9 @@ public class HaloUtils {
                 Theme theme = null;
                 for (File file : files) {
                     if (file.isDirectory()) {
+                        if (StringUtils.equals("__MACOSX", file.getName())) {
+                            continue;
+                        }
                         theme = new Theme();
                         theme.setThemeName(file.getName());
                         File optionsPath = new File(themesPath.getAbsolutePath(), file.getName() + "/module/options.ftl");
@@ -134,7 +137,7 @@ public class HaloUtils {
                 }
             }
         }catch (Exception e){
-            log.error("主题获取失败：{0}",e.getMessage());
+            log.error("主题获取失败：", e.getMessage());
         }
         return themes;
     }
@@ -170,7 +173,7 @@ public class HaloUtils {
                 }
             }
         }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
         return tpls;
     }
@@ -191,7 +194,7 @@ public class HaloUtils {
             inputStream.close();
             return new String(fileContent,"UTF-8");
         }catch (Exception e){
-            log.error("读取模板文件错误：{0}",e.getMessage());
+            log.error("读取模板文件错误：", e.getMessage());
         }
         return null;
     }
@@ -220,14 +223,14 @@ public class HaloUtils {
      */
     public static String getIpAddr(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
-            if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getHeader("Proxy-Client-IP");
-            }
-            if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getHeader("WL-Proxy-Client-IP");
-            }
-            if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getRemoteAddr();
+        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
         }
         return ip;
     }

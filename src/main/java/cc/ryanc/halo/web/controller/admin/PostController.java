@@ -259,14 +259,14 @@ public class PostController extends BaseController{
      * @return 重定向到/admin/posts
      */
     @GetMapping("/throw")
-    public String moveToTrash(@RequestParam("postId") Long postId){
+    public String moveToTrash(@RequestParam("postId") Long postId,@RequestParam("status") Integer status){
         try{
             postService.updatePostStatus(postId,2);
             log.info("编号为"+postId+"的文章已被移到回收站");
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }
-        return "redirect:/admin/posts";
+        return "redirect:/admin/posts?status="+status;
     }
 
     /**
