@@ -101,7 +101,7 @@
                 </a>
                 <ul class="treeview-menu">
                     <li><a data-pjax="true" href="/admin/option"><i class="fa fa-circle-o"></i>博客设置</a></li>
-                    <li><a data-pjax="true" href="/admin/backup"><i class="fa fa-circle-o"></i>备份恢复</a></li>
+                    <li><a data-pjax="true" href="/admin/backup"><i class="fa fa-circle-o"></i>博客备份</a></li>
                 </ul>
             </li>
         </ul>

@@ -11,6 +11,7 @@ import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -103,7 +104,7 @@ public class FrontCommentController {
             comment.setCommentAuthorEmail(HtmlUtil.encode(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
             comment.setCommentDate(DateUtil.date());
-            comment.setCommentAuthorIp(HaloUtils.getIpAddr(request));
+            comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setIsAdmin(0);
             comment.setCommentAuthor(HtmlUtil.encode(comment.getCommentAuthor()));
             if(comment.getCommentParent()>0){

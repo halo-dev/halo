@@ -61,7 +61,7 @@ public class User implements Serializable {
     /**
      * 是否禁用登录
      */
-    private String loginEnable;
+    private String loginEnable = "true";
 
     /**
      * 最后一次登录时间
@@ -71,5 +71,5 @@ public class User implements Serializable {
     /**
      * 登录错误次数记录
      */
-    private Integer loginError;
+    private Integer loginError = 0;
 }

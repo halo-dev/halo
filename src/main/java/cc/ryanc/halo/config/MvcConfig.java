@@ -38,6 +38,7 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/admin/**")
+                .addPathPatterns("/backup/**")
                 .excludePathPatterns("/admin/login")
                 .excludePathPatterns("/admin/getLogin")
                 .excludePathPatterns("/static/**");
@@ -63,5 +64,7 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/upload/");
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations("classpath:/static/images/favicon.ico");
+        registry.addResourceHandler("/backup/**")
+                .addResourceLocations("file:///"+System.getProperties().getProperty("user.home")+"/halo/backup/");
     }
 }

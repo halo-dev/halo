@@ -1,18 +1,31 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : RYAN0UP
@@ -28,6 +41,10 @@ public class BackupController {
     @Autowired
     private PostService postService;
 
+    @Autowired
+    private MailService mailService;
+
+
     /**
      * 渲染备份页面
      *
@@ -35,8 +52,34 @@ public class BackupController {
      * @return 模板路径admin/admin_backup
      */
     @GetMapping
-    public String backup() {
+    public String backup(Model model) {
+        List<BackupDto> resourcesBackup = HaloUtils.getBackUps("resources");
+        List<BackupDto> databasesBackup = HaloUtils.getBackUps("databases");
+        List<BackupDto> postsBackup = HaloUtils.getBackUps("posts");
+        model.addAttribute("resourcesBackup", resourcesBackup);
+        model.addAttribute("databasesBackup", databasesBackup);
+        model.addAttribute("postsBackup", postsBackup);
         return "admin/admin_backup";
+    }
+
+    /**
+     * 执行备份
+     *
+     * @param type 备份类型
+     * @return JsonResult
+     */
+    @GetMapping(value = "doBackup")
+    @ResponseBody
+    public JsonResult doBackup(@RequestParam("type") String type) {
+        if (StringUtils.equals("resources", type)) {
+            return this.backupResources();
+        } else if (StringUtils.equals("db", type)) {
+            return this.backupDatabase();
+        } else if (StringUtils.equals("posts", type)) {
+            return this.backupPosts();
+        } else {
+            return new JsonResult(0, "备份失败！");
+        }
     }
 
     /**
@@ -44,46 +87,127 @@ public class BackupController {
      *
      * @return 重定向到/admin/backup
      */
-    @GetMapping(value = "/backupDb")
-    public String backupDatabase() {
-        String fileName = "db_backup_" + HaloUtils.getStringDate("yyyy_MM_dd_HH_mm_ss") + ".sql";
+    public JsonResult backupDatabase() {
         try {
-            File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            String savePath = path.getAbsolutePath() + "/backup/database";
-            HaloUtils.exportDatabase("localhost", "root", "123456", savePath, fileName, "testdb");
+            String srcPath = System.getProperties().getProperty("user.home") + "/halo";
+            String distName = "databases_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            ZipUtil.zip(srcPath + "/halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
+            return new JsonResult(1, "备份成功！");
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：", e.getMessage());
+            return new JsonResult(0, "备份失败！");
         }
-        return "redirect:/admin/backup";
     }
 
     /**
      * 备份资源文件 重要
      *
-     * @return return
+     * @return JsonResult
      */
-    @GetMapping(value = "/backupRe")
-    public String backupResources() {
-        return null;
+    public JsonResult backupResources() {
+        try {
+            File path = new File(ResourceUtils.getURL("classpath:").getPath());
+            String srcPath = path.getAbsolutePath();
+            String distName = "resources_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            //执行打包
+            ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
+            return new JsonResult(1, "备份成功！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JsonResult(0, "备份失败！");
+        }
     }
 
     /**
      * 备份文章，导出markdown文件
      *
-     * @return 重定向到/admin/backup
+     * @return JsonResult
      */
-    @GetMapping(value = "/backupPost")
-    public String backupPosts() {
+    public JsonResult backupPosts() {
         List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
+        posts.addAll(postService.findAllPosts(HaloConst.POST_TYPE_PAGE));
         try {
-            File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            String savePath = path.getAbsolutePath() + "/backup/posts/posts_backup_" + HaloUtils.getStringDate("yyyy_MM_dd_HH_mm_ss");
+            //打包好的文件名
+            String distName = "posts_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName;
             for (Post post : posts) {
-                HaloUtils.dbToFile(post.getPostContentMd(), savePath, post.getPostTitle() + ".md");
+                HaloUtils.postToFile(post.getPostContentMd(), srcPath, post.getPostTitle() + ".md");
             }
+            //打包导出好的文章
+            ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName + ".zip");
+            FileUtil.del(srcPath);
+            return new JsonResult(1, "备份成功！");
         } catch (Exception e) {
             e.printStackTrace();
+            return new JsonResult(0, "备份失败！");
         }
-        return "redirect:/admin/backup";
+    }
+
+    /**
+     * 删除备份
+     *
+     * @param fileName 文件名
+     * @param type     备份类型
+     * @return JsonResult
+     */
+    @GetMapping(value = "delBackup")
+    @ResponseBody
+    public JsonResult delBackup(@RequestParam("fileName") String fileName,
+                                @RequestParam("type") String type) {
+        String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
+        try {
+            FileUtil.del(srcPath);
+            return new JsonResult(1, "删除成功！");
+        } catch (Exception e) {
+            return new JsonResult(0, "删除失败！");
+        }
+    }
+
+    /**
+     * 将备份发送到邮箱
+     *
+     * @param fileName 文件名
+     * @param type     备份类型
+     * @return JsonResult
+     */
+    @GetMapping(value = "sendToEmail")
+    @ResponseBody
+    public JsonResult sendToEmail(@RequestParam("fileName") String fileName,
+                                  @RequestParam("type") String type,
+                                  HttpSession session) {
+        String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
+        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        if (null == user.getUserEmail() || StringUtils.equals(user.getUserEmail(), "")) {
+            return new JsonResult(0, "博主邮箱没有配置！");
+        }
+        if (StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"), "false")) {
+            return new JsonResult(0, "发信邮箱没有配置！");
+        }
+        new EmailToAdmin(srcPath, user).start();
+        return new JsonResult(1, "邮件发送成功！");
+    }
+
+    class EmailToAdmin extends Thread {
+        private String srcPath;
+        private User user;
+
+        public EmailToAdmin(String srcPath, User user) {
+            this.srcPath = srcPath;
+            this.user = user;
+        }
+
+        @Override
+        public void run() {
+            File file = new File(srcPath);
+            Map<String, Object> content = new HashMap<>();
+            try {
+                content.put("fileName", file.getName());
+                content.put("createAt", HaloUtils.getCreateTime(srcPath));
+                content.put("size", HaloUtils.parseSize(file.length()));
+                mailService.sendAttachMail(user.getUserEmail(), "有新的备份！", content, "common/mail/mail_attach.ftl", srcPath);
+            } catch (Exception e) {
+                log.error("邮件服务器未配置：", e.getMessage());
+            }
+        }
     }
 }

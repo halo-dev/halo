@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,7 +233,7 @@ public class PageController {
                 post.setPostUpdate(DateUtil.date());
             }
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), HaloUtils.getIpAddr(request), DateUtil.date()));
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
             return new JsonResult(1,msg);
         } catch (Exception e) {
             log.error("未知错误：{0}", e.getMessage());

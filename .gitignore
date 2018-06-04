@@ -31,5 +31,7 @@ nbdist/
 */.DS_Store
 
 ### VS Code ###
-.project
-.factorypath
+*.project
+*.factorypath
+
+~/

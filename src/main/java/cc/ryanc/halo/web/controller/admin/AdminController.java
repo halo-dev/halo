@@ -18,6 +18,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -126,9 +127,11 @@ public class AdminController extends BaseController {
         //已注册账号，单用户，只有一个
         User aUser = userService.findUser();
         //首先判断是否已经被禁用已经是否已经过了10分钟
-        Date loginLast = aUser.getLoginLast();
+        Date loginLast = DateUtil.date();
+        if(null!=aUser.getLoginLast()){
+            loginLast = aUser.getLoginLast();
+        }
         Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
-        log.info(between+"");
         if (StringUtils.equals(aUser.getLoginEnable(), "false") && (between < 10)) {
             return new JsonResult(0, "已禁止登录，请10分钟后再试");
         }
@@ -145,7 +148,7 @@ public class AdminController extends BaseController {
             session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
             //重置用户的登录状态为正常
             userService.updateUserNormal();
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtils.getIpAddr(request), DateUtil.date()));
+            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
             return new JsonResult(1, "登录成功！");
         } else {
             //更新失败次数
@@ -158,7 +161,7 @@ public class AdminController extends BaseController {
                     new Logs(
                             LogsRecord.LOGIN,
                             LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.encode(loginName) + "," + HtmlUtil.encode(loginPwd) + "]",
-                            HaloUtils.getIpAddr(request),
+                            ServletUtil.getClientIP(request),
                             DateUtil.date()
                     )
             );
@@ -175,7 +178,7 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtils.getIpAddr(request), DateUtil.date()));
+        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), ServletUtil.getClientIP(request), DateUtil.date()));
         session.invalidate();
         log.info("用户[" + user.getUserName() + "]退出登录");
         return "redirect:/admin/login";
