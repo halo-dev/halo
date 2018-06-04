@@ -124,18 +124,20 @@ public class HaloUtils {
         List<BackupDto> backupDtos = new ArrayList<>();
         BackupDto backupDto = null;
         //遍历文件
-        for (File file : files) {
-            if (file.isFile()) {
-                if (StringUtils.equals(file.getName(), ".DS_Store")) {
-                    continue;
+        if(null != files){
+            for (File file : files) {
+                if (file.isFile()) {
+                    if (StringUtils.equals(file.getName(), ".DS_Store")) {
+                        continue;
+                    }
+                    backupDto = new BackupDto();
+                    backupDto.setFileName(file.getName());
+                    backupDto.setCreateAt(getCreateTime(file.getAbsolutePath()));
+                    backupDto.setFileType(FileUtil.getType(file));
+                    backupDto.setFileSize(parseSize(file.length()));
+                    backupDto.setBackupType(dir);
+                    backupDtos.add(backupDto);
                 }
-                backupDto = new BackupDto();
-                backupDto.setFileName(file.getName());
-                backupDto.setCreateAt(getCreateTime(file.getAbsolutePath()));
-                backupDto.setFileType(FileUtil.getType(file));
-                backupDto.setFileSize(parseSize(file.length()));
-                backupDto.setBackupType(dir);
-                backupDtos.add(backupDto);
             }
         }
         return backupDtos;
