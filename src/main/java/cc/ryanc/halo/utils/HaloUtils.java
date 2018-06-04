@@ -1,8 +1,10 @@
 package cc.ryanc.halo.utils;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
+import cn.hutool.core.io.FileUtil;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Content;
 import com.sun.syndication.feed.rss.Item;
@@ -17,13 +19,18 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -102,6 +109,84 @@ public class HaloUtils {
             log.error("未知错误：{0}",e.getMessage());
         }
         return FILE_LIST;
+    }
+
+    /**
+     * 获取备份文件信息
+     *
+     * @param dir dir
+     * @return List<BackupDto></>
+     */
+    public static List<BackupDto> getBackUps(String dir) {
+        String srcPathStr = System.getProperties().getProperty("user.home") + "/halo/backup/" + dir;
+        File srcPath = new File(srcPathStr);
+        File[] files = srcPath.listFiles();
+        List<BackupDto> backupDtos = new ArrayList<>();
+        BackupDto backupDto = null;
+        //遍历文件
+        for (File file : files) {
+            if (file.isFile()) {
+                if (StringUtils.equals(file.getName(), ".DS_Store")) {
+                    continue;
+                }
+                backupDto = new BackupDto();
+                backupDto.setFileName(file.getName());
+                backupDto.setCreateAt(getCreateTime(file.getAbsolutePath()));
+                backupDto.setFileType(FileUtil.getType(file));
+                backupDto.setFileSize(parseSize(file.length()));
+                backupDto.setBackupType(dir);
+                backupDtos.add(backupDto);
+            }
+        }
+        return backupDtos;
+    }
+
+    /**
+     * 转换文件大小
+     *
+     * @param size size
+     * @return string
+     */
+    public static String parseSize(long size) {
+        if (size < 1024) {
+            return String.valueOf(size) + "B";
+        } else {
+            size = size / 1024;
+        }
+        if (size < 1024) {
+            return String.valueOf(size) + "KB";
+        } else {
+            size = size / 1024;
+        }
+        if (size < 1024) {
+            size = size * 100;
+            return String.valueOf((size / 100)) + "." + String.valueOf((size % 100)) + "MB";
+        } else {
+            size = size * 100 / 1024;
+            return String.valueOf((size / 100)) + "." + String.valueOf((size % 100)) + "GB";
+        }
+    }
+
+    /**
+     * 获取文件创建时间
+     *
+     * @param srcPath 文件绝对路径
+     * @return 时间
+     */
+    public static Date getCreateTime(String srcPath) {
+        Path path = Paths.get(srcPath);
+        BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+        BasicFileAttributes attr;
+        try {
+            attr = basicview.readAttributes();
+            Date createDate = new Date(attr.creationTime().toMillis());
+            return createDate;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.set(1970, 0, 1, 0, 0, 0);
+        return cal.getTime();
     }
 
     /**
@@ -216,26 +301,6 @@ public class HaloUtils {
     }
 
     /**
-     * 获取客户端ip地址
-     *
-     * @param request request
-     * @return string
-     */
-    public static String getIpAddr(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
-    }
-
-    /**
      * 备份数据库
      *
      * @param hostIp ip
@@ -288,7 +353,14 @@ public class HaloUtils {
         return false;
     }
 
-    public static void dbToFile(String data,String filePath,String fileName){
+    /**
+     * 导出为文件
+     *
+     * @param data     内容
+     * @param filePath 保存路径
+     * @param fileName 文件名
+     */
+    public static void postToFile(String data, String filePath, String fileName) {
         try{
             File file =new File(filePath);
             if(!file.exists()){
@@ -299,7 +371,6 @@ public class HaloUtils {
             BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
             bufferWritter.write(data);
             bufferWritter.close();
-            System.out.println("Done");
         }catch (Exception e){
             e.printStackTrace();
         }

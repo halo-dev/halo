@@ -11,6 +11,7 @@ import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -193,7 +194,7 @@ public class PostController extends BaseController{
             }
             post.setPostUrl(urlFilter(post.getPostUrl()));
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),HaloUtils.getIpAddr(request),DateUtil.date()));
+            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST,post.getPostTitle(),ServletUtil.getClientIP(request),DateUtil.date()));
             return new JsonResult(1,msg);
         }catch (Exception e){
             log.error("未知错误：", e.getMessage());
@@ -298,7 +299,7 @@ public class PostController extends BaseController{
         try{
             Optional<Post> post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
-            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),HaloUtils.getIpAddr(request),DateUtil.date()));
+            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST,post.get().getPostTitle(),ServletUtil.getClientIP(request),DateUtil.date()));
         }catch (Exception e){
             log.error("未知错误：{0}",e.getMessage());
         }

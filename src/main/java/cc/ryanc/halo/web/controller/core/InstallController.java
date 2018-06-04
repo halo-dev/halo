@@ -7,6 +7,7 @@ import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -177,7 +178,7 @@ public class InstallController {
                     new Logs(
                             LogsRecord.INSTALL,
                             "安装成功，欢迎使用Halo。",
-                            HaloUtils.getIpAddr(request),
+                            ServletUtil.getClientIP(request),
                             DateUtil.date()
                     )
             );

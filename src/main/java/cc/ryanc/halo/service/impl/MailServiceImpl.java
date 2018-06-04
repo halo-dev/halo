@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -73,6 +74,38 @@ public class MailServiceImpl implements MailService {
                     .html(text)
                     .send();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 发送带有附件的邮件
+     *
+     * @param to           接收者
+     * @param subject      主题
+     * @param content      内容
+     * @param templateName 模板路径
+     * @param attachSrc    附件路径
+     */
+    @Override
+    public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachSrc) {
+        //配置邮件服务器
+        HaloUtils.configMail(
+                HaloConst.OPTIONS.get("mail_smtp_host"),
+                HaloConst.OPTIONS.get("mail_smtp_username"),
+                HaloConst.OPTIONS.get("mail_smtp_password"));
+        File file = new File(attachSrc);
+        String text = "";
+        try{
+            Template template = freeMarker.getConfiguration().getTemplate(templateName);
+            text = FreeMarkerTemplateUtils.processTemplateIntoString(template,content);
+            OhMyEmail.subject(subject)
+                    .from(HaloConst.OPTIONS.get("mail_from_name"))
+                    .to(to)
+                    .html(text)
+                    .attach(file,file.getName())
+                    .send();
+        }catch (Exception e){
             e.printStackTrace();
         }
     }
