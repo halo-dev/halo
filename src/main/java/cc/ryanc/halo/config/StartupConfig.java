@@ -48,16 +48,12 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
      * 加载主题设置
      */
     private void loadActiveTheme(){
-        try {
-            String themeValue = optionsService.findOneOption("theme");
-            if(StringUtils.isNotEmpty("themeValue") && !StringUtils.equals(themeValue,null)){
-                BaseController.THEME = themeValue;
-            }else{
-                //以防万一
-                BaseController.THEME = "anatole";
-            }
-        }catch (Exception e){
-            log.error("加载主题设置失败：{0}",e.getMessage());
+        String themeValue = optionsService.findOneOption("theme");
+        if(StringUtils.isNotEmpty("themeValue") && !StringUtils.equals(themeValue,null)){
+            BaseController.THEME = themeValue;
+        }else{
+            //以防万一
+            BaseController.THEME = "anatole";
         }
     }
 
@@ -65,13 +61,9 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
      * 加载设置选项
      */
     private void loadOptions(){
-        try{
-            Map<String,String> options = optionsService.findAllOptions();
-            if(options!=null&&!options.isEmpty()){
-                HaloConst.OPTIONS = options;
-            }
-        }catch (Exception e){
-            log.error("加载设置选项失败：{0}",e.getMessage());
+        Map<String,String> options = optionsService.findAllOptions();
+        if(options!=null&&!options.isEmpty()){
+            HaloConst.OPTIONS = options;
         }
     }
 
@@ -79,13 +71,9 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
      * 加载所有文件
      */
     private void loadFiles(){
-        try {
-            List<Attachment> attachments = attachmentService.findAllAttachments();
-            if(null!=attachments){
-                HaloConst.ATTACHMENTS = attachments;
-            }
-        }catch (Exception e){
-            log.error("加载所有文件失败：{0}",e.getMessage());
+        List<Attachment> attachments = attachmentService.findAllAttachments();
+        if(null!=attachments){
+            HaloConst.ATTACHMENTS = attachments;
         }
     }
 
@@ -93,14 +81,10 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
      * 加载所有主题
      */
     private void loadThemes(){
-        try{
-            HaloConst.THEMES.clear();
-            List<Theme> themes = HaloUtils.getThemes();
-            if(null!=themes){
-                HaloConst.THEMES = themes;
-            }
-        }catch (Exception e){
-            log.error("加载主题失败：{0}",e.getMessage());
+        HaloConst.THEMES.clear();
+        List<Theme> themes = HaloUtils.getThemes();
+        if(null!=themes){
+            HaloConst.THEMES = themes;
         }
     }
 }
