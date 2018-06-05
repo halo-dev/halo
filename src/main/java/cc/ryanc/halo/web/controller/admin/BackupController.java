@@ -8,6 +8,7 @@ import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,13 +54,19 @@ public class BackupController {
      * @return 模板路径admin/admin_backup
      */
     @GetMapping
-    public String backup(Model model) {
-        List<BackupDto> resourcesBackup = HaloUtils.getBackUps("resources");
-        List<BackupDto> databasesBackup = HaloUtils.getBackUps("databases");
-        List<BackupDto> postsBackup = HaloUtils.getBackUps("posts");
-        model.addAttribute("resourcesBackup", resourcesBackup);
-        model.addAttribute("databasesBackup", databasesBackup);
-        model.addAttribute("postsBackup", postsBackup);
+    public String backup(@RequestParam(value = "type",defaultValue = "resources") String type,Model model) {
+        List<BackupDto> backups = null;
+        if(StringUtils.equals(type,"resources")){
+            backups = HaloUtils.getBackUps("resources");
+        }else if(StringUtils.equals(type,"databases")){
+            backups = HaloUtils.getBackUps("databases");
+        }else if(StringUtils.equals(type,"posts")){
+            backups = HaloUtils.getBackUps("posts");
+        }else{
+            backups = new ArrayList<>();
+        }
+        model.addAttribute("backups", backups);
+        model.addAttribute("type", type);
         return "admin/admin_backup";
     }
 
@@ -73,7 +81,7 @@ public class BackupController {
     public JsonResult doBackup(@RequestParam("type") String type) {
         if (StringUtils.equals("resources", type)) {
             return this.backupResources();
-        } else if (StringUtils.equals("db", type)) {
+        } else if (StringUtils.equals("databases", type)) {
             return this.backupDatabase();
         } else if (StringUtils.equals("posts", type)) {
             return this.backupPosts();
@@ -89,9 +97,14 @@ public class BackupController {
      */
     public JsonResult backupDatabase() {
         try {
-            String srcPath = System.getProperties().getProperty("user.home") + "/halo";
+            if(HaloUtils.getBackUps("databases").size()>10){
+                FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
+            }
+            String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
             String distName = "databases_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
-            ZipUtil.zip(srcPath + "/halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
+            //压缩文件
+            ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
+            log.info("当前时间："+DateUtil.now()+"，执行了数据库备份。");
             return new JsonResult(1, "备份成功！");
         } catch (Exception e) {
             log.error("未知错误：", e.getMessage());
@@ -106,11 +119,15 @@ public class BackupController {
      */
     public JsonResult backupResources() {
         try {
+            if(HaloUtils.getBackUps("resources").size()>10){
+                FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/resources/");
+            }
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
             String srcPath = path.getAbsolutePath();
             String distName = "resources_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
+            log.info("当前时间："+DateUtil.now()+"，执行了资源文件备份。");
             return new JsonResult(1, "备份成功！");
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,6 +144,9 @@ public class BackupController {
         List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
         posts.addAll(postService.findAllPosts(HaloConst.POST_TYPE_PAGE));
         try {
+            if(HaloUtils.getBackUps("posts").size()>10){
+                FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
+            }
             //打包好的文件名
             String distName = "posts_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName;
@@ -134,8 +154,9 @@ public class BackupController {
                 HaloUtils.postToFile(post.getPostContentMd(), srcPath, post.getPostTitle() + ".md");
             }
             //打包导出好的文章
-            ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName + ".zip");
+            ZipUtil.zip(srcPath, srcPath + ".zip");
             FileUtil.del(srcPath);
+            log.info("当前时间："+DateUtil.now()+"，执行了文章备份。");
             return new JsonResult(1, "备份成功！");
         } catch (Exception e) {
             e.printStackTrace();
