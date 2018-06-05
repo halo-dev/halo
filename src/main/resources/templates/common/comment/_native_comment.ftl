@@ -198,8 +198,8 @@
             <input type="hidden" name="postId" value="${post.postId?c}">
             <input type="hidden" name="commentParent" id="commentParent" value="0">
             <input type="text" class="comment-input comment-input-who" name="commentAuthor" id="commentAuthor" placeholder="昵称(必填)">
-            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" placeholder="邮箱(选填)">
-            <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" placeholder="网址(选填)">
+            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" id="commentAuthorEmail" placeholder="邮箱(选填)">
+            <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" id="commentAuthorUrl" placeholder="网址(选填)">
         </div>
         <div class="comment-content">
             <textarea class="comment-input-content" name="commentContent" id="commentContent"
@@ -255,10 +255,15 @@
             var uaInfo = $(this).children(".native-comment-ua-info").html();
             $(this).append(show_ua(uaInfo));
         });
+        $("#commentAuthor").val(localStorage.getItem("author"));
+        $("#commentAuthorEmail").val(localStorage.getItem("email"));
+        $("#commentAuthorUrl").val(localStorage.getItem("url"));
     });
     $('#btn-push').click(function () {
         var author = $("#commentAuthor");
         var content = $("#commentContent");
+        var email = $("#commentAuthorEmail");
+        var url = $("#commentAuthorUrl")
         if (author.val() == '' || content.val() == '') {
             $(".native-message").html("<span style='color:red'>请输入必填项！</span>");
             $(".native-message").fadeIn(1000);
@@ -284,6 +289,9 @@
                 'commentParent': $('input[name=commentParent]').val()
             },
             success: function (data) {
+                localStorage.setItem('author', author.val());
+                localStorage.setItem('email', email.val());
+                localStorage.setItem('url', url.val());
                 if(data.code==1){
                     $('.comment-input-content').val("");
                 }
