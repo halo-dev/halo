@@ -1,0 +1,3 @@
+cc.ryanc.halo.web.controller.admin.BackupController.backupResources = 0 0 1 * * ?
+cc.ryanc.halo.web.controller.admin.BackupController.backupDatabase = 0 0 1 * * ?
+cc.ryanc.halo.web.controller.admin.BackupController.backupPosts = 0 0 1 * * ?

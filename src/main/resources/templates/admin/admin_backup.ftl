@@ -6,6 +6,9 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
+        <style type="text/css" rel="stylesheet">
+            .resourceType,.databaseType,.postType{list-style:none;float:left;margin:0;padding-bottom:10px}
+        </style>
         <section class="content-header">
             <h1 style="display: inline-block;">博客备份</h1>
             <ol class="breadcrumb">
@@ -18,143 +21,57 @@
         </section>
         <section class="content container-fluid">
             <div class="row">
-                <div class="col-md-12">
-                    <div class="nav-tabs-custom">
-                        <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="#resources" data-toggle="tab">资源目录备份</a>
-                            </li>
-                            <li>
-                                <a href="#database" data-toggle="tab">数据库备份</a>
-                            </li>
-                            <li>
-                                <a href="#post" data-toggle="tab">文章备份</a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="resources">
-                                <form method="post" class="form-horizontal" id="resourcesBackup">
-                                    <div class="box-body table-responsive" style="padding: 10px 0;">
-                                        <table class="table table-bordered table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>文件名称</th>
-                                                    <th>备份时间</th>
-                                                    <th>文件大小</th>
-                                                    <th>文件类型</th>
-                                                    <th>操作</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <#if resourcesBackup?size gt 0>
-                                                    <#list resourcesBackup as resource>
-                                                        <tr>
-                                                            <td>${resource.fileName}</td>
-                                                            <td>${resource.createAt?string("yyyy-MM-dd HH:mm")}</td>
-                                                            <td>${resource.fileSize}</td>
-                                                            <td>${resource.fileType}</td>
-                                                            <td>
-                                                                <a href="/backup/resources/${resource.fileName}" class="btn btn-xs btn-primary" download="${resource.fileName}">下载</a>
-                                                                <button type="button" class="btn btn-xs btn-info" onclick="sendToEmail('${resource.fileName}','${resource.backupType}')">发送到邮箱</button>
-                                                                <button type="button" class="btn btn-xs btn-danger" onclick="delBackup('${resource.fileName}','${resource.backupType}')">删除</button>
-                                                            </td>
-                                                        </tr>
-                                                    </#list>
-                                                <#else>
-                                                <tr>
-                                                    <td colspan="5" style="text-align: center">暂无备份</td>
-                                                </tr>
-                                                </#if>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="btn_backup('resources')">备份</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="tab-pane" id="database">
-                                <form method="post" class="form-horizontal" id="databaseBackup">
-                                    <div class="box-body table-responsive" style="padding: 10px 0;">
-                                        <table class="table table-bordered table-hover">
-                                            <thead>
+                <div class="col-xs-12">
+                    <ul style="list-style: none;padding-left: 0">
+                        <li class="resourceType">
+                            <a data-pjax="true" href="/admin/backup?type=resources" <#if type=='resources'>style="color: #000" </#if>>资源文件备份</a>&nbsp;|&nbsp;
+                        </li>
+                        <li class="databaseType">
+                            <a data-pjax="true" href="/admin/backup?type=databases" <#if type=='databases'>style="color: #000" </#if>>数据库备份</a>&nbsp;|&nbsp;
+                        </li>
+                        <li class="postType">
+                            <a data-pjax="true" href="/admin/backup?type=posts" <#if type=='posts'>style="color: #000" </#if>>文章备份</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-12">
+                    <div class="box box-primary">
+                        <div class="box-body table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>文件名称</th>
+                                    <th>备份时间</th>
+                                    <th>文件大小</th>
+                                    <th>文件类型</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <#if backups?size gt 0>
+                                        <#list backups as backup>
                                             <tr>
-                                                <th>文件名称</th>
-                                                <th>备份时间</th>
-                                                <th>文件大小</th>
-                                                <th>文件类型</th>
-                                                <th>操作</th>
+                                                <td>${backup.fileName}</td>
+                                                <td>${backup.createAt?string("yyyy-MM-dd HH:mm")}</td>
+                                                <td>${backup.fileSize}</td>
+                                                <td>${backup.fileType}</td>
+                                                <td>
+                                                    <a href="/backup/${type}/${backup.fileName}" class="btn btn-xs btn-primary" download="${backup.fileName}">下载</a>
+                                                    <button type="button" class="btn btn-xs btn-info" onclick="sendToEmail('${backup.fileName}','${backup.backupType}')">发送到邮箱</button>
+                                                    <button type="button" class="btn btn-xs btn-danger" onclick="delBackup('${backup.fileName}','${backup.backupType}')">删除</button>
+                                                </td>
                                             </tr>
-                                            </thead>
-                                            <tbody>
-                                                <#if databasesBackup?size gt 0>
-                                                    <#list databasesBackup as database>
-                                                        <tr>
-                                                            <td>${database.fileName}</td>
-                                                            <td>${database.createAt?string("yyyy-MM-dd HH:mm")}</td>
-                                                            <td>${database.fileSize}</td>
-                                                            <td>${database.fileType}</td>
-                                                            <td>
-                                                                <a href="/backup/databases/${database.fileName}" class="btn btn-xs btn-primary" download="${database.fileName}">下载</a>
-                                                                <button type="button" class="btn btn-xs btn-info" onclick="sendToEmail('${database.fileName}','${database.backupType}')">发送到邮箱</button>
-                                                                <button type="button" class="btn btn-xs btn-danger" onclick="delBackup('${database.fileName}','${database.backupType}')">删除</button>
-                                                            </td>
-                                                        </tr>
-                                                    </#list>
-                                                <#else>
-                                                <tr>
-                                                    <td colspan="5" style="text-align: center">暂无备份</td>
-                                                </tr>
-                                                </#if>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="btn_backup('db')">备份</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="tab-pane" id="post">
-                                <form method="post" class="form-horizontal" id="postBackup">
-                                    <div class="box-body table-responsive" style="padding: 10px 0;">
-                                        <table class="table table-bordered table-hover">
-                                            <thead>
-                                            <tr>
-                                                <th>文件名称</th>
-                                                <th>备份时间</th>
-                                                <th>文件大小</th>
-                                                <th>文件类型</th>
-                                                <th>操作</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                <#if postsBackup?size gt 0>
-                                                    <#list postsBackup as post>
-                                                        <tr>
-                                                            <td>${post.fileName}</td>
-                                                            <td>${post.createAt?string("yyyy-MM-dd HH:mm")}</td>
-                                                            <td>${post.fileSize}</td>
-                                                            <td>${post.fileType}</td>
-                                                            <td>
-                                                                <a href="/backup/posts/${post.fileName}" class="btn btn-xs btn-primary" download="${post.fileName}">下载</a>
-                                                                <button type="button" class="btn btn-xs btn-info" onclick="sendToEmail('${post.fileName}','${post.backupType}')">发送到邮箱</button>
-                                                                <button type="button" class="btn btn-xs btn-danger" onclick="delBackup('${post.fileName}','${post.backupType}')">删除</button>
-                                                            </td>
-                                                        </tr>
-                                                    </#list>
-                                                <#else>
-                                                <tr>
-                                                    <td colspan="5" style="text-align: center">暂无备份</td>
-                                                </tr>
-                                                </#if>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="btn_backup('posts')">备份</button>
-                                    </div>
-                                </form>
-                            </div>
+                                        </#list>
+                                    <#else>
+                                        <tr>
+                                            <th colspan="5" style="text-align: center">暂无备份</th>
+                                        </tr>
+                                    </#if>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="box-footer clearfix">
+                            <button type="button" class="btn btn-primary btn-sm " onclick="btn_backup('${type}')">备份</button>
                         </div>
                     </div>
                 </div>
@@ -238,10 +155,7 @@
                                 position: 'top-center',
                                 textAlign: 'left',
                                 loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    window.location.reload();
-                                }
+                                loaderBg: '#ffffff'
                             });
                         }else{
                             $.toast({

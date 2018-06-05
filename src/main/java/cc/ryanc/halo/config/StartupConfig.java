@@ -7,6 +7,7 @@ import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.cron.CronUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
         this.loadOptions();
         this.loadFiles();
         this.loadThemes();
+        //启动定时任务
+        CronUtil.start();
+        log.info("定时任务启动成功！");
     }
 
     /**
