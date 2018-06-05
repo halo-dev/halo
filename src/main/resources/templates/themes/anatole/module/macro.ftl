@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="renderer" content="webkit">
+    <meta name="theme-color" content="${options.anatole_style_google_color?default('#fff')}">
     <meta name="author" content="${user.userDisplayName?if_exists}" />
     <meta name="keywords" content="${keywords?default("Anatole")}"/>
     <meta name="description" content="${description?default("Anatole")}" />
