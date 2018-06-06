@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     FreeMarker自定义标签
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Component

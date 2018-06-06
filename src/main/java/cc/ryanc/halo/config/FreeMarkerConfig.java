@@ -12,8 +12,11 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 
 /**
+ * <pre>
+ *     FreeMarker配置
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Slf4j

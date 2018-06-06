@@ -14,8 +14,6 @@ import java.util.Map;
 /**
  * @author : RYAN0UP
  * @date : 2017/12/13
- * @version : 1.0
- * description : 设置选项控制器
  */
 @Slf4j
 @Controller

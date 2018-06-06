@@ -39,47 +39,49 @@ import java.util.*;
 import java.util.List;
 
 /**
+ * <pre>
+ *     常用工具
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/22
- * @version : 1.0
- * description:常用的方法
  */
 @Slf4j
 public class HaloUtils {
 
     private final static Calendar NOW = Calendar.getInstance();
 
-    public final static String YEAR = NOW.get(Calendar.YEAR)+"";
+    public final static String YEAR = NOW.get(Calendar.YEAR) + "";
 
-    public final static String MONTH = (NOW.get(Calendar.MONTH)+1)+"";
+    public final static String MONTH = (NOW.get(Calendar.MONTH) + 1) + "";
 
     private static ArrayList<String> FILE_LIST = new ArrayList<>();
 
     /**
      * 截取图片
      *
-     * @param src 输入路径
-     * @param dest 输出路径
-     * @param w 宽度
-     * @param h 长度
+     * @param src    输入路径
+     * @param dest   输出路径
+     * @param w      宽度
+     * @param h      长度
      * @param suffix 后缀
      * @throws IOException
      */
-    public static void cutCenterImage(String src,String dest,int w,int h,String suffix){
-        try{
+    public static void cutCenterImage(String src, String dest, int w, int h, String suffix) {
+        try {
             Iterator iterator = ImageIO.getImageReadersByFormatName(suffix);
-            ImageReader reader = (ImageReader)iterator.next();
-            InputStream in=new FileInputStream(src);
+            ImageReader reader = (ImageReader) iterator.next();
+            InputStream in = new FileInputStream(src);
             ImageInputStream iis = ImageIO.createImageInputStream(in);
             reader.setInput(iis, true);
             ImageReadParam param = reader.getDefaultReadParam();
             int imageIndex = 0;
-            Rectangle rect = new Rectangle((reader.getWidth(imageIndex)-w)/2, (reader.getHeight(imageIndex)-h)/2, w, h);
+            Rectangle rect = new Rectangle((reader.getWidth(imageIndex) - w) / 2, (reader.getHeight(imageIndex) - h) / 2, w, h);
             param.setSourceRegion(rect);
-            BufferedImage bi = reader.read(0,param);
+            BufferedImage bi = reader.read(0, param);
             ImageIO.write(bi, suffix, new File(dest));
-        }catch (Exception e){
-            log.error("剪裁失败，图片本身尺寸小于需要修剪的尺寸：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("剪裁失败，图片本身尺寸小于需要修剪的尺寸：{0}", e.getMessage());
         }
     }
 
@@ -89,24 +91,24 @@ public class HaloUtils {
      * @param filePath filePath
      * @return Map
      */
-    public static ArrayList<String> getFiles(String filePath){
-        try{
+    public static ArrayList<String> getFiles(String filePath) {
+        try {
             //获取项目根路径
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取目标路径
-            File targetPath = new File(basePath.getAbsolutePath(),filePath);
+            File targetPath = new File(basePath.getAbsolutePath(), filePath);
             File[] files = targetPath.listFiles();
             //遍历文件
-            for(File file:files){
-                if(file.isDirectory()){
-                    getFiles(filePath+"/"+file.getName());
-                }else{
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    getFiles(filePath + "/" + file.getName());
+                } else {
                     String abPath = file.getAbsolutePath().substring(file.getAbsolutePath().indexOf("/upload"));
                     FILE_LIST.add(abPath);
                 }
             }
-        }catch (Exception e){
-            log.error("未知错误：{0}",e.getMessage());
+        } catch (Exception e) {
+            log.error("未知错误：{0}", e.getMessage());
         }
         return FILE_LIST;
     }
@@ -124,7 +126,7 @@ public class HaloUtils {
         List<BackupDto> backupDtos = new ArrayList<>();
         BackupDto backupDto = null;
         //遍历文件
-        if(null != files){
+        if (null != files) {
             for (File file : files) {
                 if (file.isFile()) {
                     if (StringUtils.equals(file.getName(), ".DS_Store")) {
@@ -196,15 +198,15 @@ public class HaloUtils {
      *
      * @return list
      */
-    public static List<Theme> getThemes(){
+    public static List<Theme> getThemes() {
         List<Theme> themes = new ArrayList<>();
         try {
             //获取项目根路径
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取主题路径
-            File themesPath = new File(basePath.getAbsolutePath(),"templates/themes");
+            File themesPath = new File(basePath.getAbsolutePath(), "templates/themes");
             File[] files = themesPath.listFiles();
-            if(null!=files) {
+            if (null != files) {
                 Theme theme = null;
                 for (File file : files) {
                     if (file.isDirectory()) {
@@ -223,7 +225,7 @@ public class HaloUtils {
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("主题获取失败：", e.getMessage());
         }
         return themes;
@@ -235,31 +237,31 @@ public class HaloUtils {
      * @param theme theme
      * @return list
      */
-    public static List<String> getTplName (String theme){
+    public static List<String> getTplName(String theme) {
         List<String> tpls = new ArrayList<>();
-        try{
+        try {
             //获取项目根路径
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取主题路径
-            File themesPath = new File(basePath.getAbsolutePath(),"templates/themes/"+theme);
-            File modulePath = new File(themesPath.getAbsolutePath(),"module");
+            File themesPath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
+            File modulePath = new File(themesPath.getAbsolutePath(), "module");
             File[] baseFiles = themesPath.listFiles();
             File[] moduleFiles = modulePath.listFiles();
-            if(null!=moduleFiles) {
+            if (null != moduleFiles) {
                 for (File file : moduleFiles) {
                     if (file.isFile() && file.getName().endsWith(".ftl")) {
                         tpls.add("module/" + file.getName());
                     }
                 }
             }
-            if(null!=baseFiles){
-                for (File file:baseFiles){
-                    if(file.isFile() && file.getName().endsWith(".ftl")) {
+            if (null != baseFiles) {
+                for (File file : baseFiles) {
+                    if (file.isFile() && file.getName().endsWith(".ftl")) {
                         tpls.add(file.getName());
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("未知错误：", e.getMessage());
         }
         return tpls;
@@ -271,16 +273,16 @@ public class HaloUtils {
      * @param filePath filePath
      * @return string
      */
-    public static String getFileContent(String filePath){
+    public static String getFileContent(String filePath) {
         File file = new File(filePath);
         Long fileLength = file.length();
         byte[] fileContent = new byte[fileLength.intValue()];
-        try{
+        try {
             FileInputStream inputStream = new FileInputStream(file);
             inputStream.read(fileContent);
             inputStream.close();
-            return new String(fileContent,"UTF-8");
-        }catch (Exception e){
+            return new String(fileContent, "UTF-8");
+        } catch (Exception e) {
             log.error("读取模板文件错误：", e.getMessage());
         }
         return null;
@@ -297,7 +299,7 @@ public class HaloUtils {
         return dateString;
     }
 
-    public static String getStringDate(Date date,String format){
+    public static String getStringDate(Date date, String format) {
         Long unixTime = Long.parseLong(String.valueOf(date.getTime() / 1000));
         return Instant.ofEpochSecond(unixTime).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(format));
     }
@@ -305,50 +307,50 @@ public class HaloUtils {
     /**
      * 备份数据库
      *
-     * @param hostIp ip
-     * @param userName 用户名
-     * @param password 密码
-     * @param savePath 保存路径
-     * @param fileName 文件名
+     * @param hostIp       ip
+     * @param userName     用户名
+     * @param password     密码
+     * @param savePath     保存路径
+     * @param fileName     文件名
      * @param databaseName 数据库名
      * @return boolean
      * @throws InterruptedException InterruptedException
      */
-    public static boolean exportDatabase(String hostIp,String userName,String password,String savePath,String fileName,String databaseName) throws InterruptedException{
+    public static boolean exportDatabase(String hostIp, String userName, String password, String savePath, String fileName, String databaseName) throws InterruptedException {
         File saveFile = new File(savePath);
-        if(!saveFile.exists()){
+        if (!saveFile.exists()) {
             saveFile.mkdirs();
         }
-        if(!savePath.endsWith(File.separator)){
-            savePath = savePath+File.separator;
+        if (!savePath.endsWith(File.separator)) {
+            savePath = savePath + File.separator;
         }
 
         PrintWriter printWriter = null;
         BufferedReader bufferedReader = null;
-        try{
-            printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(savePath+fileName),"utf-8"));
+        try {
+            printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(savePath + fileName), "utf-8"));
             Process process = Runtime.getRuntime().exec(" mysqldump -h" + hostIp + " -u" + userName + " -p" + password + " --set-charset=UTF8 " + databaseName);
-            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(),"utf-8");
+            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream(), "utf-8");
             bufferedReader = new BufferedReader(inputStreamReader);
             String line;
-            while((line = bufferedReader.readLine())!=null){
+            while ((line = bufferedReader.readLine()) != null) {
                 printWriter.println(line);
             }
             printWriter.flush();
-            if(process.waitFor()==0){
+            if (process.waitFor() == 0) {
                 return true;
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            try{
-                if(bufferedReader != null){
+        } finally {
+            try {
+                if (bufferedReader != null) {
                     bufferedReader.close();
                 }
-                if(printWriter!=null){
+                if (printWriter != null) {
                     printWriter.close();
                 }
-            }catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -363,17 +365,17 @@ public class HaloUtils {
      * @param fileName 文件名
      */
     public static void postToFile(String data, String filePath, String fileName) {
-        try{
-            File file =new File(filePath);
-            if(!file.exists()){
+        try {
+            File file = new File(filePath);
+            if (!file.exists()) {
                 file.mkdirs();
             }
             //true = append file
-            FileWriter fileWritter = new FileWriter(file.getAbsoluteFile()+"/"+fileName,true);
+            FileWriter fileWritter = new FileWriter(file.getAbsoluteFile() + "/" + fileName, true);
             BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
             bufferWritter.write(data);
             bufferWritter.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -387,24 +389,24 @@ public class HaloUtils {
      */
     public static String getRss(List<Post> posts) throws FeedException {
         Channel channel = new Channel("rss_2.0");
-        if(null==HaloConst.OPTIONS.get("blog_title")){
+        if (null == HaloConst.OPTIONS.get("blog_title")) {
             channel.setTitle("");
-        }else{
+        } else {
             channel.setTitle(HaloConst.OPTIONS.get("blog_title"));
         }
-        if(null==HaloConst.OPTIONS.get("blog_url")){
+        if (null == HaloConst.OPTIONS.get("blog_url")) {
             channel.setLink("");
-        }else {
+        } else {
             channel.setLink(HaloConst.OPTIONS.get("blog_url"));
         }
-        if(null==HaloConst.OPTIONS.get("seo_desc")){
+        if (null == HaloConst.OPTIONS.get("seo_desc")) {
             channel.setDescription("");
-        }else{
+        } else {
             channel.setDescription(HaloConst.OPTIONS.get("seo_desc"));
         }
         channel.setLanguage("zh-CN");
         List<Item> items = new ArrayList<>();
-        for(Post post : posts){
+        for (Post post : posts) {
             Item item = new Item();
             item.setTitle(post.getPostTitle());
             Content content = new Content();
@@ -420,7 +422,7 @@ public class HaloUtils {
             value = new String(xmlChar);
             content.setValue(value);
             item.setContent(content);
-            item.setLink(HaloConst.OPTIONS.get("blog_url")+"/archives/"+post.getPostUrl());
+            item.setLink(HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl());
             item.setPubDate(post.getPostDate());
             items.add(item);
         }
@@ -435,16 +437,16 @@ public class HaloUtils {
      * @param posts posts
      * @return string
      */
-    public static String getSiteMap(List<Post> posts){
+    public static String getSiteMap(List<Post> posts) {
         String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
-        String urlBody="";
+        String urlBody = "";
         String urlItem;
-        String urlPath = HaloConst.OPTIONS.get("blog_url")+"/archives/";
-        for(Post post:posts){
-            urlItem = "<url><loc>"+urlPath+post.getPostUrl()+"</loc><lastmod>"+getStringDate(post.getPostDate(),"yyyy-MM-dd'T'HH:mm:ss.SSSXXX")+"</lastmod>"+"</url>";
-            urlBody+=urlItem;
+        String urlPath = HaloConst.OPTIONS.get("blog_url") + "/archives/";
+        for (Post post : posts) {
+            urlItem = "<url><loc>" + urlPath + post.getPostUrl() + "</loc><lastmod>" + getStringDate(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX") + "</lastmod>" + "</url>";
+            urlBody += urlItem;
         }
-        return head+urlBody+"</urlset>";
+        return head + urlBody + "</urlset>";
     }
 
     /**
@@ -454,10 +456,10 @@ public class HaloUtils {
      * @param userName 邮件地址
      * @param password 密码
      */
-    public static void configMail(String smtpHost,String userName,String password){
+    public static void configMail(String smtpHost, String userName, String password) {
         Properties properties = OhMyEmail.defaultConfig(false);
-        properties.setProperty("mail.smtp.host",smtpHost);
-        OhMyEmail.config(properties,userName,password);
+        properties.setProperty("mail.smtp.host", smtpHost);
+        OhMyEmail.config(properties, userName, password);
     }
 
     /**
@@ -486,7 +488,7 @@ public class HaloUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             try {
                 if (in != null) {
                     in.close();
@@ -502,20 +504,20 @@ public class HaloUtils {
      * 百度主动推送
      *
      * @param blogUrl 博客地址
-     * @param token 百度推送token
-     * @param urls 文章路径
+     * @param token   百度推送token
+     * @param urls    文章路径
      * @return string
      */
-    public static String baiduPost(String blogUrl,String token,String urls){
-        String url = "http://data.zz.baidu.com/urls?site="+blogUrl+"&token="+token;
-        String result="";
-        PrintWriter out=null;
-        BufferedReader in=null;
+    public static String baiduPost(String blogUrl, String token, String urls) {
+        String url = "http://data.zz.baidu.com/urls?site=" + blogUrl + "&token=" + token;
+        String result = "";
+        PrintWriter out = null;
+        BufferedReader in = null;
         try {
             //建立URL之间的连接
-            URLConnection conn=new URL(url).openConnection();
+            URLConnection conn = new URL(url).openConnection();
             //设置通用的请求属性
-            conn.setRequestProperty("Host","data.zz.baidu.com");
+            conn.setRequestProperty("Host", "data.zz.baidu.com");
             conn.setRequestProperty("User-Agent", "curl/7.12.1");
             conn.setRequestProperty("Content-Length", "83");
             conn.setRequestProperty("Content-Type", "text/plain");
@@ -525,27 +527,27 @@ public class HaloUtils {
             conn.setDoOutput(true);
 
             //获取conn对应的输出流
-            out=new PrintWriter(conn.getOutputStream());
+            out = new PrintWriter(conn.getOutputStream());
             out.print(urls.trim());
             //进行输出流的缓冲
             out.flush();
             //通过BufferedReader输入流来读取Url的响应
-            in=new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
-            while((line=in.readLine())!= null){
+            while ((line = in.readLine()) != null) {
                 result += line;
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally{
-            try{
-                if(null != out){
+        } finally {
+            try {
+                if (null != out) {
                     out.close();
                 }
-                if(null != in){
+                if (null != in) {
                     in.close();
                 }
-            }catch(IOException ex){
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }

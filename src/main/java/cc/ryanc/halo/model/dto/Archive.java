@@ -6,10 +6,12 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章归档
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/20
- * @version : 1.0
- * description : 文章归档数据
  */
 @Data
 public class Archive {

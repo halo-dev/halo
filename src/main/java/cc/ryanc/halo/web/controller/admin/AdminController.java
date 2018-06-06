@@ -39,8 +39,6 @@ import java.util.List;
 /**
  * @author : RYAN0UP
  * @date : 2017/12/5
- * @version : 1.0
- * description: 后台首页控制器
  */
 @Slf4j
 @Controller

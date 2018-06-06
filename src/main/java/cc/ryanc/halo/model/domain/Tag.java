@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章标签
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/12
- * @version : 1.0
  */
 @Data
 @Entity

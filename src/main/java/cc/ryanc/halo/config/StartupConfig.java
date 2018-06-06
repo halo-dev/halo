@@ -19,13 +19,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     应用启动的时候所执行的方法
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/22
- * @version : 1.0
  */
 @Slf4j
 @Configuration
-public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>{
+public class StartupConfig implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
     private OptionsService optionsService;
@@ -47,11 +50,11 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     /**
      * 加载主题设置
      */
-    private void loadActiveTheme(){
+    private void loadActiveTheme() {
         String themeValue = optionsService.findOneOption("theme");
-        if(StringUtils.isNotEmpty("themeValue") && !StringUtils.equals(themeValue,null)){
+        if (StringUtils.isNotEmpty("themeValue") && !StringUtils.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
-        }else{
+        } else {
             //以防万一
             BaseController.THEME = "anatole";
         }
@@ -60,9 +63,9 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     /**
      * 加载设置选项
      */
-    private void loadOptions(){
-        Map<String,String> options = optionsService.findAllOptions();
-        if(options!=null&&!options.isEmpty()){
+    private void loadOptions() {
+        Map<String, String> options = optionsService.findAllOptions();
+        if (options != null && !options.isEmpty()) {
             HaloConst.OPTIONS = options;
         }
     }
@@ -70,9 +73,9 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     /**
      * 加载所有文件
      */
-    private void loadFiles(){
+    private void loadFiles() {
         List<Attachment> attachments = attachmentService.findAllAttachments();
-        if(null!=attachments){
+        if (null != attachments) {
             HaloConst.ATTACHMENTS = attachments;
         }
     }
@@ -80,10 +83,10 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     /**
      * 加载所有主题
      */
-    private void loadThemes(){
+    private void loadThemes() {
         HaloConst.THEMES.clear();
         List<Theme> themes = HaloUtils.getThemes();
-        if(null!=themes){
+        if (null != themes) {
             HaloConst.THEMES = themes;
         }
     }

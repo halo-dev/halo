@@ -6,7 +6,6 @@ import java.util.Date;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 public interface UserService {

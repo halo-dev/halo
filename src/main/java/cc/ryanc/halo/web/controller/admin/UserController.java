@@ -15,8 +15,6 @@ import javax.servlet.http.HttpSession;
 /**
  * @author : RYAN0UP
  * @date : 2017/12/24
- * @version : 1.0
- * description: 用户控制
  */
 @Slf4j
 @Controller

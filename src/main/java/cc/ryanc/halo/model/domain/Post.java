@@ -10,8 +10,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章／页面
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 @Data
@@ -51,6 +54,7 @@ public class Post implements Serializable {
      * 文章内容 Markdown格式
      */
     @Lob
+    @JsonIgnore
     private String postContentMd;
 
     /**

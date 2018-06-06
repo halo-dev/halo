@@ -13,8 +13,6 @@ import javax.websocket.server.PathParam;
 /**
  * @author : RYAN0UP
  * @date : 2018/1/30
- * @version : 1.0
- * description :
  */
 @Slf4j
 @Controller

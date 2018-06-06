@@ -8,17 +8,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     公共常量
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/29
- * @version : 1.0
- * description: 常量
  */
 public class HaloConst {
 
     /**
      * 所有设置选项（key,value）
      */
-    public static Map<String,String> OPTIONS = new HashMap<>();
+    public static Map<String, String> OPTIONS = new HashMap<>();
 
     /**
      * 所有文件
@@ -35,7 +37,13 @@ public class HaloConst {
      */
     public static String USER_SESSION_KEY = "user_session";
 
+    /**
+     * Post类型：文章
+     */
     public static String POST_TYPE_POST = "post";
 
+    /**
+     * Post类型：页面
+     */
     public static String POST_TYPE_PAGE = "page";
 }

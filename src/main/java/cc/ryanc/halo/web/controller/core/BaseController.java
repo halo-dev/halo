@@ -3,8 +3,6 @@ package cc.ryanc.halo.web.controller.core;
 /**
  * @author : RYAN0UP
  * @date : 2017/12/15
- * @version : 1.0
- * description:
  */
 public abstract class BaseController {
 

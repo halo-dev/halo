@@ -10,8 +10,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * <pre>
+ *     附件
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/10
  */
 @Data

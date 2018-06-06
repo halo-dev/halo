@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -7,9 +8,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * <pre>
+ *     评论
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/22
- * @version : 1.0
  */
 @Data
 @Entity
@@ -28,7 +32,7 @@ public class Comment implements Serializable {
     /**
      * 评论文章
      */
-    @ManyToOne(targetEntity = Post.class,fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Post.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id")
     private Post post;
 
@@ -50,6 +54,7 @@ public class Comment implements Serializable {
     /**
      * 评论人的ip
      */
+    @JsonIgnore
     private String commentAuthorIp;
 
     /**
@@ -81,7 +86,7 @@ public class Comment implements Serializable {
     /**
      * 评论状态，0：正常，1：待审核，2：回收站
      */
-    private Integer commentStatus=1;
+    private Integer commentStatus = 1;
 
     /**
      * 是否是博主的评论 0:不是 1:是
