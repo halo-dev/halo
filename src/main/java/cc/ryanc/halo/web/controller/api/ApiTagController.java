@@ -43,7 +43,7 @@ public class ApiTagController {
      * @param tagUrl tagUrl
      * @return JsonResult
      */
-    @GetMapping(value = "/${tagUrl}")
+    @GetMapping(value = "/{tagUrl}")
     public JsonResult tags(@PathVariable("tagUrl") String tagUrl){
         Tag tag = tagService.findByTagUrl(tagUrl);
         if(null!=tag){
