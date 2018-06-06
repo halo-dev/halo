@@ -4,11 +4,14 @@ import cc.ryanc.halo.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
+ * <pre>
+ *     用户持久层
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/11/14
- * @version : 1.0
  */
-public interface UserRepository extends JpaRepository<User,Long>{
+public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * 根据用户名和密码查询
@@ -23,17 +26,17 @@ public interface UserRepository extends JpaRepository<User,Long>{
      * 根据邮箱和密码查询
      *
      * @param userEmail userEmail
-     * @param userPass userPass
+     * @param userPass  userPass
      * @return list
      */
-    User findByUserEmailAndUserPass(String userEmail,String userPass);
+    User findByUserEmailAndUserPass(String userEmail, String userPass);
 
     /**
      * 根据用户编号和密码查询
      *
-     * @param userId userId
+     * @param userId   userId
      * @param userPass userpass
      * @return User
      */
-    User findByUserIdAndUserPass(Long userId,String userPass);
+    User findByUserIdAndUserPass(Long userId, String userPass);
 }

@@ -3,8 +3,11 @@ package cc.ryanc.halo.model.dto;
 import lombok.Data;
 
 /**
+ * <pre>
+ *     Json格式
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/5/24
  */
 @Data
@@ -29,7 +32,7 @@ public class JsonResult {
      * 不返回数据的构造方法
      *
      * @param code 状态码
-     * @param msg 信息
+     * @param msg  信息
      */
     public JsonResult(Integer code, String msg) {
         this.code = code;
@@ -39,8 +42,8 @@ public class JsonResult {
     /**
      * 返回数据的构造方法
      *
-     * @param code 状态码
-     * @param msg 信息
+     * @param code   状态码
+     * @param msg    信息
      * @param result 数据
      */
     public JsonResult(Integer code, String msg, Object result) {
@@ -52,7 +55,7 @@ public class JsonResult {
     /**
      * 返回状态码和数据
      *
-     * @param code 状态码
+     * @param code   状态码
      * @param result 数据
      */
     public JsonResult(Integer code, Object result) {

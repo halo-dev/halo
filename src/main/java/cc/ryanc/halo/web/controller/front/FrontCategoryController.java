@@ -22,7 +22,6 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Controller
@@ -35,9 +34,9 @@ public class FrontCategoryController extends BaseController {
     @Autowired
     private PostService postService;
 
-    public String categories(Model model){
+    public String categories(Model model) {
         List<Category> categories = categoryService.findAllCategories();
-        model.addAttribute("categories",categories);
+        model.addAttribute("categories", categories);
         return this.render("categories");
     }
 
@@ -51,34 +50,34 @@ public class FrontCategoryController extends BaseController {
     @GetMapping(value = "{cateUrl}")
     public String categories(Model model,
                              @PathVariable("cateUrl") String cateUrl) {
-        return this.categories(model,cateUrl,1);
+        return this.categories(model, cateUrl, 1);
     }
 
     /**
      * 根据分类目录查询所有文章 分页
      *
-     * @param model model
+     * @param model   model
      * @param cateUrl 分类目录路径
-     * @param page 页码
+     * @param page    页码
      * @return string
      */
     @GetMapping("{cateUrl}/page/{page}")
     public String categories(Model model,
                              @PathVariable("cateUrl") String cateUrl,
-                             @PathVariable("page") Integer page){
+                             @PathVariable("page") Integer page) {
         Category category = categoryService.findByCateUrl(cateUrl);
-        if(null==category){
+        if (null == category) {
             return this.renderNotFound();
         }
-        Sort sort = new Sort(Sort.Direction.DESC,"postDate");
+        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;
-        if(!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))){
+        if (!StringUtils.isBlank(HaloConst.OPTIONS.get("index_posts"))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
-        Pageable pageable = PageRequest.of(page-1,size,sort);
-        Page<Post> posts = postService.findPostByCategories(category,pageable);
-        model.addAttribute("posts",posts);
-        model.addAttribute("category",category);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Page<Post> posts = postService.findPostByCategories(category, pageable);
+        model.addAttribute("posts", posts);
+        model.addAttribute("category", category);
         return this.render("category");
     }
 }

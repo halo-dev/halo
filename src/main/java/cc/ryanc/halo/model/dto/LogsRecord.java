@@ -1,8 +1,11 @@
 package cc.ryanc.halo.model.dto;
 
 /**
+ * <pre>
+ *     日志常量
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/19
  */
 public interface LogsRecord {

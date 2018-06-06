@@ -9,8 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章分类
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/30
  */
 @Data

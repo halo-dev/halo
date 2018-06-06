@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Controller

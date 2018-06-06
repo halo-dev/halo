@@ -9,7 +9,6 @@ import java.util.Optional;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/19
  */
 public interface LogsService {

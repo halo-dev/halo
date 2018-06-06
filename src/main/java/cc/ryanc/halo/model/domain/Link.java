@@ -9,14 +9,17 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
+ * <pre>
+ *     友情链接
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/11/14
- * @version : 1.0
  */
 @Data
 @Entity
 @Table(name = "halo_link")
-public class Link implements Serializable{
+public class Link implements Serializable {
 
     private static final long serialVersionUID = 5441686055841177588L;
 

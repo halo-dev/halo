@@ -23,7 +23,6 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Slf4j
@@ -68,7 +67,7 @@ public class FrontIndexController extends BaseController {
         //所有文章数据，分页
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
-        if(null==posts){
+        if (null == posts) {
             return this.renderNotFound();
         }
         model.addAttribute("posts", posts);
@@ -102,13 +101,13 @@ public class FrontIndexController extends BaseController {
      * 搜索文章
      *
      * @param keyword keyword
-     * @param model model
+     * @param model   model
      * @return 模板路径/themes/{theme}/index
      */
     @GetMapping(value = "search")
-    public String search(@PathParam("keyword") String keyword,Model model){
-        Page<Post> posts = postService.searchByKeywords(keyword,null);
-        model.addAttribute("posts",posts);
+    public String search(@PathParam("keyword") String keyword, Model model) {
+        Page<Post> posts = postService.searchByKeywords(keyword, null);
+        model.addAttribute("posts", posts);
         return this.render("index");
     }
 }

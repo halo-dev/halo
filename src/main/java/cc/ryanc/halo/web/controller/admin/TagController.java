@@ -13,8 +13,6 @@ import javax.websocket.server.PathParam;
 /**
  * @author : RYAN0UP
  * @date : 2017/12/10
- * @version : 1.0
- * description: 标签控制器
  */
 @Slf4j
 @Controller

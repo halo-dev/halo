@@ -23,7 +23,6 @@ import java.util.List;
 
 /**
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/4/26
  */
 @Slf4j

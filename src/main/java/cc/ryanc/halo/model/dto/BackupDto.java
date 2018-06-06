@@ -5,8 +5,11 @@ import lombok.Data;
 import java.util.Date;
 
 /**
+ * <pre>
+ *     备份信息
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/6/4
  */
 @Data

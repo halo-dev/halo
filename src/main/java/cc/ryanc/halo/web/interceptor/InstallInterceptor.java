@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author : RYAN0UP
  * @date : 2018/1/28
- * @version : 1.0
- * description : 安装拦截器
  */
 @Component
 public class InstallInterceptor implements HandlerInterceptor {

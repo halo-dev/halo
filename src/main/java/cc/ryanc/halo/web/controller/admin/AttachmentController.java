@@ -35,8 +35,6 @@ import java.util.*;
 /**
  * @author : RYAN0UP
  * @date : 2017/12/19
- * @version : 1.0
- * description: 附件
  */
 @Slf4j
 @Controller

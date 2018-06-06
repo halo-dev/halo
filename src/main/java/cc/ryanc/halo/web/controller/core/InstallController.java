@@ -24,8 +24,6 @@ import java.util.List;
 /**
  * @author : RYAN0UP
  * @date : 2018/1/28
- * @version : 1.0
- * description : 安装控制器
  */
 @Slf4j
 @Controller
