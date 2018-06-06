@@ -53,7 +53,7 @@ public class ApiPostController {
      * @param postUrl 文章路径
      * @return JsonResult
      */
-    @GetMapping(value = "/posts/${postUrl}")
+    @GetMapping(value = "/posts/{postUrl}")
     public JsonResult posts(@PathVariable(value = "postUrl") String postUrl){
         Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
         if(null!=post){

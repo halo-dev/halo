@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Menu;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +26,7 @@ public class ApiMenuController {
      *
      * @return JsonResult
      */
+    @GetMapping
     public JsonResult menus(){
         List<Menu> menus = menuService.findAllMenus();
         if(null!=menus && menus.size()>0){

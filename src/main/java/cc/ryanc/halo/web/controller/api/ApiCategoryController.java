@@ -40,7 +40,7 @@ public class ApiCategoryController {
      * @param cateUrl 分类路径
      * @return JsonResult
      */
-    @GetMapping(value = "/${cateUrl}")
+    @GetMapping(value = "/{cateUrl}")
     public JsonResult categories(@PathVariable("cateUrl") String cateUrl){
         Category category = categoryService.findByCateUrl(cateUrl);
         if(null!=category){
