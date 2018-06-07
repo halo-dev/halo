@@ -32,7 +32,7 @@ public class ApiPostController {
      * @param page 页码
      * @return JsonResult
      */
-    @GetMapping(value = "/posts/{page}")
+    @GetMapping(value = "/page/{page}")
     public JsonResult posts(@PathVariable(value = "page") Integer page){
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;
@@ -53,7 +53,7 @@ public class ApiPostController {
      * @param postUrl 文章路径
      * @return JsonResult
      */
-    @GetMapping(value = "/posts/{postUrl}")
+    @GetMapping(value = "/{postUrl}")
     public JsonResult posts(@PathVariable(value = "postUrl") String postUrl){
         Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
         if(null!=post){
