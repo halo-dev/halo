@@ -22,6 +22,7 @@
         padding: 10px;
         overflow: hidden;
         position: relative;
+        margin-left: 58px;
     }
 
     input, textarea, button {
@@ -172,6 +173,22 @@
         font-size: 12px;
         color: #555;
     }
+    .comment-avatar{
+        position: relative;
+        float: left;
+    }
+    .comment-avatar img{
+        border-radius: 100%;
+        -webkit-transition: 0.4s;
+        -webkit-transition: -webkit-transform 0.4s ease-out;
+        transition: transform 0.4s ease-out;
+        -moz-transition: -moz-transform 0.4s ease-out;
+        cursor: pointer;
+    }
+
+    .comment-avatar img:hover{
+        transform: rotate(360deg);
+    }
 
     .native-nav{
         padding: 10px 0;
@@ -193,12 +210,15 @@
     }
 </style>
 <div class="native-comment">
+    <div class="comment-avatar">
+        <img src="//www.gravatar.com/avatar/none?s=256&d=${options.native_comment_avatar?default('mm')}" height="48" width="48" class="comment-author-avatar">
+    </div>
     <div class="native-wrap">
         <div class="comment-header">
             <input type="hidden" name="postId" value="${post.postId?c}">
             <input type="hidden" name="commentParent" id="commentParent" value="0">
             <input type="text" class="comment-input comment-input-who" name="commentAuthor" id="commentAuthor" placeholder="昵称(必填)">
-            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" id="commentAuthorEmail" placeholder="邮箱(选填)">
+            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" id="commentAuthorEmail" onblur="loadAvatar()" placeholder="邮箱(选填)">
             <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" id="commentAuthorUrl" placeholder="网址(选填)">
         </div>
         <div class="comment-content">
@@ -258,6 +278,7 @@
         $("#commentAuthor").val(localStorage.getItem("author"));
         $("#commentAuthorEmail").val(localStorage.getItem("email"));
         $("#commentAuthorUrl").val(localStorage.getItem("url"));
+        loadAvatar();
     });
     $('#btn-push').click(function () {
         var author = $("#commentAuthor");
@@ -310,6 +331,13 @@
         $('#commentContent').val("@"+commentParentAuthor+": ");
         $('#commentContent').focus();
     });
+    function loadAvatar() {
+        alert("加载头像")
+        $(".comment-author-avatar").attr("src","//www.gravatar.com/avatar/"+md5(localStorage.getItem("email"))+"?s=256&d=${options.native_comment_avatar?default('mm')}");
+        if($('input[name=commentAuthorEmail]').val()!='' && $('input[name=commentAuthorEmail]').val()!=null){
+            $(".comment-author-avatar").attr("src","//www.gravatar.com/avatar/"+md5($('input[name=commentAuthorEmail]').val())+"?s=256&d=${options.native_comment_avatar?default('mm')}");
+        }
+    }
     var parser = new UAParser();
     function show_ua(string){
         parser.setUA(string);
