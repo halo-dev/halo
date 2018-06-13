@@ -56,7 +56,7 @@ Let's start: http://localhost:8090
 
 [下载](https://github.com/ruibaby/halo/releases)最新的压缩包，解压之后进入根目录执行`java -jar halo-xxx.jar`即可运行。
 
-> 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run)。
+> 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run-with-git-maven)。
 
 ## Docs 文档
 
