@@ -500,6 +500,7 @@ public class HaloUtils {
         return null;
     }
 
+
     /**
      * 百度主动推送
      *
@@ -553,4 +554,5 @@ public class HaloUtils {
         }
         return result;
     }
+
 }

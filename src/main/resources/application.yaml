@@ -1,5 +1,11 @@
 server:
   port: 8090
+  use-forward-headers: true
+  undertow:
+    io-threads : 2
+    worker-threads: 36
+    buffer-size: 1024
+    directBuffers: true
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
