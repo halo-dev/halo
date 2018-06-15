@@ -52,7 +52,7 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
      */
     private void loadActiveTheme() {
         String themeValue = optionsService.findOneOption("theme");
-        if (StringUtils.isNotEmpty("themeValue") && !StringUtils.equals(themeValue, null)) {
+        if (StringUtils.isNotEmpty(themeValue) && !StringUtils.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
         } else {
             //以防万一

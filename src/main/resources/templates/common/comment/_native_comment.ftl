@@ -108,6 +108,15 @@
         float: left;
         border-radius: 50%;
         margin-right: .7rem;
+        cursor: pointer;
+        -webkit-transition: 0.4s;
+        -webkit-transition: -webkit-transform 0.4s ease-out;
+        transition: transform 0.4s ease-out;
+        -moz-transition: -moz-transform 0.4s ease-out;
+    }
+
+    .native-list-one-img:hover{
+        transform: rotate(360deg);
     }
 
     .native-list .native-list-one section {
