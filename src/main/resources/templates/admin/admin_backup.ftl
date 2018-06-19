@@ -49,7 +49,7 @@
                                 </thead>
                                 <tbody>
                                     <#if backups?size gt 0>
-                                        <#list backups as backup>
+                                        <#list backups?sort_by("createAt")?reverse as backup>
                                             <tr>
                                                 <td>${backup.fileName}</td>
                                                 <td>${backup.createAt?string("yyyy-MM-dd HH:mm")}</td>

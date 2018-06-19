@@ -25,15 +25,15 @@
         </section>
         <section class="content container-fluid">
             <div id='write' class='is-mac'>
-                <blockquote>
-                    <p>一款使用Java开发的简约，&quot;轻&quot;，快的博客系统。</p>
+                <blockquote style="font-size: 14px;">
+                    <p>Halo可能是最好的Java博客系统😉</p>
                     <p>非常感谢你使用Halo进行创作。</p>
                 </blockquote>
                 <p>如果在使用过程中出现bug或者无法解决的问题，希望各位在使用过程中及时向我反馈：</p>
-                <p>Github issues ：<a href='https://github.com/ruibaby/halo' target="_blank">https://github.com/ruibaby/halo</a></p>
+                <p>Github issues ：<a href='https://github.com/ruibaby/halo/issues' target="_blank">https://github.com/ruibaby/halo/issues</a></p>
                 <p>Blog : <a href="https://ryanc.cc" target="_blank">https://ryanc.cc</a> </p>
                 <p>Email : <a href='mailto:i@ryanc.cc'>i@ryanc.cc</a></p>
-                <p>Telegram : <a href="https://telegram.me/RYAN0UP" target="_blank">RYAN0UP</a></p>
+                <p>Telegram : <a href="https://t.me/ruibaby" target="_blank">ruibaby</a></p>
                 <p>QQ : 709831589</p>
             </div>
         </section>
