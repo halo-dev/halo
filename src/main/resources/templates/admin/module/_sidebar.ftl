@@ -20,7 +20,7 @@
         </form>
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">HEADER</li>
-            <li class="">
+            <li>
                 <a data-pjax="true" href="/admin">
                     <i class="fa fa-dashboard"></i>
                     <span>仪表盘</span>
@@ -33,7 +33,7 @@
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                 </a>
                 <ul class="treeview-menu" style="">
-                    <li class=""><a data-pjax="true" href="/admin/posts"><i class="fa fa-circle-o"></i>所有文章</a></li>
+                    <li><a data-pjax="true" href="/admin/posts"><i class="fa fa-circle-o"></i>所有文章</a></li>
                     <li><a data-pjax="false" href="/admin/posts/new"><i class="fa fa-circle-o"></i>写文章</a></li>
                     <li><a data-pjax="true" href="/admin/category"><i class="fa fa-circle-o"></i>分类目录</a></li>
                     <li><a data-pjax="true" href="/admin/tag"><i class="fa fa-circle-o"></i>标签</a></li>
