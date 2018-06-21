@@ -41,6 +41,9 @@ public class ArticleTagDirective implements TemplateDirectiveModel {
                 case "archivesLess":
                     environment.setVariable("archivesLess", builder.build().wrap(postService.findPostGroupByYear()));
                     break;
+                case "hotPosts":
+                    environment.setVariable("hotPosts", builder.build().wrap(postService.hotPosts()));
+                    break;
                 default:
                     break;
             }

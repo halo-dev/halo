@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @author : RYAN0UP
  * @date : 2018/6/6
@@ -45,6 +47,16 @@ public class ApiPostController {
             return new JsonResult(200,"empty");
         }
         return new JsonResult(200,"success",posts);
+    }
+
+    @GetMapping(value = "/hot")
+    public JsonResult hotPosts() {
+        List<Post> posts = postService.hotPosts();
+        if (null != posts && posts.size() > 0) {
+            return new JsonResult(200, "success", posts);
+        } else {
+            return new JsonResult(200, "empty");
+        }
     }
 
     /**

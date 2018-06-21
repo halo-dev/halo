@@ -3,7 +3,7 @@
 <style type="text/css" rel="stylesheet">
     ${options.changyan_css?if_exists}
 </style>
-<div id="SOHUCS" sid="请将此处替换为配置SourceID的语句" ></div>
+<div id="SOHUCS" sid="${post.postId?c}" ></div>
 <script type="text/javascript">
     (function(){
         var appid = '${options.changyan_appid?if_exists}';

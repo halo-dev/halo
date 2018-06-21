@@ -180,4 +180,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      */
     @Query(value = "select * from halo_post where post_status = 0 and post_type='post' and post_title like '%=:keyword%' or post_content like '%=:keyword%'", nativeQuery = true)
     Page<Post> findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(String keyword, Pageable pageable);
+
+    /**
+     * 按热度从大到小排序
+     *
+     * @param postStatus 文章状态
+     * @return List<Post>
+     */
+    List<Post> findPostsByPostTypeOrderByPostViewsDesc(String postStatus);
 }
