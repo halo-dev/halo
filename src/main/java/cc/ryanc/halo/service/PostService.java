@@ -203,6 +203,13 @@ public interface PostService {
     Page<Post> searchByKeywords(String keyword,Pageable pageable);
 
     /**
+     * 热门文章
+     *
+     * @return List<Post>
+     */
+    List<Post> hotPosts();
+
+    /**
      * 生成rss
      *
      * @param posts posts

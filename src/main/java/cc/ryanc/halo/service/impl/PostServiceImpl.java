@@ -316,6 +316,16 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * 热门文章
+     *
+     * @return List<Post>
+     */
+    @Override
+    public List<Post> hotPosts() {
+        return postRepository.findPostsByPostTypeOrderByPostViewsDesc(HaloConst.POST_TYPE_POST);
+    }
+
+    /**
      * 生成rss
      *
      * @param posts posts

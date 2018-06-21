@@ -31,7 +31,6 @@ function initMenu() {
     if(pathName=="/admin/menus/edit"){
         pathName="/admin/menus";
     }
-    console.log(pathName);
     $(".sidebar-menu").children().each(function () {
         var li = $(this);
         li.find('a').each(function () {

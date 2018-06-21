@@ -77,6 +77,9 @@
                                                         <#break>
                                                         <#case "gallery.ftl">
                                                         图库页面
+                                                        <#case "module/options.ftl">
+                                                        设置选项
+                                                        <#break >
                                                         <#break>
                                                     </#switch>
                                                 </td>

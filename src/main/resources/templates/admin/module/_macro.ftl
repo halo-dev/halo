@@ -20,6 +20,7 @@
     <![endif]-->
     <script src="/static/plugins/jquery/jquery.min.js"></script>
     <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme?default('skin-blue')} ${options.admin_layout?default('')} ${options.sidebar_style?default('')}">
 <#if options.admin_loading?default("false") == "true">
@@ -47,6 +48,9 @@
 <script src="/static/js/app.js"></script>
 <@compress single_line=true>
 <script>
+    Pace.options = {
+        restartOnRequestAfter: false
+    };
     $(document).ajaxStart(function() {Pace.restart();});
     <#if options.admin_pjax?default("true") == "true">
         $(document).pjax('a[data-pjax=true]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});

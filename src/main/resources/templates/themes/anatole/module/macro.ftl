@@ -15,8 +15,8 @@
     <meta name="description" content="${description?default("Anatole")}" />
     <link rel="shortcut icon" href="${options.anatole_style_favicon?default("/anatole/source/images/favicon.png")}" type="image/x-icon" />
     <link href="/anatole/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/anatole/source/css/blog_basic.css?version=88107691fe">
-    <link href="/anatole/source/css/style.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" href="/anatole/source/css/blog_basic.min.css?version=88107691fe">
+    <link href="/anatole/source/css/style.min.css" type="text/css" rel="stylesheet" />
     <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/feed.xml">
     <#if options.anatole_style_post_title_lower?default("true") == "false">
     <style>
@@ -29,9 +29,9 @@
 <body>
 </#macro>
 <#macro footer>
-<script type="text/javascript" src="/anatole/source/js/jquery.js"></script>
+<script type="text/javascript" src="/anatole/source/js/jquery.min.js"></script>
 <script type="text/javascript" src="/anatole/source/js/jquery-migrate-1.2.1.min.js"></script>
-<script type="text/javascript" src="/anatole/source/js/jquery.appear.js"></script>
+<script type="text/javascript" src="/anatole/source/js/jquery.appear.min.js"></script>
 <script type="text/javascript">
     var url = location.href;
     var urlstatus = false;
