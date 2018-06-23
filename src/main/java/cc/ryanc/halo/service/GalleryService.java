@@ -25,6 +25,7 @@ public interface GalleryService {
      * 根据编号删除图片
      *
      * @param galleryId galleryId
+     * @return Gallery
      */
     Gallery removeByGalleryId(Long galleryId);
 
@@ -40,14 +41,14 @@ public interface GalleryService {
      * 查询所有图片 分页
      *
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Gallery> findAllGalleries(Pageable pageable);
 
     /**
      * 查询所有图片 不分页
      *
-     * @return list
+     * @return List
      */
     List<Gallery> findAllGalleries();
 
@@ -55,7 +56,7 @@ public interface GalleryService {
      * 根据编号查询图片信息
      *
      * @param galleryId galleryId
-     * @return gallery
+     * @return Optional
      */
     Optional<Gallery> findByGalleryId(Long galleryId);
 }

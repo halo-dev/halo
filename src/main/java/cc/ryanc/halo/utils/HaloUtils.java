@@ -89,7 +89,7 @@ public class HaloUtils {
      * 获取所有附件
      *
      * @param filePath filePath
-     * @return Map
+     * @return ArrayList
      */
     public static ArrayList<String> getFiles(String filePath) {
         try {
@@ -117,7 +117,7 @@ public class HaloUtils {
      * 获取备份文件信息
      *
      * @param dir dir
-     * @return List<BackupDto></>
+     * @return List
      */
     public static List<BackupDto> getBackUps(String dir) {
         String srcPathStr = System.getProperties().getProperty("user.home") + "/halo/backup/" + dir;
@@ -149,7 +149,7 @@ public class HaloUtils {
      * 转换文件大小
      *
      * @param size size
-     * @return string
+     * @return String
      */
     public static String parseSize(long size) {
         if (size < 1024) {
@@ -196,7 +196,7 @@ public class HaloUtils {
     /**
      * 获取所有主题
      *
-     * @return list
+     * @return List
      */
     public static List<Theme> getThemes() {
         List<Theme> themes = new ArrayList<>();
@@ -235,7 +235,7 @@ public class HaloUtils {
      * 获取主题下的模板文件名
      *
      * @param theme theme
-     * @return list
+     * @return List
      */
     public static List<String> getTplName(String theme) {
         List<String> tpls = new ArrayList<>();
@@ -271,7 +271,7 @@ public class HaloUtils {
      * 获取文件内容
      *
      * @param filePath filePath
-     * @return string
+     * @return String
      */
     public static String getFileContent(String filePath) {
         File file = new File(filePath);
@@ -384,7 +384,7 @@ public class HaloUtils {
      * 生成rss
      *
      * @param posts posts
-     * @return string
+     * @return String
      * @throws FeedException
      */
     public static String getRss(List<Post> posts) throws FeedException {
@@ -435,7 +435,7 @@ public class HaloUtils {
      * 获取sitemap
      *
      * @param posts posts
-     * @return string
+     * @return String
      */
     public static String getSiteMap(List<Post> posts) {
         String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
@@ -466,7 +466,7 @@ public class HaloUtils {
      * 访问路径获取json数据
      *
      * @param enterUrl 路径
-     * @return string
+     * @return String
      */
     public static String getHttpResponse(String enterUrl) {
         BufferedReader in = null;
@@ -507,7 +507,7 @@ public class HaloUtils {
      * @param blogUrl 博客地址
      * @param token   百度推送token
      * @param urls    文章路径
-     * @return string
+     * @return String
      */
     public static String baiduPost(String blogUrl, String token, String urls) {
         String url = "http://data.zz.baidu.com/urls?site=" + blogUrl + "&token=" + token;

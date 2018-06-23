@@ -25,7 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     /**
      * 查询前五条文章
      *
-     * @return list
+     * @return List
      */
     @Query(value = "SELECT * FROM halo_post where post_type='post' ORDER BY post_date DESC LIMIT 5", nativeQuery = true)
     List<Post> findTopFive();
@@ -34,7 +34,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * 查询所有文章 根据文章类型
      *
      * @param postType post or page
-     * @return List<Post></>
+     * @return List
      */
     List<Post> findPostsByPostType(String postType);
 
@@ -43,7 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @param postType post or page
      * @param pageable 分页信息
-     * @return Page<Post></>
+     * @return Page
      */
     Page<Post> findPostsByPostType(String postType, Pageable pageable);
 
@@ -52,7 +52,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @param keyWord  keyword
      * @param pageable pageable
-     * @return list
+     * @return List
      */
     List<Post> findByPostTitleLike(String keyWord, Pageable pageable);
 
@@ -62,7 +62,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param status   0，1，2
      * @param postType post or page
      * @param pageable 分页信息
-     * @return Page<Post></>
+     * @return Page
      */
     Page<Post> findPostsByPostStatusAndPostType(Integer status, String postType, Pageable pageable);
 
@@ -71,7 +71,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @param status   0,1,2
      * @param postType post or page
-     * @return List<Post></>
+     * @return List
      */
     List<Post> findPostsByPostStatusAndPostType(Integer status, String postType);
 
@@ -90,7 +90,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param postDate   发布时间
      * @param postStatus 0，1，2
      * @param postType   post or page
-     * @return List<Post></>
+     * @return List
      */
     List<Post> findByPostDateAfterAndPostStatusAndPostTypeOrderByPostDateDesc(Date postDate, Integer postStatus, String postType);
 
@@ -101,14 +101,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param postDate   发布时间
      * @param postStatus 0，1，2
      * @param postType   post or page
-     * @return List<Post></>
+     * @return List
      */
     List<Post> findByPostDateBeforeAndPostStatusAndPostTypeOrderByPostDateAsc(Date postDate, Integer postStatus, String postType);
 
     /**
      * 查询文章归档信息 根据年份和月份
      *
-     * @return List<Object [ ]></>
+     * @return List
      */
     @Query(value = "select year(post_date) as year,month(post_date) as month,count(*) as count from halo_post where post_status=0 and post_type='post' group by year(post_date),month(post_date) order by year desc,month desc", nativeQuery = true)
     List<Object[]> findPostGroupByYearAndMonth();
@@ -116,7 +116,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     /**
      * 查询文章归档信息 根据年份
      *
-     * @return List<Object   [   ]></>
+     * @return List
      */
     @Query(value = "select year(post_date) as year,count(*) as count from halo_post where post_status=0 and post_type='post' group by year(post_date) order by year desc", nativeQuery = true)
     List<Object[]> findPostGroupByYear();
@@ -126,7 +126,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @param year  year
      * @param month month
-     * @return List<Post></>
+     * @return List
      */
     @Query(value = "select *,year(post_date) as year,month(post_date) as month from halo_post where post_status=0 and post_type='post' and year(post_date)=:year and month(post_date)=:month order by post_date desc", nativeQuery = true)
     List<Post> findPostByYearAndMonth(@Param("year") String year, @Param("month") String month);
@@ -135,7 +135,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * 根据年份查询文章
      *
      * @param year year
-     * @return List<Post></>
+     * @return List
      */
     @Query(value = "select *,year(post_date) as year from halo_post where post_status=0 and post_type='post' and year(post_date)=:year order by post_date desc", nativeQuery = true)
     List<Post> findPostByYear(@Param("year") String year);
@@ -146,7 +146,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param year     year
      * @param month    month
      * @param pageable pageable
-     * @return Page<Post></>
+     * @return Page
      */
     @Query(value = "select * from halo_post where post_status=0 and post_type='post' and year(post_date)=:year and month(post_date)=:month order by post_date desc", countQuery = "select count(*) from halo_post where post_status=0 and year(post_date)=:year and month(post_date)=:month", nativeQuery = true)
     Page<Post> findPostByYearAndMonth(@Param("year") String year, @Param("month") String month, Pageable pageable);
@@ -156,27 +156,33 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @param category category
      * @param pageable pageable
-     * @return Page<Post></>
+     * @return Page
      */
     Page<Post> findPostByCategories(Category category, Pageable pageable);
 
     /**
-     * 根据标签查询文章
+     * 根据标签查询文章，分页
      *
      * @param tag      tag
      * @param pageable pageable
-     * @return Page<Post></>
+     * @return Page
      */
     Page<Post> findPostsByTags(Tag tag, Pageable pageable);
 
     /**
+     * 根据标签查询文章
+     *
+     * @param tag tag
+     * @return List
+     */
+    List<Post> findPostsByTags(Tag tag);
+
+    /**
      * 模糊查询文章
      *
-     * @param postType   文章类型，post or page
-     * @param postStatus 0，1，2
      * @param keyword    关键词
      * @param pageable   分页信息
-     * @return Page<Post></>
+     * @return Page
      */
     @Query(value = "select * from halo_post where post_status = 0 and post_type='post' and post_title like '%=:keyword%' or post_content like '%=:keyword%'", nativeQuery = true)
     Page<Post> findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(String keyword, Pageable pageable);

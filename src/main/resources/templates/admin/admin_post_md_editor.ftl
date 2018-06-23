@@ -202,7 +202,7 @@
                     scrollbar: false
                 });
             }
-            
+
             function openAttachCopy() {
                 layer.open({
                     type: 2,
@@ -281,7 +281,8 @@
                 });
             }
             $('#btn_input_postUrl').click(function () {
-                $('#postUrl').html("<input type='text' id='newPostUrl' onblur='urlOnBlurAuto()' value=''>");
+                var postUrl = $("#postUrl").html();
+                $('#postUrl').html("<input type='text' id='newPostUrl' onblur='urlOnBlurAuto()' value='"+postUrl+"'>");
                 $(this).hide();
                 $('#btn_change_postUrl').show();
             });

@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     /**
      * 查询所有分类目录
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Category> findAllCategories() {
@@ -69,13 +69,12 @@ public class CategoryServiceImpl implements CategoryService {
      * 根据分类目录路径查询，用于验证是否已经存在该路径
      *
      * @param cateUrl cateUrl
-     * @return category
+     * @return Category
      */
     @Override
     public Category findByCateUrl(String cateUrl) {
         return categoryRepository.findCategoryByCateUrl(cateUrl);
     }
-
 
     @Override
     public List<Category> strListToCateList(List<String> strings) {

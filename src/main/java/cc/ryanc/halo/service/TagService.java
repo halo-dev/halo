@@ -30,7 +30,7 @@ public interface TagService {
     /**
      * 获取所有标签
      *
-     * @return list
+     * @return List
      */
     List<Tag> findAllTags();
 
@@ -38,7 +38,7 @@ public interface TagService {
      * 根据编号查询标签
      *
      * @param tagId tagId
-     * @return Link
+     * @return Optional
      */
     Optional<Tag> findByTagId(Long tagId);
 
@@ -46,7 +46,7 @@ public interface TagService {
      * 根据标签路径查询
      *
      * @param tagUrl tagUrl
-     * @return tag
+     * @return Tag
      */
     Tag findByTagUrl(String tagUrl);
 
@@ -54,7 +54,7 @@ public interface TagService {
      * 根据标签名称查询
      *
      * @param tagName tagName
-     * @return tag
+     * @return Tag
      */
     Tag findTagByTagName(String tagName);
 
@@ -62,7 +62,7 @@ public interface TagService {
      * 转换标签字符串为实体集合
      *
      * @param tagList tagList
-     * @return list
+     * @return List
      */
     List<Tag> strListToTagList(String tagList);
 }

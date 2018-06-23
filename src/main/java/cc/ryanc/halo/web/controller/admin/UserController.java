@@ -42,7 +42,7 @@ public class UserController {
      *
      * @param user    user
      * @param session session
-     * @return true：修改成功，false：修改失败
+     * @return JsonResult
      */
     @PostMapping(value = "save")
     @ResponseBody
@@ -69,7 +69,7 @@ public class UserController {
      * @param newPass    新密码
      * @param userId     用户编号
      * @param session    session
-     * @return true：修改密码成功，false：修改密码失败
+     * @return JsonResult
      */
     @PostMapping(value = "changePass")
     @ResponseBody

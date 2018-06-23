@@ -91,7 +91,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param postType post or page
      * @param pageable 分页信息
-     * @return Page<Post></>
+     * @return Page
      */
     @Override
     public Page<Post> findAllPosts(String postType, Pageable pageable) {
@@ -102,7 +102,7 @@ public class PostServiceImpl implements PostService {
      * 获取文章列表 不分页
      *
      * @param postType post or page
-     * @return List<Post></>
+     * @return List
      */
     @Override
     public List<Post> findAllPosts(String postType) {
@@ -114,7 +114,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param keyWord  keyword
      * @param pageable pageable
-     * @return list
+     * @return List
      */
     @Override
     public List<Post> searchPosts(String keyWord, Pageable pageable) {
@@ -127,7 +127,7 @@ public class PostServiceImpl implements PostService {
      * @param status   0，1，2
      * @param postType post or page
      * @param pageable 分页信息
-     * @return Page<Post></>
+     * @return Page
      */
     @Override
     public Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable) {
@@ -139,7 +139,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param status   0，1，2
      * @param postType post or page
-     * @return List<Post></>
+     * @return List
      */
     @Override
     public List<Post> findPostByStatus(Integer status, String postType) {
@@ -150,7 +150,7 @@ public class PostServiceImpl implements PostService {
      * 根据编号查询文章
      *
      * @param postId postId
-     * @return post
+     * @return Optional
      */
     @Override
     public Optional<Post> findByPostId(Long postId) {
@@ -172,7 +172,7 @@ public class PostServiceImpl implements PostService {
     /**
      * 查询最新的5篇文章
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Post> findPostLatest() {
@@ -194,7 +194,7 @@ public class PostServiceImpl implements PostService {
      * 查询Id之前的文章
      *
      * @param postDate 发布时间
-     * @return list
+     * @return List
      */
     @Override
     public List<Post> findByPostDateBefore(Date postDate) {
@@ -226,7 +226,7 @@ public class PostServiceImpl implements PostService {
     /**
      * 查询归档信息 根据年份
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Archive> findPostGroupByYear() {
@@ -248,7 +248,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param year  year
      * @param month month
-     * @return list
+     * @return List
      */
     @Override
     public List<Post> findPostByYearAndMonth(String year, String month) {
@@ -259,7 +259,7 @@ public class PostServiceImpl implements PostService {
      * 根据年份查询文章
      *
      * @param year year
-     * @return list
+     * @return List
      */
     @Override
     public List<Post> findPostByYear(String year) {
@@ -272,7 +272,7 @@ public class PostServiceImpl implements PostService {
      * @param year     year year
      * @param month    month month
      * @param pageable pageable pageable
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable) {
@@ -284,7 +284,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param category category
      * @param pageable pageable
-     * @return Page<Post></>
+     * @return Page
      */
     @Override
     public Page<Post> findPostByCategories(Category category, Pageable pageable) {
@@ -296,7 +296,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param tag      tag
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
@@ -308,7 +308,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param keyword 关键词
      * @param pageable 分页信息
-     * @return List<Post></>
+     * @return Page
      */
     @Override
     public Page<Post> searchByKeywords(String keyword,Pageable pageable) {
@@ -318,7 +318,7 @@ public class PostServiceImpl implements PostService {
     /**
      * 热门文章
      *
-     * @return List<Post>
+     * @return List
      */
     @Override
     public List<Post> hotPosts() {
@@ -326,10 +326,36 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * 当前文章的相似文章
+     *
+     * @param post post
+     * @return List
+     */
+    @Override
+    public List<Post> relatedPosts(Post post) {
+        //获取当前文章的所有标签
+        List<Tag> tags = post.getTags();
+        List<Post> tempPosts = new ArrayList<>();
+        for (Tag tag : tags) {
+            tempPosts.addAll(postRepository.findPostsByTags(tag));
+        }
+        //去掉当前的文章
+        tempPosts.remove(post);
+        //去掉重复的文章
+        List<Post> allPosts = new ArrayList<>();
+        for (int i = 0; i < tempPosts.size(); i++) {
+            if (!allPosts.contains(tempPosts.get(i))) {
+                allPosts.add(tempPosts.get(i));
+            }
+        }
+        return allPosts;
+    }
+
+    /**
      * 生成rss
      *
      * @param posts posts
-     * @return string
+     * @return String
      */
     @Override
     public String buildRss(List<Post> posts) {
@@ -346,7 +372,7 @@ public class PostServiceImpl implements PostService {
      * 生成sitemap
      *
      * @param posts posts
-     * @return string
+     * @return String
      */
     @Override
     public String buildSiteMap(List<Post> posts) {

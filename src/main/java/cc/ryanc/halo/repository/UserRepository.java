@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      *
      * @param userName userName
      * @param userPass userPass
-     * @return list
+     * @return User
      */
     User findByUserNameAndUserPass(String userName, String userPass);
 
@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      *
      * @param userEmail userEmail
      * @param userPass  userPass
-     * @return list
+     * @return User
      */
     User findByUserEmailAndUserPass(String userEmail, String userPass);
 

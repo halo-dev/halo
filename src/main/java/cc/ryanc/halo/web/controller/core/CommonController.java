@@ -23,7 +23,7 @@ public class CommonController implements ErrorController {
      * 渲染404，500
      *
      * @param request request
-     * @return string
+     * @return String
      */
     @GetMapping(value = ERROR_PATH)
     public String handleError(HttpServletRequest request) {
@@ -39,7 +39,7 @@ public class CommonController implements ErrorController {
      * 渲染404页面
      *
      * @param model model
-     * @return string
+     * @return String
      */
     @GetMapping(value = "/404")
     public String fourZeroFour(Model model) {
@@ -52,7 +52,7 @@ public class CommonController implements ErrorController {
      * 渲染500页面
      *
      * @param model model
-     * @return string
+     * @return String
      */
     @GetMapping(value = "/500")
     public String fiveZeroZero(Model model) {

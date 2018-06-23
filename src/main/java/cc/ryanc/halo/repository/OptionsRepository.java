@@ -17,7 +17,7 @@ public interface OptionsRepository extends JpaRepository<Options, Long> {
      * 根据key查询单个option
      *
      * @param key key
-     * @return String
+     * @return Options
      */
     Options findOptionsByOptionName(String key);
 }

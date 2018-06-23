@@ -157,6 +157,10 @@ public class PostController extends BaseController {
     public JsonResult pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         String msg = "发表成功";
+        //判断文章路径是否已经存在
+        if (null != postService.findByPostUrl(post.getPostUrl(), HaloConst.POST_TYPE_POST)) {
+            return new JsonResult(0, "该文章路径已存在！");
+        }
         try {
             //提取摘要
             int postSummary = 50;

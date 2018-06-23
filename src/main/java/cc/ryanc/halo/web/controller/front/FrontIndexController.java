@@ -78,7 +78,7 @@ public class FrontIndexController extends BaseController {
      * ajax分页
      *
      * @param page page 当前页码
-     * @return List<Post>集合</>
+     * @return List
      */
     @GetMapping(value = "next")
     @ResponseBody

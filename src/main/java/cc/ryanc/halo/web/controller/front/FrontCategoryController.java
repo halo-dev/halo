@@ -34,6 +34,12 @@ public class FrontCategoryController extends BaseController {
     @Autowired
     private PostService postService;
 
+    /**
+     * 分类列表页面
+     *
+     * @param model model
+     * @return String
+     */
     public String categories(Model model) {
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories", categories);
@@ -59,7 +65,7 @@ public class FrontCategoryController extends BaseController {
      * @param model   model
      * @param cateUrl 分类目录路径
      * @param page    页码
-     * @return string
+     * @return String
      */
     @GetMapping("{cateUrl}/page/{page}")
     public String categories(Model model,

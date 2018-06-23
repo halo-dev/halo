@@ -36,6 +36,7 @@ public class GalleryServiceImpl implements GalleryService {
      * 根据编号删除图片
      *
      * @param galleryId galleryId
+     * @return Gallery
      */
     @Override
     public Gallery removeByGalleryId(Long galleryId) {
@@ -59,7 +60,7 @@ public class GalleryServiceImpl implements GalleryService {
      * 查询所有图片 分页
      *
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Gallery> findAllGalleries(Pageable pageable) {
@@ -69,7 +70,7 @@ public class GalleryServiceImpl implements GalleryService {
     /**
      * 查询所有图片 不分页
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Gallery> findAllGalleries() {
@@ -80,7 +81,7 @@ public class GalleryServiceImpl implements GalleryService {
      * 根据编号查询图片信息
      *
      * @param galleryId galleryId
-     * @return gallery
+     * @return Optional
      */
     @Override
     public Optional<Gallery> findByGalleryId(Long galleryId) {

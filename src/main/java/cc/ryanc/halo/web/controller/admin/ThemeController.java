@@ -26,7 +26,6 @@ import javax.websocket.server.PathParam;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,7 +63,7 @@ public class ThemeController extends BaseController {
      *
      * @param siteTheme 主题名称
      * @param request   request
-     * @return true：激活成功，false：激活失败
+     * @return JsonResult
      */
     @GetMapping(value = "/set")
     @ResponseBody
@@ -91,7 +90,7 @@ public class ThemeController extends BaseController {
      * 上传主题
      *
      * @param file 文件
-     * @return boolean true：上传成功，false：上传失败
+     * @return JsonResult
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
@@ -193,7 +192,7 @@ public class ThemeController extends BaseController {
      *
      * @param tplName    模板名称
      * @param tplContent 模板内容
-     * @return boolean true：修改成功，false：修改失败
+     * @return JsonResult
      */
     @PostMapping(value = "/editor/save")
     @ResponseBody

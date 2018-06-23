@@ -22,7 +22,7 @@ public class MenuServiceImpl implements MenuService {
     /**
      * 查询所有菜单
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Menu> findAllMenus() {
@@ -44,7 +44,7 @@ public class MenuServiceImpl implements MenuService {
      * 删除菜单
      *
      * @param menuId menuId
-     * @return menu
+     * @return Menu
      */
     @Override
     public Menu removeByMenuId(Long menuId) {

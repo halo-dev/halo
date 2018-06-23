@@ -25,7 +25,7 @@ public interface CommentService {
      * 删除评论
      *
      * @param commentId commentId
-     * @return comment
+     * @return Optional
      */
     Optional<Comment> removeByCommentId(Long commentId);
 
@@ -34,7 +34,7 @@ public interface CommentService {
      *
      * @param status   status
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Comment> findAllComments(Integer status, Pageable pageable);
 
@@ -42,14 +42,14 @@ public interface CommentService {
      * 根据评论状态查询评论
      *
      * @param status 评论状态
-     * @return list
+     * @return List
      */
     List<Comment> findAllComments(Integer status);
 
     /**
      * 查询所有评论，不分页
      *
-     * @return list
+     * @return List
      */
     List<Comment> findAllComments();
 
@@ -58,7 +58,7 @@ public interface CommentService {
      *
      * @param commentId commentId
      * @param status    status
-     * @return comment
+     * @return Comment
      */
     Comment updateCommentStatus(Long commentId, Integer status);
 
@@ -66,7 +66,7 @@ public interface CommentService {
      * 根据评论编号查询评论
      *
      * @param commentId commentId
-     * @return comment
+     * @return Optional
      */
     Optional<Comment> findCommentById(Long commentId);
 
@@ -75,7 +75,7 @@ public interface CommentService {
      *
      * @param post     post
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Comment> findCommentsByPost(Post post, Pageable pageable);
 
@@ -85,14 +85,14 @@ public interface CommentService {
      * @param post     post
      * @param pageable pageable
      * @param status   status
-     * @return page
+     * @return Page
      */
     Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status);
 
     /**
      * 查询最新的前五条评论
      *
-     * @return list
+     * @return List
      */
     List<Comment> findCommentsLatest();
 }

@@ -76,7 +76,7 @@ public class OptionsServiceImpl implements OptionsService {
     /**
      * 获取设置选项
      *
-     * @return map
+     * @return Map
      */
     @Override
     public Map<String, String> findAllOptions() {
