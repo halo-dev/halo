@@ -166,6 +166,8 @@ public class AttachmentController {
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
                 attachment.setAttachCreated(DateUtil.date());
+                attachment.setAttachSize(HaloUtils.parseSize(new File(mediaPath,fileName).length()));
+                attachment.setAttachWh(HaloUtils.getImageWh(new File(mediaPath,fileName)));
                 attachmentService.saveByAttachment(attachment);
                 updateConst();
                 log.info("上传文件[" + fileName + "]到[" + mediaPath.getAbsolutePath() + "]成功");

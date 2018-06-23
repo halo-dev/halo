@@ -60,4 +60,14 @@ public class Attachment implements Serializable {
      * 上传时间
      */
     private Date attachCreated;
+
+    /**
+     * 附件大小
+     */
+    private String attachSize;
+
+    /**
+     * 附件长宽
+     */
+    private String attachWh;
 }

@@ -52,13 +52,13 @@
                         <div class="form-group">
                             <label for="attachStorage" class="col-sm-2 control-label">附件大小：</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachStorage" disabled>
+                                <input type="text" class="form-control" id="attachStorage" value="${attachment.attachSize?if_exists}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="attachSize" class="col-sm-2 control-label">图片尺寸：</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachSize" disabled>
+                                <input type="text" class="form-control" id="attachSize" value="${attachment.attachWh?if_exists}" disabled>
                             </div>
                         </div>
                     </div>
@@ -121,14 +121,6 @@
     }
     $(document).ready(function(){
         var clipboard = new Clipboard('.btn-copy');
-        var img = document.getElementsByTagName("img")[0];
-        //获取文件的大小和尺寸
-        var width = img.naturalWidth;
-        var height = img.naturalHeight;
-        var image = new Image();
-        image.src = img.src;
-        $('#attachSize').val(width+'x'+height);
-        $('#attachStorage').val('256k');
     });
     $('.btn-copy').click(function () {
         showMsg("复制成功","success",1000)
