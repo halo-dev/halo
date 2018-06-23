@@ -156,6 +156,13 @@
 			<version>4.0.1</version>
 		</dependency>
 
+		<!-- 图片操作 -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.8</version>
+		</dependency>
+
 	</dependencies>
 
 	<repositories>
