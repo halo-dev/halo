@@ -194,6 +194,22 @@ public class HaloUtils {
     }
 
     /**
+     * 获取文件长和宽
+     *
+     * @param file file
+     * @return String
+     */
+    public static String getImageWh(File file) {
+        try {
+            BufferedImage image = ImageIO.read(new FileInputStream(file));
+            return image.getWidth() + "x" + image.getHeight();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /**
      * 获取所有主题
      *
      * @return List
