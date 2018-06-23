@@ -47,7 +47,7 @@ public class FrontTagController extends BaseController {
      *
      * @param tagUrl 标签路径
      * @param model  model
-     * @return string
+     * @return String
      */
     @GetMapping(value = "{tagUrl}")
     public String tags(Model model,
@@ -61,7 +61,7 @@ public class FrontTagController extends BaseController {
      * @param model  model
      * @param tagUrl 标签路径
      * @param page   页码
-     * @return string
+     * @return String
      */
     @GetMapping(value = "{tagUrl}/page/{page}")
     public String tags(Model model,

@@ -35,7 +35,8 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 删除评论
      *
-     * @param comment
+     * @param commentId commentId
+     * @return Optional
      */
     @Override
     public Optional<Comment> removeByCommentId(Long commentId) {
@@ -48,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
      * 查询所有的评论，用于后台管理
      *
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Comment> findAllComments(Integer status, Pageable pageable) {
@@ -59,7 +60,7 @@ public class CommentServiceImpl implements CommentService {
      * 根据评论状态查询评论
      *
      * @param status 评论状态
-     * @return list
+     * @return List
      */
     @Override
     public List<Comment> findAllComments(Integer status) {
@@ -81,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param commentId commentId
      * @param status    status
-     * @return comment
+     * @return Comment
      */
     @Override
     public Comment updateCommentStatus(Long commentId, Integer status) {
@@ -94,7 +95,7 @@ public class CommentServiceImpl implements CommentService {
      * 根据评论编号查询评论
      *
      * @param commentId commentId
-     * @return comment
+     * @return Optional
      */
     @Override
     public Optional<Comment> findCommentById(Long commentId) {
@@ -106,7 +107,7 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param post     post
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Comment> findCommentsByPost(Post post, Pageable pageable) {
@@ -119,7 +120,7 @@ public class CommentServiceImpl implements CommentService {
      * @param post     post
      * @param pageable pageable
      * @param status   status
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status) {
@@ -129,7 +130,7 @@ public class CommentServiceImpl implements CommentService {
     /**
      * 查询最新的前五条评论
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Comment> findCommentsLatest() {

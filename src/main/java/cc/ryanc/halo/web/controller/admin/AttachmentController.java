@@ -31,7 +31,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 /**
  * @author : RYAN0UP
@@ -101,7 +104,7 @@ public class AttachmentController {
      *
      * @param file    file
      * @param request request
-     * @return Map<String   ,   Object></>
+     * @return Map
      */
     @PostMapping(value = "/upload", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
@@ -115,7 +118,7 @@ public class AttachmentController {
      *
      * @param file    file
      * @param request request
-     * @return Map<String   ,   Object></>
+     * @return Map
      */
     @PostMapping(value = "/upload/editor", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
@@ -130,7 +133,7 @@ public class AttachmentController {
      *
      * @param file    file
      * @param request request
-     * @return Map<String   ,   Object></>
+     * @return Map
      */
     private Map<String, Object> uploadAttachment(MultipartFile file, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<String, Object>();

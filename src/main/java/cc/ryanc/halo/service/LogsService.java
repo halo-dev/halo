@@ -17,7 +17,7 @@ public interface LogsService {
      * 保存日志
      *
      * @param logs logs
-     * @return logs
+     * @return Logs
      */
     Logs saveByLogs(Logs logs);
 
@@ -37,14 +37,14 @@ public interface LogsService {
      * 查询所有日志并分页
      *
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Logs> findAllLogs(Pageable pageable);
 
     /**
      * 查询最新的五条日志
      *
-     * @return list
+     * @return List
      */
     List<Logs> findLogsLatest();
 
@@ -52,7 +52,7 @@ public interface LogsService {
      * 根据编号查询
      *
      * @param logsId logsId
-     * @return logs
+     * @return Optional
      */
     Optional<Logs> findLogsByLogsId(Long logsId);
 }

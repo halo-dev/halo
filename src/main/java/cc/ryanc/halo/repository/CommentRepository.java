@@ -24,7 +24,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      *
      * @param status   文章状态
      * @param pageable 分页信息
-     * @return page
+     * @return Page
      */
     Page<Comment> findCommentsByCommentStatus(Integer status, Pageable pageable);
 
@@ -32,7 +32,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * 根据评论状态查询所有评论 不分页
      *
      * @param status 文章状态
-     * @return list
+     * @return List
      */
     List<Comment> findCommentsByCommentStatus(Integer status);
 
@@ -41,7 +41,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      *
      * @param post     post
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     Page<Comment> findCommentsByPost(Post post, Pageable pageable);
 
@@ -51,14 +51,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @param post     post
      * @param pageable pageable
      * @param status   status
-     * @return page
+     * @return Page
      */
     Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status);
 
     /**
      * 查询最新的前五条评论
      *
-     * @return list
+     * @return List
      */
     @Query(value = "SELECT * FROM halo_comment ORDER BY comment_date DESC LIMIT 5", nativeQuery = true)
     List<Comment> findTopFive();

@@ -35,7 +35,7 @@ public interface OptionsService {
     /**
      * 获取所有设置选项
      *
-     * @return map
+     * @return Map
      */
     Map<String, String> findAllOptions();
 

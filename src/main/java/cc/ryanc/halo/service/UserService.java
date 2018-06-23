@@ -31,14 +31,14 @@ public interface UserService {
      *
      * @param userEmail userEmail
      * @param userPass  userPass
-     * @return list
+     * @return User
      */
     User userLoginByEmail(String userEmail, String userPass);
 
     /**
      * 查询所有用户
      *
-     * @return list
+     * @return User
      */
     User findUser();
 
@@ -47,7 +47,7 @@ public interface UserService {
      *
      * @param userId   userid
      * @param userPass userpass
-     * @return user
+     * @return User
      */
     User findByUserIdAndUserPass(Long userId, String userPass);
 

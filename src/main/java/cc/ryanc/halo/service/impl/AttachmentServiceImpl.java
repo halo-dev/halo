@@ -35,7 +35,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     /**
      * 获取所有附件信息
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Attachment> findAllAttachments() {
@@ -46,7 +46,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 获取所有附件信息 分页
      *
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Attachment> findAllAttachments(Pageable pageable) {
@@ -57,7 +57,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 根据附件id查询附件
      *
      * @param attachId attachId
-     * @return attachment
+     * @return Optional
      */
     @Override
     public Optional<Attachment> findByAttachId(Long attachId) {
@@ -68,7 +68,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 根据编号移除附件
      *
      * @param attachId attachId
-     * @return attachment
+     * @return Attachment
      */
     @Override
     public Attachment removeByAttachId(Long attachId) {

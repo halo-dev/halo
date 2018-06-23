@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param userName userName
      * @param userPass userPass
-     * @return user
+     * @return User
      */
     @Override
     public User userLoginByName(String userName, String userPass) {
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
      *
      * @param userEmail userEmail
      * @param userPass  userPass
-     * @return list
+     * @return User
      */
     @Override
     public User userLoginByEmail(String userEmail, String userPass) {
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     /**
      * 查询所有用户
      *
-     * @return list
+     * @return User
      */
     @Override
     public User findUser() {

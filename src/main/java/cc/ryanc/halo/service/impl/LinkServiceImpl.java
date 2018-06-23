@@ -34,7 +34,7 @@ public class LinkServiceImpl implements LinkService {
      * 移除友情链接
      *
      * @param linkId linkId
-     * @return link
+     * @return Link
      */
     @Override
     public Link removeByLinkId(Long linkId) {
@@ -46,7 +46,7 @@ public class LinkServiceImpl implements LinkService {
     /**
      * 查询所有友情链接
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Link> findAllLinks() {
@@ -57,7 +57,7 @@ public class LinkServiceImpl implements LinkService {
      * 根据编号查询友情链接
      *
      * @param linkId linkId
-     * @return Link
+     * @return Optional
      */
     @Override
     public Optional<Link> findByLinkId(Long linkId) {

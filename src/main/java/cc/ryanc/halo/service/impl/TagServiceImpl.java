@@ -47,7 +47,7 @@ public class TagServiceImpl implements TagService {
     /**
      * 获取所有标签
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Tag> findAllTags() {
@@ -58,7 +58,7 @@ public class TagServiceImpl implements TagService {
      * 根据编号查询标签
      *
      * @param tagId tagId
-     * @return Link
+     * @return Optional
      */
     @Override
     public Optional<Tag> findByTagId(Long tagId) {
@@ -69,7 +69,7 @@ public class TagServiceImpl implements TagService {
      * 根据标签路径查询
      *
      * @param tagUrl tagUrl
-     * @return tag
+     * @return Tag
      */
     @Override
     public Tag findByTagUrl(String tagUrl) {
@@ -80,7 +80,7 @@ public class TagServiceImpl implements TagService {
      * 根据标签名称查询
      *
      * @param tagName tagName
-     * @return tag
+     * @return Tag
      */
     @Override
     public Tag findTagByTagName(String tagName) {
@@ -91,7 +91,7 @@ public class TagServiceImpl implements TagService {
      * 转换标签字符串为实体集合
      *
      * @param tagList tagList
-     * @return list
+     * @return List
      */
     @Override
     public List<Tag> strListToTagList(String tagList) {

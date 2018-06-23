@@ -25,7 +25,7 @@ public class LogsServiceImpl implements LogsService {
      * 保存日志
      *
      * @param logs logs
-     * @return logs
+     * @return Logs
      */
     @Override
     public Logs saveByLogs(Logs logs) {
@@ -55,7 +55,7 @@ public class LogsServiceImpl implements LogsService {
      * 查询所有日志并分页
      *
      * @param pageable pageable
-     * @return page
+     * @return Page
      */
     @Override
     public Page<Logs> findAllLogs(Pageable pageable) {
@@ -65,7 +65,7 @@ public class LogsServiceImpl implements LogsService {
     /**
      * 查询最新的五条日志
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Logs> findLogsLatest() {
@@ -76,7 +76,7 @@ public class LogsServiceImpl implements LogsService {
      * 根据编号查询
      *
      * @param logsId logsId
-     * @return logs
+     * @return Optional
      */
     @Override
     public Optional<Logs> findLogsByLogsId(Long logsId) {
