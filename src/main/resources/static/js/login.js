@@ -1,3 +1,6 @@
+$(document).ready(function () {
+    $("#login-name").val(localStorage.getItem("loginName"));
+});
 function btn_login() {
     $('#btn-login').button('loading');
     var name = $("#login-name").val();
@@ -15,6 +18,7 @@ function btn_login() {
                 'loginPwd': pwd
             },
             success: function (data) {
+                localStorage.setItem('loginName', $("#login-name").val());
                 if(data.code==1){
                     $.toast({
                         text: data.msg,
