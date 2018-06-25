@@ -64,7 +64,7 @@
                     </div>
                     <div class="box-footer">
                         <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()">永久删除</button>
-                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="${attachment.attachPath}">复制链接</button>
+                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="${options.blog_url?if_exists}${attachment.attachPath}">复制链接</button>
                     </div>
                 </form>
             </div>

@@ -231,17 +231,8 @@ public class AttachmentController {
             File mediaPath = new File(basePath.getAbsolutePath(), attachment.get().getAttachPath().substring(0, attachment.get().getAttachPath().lastIndexOf('/')));
             File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
             File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
-
-            BufferedImage sourceImg = ImageIO.read(new FileInputStream(delFile));
-            if (sourceImg.getWidth() > 500 && sourceImg.getHeight() > 500) {
-                if (delSmallFile.exists()) {
-                    if (delSmallFile.delete()) {
-                        updateConst();
-                    }
-                }
-            }
             if (delFile.exists() && delFile.isFile()) {
-                if (delFile.delete()) {
+                if (delFile.delete() && delSmallFile.delete()) {
                     updateConst();
                     log.info("删除文件[" + delFileName + "]成功！");
                     logsService.saveByLogs(

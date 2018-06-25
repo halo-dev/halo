@@ -29,7 +29,7 @@
                     <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
                 <li>
-                    <a data-pjax="true" href="/admin/posts">文章</a>
+                    <a data-pjax="true" href="/admin/posts">文章管理</a>
                 </li>
                 <li class="active">新建文章</li>
             </ol>

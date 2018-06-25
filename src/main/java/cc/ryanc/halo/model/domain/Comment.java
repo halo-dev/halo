@@ -44,6 +44,7 @@ public class Comment implements Serializable {
     /**
      * 评论人的邮箱
      */
+    @JsonIgnore
     private String commentAuthorEmail;
 
     /**

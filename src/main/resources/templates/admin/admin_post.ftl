@@ -14,7 +14,7 @@
             #btnNewPost:hover{background:#3c8dbc;color:#fff}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">文章</h1>
+            <h1 style="display: inline-block;">文章管理</h1>
             <a data-pjax="false" id="btnNewPost" href="/admin/posts/new">
                 写文章
             </a>
@@ -23,7 +23,7 @@
                     <a data-pjax="true" href="/admin">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a data-pjax="true" href="#">文章</a></li>
+                <li><a data-pjax="true" href="#">文章管理</a></li>
                 <li class="active">所有文章</li>
             </ol>
         </section>

@@ -18,7 +18,7 @@
             .thumbnail{margin-bottom:0}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">图库<small></small></h1>
+            <h1 style="display: inline-block;">图库页面<small></small></h1>
             <a id="btnNewPicture" href="#">
                 添加图片
             </a>
@@ -26,8 +26,8 @@
                 <li>
                     <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a data-pjax="true" href="/admin/page">页面</a></li>
-                <li class="active">图库</li>
+                <li><a data-pjax="true" href="/admin/page">页面管理</a></li>
+                <li class="active">图库页面</li>
             </ol>
         </section>
         <section class="content container-fluid">
