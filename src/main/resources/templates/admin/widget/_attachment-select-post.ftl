@@ -26,7 +26,7 @@
                     <div class="row">
                         <#list attachments.content as attachment>
                             <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 div-thumbnail">
-                                <a href="#" class="thumbnail" data-clipboard-text="${attachment.attachPath}">
+                                <a href="#" class="thumbnail" data-clipboard-text="${options.blog_url?if_exists}${attachment.attachPath}">
                                     <img src="${attachment.attachSmallPath}" class="img-responsive">
                                 </a>
                             </div>

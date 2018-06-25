@@ -17,7 +17,7 @@
                     <a data-pjax="true" href="/admin">
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a data-pjax="true" href="#">文章</a></li>
+                <li><a data-pjax="true" href="#">文章管理</a></li>
                 <li class="active">分类目录</li>
             </ol>
         </section>

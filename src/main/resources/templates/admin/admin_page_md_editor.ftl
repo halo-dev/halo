@@ -30,7 +30,7 @@
                     <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
                 <li>
-                    <a data-pjax="true" href="/admin/page">页面</a>
+                    <a data-pjax="true" href="/admin/page">页面管理</a>
                 </li>
                 <li class="active">新建页面</li>
             </ol>

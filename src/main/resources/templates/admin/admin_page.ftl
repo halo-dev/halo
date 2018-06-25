@@ -13,7 +13,7 @@
             #btnNewPage:hover{background:#3c8dbc;color:#fff}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">页面<small></small></h1>
+            <h1 style="display: inline-block;">页面管理<small></small></h1>
             <a id="btnNewPage" href="/admin/page/new">
                 新建页面
             </a>
@@ -21,7 +21,7 @@
                 <li>
                     <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
                 </li>
-                <li><a data-pjax="true" href="#">页面</a></li>
+                <li><a data-pjax="true" href="#">页面管理</a></li>
                 <li class="active">所有页面</li>
             </ol>
         </section>
