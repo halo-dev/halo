@@ -1,3 +1,4 @@
+<#compress >
 <#include "module/_macro.ftl">
 <@head title="${options.blog_title} | 后台管理：页面编辑"></@head>
 <div class="wrapper">
@@ -314,3 +315,4 @@
     <#include "module/_footer.ftl">
 </div>
 <@footer></@footer>
+</#compress>
