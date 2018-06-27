@@ -17,7 +17,7 @@
         </style>
         <section class="content-header">
             <h1>
-                设置
+                博客设置
                 <small></small>
             </h1>
             <ol class="breadcrumb">
@@ -26,7 +26,7 @@
                         <i class="fa fa-dashboard"></i> 首页</a>
                 </li>
                 <li><a data-pjax="true" href="#">设置</a></li>
-                <li class="active">网站设置</li>
+                <li class="active">博客设置</li>
             </ol>
         </section>
         <!-- tab选项卡 -->
@@ -395,12 +395,66 @@
                             <!-- 附件设置 -->
                             <div class="tab-pane" id="attach">
                                 <form method="post" class="form-horizontal" id="attachOptions">
-                                    <div class="box-body">
-                                        <p>
-                                            开发中...<br/>
-                                            可选图片存储在本地或者七牛云等云...
-                                        </p>
-                                    </div>
+                                    <#--<div class="box-body">-->
+                                        <#--<div class="form-group">-->
+                                            <#--<label class="col-sm-2 control-label">存储位置：</label>-->
+                                            <#--<div class="col-sm-4">-->
+                                                <#--<label class="radio-inline">-->
+                                                    <#--<input type="radio" name="attach_loc" value="server" ${((options.attach_loc?default('server'))=='server')?string('checked','')}> 本地服务器-->
+                                                <#--</label>-->
+                                                <#--<label class="radio-inline">-->
+                                                    <#--<input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc?if_exists)=='upyun')?string('checked','')}> 又拍云-->
+                                                <#--</label>-->
+                                                <#--<label class="radio-inline">-->
+                                                    <#--<input type="radio" name="attach_loc" value="qiniu" ${((options.attach_loc?if_exists)=='qiniu')?string('checked','')}> 七牛云-->
+                                                <#--</label>-->
+                                            <#--</div>-->
+                                        <#--</div>-->
+
+                                        <#--<!-- 原生设置 &ndash;&gt;-->
+                                        <#--<div class="server-options" style="display: none">-->
+
+                                        <#--</div>-->
+
+                                        <#--<!-- 又拍云选项 &ndash;&gt;-->
+                                        <#--<div class="upyun-options" style="display: none">-->
+                                            <#--<div class="form-group">-->
+                                                <#--<label for="upyunOssDomain" class="col-sm-2 control-label">域名绑定：</label>-->
+                                                <#--<div class="col-sm-4">-->
+                                                    <#--<input type="text" class="form-control" id="upyunOssDomain" name="upyun_oss_domain" value="${options.upyun_oss_domain?if_exists}">-->
+                                                <#--</div>-->
+                                            <#--</div>-->
+                                            <#--<div class="form-group">-->
+                                                <#--<label for="upyunOssBucket" class="col-sm-2 control-label">空间名称：</label>-->
+                                                <#--<div class="col-sm-4">-->
+                                                    <#--<input type="text" class="form-control" id="upyunOssBucket" name="upyun_oss_bucket" value="${options.upyun_oss_bucket?if_exists}">-->
+                                                <#--</div>-->
+                                            <#--</div>-->
+                                            <#--<div class="form-group">-->
+                                                <#--<label for="upyunOssOperator" class="col-sm-2 control-label">操作员名称：</label>-->
+                                                <#--<div class="col-sm-4">-->
+                                                    <#--<input type="text" class="form-control" id="upyunOssOperator" name="upyun_oss_operator" value="${options.upyun_oss_operator?if_exists}">-->
+                                                <#--</div>-->
+                                            <#--</div>-->
+                                            <#--<div class="form-group">-->
+                                                <#--<label for="upyunOssPwd" class="col-sm-2 control-label">操作员密码：</label>-->
+                                                <#--<div class="col-sm-4">-->
+                                                    <#--<input type="text" class="form-control" id="upyunOssPwd" name="upyun_oss_pwd" value="${options.upyun_oss_pwd?if_exists}">-->
+                                                <#--</div>-->
+                                            <#--</div>-->
+                                            <#--<div class="form-group">-->
+                                                <#--<label for="upyunOssSrc" class="col-sm-2 control-label">文件目录：</label>-->
+                                                <#--<div class="col-sm-4">-->
+                                                    <#--<input type="text" class="form-control" id="upyunOssSrc" name="upyun_oss_src" value="${options.upyun_oss_src?if_exists}">-->
+                                                <#--</div>-->
+                                            <#--</div>-->
+                                        <#--</div>-->
+
+                                        <#--<!-- 七牛云 &ndash;&gt;-->
+                                        <#--<div class="qiniu-options" style="display: none">-->
+
+                                        <#--</div>-->
+                                    <#--</div>-->
                                     <div class="box-footer">
                                         <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('attachOptions')">保存</button>
                                     </div>
@@ -530,6 +584,17 @@
                                 <form method="post" class="form-horizontal" id="otherOptions">
                                     <div class="box-body">
                                         <div class="form-group">
+                                            <label class="col-sm-2 control-label">API服务：</label>
+                                            <div class="col-sm-4">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="api_status" value="true" ${((options.api_status?if_exists)=='true')?string('checked','')}> 启用
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="api_status" value="false" ${((options.api_status?default('false'))=='false')?string('checked','')}> 禁用
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="statisticsCode" class="col-sm-2 control-label">统计代码：
                                                 <span data-toggle="tooltip" data-placement="top" title="可以使用cnzz，百度，google等" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
@@ -651,6 +716,27 @@
                 }
             }
 
+            function checkAttachOption() {
+                var server = $('input:radio[value=server]:checked').val();
+                var upyun = $('input:radio[value=upyun]:checked').val();
+                var qiniu = $('input:radio[value=qiniu]:checked').val();
+                if(server!=null){
+                    $('.server-options').show();
+                }else{
+                    $('.server-options').hide();
+                }
+                if(upyun!=null){
+                    $('.upyun-options').show();
+                }else{
+                    $('.upyun-options').hide();
+                }
+                if(qiniu!=null){
+                    $('.qiniu-options').show();
+                }else{
+                    $('.qiniu-options').hide();
+                }
+            }
+
             /**
              * 后台布局切换
              */
@@ -676,6 +762,9 @@
             }
             $('input[name=comment_system]').click(function () {
                 checkCommentOption();
+            });
+            $('input[name=attach_loc]').click(function () {
+                checkAttachOption();
             });
             $('input[name=admin_layout]').click(function () {
                 viewLayout();
