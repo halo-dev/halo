@@ -325,7 +325,7 @@ public class HaloUtils {
      *
      * @param hostIp       ip
      * @param userName     用户名
-     * @param password     密码
+     * @param password     password
      * @param savePath     保存路径
      * @param fileName     文件名
      * @param databaseName 数据库名
@@ -470,7 +470,7 @@ public class HaloUtils {
      *
      * @param smtpHost smtpHost
      * @param userName 邮件地址
-     * @param password 密码
+     * @param password password
      */
     public static void configMail(String smtpHost, String userName, String password) {
         Properties properties = OhMyEmail.defaultConfig(false);
