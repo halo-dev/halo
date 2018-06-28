@@ -4,6 +4,8 @@ import cc.ryanc.halo.model.domain.Menu;
 import cc.ryanc.halo.repository.MenuRepository;
 import cc.ryanc.halo.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,12 +21,17 @@ public class MenuServiceImpl implements MenuService {
     @Autowired
     private MenuRepository menuRepository;
 
+    private static final String MENUS_CACHE_KEY = "'menu'";
+
+    private static final String MENUS_CACHE_NAME = "menus";
+
     /**
      * 查询所有菜单
      *
      * @return List
      */
     @Override
+    @Cacheable(value = MENUS_CACHE_NAME, key = MENUS_CACHE_KEY)
     public List<Menu> findAllMenus() {
         return menuRepository.findAll();
     }
@@ -36,6 +43,7 @@ public class MenuServiceImpl implements MenuService {
      * @return Menu
      */
     @Override
+    @CacheEvict(value = MENUS_CACHE_NAME, key = MENUS_CACHE_KEY)
     public Menu saveByMenu(Menu menu) {
         return menuRepository.save(menu);
     }
@@ -47,6 +55,7 @@ public class MenuServiceImpl implements MenuService {
      * @return Menu
      */
     @Override
+    @CacheEvict(value = MENUS_CACHE_NAME,key = MENUS_CACHE_KEY)
     public Menu removeByMenuId(Long menuId) {
         Optional<Menu> menu = this.findByMenuId(menuId);
         menuRepository.delete(menu.get());
