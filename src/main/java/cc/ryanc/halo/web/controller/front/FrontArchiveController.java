@@ -99,7 +99,7 @@ public class FrontArchiveController extends BaseController {
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl, Model model) {
         Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_POST);
-        if(null==post){
+        if(null==post || post.getPostStatus()!=0){
             return this.renderNotFound();
         }
         //获得当前文章的发布日期
