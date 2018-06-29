@@ -44,7 +44,7 @@ Let's start: http://localhost:8090
 
 ## Demo 演示
 
-[测试地址](http://39.105.26.52)，[测试后台(admin,123456)](http://39.105.26.52/admin)
+[测试地址](http://149.28.63.223)，[测试后台(admin,123456)](http://149.28.63.223/admin)
 
 [Ryan0up'S Blog](https://ryanc.cc)
 
