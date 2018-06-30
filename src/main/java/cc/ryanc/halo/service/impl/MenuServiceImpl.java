@@ -43,7 +43,7 @@ public class MenuServiceImpl implements MenuService {
      * @return Menu
      */
     @Override
-    @CacheEvict(value = MENUS_CACHE_NAME, key = MENUS_CACHE_KEY)
+    @CacheEvict(value = MENUS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Menu saveByMenu(Menu menu) {
         return menuRepository.save(menu);
     }
@@ -55,7 +55,7 @@ public class MenuServiceImpl implements MenuService {
      * @return Menu
      */
     @Override
-    @CacheEvict(value = MENUS_CACHE_NAME,key = MENUS_CACHE_KEY)
+    @CacheEvict(value = MENUS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Menu removeByMenuId(Long menuId) {
         Optional<Menu> menu = this.findByMenuId(menuId);
         menuRepository.delete(menu.get());

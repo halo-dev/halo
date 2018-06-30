@@ -76,7 +76,7 @@ public interface PostService {
     List<Post> searchPosts(String keyWord, Pageable pageable);
 
     /**
-     * 根据文章状态查询 分页
+     * 根据文章状态查询 分页，用于后台管理
      *
      * @param status   0，1，2
      * @param postType post or page
@@ -84,6 +84,13 @@ public interface PostService {
      * @return Page
      */
     Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable);
+
+    /**
+     * 根据文章状态查询 分页，首页分页
+     * @param pageable pageable
+     * @return Page
+     */
+    Page<Post> findPostByStatus(Pageable pageable);
 
     /**
      * 根据文章状态查询

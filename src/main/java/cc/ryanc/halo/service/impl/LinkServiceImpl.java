@@ -32,7 +32,7 @@ public class LinkServiceImpl implements LinkService {
      * @return Link
      */
     @Override
-    @CacheEvict(value = LINKS_CACHE_NAME, key = LINKS_CACHE_KEY)
+    @CacheEvict(value = LINKS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Link saveByLink(Link link) {
         return linkRepository.save(link);
     }
@@ -44,7 +44,7 @@ public class LinkServiceImpl implements LinkService {
      * @return Link
      */
     @Override
-    @CacheEvict(value = LINKS_CACHE_NAME, key = LINKS_CACHE_KEY)
+    @CacheEvict(value = LINKS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Link removeByLinkId(Long linkId) {
         Optional<Link> link = this.findByLinkId(linkId);
         linkRepository.delete(link.get());

@@ -10,6 +10,9 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.http.HtmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,8 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private PostRepository postRepository;
 
+    private static final String POSTS_CACHE_NAME = "posts";
+
     /**
      * 保存文章
      *
@@ -36,6 +41,7 @@ public class PostServiceImpl implements PostService {
      * @return Post
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Post saveByPost(Post post) {
         return postRepository.save(post);
     }
@@ -47,6 +53,7 @@ public class PostServiceImpl implements PostService {
      * @return Post
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Post removeByPostId(Long postId) {
         Optional<Post> post = this.findByPostId(postId);
         postRepository.delete(post.get());
@@ -61,6 +68,7 @@ public class PostServiceImpl implements PostService {
      * @return Post
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Post updatePostStatus(Long postId, Integer status) {
         Optional<Post> post = this.findByPostId(postId);
         post.get().setPostStatus(status);
@@ -73,6 +81,7 @@ public class PostServiceImpl implements PostService {
      * @param postSummary postSummary
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void updateAllSummary(Integer postSummary) {
         List<Post> posts = this.findAllPosts(HaloConst.POST_TYPE_POST);
         for (Post post : posts) {
@@ -105,6 +114,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_type_'+#postType")
     public List<Post> findAllPosts(String postType) {
         return postRepository.findPostsByPostType(postType);
     }
@@ -122,7 +132,7 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 根据文章状态查询 分页
+     * 根据文章状态查询 分页，用于后台管理
      *
      * @param status   0，1，2
      * @param postType post or page
@@ -132,6 +142,18 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable) {
         return postRepository.findPostsByPostStatusAndPostType(status, postType, pageable);
+    }
+
+    /**
+     * 根据文章状态查询 分页，首页分页
+     *
+     * @param pageable pageable
+     * @return Page
+     */
+    @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_page_'+#pageable.pageNumber")
+    public Page<Post> findPostByStatus(Pageable pageable) {
+        return postRepository.findPostsByPostStatusAndPostType(0,HaloConst.POST_TYPE_POST,pageable);
     }
 
     /**
@@ -175,6 +197,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_latest'")
     public List<Post> findPostLatest() {
         return postRepository.findTopFive();
     }
@@ -208,6 +231,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_year_month'")
     public List<Archive> findPostGroupByYearAndMonth() {
         List<Object[]> objects = postRepository.findPostGroupByYearAndMonth();
         List<Archive> archives = new ArrayList<>();
@@ -229,6 +253,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_year'")
     public List<Archive> findPostGroupByYear() {
         List<Object[]> objects = postRepository.findPostGroupByYear();
         List<Archive> archives = new ArrayList<>();
@@ -251,6 +276,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_year_month_'+#year+'_'+#month")
     public List<Post> findPostByYearAndMonth(String year, String month) {
         return postRepository.findPostByYearAndMonth(year, month);
     }
@@ -262,6 +288,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_year_'+#year")
     public List<Post> findPostByYear(String year) {
         return postRepository.findPostByYear(year);
     }
@@ -299,6 +326,7 @@ public class PostServiceImpl implements PostService {
      * @return Page
      */
     @Override
+    @CachePut(value = POSTS_CACHE_NAME, key = "'posts_tag_'+#tag.tagId+'_'+#pageable.pageNumber")
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
         return postRepository.findPostsByTags(tag, pageable);
     }
@@ -321,6 +349,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_hot'")
     public List<Post> hotPosts() {
         return postRepository.findPostsByPostTypeOrderByPostViewsDesc(HaloConst.POST_TYPE_POST);
     }
@@ -332,6 +361,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @CachePut(value = POSTS_CACHE_NAME, key = "'posts_related_'+#post.getPostId()")
     public List<Post> relatedPosts(Post post) {
         //获取当前文章的所有标签
         List<Tag> tags = post.getTags();

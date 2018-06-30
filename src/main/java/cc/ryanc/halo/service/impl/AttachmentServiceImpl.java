@@ -4,6 +4,8 @@ import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Autowired
     private AttachmentRepository attachmentRepository;
 
+    private static final String ATTACHMENTS_CACHE_NAME = "attachments";
+
     /**
      * 新增附件信息
      *
@@ -28,6 +32,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return Attachment
      */
     @Override
+    @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Attachment saveByAttachment(Attachment attachment) {
         return attachmentRepository.save(attachment);
     }
@@ -38,6 +43,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return List
      */
     @Override
+    @Cacheable(value = ATTACHMENTS_CACHE_NAME, key = "'attachment'")
     public List<Attachment> findAllAttachments() {
         return attachmentRepository.findAll();
     }
@@ -71,6 +77,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return Attachment
      */
     @Override
+    @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Attachment removeByAttachId(Long attachId) {
         Optional<Attachment> attachment = this.findByAttachId(attachId);
         attachmentRepository.delete(attachment.get());
