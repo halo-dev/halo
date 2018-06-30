@@ -4,6 +4,8 @@ import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.repository.GalleryRepository;
 import cc.ryanc.halo.service.GalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class GalleryServiceImpl implements GalleryService {
     @Autowired
     private GalleryRepository galleryRepository;
 
+    private static final String GALLERIES_CACHE_NAME = "galleries";
+
     /**
      * 保存图片
      *
@@ -28,6 +32,7 @@ public class GalleryServiceImpl implements GalleryService {
      * @return Gallery
      */
     @Override
+    @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Gallery saveByGallery(Gallery gallery) {
         return galleryRepository.save(gallery);
     }
@@ -39,6 +44,7 @@ public class GalleryServiceImpl implements GalleryService {
      * @return Gallery
      */
     @Override
+    @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Gallery removeByGalleryId(Long galleryId) {
         Optional<Gallery> gallery = this.findByGalleryId(galleryId);
         galleryRepository.delete(gallery.get());
@@ -52,6 +58,7 @@ public class GalleryServiceImpl implements GalleryService {
      * @return Gallery
      */
     @Override
+    @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Gallery updateByGallery(Gallery gallery) {
         return galleryRepository.save(gallery);
     }
@@ -73,6 +80,7 @@ public class GalleryServiceImpl implements GalleryService {
      * @return List
      */
     @Override
+    @Cacheable(value = GALLERIES_CACHE_NAME, key = "'gallery'")
     public List<Gallery> findAllGalleries() {
         return galleryRepository.findAll();
     }

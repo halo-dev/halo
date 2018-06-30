@@ -30,4 +30,64 @@
             timeToIdleSeconds="0"
             timeToLiveSeconds="300"
             memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="posts"
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="comments"
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="attachments"
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="galleries"
+            eternal="false"
+            maxElementsInMemory="100"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="tags"
+            eternal="false"
+            maxElementsInMemory="100"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="categories"
+            eternal="false"
+            maxElementsInMemory="100"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
 </ehcache>
