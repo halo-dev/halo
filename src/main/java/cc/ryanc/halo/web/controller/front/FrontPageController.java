@@ -3,7 +3,7 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.PostService;
@@ -67,7 +67,7 @@ public class FrontPageController extends BaseController {
      */
     @GetMapping(value = "/p/{postUrl}")
     public String getPage(@PathVariable(value = "postUrl") String postUrl, Model model) {
-        Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_PAGE);
+        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_PAGE.getDesc());
 
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = PageRequest.of(0,999,sort);
@@ -77,8 +77,7 @@ public class FrontPageController extends BaseController {
         }
         model.addAttribute("comments",comments);
         model.addAttribute("post", post);
-        post.setPostViews(post.getPostViews()+1);
-        postService.saveByPost(post);
+        postService.updatePostView(post);
         return this.render("page");
     }
 }

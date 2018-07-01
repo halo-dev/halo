@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Link;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.ResponseStatus;
 import cc.ryanc.halo.service.LinkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,9 +31,9 @@ public class ApiLinkController {
     public JsonResult links(){
         List<Link> links = linkService.findAllLinks();
         if(null!=links && links.size()>0){
-            return new JsonResult(200,"success",links);
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),links);
         }else{
-            return new JsonResult(200,"empty");
+            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
         }
     }
 }
