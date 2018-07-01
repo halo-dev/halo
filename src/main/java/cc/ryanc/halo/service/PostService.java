@@ -43,6 +43,13 @@ public interface PostService {
     Post updatePostStatus(Long postId, Integer status);
 
     /**
+     * 修改文章阅读量
+     *
+     * @param post post
+     */
+    void updatePostView(Post post);
+
+    /**
      * 批量修改摘要
      *
      * @param postSummary postSummary

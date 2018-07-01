@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -69,7 +70,7 @@ public class AdminController extends BaseController {
     @GetMapping(value = {"", "/index"})
     public String index(Model model, HttpSession session) {
         //查询文章条数
-        Integer postCount = postService.findAllPosts(HaloConst.POST_TYPE_POST).size();
+        Integer postCount = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc()).size();
         model.addAttribute("postCount", postCount);
 
         //查询评论的条数

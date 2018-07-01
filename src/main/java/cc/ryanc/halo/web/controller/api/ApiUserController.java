@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.ResponseStatus;
 import cc.ryanc.halo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,6 @@ public class ApiUserController {
     @GetMapping
     public JsonResult user(){
         User user = userService.findUser();
-        return new JsonResult(200,"success",user);
+        return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),user);
     }
 }

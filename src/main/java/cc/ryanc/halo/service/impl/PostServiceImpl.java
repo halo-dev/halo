@@ -4,7 +4,8 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
-import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -76,6 +77,17 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * 修改文章阅读量
+     *
+     * @param post post
+     */
+    @Override
+    public void updatePostView(Post post) {
+        post.setPostViews(post.getPostViews()+1);
+        postRepository.save(post);
+    }
+
+    /**
      * 批量更新文章摘要
      *
      * @param postSummary postSummary
@@ -83,7 +95,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void updateAllSummary(Integer postSummary) {
-        List<Post> posts = this.findAllPosts(HaloConst.POST_TYPE_POST);
+        List<Post> posts = this.findAllPosts(PostType.POST_TYPE_POST.getDesc());
         for (Post post : posts) {
             String text = HtmlUtil.cleanHtmlTag(post.getPostContent());
             if (text.length() > postSummary) {
@@ -153,7 +165,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_page_'+#pageable.pageNumber")
     public Page<Post> findPostByStatus(Pageable pageable) {
-        return postRepository.findPostsByPostStatusAndPostType(0,HaloConst.POST_TYPE_POST,pageable);
+        return postRepository.findPostsByPostStatusAndPostType(PostStatus.PUBLISHED.getCode(),PostType.POST_TYPE_POST.getDesc(),pageable);
     }
 
     /**
@@ -187,6 +199,7 @@ public class PostServiceImpl implements PostService {
      * @return Post
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME,key = "'posts_posturl_'+#postUrl+'_'+#postType")
     public Post findByPostUrl(String postUrl, String postType) {
         return postRepository.findPostByPostUrlAndPostType(postUrl, postType);
     }
@@ -210,7 +223,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public List<Post> findByPostDateAfter(Date postDate) {
-        return postRepository.findByPostDateAfterAndPostStatusAndPostTypeOrderByPostDateDesc(postDate, 0, HaloConst.POST_TYPE_POST);
+        return postRepository.findByPostDateAfterAndPostStatusAndPostTypeOrderByPostDateDesc(postDate, PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc());
     }
 
     /**
@@ -221,7 +234,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public List<Post> findByPostDateBefore(Date postDate) {
-        return postRepository.findByPostDateBeforeAndPostStatusAndPostTypeOrderByPostDateAsc(postDate, 0, HaloConst.POST_TYPE_POST);
+        return postRepository.findByPostDateBeforeAndPostStatusAndPostTypeOrderByPostDateAsc(postDate, PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc());
     }
 
 
@@ -351,7 +364,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_hot'")
     public List<Post> hotPosts() {
-        return postRepository.findPostsByPostTypeOrderByPostViewsDesc(HaloConst.POST_TYPE_POST);
+        return postRepository.findPostsByPostTypeOrderByPostViewsDesc(PostType.POST_TYPE_POST.getDesc());
     }
 
     /**
