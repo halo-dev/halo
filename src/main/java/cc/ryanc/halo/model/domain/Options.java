@@ -2,10 +2,7 @@ package cc.ryanc.halo.model.domain;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -27,6 +24,7 @@ public class Options implements Serializable {
      * 设置项名称
      */
     @Id
+    @Column(length = 127)
     private String optionName;
 
     /**
