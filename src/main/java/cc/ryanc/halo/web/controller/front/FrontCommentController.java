@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
@@ -149,7 +150,7 @@ public class FrontCommentController {
                     Map<String, Object> map = new HashMap<>();
                     map.put("author", userService.findUser().getUserDisplayName());
                     map.put("pageName", post.getPostTitle());
-                    if (StringUtils.equals(post.getPostType(), HaloConst.POST_TYPE_POST)) {
+                    if (StringUtils.equals(post.getPostType(), PostType.POST_TYPE_POST.getDesc())) {
                         map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     } else {
                         map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
@@ -189,7 +190,7 @@ public class FrontCommentController {
                     map.put("blogTitle",HaloConst.OPTIONS.get("blog_title"));
                     map.put("commentAuthor",lastComment.getCommentAuthor());
                     map.put("pageName",lastComment.getPost().getPostTitle());
-                    if (StringUtils.equals(post.getPostType(), HaloConst.POST_TYPE_POST)) {
+                    if (StringUtils.equals(post.getPostType(), PostType.POST_TYPE_POST.getDesc())) {
                         map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     } else {
                         map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());

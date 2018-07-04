@@ -4,6 +4,8 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -86,11 +88,11 @@ public class PostController extends BaseController {
                         @RequestParam(value = "size", defaultValue = "10") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Post> posts = postService.findPostByStatus(status, HaloConst.POST_TYPE_POST, pageable);
+        Page<Post> posts = postService.findPostByStatus(status, PostType.POST_TYPE_POST.getDesc(), pageable);
         model.addAttribute("posts", posts);
-        model.addAttribute("publishCount", postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable).getTotalElements());
-        model.addAttribute("draftCount", postService.findPostByStatus(1, HaloConst.POST_TYPE_POST, pageable).getTotalElements());
-        model.addAttribute("trashCount", postService.findPostByStatus(2, HaloConst.POST_TYPE_POST, pageable).getTotalElements());
+        model.addAttribute("publishCount", postService.findPostByStatus(PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable).getTotalElements());
+        model.addAttribute("draftCount", postService.findPostByStatus(PostStatus.DRAFT.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable).getTotalElements());
+        model.addAttribute("trashCount", postService.findPostByStatus(PostStatus.RECYCLE.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable).getTotalElements());
         model.addAttribute("status", status);
         return "admin/admin_post";
     }
@@ -115,7 +117,7 @@ public class PostController extends BaseController {
             Pageable pageable = PageRequest.of(page, size, sort);
             model.addAttribute("posts", postService.searchPosts(keyword, pageable));
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
         return "admin/admin_post";
     }
@@ -259,10 +261,10 @@ public class PostController extends BaseController {
     @GetMapping("/throw")
     public String moveToTrash(@RequestParam("postId") Long postId, @RequestParam("status") Integer status) {
         try {
-            postService.updatePostStatus(postId, 2);
+            postService.updatePostStatus(postId, PostStatus.RECYCLE.getCode());
             log.info("编号为" + postId + "的文章已被移到回收站");
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -277,10 +279,10 @@ public class PostController extends BaseController {
     public String moveToPublish(@RequestParam("postId") Long postId,
                                 @RequestParam("status") Integer status) {
         try {
-            postService.updatePostStatus(postId, 0);
+            postService.updatePostStatus(postId, PostStatus.PUBLISHED.getCode());
             log.info("编号为" + postId + "的文章已改变为发布状态");
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -298,9 +300,9 @@ public class PostController extends BaseController {
             postService.removeByPostId(postId);
             logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST, post.get().getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
-        if (StringUtils.equals(HaloConst.POST_TYPE_POST, postType)) {
+        if (StringUtils.equals(PostType.POST_TYPE_POST.getDesc(), postType)) {
             return "redirect:/admin/posts?status=2";
         }
         return "redirect:/admin/page";
@@ -348,7 +350,7 @@ public class PostController extends BaseController {
     @ResponseBody
     public boolean checkUrlExists(@PathParam("postUrl") String postUrl) {
         postUrl = urlFilter(postUrl);
-        Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_POST);
+        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_POST.getDesc());
         return null != post;
     }
 
@@ -365,7 +367,7 @@ public class PostController extends BaseController {
             return false;
         }
         String blogUrl = HaloConst.OPTIONS.get("blog_url");
-        List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
+        List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
         StringBuilder urls = new StringBuilder();
         for (Post post : posts) {
             urls.append(blogUrl);

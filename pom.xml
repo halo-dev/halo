@@ -92,6 +92,11 @@
 			<version>${druid.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+
 		<!-- freemarker依赖 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
@@ -59,7 +60,7 @@ public class PageController {
      */
     @GetMapping
     public String pages(Model model) {
-        List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_PAGE);
+        List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_PAGE.getDesc());
         model.addAttribute("pages", posts);
         return "admin/admin_page";
     }
@@ -100,7 +101,7 @@ public class PageController {
             Link backLink = linkService.saveByLink(link);
             log.info("保存成功，数据为：" + backLink);
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -117,7 +118,7 @@ public class PageController {
             Link link = linkService.removeByLinkId(linkId);
             log.info("删除的友情链接：" + link);
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：", e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -218,7 +219,7 @@ public class PageController {
             //发表用户
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
-            post.setPostType(HaloConst.POST_TYPE_PAGE);
+            post.setPostType(PostType.POST_TYPE_PAGE.getDesc());
             if(null!=post.getPostId()){
                 post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
@@ -260,7 +261,7 @@ public class PageController {
     @GetMapping(value = "/checkUrl")
     @ResponseBody
     public boolean checkUrlExists(@PathParam("postUrl") String postUrl) {
-        Post post = postService.findByPostUrl(postUrl, HaloConst.POST_TYPE_PAGE);
+        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_PAGE.getDesc());
         // TODO 还没写完
         if (null != post || StringUtils.equals("archives", postUrl) || StringUtils.equals("galleries", postUrl)) {
             return true;

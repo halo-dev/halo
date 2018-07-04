@@ -16,10 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReadParam;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
@@ -36,7 +32,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 
 /**
  * <pre>
@@ -56,34 +51,6 @@ public class HaloUtils {
     public final static String MONTH = (NOW.get(Calendar.MONTH) + 1) + "";
 
     private static ArrayList<String> FILE_LIST = new ArrayList<>();
-
-    /**
-     * 截取图片
-     *
-     * @param src    输入路径
-     * @param dest   输出路径
-     * @param w      宽度
-     * @param h      长度
-     * @param suffix 后缀
-     * @throws IOException
-     */
-    public static void cutCenterImage(String src, String dest, int w, int h, String suffix) {
-        try {
-            Iterator iterator = ImageIO.getImageReadersByFormatName(suffix);
-            ImageReader reader = (ImageReader) iterator.next();
-            InputStream in = new FileInputStream(src);
-            ImageInputStream iis = ImageIO.createImageInputStream(in);
-            reader.setInput(iis, true);
-            ImageReadParam param = reader.getDefaultReadParam();
-            int imageIndex = 0;
-            Rectangle rect = new Rectangle((reader.getWidth(imageIndex) - w) / 2, (reader.getHeight(imageIndex) - h) / 2, w, h);
-            param.setSourceRegion(rect);
-            BufferedImage bi = reader.read(0, param);
-            ImageIO.write(bi, suffix, new File(dest));
-        } catch (Exception e) {
-            log.error("剪裁失败，图片本身尺寸小于需要修剪的尺寸：{0}", e.getMessage());
-        }
-    }
 
     /**
      * 获取所有附件
@@ -325,7 +292,7 @@ public class HaloUtils {
      *
      * @param hostIp       ip
      * @param userName     用户名
-     * @param password     密码
+     * @param password     password
      * @param savePath     保存路径
      * @param fileName     文件名
      * @param databaseName 数据库名
@@ -470,7 +437,7 @@ public class HaloUtils {
      *
      * @param smtpHost smtpHost
      * @param userName 邮件地址
-     * @param password 密码
+     * @param password password
      */
     public static void configMail(String smtpHost, String userName, String password) {
         Properties properties = OhMyEmail.defaultConfig(false);

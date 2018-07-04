@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -139,8 +140,8 @@ public class BackupController {
      * @return JsonResult
      */
     public JsonResult backupPosts() {
-        List<Post> posts = postService.findAllPosts(HaloConst.POST_TYPE_POST);
-        posts.addAll(postService.findAllPosts(HaloConst.POST_TYPE_PAGE));
+        List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
+        posts.addAll(postService.findAllPosts(PostType.POST_TYPE_PAGE.getDesc()));
         try {
             if(HaloUtils.getBackUps("posts").size()>10){
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");

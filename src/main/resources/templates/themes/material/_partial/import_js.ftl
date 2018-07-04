@@ -17,18 +17,11 @@
 </script>
 
 <!-- Import prettify js  -->
+
+<script>
+    lsloader.load("prettify_js", "/material/source/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", !0)
+</script>
 <!--
-<% if (theme.prettify.enable){ %>
-    <% if ( (is_post()) ) { %>
-        <% if(theme.vendors.prettify) { %>
-            <%- jsLsload({path:(theme.vendors.prettify),key:'prettify_js'}) %>
-        <% } else if(theme.vendors.materialcdn) { %>
-            <%- jsLsload({path:(theme.vendors.materialcdn + '/js/prettify.min.js'),key:'prettify_js'}) %>
-        <% } else { %>
-            <%- jsLsload({path:('js/prettify.min.js'),key:'prettify_js'}) %>
-        <% } %>
-    <% } %>
-<% } %>
 <% if (theme.hanabi.enable) { %>
     <% if(theme.vendors.materialcdn) { %>
         <%- jsLsload({path:(theme.vendors.materialcdn + '/js/hanabi-browser-bundle.js'),key:'hanabi'}) %>

@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.ResponseStatus;
 import cc.ryanc.halo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,9 +32,9 @@ public class ApiCategoryController {
     public JsonResult categories(){
         List<Category> categories = categoryService.findAllCategories();
         if(null!=categories && categories.size()>0){
-            return new JsonResult(200,"success",categories);
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),categories);
         }else{
-            return new JsonResult(200,"empty");
+            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
         }
     }
 
@@ -47,9 +48,9 @@ public class ApiCategoryController {
     public JsonResult categories(@PathVariable("cateUrl") String cateUrl){
         Category category = categoryService.findByCateUrl(cateUrl);
         if(null!=category){
-            return new JsonResult(200,"success",category);
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),category);
         }else{
-            return new JsonResult(404,"not found");
+            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
         }
     }
 }
