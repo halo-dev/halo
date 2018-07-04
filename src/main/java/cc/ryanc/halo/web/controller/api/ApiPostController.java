@@ -3,6 +3,9 @@ package cc.ryanc.halo.web.controller.api;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.ResponseStatus;
 import cc.ryanc.halo.service.PostService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +45,20 @@ public class ApiPostController {
             size = Integer.parseInt(HaloConst.OPTIONS.get("index_posts"));
         }
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Post> posts = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
+        Page<Post> posts = postService.findPostByStatus(PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
-            return new JsonResult(200,"empty");
+            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
         }
-        return new JsonResult(200,"success",posts);
+        return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),posts);
     }
 
     @GetMapping(value = "/hot")
     public JsonResult hotPosts() {
         List<Post> posts = postService.hotPosts();
         if (null != posts && posts.size() > 0) {
-            return new JsonResult(200, "success", posts);
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(), posts);
         } else {
-            return new JsonResult(200, "empty");
+            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
         }
     }
 
@@ -67,11 +70,11 @@ public class ApiPostController {
      */
     @GetMapping(value = "/{postUrl}")
     public JsonResult posts(@PathVariable(value = "postUrl") String postUrl){
-        Post post = postService.findByPostUrl(postUrl,HaloConst.POST_TYPE_POST);
+        Post post = postService.findByPostUrl(postUrl,PostType.POST_TYPE_POST.getDesc());
         if(null!=post){
-            return new JsonResult(200,"success",post);
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),post);
         }else {
-            return new JsonResult(404,"not found");
+            return new JsonResult(ResponseStatus.NOTFOUND.getCode(),ResponseStatus.NOTFOUND.getMsg());
         }
     }
 }

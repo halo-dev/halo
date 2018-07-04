@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.PostService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class FrontOthersController {
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
-        Page<Post> postsPage = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
+        Page<Post> postsPage = postService.findPostByStatus(0, PostType.POST_TYPE_POST.getDesc(), pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildRss(posts);
     }
@@ -56,7 +57,7 @@ public class FrontOthersController {
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(0, 999, sort);
-        Page<Post> postsPage = postService.findPostByStatus(0, HaloConst.POST_TYPE_POST, pageable);
+        Page<Post> postsPage = postService.findPostByStatus(0, PostType.POST_TYPE_POST.getDesc(), pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildSiteMap(posts);
     }

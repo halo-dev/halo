@@ -1,5 +1,6 @@
 package cc.ryanc.halo.config;
 
+import cc.ryanc.halo.web.interceptor.ApiInterceptor;
 import cc.ryanc.halo.web.interceptor.InstallInterceptor;
 import cc.ryanc.halo.web.interceptor.LoginInterceptor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,9 @@ public class MvcConfig implements WebMvcConfigurer {
     @Autowired
     private InstallInterceptor installInterceptor;
 
+    @Autowired
+    private ApiInterceptor apiInterceptor;
+
     /**
      * 注册拦截器
      *
@@ -48,6 +52,8 @@ public class MvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/install")
                 .excludePathPatterns("/install/do")
                 .excludePathPatterns("/static/**");
+        registry.addInterceptor(apiInterceptor)
+                .addPathPatterns("/api/**");
     }
 
     /**
