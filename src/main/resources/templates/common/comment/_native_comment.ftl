@@ -1,3 +1,4 @@
+<@compress single_line=true>
 <link type="text/css" rel="stylesheet" href="/static/plugins/loaders/loaders.css">
 <style>
     * {
@@ -293,7 +294,7 @@
         var author = $("#commentAuthor");
         var content = $("#commentContent");
         var email = $("#commentAuthorEmail");
-        var url = $("#commentAuthorUrl")
+        var url = $("#commentAuthorUrl");
         if (author.val() == '' || content.val() == '') {
             $(".native-message").html("<span style='color:red'>请输入必填项！</span>");
             $(".native-message").fadeIn(1000);
@@ -358,3 +359,4 @@
         return '<span class="ua">'+browser+'</span><span class="ua">'+os+'</span>';
     }
 </script>
+</@compress>

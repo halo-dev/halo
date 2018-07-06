@@ -18,13 +18,14 @@
     <link rel="stylesheet" href="/anatole/source/css/blog_basic.min.css?version=88107691fe">
     <link href="/anatole/source/css/style.min.css" type="text/css" rel="stylesheet" />
     <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/feed.xml">
-    <#if options.anatole_style_post_title_lower?default("true") == "false">
     <style>
+        <#if options.anatole_style_post_title_lower?default("true") == "false">
         .post .post-title h3 {
             text-transform: none;
         }
+        </#if>
+        ${options.anatole_style_self?if_exists}
     </style>
-    </#if>
 </head>
 <body>
 </#macro>

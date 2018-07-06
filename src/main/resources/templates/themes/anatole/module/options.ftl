@@ -177,6 +177,12 @@
                                         <input type="text" class="form-control" id="anatoleStyleGoogleColor" name="anatole_style_google_color" value="${options.anatole_style_google_color?default("#fff")}" >
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="anatoleStyleSelf" class="col-sm-4 control-label">自定义样式：</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control" rows="3" id="anatoleStyleSelf" name="anatole_style_self" style="resize: none">${options.anatole_style_self?if_exists}</textarea>
+                                    </div>
+                                </div>
                             </div>
                             <div class="box-footer">
                                 <button type="button" class="btn btn-primary btn-sm pull-right" onclick="saveThemeOptions('anatoleStyleOptions')">保存设置</button>
