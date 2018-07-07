@@ -176,6 +176,7 @@ public class PostServiceImpl implements PostService {
      * @return List
      */
     @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_status_type_'+#status+'_'+#postType")
     public List<Post> findPostByStatus(Integer status, String postType) {
         return postRepository.findPostsByPostStatusAndPostType(status, postType);
     }
@@ -323,25 +324,28 @@ public class PostServiceImpl implements PostService {
      * 根据分类目录查询文章
      *
      * @param category category
+     * @param status status
      * @param pageable pageable
      * @return Page
      */
     @Override
+    @CachePut(value = POSTS_CACHE_NAME, key = "'posts_category_'+#category.cateId+'_'+#pageable.pageNumber")
     public Page<Post> findPostByCategories(Category category, Pageable pageable) {
-        return postRepository.findPostByCategories(category,pageable);
+        return postRepository.findPostByCategoriesAndPostStatus(category, PostStatus.PUBLISHED.getCode(), pageable);
     }
 
     /**
-     * 根据标签查询文章
+     * 根据标签查询文章，分页
      *
-     * @param tag      tag
+     * @param tag tag
+     * @param status status
      * @param pageable pageable
      * @return Page
      */
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_tag_'+#tag.tagId+'_'+#pageable.pageNumber")
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
-        return postRepository.findPostsByTags(tag, pageable);
+        return postRepository.findPostsByTagsAndPostStatus(tag, PostStatus.PUBLISHED.getCode(), pageable);
     }
 
     /**

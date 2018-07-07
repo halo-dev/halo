@@ -155,19 +155,21 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * 根据分类目录查询文章
      *
      * @param category category
+     * @param status status
      * @param pageable pageable
      * @return Page
      */
-    Page<Post> findPostByCategories(Category category, Pageable pageable);
+    Page<Post> findPostByCategoriesAndPostStatus(Category category, Integer status, Pageable pageable);
 
     /**
      * 根据标签查询文章，分页
      *
-     * @param tag      tag
+     * @param tag tag
+     * @param status status
      * @param pageable pageable
      * @return Page
      */
-    Page<Post> findPostsByTags(Tag tag, Pageable pageable);
+    Page<Post> findPostsByTagsAndPostStatus(Tag tag, Integer status, Pageable pageable);
 
     /**
      * 根据标签查询文章
