@@ -54,6 +54,7 @@
                             <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="urlOnBlurAuto()" style="display: none;">确定</button>
                         </span>
                     </div>
+</#compress>
                     <div class="box box-primary">
                         <!-- Editor.md编辑器 -->
                         <div class="box-body pad">
@@ -62,6 +63,7 @@
                             </div>
                         </div>
                     </div>
+<#compress >
                 </div>
                 <div class="col-md-3">
                     <div class="box box-primary">
