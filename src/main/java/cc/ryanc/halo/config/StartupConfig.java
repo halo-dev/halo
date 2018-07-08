@@ -11,9 +11,9 @@ import cn.hutool.cron.CronUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-public class StartupConfig implements ApplicationListener<ContextRefreshedEvent> {
+public class StartupConfig implements ApplicationListener<ApplicationStartedEvent> {
 
     @Autowired
     private OptionsService optionsService;
@@ -37,14 +37,14 @@ public class StartupConfig implements ApplicationListener<ContextRefreshedEvent>
     private AttachmentService attachmentService;
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(ApplicationStartedEvent event) {
         this.loadActiveTheme();
         this.loadOptions();
         this.loadFiles();
         this.loadThemes();
         //启动定时任务
         CronUtil.start();
-        log.info("定时任务启动成功！");
+        log.info("The scheduled task starts successfully!");
     }
 
     /**

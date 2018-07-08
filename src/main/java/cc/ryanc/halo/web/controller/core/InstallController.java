@@ -121,7 +121,7 @@ public class InstallController {
             List<Category> categories = new ArrayList<>();
             categories.add(category);
             post.setPostTitle("Hello Halo!");
-            post.setPostContentMd("#Hello Halo!\n" +
+            post.setPostContentMd("# Hello Halo!\n" +
                     "欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
             post.setPostContent("<h1 id=\"h1-hello-halo-\"><a name=\"Hello Halo!\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>Hello Halo!</h1><p>欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。</p>\n");
             post.setPostSummary("欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
