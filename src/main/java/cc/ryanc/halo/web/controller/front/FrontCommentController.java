@@ -10,6 +10,7 @@ import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
@@ -122,7 +123,7 @@ public class FrontCommentController {
             }
             commentService.saveByComment(comment);
             if(comment.getCommentParent()>0){
-                //new EmailToParent(comment,lastComment,post).start();
+                new EmailToParent(comment,lastComment,post).start();
             }else{
                 new EmailToAdmin(comment,post).start();
             }
@@ -178,14 +179,11 @@ public class FrontCommentController {
             this.post = post;
         }
 
-        Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-        Matcher matcher = patternEmail.matcher(lastComment.getCommentAuthorEmail());
-
         @Override
         public void run() {
             //发送通知给对方
             if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_reply_notice"),"true")) {
-                if(matcher.find()){
+                if(Validator.isEmail(lastComment.getCommentAuthorEmail())){
                     Map<String, Object> map = new HashMap<>();
                     map.put("blogTitle",HaloConst.OPTIONS.get("blog_title"));
                     map.put("commentAuthor",lastComment.getCommentAuthor());

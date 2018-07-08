@@ -46,34 +46,34 @@
                                     <input type="hidden" id="userPass" name="userPass" value="${user.userPass?if_exists}">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="userName" class="col-sm-2 control-label">用户名：
+                                            <label for="userName" class="col-lg-2 col-sm-4 control-label">用户名：
                                                 <span data-toggle="tooltip" data-placement="top" title="用于登录" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
-                                            <div class="col-sm-4">
+                                            <div class="col-lg-4 col-sm-8">
                                                 <input type="text" class="form-control" id="userName" name="userName" value="${user.userName?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userDisplayName" class="col-sm-2 control-label">显示名称：
+                                            <label for="userDisplayName" class="col-lg-2 col-sm-4 control-label">显示名称：
                                                 <span data-toggle="tooltip" data-placement="top" title="页面显示的名称" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
-                                            <div class="col-sm-4">
+                                            <div class="col-lg-4 col-sm-8">
                                                 <input type="text" class="form-control" id="userDisplayName" name="userDisplayName" value="${user.userDisplayName?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userEmail" class="col-sm-2 control-label">邮箱：</label>
-                                            <div class="col-sm-4">
+                                            <label for="userEmail" class="col-lg-2 col-sm-4 control-label">邮箱：</label>
+                                            <div class="col-lg-4 col-sm-8">
                                                 <input type="email" class="form-control" id="userEmail" name="userEmail" value="${user.userEmail?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userAvatar" class="col-sm-2 control-label">头像：</label>
-                                            <div class="col-sm-4">
+                                            <label for="userAvatar" class="col-lg-2 col-sm-4 control-label">头像：</label>
+                                            <div class="col-lg-4 col-sm-8">
                                                 <div class="input-group">
                                                     <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
                                                     <span class="input-group-btn">
@@ -83,12 +83,12 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userDesc" class="col-sm-2 control-label">个人说明：
+                                            <label for="userDesc" class="col-lg-2 col-sm-4 control-label">个人说明：
                                                 <span data-toggle="tooltip" data-placement="top" title="部分主题可在页面上显示这段话" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
-                                            <div class="col-sm-4">
+                                            <div class="col-lg-4 col-sm-8">
                                                 <textarea class="form-control" rows="3" id="userDesc" name="userDesc" style="resize: none">${user.userDesc?if_exists}</textarea>
                                             </div>
                                         </div>
