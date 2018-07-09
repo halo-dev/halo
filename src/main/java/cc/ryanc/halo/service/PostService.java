@@ -232,6 +232,13 @@ public interface PostService {
     List<Post> relatedPosts(Post post);
 
     /**
+     * 获取所有文章的阅读量
+     *
+     * @return Long
+     */
+    Long getPostViews();
+
+    /**
      * 生成rss
      *
      * @param posts posts

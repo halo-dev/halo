@@ -196,4 +196,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @return List<Post>
      */
     List<Post> findPostsByPostTypeOrderByPostViewsDesc(String postStatus);
+
+    /**
+     * 获取所有文章阅读量总和
+     *
+     * @return Long
+     */
+    @Query(value = "select sum(post_views) from halo_post", nativeQuery = true)
+    Long getPostViewsSum();
 }

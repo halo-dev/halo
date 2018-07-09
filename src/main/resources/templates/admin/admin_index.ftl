@@ -156,7 +156,7 @@
                     <div class="small-box bg-red">
                         <div class="inner"><h3 id="blogStart">1</h3><p>成立天数</p></div>
                         <div class="icon"><i class="ion ion-pie-graph"></i></div>
-                        <a href="#" class="small-box-footer">${options.blog_start?default('0000-00-00')} <i class="fa fa-star"></i></a>
+                        <a href="#" class="small-box-footer" data-toggle="modal" data-target="#blogInfo">${options.blog_start?default('0000-00-00')} <i class="fa fa-star"></i></a>
                     </div>
                 </div>
                 </#if>
@@ -335,6 +335,29 @@
                 </#if>
             </div>
         </section>
+        <div class="modal fade" id="blogInfo" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">博客数据</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>「${options.blog_title?if_exists}」已经运行了<span id="blogStartDay"></span>天了。</p>
+                        <p>在此期间：</p>
+                        <p>累计发表了${postCount?default(0)}篇文章。</p>
+                        <p>累计创建了<@commonTag method="tags">${tags?size}</@commonTag>个标签。</p>
+                        <p>累计获得了${commentCount}条评论。</p>
+                        <p>累计添加了<@commonTag method="links">${links?size}</@commonTag>个友链。</p>
+                        <p>文章总访问${postViewsSum}次。</p>
+                        <p>加油！不要因为走的太远，而忘了当初为什么出发。</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script src="/static/plugins/layer/layer.js"></script>
         <script src="/static/js/app.js"></script>
         <script type="application/javascript">
@@ -344,6 +367,7 @@
                 var parseDate = dateEnd.getTime() - dateBegin.getTime();
                 var days = Math.floor(parseDate/(24*3600*1000));
                 $('#blogStart').html(days+1);
+                $('#blogStartDay').html(days+1);
             });
             function openAllLogs() {
                 layer.open({
