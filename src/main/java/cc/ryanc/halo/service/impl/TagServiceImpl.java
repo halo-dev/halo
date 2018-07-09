@@ -4,8 +4,6 @@ import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.repository.TagRepository;
 import cc.ryanc.halo.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,8 +20,6 @@ public class TagServiceImpl implements TagService {
     @Autowired
     private TagRepository tagRepository;
 
-    private static final String TAGS_CACHE_NAME = "tags";
-
     /**
      * 新增/修改标签
      *
@@ -31,7 +27,6 @@ public class TagServiceImpl implements TagService {
      * @return Tag
      */
     @Override
-    @CacheEvict(value = TAGS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Tag saveByTag(Tag tag) {
         return tagRepository.save(tag);
     }
@@ -43,7 +38,6 @@ public class TagServiceImpl implements TagService {
      * @return Tag
      */
     @Override
-    @CacheEvict(value = TAGS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Tag removeByTagId(Long tagId) {
         Optional<Tag> tag = findByTagId(tagId);
         tagRepository.delete(tag.get());
@@ -56,7 +50,6 @@ public class TagServiceImpl implements TagService {
      * @return List
      */
     @Override
-    @Cacheable(value = TAGS_CACHE_NAME, key = "'tag'")
     public List<Tag> findAllTags() {
         return tagRepository.findAll();
     }

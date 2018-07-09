@@ -90,6 +90,9 @@ public class AdminController extends BaseController {
         model.addAttribute("comments", comments);
 
         model.addAttribute("mediaCount", HaloConst.ATTACHMENTS.size());
+
+        Long postViewsSum = postService.getPostViews();
+        model.addAttribute("postViewsSum",postViewsSum);
         return "admin/admin_index";
     }
 

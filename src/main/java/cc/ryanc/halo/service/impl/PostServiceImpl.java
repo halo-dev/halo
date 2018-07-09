@@ -399,6 +399,16 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * 获取所有文章的阅读量
+     *
+     * @return Long
+     */
+    @Override
+    public Long getPostViews() {
+        return postRepository.getPostViewsSum();
+    }
+
+    /**
      * 生成rss
      *
      * @param posts posts
