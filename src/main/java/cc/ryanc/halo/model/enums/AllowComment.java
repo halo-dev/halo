@@ -1,0 +1,27 @@
+package cc.ryanc.halo.model.enums;
+
+/**
+ * @author : RYAN0UP
+ * @date : 2018/7/9
+ */
+public enum AllowComment {
+    /**
+     * 允许评论
+     */
+    ALLOW(1),
+
+    /**
+     * 不允许评论
+     */
+    DISALLOW(0);
+
+    private Integer code;
+
+    AllowComment(Integer code) {
+        this.code = code;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+}

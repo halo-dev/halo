@@ -76,8 +76,11 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <div>
-                            </div>
+                            <label for="allowComment" class="control-label">开启评论：</label>
+                            <select class="form-control" id="allowComment" name="allowComment">
+                                <option value="1" <#if post?? && post.allowComment?default(1)==1>selected</#if>>是</option>
+                                <option value="0" <#if post?? && post.allowComment?default(1)==0>selected</#if>>否</option>
+                            </select>
                         </div>
                         <div class="box-footer">
                             <button onclick="push(1)" class="btn btn-default btn-sm ">保存草稿</button>
@@ -324,7 +327,8 @@
                         'postContent': editor.getHTML(),
                         'postThumbnail': $('#selectImg')[0].src,
                         'cateList' : cateList.toString(),
-                        'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString()
+                        'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
+                        'allowComment' : $('#allowComment').val()
                     },
                     success: function (data) {
                         if(data.code==1){

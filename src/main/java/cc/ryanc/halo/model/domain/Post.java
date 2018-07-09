@@ -125,4 +125,9 @@ public class Post implements Serializable {
      * 文章访问量
      */
     private Long postViews = 0L;
+
+    /**
+     * 是否允许评论
+     */
+    private Integer allowComment = 0;
 }
