@@ -9,6 +9,7 @@ import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
+import cc.ryanc.halo.utils.OwoUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.URLUtil;
@@ -113,10 +114,10 @@ public class FrontCommentController {
             if(comment.getCommentParent()>0){
                 lastComment = commentService.findCommentById(comment.getCommentParent()).get();
                 String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
-                comment.setCommentContent(StringUtils.substringAfter(HtmlUtil.encode(comment.getCommentContent()),":")+lastContent);
+                comment.setCommentContent(StringUtils.substringAfter(OwoUtil.markToImg(HtmlUtil.encode(comment.getCommentContent())),":")+lastContent);
             }else{
                 //将评论内容的字符专为安全字符
-                comment.setCommentContent(HtmlUtil.encode(comment.getCommentContent()));
+                comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.encode(comment.getCommentContent())));
             }
             if(StringUtils.isNotEmpty(comment.getCommentAuthorUrl())){
                 comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));
