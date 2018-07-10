@@ -1,5 +1,6 @@
 <@compress single_line=true>
 <link type="text/css" rel="stylesheet" href="/static/plugins/loaders/loaders.css">
+<link type="text/css" rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
 <style>
     * {
         box-sizing: border-box;
@@ -21,7 +22,6 @@
     .native-wrap {
         border: 1px solid #f0f0f0;
         padding: 10px;
-        overflow: hidden;
         position: relative;
         margin-left: 58px;
     }
@@ -62,6 +62,12 @@
         border: none!important;
         font-size: .9rem !important;
         padding: 10px 0!important;
+    }
+
+    .comment-OwO{
+        text-align: left;
+        vertical-align: middle;
+        padding-top: 10px;
     }
 
     .comment-footer {
@@ -234,6 +240,7 @@
         <div class="comment-content">
             <textarea class="comment-input-content" name="commentContent" id="commentContent"
                       placeholder="${options.native_comment_placeholder?default('赶快评论一个吧！')}"></textarea>
+            <div class="OwO"></div>
         </div>
         <div class="comment-footer">
             <button type="button" class="comment-submit" id="btn-push">提交</button>
@@ -279,7 +286,17 @@
 <script src="/static/plugins/jquery/jquery.min.js"></script>
 <script src="/static/plugins/md5/md5.min.js"></script>
 <script src="/static/plugins/ua-parser/ua-parser.min.js"></script>
+<script src="/static/plugins/OwO/OwO.min.js"></script>
 <script>
+    var s = new OwO({
+        logo: 'OωO表情',
+        container: document.getElementsByClassName('OwO')[0],
+        target: document.getElementsByClassName('comment-input-content')[0],
+        position: 'down',
+        width: '100%',
+        maxHeight: '210px',
+        api:"/static/plugins/OwO/OwO.min.json"
+    });
     $(document).ready(function () {
         $(".native-list-one-head").each(function (i) {
             var uaInfo = $(this).children(".native-comment-ua-info").html();
