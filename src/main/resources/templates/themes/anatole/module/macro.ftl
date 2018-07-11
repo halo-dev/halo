@@ -24,6 +24,17 @@
             text-transform: none;
         }
         </#if>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+            background-color: #eee;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: ${options.anatole_style_scrollbar?default("#3798e8")};
+        }
+        ::-webkit-scrollbar-track {
+            background-color: #eee;
+        }
         ${options.anatole_style_self?if_exists}
     </style>
 </head>

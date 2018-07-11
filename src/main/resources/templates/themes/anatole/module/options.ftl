@@ -178,6 +178,12 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="anatoleStyleScrollbar" class="col-sm-4 control-label">全局滚动条颜色：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="anatoleStyleScrollbar" name="anatole_style_scrollbar" value="${options.anatole_style_scrollbar?default("#3798e8")}" >
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label for="anatoleStyleSelf" class="col-sm-4 control-label">自定义样式：</label>
                                     <div class="col-sm-8">
                                         <textarea class="form-control" rows="3" id="anatoleStyleSelf" name="anatole_style_self" style="resize: none">${options.anatole_style_self?if_exists}</textarea>
