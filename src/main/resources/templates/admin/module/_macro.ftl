@@ -15,12 +15,14 @@
     <link rel="stylesheet" href="/static/css/loader.css">
     <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
     <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
+    <link type="text/css" rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
     <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <script src="/static/plugins/jquery/jquery.min.js"></script>
     <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/plugins/OwO/OwO.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme?default('skin-blue')} ${options.admin_layout?default('')} ${options.sidebar_style?default('')}">
 <#if options.admin_loading?default("false") == "true">
