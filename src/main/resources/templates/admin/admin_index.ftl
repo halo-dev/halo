@@ -358,8 +358,6 @@
                 </div>
             </div>
         </div>
-        <script src="/static/plugins/layer/layer.js"></script>
-        <script src="/static/js/app.js"></script>
         <script type="application/javascript">
             $(document).ready(function () {
                 var dateBegin = new Date("${options.blog_start?default('0000-00-00')}");

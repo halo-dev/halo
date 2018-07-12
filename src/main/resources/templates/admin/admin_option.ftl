@@ -615,8 +615,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/layer/layer.js"></script>
-        <script src="/static/js/app.js"></script>
         <@compress single_line=true>
         <script>
             $(function () {

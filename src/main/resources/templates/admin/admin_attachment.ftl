@@ -8,7 +8,6 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
         <style type="text/css" rel="stylesheet">
             #showForm{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
             #showForm:hover{background:#3c8dbc;color:#fff}
@@ -56,7 +55,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/layer/layer.js"></script>
         <script type="application/javascript">
             function openDetail(id) {
                 layer.open({
@@ -71,39 +69,35 @@
                 });
             }
             function loadFileInput() {
-                $.getScript("/static/plugins/fileinput/fileinput.min.js",function () {
-                    $.getScript("/static/plugins/fileinput/zh.min.js",function () {
-                        $('#uploadImg').fileinput({
-                            language: 'zh',
-                            uploadUrl: '/admin/attachments/upload',
-                            uploadAsync: true,
-                            allowedFileExtensions: ['jpg','gif','png','jpeg','svg','psd'],
-                            maxFileCount: 100,
-                            enctype : 'multipart/form-data',
-                            showClose: false
-                        }).on("fileuploaded",function (event,data,previewId,index) {
-                            var data = data.jqXHR.responseJSON;
-                            if(data.success=="1"){
-                                $("#uploadForm").hide(400);
-                                $.toast({
-                                    text: "上传成功！",
-                                    heading: '提示',
-                                    icon: 'success',
-                                    showHideTransition: 'fade',
-                                    allowToastClose: true,
-                                    hideAfter: 1000,
-                                    stack: 1,
-                                    position: 'top-center',
-                                    textAlign: 'left',
-                                    loader: true,
-                                    loaderBg: '#ffffff',
-                                    afterHidden: function () {
-                                        window.location.reload();
-                                    }
-                                });
+                $('#uploadImg').fileinput({
+                    language: 'zh',
+                    uploadUrl: '/admin/attachments/upload',
+                    uploadAsync: true,
+                    allowedFileExtensions: ['jpg','gif','png','jpeg','svg','psd'],
+                    maxFileCount: 100,
+                    enctype : 'multipart/form-data',
+                    showClose: false
+                }).on("fileuploaded",function (event,data,previewId,index) {
+                    var data = data.jqXHR.responseJSON;
+                    if(data.success=="1"){
+                        $("#uploadForm").hide(400);
+                        $.toast({
+                            text: "上传成功！",
+                            heading: '提示',
+                            icon: 'success',
+                            showHideTransition: 'fade',
+                            allowToastClose: true,
+                            hideAfter: 1000,
+                            stack: 1,
+                            position: 'top-center',
+                            textAlign: 'left',
+                            loader: true,
+                            loaderBg: '#ffffff',
+                            afterHidden: function () {
+                                window.location.reload();
                             }
                         });
-                    });
+                    }
                 });
             }
             $(document).ready(function () {

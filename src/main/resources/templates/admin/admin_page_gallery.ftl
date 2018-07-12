@@ -109,7 +109,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/layer/layer.js"></script>
         <script type="application/javascript">
             $('#btnNewPicture').click(function () {
                 $('#newPicturePanel').slideToggle(400);
