@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,7 +120,7 @@ public class FrontArchiveController extends BaseController {
         Pageable pageable = PageRequest.of(0,999,sort);
         Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
         model.addAttribute("post", post);
-        model.addAttribute("comments",comments);
+        model.addAttribute("comments", CommentUtil.getComments(comments.getContent()));
         postService.updatePostView(post);
         return this.render("post");
     }

@@ -130,7 +130,8 @@
                     </div>
                     <form method="post" action="/admin/comments/reply">
                         <div class="modal-body">
-                            <textarea class="form-control" rows="5" id="commentContent" name="commentContent" style="resize: none"></textarea>
+                            <textarea class="form-control comment-input-content" rows="5" id="commentContent" name="commentContent" style="resize: none"></textarea>
+                            <div class="OwO"></div>
                         </div>
                         <div class="modal-footer">
                             <input type="hidden" id="commentId" name="commentId" value=""/>
@@ -144,6 +145,14 @@
             </div>
         </div>
         <script>
+            var s = new OwO({
+                container: document.getElementsByClassName('OwO')[0],
+                target: document.getElementsByClassName('comment-input-content')[0],
+                position: 'down',
+                width: '100%',
+                maxHeight: '210px',
+                api:"/static/plugins/OwO/OwO.min.json"
+            });
             function modelShow(url,message) {
                 $('#url').val(url);
                 $('#message').html(message);

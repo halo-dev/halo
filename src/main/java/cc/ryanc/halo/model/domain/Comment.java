@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <pre>
@@ -93,4 +94,10 @@ public class Comment implements Serializable {
      * 是否是博主的评论 0:不是 1:是
      */
     private Integer isAdmin;
+
+    /**
+     * 当前评论下的所有子评论
+     */
+    @Transient
+    private List<Comment> childComments;
 }

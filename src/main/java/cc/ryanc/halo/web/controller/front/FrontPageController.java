@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -75,7 +76,7 @@ public class FrontPageController extends BaseController {
         if(null==post){
             return this.renderNotFound();
         }
-        model.addAttribute("comments",comments);
+        model.addAttribute("comments", CommentUtil.getComments(comments.getContent()));
         model.addAttribute("post", post);
         postService.updatePostView(post);
         return this.render("page");

@@ -9,6 +9,7 @@ import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.UserService;
+import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.utils.OwoUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
@@ -30,8 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author : RYAN0UP
@@ -64,12 +63,12 @@ public class FrontCommentController {
     public List<Comment> getComment(@PathVariable Long postId) {
         Optional<Post> post = postService.findByPostId(postId);
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        Pageable pageable = PageRequest.of(0, 10, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, 2).getContent();
+        Pageable pageable = PageRequest.of(0, 999, sort);
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, 0).getContent();
         if (null == comments) {
             return null;
         }
-        return comments;
+        return CommentUtil.getComments(comments);
     }
 
     /**
@@ -113,8 +112,8 @@ public class FrontCommentController {
             comment.setCommentAuthor(HtmlUtil.encode(comment.getCommentAuthor()));
             if(comment.getCommentParent()>0){
                 lastComment = commentService.findCommentById(comment.getCommentParent()).get();
-                String lastContent = " //<a href='#comment-id-"+lastComment.getCommentId()+"'>@"+lastComment.getCommentAuthor()+"</a>:"+lastComment.getCommentContent();
-                comment.setCommentContent(StringUtils.substringAfter(OwoUtil.markToImg(HtmlUtil.encode(comment.getCommentContent())),":")+lastContent);
+                String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a>";
+                comment.setCommentContent(lastContent + StringUtils.substringAfter(OwoUtil.markToImg(HtmlUtil.encode(comment.getCommentContent())), ":"));
             }else{
                 //将评论内容的字符专为安全字符
                 comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.encode(comment.getCommentContent())));
