@@ -99,3 +99,15 @@
 .layout-boxed {
     background: url('../images/boxed-bg.jpg') repeat fixed;
 }
+
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}

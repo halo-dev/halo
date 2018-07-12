@@ -14,13 +14,13 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/loader.css">
     <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
     <script src="/static/plugins/jquery/jquery.min.js"></script>
     <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme?default('skin-blue')} ${options.admin_layout?default('')} ${options.sidebar_style?default('')}">
 <#if options.admin_loading?default("false") == "true">
@@ -45,6 +45,9 @@
 <script src="/static/plugins/pace/pace.min.js"></script>
 <script src="/static/js/adminlte.min.js"></script>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/plugins/layer/layer.js"></script>
+<script src="/static/plugins/fileinput/fileinput.min.js"></script>
+<script src="/static/plugins/fileinput/zh.min.js"></script>
 <script src="/static/js/app.js"></script>
 <@compress single_line=true>
 <script>
@@ -63,16 +66,6 @@
             },500);
         });
     </#if>
-    $(function () {
-        if($(window).width()<1024){
-            if($('body').hasClass('layout-boxed')){
-                $('body').removeClass('layout-boxed');
-            }
-            if($('body').hasClass('sidebar-collapse')){
-                $('body').removeClass('sidebar-collapse');
-            }
-        }
-    });
 </script>
 </@compress>
 </body>

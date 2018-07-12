@@ -1,10 +1,23 @@
 $(document).ready(function () {
+    if($(window).width()<1024){
+        if($('body').hasClass('layout-boxed')){
+            $('body').removeClass('layout-boxed');
+        }
+        if($('body').hasClass('sidebar-collapse')){
+            $('body').removeClass('sidebar-collapse');
+        }
+    }
     initMenu();
+});
+
+$(document).on('pjax:clicked', function() {
+    $('.content-wrapper').html("");
 });
 
 $(document).on('pjax:complete',function () {
     initMenu();
 });
+
 /**
  * https://github.com/JpressProjects/jpress/blob/master/jpress-web/src/main/resources/static/admin/js/jpressadmin.js
  */

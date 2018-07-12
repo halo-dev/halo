@@ -165,7 +165,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/layer/layer.js"></script>
         <script src="/static/plugins/editor.md/editormd.min.js"></script>
         <script src="/static/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
         <script src="/static/plugins/jquery-tageditor/jquery.caret.min.js"></script>
@@ -366,7 +365,7 @@
                     }
                 });
             }
-            setInterval("autoPush()","30000");
+            setInterval("autoPush()","60000");
             /**
              * 自动保存文章
              */

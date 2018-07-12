@@ -131,7 +131,6 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/layer/layer.js"></script>
         <@compress single_line=true>
         <script>
             $(function () {
