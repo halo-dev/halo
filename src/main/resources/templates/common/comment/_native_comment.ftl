@@ -96,7 +96,6 @@
     }
 
     .native-list {
-        width: 100%;
         list-style: none;
         margin: 0 auto;
         padding: 0;
