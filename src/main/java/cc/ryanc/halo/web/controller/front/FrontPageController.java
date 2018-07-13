@@ -76,8 +76,9 @@ public class FrontPageController extends BaseController {
         if(null==post){
             return this.renderNotFound();
         }
-        model.addAttribute("comments", CommentUtil.getComments(comments.getContent()));
         model.addAttribute("post", post);
+        model.addAttribute("comments", CommentUtil.getComments(comments.getContent()));
+        model.addAttribute("commentsCount", comments.getTotalElements());
         postService.updatePostView(post);
         return this.render("page");
     }
