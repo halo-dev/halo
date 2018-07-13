@@ -233,7 +233,7 @@
 </style>
 <div class="native-comment">
     <div class="comment-avatar">
-        <img src="//www.gravatar.com/avatar/none?s=256&d=${options.native_comment_avatar?default('mm')}" height="48" width="48" class="comment-author-avatar">
+        <img src="//gravatar.loli.net/avatar/none?s=256&d=${options.native_comment_avatar?default('mm')}" height="48" width="48" class="comment-author-avatar">
     </div>
     <div class="native-wrap">
         <div class="comment-header">
@@ -254,14 +254,14 @@
     </div>
     <div class="native-message" style="text-align: center;padding: 20px;display: none"></div>
     <div class="native-info">
-        <#--<span id="native-info-total" style="font-weight: 600">${comments.getTotalElements()}</span>评论-->
+        <span id="native-info-total" style="font-weight: 600">${commentsCount?default(0)}</span>评论
     </div>
     <#macro childComments comments>
         <ul class="native-list" style="margin-left: 20px; border-left: 1px solid #f1f1f1">
         <#if comments?? && comments?size gt 0>
             <#list comments as comment>
                 <li class="native-list-one" id="comment-id-${comment.commentId?c}">
-                    <img class="native-list-one-img" src="//www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
+                    <img class="native-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                     <section>
                         <div class="native-list-one-head">
                             <a class="native-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>
@@ -290,7 +290,7 @@
         <#if comments?? && comments?size gt 0>
             <#list comments as comment>
                 <li class="native-list-one" id="comment-id-${comment.commentId?c}">
-                    <img class="native-list-one-img" src="//www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
+                    <img class="native-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                     <section>
                         <div class="native-list-one-head">
                             <a class="native-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>
@@ -398,9 +398,9 @@
         $('#commentContent').focus();
     });
     function loadAvatar() {
-        $(".comment-author-avatar").attr("src","//www.gravatar.com/avatar/"+md5(localStorage.getItem("email"))+"?s=256&d=${options.native_comment_avatar?default('mm')}");
+        $(".comment-author-avatar").attr("src","//gravatar.loli.net/avatar/"+md5(localStorage.getItem("email"))+"?s=256&d=${options.native_comment_avatar?default('mm')}");
         if($('input[name=commentAuthorEmail]').val()!='' && $('input[name=commentAuthorEmail]').val()!=null){
-            $(".comment-author-avatar").attr("src","//www.gravatar.com/avatar/"+md5($('input[name=commentAuthorEmail]').val())+"?s=256&d=${options.native_comment_avatar?default('mm')}");
+            $(".comment-author-avatar").attr("src","//gravatar.loli.net/avatar/"+md5($('input[name=commentAuthorEmail]').val())+"?s=256&d=${options.native_comment_avatar?default('mm')}");
         }
     }
     var parser = new UAParser();
