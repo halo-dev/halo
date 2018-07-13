@@ -101,13 +101,13 @@
 }
 
 ::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    background-color: transparent;
+    width: 2px;
+    height: 2px;
+    background-color: #eee;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: transparent;
+    background-color: #d0afaf;
 }
 ::-webkit-scrollbar-track {
-    background-color: transparent;
+    background-color: #eee;
 }

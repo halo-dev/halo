@@ -63,7 +63,7 @@ public class FrontArchiveController extends BaseController {
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(page - 1, 5, sort);
         Page<Post> posts = postService.findPostByStatus(0, PostType.POST_TYPE_POST.getDesc(), pageable);
-        if(null==posts){
+        if (null == posts) {
             return this.renderNotFound();
         }
         model.addAttribute("posts", posts);
@@ -83,7 +83,7 @@ public class FrontArchiveController extends BaseController {
                            @PathVariable(value = "year") String year,
                            @PathVariable(value = "month") String month) {
         Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
-        if(null==posts){
+        if (null == posts) {
             return this.renderNotFound();
         }
         model.addAttribute("posts", posts);
@@ -100,7 +100,7 @@ public class FrontArchiveController extends BaseController {
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl, Model model) {
         Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_POST.getDesc());
-        if(null==post || post.getPostStatus()!=0){
+        if (null == post || post.getPostStatus() != 0) {
             return this.renderNotFound();
         }
         //获得当前文章的发布日期
@@ -116,11 +116,12 @@ public class FrontArchiveController extends BaseController {
         if (null != afterPosts && afterPosts.size() > 0) {
             model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
         }
-        Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
-        Pageable pageable = PageRequest.of(0,999,sort);
-        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
+        Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
+        Pageable pageable = PageRequest.of(0, 999, sort);
+        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, 0);
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments.getContent()));
+        model.addAttribute("commentsCount", comments.getTotalElements());
         postService.updatePostView(post);
         return this.render("post");
     }

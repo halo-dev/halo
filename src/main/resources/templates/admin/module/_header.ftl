@@ -29,12 +29,13 @@
                                     <li>
                                         <a href="/admin/comments?status=1">
                                             <div class="pull-left">
-                                                <img src="//www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?default("hash")}?s=256&d=${options.native_comment_avatar?default("mm")}" class="img-circle" alt="User Image">
+                                                <img src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?default("hash")}?s=256&d=${options.native_comment_avatar?default("mm")}" class="img-circle" alt="User Image">
                                             </div>
-                                            <h4>${comment.commentAuthor}
+                                            <h4>
+                                                ${comment.commentAuthor}
                                                 <small> ${comment.commentDate?string("yyyy/MM/dd HH:mm")}</small>
                                             </h4>
-                                            <p>${comment.commentContent}</p>
+                                            <object>${comment.commentContent}</object>
                                         </a>
                                     </li>
                                 <#if x==10>
