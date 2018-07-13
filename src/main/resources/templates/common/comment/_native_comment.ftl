@@ -127,13 +127,13 @@
 
     .native-list .native-list-one section {
         overflow: hidden;
-        padding-bottom: 1.5rem;
+        padding-bottom: 1rem;
         border-bottom: 1px dashed #f5f5f5;
     }
 
     .native-list .native-list-one section .native-list-one-head {
         line-height: 1.5;
-        margin-bottom: .625rem;
+        margin-bottom: .5rem;
         margin-top: 0;
     }
 
@@ -256,11 +256,11 @@
         <span id="native-info-total" style="font-weight: 600">${commentsCount?default(0)}</span>评论
     </div>
     <#macro childComments comments>
-        <ul class="native-list" style="margin-left: 20px; border-left: 1px solid #f1f1f1">
+        <ul class="native-list" style="margin-left: 30px; border-left: 1px solid #f1f1f1">
         <#if comments?? && comments?size gt 0>
             <#list comments as comment>
-                <li class="native-list-one" id="comment-id-${comment.commentId?c}">
-                    <img class="native-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
+                <li class="native-list-one" id="comment-id-${comment.commentId?c}" style="margin-left: 5px;">
+                    <img class="native-list-one-img" style="width: 2rem;height: 2rem;" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                     <section>
                         <div class="native-list-one-head">
                             <a class="native-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>
