@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
@@ -64,7 +65,7 @@ public class FrontCommentController {
         Optional<Post> post = postService.findByPostId(postId);
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
         Pageable pageable = PageRequest.of(0, 999, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, 0).getContent();
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, CommentStatus.PUBLISHED.getCode()).getContent();
         if (null == comments) {
             return null;
         }
@@ -84,7 +85,7 @@ public class FrontCommentController {
                                      @RequestParam(value = "post") Post post){
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = PageRequest.of(page-1,10,sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,2).getContent();
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,CommentStatus.PUBLISHED.getCode()).getContent();
         return comments;
     }
 

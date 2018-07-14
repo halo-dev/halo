@@ -250,13 +250,13 @@
                                             <td>
                                                 <#switch comment.commentStatus>
                                                     <#case 0>
-                                                    <a href="/admin/comments">${comment.commentContent}</a>
+                                                    ${comment.commentContent}
                                                     <#break>
                                                     <#case 1>
-                                                    <a href="/admin/comments?status=1">${comment.commentContent}</a>
+                                                    ${comment.commentContent}
                                                     <#break>
                                                     <#case 2>
-                                                    <a href="/admin/comments?status=2">${comment.commentContent}</a>
+                                                    ${comment.commentContent}
                                                     <#break>
                                                 </#switch>
                                             </td>

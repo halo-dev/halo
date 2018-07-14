@@ -2,6 +2,8 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.enums.CommentStatus;
+import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
@@ -62,7 +64,7 @@ public class FrontArchiveController extends BaseController {
         //所有文章数据，分页，material主题适用
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(page - 1, 5, sort);
-        Page<Post> posts = postService.findPostByStatus(0, PostType.POST_TYPE_POST.getDesc(), pageable);
+        Page<Post> posts = postService.findPostByStatus(PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
             return this.renderNotFound();
         }
@@ -100,7 +102,7 @@ public class FrontArchiveController extends BaseController {
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl, Model model) {
         Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_POST.getDesc());
-        if (null == post || post.getPostStatus() != 0) {
+        if (null == post || !post.getPostStatus().equals(PostStatus.PUBLISHED.getCode())) {
             return this.renderNotFound();
         }
         //获得当前文章的发布日期
@@ -118,7 +120,7 @@ public class FrontArchiveController extends BaseController {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
         Pageable pageable = PageRequest.of(0, 999, sort);
-        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, 0);
+        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatus.PUBLISHED.getCode());
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments.getContent()));
         model.addAttribute("commentsCount", comments.getTotalElements());

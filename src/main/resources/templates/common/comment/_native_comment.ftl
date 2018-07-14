@@ -313,11 +313,10 @@
             </#list>
         </#if>
     </ul>
-    <#--<div class="native-nav">-->
+    <#--<div class="native-nav" id="comment-nav">-->
         <#--<ol class="page-nav">-->
-            <#--<li>←</li>-->
-            <#--<li>1</li>-->
-            <#--<li>→</li>-->
+            <#--<li><</li>-->
+            <#--<li>></li>-->
         <#--</ol>-->
     <#--</div>-->
 </div>

@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.GalleryService;
@@ -72,7 +73,7 @@ public class FrontPageController extends BaseController {
 
         Sort sort = new Sort(Sort.Direction.DESC,"commentDate");
         Pageable pageable = PageRequest.of(0,999,sort);
-        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,0);
+        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post,pageable,CommentStatus.PUBLISHED.getCode());
         if(null==post){
             return this.renderNotFound();
         }
