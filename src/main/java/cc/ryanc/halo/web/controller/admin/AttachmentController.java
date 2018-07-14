@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.ResultCode;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -198,9 +199,6 @@ public class AttachmentController {
     public String attachmentDetail(Model model, @PathParam("attachId") Long attachId) {
         Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
         model.addAttribute("attachment", attachment.get());
-
-        //设置选项
-        model.addAttribute("options", HaloConst.OPTIONS);
         return "admin/widget/_attachment-detail";
     }
 
@@ -237,13 +235,13 @@ public class AttachmentController {
                     );
                 } else {
                     log.error("删除附件[" + delFileName + "]失败！");
-                    return new JsonResult(0,"删除失败！");
+                    return new JsonResult(ResultCode.FAIL.getCode(),"删除失败！");
                 }
             }
         } catch (Exception e) {
             log.error("删除附件[" + delFileName + "]失败！:", e.getMessage());
-            return new JsonResult(0,"删除失败！");
+            return new JsonResult(ResultCode.FAIL.getCode(),"删除失败！");
         }
-        return new JsonResult(1,"删除成功！");
+        return new JsonResult(ResultCode.SUCCESS.getCode(),"删除成功！");
     }
 }

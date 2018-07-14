@@ -1,10 +1,8 @@
 package cc.ryanc.halo.web.controller.core;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,9 +40,7 @@ public class CommonController implements ErrorController {
      * @return String
      */
     @GetMapping(value = "/404")
-    public String fourZeroFour(Model model) {
-        //设置选项
-        model.addAttribute("options", HaloConst.OPTIONS);
+    public String fourZeroFour() {
         return "common/404";
     }
 
@@ -55,9 +51,7 @@ public class CommonController implements ErrorController {
      * @return String
      */
     @GetMapping(value = "/500")
-    public String fiveZeroZero(Model model) {
-        //设置选项
-        model.addAttribute("options", HaloConst.OPTIONS);
+    public String fiveZeroZero() {
         return "common/500";
     }
 

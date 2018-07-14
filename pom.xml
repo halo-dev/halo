@@ -32,12 +32,15 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<oh-my-email.version>0.0.3</oh-my-email.version>
-        <druid.version>1.1.9</druid.version>
-        <lombok.version>1.16.20</lombok.version>
+        <druid.version>1.1.10</druid.version>
+        <lombok.version>1.18.0</lombok.version>
         <ehcache.version>3.5.2</ehcache.version>
         <rome.version>1.0</rome.version>
         <commons-lang3.version>3.7</commons-lang3.version>
-		<hutool-all.version>4.0.12</hutool-all.version>
+		<hutool-all.version>4.1.1</hutool-all.version>
+		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
+        <qiniu-java-sdk.version>7.2.14</qiniu-java-sdk.version>
+        <thumbnailator.version>0.4.8</thumbnailator.version>
 	</properties>
 
 	<dependencies>
@@ -118,7 +121,7 @@
             <scope>provided</scope>
         </dependency>
 
-		<!-- ehCache -->
+		<!-- EhCache -->
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
@@ -146,18 +149,25 @@
 			<version>${hutool-all.version}</version>
 		</dependency>
 
-        <!-- 又拍云 -->
+        <!-- 又拍云SDK -->
 		<dependency>
 			<groupId>com.upyun</groupId>
 			<artifactId>java-sdk</artifactId>
-			<version>4.0.1</version>
+			<version>${upyun-java-sdk.version}</version>
+		</dependency>
+
+		<!-- 七牛云SDK -->
+		<dependency>
+			<groupId>com.qiniu</groupId>
+			<artifactId>qiniu-java-sdk</artifactId>
+			<version>${qiniu-java-sdk.version}</version>
 		</dependency>
 
 		<!-- 图片操作 -->
 		<dependency>
 			<groupId>net.coobird</groupId>
 			<artifactId>thumbnailator</artifactId>
-			<version>0.4.8</version>
+			<version>${thumbnailator.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -234,7 +244,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.4</version>
+						<version>3.1.0</version>
 						<configuration>
 							<archive>
 								<manifest>

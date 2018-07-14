@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.ResultCode;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
@@ -231,10 +232,10 @@ public class PageController {
             }
             postService.saveByPost(post);
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
-            return new JsonResult(1,msg);
+            return new JsonResult(ResultCode.SUCCESS.getCode(),msg);
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
-            return new JsonResult(0,"保存失败");
+            log.error("未知错误：{}", e.getMessage());
+            return new JsonResult(ResultCode.FAIL.getCode(),"保存失败");
         }
     }
 
