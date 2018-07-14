@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
@@ -117,23 +118,23 @@ public class CommentController extends BaseController {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
         //判断是否启用邮件服务
-        if (StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"), "true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_pass_notice"), "true")) {
+        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.COMMENT_REPLY_NOTICE.getProp()), "true")) {
             try {
                 if (status == 1 && Validator.isEmail(comment.getCommentAuthorEmail())) {
                     Map<String, Object> map = new HashMap<>();
                     if (StringUtils.equals(post.getPostType(), PostType.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     }
                     map.put("pageName", post.getPostTitle());
                     map.put("commentContent", comment.getCommentContent());
-                    map.put("blogUrl", HaloConst.OPTIONS.get("blog_url"));
-                    map.put("blogTitle", HaloConst.OPTIONS.get("blog_title"));
+                    map.put("blogUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()));
+                    map.put("blogTitle", HaloConst.OPTIONS.get(BlogProperties.BLOG_TITLE.getProp()));
                     map.put("author", user.getUserDisplayName());
                     mailService.sendTemplateMail(
                             comment.getCommentAuthorEmail(),
-                            "您在" + HaloConst.OPTIONS.get("blog_title") + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
+                            "您在" + HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
                 }
             } catch (Exception e) {
                 log.error("邮件服务器未配置：", e.getMessage());
@@ -194,7 +195,7 @@ public class CommentController extends BaseController {
             comment.setPost(post);
             comment.setCommentAuthor(user.getUserDisplayName());
             comment.setCommentAuthorEmail(user.getUserEmail());
-            comment.setCommentAuthorUrl(HaloConst.OPTIONS.get("blog_url"));
+            comment.setCommentAuthorUrl(HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()));
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
             comment.setCommentDate(DateUtil.date());
@@ -207,23 +208,23 @@ public class CommentController extends BaseController {
             commentService.saveByComment(comment);
 
             //邮件通知
-            if (StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"), "true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_reply_notice"), "true")) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.COMMENT_REPLY_NOTICE.getProp()), "true")) {
                 if (Validator.isEmail(lastComment.getCommentAuthorEmail())) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("blogTitle", HaloConst.OPTIONS.get("blog_title"));
+                    map.put("blogTitle", HaloConst.OPTIONS.get(BlogProperties.BLOG_TITLE.getProp()));
                     map.put("commentAuthor", lastComment.getCommentAuthor());
                     map.put("pageName", lastComment.getPost().getPostTitle());
                     if (StringUtils.equals(post.getPostType(), PostType.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get("blog_url") + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     }
                     map.put("commentContent", lastComment.getCommentContent());
                     map.put("replyAuthor", user.getUserDisplayName());
                     map.put("replyContent", commentContent);
-                    map.put("blogUrl", HaloConst.OPTIONS.get("blog_url"));
+                    map.put("blogUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()));
                     mailService.sendTemplateMail(
-                            lastComment.getCommentAuthorEmail(), "您在" + HaloConst.OPTIONS.get("blog_title") + "的评论有了新回复", map, "common/mail/mail_reply.ftl");
+                            lastComment.getCommentAuthorEmail(), "您在" + HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "的评论有了新回复", map, "common/mail/mail_reply.ftl");
                 }
             }
         } catch (Exception e) {

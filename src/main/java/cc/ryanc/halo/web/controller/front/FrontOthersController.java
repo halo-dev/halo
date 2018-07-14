@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.PostService;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +35,7 @@ public class FrontOthersController {
     @GetMapping(value = {"feed", "feed.xml", "atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String feed() {
-        String rssPosts = HaloConst.OPTIONS.get("rss_posts");
+        String rssPosts = HaloConst.OPTIONS.get(BlogProperties.RSS_POSTS.getProp());
         if (StringUtils.isBlank(rssPosts)) {
             rssPosts = "20";
         }

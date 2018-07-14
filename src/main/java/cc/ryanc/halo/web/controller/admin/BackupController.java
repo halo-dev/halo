@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.ResultCode;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -85,7 +86,7 @@ public class BackupController {
         } else if (StringUtils.equals("posts", type)) {
             return this.backupPosts();
         } else {
-            return new JsonResult(0, "备份失败！");
+            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -104,10 +105,10 @@ public class BackupController {
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
             log.info("当前时间："+DateUtil.now()+"，执行了数据库备份。");
-            return new JsonResult(1, "备份成功！");
+            return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             log.error("未知错误：", e.getMessage());
-            return new JsonResult(0, "备份失败！");
+            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -127,10 +128,10 @@ public class BackupController {
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
             log.info("当前时间："+DateUtil.now()+"，执行了资源文件备份。");
-            return new JsonResult(1, "备份成功！");
+            return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             e.printStackTrace();
-            return new JsonResult(0, "备份失败！");
+            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -156,10 +157,10 @@ public class BackupController {
             ZipUtil.zip(srcPath, srcPath + ".zip");
             FileUtil.del(srcPath);
             log.info("当前时间："+DateUtil.now()+"，执行了文章备份。");
-            return new JsonResult(1, "备份成功！");
+            return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             e.printStackTrace();
-            return new JsonResult(0, "备份失败！");
+            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -177,9 +178,9 @@ public class BackupController {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         try {
             FileUtil.del(srcPath);
-            return new JsonResult(1, "删除成功！");
+            return new JsonResult(ResultCode.SUCCESS.getCode(), "删除成功！");
         } catch (Exception e) {
-            return new JsonResult(0, "删除失败！");
+            return new JsonResult(ResultCode.FAIL.getCode(), "删除失败！");
         }
     }
 
@@ -198,13 +199,13 @@ public class BackupController {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         if (null == user.getUserEmail() || StringUtils.equals(user.getUserEmail(), "")) {
-            return new JsonResult(0, "博主邮箱没有配置！");
+            return new JsonResult(ResultCode.FAIL.getCode(), "博主邮箱没有配置！");
         }
         if (StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"), "false")) {
-            return new JsonResult(0, "发信邮箱没有配置！");
+            return new JsonResult(ResultCode.FAIL.getCode(), "发信邮箱没有配置！");
         }
         new EmailToAdmin(srcPath, user).start();
-        return new JsonResult(1, "邮件发送成功！");
+        return new JsonResult(ResultCode.SUCCESS.getCode(), "邮件发送成功！");
     }
 
     class EmailToAdmin extends Thread {

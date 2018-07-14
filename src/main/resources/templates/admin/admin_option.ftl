@@ -395,66 +395,89 @@
                             <!-- 附件设置 -->
                             <div class="tab-pane" id="attach">
                                 <form method="post" class="form-horizontal" id="attachOptions">
-                                    <#--<div class="box-body">-->
-                                        <#--<div class="form-group">-->
-                                            <#--<label class="col-lg-2 col-sm-4 control-label">存储位置：</label>-->
-                                            <#--<div class="col-lg-4 col-sm-8">-->
-                                                <#--<label class="radio-inline">-->
-                                                    <#--<input type="radio" name="attach_loc" value="server" ${((options.attach_loc?default('server'))=='server')?string('checked','')}> 本地服务器-->
-                                                <#--</label>-->
-                                                <#--<label class="radio-inline">-->
-                                                    <#--<input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc?if_exists)=='upyun')?string('checked','')}> 又拍云-->
-                                                <#--</label>-->
-                                                <#--<label class="radio-inline">-->
-                                                    <#--<input type="radio" name="attach_loc" value="qiniu" ${((options.attach_loc?if_exists)=='qiniu')?string('checked','')}> 七牛云-->
-                                                <#--</label>-->
-                                            <#--</div>-->
-                                        <#--</div>-->
+                                    <div class="box-body">
+                                        <div class="form-group">
+                                            <label class="col-lg-2 col-sm-4 control-label">存储位置：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="attach_loc" value="server" ${((options.attach_loc?default('server'))=='server')?string('checked','')}> 本地服务器
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc?if_exists)=='upyun')?string('checked','')} disabled="disabled"> 又拍云
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="attach_loc" value="qiniu" ${((options.attach_loc?if_exists)=='qiniu')?string('checked','')} disabled="disabled"> 七牛云
+                                                </label>
+                                            </div>
+                                        </div>
 
-                                        <#--<!-- 原生设置 &ndash;&gt;-->
-                                        <#--<div class="server-options" style="display: none">-->
+                                        <!-- 原生设置 -->
+                                        <div class="server-options" style="display: none">
 
-                                        <#--</div>-->
+                                        </div>
 
-                                        <#--<!-- 又拍云选项 &ndash;&gt;-->
-                                        <#--<div class="upyun-options" style="display: none">-->
-                                            <#--<div class="form-group">-->
-                                                <#--<label for="upyunOssDomain" class="col-lg-2 col-sm-4 control-label">域名绑定：</label>-->
-                                                <#--<div class="col-lg-4 col-sm-8">-->
-                                                    <#--<input type="text" class="form-control" id="upyunOssDomain" name="upyun_oss_domain" value="${options.upyun_oss_domain?if_exists}">-->
-                                                <#--</div>-->
-                                            <#--</div>-->
-                                            <#--<div class="form-group">-->
-                                                <#--<label for="upyunOssBucket" class="col-lg-2 col-sm-4 control-label">空间名称：</label>-->
-                                                <#--<div class="col-lg-4 col-sm-8">-->
-                                                    <#--<input type="text" class="form-control" id="upyunOssBucket" name="upyun_oss_bucket" value="${options.upyun_oss_bucket?if_exists}">-->
-                                                <#--</div>-->
-                                            <#--</div>-->
-                                            <#--<div class="form-group">-->
-                                                <#--<label for="upyunOssOperator" class="col-lg-2 col-sm-4 control-label">操作员名称：</label>-->
-                                                <#--<div class="col-lg-4 col-sm-8">-->
-                                                    <#--<input type="text" class="form-control" id="upyunOssOperator" name="upyun_oss_operator" value="${options.upyun_oss_operator?if_exists}">-->
-                                                <#--</div>-->
-                                            <#--</div>-->
-                                            <#--<div class="form-group">-->
-                                                <#--<label for="upyunOssPwd" class="col-lg-2 col-sm-4 control-label">操作员密码：</label>-->
-                                                <#--<div class="col-lg-4 col-sm-8">-->
-                                                    <#--<input type="text" class="form-control" id="upyunOssPwd" name="upyun_oss_pwd" value="${options.upyun_oss_pwd?if_exists}">-->
-                                                <#--</div>-->
-                                            <#--</div>-->
-                                            <#--<div class="form-group">-->
-                                                <#--<label for="upyunOssSrc" class="col-lg-2 col-sm-4 control-label">文件目录：</label>-->
-                                                <#--<div class="col-lg-4 col-sm-8">-->
-                                                    <#--<input type="text" class="form-control" id="upyunOssSrc" name="upyun_oss_src" value="${options.upyun_oss_src?if_exists}">-->
-                                                <#--</div>-->
-                                            <#--</div>-->
-                                        <#--</div>-->
+                                        <!-- 又拍云选项 -->
+                                        <div class="upyun-options" style="display: none">
+                                            <div class="form-group">
+                                                <label for="upyunOssDomain" class="col-lg-2 col-sm-4 control-label">域名绑定：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="upyunOssDomain" name="upyun_oss_domain" value="${options.upyun_oss_domain?if_exists}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="upyunOssBucket" class="col-lg-2 col-sm-4 control-label">空间名称：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="upyunOssBucket" name="upyun_oss_bucket" value="${options.upyun_oss_bucket?if_exists}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="upyunOssOperator" class="col-lg-2 col-sm-4 control-label">操作员名称：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="upyunOssOperator" name="upyun_oss_operator" value="${options.upyun_oss_operator?if_exists}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="upyunOssPwd" class="col-lg-2 col-sm-4 control-label">操作员密码：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="upyunOssPwd" name="upyun_oss_pwd" value="${options.upyun_oss_pwd?if_exists}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="upyunOssSrc" class="col-lg-2 col-sm-4 control-label">文件目录：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="upyunOssSrc" name="upyun_oss_src" value="${options.upyun_oss_src?if_exists}">
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                        <#--<!-- 七牛云 &ndash;&gt;-->
-                                        <#--<div class="qiniu-options" style="display: none">-->
-
-                                        <#--</div>-->
-                                    <#--</div>-->
+                                        <!-- 七牛云 -->
+                                        <div class="qiniu-options" style="display: none">
+                                            <div class="form-group">
+                                                <label for="qiniuDomain" class="col-lg-2 col-sm-4 control-label">域名：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="qiniuDomain" name="qiniu_domain" value="${options.qiniu_domain?if_exists}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qiniuAccessKey" class="col-lg-2 col-sm-4 control-label">Access Key：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="qiniuAccessKey" name="qiniu_access_key" value="${options.qiniu_access_key?if_exists}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qiniuSecretKey" class="col-lg-2 col-sm-4 control-label">Secret Key：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="qiniuSecretKey" name="qiniu_secret_key" value="${options.qiniu_secret_key?if_exists}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="qiniuBucket" class="col-lg-2 col-sm-4 control-label">Bucket：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="text" class="form-control" id="qiniuBucket" name="qiniu_bucket" value="${options.qiniu_bucket?if_exists}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="box-footer">
                                         <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('attachOptions')">保存</button>
                                     </div>
@@ -620,6 +643,7 @@
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
                 checkCommentOption();
+                checkAttachOption();
             });
 
             /**
@@ -679,7 +703,7 @@
             }
 
             /**
-             * 评论切换
+             * 评论选项切换
              */
             function checkCommentOption() {
                 var native = $('input:radio[value=native]:checked').val();
@@ -714,6 +738,9 @@
                 }
             }
 
+            /**
+             * 附件选项切换
+             */
             function checkAttachOption() {
                 var server = $('input:radio[value=server]:checked').val();
                 var upyun = $('input:radio[value=upyun]:checked').val();

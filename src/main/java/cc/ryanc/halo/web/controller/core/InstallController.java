@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.core;
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.date.DateUtil;
@@ -62,7 +63,7 @@ public class InstallController {
     @GetMapping
     public String install(Model model) {
         try {
-            if (StringUtils.equals("true", HaloConst.OPTIONS.get("is_install"))) {
+            if (StringUtils.equals("true", HaloConst.OPTIONS.get(BlogProperties.IS_INSTALL.getProp()))) {
                 model.addAttribute("isInstall", true);
             } else {
                 model.addAttribute("isInstall", false);
@@ -95,7 +96,7 @@ public class InstallController {
                              @RequestParam("userPwd") String userPwd,
                              HttpServletRequest request) {
         try {
-            if (StringUtils.equals("true", HaloConst.OPTIONS.get("is_install"))) {
+            if (StringUtils.equals("true", HaloConst.OPTIONS.get(BlogProperties.IS_INSTALL.getProp()))) {
                 return false;
             }
             //创建新的用户
@@ -147,28 +148,28 @@ public class InstallController {
             comment.setIsAdmin(0);
             commentService.saveByComment(comment);
 
-            optionsService.saveOption("is_install", "true");
+            optionsService.saveOption(BlogProperties.IS_INSTALL.getProp(), "true");
 
             //保存博客标题和博客地址设置
-            optionsService.saveOption("blog_title", blogTitle);
-            optionsService.saveOption("blog_url", blogUrl);
+            optionsService.saveOption(BlogProperties.BLOG_TITLE.getProp(), blogTitle);
+            optionsService.saveOption(BlogProperties.BLOG_URL.getProp(), blogUrl);
 
             //设置默认主题
-            optionsService.saveOption("theme", "anatole");
+            optionsService.saveOption(BlogProperties.THEME.getProp(), "anatole");
 
             //建立网站时间
-            optionsService.saveOption("blog_start", HaloUtils.getStringDate("yyyy-MM-dd"));
+            optionsService.saveOption(BlogProperties.BLOG_START.getProp(), HaloUtils.getStringDate("yyyy-MM-dd"));
 
             //默认评论系统
-            optionsService.saveOption("comment_system", "native");
+            optionsService.saveOption(BlogProperties.COMMENT_SYSTEM.getProp(), "native");
 
             //默认不配置邮件系统
-            optionsService.saveOption("smtp_email_enable", "false");
+            optionsService.saveOption(BlogProperties.SMTP_EMAIL_ENABLE.getProp(), "false");
 
             //新评论，审核通过，回复，默认不通知
-            optionsService.saveOption("new_comment_notice", "false");
-            optionsService.saveOption("comment_pass_notice", "false");
-            optionsService.saveOption("comment_reply_notice", "false");
+            optionsService.saveOption(BlogProperties.NEW_COMMENT_NOTICE.getProp(), "false");
+            optionsService.saveOption(BlogProperties.COMMENT_PASS_NOTICE.getProp(), "false");
+            optionsService.saveOption(BlogProperties.COMMENT_REPLY_NOTICE.getProp(), "false");
 
             //更新日志
             logsService.saveByLogs(

@@ -8,6 +8,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.ResultCode;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -134,7 +135,7 @@ public class AdminController extends BaseController {
         }
         Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
         if (StringUtils.equals(aUser.getLoginEnable(), "false") && (between < 10)) {
-            return new JsonResult(0, "已禁止登录，请10分钟后再试");
+            return new JsonResult(ResultCode.FAIL.getCode(), "已禁止登录，请10分钟后再试");
         }
         //验证用户名和密码
         User user = null;
@@ -150,7 +151,7 @@ public class AdminController extends BaseController {
             //重置用户的登录状态为正常
             userService.updateUserNormal();
             logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
-            return new JsonResult(1, "登录成功！");
+            return new JsonResult(ResultCode.SUCCESS.getCode(), "登录成功！");
         } else {
             //更新失败次数
             Integer errorCount = userService.updateUserLoginError();
@@ -166,7 +167,7 @@ public class AdminController extends BaseController {
                             DateUtil.date()
                     )
             );
-            return new JsonResult(0, "登录失败，你还有" + (5 - errorCount) + "次机会。");
+            return new JsonResult(ResultCode.FAIL.getCode(), "登录失败，你还有" + (5 - errorCount) + "次机会。");
         }
     }
 

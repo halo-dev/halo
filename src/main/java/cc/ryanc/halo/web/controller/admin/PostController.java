@@ -4,8 +4,10 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.ResultCode;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -162,8 +164,8 @@ public class PostController extends BaseController {
         try {
             //提取摘要
             int postSummary = 50;
-            if (StringUtils.isNotEmpty(HaloConst.OPTIONS.get("post_summary"))) {
-                postSummary = Integer.parseInt(HaloConst.OPTIONS.get("post_summary"));
+            if (StringUtils.isNotEmpty(BlogProperties.POST_SUMMARY.getProp())) {
+                postSummary = Integer.parseInt(BlogProperties.POST_SUMMARY.getProp());
             }
             //文章摘要
             String summaryText = HtmlUtil.cleanHtmlTag(post.getPostContent());
@@ -194,10 +196,10 @@ public class PostController extends BaseController {
             post.setPostUrl(urlFilter(post.getPostUrl()));
             postService.saveByPost(post);
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
-            return new JsonResult(1, msg);
+            return new JsonResult(ResultCode.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("未知错误：", e.getMessage());
-            return new JsonResult(0, "保存失败");
+            return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
         }
     }
 
@@ -246,9 +248,9 @@ public class PostController extends BaseController {
             post.setUser(user);
         } catch (Exception e) {
             log.error("未知错误：", e.getMessage());
-            return new JsonResult(0, "保存失败");
+            return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
         }
-        return new JsonResult(1, "保存成功", postService.saveByPost(post));
+        return new JsonResult(ResultCode.SUCCESS.getCode(), "保存成功", postService.saveByPost(post));
     }
 
 
@@ -366,7 +368,7 @@ public class PostController extends BaseController {
         if (StringUtils.isEmpty(baiduToken)) {
             return false;
         }
-        String blogUrl = HaloConst.OPTIONS.get("blog_url");
+        String blogUrl = HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp());
         List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
         StringBuilder urls = new StringBuilder();
         for (Post post : posts) {
