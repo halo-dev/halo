@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
@@ -74,9 +75,9 @@ public class CommentController extends BaseController {
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Comment> comments = commentService.findAllComments(status, pageable);
         model.addAttribute("comments", comments);
-        model.addAttribute("publicCount", commentService.findAllComments(0, pageable).getTotalElements());
-        model.addAttribute("checkCount", commentService.findAllComments(1, pageable).getTotalElements());
-        model.addAttribute("trashCount", commentService.findAllComments(2, pageable).getTotalElements());
+        model.addAttribute("publicCount", commentService.findAllComments(CommentStatus.PUBLISHED.getCode(), pageable).getTotalElements());
+        model.addAttribute("checkCount", commentService.findAllComments(CommentStatus.CHECKING.getCode(), pageable).getTotalElements());
+        model.addAttribute("trashCount", commentService.findAllComments(CommentStatus.RECYCLE.getCode(), pageable).getTotalElements());
         model.addAttribute("status", status);
         return "admin/admin_comment";
     }
@@ -92,9 +93,9 @@ public class CommentController extends BaseController {
     public String moveToTrash(@PathParam("commentId") Long commentId,
                               @PathParam("status") String status) {
         try {
-            commentService.updateCommentStatus(commentId, 2);
+            commentService.updateCommentStatus(commentId, CommentStatus.RECYCLE.getCode());
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("未知错误：{}", e.getMessage());
         }
         return "redirect:/admin/comments?status=" + status;
     }
@@ -111,7 +112,7 @@ public class CommentController extends BaseController {
     public String moveToPublish(@PathParam("commentId") Long commentId,
                                 @PathParam("status") Integer status,
                                 HttpSession session) {
-        Comment comment = commentService.updateCommentStatus(commentId, 0);
+        Comment comment = commentService.updateCommentStatus(commentId, CommentStatus.PUBLISHED.getCode());
         Post post = comment.getPost();
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
@@ -155,7 +156,7 @@ public class CommentController extends BaseController {
         try {
             commentService.removeByCommentId(commentId);
         } catch (Exception e) {
-            log.error("删除评论失败：", e.getMessage());
+            log.error("删除评论失败：{}", e.getMessage());
         }
         return "redirect:/admin/comments?status=" + status;
     }
@@ -185,7 +186,7 @@ public class CommentController extends BaseController {
             Comment lastComment = commentService.findCommentById(commentId).get();
 
             //修改被回复的评论的状态
-            lastComment.setCommentStatus(0);
+            lastComment.setCommentStatus(CommentStatus.PUBLISHED.getCode());
             commentService.saveByComment(lastComment);
 
             //保存评论
@@ -201,7 +202,7 @@ public class CommentController extends BaseController {
             comment.setCommentContent(lastContent + OwoUtil.markToImg(commentContent));
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
-            comment.setCommentStatus(0);
+            comment.setCommentStatus(CommentStatus.PUBLISHED.getCode());
             comment.setIsAdmin(1);
             commentService.saveByComment(comment);
 
@@ -226,7 +227,7 @@ public class CommentController extends BaseController {
                 }
             }
         } catch (Exception e) {
-            log.error("回复评论失败！{0}", e.getMessage());
+            log.error("回复评论失败！{}", e.getMessage());
         }
         return "redirect:/admin/comments";
     }
