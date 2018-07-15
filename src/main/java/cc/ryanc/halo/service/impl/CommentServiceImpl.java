@@ -22,10 +22,10 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl implements CommentService {
 
+    private static final String COMMENTS_CACHE_NAME = "comments";
+
     @Autowired
     private CommentRepository commentRepository;
-
-    private static final String COMMENTS_CACHE_NAME = "comments";
 
     /**
      * 新增评论

@@ -55,7 +55,7 @@ public class OptionController {
             log.info("所保存的设置选项列表：" + options);
             return new JsonResult(ResultCode.SUCCESS.getCode(),"保存成功！");
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("保存设置选项失败：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(),"保存失败！");
         }
     }

@@ -104,6 +104,12 @@ public class FrontCommentController {
     public JsonResult newComment(@ModelAttribute("comment") Comment comment,
                               @ModelAttribute("post") Post post,
                               HttpServletRequest request) {
+        if (StringUtils.equals(StringUtils.trim(comment.getCommentAuthor()), "")) {
+            return new JsonResult(ResultCode.FAIL.getCode(), "请正确输入昵称！");
+        }
+        if (StringUtils.equals(StringUtils.trim(comment.getCommentContent()), "")) {
+            return new JsonResult(ResultCode.FAIL.getCode(), "请正确输入评论内容！");
+        }
         try{
             Comment lastComment = null;
             post = postService.findByPostId(post.getPostId()).get();
@@ -163,7 +169,7 @@ public class FrontCommentController {
                     map.put("commentContent", comment.getCommentContent());
                     mailService.sendTemplateMail(userService.findUser().getUserEmail(), "有新的评论", map, "common/mail/mail_admin.ftl");
                 } catch (Exception e) {
-                    log.error("邮件服务器未配置：", e.getMessage());
+                    log.error("邮件服务器未配置：{}", e.getMessage());
                 }
             }
         }

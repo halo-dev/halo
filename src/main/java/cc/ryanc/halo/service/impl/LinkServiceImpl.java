@@ -18,12 +18,12 @@ import java.util.Optional;
 @Service
 public class LinkServiceImpl implements LinkService {
 
-    @Autowired
-    private LinkRepository linkRepository;
-
     private static final String LINKS_CACHE_KEY = "'link'";
 
     private static final String LINKS_CACHE_NAME = "links";
+
+    @Autowired
+    private LinkRepository linkRepository;
 
     /**
      * 新增/修改友情链接

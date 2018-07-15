@@ -28,12 +28,12 @@ public class ApiPageController {
      * @return JsonResult
      */
     @GetMapping(value = "/{postUrl}")
-    public JsonResult pages(@PathVariable(value = "postUrl") String postUrl){
-        Post post = postService.findByPostUrl(postUrl,PostType.POST_TYPE_PAGE.getDesc());
-        if(null!=post){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),post);
-        }else{
-            return new JsonResult(ResponseStatus.NOTFOUND.getCode(),ResponseStatus.NOTFOUND.getMsg());
+    public JsonResult pages(@PathVariable(value = "postUrl") String postUrl) {
+        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_PAGE.getDesc());
+        if (null != post) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), post);
+        } else {
+            return new JsonResult(ResponseStatus.NOTFOUND.getCode(), ResponseStatus.NOTFOUND.getMsg());
         }
     }
 }

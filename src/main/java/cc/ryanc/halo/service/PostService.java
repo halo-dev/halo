@@ -94,6 +94,7 @@ public interface PostService {
 
     /**
      * 根据文章状态查询 分页，首页分页
+     *
      * @param pageable pageable
      * @return Page
      */
@@ -196,7 +197,7 @@ public interface PostService {
      * @param pageable pageable
      * @return Page
      */
-    Page<Post> findPostByCategories(Category category,Pageable pageable);
+    Page<Post> findPostByCategories(Category category, Pageable pageable);
 
     /**
      * 根据标签查询文章
@@ -210,11 +211,11 @@ public interface PostService {
     /**
      * 搜索文章
      *
-     * @param keyword 关键词
+     * @param keyword  关键词
      * @param pageable 分页信息
      * @return Page
      */
-    Page<Post> searchByKeywords(String keyword,Pageable pageable);
+    Page<Post> searchByKeywords(String keyword, Pageable pageable);
 
     /**
      * 热门文章

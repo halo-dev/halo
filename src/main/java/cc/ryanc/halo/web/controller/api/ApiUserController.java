@@ -26,8 +26,8 @@ public class ApiUserController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult user(){
+    public JsonResult user() {
         User user = userService.findUser();
-        return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),user);
+        return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), user);
     }
 }

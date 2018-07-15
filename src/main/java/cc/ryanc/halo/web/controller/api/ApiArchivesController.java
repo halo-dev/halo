@@ -28,12 +28,12 @@ public class ApiArchivesController {
      * @return JsonResult
      */
     @GetMapping(value = "/year")
-    public JsonResult archivesYear(){
+    public JsonResult archivesYear() {
         List<Archive> archives = postService.findPostGroupByYear();
-        if(null!=archives || archives.size()>0){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),archives);
-        }else {
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != archives || archives.size() > 0) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), archives);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 
@@ -43,12 +43,12 @@ public class ApiArchivesController {
      * @return JsonResult
      */
     @GetMapping(value = "/year/month")
-    public JsonResult archivesYearAndMonth(){
+    public JsonResult archivesYearAndMonth() {
         List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        if(null!=archives || archives.size()>0){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),archives);
-        }else {
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != archives || archives.size() > 0) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), archives);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 }

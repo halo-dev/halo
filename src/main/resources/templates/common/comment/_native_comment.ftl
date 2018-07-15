@@ -379,11 +379,15 @@
                 localStorage.setItem('url', url.val());
                 if(data.code==1){
                     $('.comment-input-content').val("");
+                    $(".native-message").html("<span>"+data.msg+"</span>");
+                }else{
+                    $(".native-message").html("<span style='color:red'>"+data.msg+"</span>");
                 }
-                $(".native-message").html("<span>"+data.msg+"</span>");
                 $(".native-message").fadeIn(1000);
                 setTimeout(function () {
-                    window.location.reload();
+                    $(".native-message").fadeOut(1000);
+                    $("#btn-push").removeAttr("disabled");
+                    $("#btn-push").html("提交");
                 },1500);
             }
         });

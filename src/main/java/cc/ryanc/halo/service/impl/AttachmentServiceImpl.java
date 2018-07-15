@@ -20,10 +20,10 @@ import java.util.Optional;
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
 
+    private static final String ATTACHMENTS_CACHE_NAME = "attachments";
+
     @Autowired
     private AttachmentRepository attachmentRepository;
-
-    private static final String ATTACHMENTS_CACHE_NAME = "attachments";
 
     /**
      * 新增附件信息

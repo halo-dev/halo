@@ -94,7 +94,7 @@
                         galleryId : ${gallery.galleryId?c}
                     },
                     success: function (data) {
-                        if(data==true){
+                        if(data.code==1){
                             $.toast({
                                 text: "删除成功！",
                                 heading: '提示',

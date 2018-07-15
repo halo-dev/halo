@@ -9,17 +9,17 @@ public enum PostStatus {
     /**
      * 已发布
      */
-    PUBLISHED(0,"已发布"),
+    PUBLISHED(0, "已发布"),
 
     /**
      * 草稿
      */
-    DRAFT(1,"草稿"),
+    DRAFT(1, "草稿"),
 
     /**
      * 回收站
      */
-    RECYCLE(2,"回收站");
+    RECYCLE(2, "回收站");
 
     private Integer code;
     private String desc;
