@@ -29,12 +29,12 @@ public class ApiTagController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult tags(){
+    public JsonResult tags() {
         List<Tag> tags = tagService.findAllTags();
-        if(null!=tags && tags.size()>0){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),tags);
-        }else{
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != tags && tags.size() > 0) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), tags);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 
@@ -45,12 +45,12 @@ public class ApiTagController {
      * @return JsonResult
      */
     @GetMapping(value = "/{tagUrl}")
-    public JsonResult tags(@PathVariable("tagUrl") String tagUrl){
+    public JsonResult tags(@PathVariable("tagUrl") String tagUrl) {
         Tag tag = tagService.findByTagUrl(tagUrl);
-        if(null!=tag){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),tag);
-        }else{
-            return new JsonResult(ResponseStatus.NOTFOUND.getCode(),ResponseStatus.NOTFOUND.getMsg());
+        if (null != tag) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), tag);
+        } else {
+            return new JsonResult(ResponseStatus.NOTFOUND.getCode(), ResponseStatus.NOTFOUND.getMsg());
         }
     }
 }

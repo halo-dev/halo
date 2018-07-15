@@ -119,7 +119,7 @@ public class ThemeController extends BaseController {
                 return new JsonResult(ResultCode.FAIL.getCode(),"请选择上传的主题！");
             }
         } catch (Exception e) {
-            log.error("上传主题失败：", e.getMessage());
+            log.error("上传主题失败：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(),"主题上传失败！");
         }
         return new JsonResult(ResultCode.SUCCESS.getCode(),"主题上传成功！");

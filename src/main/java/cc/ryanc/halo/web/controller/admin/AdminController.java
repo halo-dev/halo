@@ -215,7 +215,7 @@ public class AdminController extends BaseController {
         try {
             logsService.removeAllLogs();
         } catch (Exception e) {
-            log.error("未知错误：" + e.getMessage());
+            log.error("清除日志失败：{}" + e.getMessage());
         }
         return "redirect:/admin";
     }

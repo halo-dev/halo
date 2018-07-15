@@ -18,12 +18,12 @@ import java.util.Optional;
 @Service
 public class MenuServiceImpl implements MenuService {
 
-    @Autowired
-    private MenuRepository menuRepository;
-
     private static final String MENUS_CACHE_KEY = "'menu'";
 
     private static final String MENUS_CACHE_NAME = "menus";
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     /**
      * 查询所有菜单

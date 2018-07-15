@@ -30,12 +30,12 @@ public class ApiGalleryController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult galleries(){
+    public JsonResult galleries() {
         List<Gallery> galleries = galleryService.findAllGalleries();
-        if(null!=galleries && galleries.size()>0){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),galleries);
-        }else {
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != galleries && galleries.size() > 0) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), galleries);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 
@@ -46,12 +46,12 @@ public class ApiGalleryController {
      * @return JsonResult
      */
     @GetMapping(value = "/{id}")
-    public JsonResult galleries(@PathVariable("id") Long id){
+    public JsonResult galleries(@PathVariable("id") Long id) {
         Optional<Gallery> gallery = galleryService.findByGalleryId(id);
-        if(gallery.isPresent()){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),gallery.get());
-        }else{
-            return new JsonResult(ResponseStatus.NOTFOUND.getCode(),ResponseStatus.NOTFOUND.getMsg());
+        if (gallery.isPresent()) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), gallery.get());
+        } else {
+            return new JsonResult(ResponseStatus.NOTFOUND.getCode(), ResponseStatus.NOTFOUND.getMsg());
         }
     }
 }

@@ -96,16 +96,16 @@ public class MailServiceImpl implements MailService {
                 HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_PASSWORD.getProp()));
         File file = new File(attachSrc);
         String text = "";
-        try{
+        try {
             Template template = freeMarker.getConfiguration().getTemplate(templateName);
-            text = FreeMarkerTemplateUtils.processTemplateIntoString(template,content);
+            text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
             OhMyEmail.subject(subject)
                     .from(HaloConst.OPTIONS.get(BlogProperties.MAIL_FROM_NAME.getProp()))
                     .to(to)
                     .html(text)
-                    .attach(file,file.getName())
+                    .attach(file, file.getName())
                     .send();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

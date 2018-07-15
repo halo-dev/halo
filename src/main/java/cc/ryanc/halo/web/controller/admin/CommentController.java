@@ -17,6 +17,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,13 +93,14 @@ public class CommentController extends BaseController {
      */
     @GetMapping(value = "/throw")
     public String moveToTrash(@PathParam("commentId") Long commentId,
-                              @PathParam("status") String status) {
+                              @PathParam("status") String status,
+                              @RequestParam(value = "page",defaultValue = "0") Integer page) {
         try {
             commentService.updateCommentStatus(commentId, CommentStatus.RECYCLE.getCode());
         } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
+            log.error("删除评论失败：{}", e.getMessage());
         }
-        return "redirect:/admin/comments?status=" + status;
+        return "redirect:/admin/comments?status=" + status+"&page="+page;
     }
 
     /**
@@ -153,13 +155,14 @@ public class CommentController extends BaseController {
      */
     @GetMapping("/remove")
     public String moveToAway(@PathParam("commentId") Long commentId,
-                             @PathParam("status") Integer status) {
+                             @PathParam("status") Integer status,
+                             @RequestParam(value = "page",defaultValue = "0") Integer page) {
         try {
             commentService.removeByCommentId(commentId);
         } catch (Exception e) {
             log.error("删除评论失败：{}", e.getMessage());
         }
-        return "redirect:/admin/comments?status=" + status;
+        return "redirect:/admin/comments?status=" + status+"&page="+page;
     }
 
 
@@ -200,7 +203,7 @@ public class CommentController extends BaseController {
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
             comment.setCommentDate(DateUtil.date());
             String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a> ";
-            comment.setCommentContent(lastContent + OwoUtil.markToImg(commentContent));
+            comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.encode(commentContent)));
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
             comment.setCommentStatus(CommentStatus.PUBLISHED.getCode());
@@ -228,7 +231,7 @@ public class CommentController extends BaseController {
                 }
             }
         } catch (Exception e) {
-            log.error("回复评论失败！{}", e.getMessage());
+            log.error("回复评论失败：{}", e.getMessage());
         }
         return "redirect:/admin/comments";
     }

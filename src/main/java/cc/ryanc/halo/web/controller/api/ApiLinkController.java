@@ -28,12 +28,12 @@ public class ApiLinkController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult links(){
+    public JsonResult links() {
         List<Link> links = linkService.findAllLinks();
-        if(null!=links && links.size()>0){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),links);
-        }else{
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != links && links.size() > 0) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), links);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 }

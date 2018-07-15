@@ -28,12 +28,12 @@ public class ApiMenuController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult menus(){
+    public JsonResult menus() {
         List<Menu> menus = menuService.findAllMenus();
-        if(null!=menus && menus.size()>0){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),menus);
-        }else{
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != menus && menus.size() > 0) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), menus);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 }

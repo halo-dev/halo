@@ -673,7 +673,7 @@
                         postSummary : $('#postSummary').val()
                     },
                     success: function (data) {
-                        if(data==true){
+                        if(data.code==1){
                             showMsg("所有文章摘要更新成功！","success",1000);
                         }else{
                             showMsg("更新失败！","success",2000);
@@ -693,10 +693,22 @@
                         baiduToken : $('#baiduToken').val()
                     },
                     success: function (data) {
-                        if(data==true){
+                        if(data.code==1){
                             showMsg("推送所有文章成功！","success",1000);
                         }else{
-                            showMsg("推送失败！","success",2000);
+                            $.toast({
+                                text: data.msg,
+                                heading: '提示',
+                                icon: icon,
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: hideAfter,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff'
+                            });
                         }
                     }
                 });

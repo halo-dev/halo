@@ -119,7 +119,7 @@ public class PostController extends BaseController {
             Pageable pageable = PageRequest.of(page, size, sort);
             model.addAttribute("posts", postService.searchPosts(keyword, pageable));
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
+            log.error("未知错误：{}", e.getMessage());
         }
         return "admin/admin_post";
     }
@@ -165,7 +165,7 @@ public class PostController extends BaseController {
             //提取摘要
             int postSummary = 50;
             if (StringUtils.isNotEmpty(BlogProperties.POST_SUMMARY.getProp())) {
-                postSummary = Integer.parseInt(BlogProperties.POST_SUMMARY.getProp());
+                postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogProperties.POST_SUMMARY.getProp()));
             }
             //文章摘要
             String summaryText = HtmlUtil.cleanHtmlTag(post.getPostContent());
@@ -198,7 +198,7 @@ public class PostController extends BaseController {
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
             return new JsonResult(ResultCode.SUCCESS.getCode(), msg);
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
+            log.error("保存文章失败：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
         }
     }
@@ -207,9 +207,13 @@ public class PostController extends BaseController {
     /**
      * 自动保存文章为草稿
      *
-     * @param post    post
+     * @param postId 文章编号
+     * @param postTitle 文章标题
+     * @param postUrl 文章路径
+     * @param postContentMd 文章内容
+     * @param postType 文章类型
      * @param session session
-     * @return 文章的编号
+     * @return JsonResult
      */
     @PostMapping(value = "/new/autoPush")
     @ResponseBody
@@ -266,7 +270,7 @@ public class PostController extends BaseController {
             postService.updatePostStatus(postId, PostStatus.RECYCLE.getCode());
             log.info("编号为" + postId + "的文章已被移到回收站");
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
+            log.error("未知错误：{}", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -284,7 +288,7 @@ public class PostController extends BaseController {
             postService.updatePostStatus(postId, PostStatus.PUBLISHED.getCode());
             log.info("编号为" + postId + "的文章已改变为发布状态");
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
+            log.error("未知错误：{}", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -302,7 +306,7 @@ public class PostController extends BaseController {
             postService.removeByPostId(postId);
             logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST, post.get().getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
+            log.error("未知错误：{}", e.getMessage());
         }
         if (StringUtils.equals(PostType.POST_TYPE_POST.getDesc(), postType)) {
             return "redirect:/admin/posts?status=2";
@@ -328,18 +332,19 @@ public class PostController extends BaseController {
      * 更新所有摘要
      *
      * @param postSummary 文章摘要字数
-     * @return true：更新成功，false：更新失败
+     * @return JsonResult
      */
     @GetMapping(value = "/updateSummary")
     @ResponseBody
-    public boolean updateSummary(@PathParam("postSummary") Integer postSummary) {
+    public JsonResult updateSummary(@PathParam("postSummary") Integer postSummary) {
         try {
             postService.updateAllSummary(postSummary);
-            return true;
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
-            return false;
+            log.error("更新摘要失败：{}", e.getMessage());
+            e.printStackTrace();
+            return new JsonResult(ResultCode.FAIL.getCode(), "更新失败！");
         }
+        return new JsonResult(ResultCode.SUCCESS.getCode(), "所有文章摘要更新成功！");
     }
 
     /**
@@ -360,13 +365,13 @@ public class PostController extends BaseController {
      * 将所有文章推送到百度
      *
      * @param baiduToken baiduToken
-     * @return true or false
+     * @return JsonResult
      */
     @GetMapping(value = "/pushAllToBaidu")
     @ResponseBody
-    public boolean pushAllToBaidu(@PathParam("baiduToken") String baiduToken) {
+    public JsonResult pushAllToBaidu(@PathParam("baiduToken") String baiduToken) {
         if (StringUtils.isEmpty(baiduToken)) {
-            return false;
+            return new JsonResult(ResultCode.FAIL.getCode(), "百度推送Token为空！");
         }
         String blogUrl = HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp());
         List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
@@ -379,8 +384,8 @@ public class PostController extends BaseController {
         }
         String result = HaloUtils.baiduPost(blogUrl, baiduToken, urls.toString());
         if (StringUtils.isEmpty(result)) {
-            return false;
+            return new JsonResult(ResultCode.FAIL.getCode(), "推送所有文章成功！");
         }
-        return true;
+        return new JsonResult(ResultCode.SUCCESS.getCode(), "推送成功！");
     }
 }

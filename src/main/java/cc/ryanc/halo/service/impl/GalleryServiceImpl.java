@@ -20,10 +20,10 @@ import java.util.Optional;
 @Service
 public class GalleryServiceImpl implements GalleryService {
 
+    private static final String GALLERIES_CACHE_NAME = "galleries";
+
     @Autowired
     private GalleryRepository galleryRepository;
-
-    private static final String GALLERIES_CACHE_NAME = "galleries";
 
     /**
      * 保存图片

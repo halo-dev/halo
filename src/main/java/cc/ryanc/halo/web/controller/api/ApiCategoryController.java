@@ -29,12 +29,12 @@ public class ApiCategoryController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult categories(){
+    public JsonResult categories() {
         List<Category> categories = categoryService.findAllCategories();
-        if(null!=categories && categories.size()>0){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),categories);
-        }else{
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != categories && categories.size() > 0) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), categories);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 
@@ -45,12 +45,12 @@ public class ApiCategoryController {
      * @return JsonResult
      */
     @GetMapping(value = "/{cateUrl}")
-    public JsonResult categories(@PathVariable("cateUrl") String cateUrl){
+    public JsonResult categories(@PathVariable("cateUrl") String cateUrl) {
         Category category = categoryService.findByCateUrl(cateUrl);
-        if(null!=category){
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(),ResponseStatus.SUCCESS.getMsg(),category);
-        }else{
-            return new JsonResult(ResponseStatus.EMPTY.getCode(),ResponseStatus.EMPTY.getMsg());
+        if (null != category) {
+            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), category);
+        } else {
+            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
         }
     }
 }

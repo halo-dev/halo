@@ -57,7 +57,7 @@ public class UserController {
                 return new JsonResult(ResultCode.FAIL.getCode(),"修改失败！");
             }
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
+            log.error("修改用户资料失败：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(),"修改失败！");
         }
         return new JsonResult(ResultCode.SUCCESS.getCode(),"修改成功！");
@@ -88,7 +88,7 @@ public class UserController {
                 return new JsonResult(ResultCode.FAIL.getCode(),"原密码错误！");
             }
         } catch (Exception e) {
-            log.error("修改密码：未知错误，{0}", e.getMessage());
+            log.error("修改密码失败：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(),"密码修改失败！");
         }
         return new JsonResult(ResultCode.SUCCESS.getCode(),"修改密码成功！");

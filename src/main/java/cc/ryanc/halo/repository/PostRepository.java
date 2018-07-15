@@ -155,7 +155,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * 根据分类目录查询文章
      *
      * @param category category
-     * @param status status
+     * @param status   status
      * @param pageable pageable
      * @return Page
      */
@@ -164,8 +164,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     /**
      * 根据标签查询文章，分页
      *
-     * @param tag tag
-     * @param status status
+     * @param tag      tag
+     * @param status   status
      * @param pageable pageable
      * @return Page
      */
@@ -182,8 +182,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     /**
      * 模糊查询文章
      *
-     * @param keyword    关键词
-     * @param pageable   分页信息
+     * @param keyword  关键词
+     * @param pageable 分页信息
      * @return Page
      */
     @Query(value = "select * from halo_post where post_status = 0 and post_type='post' and post_title like '%=:keyword%' or post_content like '%=:keyword%'", nativeQuery = true)
