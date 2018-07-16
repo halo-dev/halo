@@ -44,7 +44,7 @@ public class CategoryController {
         try {
             categoryService.saveByCategory(category);
         } catch (Exception e) {
-            log.error("修改分类失败：{0}", e.getMessage());
+            log.error("修改分类失败：{}", e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -72,7 +72,6 @@ public class CategoryController {
     public String removeCategory(@PathParam("cateId") Long cateId) {
         try {
             Category category = categoryService.removeByCateId(cateId);
-            log.info("删除的分类目录：" + category);
         } catch (Exception e) {
             log.error("删除分类失败：{}", e.getMessage());
         }

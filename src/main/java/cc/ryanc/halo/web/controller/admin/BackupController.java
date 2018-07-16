@@ -54,15 +54,15 @@ public class BackupController {
      * @return 模板路径admin/admin_backup
      */
     @GetMapping
-    public String backup(@RequestParam(value = "type",defaultValue = "resources") String type,Model model) {
+    public String backup(@RequestParam(value = "type", defaultValue = "resources") String type, Model model) {
         List<BackupDto> backups = null;
-        if(StringUtils.equals(type,"resources")){
+        if (StringUtils.equals(type, "resources")) {
             backups = HaloUtils.getBackUps("resources");
-        }else if(StringUtils.equals(type,"databases")){
+        } else if (StringUtils.equals(type, "databases")) {
             backups = HaloUtils.getBackUps("databases");
-        }else if(StringUtils.equals(type,"posts")){
+        } else if (StringUtils.equals(type, "posts")) {
             backups = HaloUtils.getBackUps("posts");
-        }else{
+        } else {
             backups = new ArrayList<>();
         }
         model.addAttribute("backups", backups);
@@ -97,14 +97,14 @@ public class BackupController {
      */
     public JsonResult backupDatabase() {
         try {
-            if(HaloUtils.getBackUps("databases").size()>10){
+            if (HaloUtils.getBackUps("databases").size() > 10) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
             }
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
             String distName = "databases_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
-            log.info("当前时间："+DateUtil.now()+"，执行了数据库备份。");
+            log.info("当前时间：{}，执行了数据库备份。", DateUtil.now());
             return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             log.error("备份数据库失败：{}", e.getMessage());
@@ -119,7 +119,7 @@ public class BackupController {
      */
     public JsonResult backupResources() {
         try {
-            if(HaloUtils.getBackUps("resources").size()>10){
+            if (HaloUtils.getBackUps("resources").size() > 10) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/resources/");
             }
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
@@ -127,7 +127,7 @@ public class BackupController {
             String distName = "resources_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
-            log.info("当前时间："+DateUtil.now()+"，执行了资源文件备份。");
+            log.info("当前时间：{}，执行了资源文件备份。", DateUtil.now());
             return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             log.error("备份资源文件失败：{}", e.getMessage());
@@ -144,7 +144,7 @@ public class BackupController {
         List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
         posts.addAll(postService.findAllPosts(PostType.POST_TYPE_PAGE.getDesc()));
         try {
-            if(HaloUtils.getBackUps("posts").size()>10){
+            if (HaloUtils.getBackUps("posts").size() > 10) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
             }
             //打包好的文件名
@@ -156,7 +156,7 @@ public class BackupController {
             //打包导出好的文章
             ZipUtil.zip(srcPath, srcPath + ".zip");
             FileUtil.del(srcPath);
-            log.info("当前时间："+DateUtil.now()+"，执行了文章备份。");
+            log.info("当前时间：{}，执行了文章备份。", DateUtil.now());
             return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             log.error("备份文章失败：{}", e.getMessage());

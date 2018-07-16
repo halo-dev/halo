@@ -117,7 +117,7 @@ public class PageController {
         try {
             linkService.removeByLinkId(linkId);
         } catch (Exception e) {
-            log.error("删除友情链接失败：", e.getMessage());
+            log.error("删除友情链接失败：{}", e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -219,21 +219,21 @@ public class PageController {
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
             post.setPostType(PostType.POST_TYPE_PAGE.getDesc());
-            if(null!=post.getPostId()){
+            if (null != post.getPostId()) {
                 post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
                 post.setPostUpdate(DateUtil.date());
                 msg = "更新成功";
-            }else{
+            } else {
                 post.setPostDate(DateUtil.date());
                 post.setPostUpdate(DateUtil.date());
             }
             postService.saveByPost(post);
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
-            return new JsonResult(ResultCode.SUCCESS.getCode(),msg);
+            return new JsonResult(ResultCode.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("保存页面失败：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(),"保存失败");
+            return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
         }
     }
 

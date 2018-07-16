@@ -207,12 +207,12 @@ public class PostController extends BaseController {
     /**
      * 自动保存文章为草稿
      *
-     * @param postId 文章编号
-     * @param postTitle 文章标题
-     * @param postUrl 文章路径
+     * @param postId        文章编号
+     * @param postTitle     文章标题
+     * @param postUrl       文章路径
      * @param postContentMd 文章内容
-     * @param postType 文章类型
-     * @param session session
+     * @param postType      文章类型
+     * @param session       session
      * @return JsonResult
      */
     @PostMapping(value = "/new/autoPush")
@@ -251,7 +251,7 @@ public class PostController extends BaseController {
             post.setPostUpdate(DateUtil.date());
             post.setUser(user);
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
+            log.error("未知错误：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
         }
         return new JsonResult(ResultCode.SUCCESS.getCode(), "保存成功", postService.saveByPost(post));
@@ -270,7 +270,7 @@ public class PostController extends BaseController {
             postService.updatePostStatus(postId, PostStatus.RECYCLE.getCode());
             log.info("编号为" + postId + "的文章已被移到回收站");
         } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
+            log.error("删除文章到回收站失败：{}", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -288,7 +288,7 @@ public class PostController extends BaseController {
             postService.updatePostStatus(postId, PostStatus.PUBLISHED.getCode());
             log.info("编号为" + postId + "的文章已改变为发布状态");
         } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
+            log.error("发布文章失败：{}", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -306,7 +306,7 @@ public class PostController extends BaseController {
             postService.removeByPostId(postId);
             logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST, post.get().getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
         } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
+            log.error("删除文章失败：{}", e.getMessage());
         }
         if (StringUtils.equals(PostType.POST_TYPE_POST.getDesc(), postType)) {
             return "redirect:/admin/posts?status=2";

@@ -94,13 +94,13 @@ public class CommentController extends BaseController {
     @GetMapping(value = "/throw")
     public String moveToTrash(@PathParam("commentId") Long commentId,
                               @PathParam("status") String status,
-                              @RequestParam(value = "page",defaultValue = "0") Integer page) {
+                              @RequestParam(value = "page", defaultValue = "0") Integer page) {
         try {
             commentService.updateCommentStatus(commentId, CommentStatus.RECYCLE.getCode());
         } catch (Exception e) {
             log.error("删除评论失败：{}", e.getMessage());
         }
-        return "redirect:/admin/comments?status=" + status+"&page="+page;
+        return "redirect:/admin/comments?status=" + status + "&page=" + page;
     }
 
     /**
@@ -139,7 +139,7 @@ public class CommentController extends BaseController {
                             "您在" + HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "的评论已审核通过！", map, "common/mail/mail_passed.ftl");
                 }
             } catch (Exception e) {
-                log.error("邮件服务器未配置：", e.getMessage());
+                log.error("邮件服务器未配置：{}", e.getMessage());
             }
         }
         return "redirect:/admin/comments?status=" + status;
@@ -156,13 +156,13 @@ public class CommentController extends BaseController {
     @GetMapping("/remove")
     public String moveToAway(@PathParam("commentId") Long commentId,
                              @PathParam("status") Integer status,
-                             @RequestParam(value = "page",defaultValue = "0") Integer page) {
+                             @RequestParam(value = "page", defaultValue = "0") Integer page) {
         try {
             commentService.removeByCommentId(commentId);
         } catch (Exception e) {
             log.error("删除评论失败：{}", e.getMessage());
         }
-        return "redirect:/admin/comments?status=" + status+"&page="+page;
+        return "redirect:/admin/comments?status=" + status + "&page=" + page;
     }
 
 
