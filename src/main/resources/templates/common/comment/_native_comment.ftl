@@ -258,7 +258,7 @@
     <#macro childComments comments>
         <ul class="native-list" style="margin-left: 30px; border-left: 1px solid #f1f1f1">
         <#if comments?? && comments?size gt 0>
-            <#list comments as comment>
+            <#list comments?sort_by("commentDate") as comment>
                 <li class="native-list-one" id="comment-id-${comment.commentId?c}" style="margin-left: 5px;">
                     <img class="native-list-one-img" style="width: 2rem;height: 2rem;" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                     <section>
@@ -287,7 +287,7 @@
     </#macro>
     <ul class="native-list">
         <#if comments?? && comments?size gt 0>
-            <#list comments as comment>
+            <#list comments?sort_by("commentDate")?reverse as comment>
                 <li class="native-list-one" id="comment-id-${comment.commentId?c}">
                     <img class="native-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                     <section>

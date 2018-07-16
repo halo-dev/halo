@@ -80,7 +80,7 @@ public interface CommentService {
     Page<Comment> findCommentsByPost(Post post, Pageable pageable);
 
     /**
-     * 根据文章和评论状态查询评论
+     * 根据文章和评论状态查询评论 分页
      *
      * @param post     post
      * @param pageable pageable
@@ -88,6 +88,15 @@ public interface CommentService {
      * @return Page
      */
     Page<Comment> findCommentsByPostAndCommentStatus(Post post, Pageable pageable, Integer status);
+
+    /**
+     * 根据文章和评论状态查询评论 不分页
+     *
+     * @param post   post
+     * @param status status
+     * @return List
+     */
+    List<Comment> findCommentsByPostAndCommentStatus(Post post, Integer status);
 
     /**
      * 查询最新的前五条评论

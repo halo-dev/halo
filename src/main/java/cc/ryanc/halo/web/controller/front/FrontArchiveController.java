@@ -118,12 +118,10 @@ public class FrontArchiveController extends BaseController {
         if (null != afterPosts && afterPosts.size() > 0) {
             model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        Pageable pageable = PageRequest.of(0, 999, sort);
-        Page<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatus.PUBLISHED.getCode());
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatus.PUBLISHED.getCode());
         model.addAttribute("post", post);
-        model.addAttribute("comments", CommentUtil.getComments(comments.getContent()));
-        model.addAttribute("commentsCount", comments.getTotalElements());
+        model.addAttribute("comments", CommentUtil.getComments(comments));
+        model.addAttribute("commentsCount", comments.size());
         postService.updatePostView(post);
         return this.render("post");
     }
