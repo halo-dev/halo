@@ -4,10 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.CommentStatus;
-import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.model.enums.ResultCode;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
@@ -153,7 +150,7 @@ public class FrontCommentController {
         }
         @Override
         public void run(){
-            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), "true")) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), TrueFalse.TRUE.getDesc())) {
                 try {
                     //发送邮件到博主
                     Map<String, Object> map = new HashMap<>();
@@ -191,7 +188,7 @@ public class FrontCommentController {
         @Override
         public void run() {
             //发送通知给对方
-            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), "true")) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), TrueFalse.TRUE.getDesc())) {
                 if(Validator.isEmail(lastComment.getCommentAuthorEmail())){
                     Map<String, Object> map = new HashMap<>();
                     map.put("blogTitle",HaloConst.OPTIONS.get(BlogProperties.BLOG_TITLE.getProp()));

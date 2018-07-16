@@ -40,13 +40,14 @@ public class FreeMarkerConfig {
 
     @PostConstruct
     public void setSharedVariable() {
-        configuration.setSharedVariable("commonTag", commonTagDirective);
-        configuration.setSharedVariable("articleTag", articleTagDirective);
         try {
+            //自定义标签
+            configuration.setSharedVariable("commonTag", commonTagDirective);
+            configuration.setSharedVariable("articleTag", articleTagDirective);
             configuration.setSharedVariable("options", optionsService.findAllOptions());
             configuration.setSharedVariable("user", userService.findUser());
         } catch (TemplateModelException e) {
-            e.printStackTrace();
+            log.error("自定义标签加载失败：{}", e.getMessage());
         }
     }
 }

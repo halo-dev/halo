@@ -5,8 +5,10 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.enums.ResultCode;
+import cc.ryanc.halo.model.enums.TrueFalse;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -201,7 +203,7 @@ public class BackupController {
         if (null == user.getUserEmail() || StringUtils.equals(user.getUserEmail(), "")) {
             return new JsonResult(ResultCode.FAIL.getCode(), "博主邮箱没有配置！");
         }
-        if (StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"), "false")) {
+        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.FALSE.getDesc())) {
             return new JsonResult(ResultCode.FAIL.getCode(), "发信邮箱没有配置！");
         }
         new EmailToAdmin(srcPath, user).start();
