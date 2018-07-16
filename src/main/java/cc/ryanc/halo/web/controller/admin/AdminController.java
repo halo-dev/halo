@@ -93,7 +93,7 @@ public class AdminController extends BaseController {
         model.addAttribute("mediaCount", HaloConst.ATTACHMENTS.size());
 
         Long postViewsSum = postService.getPostViews();
-        model.addAttribute("postViewsSum",postViewsSum);
+        model.addAttribute("postViewsSum", postViewsSum);
         return "admin/admin_index";
     }
 
@@ -130,7 +130,7 @@ public class AdminController extends BaseController {
         User aUser = userService.findUser();
         //首先判断是否已经被禁用已经是否已经过了10分钟
         Date loginLast = DateUtil.date();
-        if(null!=aUser.getLoginLast()){
+        if (null != aUser.getLoginLast()) {
             loginLast = aUser.getLoginLast();
         }
         Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
@@ -151,6 +151,7 @@ public class AdminController extends BaseController {
             //重置用户的登录状态为正常
             userService.updateUserNormal();
             logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
+            log.info("用户[{}]登录成功。", aUser.getUserDisplayName());
             return new JsonResult(ResultCode.SUCCESS.getCode(), "登录成功！");
         } else {
             //更新失败次数
@@ -182,7 +183,7 @@ public class AdminController extends BaseController {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), ServletUtil.getClientIP(request), DateUtil.date()));
         session.invalidate();
-        log.info("用户[" + user.getUserName() + "]退出登录");
+        log.info("用户[{}]退出登录", user.getUserName());
         return "redirect:/admin/login";
     }
 

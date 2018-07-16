@@ -84,14 +84,14 @@ public class AttachmentController {
     @GetMapping(value = "/select")
     public String selectAttachment(Model model,
                                    @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                   @RequestParam(value = "id",defaultValue = "none") String id,
-                                   @RequestParam(value = "type",defaultValue = "normal") String type) {
+                                   @RequestParam(value = "id", defaultValue = "none") String id,
+                                   @RequestParam(value = "type", defaultValue = "normal") String type) {
         Sort sort = new Sort(Sort.Direction.DESC, "attachId");
         Pageable pageable = PageRequest.of(page, 18, sort);
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
-        if(StringUtils.equals(type,"post")){
+        if (StringUtils.equals(type, "post")) {
             return "admin/widget/_attachment-select-post";
         }
         return "admin/widget/_attachment-select";
@@ -148,13 +148,13 @@ public class AttachmentController {
                     mediaPath.mkdirs();
                 }
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                String nameWithOutSuffix = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ","_").replaceAll(",","")+dateFormat.format(DateUtil.date())+new Random().nextInt(1000);
+                String nameWithOutSuffix = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", "") + dateFormat.format(DateUtil.date()) + new Random().nextInt(1000);
                 String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
-                String fileName = nameWithOutSuffix+"."+fileSuffix;
+                String fileName = nameWithOutSuffix + "." + fileSuffix;
                 file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName));
 
                 //压缩图片
-                Thumbnails.of(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString()).size(256,256).keepAspectRatio(false).toFile(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
+                Thumbnails.of(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString()).size(256, 256).keepAspectRatio(false).toFile(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
 
                 //保存在数据库
                 Attachment attachment = new Attachment();
@@ -164,11 +164,11 @@ public class AttachmentController {
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
                 attachment.setAttachCreated(DateUtil.date());
-                attachment.setAttachSize(HaloUtils.parseSize(new File(mediaPath,fileName).length()));
-                attachment.setAttachWh(HaloUtils.getImageWh(new File(mediaPath,fileName)));
+                attachment.setAttachSize(HaloUtils.parseSize(new File(mediaPath, fileName).length()));
+                attachment.setAttachWh(HaloUtils.getImageWh(new File(mediaPath, fileName)));
                 attachmentService.saveByAttachment(attachment);
                 updateConst();
-                log.info("上传文件[" + fileName + "]到[" + mediaPath.getAbsolutePath() + "]成功");
+                log.info("上传文件[{}]到[{}]成功", fileName, mediaPath.getAbsolutePath());
                 logsService.saveByLogs(
                         new Logs(LogsRecord.UPLOAD_FILE, fileName, ServletUtil.getClientIP(request), DateUtil.date())
                 );
@@ -229,19 +229,19 @@ public class AttachmentController {
             if (delFile.exists() && delFile.isFile()) {
                 if (delFile.delete() && delSmallFile.delete()) {
                     updateConst();
-                    log.info("删除文件[" + delFileName + "]成功！");
+                    log.info("删除文件[{}]成功！", delFileName);
                     logsService.saveByLogs(
                             new Logs(LogsRecord.REMOVE_FILE, delFileName, ServletUtil.getClientIP(request), DateUtil.date())
                     );
                 } else {
-                    log.error("删除附件[" + delFileName + "]失败！");
-                    return new JsonResult(ResultCode.FAIL.getCode(),"删除失败！");
+                    log.error("删除附件[{}]失败！", delFileName);
+                    return new JsonResult(ResultCode.FAIL.getCode(), "删除失败！");
                 }
             }
         } catch (Exception e) {
-            log.error("删除附件[" + delFileName + "]失败！:", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(),"删除失败！");
+            log.error("删除附件[{}]失败:{}", delFileName, e.getMessage());
+            return new JsonResult(ResultCode.FAIL.getCode(), "删除失败！");
         }
-        return new JsonResult(ResultCode.SUCCESS.getCode(),"删除成功！");
+        return new JsonResult(ResultCode.SUCCESS.getCode(), "删除成功！");
     }
 }
