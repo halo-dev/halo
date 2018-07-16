@@ -159,4 +159,15 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> findCommentsLatest() {
         return commentRepository.findTopFive();
     }
+
+    /**
+     * 根据评论状态查询数量
+     *
+     * @param status 评论状态
+     * @return 评论数量
+     */
+    @Override
+    public Integer getCountByStatus(Integer status) {
+        return commentRepository.countAllByCommentStatus(status);
+    }
 }

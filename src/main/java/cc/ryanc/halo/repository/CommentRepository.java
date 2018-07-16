@@ -72,4 +72,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query(value = "SELECT * FROM halo_comment ORDER BY comment_date DESC LIMIT 5", nativeQuery = true)
     List<Comment> findTopFive();
 
+    /**
+     * 根据评论状态查询数量
+     *
+     * @param status 评论状态
+     * @return 评论数量
+     */
+    Integer countAllByCommentStatus(Integer status);
 }

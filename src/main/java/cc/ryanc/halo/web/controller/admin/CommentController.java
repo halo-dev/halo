@@ -77,9 +77,9 @@ public class CommentController extends BaseController {
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Comment> comments = commentService.findAllComments(status, pageable);
         model.addAttribute("comments", comments);
-        model.addAttribute("publicCount", commentService.findAllComments(CommentStatus.PUBLISHED.getCode(), pageable).getTotalElements());
-        model.addAttribute("checkCount", commentService.findAllComments(CommentStatus.CHECKING.getCode(), pageable).getTotalElements());
-        model.addAttribute("trashCount", commentService.findAllComments(CommentStatus.RECYCLE.getCode(), pageable).getTotalElements());
+        model.addAttribute("publicCount", commentService.getCountByStatus(CommentStatus.PUBLISHED.getCode()));
+        model.addAttribute("checkCount", commentService.getCountByStatus(CommentStatus.CHECKING.getCode()));
+        model.addAttribute("trashCount", commentService.getCountByStatus(CommentStatus.RECYCLE.getCode()));
         model.addAttribute("status", status);
         return "admin/admin_comment";
     }

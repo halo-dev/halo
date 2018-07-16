@@ -20,9 +20,9 @@ public class CommentUtil {
     public static List<Comment> getComments(List<Comment> commentsRoot) {
         List<Comment> commentsResult = new ArrayList<>();
 
-        for (int i = 0; i < commentsRoot.size(); i++) {
-            if (commentsRoot.get(i).getCommentParent() == 0) {
-                commentsResult.add(commentsRoot.get(i));
+        for (Comment comment : commentsRoot) {
+            if (comment.getCommentParent() == 0) {
+                commentsResult.add(comment);
             }
         }
 

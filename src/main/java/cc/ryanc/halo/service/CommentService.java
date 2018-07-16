@@ -104,4 +104,12 @@ public interface CommentService {
      * @return List
      */
     List<Comment> findCommentsLatest();
+
+    /**
+     * 根据评论状态查询数量
+     *
+     * @param status 评论状态
+     * @return 评论数量
+     */
+    Integer getCountByStatus(Integer status);
 }

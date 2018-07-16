@@ -68,9 +68,6 @@ public class FrontCommentController {
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
         Pageable pageable = PageRequest.of(0, 999, sort);
         List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, CommentStatus.PUBLISHED.getCode()).getContent();
-        if (null == comments) {
-            return null;
-        }
         return CommentUtil.getComments(comments);
     }
 
@@ -133,6 +130,7 @@ public class FrontCommentController {
             commentService.saveByComment(comment);
             if(comment.getCommentParent()>0){
                 new EmailToParent(comment,lastComment,post).start();
+                new EmailToAdmin(comment, post).start();
             }else{
                 new EmailToAdmin(comment,post).start();
             }
@@ -148,13 +146,14 @@ public class FrontCommentController {
     class EmailToAdmin extends Thread{
         private Comment comment;
         private Post post;
-        public EmailToAdmin(Comment comment,Post post){
+
+        private EmailToAdmin(Comment comment, Post post) {
             this.comment = comment;
             this.post = post;
         }
         @Override
         public void run(){
-            if (StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"), "true") && StringUtils.equals(HaloConst.OPTIONS.get("new_comment_notice"), "true")) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), "true")) {
                 try {
                     //发送邮件到博主
                     Map<String, Object> map = new HashMap<>();
@@ -182,7 +181,8 @@ public class FrontCommentController {
         private Comment comment;
         private Comment lastComment;
         private Post post;
-        public EmailToParent(Comment comment,Comment lastComment,Post post){
+
+        private EmailToParent(Comment comment, Comment lastComment, Post post) {
             this.comment = comment;
             this.lastComment = lastComment;
             this.post = post;
@@ -191,7 +191,7 @@ public class FrontCommentController {
         @Override
         public void run() {
             //发送通知给对方
-            if(StringUtils.equals(HaloConst.OPTIONS.get("smtp_email_enable"),"true") && StringUtils.equals(HaloConst.OPTIONS.get("comment_reply_notice"),"true")) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), "true")) {
                 if(Validator.isEmail(lastComment.getCommentAuthorEmail())){
                     Map<String, Object> map = new HashMap<>();
                     map.put("blogTitle",HaloConst.OPTIONS.get(BlogProperties.BLOG_TITLE.getProp()));
