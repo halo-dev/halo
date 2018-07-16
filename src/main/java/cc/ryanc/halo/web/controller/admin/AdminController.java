@@ -9,6 +9,7 @@ import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.enums.ResultCode;
+import cc.ryanc.halo.model.enums.TrueFalse;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -134,7 +135,7 @@ public class AdminController extends BaseController {
             loginLast = aUser.getLoginLast();
         }
         Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
-        if (StringUtils.equals(aUser.getLoginEnable(), "false") && (between < 10)) {
+        if (StringUtils.equals(aUser.getLoginEnable(), TrueFalse.FALSE.getDesc()) && (between < 10)) {
             return new JsonResult(ResultCode.FAIL.getCode(), "已禁止登录，请10分钟后再试");
         }
         //验证用户名和密码
@@ -158,7 +159,7 @@ public class AdminController extends BaseController {
             Integer errorCount = userService.updateUserLoginError();
             //超过五次禁用账户
             if (errorCount >= 5) {
-                userService.updateUserLoginEnable("false");
+                userService.updateUserLoginEnable(TrueFalse.FALSE.getDesc());
             }
             logsService.saveByLogs(
                     new Logs(

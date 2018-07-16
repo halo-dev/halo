@@ -41,7 +41,7 @@ public class OptionController {
      * 保存设置选项
      *
      * @param options options
-     * @return true：保存成功，false：保存失败
+     * @return JsonResult
      */
     @PostMapping(value = "/save")
     @ResponseBody

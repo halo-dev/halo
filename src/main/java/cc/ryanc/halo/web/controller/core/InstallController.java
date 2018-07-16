@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.TrueFalse;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.date.DateUtil;
@@ -63,7 +64,7 @@ public class InstallController {
     @GetMapping
     public String install(Model model) {
         try {
-            if (StringUtils.equals("true", HaloConst.OPTIONS.get(BlogProperties.IS_INSTALL.getProp()))) {
+            if (StringUtils.equals(TrueFalse.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogProperties.IS_INSTALL.getProp()))) {
                 model.addAttribute("isInstall", true);
             } else {
                 model.addAttribute("isInstall", false);
@@ -96,7 +97,7 @@ public class InstallController {
                              @RequestParam("userPwd") String userPwd,
                              HttpServletRequest request) {
         try {
-            if (StringUtils.equals("true", HaloConst.OPTIONS.get(BlogProperties.IS_INSTALL.getProp()))) {
+            if (StringUtils.equals(TrueFalse.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogProperties.IS_INSTALL.getProp()))) {
                 return false;
             }
             //创建新的用户
@@ -148,7 +149,7 @@ public class InstallController {
             comment.setIsAdmin(0);
             commentService.saveByComment(comment);
 
-            optionsService.saveOption(BlogProperties.IS_INSTALL.getProp(), "true");
+            optionsService.saveOption(BlogProperties.IS_INSTALL.getProp(), TrueFalse.TRUE.getDesc());
 
             //保存博客标题和博客地址设置
             optionsService.saveOption(BlogProperties.BLOG_TITLE.getProp(), blogTitle);
@@ -164,12 +165,12 @@ public class InstallController {
             optionsService.saveOption(BlogProperties.COMMENT_SYSTEM.getProp(), "native");
 
             //默认不配置邮件系统
-            optionsService.saveOption(BlogProperties.SMTP_EMAIL_ENABLE.getProp(), "false");
+            optionsService.saveOption(BlogProperties.SMTP_EMAIL_ENABLE.getProp(), TrueFalse.FALSE.getDesc());
 
             //新评论，审核通过，回复，默认不通知
-            optionsService.saveOption(BlogProperties.NEW_COMMENT_NOTICE.getProp(), "false");
-            optionsService.saveOption(BlogProperties.COMMENT_PASS_NOTICE.getProp(), "false");
-            optionsService.saveOption(BlogProperties.COMMENT_REPLY_NOTICE.getProp(), "false");
+            optionsService.saveOption(BlogProperties.NEW_COMMENT_NOTICE.getProp(), TrueFalse.FALSE.getDesc());
+            optionsService.saveOption(BlogProperties.COMMENT_PASS_NOTICE.getProp(), TrueFalse.FALSE.getDesc());
+            optionsService.saveOption(BlogProperties.COMMENT_REPLY_NOTICE.getProp(), TrueFalse.FALSE.getDesc());
 
             //更新日志
             logsService.saveByLogs(

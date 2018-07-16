@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.TrueFalse;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
@@ -120,7 +121,7 @@ public class CommentController extends BaseController {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
         //判断是否启用邮件服务
-        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.COMMENT_REPLY_NOTICE.getProp()), "true")) {
+        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.COMMENT_REPLY_NOTICE.getProp()), TrueFalse.TRUE.getDesc())) {
             try {
                 if (status == 1 && Validator.isEmail(comment.getCommentAuthorEmail())) {
                     Map<String, Object> map = new HashMap<>();
@@ -211,7 +212,7 @@ public class CommentController extends BaseController {
             commentService.saveByComment(comment);
 
             //邮件通知
-            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), "true") && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.COMMENT_REPLY_NOTICE.getProp()), "true")) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.COMMENT_REPLY_NOTICE.getProp()), TrueFalse.TRUE.getDesc())) {
                 if (Validator.isEmail(lastComment.getCommentAuthorEmail())) {
                     Map<String, Object> map = new HashMap<>();
                     map.put("blogTitle", HaloConst.OPTIONS.get(BlogProperties.BLOG_TITLE.getProp()));

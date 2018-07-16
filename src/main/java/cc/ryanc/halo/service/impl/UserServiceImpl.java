@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.enums.TrueFalse;
 import cc.ryanc.halo.repository.UserRepository;
 import cc.ryanc.halo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +128,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUserNormal() {
         User user = this.findUser();
-        user.setLoginEnable("true");
+        user.setLoginEnable(TrueFalse.TRUE.getDesc());
         user.setLoginError(0);
         user.setLoginLast(new Date());
         userRepository.save(user);

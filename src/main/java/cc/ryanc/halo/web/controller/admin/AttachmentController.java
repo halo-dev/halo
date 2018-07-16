@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.enums.ResultCode;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
@@ -91,7 +92,7 @@ public class AttachmentController {
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
-        if (StringUtils.equals(type, "post")) {
+        if (StringUtils.equals(type, PostType.POST_TYPE_POST.getDesc())) {
             return "admin/widget/_attachment-select-post";
         }
         return "admin/widget/_attachment-select";
@@ -206,8 +207,8 @@ public class AttachmentController {
      * 移除附件的请求
      *
      * @param attachId 附件编号
-     * @param request  request
-     * @return true：移除附件成功，false：移除附件失败
+     * @param request request
+     * @return JsonResult
      */
     @GetMapping(value = "/remove")
     @ResponseBody
