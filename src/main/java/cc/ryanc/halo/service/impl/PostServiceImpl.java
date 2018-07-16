@@ -409,6 +409,17 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * 根据文章状态查询数量
+     *
+     * @param status 文章状态
+     * @return 文章数量
+     */
+    @Override
+    public Integer getCountByStatus(Integer status) {
+        return postRepository.countAllByPostStatusAndPostType(status, PostType.POST_TYPE_POST.getDesc());
+    }
+
+    /**
      * 生成rss
      *
      * @param posts posts

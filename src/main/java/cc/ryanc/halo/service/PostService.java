@@ -240,6 +240,14 @@ public interface PostService {
     Long getPostViews();
 
     /**
+     * 根据文章状态查询数量
+     *
+     * @param status 文章状态
+     * @return 文章数量
+     */
+    Integer getCountByStatus(Integer status);
+
+    /**
      * 生成rss
      *
      * @param posts posts

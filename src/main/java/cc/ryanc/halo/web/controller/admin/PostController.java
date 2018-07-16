@@ -92,9 +92,9 @@ public class PostController extends BaseController {
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Post> posts = postService.findPostByStatus(status, PostType.POST_TYPE_POST.getDesc(), pageable);
         model.addAttribute("posts", posts);
-        model.addAttribute("publishCount", postService.findPostByStatus(PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable).getTotalElements());
-        model.addAttribute("draftCount", postService.findPostByStatus(PostStatus.DRAFT.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable).getTotalElements());
-        model.addAttribute("trashCount", postService.findPostByStatus(PostStatus.RECYCLE.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable).getTotalElements());
+        model.addAttribute("publishCount", postService.getCountByStatus(PostStatus.PUBLISHED.getCode()));
+        model.addAttribute("draftCount", postService.getCountByStatus(PostStatus.DRAFT.getCode()));
+        model.addAttribute("trashCount", postService.getCountByStatus(PostStatus.RECYCLE.getCode()));
         model.addAttribute("status", status);
         return "admin/admin_post";
     }
