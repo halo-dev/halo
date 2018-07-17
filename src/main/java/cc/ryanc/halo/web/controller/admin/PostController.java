@@ -164,7 +164,7 @@ public class PostController extends BaseController {
         try {
             //提取摘要
             int postSummary = 50;
-            if (StringUtils.isNotEmpty(BlogProperties.POST_SUMMARY.getProp())) {
+            if (StringUtils.isNotEmpty(HaloConst.OPTIONS.get(BlogProperties.POST_SUMMARY.getProp()))) {
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogProperties.POST_SUMMARY.getProp()));
             }
             //文章摘要
