@@ -236,7 +236,13 @@
                     imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
                     imageUploadURL : "/admin/attachments/upload/editor",
                     htmlDecode: "script",
-                    tocStartLevel : 1
+                    tocStartLevel : 1,
+                    onfullscreen : function() {
+                        $("#markdown-editor").css("z-index","9999");
+                    },
+                    onfullscreenExit : function() {
+                        $("#markdown-editor").css("z-index","");
+                    }
                     // toolbarIcons : function () {
                     //     return editormd.toolbarModes["simple"];
                     // }
