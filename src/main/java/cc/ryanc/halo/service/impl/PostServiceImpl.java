@@ -193,6 +193,17 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * 根据编号和类型查询文章
+     *
+     * @param postId postId
+     * @return Post
+     */
+    @Override
+    public Post findByPostId(Long postId, String postType) {
+        return postRepository.findPostByPostIdAndPostType(postId, postType);
+    }
+
+    /**
      * 根据文章路径查询
      *
      * @param postUrl  路径

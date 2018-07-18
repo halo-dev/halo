@@ -66,12 +66,12 @@ public class ApiPostController {
     /**
      * 获取单个文章信息
      *
-     * @param postUrl 文章路径
+     * @param postId 文章编号
      * @return JsonResult
      */
-    @GetMapping(value = "/{postUrl}")
-    public JsonResult posts(@PathVariable(value = "postUrl") String postUrl) {
-        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_POST.getDesc());
+    @GetMapping(value = "/{postId}")
+    public JsonResult posts(@PathVariable(value = "postId") Long postId) {
+        Post post = postService.findByPostId(postId, PostType.POST_TYPE_POST.getDesc());
         if (null != post) {
             return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), post);
         } else {
