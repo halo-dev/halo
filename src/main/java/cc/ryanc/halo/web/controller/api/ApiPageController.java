@@ -25,11 +25,12 @@ public class ApiPageController {
     /**
      * 获取单个页面
      *
+     * @param postId postId
      * @return JsonResult
      */
-    @GetMapping(value = "/{postUrl}")
-    public JsonResult pages(@PathVariable(value = "postUrl") String postUrl) {
-        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_PAGE.getDesc());
+    @GetMapping(value = "/{postId}")
+    public JsonResult pages(@PathVariable(value = "postId") Long postId) {
+        Post post = postService.findByPostId(postId, PostType.POST_TYPE_PAGE.getDesc());
         if (null != post) {
             return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), post);
         } else {

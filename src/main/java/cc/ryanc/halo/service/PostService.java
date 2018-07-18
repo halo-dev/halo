@@ -118,6 +118,15 @@ public interface PostService {
     Optional<Post> findByPostId(Long postId);
 
     /**
+     * 根据编号和类型查询文章
+     *
+     * @param postId   postId
+     * @param postType postType
+     * @return Post
+     */
+    Post findByPostId(Long postId, String postType);
+
+    /**
      * 根据文章路径查询
      *
      * @param postUrl  路径
