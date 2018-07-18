@@ -53,9 +53,9 @@
                                                 <td>${comment.commentContent}</td>
                                                 <td>
                                                     <#if comment.post.postType == "post">
-                                                        <a target="_blank" href="/archives/${comment.post.postUrl}">${comment.post.postTitle}</a>
+                                                        <a target="_blank" href="/archives/${comment.post.postUrl}#comment-id-${comment.commentId?c}">${comment.post.postTitle}</a>
                                                     <#else >
-                                                        <a target="_blank" href="/p/${comment.post.postUrl}">${comment.post.postTitle}</a>
+                                                        <a target="_blank" href="/p/${comment.post.postUrl}#comment-id-${comment.commentId?c}">${comment.post.postTitle}</a>
                                                     </#if>
                                                 </td>
                                                 <td>${comment.commentDate}</td>

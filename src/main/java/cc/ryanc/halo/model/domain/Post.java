@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -54,7 +55,6 @@ public class Post implements Serializable {
      * 文章内容 Markdown格式
      */
     @Lob
-    @JsonIgnore
     private String postContentMd;
 
     /**
@@ -130,4 +130,14 @@ public class Post implements Serializable {
      * 是否允许评论
      */
     private Integer allowComment = 0;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getPostDate() {
+        return postDate;
+    }
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getPostUpdate() {
+        return postUpdate;
+    }
 }
