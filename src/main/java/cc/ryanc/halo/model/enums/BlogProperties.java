@@ -49,12 +49,12 @@ public enum BlogProperties {
     /**
      * 邮箱地址
      */
-    MAIL_SMTP_USERNAME("smtp_username"),
+    MAIL_SMTP_USERNAME("mail_smtp_username"),
 
     /**
      * 邮箱密码／授权码
      */
-    MAIL_SMTP_PASSWORD("smtp_password"),
+    MAIL_SMTP_PASSWORD("mail_smtp_password"),
 
     /**
      * 发送者名称
