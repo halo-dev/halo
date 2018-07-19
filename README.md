@@ -35,7 +35,7 @@
 git clone https://github.com/ruibaby/halo.git
 cd halo
 mvn clean package -Pprod
-java -jar target/dist/halo/halo-xxx.jar
+java -jar target/dist/halo/halo-latest.jar
 ```
 
 > 注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件。
@@ -54,9 +54,7 @@ Let's start: http://localhost:8090
 
 ## Download 下载部署
 
-[下载](https://github.com/ruibaby/halo/releases)最新的压缩包，解压之后进入根目录执行`java -jar halo-xxx.jar`即可运行。
-
-> 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run-with-git-maven)。
+> 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run-with-git-maven)或者[Wiki](https://github.com/ruibaby/halo/wiki)。
 
 ## Docs 文档
 
@@ -98,6 +96,7 @@ Halo的诞生离不开下面这些项目：
 - [Apache Commons](http://commons.apache.org/)：非常好用的Java工具库
 - [oh-my-email](https://github.com/biezhi/oh-my-email)：可能是最小的Java邮件发送库了，支持抄送、附件、模板等
 - [Hutool](https://github.com/looly/hutool)：一个Java基础工具类
+- [Thumbnailator](https://github.com/coobird/thumbnailator)：缩略图生成库
 - [AdminLTE](https://github.com/almasaeed2010/AdminLTE)：基于Bootstrap的后台模板
 - [Bootstrap](https://github.com/twbs/bootstrap.git)：使用最广泛的前端ui框架
 - [Animate](https://github.com/daneden/animate.css.git)：非常好用的css动效库
@@ -109,6 +108,7 @@ Halo的诞生离不开下面这些项目：
 - [Layer](https://github.com/sentsin/layer.git)：个人认为最实用最好看的弹出层组件，没有之一
 - [Jquery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：消息提示组件
 - [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
+- [OwO](https://github.com/DIYgod/OwO)：前端表情库
 
 ## Donate 捐赠
 
