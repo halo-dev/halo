@@ -24,6 +24,8 @@ public class CommentServiceImpl implements CommentService {
 
     private static final String COMMENTS_CACHE_NAME = "comments";
 
+    private static final String POSTS_CACHE_NAME = "posts";
+
     @Autowired
     private CommentRepository commentRepository;
 
@@ -33,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
      * @param comment comment
      */
     @Override
-    @CacheEvict(value = COMMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public void saveByComment(Comment comment) {
         commentRepository.save(comment);
     }
@@ -45,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
      * @return Optional
      */
     @Override
-    @CacheEvict(value = COMMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Optional<Comment> removeByCommentId(Long commentId) {
         Optional<Comment> comment = this.findCommentById(commentId);
         commentRepository.delete(comment.get());

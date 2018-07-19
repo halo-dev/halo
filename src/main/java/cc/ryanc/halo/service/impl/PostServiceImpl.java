@@ -32,6 +32,8 @@ public class PostServiceImpl implements PostService {
 
     private static final String POSTS_CACHE_NAME = "posts";
 
+    private static final String COMMENTS_CACHE_NAME = "comments";
+
     @Autowired
     private PostRepository postRepository;
 
@@ -42,7 +44,7 @@ public class PostServiceImpl implements PostService {
      * @return Post
      */
     @Override
-    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Post saveByPost(Post post) {
         return postRepository.save(post);
     }
@@ -54,7 +56,7 @@ public class PostServiceImpl implements PostService {
      * @return Post
      */
     @Override
-    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
+    @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Post removeByPostId(Long postId) {
         Optional<Post> post = this.findByPostId(postId);
         postRepository.delete(post.get());
