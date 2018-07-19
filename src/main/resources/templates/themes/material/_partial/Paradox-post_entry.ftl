@@ -3,7 +3,11 @@
 <div class="post_entry-module mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp mdl-cell mdl-cell--12-col fade out">
     <!-- Post Thumbnail -->
     <!-- Random Thumbnail -->
+    <#if post.postThumbnail?if_exists == "${options.blog_url}/static/images/thumbnail.png">
     <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
+    <#else>
+    <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50 lazy" data-original="${post.postThumbnail?if_exists}">
+    </#if>
         <!-- Post Title -->
         <p class="article-headline-p"><a href="/archives/${post.postUrl}">${post.postTitle?if_exists}</a></p>
     </div>
