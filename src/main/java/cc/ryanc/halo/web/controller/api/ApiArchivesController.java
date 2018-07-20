@@ -30,7 +30,7 @@ public class ApiArchivesController {
     @GetMapping(value = "/year")
     public JsonResult archivesYear() {
         List<Archive> archives = postService.findPostGroupByYear();
-        if (null != archives || archives.size() > 0) {
+        if (null != archives && archives.size() > 0) {
             return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), archives);
         } else {
             return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
@@ -45,7 +45,7 @@ public class ApiArchivesController {
     @GetMapping(value = "/year/month")
     public JsonResult archivesYearAndMonth() {
         List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        if (null != archives || archives.size() > 0) {
+        if (null != archives && archives.size() > 0) {
             return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), archives);
         } else {
             return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
