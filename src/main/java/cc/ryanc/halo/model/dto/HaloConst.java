@@ -1,7 +1,5 @@
 package cc.ryanc.halo.model.dto;
 
-import cc.ryanc.halo.model.domain.Attachment;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,11 +24,6 @@ public class HaloConst {
      * OwO表情
      */
     public static Map<String, String> OWO = new HashMap<>();
-
-    /**
-     * 所有文件
-     */
-    public static List<Attachment> ATTACHMENTS = new ArrayList<>();
 
     /**
      * 所有主题

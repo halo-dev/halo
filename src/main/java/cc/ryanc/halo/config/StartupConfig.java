@@ -1,10 +1,8 @@
 package cc.ryanc.halo.config;
 
-import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -35,14 +33,10 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
     @Autowired
     private OptionsService optionsService;
 
-    @Autowired
-    private AttachmentService attachmentService;
-
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         this.loadActiveTheme();
         this.loadOptions();
-        this.loadFiles();
         this.loadThemes();
         this.loadOwo();
         //启动定时任务
@@ -70,16 +64,6 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
         Map<String, String> options = optionsService.findAllOptions();
         if (options != null && !options.isEmpty()) {
             HaloConst.OPTIONS = options;
-        }
-    }
-
-    /**
-     * 加载所有文件
-     */
-    private void loadFiles() {
-        List<Attachment> attachments = attachmentService.findAllAttachments();
-        if (null != attachments) {
-            HaloConst.ATTACHMENTS = attachments;
         }
     }
 

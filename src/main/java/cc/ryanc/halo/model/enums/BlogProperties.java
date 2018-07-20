@@ -99,7 +99,27 @@ public enum BlogProperties {
     /**
      * 博客评论系统
      */
-    COMMENT_SYSTEM("comment_system");
+    COMMENT_SYSTEM("comment_system"),
+
+    /**
+     * 仪表盘部件 文章总数
+     */
+    WIDGET_POSTCOUNT("widget_postcount"),
+
+    /**
+     * 仪表盘部件 评论总数
+     */
+    WIDGET_COMMENTCOUNT("widget_commentcount"),
+
+    /**
+     * 仪表盘部件 附件总数
+     */
+    WIDGET_ATTACHMENTCOUNT("widget_attachmentcount"),
+
+    /**
+     * 仪表盘部件 成立天数
+     */
+    WIDGET_DAYCOUNT("widget_daycount");
 
     private String prop;
 

@@ -41,16 +41,11 @@
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
         <qiniu-java-sdk.version>7.2.14</qiniu-java-sdk.version>
         <thumbnailator.version>0.4.8</thumbnailator.version>
+        <jaxb-api.version>2.3.0</jaxb-api.version>
 	</properties>
 
 	<dependencies>
 
-		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-		<dependency>
-    			<groupId>javax.xml.bind</groupId>
-    			<artifactId>jaxb-api</artifactId>
-    			<version>2.3.0</version>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -174,6 +169,13 @@
 			<groupId>net.coobird</groupId>
 			<artifactId>thumbnailator</artifactId>
 			<version>${thumbnailator.version}</version>
+		</dependency>
+
+		<!-- jaxb-api-->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>${jaxb-api.version}</version>
 		</dependency>
 
 	</dependencies>
