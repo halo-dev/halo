@@ -69,6 +69,8 @@ Let's start: http://localhost:8090
 - [Vno](https://github.com/ruibaby/vno-halo) - 来自Jekyll的一款主题，作者[Wei Wang](https://onevcat.com/)。
 - [Hux](https://github.com/ruibaby/hux-halo) - 来自Jekyll的一款主题，作者[Xuan Huang](https://huangxuan.me/)。
 
+> 声明：不接受任何对**移植主题**功能上的意见和建议。
+
 ## License 许可证
 
 [![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
