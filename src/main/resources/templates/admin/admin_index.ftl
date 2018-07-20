@@ -127,7 +127,7 @@
                 <#if options.widget_postcount?default("true")=="true">
                 <div class="col-lg-3 col-xs-6" id="widgetPostCountBody">
                     <div class="small-box bg-aqua">
-                        <div class="inner"><h3>${postCount?default(0)}</h3><p>文章</p></div>
+                        <div class="inner"><h3><@articleTag method="postsCount">${postsCount?default(0)}</@articleTag></h3><p>文章</p></div>
                         <div class="icon"><i class="ion ion-bag"></i></div>
                         <a data-pjax="true" href="/admin/posts" class="small-box-footer">查看所有 <i class="fa fa-arrow-circle-right"></i></a>
                     </div>

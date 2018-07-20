@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.model.domain.Logs;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.PostType;
@@ -49,14 +48,6 @@ public class AttachmentController {
 
     @Autowired
     private LogsService logsService;
-
-    /**
-     * 刷新HaloConst
-     */
-    private void updateConst() {
-        HaloConst.ATTACHMENTS.clear();
-        HaloConst.ATTACHMENTS = attachmentService.findAllAttachments();
-    }
 
     /**
      * 获取upload的所有图片资源并渲染页面
@@ -168,7 +159,6 @@ public class AttachmentController {
                 attachment.setAttachSize(HaloUtils.parseSize(new File(mediaPath, fileName).length()));
                 attachment.setAttachWh(HaloUtils.getImageWh(new File(mediaPath, fileName)));
                 attachmentService.saveByAttachment(attachment);
-                updateConst();
                 log.info("上传文件[{}]到[{}]成功", fileName, mediaPath.getAbsolutePath());
                 logsService.saveByLogs(
                         new Logs(LogsRecord.UPLOAD_FILE, fileName, ServletUtil.getClientIP(request), DateUtil.date())
@@ -179,7 +169,6 @@ public class AttachmentController {
                 result.put("url", attachment.getAttachPath());
             } catch (Exception e) {
                 log.error("上传文件失败：{}", e.getMessage());
-                e.printStackTrace();
                 result.put("success", 0);
                 result.put("message", "上传失败！");
             }
@@ -220,8 +209,6 @@ public class AttachmentController {
         try {
             //删除数据库中的内容
             attachmentService.removeByAttachId(attachId);
-            //刷新HaloConst变量
-            updateConst();
             //删除文件
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             File mediaPath = new File(basePath.getAbsolutePath(), attachment.get().getAttachPath().substring(0, attachment.get().getAttachPath().lastIndexOf('/')));
@@ -229,7 +216,6 @@ public class AttachmentController {
             File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
             if (delFile.exists() && delFile.isFile()) {
                 if (delFile.delete() && delSmallFile.delete()) {
-                    updateConst();
                     log.info("删除文件[{}]成功！", delFileName);
                     logsService.saveByLogs(
                             new Logs(LogsRecord.REMOVE_FILE, delFileName, ServletUtil.getClientIP(request), DateUtil.date())

@@ -96,7 +96,6 @@ public class Post implements Serializable {
      * 文章的评论
      */
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
-    @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
 
     /**

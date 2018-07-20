@@ -35,6 +35,7 @@ public class Comment implements Serializable {
      */
     @ManyToOne(targetEntity = Post.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private Post post;
 
     /**

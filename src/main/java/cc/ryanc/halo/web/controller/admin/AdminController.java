@@ -7,13 +7,9 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.enums.ResultCode;
 import cc.ryanc.halo.model.enums.TrueFalse;
-import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.UserService;
+import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
@@ -62,6 +58,9 @@ public class AdminController extends BaseController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private AttachmentService attachmentService;
+
     /**
      * 请求后台页面
      *
@@ -70,10 +69,7 @@ public class AdminController extends BaseController {
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
-    public String index(Model model, HttpSession session) {
-        //查询文章条数
-        Integer postCount = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc()).size();
-        model.addAttribute("postCount", postCount);
+    public String index(Model model) {
 
         //查询评论的条数
         Integer commentCount = commentService.findAllComments().size();
@@ -91,8 +87,10 @@ public class AdminController extends BaseController {
         List<Comment> comments = commentService.findCommentsLatest();
         model.addAttribute("comments", comments);
 
-        model.addAttribute("mediaCount", HaloConst.ATTACHMENTS.size());
+        //附件数量
+        model.addAttribute("mediaCount", attachmentService.findAllAttachments().size());
 
+        //文章阅读总数
         Long postViewsSum = postService.getPostViews();
         model.addAttribute("postViewsSum", postViewsSum);
         return "admin/admin_index";
@@ -120,7 +118,7 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
-     * @return String 登录状态
+     * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
