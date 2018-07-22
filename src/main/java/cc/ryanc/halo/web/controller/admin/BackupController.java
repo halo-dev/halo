@@ -5,10 +5,7 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.model.enums.ResultCode;
-import cc.ryanc.halo.model.enums.TrueFalse;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -58,12 +55,12 @@ public class BackupController {
     @GetMapping
     public String backup(@RequestParam(value = "type", defaultValue = "resources") String type, Model model) {
         List<BackupDto> backups = null;
-        if (StringUtils.equals(type, "resources")) {
-            backups = HaloUtils.getBackUps("resources");
-        } else if (StringUtils.equals(type, "databases")) {
-            backups = HaloUtils.getBackUps("databases");
-        } else if (StringUtils.equals(type, "posts")) {
-            backups = HaloUtils.getBackUps("posts");
+        if (StringUtils.equals(type,BackupType.RESOURCES.getDesc())) {
+            backups = HaloUtils.getBackUps(BackupType.RESOURCES.getDesc());
+        } else if (StringUtils.equals(type, BackupType.DATABASES.getDesc())) {
+            backups = HaloUtils.getBackUps(BackupType.DATABASES.getDesc());
+        } else if (StringUtils.equals(type, BackupType.POSTS.getDesc())) {
+            backups = HaloUtils.getBackUps(BackupType.POSTS.getDesc());
         } else {
             backups = new ArrayList<>();
         }
@@ -81,11 +78,11 @@ public class BackupController {
     @GetMapping(value = "doBackup")
     @ResponseBody
     public JsonResult doBackup(@RequestParam("type") String type) {
-        if (StringUtils.equals("resources", type)) {
+        if (StringUtils.equals(BackupType.RESOURCES.getDesc(), type)) {
             return this.backupResources();
-        } else if (StringUtils.equals("databases", type)) {
+        } else if (StringUtils.equals(BackupType.DATABASES.getDesc(), type)) {
             return this.backupDatabase();
-        } else if (StringUtils.equals("posts", type)) {
+        } else if (StringUtils.equals(BackupType.POSTS.getDesc(), type)) {
             return this.backupPosts();
         } else {
             return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
@@ -99,7 +96,7 @@ public class BackupController {
      */
     public JsonResult backupDatabase() {
         try {
-            if (HaloUtils.getBackUps("databases").size() > 10) {
+            if (HaloUtils.getBackUps(BackupType.DATABASES.getDesc()).size() > 10) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
             }
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
@@ -121,7 +118,7 @@ public class BackupController {
      */
     public JsonResult backupResources() {
         try {
-            if (HaloUtils.getBackUps("resources").size() > 10) {
+            if (HaloUtils.getBackUps(BackupType.RESOURCES.getDesc()).size() > 10) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/resources/");
             }
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
@@ -146,7 +143,7 @@ public class BackupController {
         List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
         posts.addAll(postService.findAllPosts(PostType.POST_TYPE_PAGE.getDesc()));
         try {
-            if (HaloUtils.getBackUps("posts").size() > 10) {
+            if (HaloUtils.getBackUps(BackupType.POSTS.getDesc()).size() > 10) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
             }
             //打包好的文件名
@@ -210,11 +207,14 @@ public class BackupController {
         return new JsonResult(ResultCode.SUCCESS.getCode(), "邮件发送成功！");
     }
 
+    /**
+     * 异步发送附件到邮箱
+     */
     class EmailToAdmin extends Thread {
         private String srcPath;
         private User user;
 
-        public EmailToAdmin(String srcPath, User user) {
+        private EmailToAdmin(String srcPath, User user) {
             this.srcPath = srcPath;
             this.user = user;
         }
