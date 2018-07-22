@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.core;
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.AllowComment;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.TrueFalse;
 import cc.ryanc.halo.service.*;
@@ -132,6 +133,7 @@ public class InstallController {
             post.setPostUrl("hello-halo");
             post.setUser(user);
             post.setCategories(categories);
+            post.setAllowComment(AllowComment.ALLOW.getCode());
             postService.saveByPost(post);
 
             //第一个评论
