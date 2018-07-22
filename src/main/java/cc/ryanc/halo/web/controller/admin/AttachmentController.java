@@ -134,7 +134,7 @@ public class AttachmentController {
                 //upload的路径
                 StringBuffer sbMedia = new StringBuffer("upload/");
                 //获取当前年月以创建目录，如果没有该目录则创建
-                sbMedia.append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/");
+                sbMedia.append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
                 File mediaPath = new File(basePath.getAbsolutePath(), sbMedia.toString());
                 if (!mediaPath.exists()) {
                     mediaPath.mkdirs();
@@ -151,8 +151,8 @@ public class AttachmentController {
                 //保存在数据库
                 Attachment attachment = new Attachment();
                 attachment.setAttachName(fileName);
-                attachment.setAttachPath(new StringBuffer("/upload/").append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/").append(fileName).toString());
-                attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtils.YEAR).append("/").append(HaloUtils.MONTH).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
+                attachment.setAttachPath(new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(fileName).toString());
+                attachment.setAttachSmallPath(new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
                 attachment.setAttachCreated(DateUtil.date());

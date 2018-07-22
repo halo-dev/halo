@@ -12,6 +12,8 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.FileReader;
+import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -184,7 +184,8 @@ public class ThemeController extends BaseController {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取主题路径
             File themesPath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(BaseController.THEME).append("/").append(tplName).toString());
-            tplContent = HaloUtils.getFileContent(themesPath.getAbsolutePath());
+            FileReader fileReader = new FileReader(themesPath);
+            tplContent = fileReader.readString();
         } catch (Exception e) {
             log.error("获取模板文件错误：{}", e.getMessage());
         }
@@ -210,8 +211,8 @@ public class ThemeController extends BaseController {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取主题路径
             File tplPath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(BaseController.THEME).append("/").append(tplName).toString());
-            byte[] tplContentByte = tplContent.getBytes("UTF-8");
-            Files.write(Paths.get(tplPath.getAbsolutePath()), tplContentByte);
+            FileWriter fileWriter = new FileWriter(tplPath);
+            fileWriter.write(tplContent);
         } catch (Exception e) {
             log.error("模板保存失败：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(), "模板保存失败！");
