@@ -45,12 +45,6 @@ import java.util.*;
 @Slf4j
 public class HaloUtils {
 
-    private final static Calendar NOW = Calendar.getInstance();
-
-    public final static String YEAR = NOW.get(Calendar.YEAR) + "";
-
-    public final static String MONTH = (NOW.get(Calendar.MONTH) + 1) + "";
-
     private static ArrayList<String> FILE_LIST = new ArrayList<>();
 
     /**
@@ -249,32 +243,6 @@ public class HaloUtils {
             log.error("未知错误：", e.getMessage());
         }
         return tpls;
-    }
-
-    /**
-     * 获取文件内容
-     *
-     * @param filePath filePath
-     * @return String
-     */
-    public static String getFileContent(String filePath) throws IOException {
-        File file = new File(filePath);
-        Long fileLength = file.length();
-        byte[] fileContent = new byte[fileLength.intValue()];
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
-            inputStream.read(fileContent);
-            inputStream.close();
-            return new String(fileContent, "UTF-8");
-        } catch (Exception e) {
-            log.error("读取模板文件错误：", e.getMessage());
-        } finally {
-            if (null != inputStream) {
-                inputStream.close();
-            }
-        }
-        return null;
     }
 
     /**
