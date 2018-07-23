@@ -349,7 +349,7 @@
                         <p>累计创建了<@commonTag method="tags">${tags?size}</@commonTag>个标签。</p>
                         <p>累计获得了${commentCount}条评论。</p>
                         <p>累计添加了<@commonTag method="links">${links?size}</@commonTag>个友链。</p>
-                        <p>文章总访问${postViewsSum}次。</p>
+                        <p>文章总访问${postViewsSum?default(0L)}次。</p>
                         <p>加油！不要因为走的太远，而忘了当初为什么出发。</p>
                     </div>
                     <div class="modal-footer">
