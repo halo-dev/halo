@@ -152,6 +152,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     /**
+     * 根据文章和评论状态（为不查询的）查询评论 不分页
+     *
+     * @param post   post
+     * @param status status
+     * @return List
+     */
+    @Override
+    public List<Comment> findCommentsByPostAndCommentStatusNot(Post post, Integer status) {
+        return commentRepository.findCommentsByPostAndCommentStatusNot(post, status);
+    }
+
+    /**
      * 查询最新的前五条评论
      *
      * @return List

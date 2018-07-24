@@ -2,14 +2,14 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.enums.CommentStatus;
-import cc.ryanc.halo.model.enums.PostStatus;
-import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -118,7 +118,12 @@ public class FrontArchiveController extends BaseController {
         if (null != afterPosts && afterPosts.size() > 0) {
             model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
         }
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatus.PUBLISHED.getCode());
+        List<Comment> comments = null;
+        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalse.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
+            comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatus.PUBLISHED.getCode());
+        } else {
+            comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatus.RECYCLE.getCode());
+        }
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments));
         model.addAttribute("commentsCount", comments.size());
