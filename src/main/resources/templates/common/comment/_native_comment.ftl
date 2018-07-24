@@ -388,6 +388,7 @@
                     $(".native-message").fadeOut(1000);
                     $("#btn-push").removeAttr("disabled");
                     $("#btn-push").html("提交");
+                    window.location.reload();
                 },1500);
             }
         });

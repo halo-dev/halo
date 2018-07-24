@@ -72,6 +72,11 @@ public enum BlogProperties {
     COMMENT_REPLY_NOTICE("comment_reply_notice"),
 
     /**
+     * 新评论是否需要审核
+     */
+    NEW_COMMENT_NEED_CHECK("new_comment_need_check"),
+
+    /**
      * 新评论通知
      */
     NEW_COMMENT_NOTICE("new_comment_notice"),

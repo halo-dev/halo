@@ -233,6 +233,17 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label class="col-lg-2 col-sm-4 control-label">评论审核后才显示：</label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="new_comment_need_check" value="true" ${((options.new_comment_need_check?default("true"))=='true')?string('checked','')}> 开启
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="new_comment_need_check" value="false" ${((options.new_comment_need_check?if_exists)=='false')?string('checked','')}> 关闭
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label class="col-lg-2 col-sm-4 control-label">新评论通知：</label>
                                                 <div class="col-lg-4 col-sm-8">
                                                     <label class="radio-inline">
