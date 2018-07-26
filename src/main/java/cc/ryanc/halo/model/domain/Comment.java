@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -41,11 +43,13 @@ public class Comment implements Serializable {
     /**
      * 评论人
      */
+    @NotBlank(message = "评论用户名不能为空")
     private String commentAuthor;
 
     /**
      * 评论人的邮箱
      */
+    @Email(message = "邮箱格式不正确")
     @JsonIgnore
     private String commentAuthorEmail;
 
@@ -73,6 +77,7 @@ public class Comment implements Serializable {
     /**
      * 评论内容
      */
+    @NotBlank(message = "评论内容不能为空")
     @Lob
     private String commentContent;
 

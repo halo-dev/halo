@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -35,6 +37,7 @@ public class User implements Serializable {
     /**
      * 用户名
      */
+    @NotBlank(message = "用户名不能为空")
     @JsonIgnore
     private String userName;
 
@@ -52,6 +55,7 @@ public class User implements Serializable {
     /**
      * 邮箱
      */
+    @Email(message = "邮箱格式不正确")
     private String userEmail;
 
     /**

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +34,13 @@ public class Category implements Serializable {
     /**
      * 分类名称
      */
+    @NotBlank(message = "分类名称不能为空")
     private String cateName;
 
     /**
      * 分类路径
      */
+    @NotBlank(message = "分类路径不能为空")
     private String cateUrl;
 
     /**

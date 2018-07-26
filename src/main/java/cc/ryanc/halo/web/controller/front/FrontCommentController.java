@@ -24,9 +24,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,14 +98,14 @@ public class FrontCommentController {
      */
     @PostMapping(value = "/newComment")
     @ResponseBody
-    public JsonResult newComment(@ModelAttribute("comment") Comment comment,
+    public JsonResult newComment(@Valid @ModelAttribute("comment") Comment comment,
+                                 BindingResult result,
                                  @ModelAttribute("post") Post post,
                                  HttpServletRequest request) {
-        if (StringUtils.equals(StringUtils.trim(comment.getCommentAuthor()), "")) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "请正确输入昵称！");
-        }
-        if (StringUtils.equals(StringUtils.trim(comment.getCommentContent()), "")) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "请正确输入评论内容！");
+        if (result.hasErrors()) {
+            for (ObjectError error : result.getAllErrors()) {
+                return new JsonResult(ResultCode.FAIL.getCode(), error.getDefaultMessage());
+            }
         }
         try {
             Comment lastComment = null;
