@@ -3,3 +3,6 @@ jdk:
   - oraclejdk8
 script:
   - mvn clean package -Pprod
+branches:
+  only:
+    - master
