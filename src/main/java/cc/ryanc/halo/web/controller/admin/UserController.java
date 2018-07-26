@@ -9,9 +9,12 @@ import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 /**
  * @author : RYAN0UP
@@ -47,15 +50,16 @@ public class UserController {
      */
     @PostMapping(value = "save")
     @ResponseBody
-    public JsonResult saveProfile(@ModelAttribute User user, HttpSession session) {
+    public JsonResult saveProfile(@Valid @ModelAttribute User user, BindingResult result, HttpSession session) {
         try {
-            if (null != user) {
-                userService.saveByUser(user);
-                configuration.setSharedVariable("user", userService.findUser());
-                session.invalidate();
-            } else {
-                return new JsonResult(ResultCode.FAIL.getCode(), "修改失败！");
+            if (result.hasErrors()) {
+                for (ObjectError error : result.getAllErrors()) {
+                    return new JsonResult(ResultCode.FAIL.getCode(), error.getDefaultMessage());
+                }
             }
+            userService.saveByUser(user);
+            configuration.setSharedVariable("user", userService.findUser());
+            session.invalidate();
         } catch (Exception e) {
             log.error("修改用户资料失败：{}", e.getMessage());
             return new JsonResult(ResultCode.FAIL.getCode(), "修改失败！");
