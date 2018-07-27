@@ -5,6 +5,10 @@ import cc.ryanc.halo.model.domain.Options;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     系统设置业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/11/14
  */

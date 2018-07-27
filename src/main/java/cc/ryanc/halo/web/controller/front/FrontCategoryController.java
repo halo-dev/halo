@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 
 /**
+ * <pre>
+ *     前台文章分类控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/4/26
  */

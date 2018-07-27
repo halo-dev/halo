@@ -5,6 +5,10 @@ import cc.ryanc.halo.model.domain.User;
 import java.util.Date;
 
 /**
+ * <pre>
+ *     用户业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/11/14
  */

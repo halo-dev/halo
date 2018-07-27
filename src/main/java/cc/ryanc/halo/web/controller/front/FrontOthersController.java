@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 /**
+ * <pre>
+ *     sitemap，rss页面控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/4/26
  */

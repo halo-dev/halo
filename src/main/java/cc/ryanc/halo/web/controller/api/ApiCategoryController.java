@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章分类API
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/6/6
  */

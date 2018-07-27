@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     图库API
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/6/6
  */

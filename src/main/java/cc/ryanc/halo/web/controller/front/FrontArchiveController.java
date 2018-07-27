@@ -25,6 +25,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * <pre>
+ *     前台文章归档控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/4/26
  */

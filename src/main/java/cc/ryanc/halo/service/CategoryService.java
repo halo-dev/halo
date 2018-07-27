@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     分类业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/11/30
  */

@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * <pre>
+ *     API接口拦截器，用户可自己选择关闭或者开启
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/6/28
  */

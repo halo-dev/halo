@@ -7,8 +7,12 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 
 /**
- * @author RYAN0UP
- * SpringBoot启动类
+ * <pre>
+ *     Halo run!
+ * </pre>
+ *
+ * @author : RYAN0UP
+ * @date : 2017/11/14
  */
 @Slf4j
 @SpringBootApplication

@@ -1,6 +1,10 @@
 package cc.ryanc.halo.web.controller.core;
 
 /**
+ * <pre>
+ *     Controller抽象类
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/15
  */

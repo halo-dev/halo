@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * <pre>
+ *     图库业务逻辑实现类
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/2/26
  */

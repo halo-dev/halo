@@ -1,6 +1,10 @@
 package cc.ryanc.halo.model.enums;
 
 /**
+ * <pre>
+ *     评论状态enum
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/7/1
  */

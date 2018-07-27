@@ -3,6 +3,10 @@ package cc.ryanc.halo.service;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     邮件发送业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/23
  */

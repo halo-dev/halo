@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <pre>
+ *     拼装评论
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/7/12
  */
