@@ -20,6 +20,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
+ * <pre>
+ *     前台标签控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/4/26
  */

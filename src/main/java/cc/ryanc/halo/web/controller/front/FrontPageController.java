@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 /**
+ * <pre>
+ *     前台内置页面，自定义页面控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/4/26
  */

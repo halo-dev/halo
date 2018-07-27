@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * <pre>
+ *     博客初始化拦截器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/28
  */

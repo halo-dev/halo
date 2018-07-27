@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     系统设置API
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/7/19
  */

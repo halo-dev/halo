@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <pre>
+ *     博客初始化控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/28
  */

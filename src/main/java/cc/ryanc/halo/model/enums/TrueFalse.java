@@ -1,6 +1,10 @@
 package cc.ryanc.halo.model.enums;
 
 /**
+ * <pre>
+ *     true or false enum
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/7/16
  */

@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * <pre>
+ *     错误页面控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/26
  */

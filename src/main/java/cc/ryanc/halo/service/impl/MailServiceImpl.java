@@ -15,6 +15,10 @@ import java.io.File;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     邮件发送业务逻辑实现类
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/23
  */

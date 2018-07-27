@@ -39,6 +39,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * <pre>
+ *     后台评论管理控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/10
  */

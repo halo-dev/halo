@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * <pre>
+ *     页面API
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
