@@ -109,7 +109,7 @@
                                         <#list categories as cate>
                                             <li style="padding: 0;margin: 0px;list-style: none">
                                                 <label>
-                                                    <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId}"> ${cate.cateName}
+                                                    <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}"> ${cate.cateName}
                                                 </label>
                                             </li>
                                         </#list>
