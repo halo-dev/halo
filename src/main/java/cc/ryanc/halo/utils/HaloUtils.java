@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.CommonParams;
 import cn.hutool.core.io.FileUtil;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Content;
@@ -114,17 +115,17 @@ public class HaloUtils {
      * @return String
      */
     public static String parseSize(long size) {
-        if (size < 1024) {
+        if (size < CommonParams.NOT_FOUND.getValue()) {
             return String.valueOf(size) + "B";
         } else {
             size = size / 1024;
         }
-        if (size < 1024) {
+        if (size < CommonParams.NOT_FOUND.getValue()) {
             return String.valueOf(size) + "KB";
         } else {
             size = size / 1024;
         }
-        if (size < 1024) {
+        if (size < CommonParams.NOT_FOUND.getValue()) {
             size = size * 100;
             return String.valueOf((size / 100)) + "." + String.valueOf((size % 100)) + "MB";
         } else {

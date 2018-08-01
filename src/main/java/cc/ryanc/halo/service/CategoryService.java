@@ -54,5 +54,11 @@ public interface CategoryService {
      */
     Category findByCateUrl(String cateUrl);
 
+    /**
+     * 将分类字符串集合转化为Category泛型集合
+     *
+     * @param strings strings
+     * @return List
+     */
     List<Category> strListToCateList(List<String> strings);
 }
