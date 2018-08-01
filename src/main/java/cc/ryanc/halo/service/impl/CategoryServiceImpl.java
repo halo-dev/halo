@@ -80,6 +80,12 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findCategoryByCateUrl(cateUrl);
     }
 
+    /**
+     * 将分类字符串集合转化为Category泛型集合
+     *
+     * @param strings strings
+     * @return List
+     */
     @Override
     public List<Category> strListToCateList(List<String> strings) {
         if (null == strings) {

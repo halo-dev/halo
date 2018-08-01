@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.core;
 
+import cc.ryanc.halo.model.enums.CommonParams;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
@@ -30,7 +31,7 @@ public class CommonController implements ErrorController {
     @GetMapping(value = ERROR_PATH)
     public String handleError(HttpServletRequest request) {
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-        if (statusCode == 404) {
+        if (statusCode.equals(CommonParams.NOT_FOUND.getValue())) {
             return "redirect:/404";
         } else {
             return "redirect:/500";

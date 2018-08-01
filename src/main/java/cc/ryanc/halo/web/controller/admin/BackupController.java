@@ -59,7 +59,7 @@ public class BackupController {
     @GetMapping
     public String backup(@RequestParam(value = "type", defaultValue = "resources") String type, Model model) {
         List<BackupDto> backups = null;
-        if (StringUtils.equals(type,BackupType.RESOURCES.getDesc())) {
+        if (StringUtils.equals(type, BackupType.RESOURCES.getDesc())) {
             backups = HaloUtils.getBackUps(BackupType.RESOURCES.getDesc());
         } else if (StringUtils.equals(type, BackupType.DATABASES.getDesc())) {
             backups = HaloUtils.getBackUps(BackupType.DATABASES.getDesc());
@@ -100,7 +100,7 @@ public class BackupController {
      */
     public JsonResult backupDatabase() {
         try {
-            if (HaloUtils.getBackUps(BackupType.DATABASES.getDesc()).size() > 10) {
+            if (HaloUtils.getBackUps(BackupType.DATABASES.getDesc()).size() > CommonParams.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
             }
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
@@ -122,7 +122,7 @@ public class BackupController {
      */
     public JsonResult backupResources() {
         try {
-            if (HaloUtils.getBackUps(BackupType.RESOURCES.getDesc()).size() > 10) {
+            if (HaloUtils.getBackUps(BackupType.RESOURCES.getDesc()).size() > CommonParams.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/resources/");
             }
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
@@ -147,7 +147,7 @@ public class BackupController {
         List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
         posts.addAll(postService.findAllPosts(PostType.POST_TYPE_PAGE.getDesc()));
         try {
-            if (HaloUtils.getBackUps(BackupType.POSTS.getDesc()).size() > 10) {
+            if (HaloUtils.getBackUps(BackupType.POSTS.getDesc()).size() > CommonParams.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
             }
             //打包好的文件名
