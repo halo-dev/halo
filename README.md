@@ -38,6 +38,14 @@ mvn clean package -Pprod
 java -jar target/dist/halo/halo-latest.jar
 ```
 
+服务器快速部署（暂时仅支持CentOS）：
+```bash
+# 安装Halo
+yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh 1
+# 更新Halo
+sh halo-cli.sh 2
+```
+
 > 注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件。
 
 Let's start: http://localhost:8090
