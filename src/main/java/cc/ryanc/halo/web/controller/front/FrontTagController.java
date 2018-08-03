@@ -3,7 +3,7 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -78,8 +78,8 @@ public class FrontTagController extends BaseController {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;
-        if (!StringUtils.isBlank(HaloConst.OPTIONS.get(BlogProperties.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogProperties.INDEX_POSTS.getProp()));
+        if (!StringUtils.isBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostsByTags(tag, pageable);

@@ -2,8 +2,8 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.service.PostService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,14 +39,14 @@ public class FrontOthersController {
     @GetMapping(value = {"feed", "feed.xml", "atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String feed() {
-        String rssPosts = HaloConst.OPTIONS.get(BlogProperties.RSS_POSTS.getProp());
+        String rssPosts = HaloConst.OPTIONS.get(BlogPropertiesEnum.RSS_POSTS.getProp());
         if (StringUtils.isBlank(rssPosts)) {
             rssPosts = "20";
         }
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
-        Page<Post> postsPage = postService.findPostByStatus(0, PostType.POST_TYPE_POST.getDesc(), pageable);
+        Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildRss(posts);
     }
@@ -62,7 +62,7 @@ public class FrontOthersController {
         //获取文章列表并根据时间排序
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(0, 999, sort);
-        Page<Post> postsPage = postService.findPostByStatus(0, PostType.POST_TYPE_POST.getDesc(), pageable);
+        Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         List<Post> posts = postsPage.getContent();
         return postService.buildSiteMap(posts);
     }

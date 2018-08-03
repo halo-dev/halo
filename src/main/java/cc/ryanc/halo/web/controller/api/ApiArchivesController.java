@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResponseStatus;
+import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +35,9 @@ public class ApiArchivesController {
     public JsonResult archivesYear() {
         List<Archive> archives = postService.findPostGroupByYear();
         if (null != archives && archives.size() > 0) {
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), archives);
+            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archives);
         } else {
-            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
+            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
         }
     }
 
@@ -50,9 +50,9 @@ public class ApiArchivesController {
     public JsonResult archivesYearAndMonth() {
         List<Archive> archives = postService.findPostGroupByYearAndMonth();
         if (null != archives && archives.size() > 0) {
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), archives);
+            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archives);
         } else {
-            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
+            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
         }
     }
 }

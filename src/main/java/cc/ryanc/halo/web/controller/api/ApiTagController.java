@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResponseStatus;
+import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,9 +36,9 @@ public class ApiTagController {
     public JsonResult tags() {
         List<Tag> tags = tagService.findAllTags();
         if (null != tags && tags.size() > 0) {
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), tags);
+            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), tags);
         } else {
-            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
+            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
         }
     }
 
@@ -52,9 +52,9 @@ public class ApiTagController {
     public JsonResult tags(@PathVariable("tagUrl") String tagUrl) {
         Tag tag = tagService.findByTagUrl(tagUrl);
         if (null != tag) {
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), tag);
+            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), tag);
         } else {
-            return new JsonResult(ResponseStatus.NOTFOUND.getCode(), ResponseStatus.NOTFOUND.getMsg());
+            return new JsonResult(ResponseStatusEnum.NOTFOUND.getCode(), ResponseStatusEnum.NOTFOUND.getMsg());
         }
     }
 }

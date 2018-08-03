@@ -4,10 +4,10 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.CommentStatus;
-import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.model.enums.TrueFalse;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.enums.CommentStatusEnum;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.PostService;
@@ -73,15 +73,15 @@ public class FrontPageController extends BaseController {
      */
     @GetMapping(value = "/p/{postUrl}")
     public String getPage(@PathVariable(value = "postUrl") String postUrl, Model model) {
-        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_PAGE.getDesc());
+        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null == post) {
             return this.renderNotFound();
         }
         List<Comment> comments = null;
-        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalse.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
-            comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatus.PUBLISHED.getCode());
+        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
+            comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatusEnum.PUBLISHED.getCode());
         } else {
-            comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatus.RECYCLE.getCode());
+            comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments));

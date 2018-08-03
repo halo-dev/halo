@@ -71,7 +71,7 @@ public class FrontCommentController {
         Optional<Post> post = postService.findByPostId(postId);
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
         Pageable pageable = PageRequest.of(0, 999, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, CommentStatus.PUBLISHED.getCode()).getContent();
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
         return CommentUtil.getComments(comments);
     }
 
@@ -88,7 +88,7 @@ public class FrontCommentController {
                                      @RequestParam(value = "post") Post post) {
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
         Pageable pageable = PageRequest.of(page - 1, 10, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatus.PUBLISHED.getCode()).getContent();
+        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
         return comments;
     }
 
@@ -108,7 +108,7 @@ public class FrontCommentController {
                                  HttpServletRequest request) {
         if (result.hasErrors()) {
             for (ObjectError error : result.getAllErrors()) {
-                return new JsonResult(ResultCode.FAIL.getCode(), error.getDefaultMessage());
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
             }
         }
         try {
@@ -138,13 +138,13 @@ public class FrontCommentController {
             } else {
                 new EmailToAdmin(comment, post).start();
             }
-            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalse.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
-                return new JsonResult(ResultCode.SUCCESS.getCode(), "你的评论已经提交，待博主审核之后可显示。");
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
+                return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "你的评论已经提交，待博主审核之后可显示。");
             } else {
-                return new JsonResult(ResultCode.SUCCESS.getCode(), "你的评论已经提交，刷新后即可显示。");
+                return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "你的评论已经提交，刷新后即可显示。");
             }
         } catch (Exception e) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "评论失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "评论失败！");
         }
     }
 
@@ -162,16 +162,16 @@ public class FrontCommentController {
 
         @Override
         public void run() {
-            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), TrueFalse.TRUE.getDesc())) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp()), TrueFalseEnum.TRUE.getDesc())) {
                 try {
                     //发送邮件到博主
                     Map<String, Object> map = new HashMap<>();
                     map.put("author", userService.findUser().getUserDisplayName());
                     map.put("pageName", post.getPostTitle());
-                    if (StringUtils.equals(post.getPostType(), PostType.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                    if (StringUtils.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     }
                     map.put("visitor", comment.getCommentAuthor());
                     map.put("commentContent", comment.getCommentContent());
@@ -200,23 +200,23 @@ public class FrontCommentController {
         @Override
         public void run() {
             //发送通知给对方
-            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NOTICE.getProp()), TrueFalse.TRUE.getDesc())) {
+            if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.TRUE.getDesc()) && StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp()), TrueFalseEnum.TRUE.getDesc())) {
                 if (Validator.isEmail(lastComment.getCommentAuthorEmail())) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("blogTitle", HaloConst.OPTIONS.get(BlogProperties.BLOG_TITLE.getProp()));
+                    map.put("blogTitle", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()));
                     map.put("commentAuthor", lastComment.getCommentAuthor());
                     map.put("pageName", lastComment.getPost().getPostTitle());
-                    if (StringUtils.equals(post.getPostType(), PostType.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                    if (StringUtils.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
                     }
                     map.put("commentContent", lastComment.getCommentContent());
                     map.put("replyAuthor", comment.getCommentAuthor());
                     map.put("replyContent", comment.getCommentContent());
-                    map.put("blogUrl", HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp()));
+                    map.put("blogUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
                     mailService.sendTemplateMail(
-                            lastComment.getCommentAuthorEmail(), "您在" + HaloConst.OPTIONS.get(BlogProperties.BLOG_TITLE.getProp()) + "的评论有了新回复", map, "common/mail/mail_reply.ftl");
+                            lastComment.getCommentAuthorEmail(), "您在" + HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()) + "的评论有了新回复", map, "common/mail/mail_reply.ftl");
                 }
             }
         }

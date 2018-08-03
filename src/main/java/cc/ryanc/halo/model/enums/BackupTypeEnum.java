@@ -8,7 +8,7 @@ package cc.ryanc.halo.model.enums;
  * @author : RYAN0UP
  * @date : 2018/7/22
  */
-public enum BackupType {
+public enum BackupTypeEnum {
 
     /**
      * 资源文件
@@ -27,7 +27,7 @@ public enum BackupType {
 
     private String desc;
 
-    BackupType(String desc) {
+    BackupTypeEnum(String desc) {
         this.desc = desc;
     }
 

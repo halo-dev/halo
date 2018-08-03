@@ -2,27 +2,27 @@ package cc.ryanc.halo.model.enums;
 
 /**
  * <pre>
- *     文章类型enum
+ *     true or false enum
  * </pre>
  *
  * @author : RYAN0UP
- * @date : 2018/7/1
+ * @date : 2018/7/16
  */
-public enum PostType {
+public enum TrueFalseEnum {
 
     /**
-     * 文章
+     * 真
      */
-    POST_TYPE_POST("post"),
+    TRUE("true"),
 
     /**
-     * 页面
+     * 假
      */
-    POST_TYPE_PAGE("page");
+    FALSE("false");
 
     private String desc;
 
-    PostType(String desc) {
+    TrueFalseEnum(String desc) {
         this.desc = desc;
     }
 

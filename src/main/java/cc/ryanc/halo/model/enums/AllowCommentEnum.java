@@ -8,7 +8,7 @@ package cc.ryanc.halo.model.enums;
  * @author : RYAN0UP
  * @date : 2018/7/9
  */
-public enum AllowComment {
+public enum AllowCommentEnum {
     /**
      * 允许评论
      */
@@ -21,7 +21,7 @@ public enum AllowComment {
 
     private Integer code;
 
-    AllowComment(Integer code) {
+    AllowCommentEnum(Integer code) {
         this.code = code;
     }
 

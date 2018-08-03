@@ -4,8 +4,8 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.model.enums.ResultCode;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
@@ -65,7 +65,7 @@ public class PageController {
      */
     @GetMapping
     public String pages(Model model) {
-        List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_PAGE.getDesc());
+        List<Post> posts = postService.findAllPosts(PostTypeEnum.POST_TYPE_PAGE.getDesc());
         model.addAttribute("pages", posts);
         return "admin/admin_page";
     }
@@ -191,9 +191,9 @@ public class PageController {
             galleryService.removeByGalleryId(galleryId);
         } catch (Exception e) {
             log.error("删除图片失败：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "删除失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
         }
-        return new JsonResult(ResultCode.SUCCESS.getCode(), "删除成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "删除成功！");
     }
 
 
@@ -222,7 +222,7 @@ public class PageController {
             //发表用户
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
-            post.setPostType(PostType.POST_TYPE_PAGE.getDesc());
+            post.setPostType(PostTypeEnum.POST_TYPE_PAGE.getDesc());
             if (null != post.getPostId()) {
                 post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
@@ -234,10 +234,10 @@ public class PageController {
             }
             postService.saveByPost(post);
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
-            return new JsonResult(ResultCode.SUCCESS.getCode(), msg);
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("保存页面失败：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "保存失败");
         }
     }
 
@@ -264,11 +264,11 @@ public class PageController {
     @GetMapping(value = "/checkUrl")
     @ResponseBody
     public JsonResult checkUrlExists(@PathParam("postUrl") String postUrl) {
-        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_PAGE.getDesc());
+        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         // TODO 还没写完
         if (null != post || StringUtils.equals("archives", postUrl) || StringUtils.equals("galleries", postUrl)) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "该路径已经存在！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "该路径已经存在！");
         }
-        return new JsonResult(ResultCode.SUCCESS.getCode(), "");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
     }
 }
