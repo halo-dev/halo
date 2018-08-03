@@ -19,6 +19,13 @@
         padding: 10px;
     }
 
+    .native-comment img{
+        display: inline-block;!important;
+        max-width: 100%;!important;
+        height: auto;!important;
+        margin: auto;!important;
+    }
+
     .native-wrap {
         border: 1px solid #f0f0f0;
         padding: 10px;
