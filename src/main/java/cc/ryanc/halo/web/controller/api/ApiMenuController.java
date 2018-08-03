@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Menu;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResponseStatus;
+import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +35,9 @@ public class ApiMenuController {
     public JsonResult menus() {
         List<Menu> menus = menuService.findAllMenus();
         if (null != menus && menus.size() > 0) {
-            return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), menus);
+            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), menus);
         } else {
-            return new JsonResult(ResponseStatus.EMPTY.getCode(), ResponseStatus.EMPTY.getMsg());
+            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
         }
     }
 }

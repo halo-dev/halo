@@ -1,7 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.utils.HaloUtils;
 import freemarker.template.Template;
@@ -39,12 +39,12 @@ public class MailServiceImpl implements MailService {
     public void sendMail(String to, String subject, String content) {
         //配置邮件服务器
         HaloUtils.configMail(
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_HOST.getProp()),
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_USERNAME.getProp()),
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_PASSWORD.getProp()));
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         try {
             OhMyEmail.subject(subject)
-                    .from(HaloConst.OPTIONS.get(BlogProperties.MAIL_FROM_NAME.getProp()))
+                    .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
                     .text(content)
                     .send();
@@ -65,15 +65,15 @@ public class MailServiceImpl implements MailService {
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         //配置邮件服务器
         HaloUtils.configMail(
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_HOST.getProp()),
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_USERNAME.getProp()),
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_PASSWORD.getProp()));
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         String text = "";
         try {
             Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
             OhMyEmail.subject(subject)
-                    .from(HaloConst.OPTIONS.get(BlogProperties.MAIL_FROM_NAME.getProp()))
+                    .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
                     .html(text)
                     .send();
@@ -95,16 +95,16 @@ public class MailServiceImpl implements MailService {
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachSrc) {
         //配置邮件服务器
         HaloUtils.configMail(
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_HOST.getProp()),
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_USERNAME.getProp()),
-                HaloConst.OPTIONS.get(BlogProperties.MAIL_SMTP_PASSWORD.getProp()));
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
+                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         File file = new File(attachSrc);
         String text = "";
         try {
             Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
             OhMyEmail.subject(subject)
-                    .from(HaloConst.OPTIONS.get(BlogProperties.MAIL_FROM_NAME.getProp()))
+                    .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
                     .html(text)
                     .attach(file, file.getName())

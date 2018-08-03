@@ -4,10 +4,10 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.PostStatus;
-import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.model.enums.ResultCode;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.enums.PostStatusEnum;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
@@ -94,11 +94,11 @@ public class PostController extends BaseController {
                         @RequestParam(value = "size", defaultValue = "10") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Post> posts = postService.findPostByStatus(status, PostType.POST_TYPE_POST.getDesc(), pageable);
+        Page<Post> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         model.addAttribute("posts", posts);
-        model.addAttribute("publishCount", postService.getCountByStatus(PostStatus.PUBLISHED.getCode()));
-        model.addAttribute("draftCount", postService.getCountByStatus(PostStatus.DRAFT.getCode()));
-        model.addAttribute("trashCount", postService.getCountByStatus(PostStatus.RECYCLE.getCode()));
+        model.addAttribute("publishCount", postService.getCountByStatus(PostStatusEnum.PUBLISHED.getCode()));
+        model.addAttribute("draftCount", postService.getCountByStatus(PostStatusEnum.DRAFT.getCode()));
+        model.addAttribute("trashCount", postService.getCountByStatus(PostStatusEnum.RECYCLE.getCode()));
         model.addAttribute("status", status);
         return "admin/admin_post";
     }
@@ -168,8 +168,8 @@ public class PostController extends BaseController {
         try {
             //提取摘要
             int postSummary = 50;
-            if (StringUtils.isNotEmpty(HaloConst.OPTIONS.get(BlogProperties.POST_SUMMARY.getProp()))) {
-                postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogProperties.POST_SUMMARY.getProp()));
+            if (StringUtils.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
+                postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
             }
             //文章摘要
             String summaryText = HtmlUtil.cleanHtmlTag(post.getPostContent());
@@ -200,10 +200,10 @@ public class PostController extends BaseController {
             post.setPostUrl(urlFilter(post.getPostUrl()));
             postService.saveByPost(post);
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
-            return new JsonResult(ResultCode.SUCCESS.getCode(), msg);
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("保存文章失败：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "保存失败");
         }
     }
 
@@ -256,9 +256,9 @@ public class PostController extends BaseController {
             post.setUser(user);
         } catch (Exception e) {
             log.error("未知错误：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "保存失败");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "保存失败");
         }
-        return new JsonResult(ResultCode.SUCCESS.getCode(), "保存成功", postService.saveByPost(post));
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "保存成功", postService.saveByPost(post));
     }
 
 
@@ -271,7 +271,7 @@ public class PostController extends BaseController {
     @GetMapping("/throw")
     public String moveToTrash(@RequestParam("postId") Long postId, @RequestParam("status") Integer status) {
         try {
-            postService.updatePostStatus(postId, PostStatus.RECYCLE.getCode());
+            postService.updatePostStatus(postId, PostStatusEnum.RECYCLE.getCode());
             log.info("编号为" + postId + "的文章已被移到回收站");
         } catch (Exception e) {
             log.error("删除文章到回收站失败：{}", e.getMessage());
@@ -289,7 +289,7 @@ public class PostController extends BaseController {
     public String moveToPublish(@RequestParam("postId") Long postId,
                                 @RequestParam("status") Integer status) {
         try {
-            postService.updatePostStatus(postId, PostStatus.PUBLISHED.getCode());
+            postService.updatePostStatus(postId, PostStatusEnum.PUBLISHED.getCode());
             log.info("编号为" + postId + "的文章已改变为发布状态");
         } catch (Exception e) {
             log.error("发布文章失败：{}", e.getMessage());
@@ -312,7 +312,7 @@ public class PostController extends BaseController {
         } catch (Exception e) {
             log.error("删除文章失败：{}", e.getMessage());
         }
-        if (StringUtils.equals(PostType.POST_TYPE_POST.getDesc(), postType)) {
+        if (StringUtils.equals(PostTypeEnum.POST_TYPE_POST.getDesc(), postType)) {
             return "redirect:/admin/posts?status=2";
         }
         return "redirect:/admin/page";
@@ -346,9 +346,9 @@ public class PostController extends BaseController {
         } catch (Exception e) {
             log.error("更新摘要失败：{}", e.getMessage());
             e.printStackTrace();
-            return new JsonResult(ResultCode.FAIL.getCode(), "更新失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "更新失败！");
         }
-        return new JsonResult(ResultCode.SUCCESS.getCode(), "所有文章摘要更新成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "所有文章摘要更新成功！");
     }
 
     /**
@@ -361,7 +361,7 @@ public class PostController extends BaseController {
     @ResponseBody
     public boolean checkUrlExists(@PathParam("postUrl") String postUrl) {
         postUrl = urlFilter(postUrl);
-        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_POST.getDesc());
+        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
         return null != post;
     }
 
@@ -375,10 +375,10 @@ public class PostController extends BaseController {
     @ResponseBody
     public JsonResult pushAllToBaidu(@PathParam("baiduToken") String baiduToken) {
         if (StringUtils.isEmpty(baiduToken)) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "百度推送Token为空！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "百度推送Token为空！");
         }
-        String blogUrl = HaloConst.OPTIONS.get(BlogProperties.BLOG_URL.getProp());
-        List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
+        String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
+        List<Post> posts = postService.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
         StringBuilder urls = new StringBuilder();
         for (Post post : posts) {
             urls.append(blogUrl);
@@ -388,8 +388,8 @@ public class PostController extends BaseController {
         }
         String result = HaloUtils.baiduPost(blogUrl, baiduToken, urls.toString());
         if (StringUtils.isEmpty(result)) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "推送所有文章成功！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "推送所有文章成功！");
         }
-        return new JsonResult(ResultCode.SUCCESS.getCode(), "推送成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "推送成功！");
     }
 }

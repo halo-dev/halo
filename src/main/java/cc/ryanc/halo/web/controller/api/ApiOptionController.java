@@ -1,8 +1,8 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.ResponseStatus;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.OptionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,12 +36,12 @@ public class ApiOptionController {
     public JsonResult options() {
         Map<String, String> options = optionsService.findAllOptions();
         //去掉隐私元素
-        options.remove(BlogProperties.MAIL_SMTP_HOST.getProp());
-        options.remove(BlogProperties.MAIL_FROM_NAME.getProp());
-        options.remove(BlogProperties.MAIL_SMTP_PASSWORD.getProp());
-        options.remove(BlogProperties.MAIL_SMTP_USERNAME.getProp());
-        options.remove(BlogProperties.MAIL_SMTP_USERNAME.getProp());
-        return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), options);
+        options.remove(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp());
+        options.remove(BlogPropertiesEnum.MAIL_FROM_NAME.getProp());
+        options.remove(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp());
+        options.remove(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp());
+        options.remove(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp());
+        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), options);
     }
 
     /**
@@ -53,6 +53,6 @@ public class ApiOptionController {
     @GetMapping(value = "/{optionName}")
     public JsonResult option(@PathVariable(value = "optionName") String optionName) {
         String optionValue = optionsService.findOneOption(optionName);
-        return new JsonResult(ResponseStatus.SUCCESS.getCode(), ResponseStatus.SUCCESS.getMsg(), optionValue);
+        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), optionValue);
     }
 }

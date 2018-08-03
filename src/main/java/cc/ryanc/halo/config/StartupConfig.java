@@ -2,7 +2,7 @@ package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -48,7 +48,7 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
      * 加载主题设置
      */
     private void loadActiveTheme() {
-        String themeValue = optionsService.findOneOption(BlogProperties.THEME.getProp());
+        String themeValue = optionsService.findOneOption(BlogPropertiesEnum.THEME.getProp());
         if (StringUtils.isNotEmpty(themeValue) && !StringUtils.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
         } else {

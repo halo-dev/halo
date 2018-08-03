@@ -2,13 +2,13 @@ package cc.ryanc.halo.model.enums;
 
 /**
  * <pre>
- *     评论状态enum
+ *     文章状态enum
  * </pre>
  *
  * @author : RYAN0UP
  * @date : 2018/7/1
  */
-public enum CommentStatus {
+public enum PostStatusEnum {
 
     /**
      * 已发布
@@ -16,9 +16,9 @@ public enum CommentStatus {
     PUBLISHED(0, "已发布"),
 
     /**
-     * 待审核
+     * 草稿
      */
-    CHECKING(1, "待审核"),
+    DRAFT(1, "草稿"),
 
     /**
      * 回收站
@@ -28,7 +28,7 @@ public enum CommentStatus {
     private Integer code;
     private String desc;
 
-    CommentStatus(Integer code, String desc) {
+    PostStatusEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }

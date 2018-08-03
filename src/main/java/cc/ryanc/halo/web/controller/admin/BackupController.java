@@ -59,12 +59,12 @@ public class BackupController {
     @GetMapping
     public String backup(@RequestParam(value = "type", defaultValue = "resources") String type, Model model) {
         List<BackupDto> backups = null;
-        if (StringUtils.equals(type, BackupType.RESOURCES.getDesc())) {
-            backups = HaloUtils.getBackUps(BackupType.RESOURCES.getDesc());
-        } else if (StringUtils.equals(type, BackupType.DATABASES.getDesc())) {
-            backups = HaloUtils.getBackUps(BackupType.DATABASES.getDesc());
-        } else if (StringUtils.equals(type, BackupType.POSTS.getDesc())) {
-            backups = HaloUtils.getBackUps(BackupType.POSTS.getDesc());
+        if (StringUtils.equals(type, BackupTypeEnum.RESOURCES.getDesc())) {
+            backups = HaloUtils.getBackUps(BackupTypeEnum.RESOURCES.getDesc());
+        } else if (StringUtils.equals(type, BackupTypeEnum.DATABASES.getDesc())) {
+            backups = HaloUtils.getBackUps(BackupTypeEnum.DATABASES.getDesc());
+        } else if (StringUtils.equals(type, BackupTypeEnum.POSTS.getDesc())) {
+            backups = HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc());
         } else {
             backups = new ArrayList<>();
         }
@@ -82,14 +82,14 @@ public class BackupController {
     @GetMapping(value = "doBackup")
     @ResponseBody
     public JsonResult doBackup(@RequestParam("type") String type) {
-        if (StringUtils.equals(BackupType.RESOURCES.getDesc(), type)) {
+        if (StringUtils.equals(BackupTypeEnum.RESOURCES.getDesc(), type)) {
             return this.backupResources();
-        } else if (StringUtils.equals(BackupType.DATABASES.getDesc(), type)) {
+        } else if (StringUtils.equals(BackupTypeEnum.DATABASES.getDesc(), type)) {
             return this.backupDatabase();
-        } else if (StringUtils.equals(BackupType.POSTS.getDesc(), type)) {
+        } else if (StringUtils.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
             return this.backupPosts();
         } else {
-            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -100,7 +100,7 @@ public class BackupController {
      */
     public JsonResult backupDatabase() {
         try {
-            if (HaloUtils.getBackUps(BackupType.DATABASES.getDesc()).size() > CommonParams.TEN.getValue()) {
+            if (HaloUtils.getBackUps(BackupTypeEnum.DATABASES.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
             }
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
@@ -108,10 +108,10 @@ public class BackupController {
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
             log.info("当前时间：{}，执行了数据库备份。", DateUtil.now());
-            return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             log.error("备份数据库失败：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -122,7 +122,7 @@ public class BackupController {
      */
     public JsonResult backupResources() {
         try {
-            if (HaloUtils.getBackUps(BackupType.RESOURCES.getDesc()).size() > CommonParams.TEN.getValue()) {
+            if (HaloUtils.getBackUps(BackupTypeEnum.RESOURCES.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/resources/");
             }
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
@@ -131,10 +131,10 @@ public class BackupController {
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
             log.info("当前时间：{}，执行了资源文件备份。", DateUtil.now());
-            return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             log.error("备份资源文件失败：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -144,10 +144,10 @@ public class BackupController {
      * @return JsonResult
      */
     public JsonResult backupPosts() {
-        List<Post> posts = postService.findAllPosts(PostType.POST_TYPE_POST.getDesc());
-        posts.addAll(postService.findAllPosts(PostType.POST_TYPE_PAGE.getDesc()));
+        List<Post> posts = postService.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
+        posts.addAll(postService.findAllPosts(PostTypeEnum.POST_TYPE_PAGE.getDesc()));
         try {
-            if (HaloUtils.getBackUps(BackupType.POSTS.getDesc()).size() > CommonParams.TEN.getValue()) {
+            if (HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
             }
             //打包好的文件名
@@ -160,10 +160,10 @@ public class BackupController {
             ZipUtil.zip(srcPath, srcPath + ".zip");
             FileUtil.del(srcPath);
             log.info("当前时间：{}，执行了文章备份。", DateUtil.now());
-            return new JsonResult(ResultCode.SUCCESS.getCode(), "备份成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "备份成功！");
         } catch (Exception e) {
             log.error("备份文章失败：{}", e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
         }
     }
 
@@ -181,9 +181,9 @@ public class BackupController {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         try {
             FileUtil.del(srcPath);
-            return new JsonResult(ResultCode.SUCCESS.getCode(), "删除成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "删除成功！");
         } catch (Exception e) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "删除失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
         }
     }
 
@@ -202,13 +202,13 @@ public class BackupController {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         if (null == user.getUserEmail() || StringUtils.equals(user.getUserEmail(), "")) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "博主邮箱没有配置！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "博主邮箱没有配置！");
         }
-        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.SMTP_EMAIL_ENABLE.getProp()), TrueFalse.FALSE.getDesc())) {
-            return new JsonResult(ResultCode.FAIL.getCode(), "发信邮箱没有配置！");
+        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "发信邮箱没有配置！");
         }
         new EmailToAdmin(srcPath, user).start();
-        return new JsonResult(ResultCode.SUCCESS.getCode(), "邮件发送成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "邮件发送成功！");
     }
 
     /**

@@ -68,7 +68,7 @@ public class FrontArchiveController extends BaseController {
         //所有文章数据，分页，material主题适用
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Pageable pageable = PageRequest.of(page - 1, 5, sort);
-        Page<Post> posts = postService.findPostByStatus(PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc(), pageable);
+        Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
             return this.renderNotFound();
         }
@@ -105,8 +105,8 @@ public class FrontArchiveController extends BaseController {
      */
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl, Model model) {
-        Post post = postService.findByPostUrl(postUrl, PostType.POST_TYPE_POST.getDesc());
-        if (null == post || !post.getPostStatus().equals(PostStatus.PUBLISHED.getCode())) {
+        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
+        if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
             return this.renderNotFound();
         }
         //获得当前文章的发布日期
@@ -123,10 +123,10 @@ public class FrontArchiveController extends BaseController {
             model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
         }
         List<Comment> comments = null;
-        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalse.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
-            comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatus.PUBLISHED.getCode());
+        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
+            comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatusEnum.PUBLISHED.getCode());
         } else {
-            comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatus.RECYCLE.getCode());
+            comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments));

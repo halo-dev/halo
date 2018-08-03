@@ -4,8 +4,8 @@ import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.model.enums.ResultCode;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -87,7 +87,7 @@ public class AttachmentController {
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
-        if (StringUtils.equals(type, PostType.POST_TYPE_POST.getDesc())) {
+        if (StringUtils.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
             return "admin/widget/_attachment-select-post";
         }
         return "admin/widget/_attachment-select";
@@ -226,13 +226,13 @@ public class AttachmentController {
                     );
                 } else {
                     log.error("删除附件[{}]失败！", delFileName);
-                    return new JsonResult(ResultCode.FAIL.getCode(), "删除失败！");
+                    return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
                 }
             }
         } catch (Exception e) {
             log.error("删除附件[{}]失败:{}", delFileName, e.getMessage());
-            return new JsonResult(ResultCode.FAIL.getCode(), "删除失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
         }
-        return new JsonResult(ResultCode.SUCCESS.getCode(), "删除成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "删除成功！");
     }
 }

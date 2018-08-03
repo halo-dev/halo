@@ -1,7 +1,7 @@
 package cc.ryanc.halo.model.tag;
 
-import cc.ryanc.halo.model.enums.PostStatus;
-import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.enums.PostStatusEnum;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.service.PostService;
 import freemarker.core.Environment;
 import freemarker.template.*;
@@ -34,7 +34,7 @@ public class ArticleTagDirective implements TemplateDirectiveModel {
             String method = map.get(METHOD_KEY).toString();
             switch (method) {
                 case "postsCount":
-                    environment.setVariable("postsCount", builder.build().wrap(postService.findPostByStatus(PostStatus.PUBLISHED.getCode(), PostType.POST_TYPE_POST.getDesc()).size()));
+                    environment.setVariable("postsCount", builder.build().wrap(postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc()).size()));
                     break;
                 case "archives":
                     environment.setVariable("archives", builder.build().wrap(postService.findPostGroupByYearAndMonth()));

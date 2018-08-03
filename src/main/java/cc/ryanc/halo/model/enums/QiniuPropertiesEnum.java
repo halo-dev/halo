@@ -8,7 +8,7 @@ package cc.ryanc.halo.model.enums;
  * @author : RYAN0UP
  * @date : 2018/7/14
  */
-public enum QiniuProperties {
+public enum QiniuPropertiesEnum {
 
     /**
      * 七牛云域名
@@ -32,7 +32,7 @@ public enum QiniuProperties {
 
     private String prop;
 
-    QiniuProperties(String prop) {
+    QiniuPropertiesEnum(String prop) {
         this.prop = prop;
     }
 
