@@ -72,6 +72,7 @@ public class FrontArchiveController extends BaseController {
         if (null == posts) {
             return this.renderNotFound();
         }
+        model.addAttribute("is_archives",true);
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -92,6 +93,7 @@ public class FrontArchiveController extends BaseController {
         if (null == posts) {
             return this.renderNotFound();
         }
+        model.addAttribute("is_archives",true);
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -128,6 +130,7 @@ public class FrontArchiveController extends BaseController {
         } else {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
+        model.addAttribute("is_post",true);
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments));
         model.addAttribute("commentsCount", comments.size());

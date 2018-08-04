@@ -83,6 +83,7 @@ public class FrontTagController extends BaseController {
         }
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostsByTags(tag, pageable);
+        model.addAttribute("is_tags",true);
         model.addAttribute("posts", posts);
         model.addAttribute("tag", tag);
         return this.render("tag");

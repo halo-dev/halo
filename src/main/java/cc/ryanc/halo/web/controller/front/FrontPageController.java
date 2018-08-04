@@ -83,6 +83,7 @@ public class FrontPageController extends BaseController {
         } else {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
+        model.addAttribute("is_page",true);
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments));
         model.addAttribute("commentsCount", comments.size());

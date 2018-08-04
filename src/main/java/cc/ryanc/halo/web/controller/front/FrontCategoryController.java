@@ -45,6 +45,7 @@ public class FrontCategoryController extends BaseController {
      * @param model model
      * @return String
      */
+    @GetMapping
     public String categories(Model model) {
         List<Category> categories = categoryService.findAllCategories();
         model.addAttribute("categories", categories);
@@ -87,6 +88,7 @@ public class FrontCategoryController extends BaseController {
         }
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostByCategories(category, pageable);
+        model.addAttribute("is_categories",true);
         model.addAttribute("posts", posts);
         model.addAttribute("category", category);
         return this.render("category");

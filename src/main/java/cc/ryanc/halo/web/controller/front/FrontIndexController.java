@@ -75,6 +75,7 @@ public class FrontIndexController extends BaseController {
         if (null == posts) {
             return this.renderNotFound();
         }
+        model.addAttribute("is_index",true);
         model.addAttribute("posts", posts);
         return this.render("index");
     }
