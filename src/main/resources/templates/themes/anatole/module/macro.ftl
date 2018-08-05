@@ -24,6 +24,11 @@
             text-transform: none;
         }
         </#if>
+        <#if options.anatole_style_blog_title_lower?default("true") == "false">
+        .sidebar .logo-title .title h3 {
+            text-transform: none;
+        }
+        </#if>
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
