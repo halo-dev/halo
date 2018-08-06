@@ -2,12 +2,14 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -130,10 +133,19 @@ public class FrontArchiveController extends BaseController {
         } else {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
+        //获取文章的标签用作keywords
+        List<Tag> tags = post.getTags();
+        List<String> tagWords = new ArrayList<>();
+        if (tags != null) {
+            for (Tag tag : tags) {
+                tagWords.add(tag.getTagName());
+            }
+        }
         model.addAttribute("is_post",true);
         model.addAttribute("post", post);
         model.addAttribute("comments", CommentUtil.getComments(comments));
         model.addAttribute("commentsCount", comments.size());
+        model.addAttribute("tagWords", CollUtil.join(tagWords, ","));
         postService.updatePostView(post);
         return this.render("post");
     }
