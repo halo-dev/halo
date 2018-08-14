@@ -92,6 +92,8 @@
         border: 1px solid #ededed!important;
         background: #ededed!important;
         color: #313131!important;
+        outline: none!important;
+        line-height: normal!important;
         transition: all .3s ease-in-out;
     }
 
@@ -103,29 +105,30 @@
     }
 
     .native-list {
-        list-style: none;
-        margin: 0 auto;
-        padding: 0;
+        list-style: none!important;
+        margin-top: 0!important;
+        margin-bottom: 0!important;
+        padding: 0!important;
     }
 
     .native-list .native-list-one {
-        padding-top: 10px;
-        position: relative;
-        display: block;
-        transition: all .3s ease-in-out;
+        padding-top: 10px!important;
+        position: relative!important;
+        display: block!important;
+        transition: all .3s ease-in-out!important;
     }
 
     .native-list .native-list-one .native-list-one-img {
-        width: 2.5rem;
-        height: 2.5rem;
-        float: left;
-        border-radius: 50%;
-        margin-right: .7rem;
-        cursor: pointer;
-        -webkit-transition: 0.4s;
-        -webkit-transition: -webkit-transform 0.4s ease-out;
-        transition: transform 0.4s ease-out;
-        -moz-transition: -moz-transform 0.4s ease-out;
+        width: 2.5rem!important;
+        height: 2.5rem!important;
+        float: left!important;
+        border-radius: 50%!important;
+        margin-right: .7rem!important;
+        cursor: pointer!important;
+        -webkit-transition: 0.4s!important;
+        -webkit-transition: -webkit-transform 0.4s ease-out!important;
+        transition: transform 0.4s ease-out!important;
+        -moz-transition: -moz-transform 0.4s ease-out!important;
     }
 
     .native-list-one-img:hover{
