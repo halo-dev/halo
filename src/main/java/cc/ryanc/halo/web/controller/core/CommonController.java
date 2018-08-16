@@ -46,7 +46,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/404")
     public String fourZeroFour() {
-        return "common/404";
+        return "common/error/404";
     }
 
     /**
@@ -57,7 +57,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/500")
     public String fiveZeroZero() {
-        return "common/500";
+        return "common/error/500";
     }
 
     /**

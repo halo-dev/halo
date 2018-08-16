@@ -175,7 +175,7 @@ public class FrontCommentController {
                     }
                     map.put("visitor", comment.getCommentAuthor());
                     map.put("commentContent", comment.getCommentContent());
-                    mailService.sendTemplateMail(userService.findUser().getUserEmail(), "有新的评论", map, "common/mail/mail_admin.ftl");
+                    mailService.sendTemplateMail(userService.findUser().getUserEmail(), "有新的评论", map, "common/mail_template/mail_admin.ftl");
                 } catch (Exception e) {
                     log.error("邮件服务器未配置：{}", e.getMessage());
                 }
@@ -216,7 +216,7 @@ public class FrontCommentController {
                     map.put("replyContent", comment.getCommentContent());
                     map.put("blogUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
                     mailService.sendTemplateMail(
-                            lastComment.getCommentAuthorEmail(), "您在" + HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()) + "的评论有了新回复", map, "common/mail/mail_reply.ftl");
+                            lastComment.getCommentAuthorEmail(), "您在" + HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()) + "的评论有了新回复", map, "common/mail_template/mail_reply.ftl");
                 }
             }
         }

@@ -231,7 +231,7 @@ public class BackupController {
                 content.put("fileName", file.getName());
                 content.put("createAt", HaloUtils.getCreateTime(srcPath));
                 content.put("size", HaloUtils.parseSize(file.length()));
-                mailService.sendAttachMail(user.getUserEmail(), "有新的备份！", content, "common/mail/mail_attach.ftl", srcPath);
+                mailService.sendAttachMail(user.getUserEmail(), "有新的备份！", content, "common/mail_template/mail_attach.ftl", srcPath);
             } catch (Exception e) {
                 log.error("邮件服务器未配置：{}", e.getMessage());
             }

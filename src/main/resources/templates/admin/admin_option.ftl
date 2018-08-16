@@ -89,6 +89,17 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
+                                            <label for="blogFavicon" class="col-lg-2 col-sm-4 control-label">Favicon：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control selectData" id="blogFavicon" name="blog_favicon" value="${options.blog_favicon?if_exists}">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogFavicon')">选择</button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="blogFooterInfo" class="col-lg-2 col-sm-4 control-label">页脚信息：
                                                 <span data-toggle="tooltip" data-placement="top" title="支持HTML" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>

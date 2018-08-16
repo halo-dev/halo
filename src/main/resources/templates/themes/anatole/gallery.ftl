@@ -1,3 +1,4 @@
+<#include "../../common/macro/common_macro.ftl">
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -41,6 +42,6 @@
 <script src="anatole/source/plugins/gallery/js/jquery.min.js"></script>
 <script src="anatole/source/plugins/gallery/js/skel.min.js"></script>
 <script src="anatole/source/plugins/gallery/js/main.js"></script>
-${options.statistics_code?if_exists}
+<@statistics></@statistics>
 </body>
 </html>

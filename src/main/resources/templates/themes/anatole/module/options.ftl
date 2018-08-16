@@ -117,17 +117,6 @@
                         <form method="post" class="form-horizontal" id="anatoleStyleOptions">
                             <div class="box-body">
                                 <div class="form-group">
-                                    <label for="anatoleStyleFavicon" class="col-sm-4 control-label">Favicon：</label>
-                                    <div class="col-sm-8">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" id="anatoleStyleFavicon" name="anatole_style_favicon" value="${options.anatole_style_favicon?default("/anatole/source/images/favicon.png")}" >
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-default btn-flat" type="button" onclick="openAttach('anatoleStyleFavicon')">选择</button>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
                                     <label for="anatoleStyleRightIcon" class="col-sm-4 control-label">右上角图标：</label>
                                     <div class="col-sm-8">
                                         <div class="input-group">

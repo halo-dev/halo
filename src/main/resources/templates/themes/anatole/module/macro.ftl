@@ -1,3 +1,4 @@
+<#include "../../../common/macro/common_macro.ftl">
 <#macro head title="" keywords="" description="">
 <!DOCTYPE html>
 <html>
@@ -13,7 +14,7 @@
     <meta name="author" content="${user.userDisplayName?if_exists}" />
     <meta name="keywords" content="${keywords?default("Anatole")}"/>
     <meta name="description" content="${description?default("Anatole")}" />
-    <link rel="shortcut icon" href="${options.anatole_style_favicon?default("/anatole/source/images/favicon.png")}" type="image/x-icon" />
+    <@favicon></@favicon>
     <link href="/anatole/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="/anatole/source/css/blog_basic.min.css?version=88107691fe">
     <link href="/anatole/source/css/style.min.css" type="text/css" rel="stylesheet" />
@@ -75,7 +76,7 @@
 	  xhr.send();
     </#if>
 </script>
-${options.statistics_code?if_exists}
+<@statistics></@statistics>
 </body>
 </html>
 </#macro>
