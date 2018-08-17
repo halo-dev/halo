@@ -1,5 +1,5 @@
 <#include "../../../common/macro/common_macro.ftl">
-<#macro head title="" keywords="" description="">
+<#macro head title,keywords,description>
 <!DOCTYPE html>
 <html>
 <head>
