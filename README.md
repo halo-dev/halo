@@ -125,6 +125,6 @@ Halo的诞生离不开下面这些项目：
 
 > 如果Halo对你有帮助，可以请作者喝瓶娃哈哈哈哈哈哈哈哈哈哈。
 
-| 支付宝  | 微信  |
-| :------------: | :------------: |
-| <img src="https://cdn.ryanc.cc/img/github/donate/alipay.png" width="150"/>  | <img src="https://cdn.ryanc.cc/img/github/donate/wechat.png" width="150" />  |
+| 支付宝  | 微信  | 支付宝红包  |
+| :------------: | :------------: | :------------: |
+| <img src="https://cdn.ryanc.cc/img/github/donate/alipay.png" width="150"/>  | <img src="https://cdn.ryanc.cc/img/github/donate/wechat.png" width="150" />  | <img src="https://cdn.ryanc.cc/img/github/donate/hongbao.png" width="150" />  |
