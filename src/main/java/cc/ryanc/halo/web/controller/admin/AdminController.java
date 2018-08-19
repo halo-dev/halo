@@ -167,7 +167,7 @@ public class AdminController extends BaseController {
             logsService.saveByLogs(
                     new Logs(
                             LogsRecord.LOGIN,
-                            LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.encode(loginName) + "," + HtmlUtil.encode(loginPwd) + "]",
+                            LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]",
                             ServletUtil.getClientIP(request),
                             DateUtil.date()
                     )
