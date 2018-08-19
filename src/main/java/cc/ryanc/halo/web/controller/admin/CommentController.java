@@ -183,7 +183,7 @@ public class CommentController extends BaseController {
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
             comment.setCommentDate(DateUtil.date());
             String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a> ";
-            comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.encode(commentContent)));
+            comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(commentContent)));
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
             comment.setCommentStatus(CommentStatusEnum.PUBLISHED.getCode());

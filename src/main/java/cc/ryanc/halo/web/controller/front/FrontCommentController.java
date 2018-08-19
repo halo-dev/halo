@@ -114,19 +114,19 @@ public class FrontCommentController {
         try {
             Comment lastComment = null;
             post = postService.findByPostId(post.getPostId()).get();
-            comment.setCommentAuthorEmail(HtmlUtil.encode(comment.getCommentAuthorEmail()).toLowerCase());
+            comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
             comment.setCommentDate(DateUtil.date());
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setIsAdmin(0);
-            comment.setCommentAuthor(HtmlUtil.encode(comment.getCommentAuthor()));
+            comment.setCommentAuthor(HtmlUtil.escape(comment.getCommentAuthor()));
             if (comment.getCommentParent() > 0) {
                 lastComment = commentService.findCommentById(comment.getCommentParent()).get();
                 String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a>";
-                comment.setCommentContent(lastContent + StringUtils.substringAfter(OwoUtil.markToImg(HtmlUtil.encode(comment.getCommentContent())), ":"));
+                comment.setCommentContent(lastContent + StringUtils.substringAfter(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent())), ":"));
             } else {
                 //将评论内容的字符专为安全字符
-                comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.encode(comment.getCommentContent())));
+                comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent())));
             }
             if (StringUtils.isNotEmpty(comment.getCommentAuthorUrl())) {
                 comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));

@@ -2,9 +2,6 @@
 <link type="text/css" rel="stylesheet" href="/static/plugins/loaders/loaders.css">
 <link type="text/css" rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
 <style>
-    * {
-        box-sizing: border-box;
-    }
     .native-list-one-head a, .native-list-one-content a{
         opacity: 1;!important;
         -webkit-transition: all .15s linear;

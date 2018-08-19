@@ -77,6 +77,7 @@ Let's start: http://localhost:8090
 - [Vno](https://github.com/ruibaby/vno-halo) - 来自Jekyll的一款主题，作者[Wei Wang](https://onevcat.com/)。
 - [Hux](https://github.com/ruibaby/hux-halo) - 来自Jekyll的一款主题，作者[Xuan Huang](https://huangxuan.me/)。
 - [Story](https://github.com/ruibaby/story-halo) - 来自Typecho的一款主题，作者[Trii Hsia](https://yumoe.com/)。
+- [NexT](https://github.com/ruibaby/next-halo) - 来自Hexo的一款主题，作者[iissnan](https://notes.iissnan.com/)。
 
 > 声明：不接受任何对**移植主题**功能上的意见和建议。
 
