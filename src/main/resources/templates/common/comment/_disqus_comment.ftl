@@ -1,4 +1,4 @@
-<!--disqus comment-->
+<#--disqus comment-->
 <style type="text/css" rel="stylesheet">
     ${options.disqus_css?if_exists}
 </style>

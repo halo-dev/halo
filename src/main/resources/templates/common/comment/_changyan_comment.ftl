@@ -1,4 +1,4 @@
-<!-- changyan comment -->
+<#-- changyan comment -->
 <!--PC和WAP自适应版-->
 <style type="text/css" rel="stylesheet">
     ${options.changyan_css?if_exists}

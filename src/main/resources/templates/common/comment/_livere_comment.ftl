@@ -1,4 +1,4 @@
-<!-- livere_comment -->
+<#-- livere_comment -->
 <style type="text/css" rel="stylesheet">
     ${options.livere_css?if_exists}
 </style>

@@ -130,7 +130,7 @@ public class AttachmentController {
      * @return Map
      */
     private Map<String, Object> uploadAttachment(MultipartFile file, HttpServletRequest request) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>(3);
         if (!file.isEmpty()) {
             try {
                 //程序根路径，也就是/resources

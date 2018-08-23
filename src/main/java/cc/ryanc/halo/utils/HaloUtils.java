@@ -46,36 +46,6 @@ import java.util.*;
 @Slf4j
 public class HaloUtils {
 
-    private static ArrayList<String> FILE_LIST = new ArrayList<>();
-
-    /**
-     * 获取所有附件
-     *
-     * @param filePath filePath
-     * @return ArrayList
-     */
-    public static ArrayList<String> getFiles(String filePath) {
-        try {
-            //获取项目根路径
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            //获取目标路径
-            File targetPath = new File(basePath.getAbsolutePath(), filePath);
-            File[] files = targetPath.listFiles();
-            //遍历文件
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    getFiles(filePath + "/" + file.getName());
-                } else {
-                    String abPath = file.getAbsolutePath().substring(file.getAbsolutePath().indexOf("/upload"));
-                    FILE_LIST.add(abPath);
-                }
-            }
-        } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
-        }
-        return FILE_LIST;
-    }
-
     /**
      * 获取备份文件信息
      *
@@ -205,7 +175,7 @@ public class HaloUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("主题获取失败：", e.getMessage());
+            log.error("主题获取失败：{}", e.getMessage());
         }
         return themes;
     }
@@ -241,7 +211,7 @@ public class HaloUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("未知错误：", e.getMessage());
+            log.error("获取主题模板失败：{}", e.getMessage());
         }
         return tpls;
     }

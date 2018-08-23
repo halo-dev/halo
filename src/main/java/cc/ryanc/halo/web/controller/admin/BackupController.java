@@ -226,7 +226,7 @@ public class BackupController {
         @Override
         public void run() {
             File file = new File(srcPath);
-            Map<String, Object> content = new HashMap<>();
+            Map<String, Object> content = new HashMap<>(3);
             try {
                 content.put("fileName", file.getName());
                 content.put("createAt", HaloUtils.getCreateTime(srcPath));

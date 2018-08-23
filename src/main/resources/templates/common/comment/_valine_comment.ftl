@@ -1,4 +1,4 @@
-<!-- Valine comment -->
+<#-- Valine comment -->
 <style type="text/css" rel="stylesheet">
     ${options.valine_css?if_exists}
 </style>

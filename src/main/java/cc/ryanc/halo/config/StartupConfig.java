@@ -82,7 +82,7 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
      * 加载OwO表情
      */
     private void loadOwo() {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(135);
         map.put("@[nico]", "<img src='/static/plugins/OwO/paopao/nico.png' alt='nico.png' style='vertical-align: middle;'>");
         map.put("@[OK]", "<img src='/static/plugins/OwO/paopao/OK.png' alt='OK.png' style='vertical-align: middle;'>");
         map.put("@[what]", "<img src='/static/plugins/OwO/paopao/what.png' alt='what.png' style='vertical-align: middle;'>");

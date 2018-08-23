@@ -14,7 +14,12 @@
                         <@commonTag method="links">
                             <#if links?? && links?size gt 0>
                                 <#list links as link>
-                                <p><a href="${link.linkUrl}" target="_blank" rel="external">${link.linkName}</a> – ${link.linkDesc}</p>
+                                <p>
+                                    <a href="${link.linkUrl}" target="_blank" rel="external">${link.linkName}</a>
+                                    <#if link.linkDesc!=''>
+                                         – ${link.linkDesc}
+                                    </#if>
+                                </p>
                                 </#list>
                             </#if>
                         </@commonTag>
