@@ -84,7 +84,7 @@ public class OptionsServiceImpl implements OptionsService {
      */
     @Override
     public Map<String, String> findAllOptions() {
-        Map<String, String> options = new HashMap<String, String>();
+        Map<String, String> options = new HashMap<>();
         List<Options> optionsList = optionsRepository.findAll();
         if (null != optionsList) {
             optionsList.forEach(option -> options.put(option.getOptionName(), option.getOptionValue()));

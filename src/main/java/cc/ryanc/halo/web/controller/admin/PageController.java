@@ -265,8 +265,7 @@ public class PageController {
     @ResponseBody
     public JsonResult checkUrlExists(@PathParam("postUrl") String postUrl) {
         Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
-        // TODO 还没写完
-        if (null != post || StringUtils.equals("archives", postUrl) || StringUtils.equals("galleries", postUrl)) {
+        if (null != post) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), "该路径已经存在！");
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
