@@ -3,6 +3,7 @@ package cc.ryanc.halo.utils;
 import cc.ryanc.halo.model.domain.Comment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,6 +34,8 @@ public class CommentUtil {
         for (Comment comment : commentsResult) {
             comment.setChildComments(getChild(comment.getCommentId(), commentsRoot));
         }
+        //集合倒序，最新的评论在最前面
+        Collections.reverse(commentsResult);
         return commentsResult;
     }
 

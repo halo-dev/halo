@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.ListPage;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommentStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -72,7 +74,9 @@ public class FrontPageController extends BaseController {
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "/p/{postUrl}")
-    public String getPage(@PathVariable(value = "postUrl") String postUrl, Model model) {
+    public String getPage(@PathVariable(value = "postUrl") String postUrl,
+                          @RequestParam(value = "cp",defaultValue = "1") Integer cp,
+                          Model model) {
         Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null == post) {
             return this.renderNotFound();
@@ -83,9 +87,17 @@ public class FrontPageController extends BaseController {
         } else {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
+        //默认显示10条
+        Integer size = 10;
+        //获取每页评论条数
+        if (!StringUtils.isBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
+            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
+        }
+        //评论分页
+        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
         model.addAttribute("is_page",true);
         model.addAttribute("post", post);
-        model.addAttribute("comments", CommentUtil.getComments(comments));
+        model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
         postService.updatePostView(post);
         return this.render("page");

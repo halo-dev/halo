@@ -213,16 +213,20 @@
     }
 
     .native-nav{
-        padding: 10px 0;
+        padding: 10px 0!important;;
     }
     .page-nav{
-        margin: 20px 0;
-        padding: 0 10px;
-        list-style: none;
-        text-align: center;
+        margin: 20px 0!important;;
+        padding: 0 10px!important;;
+        list-style: none!important;;
+        text-align: center!important;;
     }
     .page-nav li{
-        display: inline-block;
+        display: inline-block!important;
+        padding: 0 10px!important;
+    }
+    .page-nav li a{
+        text-decoration: #0a001f!important;
     }
     ${options.native_css?if_exists}
     @media screen and (max-width: 560px) {
@@ -292,9 +296,9 @@
         </#if>
         </ul>
     </#macro>
-    <ul class="native-list">
-        <#if comments?? && comments?size gt 0>
-            <#list comments?sort_by("commentDate")?reverse as comment>
+    <ul class="native-list" id="comments-list">
+        <#if comments?? && comments.getPageList()?size gt 0>
+            <#list comments.getPageList()?sort_by("commentDate")?reverse as comment>
                 <li class="native-list-one" id="comment-id-${comment.commentId?c}">
                     <img class="native-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                     <section>
@@ -320,12 +324,25 @@
             </#list>
         </#if>
     </ul>
-    <#--<div class="native-nav" id="comment-nav">-->
-        <#--<ol class="page-nav">-->
-            <#--<li><</li>-->
-            <#--<li>></li>-->
-        <#--</ol>-->
-    <#--</div>-->
+    <div class="native-nav" id="comment-nav">
+        <#if comments.totalPage gt 1>
+            <ol class="page-nav">
+                <#if comments.hasPrevious>
+                <li>
+                    <a href="?cp=${comments.nowPage-1}#comments-list" title="上一页">←</a>
+                </li>
+                </#if>
+                <li>
+                    <span title="当前页">${comments.nowPage}</span>
+                </li>
+                <#if comments.hasNext>
+                <li>
+                    <a href="?cp=${comments.nowPage+1}#comments-list" title="下一页">→</a>
+                </li>
+                </#if>
+            </ol>
+        </#if>
+    </div>
 </div>
 <script src="/static/plugins/jquery/jquery.min.js"></script>
 <script src="/static/plugins/md5/md5.min.js"></script>

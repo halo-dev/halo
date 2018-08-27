@@ -31,6 +31,11 @@ public enum BlogPropertiesEnum {
     INDEX_POSTS("index_posts"),
 
     /**
+     * 每页评论条数
+     */
+    INDEX_COMMENTS("index_comments"),
+
+    /**
      * 是否已经安装
      */
     IS_INSTALL("is_install"),
