@@ -288,6 +288,16 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
+                                                <label for="indexComments" class="col-lg-2 col-sm-4 control-label">每页显示条数：
+                                                    <span data-toggle="tooltip" data-placement="top" title="默认为10条" style="cursor: pointer">
+                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                                </span>
+                                                </label>
+                                                <div class="col-lg-4 col-sm-8">
+                                                    <input type="number" class="form-control" id="indexComments" name="index_comments" value="${options.index_comments?default('10')}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <label for="nativeCommentPlaceholder" class="col-lg-2 col-sm-4 control-label">占位提示：</label>
                                                 <div class="col-lg-4 col-sm-8">
                                                     <input type="url" class="form-control" id="nativeCommentPlaceholder" name="native_comment_placeholder" value="${options.native_comment_placeholder?default('赶快评论一个吧！')}">

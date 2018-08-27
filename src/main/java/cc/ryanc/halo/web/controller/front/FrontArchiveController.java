@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.ListPage;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
@@ -22,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -109,7 +111,9 @@ public class FrontArchiveController extends BaseController {
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "{postUrl}")
-    public String getPost(@PathVariable String postUrl, Model model) {
+    public String getPost(@PathVariable String postUrl,
+                          @RequestParam(value = "cp",defaultValue = "1") Integer cp,
+                          Model model) {
         Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
         if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
             return this.renderNotFound();
@@ -141,9 +145,17 @@ public class FrontArchiveController extends BaseController {
                 tagWords.add(tag.getTagName());
             }
         }
+        //默认显示10条
+        Integer size = 10;
+        //获取每页评论条数
+        if (!StringUtils.isBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
+            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
+        }
+        //评论分页
+        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
         model.addAttribute("is_post",true);
         model.addAttribute("post", post);
-        model.addAttribute("comments", CommentUtil.getComments(comments));
+        model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
         model.addAttribute("tagWords", CollUtil.join(tagWords, ","));
         postService.updatePostView(post);
