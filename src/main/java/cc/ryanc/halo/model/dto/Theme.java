@@ -26,4 +26,9 @@ public class Theme implements Serializable {
      * 是否支持设置
      */
     private boolean hasOptions;
+
+    /**
+     * 是否支持更新
+     */
+    private boolean hasUpdate;
 }
