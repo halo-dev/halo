@@ -60,8 +60,8 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;">主题管理</h1>
-            <a id="showForm" href="#">
-                <i class="fa fa-cloud-upload" aria-hidden="true"></i>上传
+            <a id="showForm" href="#" onclick="openThemeInstall()">
+                <i class="fa fa-cloud-upload" aria-hidden="true"></i>安装主题
             </a>
             <ol class="breadcrumb">
                 <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
@@ -70,15 +70,6 @@
             </ol>
         </section>
         <section class="content container-fluid">
-            <div class="row" id="uploadForm">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <div class="file-loading">
-                            <input id="uploadTheme" class="file-loading" type="file" name="file" multiple>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="row">
                 <#if themes?? && (themes?size>0)>
                     <#list themes as theme>
@@ -89,8 +80,11 @@
                                 </div>
                                 <div class="box-footer">
                                     <span class="theme-title">${theme.themeName?if_exists?upper_case}</span>
-                                    <#if theme.hasOptions==true>
+                                    <#if theme.hasOptions>
                                         <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}')" style="display: none">设置</button>
+                                    </#if>
+                                    <#if theme.hasUpdate>
+                                        <button class="btn btn-warning btn-sm pull-right btn-theme-update" data-loading-text="更新中..." onclick="updateTheme('${theme.themeName?if_exists}',this)" style="display: none;margin-right: 3px">更新</button>
                                     </#if>
                                     <#if activeTheme != "${theme.themeName}">
                                         <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px">启用</button>
@@ -133,63 +127,26 @@
             </div>
         </div>
         <script type="application/javascript">
-            function loadFileInput() {
-                $('#uploadTheme').fileinput({
-                    language: 'zh',
-                    uploadUrl: '/admin/themes/upload',
-                    allowedFileExtensions: ['zip','jpg'],
-                    maxFileCount: 1,
-                    enctype: 'multipart/form-data',
-                    dropZoneTitle: '拖拽主题压缩包到这里 &hellip;<br>不支持多个主题同时上传',
-                    showClose: false
-                }).on("fileuploaded",function (event,data,previewId,index) {
-                    var data = data.jqXHR.responseJSON;
-                    if(data.code==1){
-                        $("#uploadForm").hide(400);
-                        $.toast({
-                            text: data.msg,
-                            heading: '提示',
-                            icon: 'success',
-                            showHideTransition: 'fade',
-                            allowToastClose: true,
-                            hideAfter: 1000,
-                            stack: 1,
-                            position: 'top-center',
-                            textAlign: 'left',
-                            loader: true,
-                            loaderBg: '#ffffff',
-                            afterHidden: function () {
-                                window.location.reload();
-                            }
-                        });
-                    }else{
-                        $.toast({
-                            text: data.msg,
-                            heading: '提示',
-                            icon: 'error',
-                            showHideTransition: 'fade',
-                            allowToastClose: true,
-                            hideAfter: 1000,
-                            stack: 1,
-                            position: 'top-center',
-                            textAlign: 'left',
-                            loader: true,
-                            loaderBg: '#ffffff'
-                        });
-                    }
+            /**
+             * 打开安装主题的窗口
+             */
+            function openThemeInstall() {
+                layer.open({
+                    type: 2,
+                    title: '安装主题',
+                    shadeClose: true,
+                    shade: 0.5,
+                    maxmin: true,
+                    area: ['90%', '90%'],
+                    content: '/admin/themes/install',
+                    scrollbar: false
                 });
             }
-            $(document).ready(function () {
-                loadFileInput();
-            });
-            <#if options.admin_pjax?default("true") == "true">
-            $(document).on('pjax:complete',function () {
-                loadFileInput();
-            });
-            </#if>
-            $("#showForm").click(function(){
-                $("#uploadForm").slideToggle(400);
-            });
+
+            /**
+             * 设置主题
+             * @param site_theme 主题名
+             */
             function setTheme(site_theme) {
                 $.ajax({
                     type: 'get',
@@ -233,6 +190,61 @@
                     }
                 });
             }
+
+            /**
+             * 更新主题
+             */
+            function updateTheme(theme,e) {
+                $(e).button('loading');
+                $.ajax({
+                    type: 'get',
+                    url: '/admin/themes/pull',
+                    data: {
+                        'themeName': theme
+                    },
+                    success: function (data) {
+                        if(data.code==1){
+                            $.toast({
+                                text: data.msg,
+                                heading: '提示',
+                                icon: 'success',
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: 1000,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff',
+                                afterHidden: function () {
+                                    window.location.reload();
+                                }
+                            });
+                        }else{
+                            $.toast({
+                                text: data.msg,
+                                heading: '提示',
+                                icon: 'error',
+                                showHideTransition: 'fade',
+                                allowToastClose: true,
+                                hideAfter: 2000,
+                                stack: 1,
+                                position: 'top-center',
+                                textAlign: 'left',
+                                loader: true,
+                                loaderBg: '#ffffff'
+                            });
+                            $(e).button('reset');
+                        }
+                    }
+                });
+            }
+
+            /**
+             * 打开主题设置
+             *
+             * @param theme 主题名
+             */
             function openSetting(theme) {
                 layer.open({
                     type: 2,
@@ -253,11 +265,11 @@
             });
             $('.theme-body').mouseover(function () {
                 $(this).find(".theme-thumbnail").css("opacity","0.8");
-                $(this).find(".btn-theme-setting,.btn-theme-enable").show();
+                $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").show();
             });
             $('.theme-body').mouseleave(function () {
                 $(this).find(".theme-thumbnail").css("opacity","1");
-                $(this).find(".btn-theme-setting,.btn-theme-enable").hide();
+                $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").hide();
             });
             function modelShow(url) {
                 $('#url').val(url);

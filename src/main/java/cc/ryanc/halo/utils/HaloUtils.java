@@ -170,6 +170,12 @@ public class HaloUtils {
                         } else {
                             theme.setHasOptions(false);
                         }
+                        File gitPath = new File(themesPath.getAbsolutePath(), file.getName() + "/.git");
+                        if (gitPath.exists()) {
+                            theme.setHasUpdate(true);
+                        } else {
+                            theme.setHasUpdate(false);
+                        }
                         themes.add(theme);
                     }
                 }

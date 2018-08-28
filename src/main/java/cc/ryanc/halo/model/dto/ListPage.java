@@ -64,10 +64,10 @@ public class ListPage<T> {
         this.nowPage = nowPage;
         this.totalCount = data.size();
         this.totalPage = (totalCount + pageSize - 1) / pageSize;
-        this.prePage = nowPage-1>1? nowPage-1:1;
-        this.nextPage = nowPage>=totalPage? totalPage: nowPage + 1;
-        this.hasPrevious = nowPage!=prePage;
-        this.hasNext = nowPage!=nextPage;
+        this.prePage = nowPage - 1 > 1 ? nowPage - 1 : 1;
+        this.nextPage = nowPage >= totalPage ? totalPage : nowPage + 1;
+        this.hasPrevious = nowPage != prePage;
+        this.hasNext = nowPage != nextPage;
     }
 
     /**
@@ -80,7 +80,7 @@ public class ListPage<T> {
         if (fromIndex >= data.size()) {
             return Collections.emptyList();
         }
-        if(fromIndex<0){
+        if (fromIndex < 0) {
             return Collections.emptyList();
         }
         int toIndex = nowPage * pageSize;
