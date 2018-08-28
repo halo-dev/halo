@@ -217,7 +217,7 @@
                                 loader: true,
                                 loaderBg: '#ffffff',
                                 afterHidden: function () {
-                                    window.location.reload();
+                                    window.location.href="/admin/themes";
                                 }
                             });
                         }else{

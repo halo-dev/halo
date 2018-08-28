@@ -48,7 +48,7 @@
                         <div class="box-body">
                             <div class="alert alert-info alert-dismissible" role="alert">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <strong>注意!</strong> 使用该功能必须安装Git，否则无法使用。更多主题请点击<a href="https://gitee.com/babyrui" class="alert-link">https://gitee.com/babyrui</a>.
+                                <strong>注意!</strong> 使用该功能必须安装Git，否则无法使用。更多主题请点击<a href="https://gitee.com/babyrui" target="_blank" class="alert-link">https://gitee.com/babyrui</a>.
                             </div>
                             <div class="form-group">
                                 <label for="remoteAddr" class="col-lg-2 col-sm-4 control-label">远程地址：</label>
@@ -114,7 +114,7 @@
                     loader: true,
                     loaderBg: '#ffffff',
                     afterHidden: function () {
-                        parent.location.reload();
+                        parent.location.href="/admin/themes";
                     }
                 });
             }else{
@@ -180,7 +180,7 @@
                         loader: true,
                         loaderBg: '#ffffff',
                         afterHidden: function () {
-                            parent.location.reload();
+                            parent.location.href="/admin/themes";
                         }
                     });
                 }else {
