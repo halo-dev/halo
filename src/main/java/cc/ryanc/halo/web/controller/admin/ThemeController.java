@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
+import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -224,8 +225,15 @@ public class ThemeController extends BaseController {
      * @param theme theme名称
      */
     @GetMapping(value = "/options")
-    public String setting(Model model, @RequestParam("theme") String theme) {
+    public String setting(Model model,
+                          @RequestParam("theme") String theme,
+                          @RequestParam("hasUpdate") String hasUpdate) {
         model.addAttribute("themeDir", theme);
+        if (StringUtils.equals(hasUpdate, TrueFalseEnum.TRUE.getDesc())) {
+            model.addAttribute("hasUpdate", true);
+        } else {
+            model.addAttribute("hasUpdate", false);
+        }
         return "themes/" + theme + "/module/options";
     }
 
