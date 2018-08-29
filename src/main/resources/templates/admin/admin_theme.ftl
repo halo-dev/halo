@@ -81,10 +81,7 @@
                                 <div class="box-footer">
                                     <span class="theme-title">${theme.themeName?if_exists?upper_case}</span>
                                     <#if theme.hasOptions>
-                                        <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}')" style="display: none">设置</button>
-                                    </#if>
-                                    <#if theme.hasUpdate>
-                                        <button class="btn btn-warning btn-sm pull-right btn-theme-update" data-loading-text="更新中..." onclick="updateTheme('${theme.themeName?if_exists}',this)" style="display: none;margin-right: 3px">更新</button>
+                                        <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}','<#if theme.hasUpdate>true<#else>false</#if>')" style="display: none">设置</button>
                                     </#if>
                                     <#if activeTheme != "${theme.themeName}">
                                         <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px">启用</button>
@@ -192,60 +189,11 @@
             }
 
             /**
-             * 更新主题
-             */
-            function updateTheme(theme,e) {
-                $(e).button('loading');
-                $.ajax({
-                    type: 'get',
-                    url: '/admin/themes/pull',
-                    data: {
-                        'themeName': theme
-                    },
-                    success: function (data) {
-                        if(data.code==1){
-                            $.toast({
-                                text: data.msg,
-                                heading: '提示',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    window.location.href="/admin/themes";
-                                }
-                            });
-                        }else{
-                            $.toast({
-                                text: data.msg,
-                                heading: '提示',
-                                icon: 'error',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 2000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff'
-                            });
-                            $(e).button('reset');
-                        }
-                    }
-                });
-            }
-
-            /**
              * 打开主题设置
              *
              * @param theme 主题名
              */
-            function openSetting(theme) {
+            function openSetting(theme,hasUpdate) {
                 layer.open({
                     type: 2,
                     title: theme+'主题设置',
@@ -253,7 +201,7 @@
                     shade: 0.5,
                     maxmin: true,
                     area: ['90%', '90%'],
-                    content: '/admin/themes/options?theme='+theme,
+                    content: '/admin/themes/options?theme='+theme+'&hasUpdate='+hasUpdate,
                     scrollbar: false
                 });
             }
