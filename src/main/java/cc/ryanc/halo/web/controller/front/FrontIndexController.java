@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,8 +76,10 @@ public class FrontIndexController extends BaseController {
         if (null == posts) {
             return this.renderNotFound();
         }
+        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_index",true);
         model.addAttribute("posts", posts);
+        model.addAttribute("rainbow", rainbow);
         return this.render("index");
     }
 

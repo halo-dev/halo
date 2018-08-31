@@ -11,6 +11,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,10 +154,12 @@ public class FrontArchiveController extends BaseController {
         }
         //评论分页
         ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
+        int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
         model.addAttribute("is_post",true);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
+        model.addAttribute("rainbow", rainbow);
         model.addAttribute("tagWords", CollUtil.join(tagWords, ","));
         postService.updatePostView(post);
         return this.render("post");

@@ -333,7 +333,13 @@
                 </li>
                 </#if>
                 <li>
-                    <span title="当前页">${comments.nowPage}</span>
+                    <#list rainbow as r>
+                        <#if r == comments.nowPage>
+                            <a href="?cp=${comments.nowPage}#comments-list" style="color: red;">${r}</a>
+                        <#else>
+                            <a href="?cp=${r}#comments-list">${r}</a>
+                        </#if>
+                    </#list>
                 </li>
                 <#if comments.hasNext>
                 <li>
