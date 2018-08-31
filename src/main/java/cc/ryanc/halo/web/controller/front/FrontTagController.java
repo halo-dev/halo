@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.util.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -83,8 +84,10 @@ public class FrontTagController extends BaseController {
         }
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> posts = postService.findPostsByTags(tag, pageable);
+        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_tags",true);
         model.addAttribute("posts", posts);
+        model.addAttribute("rainbow", rainbow);
         model.addAttribute("tag", tag);
         return this.render("tag");
     }

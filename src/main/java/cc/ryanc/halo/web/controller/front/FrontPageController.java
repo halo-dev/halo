@@ -14,6 +14,7 @@ import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.util.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -95,10 +96,12 @@ public class FrontPageController extends BaseController {
         }
         //评论分页
         ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
+        int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
         model.addAttribute("is_page",true);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
+        model.addAttribute("rainbow", rainbow);
         postService.updatePostView(post);
         return this.render("page");
     }

@@ -371,7 +371,7 @@
                     }
                 });
             }
-            setInterval("autoPush()","60000");
+            // setInterval("autoPush()","60000");
             /**
              * 自动保存文章
              */
