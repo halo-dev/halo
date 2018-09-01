@@ -27,7 +27,7 @@
 
 轻快，简洁，功能强大，使用Java开发的博客系统。
 
-> Halo交流群: 162747721
+> QQ交流群: 162747721，Telegram交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog)
 
 ## Quickstart 快速开始
 
