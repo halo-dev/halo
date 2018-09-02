@@ -133,7 +133,12 @@ public enum BlogPropertiesEnum {
     /**
      * 仪表盘部件 成立天数
      */
-    WIDGET_DAYCOUNT("widget_daycount");
+    WIDGET_DAYCOUNT("widget_daycount"),
+
+    /**
+     * 默认缩略图地址
+     */
+    DEFAULT_THUMBNAIL("/static/images/thumbnail/thumbnail.png");
 
     private String prop;
 
