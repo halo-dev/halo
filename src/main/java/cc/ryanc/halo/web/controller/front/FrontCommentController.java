@@ -14,6 +14,7 @@ import cc.ryanc.halo.utils.OwoUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -120,6 +121,9 @@ public class FrontCommentController {
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setIsAdmin(0);
             comment.setCommentAuthor(HtmlUtil.escape(comment.getCommentAuthor()));
+            if(StringUtils.isNotBlank(comment.getCommentAuthorEmail())) {
+                comment.setCommentAuthorAvatarMd5(SecureUtil.md5(comment.getCommentAuthorEmail()));
+            }
             if (comment.getCommentParent() > 0) {
                 lastComment = commentService.findCommentById(comment.getCommentParent()).get();
                 String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a>";
