@@ -24,26 +24,26 @@
     }
 
     .native-wrap {
-        border: 1px solid #f0f0f0!important;
-        padding: 10px!important;
-        position: relative!important;
-        margin-left: 58px!important;
+        border: 1px solid #f0f0f0;
+        padding: 10px;
+        position: relative;
+        margin-left: 58px;
     }
 
     input, textarea, button {
-        outline: none!important;
+        outline: none;
     }
 
     .comment-submit,.native-list-one-img,.native-list-one-footer-time,.native-list-one-footer-reback,.native-info,.native-nav,.ua,.native-message{
-        -webkit-user-select:none!important;
-        -moz-user-select:none!important;
-        -ms-user-select:none!important;
-        user-select:none!important;
+        -webkit-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
     }
 
     .comment-header {
-        width: 100%!important;
-        line-height: 1.8!important;
+        width: 100%;
+        line-height: 1.8;
     }
 
     .comment-input-who, .comment-input-email, .comment-input-website {
@@ -69,15 +69,15 @@
     }
 
     .comment-OwO{
-        text-align: left!important;
-        vertical-align: middle!important;
-        padding-top: 10px!important;
+        text-align: left;
+        vertical-align: middle;
+        padding-top: 10px;
     }
 
     .comment-footer {
-        text-align: right!important;
-        vertical-align: middle!important;
-        padding-top: 10px!important;
+        text-align: right;
+        vertical-align: middle;
+        padding-top: 10px;
     }
 
     .comment-submit {
@@ -91,7 +91,7 @@
         color: #313131!important;
         outline: none!important;
         line-height: normal!important;
-        transition: all .3s ease-in-out!important;
+        transition: all .3s ease-in-out;
     }
 
     .comment-submit:hover{
@@ -113,6 +113,7 @@
         position: relative!important;
         display: block!important;
         transition: all .3s ease-in-out!important;
+		margin: 0 !important;
     }
 
     .native-list .native-list-one .native-list-one-img {
@@ -129,79 +130,79 @@
     }
 
     .native-list-one-img:hover{
-        transform: rotate(360deg)!important;
+        transform: rotate(360deg);
     }
 
     .native-list .native-list-one section {
-        overflow: hidden!important;
-        padding-bottom: 1rem!important;
-        border-bottom: 1px dashed #f5f5f5!important;
+        overflow: hidden;
+        padding-bottom: 1rem;
+        border-bottom: 1px dashed #f5f5f5;
     }
 
     .native-list .native-list-one section .native-list-one-head {
-        line-height: 1.5!important;
-        margin-bottom: .5rem!important;
-        margin-top: 0!important;
+        line-height: 1.5;
+        margin-bottom: .5rem;
+        margin-top: 0;
     }
 
     .native-list-one-head-name {
-        font-size: .875rem!important;
-        font-weight: 700!important;
-        cursor: pointer!important;
-        text-decoration: none!important;
-        color: #555!important;
+        font-size: .875rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        color: #555;
     }
 
     .native-list-one-head-admin{
-        padding: .1em 0.2em!important;
-        border-radius: 2px!important;
-        font-size: 70%!important;
-        font-weight: 700!important;
-        background-color: #87ceeb!important;
-        color: #fff!important;
-        display: inline!important;
+        padding: .1em 0.2em;
+        border-radius: 2px;
+        font-size: 70%;
+        font-weight: 700;
+        background-color: #87ceeb;
+        color: #fff;
+        display: inline;
     }
 
     .ua {
         display: inline-block;
-        padding: .2rem .5rem!important;
-        background: #ededed!important;
-        color: #b3b1b1!important;
-        font-size: .75rem!important;
-        border-radius: .2rem!important;
-        margin-right: .3rem!important;
+        padding: .2rem .5rem;
+        background: #ededed;
+        color: #b3b1b1;
+        font-size: .75rem;
+        border-radius: .2rem;
+        margin-right: .3rem;
     }
 
     .native-list-one-content p {
-        font-size: 14px!important;
-        letter-spacing: 0!important;
-        margin: 0!important;
-        font-weight: 400!important;
+        font-size: 14px;
+        letter-spacing: 0;
+        margin: 0 0 1pc;
+        font-weight: 400;
     }
 
     .native-list-one-footer-time {
-        color: #b3b3b3!important;
-        font-size: .75rem!important;
-        margin-right: .875rem!important;
+        color: #b3b3b3;
+        font-size: .75rem;
+        margin-right: .875rem;
     }
 
     .native-list-one-footer-reback {
-        font-size: .8125rem!important;
-        color: #ef2f11!important;
-        cursor: pointer!important;
+        font-size: .8125rem;
+        color: #ef2f11;
+        cursor: pointer;
     }
     .native-info{
-        padding-top: 10px!important;
-        font-size: 12px!important;
-        color: #555!important;
+        padding-top: 10px;
+        font-size: 12px;
+        color: #555;
     }
     .comment-avatar{
-        position: relative!important;
-        float: left!important;
+        position: relative;
+        float: left;
     }
     .comment-avatar img{
-        border-radius: 100%!important;
-        -webkit-transition: 0.4s!important;
+        border-radius: 100%;
+        -webkit-transition: 0.4s;
         -webkit-transition: -webkit-transform 0.4s ease-out;
         transition: transform 0.4s ease-out;
         -moz-transition: -moz-transform 0.4s ease-out;
@@ -209,7 +210,7 @@
     }
 
     .comment-avatar img:hover{
-        transform: rotate(360deg)!important;
+        transform: rotate(360deg);
     }
 
     .native-nav{
