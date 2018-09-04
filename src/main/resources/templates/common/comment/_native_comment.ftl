@@ -15,37 +15,31 @@
     .native-comment {
         padding: 10px;
     }
-
     .native-comment img{
         display: inline-block;!important;
         max-width: 100%;!important;
         height: auto;!important;
         margin: auto;!important;
     }
-
     .native-wrap {
-        border: 1px solid #f0f0f0;
-        padding: 10px;
-        position: relative;
-        margin-left: 58px;
+        border: 1px solid #f0f0f0!important;
+        padding: 10px!important;
+        position: relative!important;
+        margin-left: 58px!important;
     }
-
     input, textarea, button {
-        outline: none;
+        outline: none!important;
     }
-
     .comment-submit,.native-list-one-img,.native-list-one-footer-time,.native-list-one-footer-reback,.native-info,.native-nav,.ua,.native-message{
-        -webkit-user-select:none;
-        -moz-user-select:none;
-        -ms-user-select:none;
-        user-select:none;
+        -webkit-user-select:none!important;
+        -moz-user-select:none!important;
+        -ms-user-select:none!important;
+        user-select:none!important;
     }
-
     .comment-header {
-        width: 100%;
-        line-height: 1.8;
+        width: 100%!important;
+        line-height: 1.8!important;
     }
-
     .comment-input-who, .comment-input-email, .comment-input-website {
         width: 33.33% !important;
         padding: 10px 0 !important;
@@ -54,11 +48,9 @@
         border: none !important;
         border-bottom: 1px dashed #dedede !important;
     }
-
     .comment-input:focus {
         border-bottom: 1px dashed red !important;
     }
-
     .comment-input-content {
         width: 100% !important;
         min-height: 120px !important;
@@ -67,19 +59,16 @@
         font-size: .9rem !important;
         padding: 10px 0!important;
     }
-
     .comment-OwO{
-        text-align: left;
-        vertical-align: middle;
-        padding-top: 10px;
+        text-align: left!important;
+        vertical-align: middle!important;
+        padding-top: 10px!important;
     }
-
     .comment-footer {
-        text-align: right;
-        vertical-align: middle;
-        padding-top: 10px;
+        text-align: right!important;
+        vertical-align: middle!important;
+        padding-top: 10px!important;
     }
-
     .comment-submit {
         border-radius: 0 !important;
         vertical-align: middle!important;
@@ -91,23 +80,20 @@
         color: #313131!important;
         outline: none!important;
         line-height: normal!important;
-        transition: all .3s ease-in-out;
+        transition: all .3s ease-in-out!important;
     }
-
     .comment-submit:hover{
         background-color: #fff !important;
         border-radius: 1.9rem !important;
         border-color: #859cff !important;
         color: #859cff !important;
     }
-
     .native-list {
         list-style: none!important;
         margin-top: 0!important;
         margin-bottom: 0!important;
         padding: 0!important;
     }
-
     .native-list .native-list-one {
         padding-top: 10px!important;
         position: relative!important;
@@ -115,7 +101,6 @@
         transition: all .3s ease-in-out!important;
 		margin: 0 !important;
     }
-
     .native-list .native-list-one .native-list-one-img {
         width: 2.5rem!important;
         height: 2.5rem!important;
@@ -128,91 +113,80 @@
         transition: transform 0.4s ease-out!important;
         -moz-transition: -moz-transform 0.4s ease-out!important;
     }
-
     .native-list-one-img:hover{
-        transform: rotate(360deg);
+        transform: rotate(360deg)!important;
     }
-
     .native-list .native-list-one section {
-        overflow: hidden;
-        padding-bottom: 1rem;
-        border-bottom: 1px dashed #f5f5f5;
+        overflow: hidden!important;
+        padding-bottom: 1rem!important;
+        border-bottom: 1px dashed #f5f5f5!important;
     }
-
     .native-list .native-list-one section .native-list-one-head {
-        line-height: 1.5;
-        margin-bottom: .5rem;
-        margin-top: 0;
+        line-height: 1.5!important;
+        margin-bottom: .5rem!important;
+        margin-top: 0!important;
     }
-
     .native-list-one-head-name {
-        font-size: .875rem;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        color: #555;
+        font-size: .875rem!important;
+        font-weight: 700!important;
+        cursor: pointer!important;
+        text-decoration: none!important;
+        color: #555!important;
     }
-
     .native-list-one-head-admin{
-        padding: .1em 0.2em;
-        border-radius: 2px;
-        font-size: 70%;
-        font-weight: 700;
-        background-color: #87ceeb;
-        color: #fff;
-        display: inline;
+        padding: .1em 0.2em!important;
+        border-radius: 2px!important;
+        font-size: 70%!important;
+        font-weight: 700!important;
+        background-color: #87ceeb!important;
+        color: #fff!important;
+        display: inline!important;
     }
-
     .ua {
         display: inline-block;
-        padding: .2rem .5rem;
-        background: #ededed;
-        color: #b3b1b1;
-        font-size: .75rem;
-        border-radius: .2rem;
-        margin-right: .3rem;
+        padding: .2rem .5rem!important;
+        background: #ededed!important;
+        color: #b3b1b1!important;
+        font-size: .75rem!important;
+        border-radius: .2rem!important;
+        margin-right: .3rem!important;
     }
-
     .native-list-one-content p {
-        font-size: 14px;
-        letter-spacing: 0;
-        margin: 0 0 1pc;
-        font-weight: 400;
+        font-size: 14px!important;
+        letter-spacing: 0!important;
+        margin: 0!important;
+        font-weight: 400!important;
     }
-
     .native-list-one-footer-time {
-        color: #b3b3b3;
-        font-size: .75rem;
-        margin-right: .875rem;
+        color: #b3b3b3!important;
+        font-size: .75rem!important;
+        margin-right: .875rem!important;
     }
-
     .native-list-one-footer-reback {
-        font-size: .8125rem;
-        color: #ef2f11;
-        cursor: pointer;
+        font-size: .8125rem!important;
+        color: #ef2f11!important;
+        cursor: pointer!important;
     }
     .native-info{
-        padding-top: 10px;
-        font-size: 12px;
-        color: #555;
+        padding-top: 10px!important;
+        font-size: 12px!important;
+        color: #555!important;
     }
     .comment-avatar{
-        position: relative;
-        float: left;
+        position: relative!important;
+        float: left!important;
     }
     .comment-avatar img{
-        border-radius: 100%;
-        -webkit-transition: 0.4s;
+        border-radius: 100%!important;
+        -webkit-transition: 0.4s!important;
         -webkit-transition: -webkit-transform 0.4s ease-out;
         transition: transform 0.4s ease-out;
         -moz-transition: -moz-transform 0.4s ease-out;
         cursor: pointer;
     }
-
     .comment-avatar img:hover{
-        transform: rotate(360deg);
+        transform: rotate(360deg)!important;
     }
-
     .native-nav{
         padding: 10px 0!important;;
     }
