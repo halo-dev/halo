@@ -69,7 +69,7 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/templates/themes/")
                 .addResourceLocations("classpath:/robots.txt");
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations("classpath:/upload/");
+                .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/upload/");
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations("classpath:/static/images/favicon.ico");
         registry.addResourceHandler("/backup/**")

@@ -21,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -133,13 +132,13 @@ public class AttachmentController {
         Map<String, Object> result = new HashMap<>(3);
         if (!file.isEmpty()) {
             try {
-                //程序根路径，也就是/resources
-                File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+                //用户目录
+                String userPath = System.getProperties().getProperty("user.home") + "/halo";
                 //upload的路径
                 StringBuffer sbMedia = new StringBuffer("upload/");
                 //获取当前年月以创建目录，如果没有该目录则创建
                 sbMedia.append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
-                File mediaPath = new File(basePath.getAbsolutePath(), sbMedia.toString());
+                File mediaPath = new File(userPath, sbMedia.toString());
                 if (!mediaPath.exists()) {
                     mediaPath.mkdirs();
                 }
@@ -200,7 +199,7 @@ public class AttachmentController {
      * 移除附件的请求
      *
      * @param attachId 附件编号
-     * @param request request
+     * @param request  request
      * @return JsonResult
      */
     @GetMapping(value = "/remove")
@@ -214,8 +213,8 @@ public class AttachmentController {
             //删除数据库中的内容
             attachmentService.removeByAttachId(attachId);
             //删除文件
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File mediaPath = new File(basePath.getAbsolutePath(), attachment.get().getAttachPath().substring(0, attachment.get().getAttachPath().lastIndexOf('/')));
+            String userPath = System.getProperties().getProperty("user.home") + "/halo";
+            File mediaPath = new File(userPath, attachment.get().getAttachPath().substring(0, attachment.get().getAttachPath().lastIndexOf('/')));
             File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
             File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
             if (delFile.exists() && delFile.isFile()) {
