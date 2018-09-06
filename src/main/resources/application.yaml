@@ -40,12 +40,18 @@ spring:
     content-type: text/html
     expose-request-attributes: false
     expose-session-attributes: false
-    expose-spring-macro-helpers: false
+    expose-spring-macro-helpers: true
     suffix: .ftl
+    settings:
+      auto_import: /spring.ftl as spring
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
+  # 多语言资源文件路径
+  messages:
+    basename: i18n/messages
 logging:
   file: ./logs/log.log
 
