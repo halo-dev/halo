@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
         <meta name="renderer" content="webkit">
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <title>Halo安装向导</title>
+        <title>Halo-<@spring.message code='install.page.title'/></title>
         <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
         <link rel="stylesheet" href="/static/plugins/animate/animate.min.css">
@@ -32,94 +32,82 @@
             <div class="row" style="padding-top: 50px">
                 <div class="col-lg-12 col-xs-12">
                     <div class="logo animated fadeInUp">
-                        Halo<small style="font-size: 14px;">安装向导</small>
+                        Halo<small style="font-size: 14px;"><@spring.message code='install.page.title'/></small>
                     </div>
                     <#if isInstall==false>
                     <form method="post" action="/install/do" class="form-horizontal" id="installForm">
                         <div class="box box-solid animated" id="installFirst">
                             <div class="box-body" style="padding: 30px;">
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
-                                    <label for="blogTitle" class="col-sm-4 control-label">网站标题：</label>
+                                    <label for="blogTitle" class="col-sm-4 control-label"><@spring.message code='install.form.blogTitle'/>：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="blogTitle" name="blogTitle" value="">
+                                        <input type="text" class="form-control" id="blogTitle" name="blogTitle">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
-                                    <label for="blogUrl" class="col-sm-4 control-label">网站地址：</label>
+                                    <label for="blogUrl" class="col-sm-4 control-label"><@spring.message code='install.form.blogUrl'/>：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="blogUrl" name="blogUrl" value="">
+                                        <input type="text" class="form-control" id="blogUrl" name="blogUrl">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
-                                    <label for="userEmail" class="col-sm-4 control-label">电子邮箱：
-                                        <span data-toggle="tooltip" data-placement="top" title="重要，将用于找回密码" style="cursor: pointer">
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                        </span>
-                                    </label>
+                                    <label for="userEmail" class="col-sm-4 control-label"><@spring.message code='install.form.userEmail'/>：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="userEmail" name="userEmail" value="">
+                                        <input type="text" class="form-control" id="userEmail" name="userEmail">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.3s">
-                                    <label for="userName" class="col-sm-4 control-label">用户名：
-                                        <span data-toggle="tooltip" data-placement="top" title="用于登录后台" style="cursor: pointer">
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                        </span>
-                                    </label>
+                                    <label for="userName" class="col-sm-4 control-label"><@spring.message code='install.form.userName'/>：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="userName" name="userName" value="">
+                                        <input type="text" class="form-control" id="userName" name="userName">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.4s">
-                                    <label for="userDisplayName" class="col-sm-4 control-label">显示昵称：
-                                        <span data-toggle="tooltip" data-placement="top" title="主题或后台显示的名称" style="cursor: pointer">
-                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                        </span>
-                                    </label>
+                                    <label for="userDisplayName" class="col-sm-4 control-label"><@spring.message code='install.form.userDisplayName'/>：</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="userDisplayName" name="userDisplayName" value="">
+                                        <input type="text" class="form-control" id="userDisplayName" name="userDisplayName">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.5s">
-                                    <label for="userPwd" class="col-sm-4 control-label">登录密码：</label>
+                                    <label for="userPwd" class="col-sm-4 control-label"><@spring.message code='install.form.userPwd'/>：</label>
                                     <div class="col-sm-8">
-                                        <input type="password" class="form-control" id="userPwd" name="userPwd" value="">
+                                        <input type="password" class="form-control" id="userPwd" name="userPwd">
                                     </div>
                                 </div>
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.6s">
-                                    <label for="userRePwd" class="col-sm-4 control-label">确认密码：</label>
+                                    <label for="userRePwd" class="col-sm-4 control-label"><@spring.message code='install.form.userRePwd'/>：</label>
                                     <div class="col-sm-8">
-                                        <input type="password" class="form-control" id="userRePwd" name="userRePwd" value="">
+                                        <input type="password" class="form-control" id="userRePwd" name="userRePwd">
                                     </div>
                                 </div>
                             </div>
                             <div class="box-footer" style="padding-right: 30px;">
-                                <button type="submit" class="btn btn-primary btn-sm btn-flat pull-right animated fadeInUp" style="animation-delay: 0.9s">安装Halo</button>
+                                <button type="submit" class="btn btn-primary btn-sm btn-flat pull-right animated fadeInUp" style="animation-delay: 0.9s"><@spring.message code='install.btn.submit'/></button>
                             </div>
                         </div>
                         <div class="box box-solid animated fadeInUp" style="display: none" id="installSuccess">
                             <div class="box-body">
-                                <h2>安装成功！</h2>
-                                <h4>你可以选择进入前台，或者登陆后台！</h4>
+                                <h2><@spring.message code='install.success.title'/></h2>
+                                <h4><@spring.message code='install.success.message'/></h4>
                             </div>
                             <div class="box-footer" style="padding-right: 30px;">
-                                <a class="btn btn-primary btn-sm btn-flat" href="/">前台</a>
-                                <a class="btn btn-primary btn-sm btn-flat" href="/admin/login">登录后台</a>
+                                <a class="btn btn-primary btn-sm btn-flat" href="/"><@spring.message code='install.success.btn.front'/></a>
+                                <a class="btn btn-primary btn-sm btn-flat" href="/admin/login"><@spring.message code='install.success.btn.dashboard'/></a>
                             </div>
                         </div>
                         <div class="box box-solid animated fadeInUp" style="display: none" id="installError">
                             <div class="box-body">
-                                <h2>安装失败！</h2>
-                                <h4>请返回安装页面尝试重新安装！</h4>
+                                <h2><@spring.message code='install.error.title'/></h2>
+                                <h4><@spring.message code='install.error.message'/></h4>
                             </div>
                             <div class="box-footer" style="padding-right: 30px;">
-                                <a class="btn btn-primary btn-sm btn-flat" href="/install">返回</a>
+                                <a class="btn btn-primary btn-sm btn-flat" href="/install"><@spring.message code='install.error.btn.return'/></a>
                             </div>
                         </div>
                     </form>
                     <#else >
                     <div class="animated fadeInUp" style="animation-delay: 0.1s">
-                        <h4>已经安装过了，不能重复安装的酱紫！</h4>
+                        <h4><@spring.message code='install.installed.message'/></h4>
                         <pre style="font: 10px/7px monospace;border: none;">
                                     .'+:
                                   `+@#'##
