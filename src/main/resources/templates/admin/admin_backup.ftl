@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="${options.blog_title} | 后台管理：备份"></@head>
+<@head>${options.blog_title} | <@spring.message code='admin.backup.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
