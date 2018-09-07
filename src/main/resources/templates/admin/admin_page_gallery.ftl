@@ -17,7 +17,7 @@
             .thumbnail{margin-bottom:0}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">图库页面<small></small></h1>
+            <h1 style="display: inline-block;"><@spring.message code='admin.pages.galleries.title' /><small></small></h1>
             <a id="btnNewPicture" href="#">
                 添加图片
             </a>

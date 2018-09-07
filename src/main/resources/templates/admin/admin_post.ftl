@@ -13,7 +13,7 @@
             #btnNewPost:hover{background:#3c8dbc;color:#fff}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">文章管理</h1>
+            <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
             <a data-pjax="false" id="btnNewPost" href="/admin/posts/new">
                 写文章
             </a>

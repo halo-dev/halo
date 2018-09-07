@@ -12,7 +12,7 @@
         </style>
         <section class="content-header">
             <h1>
-                标签
+                <@spring.message code='admin.tags.title' />
                 <small></small>
             </h1>
             <ol class="breadcrumb">

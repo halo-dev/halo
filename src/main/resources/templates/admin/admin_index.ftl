@@ -344,7 +344,7 @@
                     </div>
                     <div class="modal-body">
                         <p>「${options.blog_title?if_exists}」已经运行了<span id="blogStartDay"></span>天了。</p>
-                        <p>在此期间：</p>
+                        <p><@spring.message code='admin.index.blog-data.during' /></p>
                         <p>累计发表了<@articleTag method="postsCount">${postsCount?default(0)}</@articleTag>篇文章。</p>
                         <p>累计创建了<@commonTag method="tags">${tags?size}</@commonTag>个标签。</p>
                         <p>累计获得了${commentCount}条评论。</p>

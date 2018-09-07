@@ -14,7 +14,7 @@
             .thumbnail{margin-bottom:0}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">附件管理</h1>
+            <h1 style="display: inline-block;"><@spring.message code='admin.attachments.title' /></h1>
             <a id="showForm" href="#">
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i>上传
             </a>

@@ -21,7 +21,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;">
-                新建页面
+                <@spring.message code='admin.pages.edit.title' />
             </h1>
             <a id="btnOpenAttach" href="#" onclick="openAttachCopy()">
                 附件库

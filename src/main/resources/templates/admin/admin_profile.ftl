@@ -14,7 +14,7 @@
         </style>
         <section class="content-header">
             <h1>
-                个人资料
+                <@spring.message code='admin.user.profile.title' />
                 <small></small>
             </h1>
             <ol class="breadcrumb">

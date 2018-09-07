@@ -9,7 +9,7 @@
         </a>
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
-                <li><a href="/" title="跳转到前台" target="_blank"><i class="fa fa-location-arrow"></i></a></li>
+                <li><a href="/" title="<@spring.message code='admin.module.header.a.title.turn-to-front' />" target="_blank"><i class="fa fa-location-arrow"></i></a></li>
                 <@commonTag method="newComments">
                 <li class="dropdown messages-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -45,7 +45,7 @@
                                 </#if>
                             </ul>
                         </li>
-                        <li class="footer"><a href="/admin/comments?status=1">查看所有评论</a></li>
+                        <li class="footer"><a href="/admin/comments?status=1"><@spring.message code='admin.module.header.btn.view-all-comments' /></a></li>
                     </ul>
                 </li>
                 </@commonTag>
@@ -60,8 +60,8 @@
                             <p>${user_session.userDisplayName?if_exists}</p>
                         </li>
                         <li class="user-footer">
-                            <div class="pull-left"><a data-pjax="true" href="/admin/profile" class="btn btn-default "><i class="fa fa-user"></i>个人资料</a></div>
-                            <div class="pull-right"><a href="/admin/logOut" class="btn btn-default "><i class="fa fa-sign-out"></i>退出登录</a></div>
+                            <div class="pull-left"><a data-pjax="true" href="/admin/profile" class="btn btn-default "><i class="fa fa-user"></i><@spring.message code='admin.module.header.btn.profile' /></a></div>
+                            <div class="pull-right"><a href="/admin/logOut" class="btn btn-default "><i class="fa fa-sign-out"></i><@spring.message code='admin.module.header.btn.loginout' /></a></div>
                         </li>
                     </ul>
                 </li>

@@ -17,7 +17,7 @@
         </style>
         <section class="content-header">
             <h1>
-                博客设置
+                <@spring.message code='admin.options.title' />
                 <small></small>
             </h1>
             <ol class="breadcrumb">
