@@ -9,7 +9,7 @@
     <div class="content-wrapper">
         <section class="content-header">
             <h1>
-                分类目录
+                <@spring.message code='admin.categories.title' />
                 <small></small>
             </h1>
             <ol class="breadcrumb">

@@ -8,7 +8,7 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <section class="content-header">
-            <h1 style="display: inline-block;">菜单管理</h1>
+            <h1 style="display: inline-block;"><@spring.message code='admin.menus.title' /></h1>
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>

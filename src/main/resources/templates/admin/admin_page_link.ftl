@@ -8,7 +8,7 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <section class="content-header">
-            <h1>友情链接页面<small></small></h1>
+            <h1><@spring.message code='admin.pages.links.title' /><small></small></h1>
             <ol class="breadcrumb">
                 <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i>首页</a></li>
                 <li><a data-pjax="true" href="/admin/page">页面管理</a></li>

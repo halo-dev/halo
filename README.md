@@ -1,27 +1,30 @@
-<h1><a href="#" target="_blank">Halo</a></h1>
+<h1>
+    <a href="#" target="_blank">Halo</a>
+</h1>
 
-> Halo may be the best Java blog system. | Halo可能是最好的Java博客系统。
+> Halo可能是最好的Java博客系统。
 
 [![JDK](https://img.shields.io/badge/JDK-1.8-yellow.svg)](#)
 [![GitHub release](https://img.shields.io/github/release/ruibaby/halo.svg)](https://github.com/ruibaby/halo/releases)
 [![Travis CI](https://img.shields.io/travis/ruibaby/halo.svg)](https://travis-ci.org/ruibaby/halo)
 
 ------------------------------
+简体中文 | [English](./README-en-US.md)
 
 ## 目录
 
-- [Introduction 简介](#introduction-简介)
-- [Quickstart 快速开始](#quickstart-快速开始)
-- [Demo 演示](#demo-演示)
-- [Download 下载部署](#download-下载部署)
-- [Docs 文档](#docs-文档)
-- [Themes 主题](#themes-主题)
-- [License 许可证](#license-许可证)
-- [Todo 后续功能](#todo-后续功能)
-- [Thanks 感谢](#thanks-感谢)
-- [Donate 捐赠](#donate-捐赠)
+- [简介](#简介)
+- [快速开始](#快速开始)
+- [演示](#演示)
+- [下载部署](#下载部署)
+- [文档](#文档)
+- [主题](#主题)
+- [许可证](#许可证)
+- [后续功能](#后续功能)
+- [感谢](#感谢)
+- [捐赠](#捐赠)
 
-## Introduction 简介
+## 简介
 
 **Halo** [ˈheɪloʊ]，意为光环。当然，你也可以当成拼音读(哈喽)。
 
@@ -29,7 +32,7 @@
 
 > QQ交流群: 162747721，Telegram交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog)
 
-## Quickstart 快速开始
+## 快速开始
 
 ```bash
 git clone https://github.com/ruibaby/halo.git
@@ -50,9 +53,7 @@ sh halo-cli.sh 2
 
 Let's start: http://localhost:8090
 
-## Demo 演示
-
-[测试地址](http://149.28.63.223)，[测试后台(admin,123456)](http://149.28.63.223/admin)
+## 演示
 
 [Ryan0up'S Blog](https://ryanc.cc)
 
@@ -60,17 +61,17 @@ Let's start: http://localhost:8090
 
 [宋浩志博客](http://songhaozhi.com)
 
-## Download 下载部署
+## 下载部署
 
 > 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run-with-git-maven)或者[Wiki](https://github.com/ruibaby/halo/wiki)。
 
-## Docs 文档
+## 文档
 
 [Halo Document](https://halo-doc.ryanc.cc)
 
 > 文档正在不断完善中。
 
-## Themes 主题
+## 主题
 
 除了内置的[Anatole](https://github.com/hi-caicai/farbox-theme-Anatole)和[Material](https://github.com/viosey/hexo-theme-material)，还有下列主题没有集成在项目里，如有需要，请自行下载之后通过后台上传上去使用。
 
@@ -81,19 +82,19 @@ Let's start: http://localhost:8090
 
 > 声明：不接受任何对**移植主题**功能上的意见和建议。
 
-## License 许可证
+## 许可证
 
 [![license](https://img.shields.io/github/license/ruibaby/halo.svg)](https://github.com/ruibaby/halo/blob/master/LICENSE)
 
 > Halo使用GPL-v3.0协议开源，请尽量遵守开源协议，即便是在中国。
 
-## Todo 后续功能
+## 后续功能
 
 - [x] 文章阅读统计
 - [ ] 文章顶置
 - [ ] 集成又拍云，七牛云等云服务
 
-## Thanks 感谢
+## 感谢
 
 Halo的诞生离不开下面这些项目：
 
@@ -107,7 +108,7 @@ Halo的诞生离不开下面这些项目：
 - [Lombok](https://www.projectlombok.org/)：让代码更简洁
 - [Apache Commons](http://commons.apache.org/)：非常好用的Java工具库
 - [oh-my-email](https://github.com/biezhi/oh-my-email)：可能是最小的Java邮件发送库了，支持抄送、附件、模板等
-- [Hutool](https://github.com/looly/hutool)：一个Java基础工具类
+- [Hutool](https://github.com/looly/hutool)：一个Java基础工具类库
 - [Thumbnailator](https://github.com/coobird/thumbnailator)：缩略图生成库
 - [AdminLTE](https://github.com/almasaeed2010/AdminLTE)：基于Bootstrap的后台模板
 - [Bootstrap](https://github.com/twbs/bootstrap.git)：使用最广泛的前端ui框架
@@ -122,7 +123,7 @@ Halo的诞生离不开下面这些项目：
 - [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
 - [OwO](https://github.com/DIYgod/OwO)：前端表情库
 
-## Donate 捐赠
+## 捐赠
 
 > 如果Halo对你有帮助，可以请作者喝瓶娃哈哈哈哈哈哈哈哈哈哈。
 

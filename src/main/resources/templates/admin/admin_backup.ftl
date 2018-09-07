@@ -11,7 +11,7 @@
             .resourceType,.databaseType,.postType{list-style:none;float:left;margin:0;padding-bottom:10px}
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">备份管理</h1>
+            <h1 style="display: inline-block;"><@spring.message code='admin.backup.title' /></h1>
             <ol class="breadcrumb">
                 <li>
                     <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>

@@ -11,7 +11,7 @@
             .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}s
         </style>
         <section class="content-header">
-            <h1>评论管理<small></small></h1>
+            <h1><@spring.message code='admin.comments.title' /><small></small></h1>
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>

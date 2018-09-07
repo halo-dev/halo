@@ -59,7 +59,7 @@
             }
         </style>
         <section class="content-header">
-            <h1 style="display: inline-block;">主题管理</h1>
+            <h1 style="display: inline-block;"><@spring.message code='admin.themes.title' /></h1>
             <a id="showForm" href="#" onclick="openThemeInstall()">
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i>安装主题
             </a>
