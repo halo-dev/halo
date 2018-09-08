@@ -2,33 +2,33 @@ package cc.ryanc.halo.web.interceptor;
 
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
-import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.model.enums.LocaleEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
 
 /**
- * <pre>
- *     API接口拦截器，用户可自己选择关闭或者开启
- * </pre>
- *
- * @author : RYAN0UP
- * @date : 2018/6/28
+ * @author : wangry
+ * @version : 1.0
+ * @date : 2018年09月08日
  */
 @Component
-public class ApiInterceptor implements HandlerInterceptor {
+public class LocaleInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (StringUtils.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.API_STATUS.getProp()))) {
-            return true;
+        if (StringUtils.equals(LocaleEnum.EN_US.getValue(), HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_LOCALE.getProp()))) {
+            request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("en", "US"));
+        } else {
+            request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("zh", "CN"));
         }
-        response.sendRedirect("/404");
-        return false;
+        return true;
     }
 
     @Override

@@ -83,6 +83,7 @@ public class InstallController {
     /**
      * 执行安装
      *
+     * @param blogLocale      系统语言
      * @param siteTitle       博客标题
      * @param siteUrl         博客网址
      * @param userName        用户名
@@ -94,7 +95,8 @@ public class InstallController {
      */
     @PostMapping(value = "/do")
     @ResponseBody
-    public boolean doInstall(@RequestParam("blogTitle") String blogTitle,
+    public boolean doInstall(@RequestParam("blogLocale") String blogLocale,
+                             @RequestParam("blogTitle") String blogTitle,
                              @RequestParam("blogUrl") String blogUrl,
                              @RequestParam("userName") String userName,
                              @RequestParam("userDisplayName") String userDisplayName,
@@ -157,6 +159,8 @@ public class InstallController {
 
             optionsService.saveOption(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
 
+            //语言设置
+            optionsService.saveOption(BlogPropertiesEnum.BLOG_LOCALE.getProp(),blogLocale);
             //保存博客标题和博客地址设置
             optionsService.saveOption(BlogPropertiesEnum.BLOG_TITLE.getProp(), blogTitle);
             optionsService.saveOption(BlogPropertiesEnum.BLOG_URL.getProp(), blogUrl);
