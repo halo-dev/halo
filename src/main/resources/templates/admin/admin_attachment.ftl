@@ -16,11 +16,11 @@
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.attachments.title' /></h1>
             <a id="showForm" href="#">
-                <i class="fa fa-cloud-upload" aria-hidden="true"></i>上传
+                <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.attachments.btn.upload' />
             </a>
             <ol class="breadcrumb">
-                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
-                <li class="active">附件管理</li>
+                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a></li>
+                <li class="active"><@spring.message code='admin.attachments.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -43,13 +43,13 @@
                 </#list>
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="no-margin pull-left">
-                        第${attachments.number+1}/${attachments.totalPages}页
+                        <@spring.message code='admin.pageinfo.text.no' />${attachments.number+1}/${attachments.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                     </div>
                     <ul class="pagination no-margin pull-right">
-                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments" >首页</a> </li>
-                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments?page=${attachments.number-1}" >上页</a></li>
-                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.number+1}">下页</a></li>
-                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.totalPages-1}">尾页</a> </li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments" ><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments?page=${attachments.number-1}" ><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments?page=${attachments.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
                     </ul>
                 </div>
             </div>
