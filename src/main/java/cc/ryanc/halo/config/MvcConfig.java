@@ -2,13 +2,19 @@ package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.web.interceptor.ApiInterceptor;
 import cc.ryanc.halo.web.interceptor.InstallInterceptor;
+import cc.ryanc.halo.web.interceptor.LocaleInterceptor;
 import cc.ryanc.halo.web.interceptor.LoginInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+
+import java.util.Locale;
 
 /**
  * <pre>
@@ -34,6 +40,9 @@ public class MvcConfig implements WebMvcConfigurer {
     @Autowired
     private ApiInterceptor apiInterceptor;
 
+    @Autowired
+    private LocaleInterceptor localeInterceptor;
+
     /**
      * 注册拦截器
      *
@@ -54,6 +63,9 @@ public class MvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/static/**");
         registry.addInterceptor(apiInterceptor)
                 .addPathPatterns("/api/**");
+        registry.addInterceptor(localeInterceptor)
+                .addPathPatterns("/admin/**")
+                .addPathPatterns("/install");
     }
 
     /**
@@ -83,5 +95,12 @@ public class MvcConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowedOrigins("*")
                 .allowedMethods("*");
+    }
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        SessionLocaleResolver slr = new SessionLocaleResolver();
+        slr.setDefaultLocale(Locale.CHINA);
+        return slr;
     }
 }

@@ -66,6 +66,15 @@
                                 <form method="post" class="form-horizontal" id="commonOptions">
                                     <div class="box-body">
                                         <div class="form-group">
+                                            <label for="blogLocale" class="col-lg-2 col-sm-4 control-label">系统语言：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <select class="form-control" id="blogLocale" name="blog_locale">
+                                                    <option value="zh_CN" ${((options.blog_locale?default('zh_CN'))=='zh_CN')?string('selected','')}>简体中文</option>
+                                                    <option value="en_US" ${((options.blog_locale?if_exists)=='en_US')?string('selected','')}>English</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="blogTitle" class="col-lg-2 col-sm-4 control-label">博客标题：</label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <input type="text" class="form-control" id="blogTitle" name="blog_title" value="${options.blog_title?if_exists}">

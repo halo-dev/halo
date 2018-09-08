@@ -39,50 +39,59 @@
                         <div class="box box-solid animated" id="installFirst">
                             <div class="box-body" style="padding: 30px;">
                                 <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
-                                    <label for="blogTitle" class="col-sm-4 control-label"><@spring.message code='install.form.blogTitle'/>：</label>
+                                    <label for="blogLocale" class="col-sm-4 control-label"><@spring.message code='install.form.language'/></label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="blogLocale" name="blogLocale">
+                                            <option value="zh_CN" ${((options.blog_locale?default('zh_CN'))=='zh_CN')?string('selected','')}>简体中文</option>
+                                            <option value="en_US" ${((options.blog_locale?if_exists)=='en_US')?string('selected','')}>English</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
+                                    <label for="blogTitle" class="col-sm-4 control-label"><@spring.message code='install.form.blogTitle'/></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="blogTitle" name="blogTitle">
                                     </div>
                                 </div>
-                                <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
-                                    <label for="blogUrl" class="col-sm-4 control-label"><@spring.message code='install.form.blogUrl'/>：</label>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.3s">
+                                    <label for="blogUrl" class="col-sm-4 control-label"><@spring.message code='install.form.blogUrl'/></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="blogUrl" name="blogUrl">
                                     </div>
                                 </div>
-                                <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
-                                    <label for="userEmail" class="col-sm-4 control-label"><@spring.message code='install.form.userEmail'/>：</label>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.4s">
+                                    <label for="userEmail" class="col-sm-4 control-label"><@spring.message code='install.form.userEmail'/></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="userEmail" name="userEmail">
                                     </div>
                                 </div>
-                                <div class="form-group animated fadeInUp" style="animation-delay: 0.3s">
-                                    <label for="userName" class="col-sm-4 control-label"><@spring.message code='install.form.userName'/>：</label>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.5s">
+                                    <label for="userName" class="col-sm-4 control-label"><@spring.message code='install.form.userName'/></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="userName" name="userName">
                                     </div>
                                 </div>
-                                <div class="form-group animated fadeInUp" style="animation-delay: 0.4s">
-                                    <label for="userDisplayName" class="col-sm-4 control-label"><@spring.message code='install.form.userDisplayName'/>：</label>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.6s">
+                                    <label for="userDisplayName" class="col-sm-4 control-label"><@spring.message code='install.form.userDisplayName'/></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" id="userDisplayName" name="userDisplayName">
                                     </div>
                                 </div>
-                                <div class="form-group animated fadeInUp" style="animation-delay: 0.5s">
-                                    <label for="userPwd" class="col-sm-4 control-label"><@spring.message code='install.form.userPwd'/>：</label>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.7s">
+                                    <label for="userPwd" class="col-sm-4 control-label"><@spring.message code='install.form.userPwd'/></label>
                                     <div class="col-sm-8">
                                         <input type="password" class="form-control" id="userPwd" name="userPwd">
                                     </div>
                                 </div>
-                                <div class="form-group animated fadeInUp" style="animation-delay: 0.6s">
-                                    <label for="userRePwd" class="col-sm-4 control-label"><@spring.message code='install.form.userRePwd'/>：</label>
+                                <div class="form-group animated fadeInUp" style="animation-delay: 0.8s">
+                                    <label for="userRePwd" class="col-sm-4 control-label"><@spring.message code='install.form.userRePwd'/></label>
                                     <div class="col-sm-8">
                                         <input type="password" class="form-control" id="userRePwd" name="userRePwd">
                                     </div>
                                 </div>
                             </div>
                             <div class="box-footer" style="padding-right: 30px;">
-                                <button type="submit" class="btn btn-primary btn-sm btn-flat pull-right animated fadeInUp" style="animation-delay: 0.9s"><@spring.message code='install.btn.submit'/></button>
+                                <button type="submit" class="btn btn-primary btn-sm btn-flat pull-right animated fadeInUp" style="animation-delay: 1s"><@spring.message code='install.btn.submit'/></button>
                             </div>
                         </div>
                         <div class="box box-solid animated fadeInUp" style="display: none" id="installSuccess">

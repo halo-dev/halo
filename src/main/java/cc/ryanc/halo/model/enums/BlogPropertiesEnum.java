@@ -11,6 +11,11 @@ package cc.ryanc.halo.model.enums;
 public enum BlogPropertiesEnum {
 
     /**
+     * 博客语言
+     */
+    BLOG_LOCALE("blog_locale"),
+
+    /**
      * 博客标题
      */
     BLOG_TITLE("blog_title"),
