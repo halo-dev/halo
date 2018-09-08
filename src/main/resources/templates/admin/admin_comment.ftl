@@ -14,21 +14,21 @@
             <h1><@spring.message code='admin.comments.title' /><small></small></h1>
             <ol class="breadcrumb">
                 <li>
-                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li class="active">评论管理</li>
+                <li class="active"><@spring.message code='admin.comments.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
             <ul style="list-style: none;padding-left: 0">
                 <li class="publish">
-                    <a data-pjax="true" href="/admin/comments" <#if status==0>style="color: #000" </#if>>已发布<span class="count">(${publicCount?default("0")})</span></a>&nbsp;|&nbsp;
+                    <a data-pjax="true" href="/admin/comments" <#if status==0>style="color: #000" </#if>><@spring.message code='common.status.published' /><span class="count">(${publicCount})</span></a>&nbsp;|&nbsp;
                 </li>
                 <li class="draft">
-                    <a data-pjax="true" href="/admin/comments?status=1" <#if status==1>style="color: #000" </#if>>待审核<span class="count">(${checkCount?default("0")})</span></a>&nbsp;|&nbsp;
+                    <a data-pjax="true" href="/admin/comments?status=1" <#if status==1>style="color: #000" </#if>><@spring.message code='common.status.checking' /><span class="count">(${checkCount})</span></a>&nbsp;|&nbsp;
                 </li>
                 <li class="trash">
-                    <a data-pjax="true" href="/admin/comments?status=2" <#if status==2>style="color: #000" </#if>>回收站<span class="count">(${trashCount?default("0")})</span></a>
+                    <a data-pjax="true" href="/admin/comments?status=2" <#if status==2>style="color: #000" </#if>><@spring.message code='common.status.recycle-bin' /><span class="count">(${trashCount})</span></a>
                 </li>
             </ul>
             <div class="row">
@@ -38,11 +38,11 @@
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
-                                    <th>评论者</th>
-                                    <th width="50%">评论内容</th>
-                                    <th>评论页面</th>
-                                    <th>日期</th>
-                                    <th>操作</th>
+                                    <th><@spring.message code='common.th.comment-author' /></th>
+                                    <th width="50%"><@spring.message code='common.th.content' /></th>
+                                    <th><@spring.message code='common.th.comment-page' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -58,7 +58,7 @@
                                                         <a target="_blank" href="/p/${comment.post.postUrl}#comment-id-${comment.commentId?c}">${comment.post.postTitle}</a>
                                                     </#if>
                                                 </td>
-                                                <td>${comment.commentDate}</td>
+                                                <td>${comment.commentDate?string('yyyy-MM-dd HH:mm')}</td>
                                                 <td>
                                                     <#switch comment.commentStatus>
                                                         <#case 0>
@@ -91,10 +91,10 @@
                                 第${comments.number+1}/${comments.totalPages}页
                             </div>
                             <ul class="pagination no-margin pull-right">
-                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}">首页</a> </li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number-1}">上页</a></li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number+1}">下页</a></li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.totalPages-1}">尾页</a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number-1}"><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
                             </ul>
                         </div>
                     </div>

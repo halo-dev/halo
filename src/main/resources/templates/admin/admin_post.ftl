@@ -15,15 +15,15 @@
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
             <a data-pjax="false" id="btnNewPost" href="/admin/posts/new">
-                写文章
+                <@spring.message code='admin.posts.btn.new-post' />
             </a>
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin">
-                        <i class="fa fa-dashboard"></i> 首页</a>
+                        <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="#">文章管理</a></li>
-                <li class="active">所有文章</li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.posts.title' /></a></li>
+                <li class="active"><@spring.message code='admin.posts.bread.all-posts' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -31,13 +31,13 @@
                 <div class="col-xs-12">
                     <ul style="list-style: none;padding-left: 0">
                         <li class="publish">
-                            <a data-pjax="true" href="/admin/posts" <#if status==0>style="color: #000" </#if>>已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/posts" <#if status==0>style="color: #000" </#if>><@spring.message code='common.status.published' /><span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
                         </li>
                         <li class="draft">
-                            <a data-pjax="true" href="/admin/posts?status=1" <#if status==1>style="color: #000" </#if>>草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/posts?status=1" <#if status==1>style="color: #000" </#if>><@spring.message code='common.status.draft' /><span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
                         </li>
                         <li class="trash">
-                            <a data-pjax="true" href="/admin/posts?status=2" <#if status==2>style="color: #000" </#if>>回收站<span class="count">(${trashCount})</span></a>
+                            <a data-pjax="true" href="/admin/posts?status=2" <#if status==2>style="color: #000" </#if>><@spring.message code='common.status.recycle-bin' /><span class="count">(${trashCount})</span></a>
                         </li>
                     </ul>
                 </div>
@@ -47,13 +47,13 @@
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
-                                    <th>标题</th>
-                                    <th>分类目录</th>
-                                    <th>标签</th>
-                                    <th>评论</th>
-                                    <th>访问量</th>
-                                    <th>日期</th>
-                                    <th>操作</th>
+                                    <th><@spring.message code='common.th.title' /></th>
+                                    <th><@spring.message code='common.th.categories' /></th>
+                                    <th><@spring.message code='common.th.tags' /></th>
+                                    <th><@spring.message code='common.th.comments' /></th>
+                                    <th><@spring.message code='common.th.views' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -124,10 +124,10 @@
                                 第${posts.number+1}/${posts.totalPages}页
                             </div>
                             <ul class="pagination no-margin pull-right">
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}">首页</a> </li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}">上页</a></li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}">下页</a></li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}">尾页</a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}"><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
+                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
                             </ul>
                         </div>
                     </div>

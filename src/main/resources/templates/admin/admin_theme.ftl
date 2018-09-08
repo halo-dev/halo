@@ -61,12 +61,12 @@
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.themes.title' /></h1>
             <a id="showForm" href="#" onclick="openThemeInstall()">
-                <i class="fa fa-cloud-upload" aria-hidden="true"></i>安装主题
+                <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.themes.btn.install' />
             </a>
             <ol class="breadcrumb">
-                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a></li>
-                <li><a data-pjax="true" href="#">外观</a></li>
-                <li class="active">主题管理</li>
+                <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a></li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.themes.bread.appearance' /></a></li>
+                <li class="active"><@spring.message code='admin.themes.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -81,12 +81,12 @@
                                 <div class="box-footer">
                                     <span class="theme-title">${theme.themeName?if_exists?upper_case}</span>
                                     <#if theme.hasOptions>
-                                        <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}','<#if theme.hasUpdate>true<#else>false</#if>')" style="display: none">设置</button>
+                                        <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}','<#if theme.hasUpdate>true<#else>false</#if>')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
                                     </#if>
                                     <#if activeTheme != "${theme.themeName}">
-                                        <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px">启用</button>
+                                        <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px"><@spring.message code='admin.themes.btn.enable' /></button>
                                         <#else>
-                                        <button class="btn btn-default btn-sm pull-right btn-theme-enable" style="display: none;margin-right: 3px" disabled>已启用</button>
+                                        <button class="btn btn-default btn-sm pull-right btn-theme-enable" style="display: none;margin-right: 3px" disabled><@spring.message code='admin.themes.btn.activated' /></button>
                                     </#if>
                                 </div>
                             </div>
