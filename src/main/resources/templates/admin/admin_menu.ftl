@@ -11,7 +11,7 @@
             <h1 style="display: inline-block;"><@spring.message code='admin.menus.title' /></h1>
             <ol class="breadcrumb">
                 <li>
-                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
                 <li><a data-pjax="true" href="#">外观</a></li>
                 <li class="active">菜单管理</li>
@@ -109,11 +109,11 @@
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                    <th>名称</th>
-                                    <th>路径</th>
+                                    <th><@spring.message code='common.th.name' /></th>
+                                    <th><@spring.message code='common.th.url' /></th>
                                     <th>排序</th>
                                     <th>图标</th>
-                                    <th>操作</th>
+                                    <th><@spring.message code='common.th.name' /></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -150,13 +150,13 @@
                 <div class="modal-content message_align">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title">提示信息</h4>
+                        <h4 class="modal-title"><@spring.message code='common.text.tips' /></h4>
                     </div>
                     <div class="modal-body"><p>您确认要删除吗？</p></div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code='common.btn.cancel' /></button>
+                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal"><@spring.message code='common.btn.define' /></a>
                     </div>
                 </div>
             </div>

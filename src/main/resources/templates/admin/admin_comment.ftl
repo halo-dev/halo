@@ -62,7 +62,7 @@
                                                 <td>
                                                     <#switch comment.commentStatus>
                                                         <#case 0>
-                                                        <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')" <#if comment.isAdmin==1>disabled</#if>><@spring.message code="common.btn.replay" /></button>
+                                                        <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')" <#if comment.isAdmin==1>disabled</#if>><@spring.message code="common.btn.reply" /></button>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=0&page=${comments.number}','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code="common.btn.recycling" /></button>
                                                         <#break >
                                                         <#case 1>
@@ -88,7 +88,7 @@
                         </div>
                         <div class="box-footer clearfix">
                             <div class="no-margin pull-left">
-                                第${comments.number+1}/${comments.totalPages}页
+                                <@spring.message code='admin.pageinfo.text.no' />${comments.number+1}/${comments.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                             </div>
                             <ul class="pagination no-margin pull-right">
                                 <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>

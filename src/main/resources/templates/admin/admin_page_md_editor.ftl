@@ -28,7 +28,7 @@
             </a>
             <ol class="breadcrumb">
                 <li>
-                    <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
                 <li>
                     <a data-pjax="true" href="/admin/page">页面管理</a>
@@ -52,7 +52,7 @@
                             永久链接：
                             <a href="#">${options.blog_url}/p/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
                             <button class="btn btn-default btn-sm " id="btn_input_postUrl">编辑</button>
-                            <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;">确定</button>
+                            <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;"><@spring.message code='common.btn.define' /></button>
                         </span>
                     </div>
                     <div class="box box-primary">
@@ -123,7 +123,7 @@
             function openAttach(e) {
                 layer.open({
                     type: 2,
-                    title: '所有附件',
+                    title: '<@spring.message code="common.js.all-attachment" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,
@@ -135,7 +135,7 @@
             function openAttachCopy() {
                 layer.open({
                     type: 2,
-                    title: '所有附件',
+                    title: '<@spring.message code="common.js.all-attachment" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,

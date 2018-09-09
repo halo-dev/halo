@@ -23,7 +23,7 @@
             </a>
             <ol class="breadcrumb">
                 <li>
-                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
                 <li><a data-pjax="true" href="/admin/page">页面管理</a></li>
                 <li class="active">图库页面</li>
@@ -68,7 +68,7 @@
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="galleryUrl" name="galleryUrl">
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default " type="button" onclick="openAttach('galleryUrl')">选择</button>
+                                                <button class="btn btn-default " type="button" onclick="openAttach('galleryUrl')"><@spring.message code='common.btn.choose' /></button>
                                             </span>
                                         </div>
                                     </div>
@@ -81,7 +81,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary pull-left">保存</button>
+                                <button type="submit" class="btn btn-primary pull-left"><@spring.message code='common.btn.save' /></button>
                             </div>
                         </form>
                     </div>
@@ -100,10 +100,10 @@
                         第${galleries.number+1}/${galleries.totalPages}页
                     </div>
                     <ul class="pagination no-margin pull-right">
-                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries" >首页</a> </li>
-                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number-1}" >上页</a></li>
-                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number+1}">下页</a></li>
-                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.totalPages-1}">尾页</a> </li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries" ><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number-1}" ><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
+                        <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
                     </ul>
                 </div>
             </div>
@@ -115,7 +115,7 @@
             function openAttach(id) {
                 layer.open({
                     type: 2,
-                    title: '所有附件',
+                    title: '<@spring.message code="common.js.all-attachment" />',
                     shadeClose: true,
                     shade: 0.5,
                     area: ['90%', '90%'],

@@ -16,8 +16,8 @@
                 <li>
                     <a href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a href="#">设置</a></li>
-                <li class="active">备份管理</li>
+                <li><a href="#"><@spring.message code='admin.backup.bread.setting' /></a></li>
+                <li class="active"><@spring.message code='admin.backup.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -25,13 +25,13 @@
                 <div class="col-xs-12">
                     <ul style="list-style: none;padding-left: 0">
                         <li class="resourceType">
-                            <a data-pjax="true" href="/admin/backup?type=resources" <#if type=='resources'>style="color: #000" </#if>>资源文件备份</a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/backup?type=resources" <#if type=='resources'>style="color: #000" </#if>><@spring.message code='admin.backup.item.resources' /></a>&nbsp;|&nbsp;
                         </li>
                         <li class="databaseType">
-                            <a data-pjax="true" href="/admin/backup?type=databases" <#if type=='databases'>style="color: #000" </#if>>数据库备份</a>&nbsp;|&nbsp;
+                            <a data-pjax="true" href="/admin/backup?type=databases" <#if type=='databases'>style="color: #000" </#if>><@spring.message code='admin.backup.item.database' /></a>&nbsp;|&nbsp;
                         </li>
                         <li class="postType">
-                            <a data-pjax="true" href="/admin/backup?type=posts" <#if type=='posts'>style="color: #000" </#if>>文章备份</a>
+                            <a data-pjax="true" href="/admin/backup?type=posts" <#if type=='posts'>style="color: #000" </#if>><@spring.message code='admin.backup.item.posts' /></a>
                         </li>
                     </ul>
                 </div>
@@ -41,11 +41,11 @@
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
-                                    <th>文件名称</th>
-                                    <th>备份时间</th>
-                                    <th>文件大小</th>
-                                    <th>文件类型</th>
-                                    <th>操作</th>
+                                    <th><@spring.message code='common.th.file-name' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                    <th><@spring.message code='common.th.file-size' /></th>
+                                    <th><@spring.message code='common.th.file-type' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -57,22 +57,22 @@
                                                 <td>${backup.fileSize}</td>
                                                 <td>${backup.fileType}</td>
                                                 <td>
-                                                    <a href="/backup/${type}/${backup.fileName}" class="btn btn-xs btn-primary" download="${backup.fileName}">下载</a>
-                                                    <button type="button" class="btn btn-xs btn-info" onclick="sendToEmail('${backup.fileName}','${backup.backupType}')">发送到邮箱</button>
-                                                    <button type="button" class="btn btn-xs btn-danger" onclick="delBackup('${backup.fileName}','${backup.backupType}')">删除</button>
+                                                    <a href="/backup/${type}/${backup.fileName}" class="btn btn-xs btn-primary" download="${backup.fileName}"><@spring.message code='admin.backup.btn.download' /></a>
+                                                    <button type="button" class="btn btn-xs btn-info" onclick="sendToEmail('${backup.fileName}','${backup.backupType}')"><@spring.message code='admin.backup.btn.send-to-email' /></button>
+                                                    <button type="button" class="btn btn-xs btn-danger" onclick="delBackup('${backup.fileName}','${backup.backupType}')"><@spring.message code='admin.backup.btn.delete' /></button>
                                                 </td>
                                             </tr>
                                         </#list>
                                     <#else>
                                         <tr>
-                                            <th colspan="5" style="text-align: center">暂无备份</th>
+                                            <th colspan="5" style="text-align: center"><@spring.message code='common.text.no-data' /></th>
                                         </tr>
                                     </#if>
                                 </tbody>
                             </table>
                         </div>
                         <div class="box-footer clearfix">
-                            <button type="button" class="btn btn-primary btn-sm " onclick="btn_backup('${type}')">备份</button>
+                            <button type="button" class="btn btn-primary btn-sm " onclick="btn_backup('${type}')"><@spring.message code='admin.backup.btn.backup' /></button>
                         </div>
                     </div>
                 </div>

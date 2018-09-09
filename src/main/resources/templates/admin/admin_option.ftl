@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.options.title' /></@head>
+<@head>${options.blog_title} | <@spring.message code='admin.setting.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -23,10 +23,10 @@
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin">
-                        <i class="fa fa-dashboard"></i> 首页</a>
+                        <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="#">设置</a></li>
-                <li class="active">博客设置</li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.setting.bread.setting' /></a></li>
+                <li class="active"><@spring.message code='admin.setting.title' /></li>
             </ol>
         </section>
         <!-- tab选项卡 -->
@@ -36,28 +36,28 @@
                     <div class="nav-tabs-custom">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="#general" data-toggle="tab">常规设置</a>
+                                <a href="#general" data-toggle="tab"><@spring.message code='admin.setting.tab.general' /></a>
                             </li>
                             <li>
-                                <a href="#seo" data-toggle="tab">SEO设置</a>
+                                <a href="#seo" data-toggle="tab"><@spring.message code='admin.setting.tab.seo' /></a>
                             </li>
                             <li>
-                                <a href="#post" data-toggle="tab">文章设置</a>
+                                <a href="#post" data-toggle="tab"><@spring.message code='admin.setting.tab.post' /></a>
                             </li>
                             <li>
-                                <a href="#comment" data-toggle="tab">评论设置</a>
+                                <a href="#comment" data-toggle="tab"><@spring.message code='admin.setting.tab.comment' /></a>
                             </li>
                             <li>
-                                <a href="#attach" data-toggle="tab">附件设置</a>
+                                <a href="#attach" data-toggle="tab"><@spring.message code='admin.setting.tab.attach' /></a>
                             </li>
                             <li>
-                                <a href="#admin" data-toggle="tab">后台设置</a>
+                                <a href="#admin" data-toggle="tab"><@spring.message code='admin.setting.tab.admin' /></a>
                             </li>
                             <li>
-                                <a href="#email" data-toggle="tab">邮箱设置</a>
+                                <a href="#email" data-toggle="tab"><@spring.message code='admin.setting.tab.email' /></a>
                             </li>
                             <li>
-                                <a href="#other" data-toggle="tab">其他设置</a>
+                                <a href="#other" data-toggle="tab"><@spring.message code='admin.setting.tab.other' /></a>
                             </li>
                         </ul>
                         <!-- 基础设置 -->
@@ -92,7 +92,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="blogLogo" name="blog_logo" value="${options.blog_logo?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogLogo')">选择</button>
+                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogLogo')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -103,7 +103,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="blogFavicon" name="blog_favicon" value="${options.blog_favicon?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogFavicon')">选择</button>
+                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogFavicon')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -120,7 +120,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('commonOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('commonOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -161,7 +161,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('seoOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('seoOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -198,7 +198,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('postOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('postOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -429,7 +429,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('commentOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('commentOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -520,7 +520,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('attachOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('attachOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -593,7 +593,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('adminOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('adminOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -639,7 +639,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('emailOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('emailOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -670,7 +670,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('otherOptions')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveOptions('otherOptions')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -693,7 +693,7 @@
             function openAttach(id) {
                 layer.open({
                     type: 2,
-                    title: '所有附件',
+                    title: '<@spring.message code="common.js.all-attachment" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,

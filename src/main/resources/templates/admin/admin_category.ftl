@@ -85,7 +85,7 @@
                 <div class="col-md-7">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">所有分类目录</h3>
+                            <h3 class="box-title"><@spring.message code='admin.categories.text.all-categories' /></h3>
                         </div>
                         <div class="box-body table-responsive">
                             <table class="table table-hover">
@@ -162,7 +162,7 @@
                 var desc = $('#cateDesc').val();
                 var result = true;
                 if(name==""||url==""||desc==""){
-                    showMsg("请输入完整信息！","info",2000);
+                    showMsg("<@spring.message code='common.js.info-no-complate' />","info",2000);
                     result = false;
                 }
                 $.ajax({

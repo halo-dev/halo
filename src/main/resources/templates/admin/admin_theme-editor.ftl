@@ -12,7 +12,7 @@
             <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
             <ol class="breadcrumb">
                 <li>
-                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
                 <li><a data-pjax="true" href="#">外观</a></li>
                 <li class="active">主题编辑</li>

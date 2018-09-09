@@ -20,10 +20,10 @@
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin">
-                        <i class="fa fa-dashboard"></i> 首页</a>
+                        <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="#">用户</a></li>
-                <li class="active">个人资料</li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.user.profile.bread.user' /></a></li>
+                <li class="active"><@spring.message code='admin.user.profile.title' /></li>
             </ol>
         </section>
         <!-- tab选项卡 -->
@@ -33,10 +33,10 @@
                     <div class="nav-tabs-custom">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="#general" data-toggle="tab">基本资料</a>
+                                <a href="#general" data-toggle="tab"><@spring.message code='admin.user.profile.tab.basic' /></a>
                             </li>
                             <li>
-                                <a href="#pass" data-toggle="tab">密码修改</a>
+                                <a href="#pass" data-toggle="tab"><@spring.message code='admin.user.profile.tab.password-change' /></a>
                             </li>
                         </ul>
                         <div class="tab-content">
@@ -46,8 +46,8 @@
                                     <input type="hidden" id="userPass" name="userPass" value="${user.userPass?if_exists}">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="userName" class="col-lg-2 col-sm-4 control-label">用户名：
-                                                <span data-toggle="tooltip" data-placement="top" title="用于登录" style="cursor: pointer">
+                                            <label for="userName" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.username' />
+                                                <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.user.profile.form.username.tips' />" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
@@ -56,8 +56,8 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userDisplayName" class="col-lg-2 col-sm-4 control-label">显示名称：
-                                                <span data-toggle="tooltip" data-placement="top" title="页面显示的名称" style="cursor: pointer">
+                                            <label for="userDisplayName" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.display-name' />
+                                                <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.user.profile.form.display-name.tips' />" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
@@ -66,25 +66,25 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userEmail" class="col-lg-2 col-sm-4 control-label">邮箱：</label>
+                                            <label for="userEmail" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.email' /></label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <input type="email" class="form-control" id="userEmail" name="userEmail" value="${user.userEmail?if_exists}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userAvatar" class="col-lg-2 col-sm-4 control-label">头像：</label>
+                                            <label for="userAvatar" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.avatar' /></label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <div class="input-group">
                                                     <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('userAvatar')">选择</button>
+                                                        <button class="btn btn-default " type="button" onclick="openAttach('userAvatar')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="userDesc" class="col-lg-2 col-sm-4 control-label">个人说明：
-                                                <span data-toggle="tooltip" data-placement="top" title="部分主题可在页面上显示这段话" style="cursor: pointer">
+                                            <label for="userDesc" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.desc' />
+                                                <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.user.profile.form.desc.tips' />" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
@@ -94,7 +94,7 @@
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveUser('profileForm')">保存</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="saveUser('profileForm')"><@spring.message code='common.btn.save' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -103,26 +103,26 @@
                                     <input type="hidden" name="userId" value="${user.userId?c}">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label for="beforePass" class="col-sm-2 control-label">原密码：</label>
+                                            <label for="beforePass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.old-password' /></label>
                                             <div class="col-sm-4">
                                                 <input type="password" class="form-control" id="beforePass" name="beforePass">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="newPass" class="col-sm-2 control-label">新密码：</label>
+                                            <label for="newPass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.new-password' /></label>
                                             <div class="col-sm-4">
                                                 <input type="password" class="form-control" id="newPass" name="newPass">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="reNewPass" class="col-sm-2 control-label">确认密码：</label>
+                                            <label for="reNewPass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.confirm-password' /></label>
                                             <div class="col-sm-4">
                                                 <input type="password" class="form-control" id="reNewPass" name="reNewPass">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="box-footer">
-                                        <button type="button" class="btn btn-primary btn-sm " onclick="changPass()">修改</button>
+                                        <button type="button" class="btn btn-primary btn-sm " onclick="changPass()"><@spring.message code='common.btn.modify' /></button>
                                     </div>
                                 </form>
                             </div>
@@ -139,7 +139,7 @@
             function openAttach(id) {
                 layer.open({
                     type: 2,
-                    title: '所有附件',
+                    title: '<@spring.message code="common.js.all-attachment" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,
@@ -183,7 +183,7 @@
                 var newPass = $('#newPass').val();
                 var reNewPass = $('#reNewPass').val();
                 if(beforePass==""||newPass==""||reNewPass==""){
-                    showMsg("请输入完整信息！","info",2000);
+                    showMsg("<@spring.message code='common.js.info-no-complate' />","info",2000);
                     return;
                 }
                 if(newPass!=reNewPass){
