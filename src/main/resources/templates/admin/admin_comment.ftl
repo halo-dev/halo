@@ -62,17 +62,17 @@
                                                 <td>
                                                     <#switch comment.commentStatus>
                                                         <#case 0>
-                                                        <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')" <#if comment.isAdmin==1>disabled</#if>>回复</button>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=0&page=${comments.number}','确定移动到回收站？')">丢弃</button>
+                                                        <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')" <#if comment.isAdmin==1>disabled</#if>><@spring.message code="common.btn.replay" /></button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=0&page=${comments.number}','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code="common.btn.recycling" /></button>
                                                         <#break >
                                                         <#case 1>
-                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=1">通过</a>
-                                                        <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')">通过并回复</button>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=1&page=${comments.number}','确定移动到回收站？')">丢弃</button>
+                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=1"><@spring.message code="common.btn.pass" /></a>
+                                                        <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')"><@spring.message code="common.btn.pass-reply" /></button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=1&page=${comments.number}','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code="common.btn.recycling" /></button>
                                                         <#break >
                                                         <#case 2>
-                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=2">还原</a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId?c}&status=2&page=${comments.number}','确定要永久删除？')">删除</button>
+                                                        <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=2"><@spring.message code="common.btn.reduction" /></a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId?c}&status=2&page=${comments.number}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code="common.btn.delete" /></button>
                                                         <#break >
                                                     </#switch>
                                                 </td>
@@ -80,7 +80,7 @@
                                         </#list>
                                     <#else >
                                         <tr>
-                                            <td colspan="5" style="text-align: center">暂无评论</td>
+                                            <td colspan="5" style="text-align: center"><@spring.message code="common.text.no-data" /></td>
                                         </tr>
                                     </#if>
                                 </tbody>
@@ -107,15 +107,15 @@
                 <div class="modal-content message_align">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title">提示信息</h4>
+                        <h4 class="modal-title"><@spring.message code="common.text.tips" /></h4>
                     </div>
                     <div class="modal-body">
                         <p id="message"></p>
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code="common.btn.cancel" /></button>
+                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal"><@spring.message code="common.btn.define" /></a>
                     </div>
                 </div>
             </div>
@@ -137,8 +137,8 @@
                             <input type="hidden" id="commentId" name="commentId" value=""/>
                             <input type="hidden" id="userAgent" name="userAgent" value=""/>
                             <input type="hidden" id="postId" name="postId" value="" />
-                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                            <button type="submit" class="btn btn-primary">确定</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code="common.btn.cancel" /></button>
+                            <button type="submit" class="btn btn-primary"><@spring.message code="common.btn.define" /></button>
                         </div>
                     </form>
                 </div>

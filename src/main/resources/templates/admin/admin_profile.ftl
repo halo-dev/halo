@@ -158,7 +158,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -199,7 +199,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,

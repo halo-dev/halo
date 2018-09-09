@@ -14,7 +14,7 @@
             <h1 style="display: inline-block;"><@spring.message code='admin.backup.title' /></h1>
             <ol class="breadcrumb">
                 <li>
-                    <a href="/admin"><i class="fa fa-dashboard"></i> 首页</a>
+                    <a href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
                 <li><a href="#">设置</a></li>
                 <li class="active">备份管理</li>
@@ -95,7 +95,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -112,7 +112,7 @@
                         }else{
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'error',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -147,7 +147,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -161,7 +161,7 @@
                         }else{
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'error',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -193,7 +193,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -210,7 +210,7 @@
                         }else{
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'error',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,

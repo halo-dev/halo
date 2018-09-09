@@ -82,7 +82,7 @@
                         $("#uploadForm").hide(400);
                         $.toast({
                             text: "上传成功！",
-                            heading: '提示',
+                            heading: '<@spring.message code="common.text.tips" />',
                             icon: 'success',
                             showHideTransition: 'fade',
                             allowToastClose: true,

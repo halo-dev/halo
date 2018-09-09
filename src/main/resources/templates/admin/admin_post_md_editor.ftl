@@ -339,7 +339,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -356,7 +356,7 @@
                         }else{
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'error',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
