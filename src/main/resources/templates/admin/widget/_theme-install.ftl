@@ -103,7 +103,7 @@
                 $("#uploadForm").hide(400);
                 $.toast({
                     text: data.msg,
-                    heading: '提示',
+                    heading: '<@spring.message code="common.text.tips" />',
                     icon: 'success',
                     showHideTransition: 'fade',
                     allowToastClose: true,
@@ -120,7 +120,7 @@
             }else{
                 $.toast({
                     text: data.msg,
-                    heading: '提示',
+                    heading: '<@spring.message code="common.text.tips" />',
                     icon: 'error',
                     showHideTransition: 'fade',
                     allowToastClose: true,
@@ -143,8 +143,8 @@
         var themeName = $("#themeName").val();
         if(remoteAddr==null || themeName==null){
             $.toast({
-                text: "请输入完整信息！",
-                heading: '提示',
+                text: "<@spring.message code='common.js.info-no-complate' />",
+                heading: '<@spring.message code="common.text.tips" />',
                 icon: 'error',
                 showHideTransition: 'fade',
                 allowToastClose: true,
@@ -169,7 +169,7 @@
                 if(data.code==1){
                     $.toast({
                         text: data.msg,
-                        heading: '提示',
+                        heading: '<@spring.message code="common.text.tips" />',
                         icon: 'success',
                         showHideTransition: 'fade',
                         allowToastClose: true,

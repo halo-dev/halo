@@ -36,10 +36,10 @@
                                 第${attachments.number+1}/${attachments.totalPages}页
                             </div>
                             <ul class="pagination no-margin pull-right">
-                                <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select" >首页</a> </li>
-                                <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}" >上页</a></li>
-                                <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}">下页</a></li>
-                                <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}">尾页</a> </li>
+                                <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select" ><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
+                                <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}" ><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
+                                <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
+                                <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
                             </ul>
                         </div>
                     </div>
@@ -80,7 +80,7 @@
             $("#uploadForm").hide(400);
             $.toast({
                 text: "上传成功！",
-                heading: '提示',
+                heading: '<@spring.message code="common.text.tips" />',
                 icon: 'success',
                 showHideTransition: 'fade',
                 allowToastClose: true,

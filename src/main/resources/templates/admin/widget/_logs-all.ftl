@@ -41,10 +41,10 @@
                     </div>
                     <div class="no-margin pull-right">
                         <ul class="pagination" style="margin: 0;">
-                            <li><a class="btn btn-sm <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs">首页</a> </li>
-                            <li><a class="btn btn-sm <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs?page=${logs.number-1}">上页</a></li>
-                            <li><a class="btn btn-sm <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.number+1}">下页</a></li>
-                            <li><a class="btn btn-sm <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.totalPages-1}">尾页</a> </li>
+                            <li><a class="btn btn-sm <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
+                            <li><a class="btn btn-sm <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs?page=${logs.number-1}"><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
+                            <li><a class="btn btn-sm <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
+                            <li><a class="btn btn-sm <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
                         </ul>
                     </div>
                 </div>

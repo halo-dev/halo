@@ -65,7 +65,7 @@
                     </div>
                     <div class="box-footer">
                         <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()">永久删除</button>
-                        <button type="button" class="btn btn-info btn-sm pull-right" onclick="btn_save()">保存</button>
+                        <button type="button" class="btn btn-info btn-sm pull-right" onclick="btn_save()"><@spring.message code='common.btn.save' /></button>
                     </div>
                 </form>
             </div>
@@ -83,7 +83,7 @@
     function btn_delete() {
         layer.msg('你确定要删除？', {
             time: 0
-            ,btn: ['删除', '取消']
+            ,btn: ['删除', '<@spring.message code="common.btn.cancel" />']
             ,yes: function(index){
                 layer.close(index);
                 $.ajax({
@@ -97,7 +97,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: "删除成功！",
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,

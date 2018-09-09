@@ -83,7 +83,7 @@
     function btn_delete() {
         layer.msg('你确定要删除？', {
             time: 0
-            ,btn: ['删除', '取消']
+            ,btn: ['删除', '<@spring.message code="common.btn.cancel" />']
             ,yes: function(index){
                 layer.close(index);
                 $.ajax({
@@ -97,7 +97,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,

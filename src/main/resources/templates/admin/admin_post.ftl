@@ -121,7 +121,7 @@
                         </div>
                         <div class="box-footer clearfix">
                             <div class="no-margin pull-left">
-                                第${posts.number+1}/${posts.totalPages}页
+                                <@spring.message code='admin.pageinfo.text.no' />${posts.number+1}/${posts.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                             </div>
                             <ul class="pagination no-margin pull-right">
                                 <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
