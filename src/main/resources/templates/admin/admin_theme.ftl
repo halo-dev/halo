@@ -130,7 +130,7 @@
             function openThemeInstall() {
                 layer.open({
                     type: 2,
-                    title: '安装主题',
+                    title: '<@spring.message code="admin.themes.js.install-theme" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,
@@ -155,7 +155,7 @@
                         if(data.code==1){
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -172,7 +172,7 @@
                         }else{
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'error',
                                 showHideTransition: 'fade',
                                 allowToastClose: true,
@@ -196,7 +196,7 @@
             function openSetting(theme,hasUpdate) {
                 layer.open({
                     type: 2,
-                    title: theme+'主题设置',
+                    title: theme+' <@spring.message code="admin.themes.js.theme-setting" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,

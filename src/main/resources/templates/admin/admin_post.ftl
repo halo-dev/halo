@@ -93,19 +93,19 @@
                                                 <td>
                                                     <#switch post.postStatus>
                                                         <#case 0>
-                                                            <a href="/archives/${post.postUrl}" class="btn btn-primary btn-xs " target="_blank">查看</a>
-                                                            <a href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs ">编辑</a>
-                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=0','确定移到回收站？')">丢弃</button>
+                                                            <a href="/archives/${post.postUrl}" class="btn btn-primary btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
+                                                            <a href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                             <#break >
                                                         <#case 1>
                                                             <a href="/admin/posts/edit?postId=${post.postId?c}"
-                                                               class="btn btn-info btn-xs ">编辑</a>
-                                                            <button class="btn btn-primary btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId?c}&status=1','确定发布该文章？')">发布</button>
-                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=1','确定移到回收站？')">丢弃</button>
+                                                               class="btn btn-info btn-xs "><@spring.message code="common.btn.edit" /></a>
+                                                            <button class="btn btn-primary btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-release-post" />')"><@spring.message code='common.btn.release' /></button>
+                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                             <#break >
                                                         <#case 2>
-                                                            <a href="/admin/posts/revert?postId=${post.postId?c}&status=2" class="btn btn-primary btn-xs ">还原</a>
-                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId?c}&postType=${post.postType}','确定永久删除？(不可逆)')">永久删除</button>
+                                                            <a href="/admin/posts/revert?postId=${post.postId?c}&status=2" class="btn btn-primary btn-xs "><@spring.message code='common.btn.reduction' /></a>
+                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId?c}&postType=${post.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
                                                             <#break >
                                                     </#switch>
                                                 </td>
@@ -113,7 +113,7 @@
                                         </#list>
                                         <#else>
                                         <tr>
-                                            <th colspan="7" style="text-align: center">暂无文章</th>
+                                            <th colspan="7" style="text-align: center"><@spring.message code='common.text.no-data' /></th>
                                         </tr>
                                     </#if>
                                 </tbody>
@@ -140,15 +140,15 @@
                 <div class="modal-content message_align">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title">提示信息</h4>
+                        <h4 class="modal-title"><@spring.message code='common.text.tips' /></h4>
                     </div>
                     <div class="modal-body">
                         <p id="message"></p>
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code='common.btn.cancel' /></button>
+                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal"><@spring.message code='common.btn.define' /></a>
                     </div>
                 </div>
             </div>

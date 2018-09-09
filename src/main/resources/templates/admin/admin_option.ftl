@@ -739,7 +739,7 @@
                         }else{
                             $.toast({
                                 text: data.msg,
-                                heading: '提示',
+                                heading: '<@spring.message code="common.text.tips" />',
                                 icon: icon,
                                 showHideTransition: 'fade',
                                 allowToastClose: true,

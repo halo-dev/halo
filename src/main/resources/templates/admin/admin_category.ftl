@@ -15,10 +15,10 @@
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin">
-                        <i class="fa fa-dashboard"></i> 首页</a>
+                        <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="#">文章管理</a></li>
-                <li class="active">分类目录</li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.categories.bread.posts' /></a></li>
+                <li class="active"><@spring.message code='admin.categories.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -27,56 +27,56 @@
                     <div class="box box-primary">
                         <#if updateCategory??>
                             <div class="box-header with-border">
-                                <h3 class="box-title">修改分类目录<#if updateCategory??>[${updateCategory.cateName}]</#if></h3>
+                                <h3 class="box-title"><@spring.message code='admin.categories.text.edit-category' /> <#if updateCategory??>[${updateCategory.cateName}]</#if></h3>
                             </div>
                             <form action="/admin/category/save" method="post" role="form" id="cateAddForm">
                                 <input type="hidden" name="cateId" value="${updateCategory.cateId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="exampleInputEmail1">名称</label>
+                                        <label for="exampleInputEmail1"><@spring.message code='admin.categories.form.cate-name' /></label>
                                         <input type="text" class="form-control" id="cateName" name="cateName" value="${updateCategory.cateName}">
-                                        <small>页面上所显示的名称</small>
+                                        <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputPassword1">路径名称</label>
+                                        <label for="exampleInputPassword1"><@spring.message code='admin.categories.form.cate-url' /></label>
                                         <input type="text" class="form-control" id="cateUrl" name="cateUrl" value="${updateCategory.cateUrl}">
-                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                        <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="cateDesc" class="control-label">描述</label>
+                                        <label for="cateDesc" class="control-label"><@spring.message code='admin.categories.form.cate-desc' /></label>
                                         <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none">${updateCategory.cateDesc}</textarea>
-                                        <small>*添加描述，部分主题可显示</small>
+                                        <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定修改</button>
-                                    <a data-pjax="true" href="/admin/category" class="btn btn-info btn-sm ">返回添加</a>
+                                    <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-edit' /></button>
+                                    <a data-pjax="true" href="/admin/category" class="btn btn-info btn-sm "><@spring.message code='common.btn.back-to-add' /></a>
                                 </div>
                             </form>
                         <#else >
                             <div class="box-header with-border">
-                                <h3 class="box-title">添加分类目录</h3>
+                                <h3 class="box-title"><@spring.message code='admin.categories.text.add-category' /></h3>
                             </div>
                             <form action="/admin/category/save" method="post" role="form" id="cateAddForm" onsubmit="return checkCate()">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="exampleInputEmail1">名称</label>
+                                        <label for="exampleInputEmail1"><@spring.message code='admin.categories.form.cate-name' /></label>
                                         <input type="text" class="form-control" id="cateName" name="cateName" placeholder="">
-                                        <small>页面上所显示的名称</small>
+                                        <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputPassword1">路径名称</label>
+                                        <label for="exampleInputPassword1"><@spring.message code='admin.categories.form.cate-url' /></label>
                                         <input type="text" class="form-control" id="cateUrl" name="cateUrl" placeholder="">
-                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                        <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="cateDesc" class="control-label">描述</label>
+                                        <label for="cateDesc" class="control-label"><@spring.message code='admin.categories.form.cate-desc' /></label>
                                         <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none"></textarea>
-                                        <small>*添加描述，部分主题可显示</small>
+                                        <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定添加</button>
+                                    <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-add' /></button>
                                 </div>
                             </form>
                         </#if>
@@ -91,11 +91,11 @@
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
-                                    <th>名称</th>
-                                    <th>路径</th>
-                                    <th>描述</th>
-                                    <th>文章数</th>
-                                    <th>操作</th>
+                                    <th><@spring.message code='common.th.name' /></th>
+                                    <th><@spring.message code='common.th.url' /></th>
+                                    <th><@spring.message code='common.th.desc' /></th>
+                                    <th><@spring.message code='common.th.posts-count' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -111,7 +111,7 @@
                                                 </td>
                                                 <td>
                                                     <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
-                                                        <a href="#" class="btn btn-primary btn-xs " disabled>正在修改</a>
+                                                        <a href="#" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
                                                     <#else >
                                                         <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs ">修改</a>
                                                     </#if>
@@ -134,15 +134,15 @@
                 <div class="modal-content message_align">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title">提示信息</h4>
+                        <h4 class="modal-title"><@spring.message code='common.text.tips' /></h4>
                     </div>
                     <div class="modal-body">
-                        <p>您确认要删除吗？</p>
+                        <p><@spring.message code='common.text.tips.to-delete' /></p>
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default " data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger " data-dismiss="modal">确定</a>
+                        <button type="button" class="btn btn-default " data-dismiss="modal"><@spring.message code='common.btn.cancel' /></button>
+                        <a onclick="removeIt()" class="btn btn-danger " data-dismiss="modal"><@spring.message code='common.btn.define' /></a>
                     </div>
                 </div>
             </div>
