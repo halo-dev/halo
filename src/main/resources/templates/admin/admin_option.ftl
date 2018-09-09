@@ -17,7 +17,7 @@
         </style>
         <section class="content-header">
             <h1>
-                <@spring.message code='admin.options.title' />
+                <@spring.message code='admin.setting.title' />
                 <small></small>
             </h1>
             <ol class="breadcrumb">
