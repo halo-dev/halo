@@ -9,6 +9,7 @@ import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,9 @@ public class AttachmentController {
 
     @Autowired
     private LogsService logsService;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 获取upload的所有图片资源并渲染页面
@@ -168,12 +172,12 @@ public class AttachmentController {
                 );
 
                 result.put("success", 1);
-                result.put("message", "上传成功！");
+                result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
                 result.put("url", attachment.getAttachPath());
             } catch (Exception e) {
                 log.error("上传文件失败：{}", e.getMessage());
                 result.put("success", 0);
-                result.put("message", "上传失败！");
+                result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
             }
         } else {
             log.error("文件不能为空");
@@ -225,13 +229,13 @@ public class AttachmentController {
                     );
                 } else {
                     log.error("删除附件[{}]失败！", delFileName);
-                    return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
+                    return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
                 }
             }
         } catch (Exception e) {
             log.error("删除附件[{}]失败:{}", delFileName, e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "删除成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
     }
 }

@@ -45,7 +45,7 @@
                                     <div class="form-group">
                                         <label for="cateDesc" class="control-label"><@spring.message code='admin.categories.form.cate-desc' /></label>
                                         <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none">${updateCategory.cateDesc}</textarea>
-                                        <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
+                                        <small><@spring.message code='admin.categories.form.cate-desc-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
@@ -72,7 +72,7 @@
                                     <div class="form-group">
                                         <label for="cateDesc" class="control-label"><@spring.message code='admin.categories.form.cate-desc' /></label>
                                         <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none"></textarea>
-                                        <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
+                                        <small><@spring.message code='admin.categories.form.cate-desc-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">

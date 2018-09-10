@@ -11,6 +11,7 @@ import cc.ryanc.halo.model.enums.CommonParamsEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
@@ -65,6 +66,9 @@ public class AdminController extends BaseController {
 
     @Autowired
     private AttachmentService attachmentService;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 请求后台页面
@@ -139,7 +143,7 @@ public class AdminController extends BaseController {
         }
         Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
         if (StringUtils.equals(aUser.getLoginEnable(), TrueFalseEnum.FALSE.getDesc()) && (between < CommonParamsEnum.TEN.getValue())) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "已禁止登录，请10分钟后再试");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.disabled"));
         }
         //验证用户名和密码
         User user = null;
@@ -156,7 +160,7 @@ public class AdminController extends BaseController {
             userService.updateUserNormal();
             logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
             log.info("用户[{}]登录成功。", aUser.getUserDisplayName());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "登录成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
         } else {
             //更新失败次数
             Integer errorCount = userService.updateUserLoginError();
@@ -172,7 +176,8 @@ public class AdminController extends BaseController {
                             DateUtil.date()
                     )
             );
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "登录失败，你还有" + (5 - errorCount) + "次机会。");
+            Object[] args = {(5 - errorCount)};
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.failed", args));
         }
     }
 
