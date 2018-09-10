@@ -106,13 +106,23 @@
                             <div class="form-group">
                                 <ul style="list-style: none;padding: 0px;margin: 0px;">
                                     <@commonTag method="categories">
-                                        <#list categories as cate>
-                                            <li style="padding: 0;margin: 0px;list-style: none">
-                                                <label>
-                                                    <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}"> ${cate.cateName}
-                                                </label>
-                                            </li>
-                                        </#list>
+                                        <#if post??>
+                                            <#list categories as cate>
+                                                <li style="padding: 0;margin: 0px;list-style: none">
+                                                    <label>
+                                                        <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}" <#list post.categories as postCate><#if postCate.cateId = cate.cateId>checked="checked"</#if></#list>> ${cate.cateName}
+                                                    </label>
+                                                </li>
+                                            </#list>
+                                        <#else>
+                                            <#list categories as cate>
+                                                <li style="padding: 0;margin: 0px;list-style: none">
+                                                    <label>
+                                                        <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}"> ${cate.cateName}
+                                                    </label>
+                                                </li>
+                                            </#list>
+                                        </#if>
                                     </@commonTag>
                                 </ul>
                             </div>
