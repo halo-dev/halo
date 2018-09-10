@@ -10,6 +10,7 @@ import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
@@ -53,6 +54,9 @@ public class ThemeController extends BaseController {
     @Autowired
     private LogsService logsService;
 
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
+
     private static final String NOT_FOUND_GIT = "-bash: git: command not found";
 
     /**
@@ -91,10 +95,10 @@ public class ThemeController extends BaseController {
             logsService.saveByLogs(
                     new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, ServletUtil.getClientIP(request), DateUtil.date())
             );
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "主题已设置为" + siteTheme);
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-success", new Object[]{siteTheme}));
         } catch (Exception e) {
             log.error("主题设置失败，当前主题为：{}", siteTheme);
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "主题设置失败");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-failed"));
         }
     }
 

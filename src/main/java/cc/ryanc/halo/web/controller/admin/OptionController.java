@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.OptionsService;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class OptionController {
     @Autowired
     private Configuration configuration;
 
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
+
     /**
      * 请求跳转到option页面并完成渲染
      *
@@ -57,10 +61,10 @@ public class OptionController {
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
             log.info("所保存的设置选项列表：" + options);
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "保存成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
             log.error("保存设置选项失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "保存失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
 }

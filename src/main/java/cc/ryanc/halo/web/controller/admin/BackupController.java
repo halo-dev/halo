@@ -9,6 +9,7 @@ import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ZipUtil;
@@ -48,6 +49,9 @@ public class BackupController {
 
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
 
     /**
@@ -89,7 +93,7 @@ public class BackupController {
         } else if (StringUtils.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
             return this.backupPosts();
         } else {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
 
@@ -108,10 +112,10 @@ public class BackupController {
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
             log.info("当前时间：{}，执行了数据库备份。", DateUtil.now());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "备份成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
             log.error("备份数据库失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
 
@@ -131,10 +135,10 @@ public class BackupController {
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
             log.info("当前时间：{}，执行了资源文件备份。", DateUtil.now());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "备份成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
             log.error("备份资源文件失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
 
@@ -160,10 +164,10 @@ public class BackupController {
             ZipUtil.zip(srcPath, srcPath + ".zip");
             FileUtil.del(srcPath);
             log.info("当前时间：{}，执行了文章备份。", DateUtil.now());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "备份成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
             log.error("备份文章失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "备份失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
 
@@ -181,9 +185,9 @@ public class BackupController {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         try {
             FileUtil.del(srcPath);
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "删除成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
         } catch (Exception e) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
     }
 
@@ -202,13 +206,13 @@ public class BackupController {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         if (null == user.getUserEmail() || StringUtils.equals(user.getUserEmail(), "")) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "博主邮箱没有配置！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.no-email"));
         }
         if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "发信邮箱没有配置！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.no-post"));
         }
         new EmailToAdmin(srcPath, user).start();
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "邮件发送成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.email-success"));
     }
 
     /**
@@ -231,7 +235,7 @@ public class BackupController {
                 content.put("fileName", file.getName());
                 content.put("createAt", HaloUtils.getCreateTime(srcPath));
                 content.put("size", HaloUtils.parseSize(file.length()));
-                mailService.sendAttachMail(user.getUserEmail(), "有新的备份！", content, "common/mail_template/mail_attach.ftl", srcPath);
+                mailService.sendAttachMail(user.getUserEmail(), localeMessageUtil.getMessage("code.admin.backup.have-new-backup"), content, "common/mail_template/mail_attach.ftl", srcPath);
             } catch (Exception e) {
                 log.error("邮件服务器未配置：{}", e.getMessage());
             }
