@@ -273,7 +273,7 @@ public class PostController extends BaseController {
      * @param postId 文章编号
      * @return 重定向到/admin/posts
      */
-    @GetMapping("/throw")
+    @GetMapping(value = "/throw")
     public String moveToTrash(@RequestParam("postId") Long postId, @RequestParam("status") Integer status) {
         try {
             postService.updatePostStatus(postId, PostStatusEnum.RECYCLE.getCode());
@@ -290,7 +290,7 @@ public class PostController extends BaseController {
      * @param postId 文章编号
      * @return 重定向到/admin/posts
      */
-    @GetMapping("/revert")
+    @GetMapping(value = "/revert")
     public String moveToPublish(@RequestParam("postId") Long postId,
                                 @RequestParam("status") Integer status) {
         try {

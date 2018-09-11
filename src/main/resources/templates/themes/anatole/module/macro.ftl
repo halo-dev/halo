@@ -14,6 +14,7 @@
     <meta name="author" content="${user.userDisplayName?if_exists}" />
     <meta name="keywords" content="${keywords?default("Anatole")}"/>
     <meta name="description" content="${description?default("Anatole")}" />
+    <@verification></@verification>
     <@favicon></@favicon>
     <link href="/anatole/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="/anatole/source/css/blog_basic.min.css?version=88107691fe">

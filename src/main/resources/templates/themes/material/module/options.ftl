@@ -132,18 +132,6 @@
                                         <input type="text" class="form-control" id="materialCopyrightSince" name="theme_material_copyright_since" value="${options.theme_material_copyright_since?if_exists}" >
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="materialGoogleSiteVerification" class="col-sm-4 control-label">谷歌Search Console验证：</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialGoogleSiteVerification" name="theme_material_google_site_verification" value="${options.theme_material_google_site_verification?if_exists}" >
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="materialBaiduSiteVerification" class="col-sm-4 control-label">百度站长平台验证：</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" id="materialBaiduSiteVerification" name="theme_material_baidu_site_verification" value="${options.theme_material_baidu_site_verification?if_exists}" >
-                                    </div>
-                                </div>
                             </div>
                             <div class="box-footer">
                                 <button type="button" class="btn btn-primary btn-sm pull-right" onclick="saveThemeOptions('materialGeneralOptions')">保存设置</button>

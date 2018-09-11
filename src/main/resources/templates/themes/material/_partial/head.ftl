@@ -1,4 +1,5 @@
 <#macro head title="" keywords="" description="">
+<#import "../../../common/macro/common_macro.ftl" as common>
 <head>
     <meta charset="utf-8">
     <!--
@@ -94,8 +95,7 @@
 
     <!-- Site Verification -->
 
-    <meta name="google-site-verification" content="${options.theme_material_google_site_verification?if_exists}" />
-    <meta name="baidu-site-verification" content="${options.theme_material_baidu_site_verification?if_exists}" />
+    <@common.verification />
 
     <!-- RSS -->
     <link rel=alternate type="application/atom+xml" href="/atom.xml">

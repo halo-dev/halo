@@ -89,7 +89,7 @@ public class PageController {
      * @param linkId linkId 友情链接编号
      * @return String 模板路径admin/admin_page_link
      */
-    @GetMapping("/links/edit")
+    @GetMapping(value = "/links/edit")
     public String toEditLink(Model model, @PathParam("linkId") Long linkId) {
         Optional<Link> link = linkService.findByLinkId(linkId);
         model.addAttribute("updateLink", link.get());

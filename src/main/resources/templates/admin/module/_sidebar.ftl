@@ -2,10 +2,10 @@
     <section class="sidebar">
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<#if user_session.userAvatar?if_exists!="">${user_session.userAvatar?if_exists}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
+                <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar?if_exists}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
-                <p>${user_session.userDisplayName?if_exists}</p><a href="/admin/profile"><i class="fa fa-circle text-success"></i><@spring.message code='admin.menu.profile' /></a>
+                <p>${user.userDisplayName?if_exists}</p><a href="/admin/profile"><i class="fa fa-circle text-success"></i><@spring.message code='admin.menu.profile' /></a>
             </div>
         </div>
         <form action="#" method="get" class="sidebar-form">
