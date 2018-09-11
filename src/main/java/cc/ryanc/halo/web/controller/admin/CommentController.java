@@ -112,7 +112,7 @@ public class CommentController extends BaseController {
      * @param session   session
      * @return 重定向到/admin/comments
      */
-    @GetMapping("/revert")
+    @GetMapping(value = "/revert")
     public String moveToPublish(@PathParam("commentId") Long commentId,
                                 @PathParam("status") Integer status,
                                 HttpSession session) {
@@ -133,7 +133,7 @@ public class CommentController extends BaseController {
      * @param page      当前页码
      * @return string 重定向到/admin/comments
      */
-    @GetMapping("/remove")
+    @GetMapping(value = "/remove")
     public String moveToAway(@PathParam("commentId") Long commentId,
                              @PathParam("status") Integer status,
                              @RequestParam(value = "page", defaultValue = "0") Integer page) {
@@ -153,7 +153,7 @@ public class CommentController extends BaseController {
      * @param commentContent 回复的内容
      * @return 重定向到/admin/comments
      */
-    @PostMapping("/reply")
+    @PostMapping(value = "/reply")
     public String replyComment(@RequestParam("commentId") Long commentId,
                                @RequestParam("postId") Long postId,
                                @RequestParam("commentContent") String commentContent,

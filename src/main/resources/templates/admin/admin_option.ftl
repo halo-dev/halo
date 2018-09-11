@@ -145,7 +145,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="baiduToken" class="col-lg-2 col-sm-4 control-label">百度推送token：
+                                            <label for="baiduToken" class="col-lg-2 col-sm-4 control-label">百度推送 token：
                                                 <span data-toggle="tooltip" data-placement="top" title="百度站长平台获取" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
@@ -157,6 +157,31 @@
                                                         <button class="btn btn-default " id="btn_push_baidu" onclick="pushAllToBaidu()" type="button">推送</button>
                                                     </span>
                                                 </div>
+                                            </div>
+                                        </div>
+                                        <#-- 站点验证代码 -->
+                                        <div class="form-group">
+                                            <label for="blogVerificationGoogle" class="col-lg-2 col-sm-4 control-label">Google 站点验证：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="blogVerificationGoogle" name="blog_verification_google" value="${options.blog_verification_google?if_exists}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="blogVerificationBing" class="col-lg-2 col-sm-4 control-label">Bing 站点验证：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="blogVerificationBing" name="blog_verification_bing" value="${options.blog_verification_bing?if_exists}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="blogVerificationBaidu" class="col-lg-2 col-sm-4 control-label">Baidu 站点验证：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="blogVerificationBaidu" name="blog_verification_baidu" value="${options.blog_verification_baidu?if_exists}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="blogVerificationQihu" class="col-lg-2 col-sm-4 control-label">360 站点验证：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="blogVerificationQihu" name="blog_verification_qihu" value="${options.blog_verification_qihu?if_exists}">
                                             </div>
                                         </div>
                                     </div>
@@ -180,7 +205,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="rssPosts" class="col-lg-2 col-sm-4 control-label">RSS显示条数：</label>
+                                            <label for="rssPosts" class="col-lg-2 col-sm-4 control-label">RSS 显示条数：</label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <input type="number" class="form-control" id="rssPosts" name="rss_posts" value="${options.rss_posts?if_exists}">
                                             </div>
@@ -313,7 +338,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="nativeCss" class="col-lg-2 col-sm-4 control-label">自定义CSS：
+                                                <label for="nativeCss" class="col-lg-2 col-sm-4 control-label">自定义 CSS：
                                                     <span data-toggle="tooltip" data-placement="top" title="对评论框自定义样式，如边距等" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
@@ -351,7 +376,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="valineCss" class="col-lg-2 col-sm-4 control-label">自定义CSS：
+                                                <label for="valineCss" class="col-lg-2 col-sm-4 control-label">自定义 CSS：
                                                     <span data-toggle="tooltip" data-placement="top" title="对评论框自定义样式，如边距等" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
@@ -371,7 +396,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="disqusCss" class="col-lg-2 col-sm-4 control-label">自定义CSS：
+                                                <label for="disqusCss" class="col-lg-2 col-sm-4 control-label">自定义 CSS：
                                                     <span data-toggle="tooltip" data-placement="top" title="对评论框自定义样式，如边距等" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
@@ -391,7 +416,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="livereCss" class="col-lg-2 col-sm-4 control-label">自定义CSS：
+                                                <label for="livereCss" class="col-lg-2 col-sm-4 control-label">自定义 CSS：
                                                     <span data-toggle="tooltip" data-placement="top" title="对评论框自定义样式，如边距等" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
@@ -417,7 +442,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label for="changyanCss" class="col-lg-2 col-sm-4 control-label">自定义CSS：
+                                                <label for="changyanCss" class="col-lg-2 col-sm-4 control-label">自定义 CSS：
                                                     <span data-toggle="tooltip" data-placement="top" title="对评论框自定义样式，如边距等" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
@@ -529,7 +554,7 @@
                                 <form method="post" class="form-horizontal" id="adminOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label class="col-lg-2 col-sm-4 control-label">启用pjax：</label>
+                                            <label class="col-lg-2 col-sm-4 control-label">启用 pjax：</label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <label class="radio-inline">
                                                     <input type="radio" name="admin_pjax" value="true" ${((options.admin_pjax?default('true'))=='true')?string('checked','')}> 启用
@@ -614,7 +639,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="emSmtpHost" class="col-lg-2 col-sm-4 control-label">SMTP地址：</label>
+                                            <label for="emSmtpHost" class="col-lg-2 col-sm-4 control-label">SMTP 地址：</label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <input type="text" class="form-control" id="emailSmtpHost" name="mail_smtp_host" value="${options.mail_smtp_host?if_exists}" autocomplete='address-line1'>
                                             </div>
@@ -648,7 +673,7 @@
                                 <form method="post" class="form-horizontal" id="otherOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label class="col-lg-2 col-sm-4 control-label">API服务：</label>
+                                            <label class="col-lg-2 col-sm-4 control-label">API 服务：</label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <label class="radio-inline">
                                                     <input type="radio" name="api_status" value="true" ${((options.api_status?if_exists)=='true')?string('checked','')}> 启用
