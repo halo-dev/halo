@@ -17,8 +17,10 @@
     <#include "social-list.ftl">
     <div class="footer">
         <a target="_blank" href="#">
+            <#-- 不允许修改该主题信息，也不能删除。 -->
             <span>Designed by </span>
             <a href="https://www.caicai.me">CaiCai</a>
+            <#-- 虽然Halo使用了宽松的GPL协议，但开发不易，希望您可以保留一下版权声明。笔芯~ -->
             <div class="by_halo">
                 <a href="https://github.com/ruibaby/halo" target="_blank">Proudly published with Halo&#65281;</a>
             </div>

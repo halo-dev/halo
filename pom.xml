@@ -6,7 +6,7 @@
 	<artifactId>halo</artifactId>
 	<version>latest</version>
 	<name>halo</name>
-
+	<!-- 虽然Halo使用了宽松的GPL协议，但开发不易，希望您可以保留一下版权声明。笔芯~ -->
 	<description>
 		halo，一个基于SpringBoot的博客系统，最求轻快，易用，以内容为中心。
 	</description>

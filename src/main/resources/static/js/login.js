@@ -22,7 +22,7 @@ function btn_login() {
                 if(data.code==1){
                     $.toast({
                         text: data.msg,
-                        heading: '提示',
+                        heading: heading,
                         icon: 'success',
                         showHideTransition: 'fade',
                         allowToastClose: true,
@@ -40,7 +40,7 @@ function btn_login() {
                     $('.login-body').addClass('animate shake');
                     $.toast({
                         text: data.msg,
-                        heading: '提示',
+                        heading: heading,
                         icon: 'error',
                         showHideTransition: 'fade',
                         allowToastClose: true,

@@ -16,6 +16,7 @@
 </head>
 <body>
 <div class="container login-form">
+    <#-- 虽然Halo使用了宽松的GPL协议，但开发不易，希望您可以保留一下版权声明。笔芯~ -->
     <div class="login-logo animated fadeInUp">
         Halo
     </div>
@@ -40,6 +41,9 @@
     </div>
 </div>
 </body>
+<script>
+    var heading = "<@spring.message code='common.text.tips' />";
+</script>
 <script src="/static/plugins/jquery/jquery.min.js"></script>
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
