@@ -1,4 +1,4 @@
-<#ftl output_format="HTML" strip_whitespace=true>
+<#ftl strip_whitespace=true>
 
 <#-- 统计代码 -->
 <#macro statistics>

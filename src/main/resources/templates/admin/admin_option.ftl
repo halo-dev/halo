@@ -1,4 +1,3 @@
-<#compress >
 <#include "module/_macro.ftl">
 <@head>${options.blog_title} | <@spring.message code='admin.setting.title' /></@head>
 <div class="wrapper">
@@ -898,4 +897,3 @@
     <#include "module/_footer.ftl">
 </div>
 <@footer></@footer>
-</#compress>
