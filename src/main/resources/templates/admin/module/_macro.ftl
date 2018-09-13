@@ -68,6 +68,7 @@
             },500);
         });
     </#if>
+    var heading = "<@spring.message code='common.text.tips' />";
 </script>
 </@compress>
 </body>

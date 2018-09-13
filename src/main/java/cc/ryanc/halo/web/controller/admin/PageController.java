@@ -11,6 +11,7 @@ import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.servlet.ServletUtil;
@@ -58,6 +59,9 @@ public class PageController {
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    LocaleMessageUtil localeMessageUtil;
 
     /**
      * 页面管理页面
@@ -193,9 +197,9 @@ public class PageController {
             galleryService.removeByGalleryId(galleryId);
         } catch (Exception e) {
             log.error("删除图片失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "删除失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "删除成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
     }
 
 
@@ -218,7 +222,7 @@ public class PageController {
     @PostMapping(value = "/new/push")
     @ResponseBody
     public JsonResult pushPage(@ModelAttribute Post post, HttpSession session) {
-        String msg = "发表成功";
+        String msg = localeMessageUtil.getMessage("code.admin.common.save-success");
         try {
             post.setPostDate(DateUtil.date());
             //发表用户
@@ -229,7 +233,7 @@ public class PageController {
                 post.setPostViews(postService.findByPostId(post.getPostId()).get().getPostViews());
                 post.setPostDate(postService.findByPostId(post.getPostId()).get().getPostDate());
                 post.setPostUpdate(DateUtil.date());
-                msg = "更新成功";
+                msg = localeMessageUtil.getMessage("code.admin.common.update-success");
             } else {
                 post.setPostDate(DateUtil.date());
                 post.setPostUpdate(DateUtil.date());
@@ -243,7 +247,7 @@ public class PageController {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("保存页面失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "保存失败");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
 

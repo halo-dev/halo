@@ -13,6 +13,7 @@ import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -63,6 +64,9 @@ public class PostController extends BaseController {
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 去除html，htm后缀，以及将空格替换成-
@@ -165,7 +169,7 @@ public class PostController extends BaseController {
     @ResponseBody
     public JsonResult pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        String msg = "发表成功";
+        String msg = localeMessageUtil.getMessage("code.admin.common.save-success");
         try {
             //提取摘要
             int postSummary = 50;
@@ -186,7 +190,7 @@ public class PostController extends BaseController {
                 post.setPostDate(oldPost.getPostDate());
                 post.setPostUpdate(DateUtil.date());
                 post.setPostViews(oldPost.getPostViews());
-                msg = "更新成功";
+                msg = localeMessageUtil.getMessage("code.admin.common.update-success");
             } else {
                 post.setPostDate(DateUtil.date());
                 post.setPostUpdate(DateUtil.date());
@@ -208,7 +212,7 @@ public class PostController extends BaseController {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("保存文章失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "保存失败");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
 
@@ -261,9 +265,9 @@ public class PostController extends BaseController {
             post.setUser(user);
         } catch (Exception e) {
             log.error("未知错误：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "保存失败");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "保存成功", postService.saveByPost(post));
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"), postService.saveByPost(post));
     }
 
 
