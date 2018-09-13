@@ -67,7 +67,7 @@ function initMenu() {
 function showMsg(text,icon,hideAfter) {
     $.toast({
         text: text,
-        heading: '提示',
+        heading: heading,
         icon: icon,
         showHideTransition: 'fade',
         allowToastClose: true,

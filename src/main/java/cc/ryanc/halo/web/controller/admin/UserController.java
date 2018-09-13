@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.UserService;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.crypto.SecureUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,9 @@ public class UserController {
 
     @Autowired
     private Configuration configuration;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 获取用户信息并跳转
@@ -66,9 +70,9 @@ public class UserController {
             session.invalidate();
         } catch (Exception e) {
             log.error("修改用户资料失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "修改失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.edit-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "修改成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.edit-success"));
     }
 
     /**
@@ -93,12 +97,12 @@ public class UserController {
                 userService.saveByUser(user);
                 session.invalidate();
             } else {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), "原密码错误！");
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.old-password-error"));
             }
         } catch (Exception e) {
             log.error("修改密码失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "密码修改失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.update-password-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "修改密码成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.user.update-password-success"));
     }
 }

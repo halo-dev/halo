@@ -61,6 +61,8 @@ Let's start: http://localhost:8090
 
 [宋浩志博客](http://songhaozhi.com)
 
+[KingYiFan'S Blog](https://blog.cnbuilder.cn)
+
 ## Download
 
 > For deployment to the server, please refer to [Halo部署教程](https://ryanc.cc/archives/halo-run-with-git-maven) or [Wiki](https://github.com/ruibaby/halo/wiki).
