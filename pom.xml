@@ -32,16 +32,16 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<oh-my-email.version>0.0.3</oh-my-email.version>
-        <druid.version>1.1.10</druid.version>
-        <lombok.version>1.18.0</lombok.version>
-        <ehcache.version>3.5.2</ehcache.version>
-        <rome.version>1.0</rome.version>
-        <commons-lang3.version>3.7</commons-lang3.version>
-		<hutool-all.version>4.1.7</hutool-all.version>
+		<druid.version>1.1.10</druid.version>
+		<lombok.version>1.18.2</lombok.version>
+		<ehcache.version>3.6.0</ehcache.version>
+		<rome.version>1.0</rome.version>
+		<commons-lang3.version>3.8</commons-lang3.version>
+		<hutool-all.version>4.1.11</hutool-all.version>
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
-        <qiniu-java-sdk.version>7.2.14</qiniu-java-sdk.version>
-        <thumbnailator.version>0.4.8</thumbnailator.version>
-        <jaxb-api.version>2.3.0</jaxb-api.version>
+		<qiniu-java-sdk.version>7.2.14</qiniu-java-sdk.version>
+		<thumbnailator.version>0.4.8</thumbnailator.version>
+		<jaxb-api.version>2.3.0</jaxb-api.version>
 	</properties>
 
 	<dependencies>
