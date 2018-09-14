@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -84,7 +83,7 @@ public class ThemeController extends BaseController {
     @GetMapping(value = "/set")
     @ResponseBody
     @CacheEvict(value = "posts", allEntries = true, beforeInvocation = true)
-    public JsonResult activeTheme(@PathParam("siteTheme") String siteTheme,
+    public JsonResult activeTheme(@RequestParam("siteTheme") String siteTheme,
                                   HttpServletRequest request) {
         try {
             //保存主题设置项
@@ -129,13 +128,13 @@ public class ThemeController extends BaseController {
                 HaloConst.THEMES = HaloUtils.getThemes();
             } else {
                 log.error("上传主题失败，没有选择文件");
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), "请选择上传的主题！");
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-no-file"));
             }
         } catch (Exception e) {
             log.error("上传主题失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "主题上传失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "主题上传成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-success"));
     }
 
     /**
@@ -180,22 +179,22 @@ public class ThemeController extends BaseController {
     public JsonResult cloneFromRemote(@RequestParam(value = "remoteAddr") String remoteAddr,
                                       @RequestParam(value = "themeName") String themeName) {
         if (StringUtils.isBlank(remoteAddr) || StringUtils.isBlank(themeName)) {
-            return new JsonResult(0, "请输入完整信息！");
+            return new JsonResult(0, localeMessageUtil.getMessage("code.admin.common.info-no-complete"));
         }
         try {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
             String cmdResult = RuntimeUtil.execForStr("git clone " + remoteAddr + " " + themePath.getAbsolutePath() + "/" + themeName);
             if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(0, "没有安装Git！");
+                return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
             HaloConst.THEMES.clear();
             HaloConst.THEMES = HaloUtils.getThemes();
         } catch (FileNotFoundException e) {
             log.error("克隆主题失败：{}", e.getMessage());
-            return new JsonResult(0, "克隆主题失败：" + e.getMessage());
+            return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.clone-theme-failed") + e.getMessage());
         }
-        return new JsonResult(1, "安装成功！");
+        return new JsonResult(1, localeMessageUtil.getMessage("code.admin.common.install-success"));
     }
 
     /**
@@ -212,15 +211,15 @@ public class ThemeController extends BaseController {
             File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
             String cmdResult = RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName + " && git pull");
             if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(0, "没有安装Git！");
+                return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
             HaloConst.THEMES.clear();
             HaloConst.THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
             log.error("更新主题失败：{}", e.getMessage());
-            return new JsonResult(0, "更新主题失败：" + e.getMessage());
+            return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.update-theme-failed") + e.getMessage());
         }
-        return new JsonResult(1, "更新成功！");
+        return new JsonResult(1, localeMessageUtil.getMessage("code.admin.common.update-success"));
     }
 
     /**
@@ -289,7 +288,7 @@ public class ThemeController extends BaseController {
     public JsonResult saveTpl(@RequestParam("tplName") String tplName,
                               @RequestParam("tplContent") String tplContent) {
         if (StringUtils.isBlank(tplContent)) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "模板不能为空！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.edit.no-content"));
         }
         try {
             //获取项目根路径
@@ -300,8 +299,8 @@ public class ThemeController extends BaseController {
             fileWriter.write(tplContent);
         } catch (Exception e) {
             log.error("模板保存失败：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "模板保存失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "模板保存成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
     }
 }

@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.websocket.server.PathParam;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -93,8 +92,8 @@ public class CommentController extends BaseController {
      * @return 重定向到/admin/comments
      */
     @GetMapping(value = "/throw")
-    public String moveToTrash(@PathParam("commentId") Long commentId,
-                              @PathParam("status") String status,
+    public String moveToTrash(@RequestParam("commentId") Long commentId,
+                              @RequestParam("status") String status,
                               @RequestParam(value = "page", defaultValue = "0") Integer page) {
         try {
             commentService.updateCommentStatus(commentId, CommentStatusEnum.RECYCLE.getCode());
@@ -113,8 +112,8 @@ public class CommentController extends BaseController {
      * @return 重定向到/admin/comments
      */
     @GetMapping(value = "/revert")
-    public String moveToPublish(@PathParam("commentId") Long commentId,
-                                @PathParam("status") Integer status,
+    public String moveToPublish(@RequestParam("commentId") Long commentId,
+                                @RequestParam("status") Integer status,
                                 HttpSession session) {
         Comment comment = commentService.updateCommentStatus(commentId, CommentStatusEnum.PUBLISHED.getCode());
         Post post = comment.getPost();
@@ -134,8 +133,8 @@ public class CommentController extends BaseController {
      * @return string 重定向到/admin/comments
      */
     @GetMapping(value = "/remove")
-    public String moveToAway(@PathParam("commentId") Long commentId,
-                             @PathParam("status") Integer status,
+    public String moveToAway(@RequestParam("commentId") Long commentId,
+                             @RequestParam("status") Integer status,
                              @RequestParam(value = "page", defaultValue = "0") Integer page) {
         try {
             commentService.removeByCommentId(commentId);

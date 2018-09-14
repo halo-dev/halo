@@ -190,7 +190,7 @@
                     },
                     success: function (data) {
                         if(data.code==0){
-                            showMsg("该路径已经存在！","info",2000);
+                            showMsg(data.msg,"error",2000);
                             return;
                         }else{
                             $('#postUrl').html($('#newPostUrl').val());

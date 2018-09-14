@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.UserService;
@@ -67,7 +68,7 @@ public class UserController {
             }
             userService.saveByUser(user);
             configuration.setSharedVariable("user", userService.findUser());
-            session.invalidate();
+            session.removeAttribute(HaloConst.USER_SESSION_KEY);
         } catch (Exception e) {
             log.error("修改用户资料失败：{}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.edit-failed"));
@@ -95,7 +96,7 @@ public class UserController {
             if (null != user) {
                 user.setUserPass(SecureUtil.md5(newPass));
                 userService.saveByUser(user);
-                session.invalidate();
+                session.removeAttribute(HaloConst.USER_SESSION_KEY);
             } else {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.old-password-error"));
             }

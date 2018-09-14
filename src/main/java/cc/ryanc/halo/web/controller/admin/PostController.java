@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.websocket.server.PathParam;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
@@ -141,7 +140,7 @@ public class PostController extends BaseController {
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "/view")
-    public String viewPost(@PathParam("postId") Long postId, Model model) {
+    public String viewPost(@RequestParam("postId") Long postId, Model model) {
         Optional<Post> post = postService.findByPostId(postId);
         model.addAttribute("post", post.get());
         return this.render("post");
@@ -313,7 +312,7 @@ public class PostController extends BaseController {
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/remove")
-    public String removePost(@PathParam("postId") Long postId, @PathParam("postType") String postType) {
+    public String removePost(@RequestParam("postId") Long postId, @RequestParam("postType") String postType) {
         try {
             Optional<Post> post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
@@ -335,7 +334,7 @@ public class PostController extends BaseController {
      * @return 模板路径admin/admin_editor
      */
     @GetMapping(value = "/edit")
-    public String editPost(@PathParam("postId") Long postId, Model model) {
+    public String editPost(@RequestParam("postId") Long postId, Model model) {
         Optional<Post> post = postService.findByPostId(postId);
         model.addAttribute("post", post.get());
         return "admin/admin_post_md_editor";
@@ -349,29 +348,32 @@ public class PostController extends BaseController {
      */
     @GetMapping(value = "/updateSummary")
     @ResponseBody
-    public JsonResult updateSummary(@PathParam("postSummary") Integer postSummary) {
+    public JsonResult updateSummary(@RequestParam("postSummary") Integer postSummary) {
         try {
             postService.updateAllSummary(postSummary);
         } catch (Exception e) {
             log.error("更新摘要失败：{}", e.getMessage());
             e.printStackTrace();
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "更新失败！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.update-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "所有文章摘要更新成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
     }
 
     /**
      * 验证文章路径是否已经存在
      *
      * @param postUrl 文章路径
-     * @return true：不存在，false：已存在
+     * @return JsonResult
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public boolean checkUrlExists(@PathParam("postUrl") String postUrl) {
+    public JsonResult checkUrlExists(@RequestParam("postUrl") String postUrl) {
         postUrl = urlFilter(postUrl);
         Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
-        return null != post;
+        if (null != post) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+        }
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
     }
 
     /**
@@ -382,9 +384,9 @@ public class PostController extends BaseController {
      */
     @GetMapping(value = "/pushAllToBaidu")
     @ResponseBody
-    public JsonResult pushAllToBaidu(@PathParam("baiduToken") String baiduToken) {
+    public JsonResult pushAllToBaidu(@RequestParam("baiduToken") String baiduToken) {
         if (StringUtils.isEmpty(baiduToken)) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "百度推送Token为空！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.no-baidu-token"));
         }
         String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
         List<Post> posts = postService.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
@@ -397,8 +399,8 @@ public class PostController extends BaseController {
         }
         String result = HaloUtils.baiduPost(blogUrl, baiduToken, urls.toString());
         if (StringUtils.isEmpty(result)) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "推送所有文章成功！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "推送成功！");
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-success"));
     }
 }

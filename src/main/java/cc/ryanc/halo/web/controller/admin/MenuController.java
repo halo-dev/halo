@@ -8,8 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-
 /**
  * <pre>
  *     后台菜单管理控制器
@@ -74,7 +72,7 @@ public class MenuController {
      * @return 重定向到/admin/menus
      */
     @GetMapping(value = "/remove")
-    public String removeMenu(@PathParam("menuId") Long menuId) {
+    public String removeMenu(@RequestParam("menuId") Long menuId) {
         try {
             menuService.removeByMenuId(menuId);
         } catch (Exception e) {

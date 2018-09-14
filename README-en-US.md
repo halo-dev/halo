@@ -9,7 +9,7 @@
 [![Travis CI](https://img.shields.io/travis/ruibaby/halo.svg)](https://travis-ci.org/ruibaby/halo)
 
 ------------------------------
-[简体中文](./README.md) | English
+🇨🇳[简体中文](./README.md) | 🇺🇸English
 
 ## Catalog
 
