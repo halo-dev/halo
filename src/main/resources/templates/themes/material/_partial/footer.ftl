@@ -1,6 +1,6 @@
 <!--Footer-->
 <footer class="mdl-mini-footer" id="bottom">
-    <#if options.theme_material_scheme?if_exists == "Paradox">
+    <#if options.theme_material_scheme?default('Paradox') == "Paradox">
     <!-- Paradox Footer Left Section -->
     <#include "footer-left.ftl">
 

@@ -1,4 +1,4 @@
-<#if options.theme_material_scheme?if_exists == "Paradox">
+<#if options.theme_material_scheme?default('Paradox') == "Paradox">
     <!-- Paradox Post Header -->
     <!-- Random Thumbnail -->
     <#if post.postThumbnail?if_exists == "${options.blog_url}/static/images/thumbnail.png">
@@ -12,7 +12,7 @@
         </p>
     </div>
 </#if>
-<#if options.theme_material_scheme?if_exists == "Isolation">
+<#if options.theme_material_scheme?default('Paradox') == "Isolation">
     <div class="post-header_info without-thumbnail">
         <!-- Author Avatar & Name -->
         <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName?default('halo')}'s avatar">
