@@ -6,7 +6,7 @@
         <!-- Pin on top -->
 
         <!-- Normal Post -->
-        <#if options.theme_material_scheme?if_exists == "Paradox">
+        <#if options.theme_material_scheme?default('Paradox') == "Paradox">
         <!-- Paradox Thumbnail -->
         <#include "_partial/Paradox-post_entry.ftl">
         <#else>
@@ -15,7 +15,7 @@
         </#if>
         <#include "_partial/index-nav.ftl">
         <@nav url="/archives/"></@nav>
-        <#if options.theme_material_scheme?if_exists == "Paradox">
+        <#if options.theme_material_scheme?default('Paradox') == "Paradox">
             <#include "_partial/Paradox-post_entry-thumbnail.ftl">
         </#if>
     </div>
