@@ -147,7 +147,7 @@
                 var name = $('#linkName').val();
                 var url = $('#linkUrl').val();
                 if(name==""||url==""){
-                    showMsg("<@spring.message code='common.js.info-no-complate' />","info",2000);
+                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
                     return false;
                 }
             }

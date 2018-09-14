@@ -15,12 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 /**
@@ -91,7 +87,7 @@ public class FrontIndexController extends BaseController {
      */
     @GetMapping(value = "next")
     @ResponseBody
-    public List<Post> ajaxIndex(@PathParam(value = "page") Integer page) {
+    public List<Post> ajaxIndex(@RequestParam(value = "page") Integer page) {
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         //默认显示10条
         Integer size = 10;
@@ -114,7 +110,7 @@ public class FrontIndexController extends BaseController {
      * @return 模板路径/themes/{theme}/index
      */
     @GetMapping(value = "search")
-    public String search(@PathParam("keyword") String keyword, Model model) {
+    public String search(@RequestParam("keyword") String keyword, Model model) {
         Page<Post> posts = postService.searchByKeywords(keyword, null);
         model.addAttribute("posts", posts);
         return this.render("index");

@@ -190,8 +190,8 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        session.removeAttribute(HaloConst.USER_SESSION_KEY);
         logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), ServletUtil.getClientIP(request), DateUtil.date()));
-        session.invalidate();
         log.info("用户[{}]退出登录", user.getUserName());
         return "redirect:/admin/login";
     }

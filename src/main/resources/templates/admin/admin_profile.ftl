@@ -183,11 +183,11 @@
                 var newPass = $('#newPass').val();
                 var reNewPass = $('#reNewPass').val();
                 if(beforePass==""||newPass==""||reNewPass==""){
-                    showMsg("<@spring.message code='common.js.info-no-complate' />","info",2000);
+                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
                     return;
                 }
                 if(newPass!=reNewPass){
-                    showMsg("两次密码不一样！","error",2000);
+                    showMsg("<@spring.message code='admin.user.profile.form.password.no-same' />","error",2000);
                     return;
                 }
                 var param = $('#passForm').serialize();

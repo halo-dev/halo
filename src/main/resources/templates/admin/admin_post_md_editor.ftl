@@ -290,8 +290,8 @@
                         'postUrl': $('#newPostUrl').val()
                     },
                     success: function (data) {
-                        if(data==true){
-                            showMsg("该路径已经存在！","info",2000);
+                        if(data.code==0){
+                            showMsg(data.msg,"error",2000);
                             return;
                         }else{
                             $('#postUrl').html($('#newPostUrl').val());

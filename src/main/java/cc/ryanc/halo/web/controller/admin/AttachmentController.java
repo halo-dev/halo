@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -193,7 +192,7 @@ public class AttachmentController {
      * @return 模板路径admin/widget/_attachment-detail
      */
     @GetMapping(value = "/attachment")
-    public String attachmentDetail(Model model, @PathParam("attachId") Long attachId) {
+    public String attachmentDetail(Model model, @RequestParam("attachId") Long attachId) {
         Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
         model.addAttribute("attachment", attachment.get());
         return "admin/widget/_attachment-detail";
@@ -208,7 +207,7 @@ public class AttachmentController {
      */
     @GetMapping(value = "/remove")
     @ResponseBody
-    public JsonResult removeAttachment(@PathParam("attachId") Long attachId,
+    public JsonResult removeAttachment(@RequestParam("attachId") Long attachId,
                                        HttpServletRequest request) {
         Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
         String delFileName = attachment.get().getAttachName();

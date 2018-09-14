@@ -136,7 +136,7 @@
                 var url = $('#tagUrl').val();
                 var result = true;
                 if(name==""||url==""){
-                    showMsg("<@spring.message code='common.js.info-no-complate' />","info",2000);
+                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
                     result = false;
                 }
                 $.ajax({
@@ -147,8 +147,8 @@
                         'tagUrl' : url
                     },
                     success: function (data) {
-                        if(data==true){
-                            showMsg("该路径已经存在！","info",2000);
+                        if(data.code==0){
+                            showMsg(data.msg,"error",2000);
                             result = false;
                         }
                     }

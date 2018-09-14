@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,7 +93,7 @@ public class PageController {
      * @return String 模板路径admin/admin_page_link
      */
     @GetMapping(value = "/links/edit")
-    public String toEditLink(Model model, @PathParam("linkId") Long linkId) {
+    public String toEditLink(Model model, @RequestParam("linkId") Long linkId) {
         Optional<Link> link = linkService.findByLinkId(linkId);
         model.addAttribute("updateLink", link.get());
         return "admin/admin_page_link";
@@ -123,7 +122,7 @@ public class PageController {
      * @return 重定向到/admin/page/links
      */
     @GetMapping(value = "/links/remove")
-    public String removeLink(@PathParam("linkId") Long linkId) {
+    public String removeLink(@RequestParam("linkId") Long linkId) {
         try {
             linkService.removeByLinkId(linkId);
         } catch (Exception e) {
@@ -178,7 +177,7 @@ public class PageController {
      * @return 模板路径admin/widget/_gallery-detail
      */
     @GetMapping(value = "/gallery")
-    public String gallery(Model model, @PathParam("galleryId") Long galleryId) {
+    public String gallery(Model model, @RequestParam("galleryId") Long galleryId) {
         Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
         model.addAttribute("gallery", gallery.get());
         return "admin/widget/_gallery-detail";
@@ -259,7 +258,7 @@ public class PageController {
      * @return admin/admin_page_md_editor
      */
     @GetMapping(value = "/edit")
-    public String editPage(@PathParam("pageId") Long pageId, Model model) {
+    public String editPage(@RequestParam("pageId") Long pageId, Model model) {
         Optional<Post> post = postService.findByPostId(pageId);
         model.addAttribute("post", post.get());
         return "admin/admin_page_md_editor";
@@ -273,10 +272,10 @@ public class PageController {
      */
     @GetMapping(value = "/checkUrl")
     @ResponseBody
-    public JsonResult checkUrlExists(@PathParam("postUrl") String postUrl) {
+    public JsonResult checkUrlExists(@RequestParam("postUrl") String postUrl) {
         Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null != post) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "该路径已经存在！");
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
     }

@@ -143,7 +143,7 @@
         var themeName = $("#themeName").val();
         if(remoteAddr==null || themeName==null){
             $.toast({
-                text: "<@spring.message code='common.js.info-no-complate' />",
+                text: "<@spring.message code='common.js.info-no-complete' />",
                 heading: '<@spring.message code="common.text.tips" />',
                 icon: 'error',
                 showHideTransition: 'fade',
