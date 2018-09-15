@@ -58,7 +58,7 @@
             function openDetail(id) {
                 layer.open({
                     type: 2,
-                    title: '附件详情',
+                    title: '<@spring.message code="admin.attachments.js.modal.detail-title" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,
@@ -81,7 +81,7 @@
                     if(data.success=="1"){
                         $("#uploadForm").hide(400);
                         $.toast({
-                            text: "上传成功！",
+                            text: data.message,
                             heading: '<@spring.message code="common.text.tips" />',
                             icon: 'success',
                             showHideTransition: 'fade',

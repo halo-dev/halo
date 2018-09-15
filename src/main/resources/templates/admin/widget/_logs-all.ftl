@@ -15,11 +15,11 @@
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th>日志编号</th>
-                                <th>触发事件</th>
-                                <th>产生结果</th>
+                                <th><@spring.message code='admin.logs.th.log-id' /></th>
+                                <th><@spring.message code='admin.logs.th.log-action' /></th>
+                                <th><@spring.message code='admin.logs.th.log-result' /></th>
                                 <th>IP</th>
-                                <th>产生时间</th>
+                                <th><@spring.message code='admin.logs.th.log-datetime' /></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="box-footer clearfix">
                     <div class="no-margin pull-left">
-                        第${logs.number+1}/${logs.totalPages}页
+                        <@spring.message code='admin.pageinfo.text.no' />${logs.number+1}/${logs.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                     </div>
                     <div class="no-margin pull-right">
                         <ul class="pagination" style="margin: 0;">
@@ -55,6 +55,4 @@
 </body>
 <script src="/static/plugins/jquery/jquery.min.js"></script>
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script>
-</script>
 </html>

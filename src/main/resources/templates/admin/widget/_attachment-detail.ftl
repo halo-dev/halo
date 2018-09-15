@@ -21,50 +21,50 @@
         <div class="col-lg-6 attachDesc">
             <div class="box box-solid">
                 <div class="box-header with-border">
-                    <h3 class="box-title">详细信息</h3>
+                    <h3 class="box-title"><@spring.message code='admin.attachments.modal.detail-title' /></h3>
                 </div>
                 <form class="form-horizontal">
                     <div class="box-body">
                         <div class="form-group">
-                            <label for="attachName" class="col-sm-2 control-label">附件名：</label>
+                            <label for="attachName" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-name' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="attachName" value="${attachment.attachName?if_exists}">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="attachType" class="col-sm-2 control-label">附件类型：</label>
+                            <label for="attachType" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-type' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="attachType" value="${attachment.attachType?if_exists}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="attachPath" class="col-sm-2 control-label">附件路径：</label>
+                            <label for="attachPath" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-path' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="attachPath" value="${attachment.attachPath?if_exists}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="attachCreated" class="col-sm-2 control-label">上传时间：</label>
+                            <label for="attachCreated" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-created' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="attachCreated" value="${attachment.attachCreated?if_exists}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="attachStorage" class="col-sm-2 control-label">附件大小：</label>
+                            <label for="attachStorage" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-storage' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="attachStorage" value="${attachment.attachSize?if_exists}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="attachSize" class="col-sm-2 control-label">图片尺寸：</label>
+                            <label for="attachSize" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-size' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="attachSize" value="${attachment.attachWh?if_exists}" disabled>
                             </div>
                         </div>
                     </div>
                     <div class="box-footer">
-                        <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()">永久删除</button>
-                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="${options.blog_url?if_exists}${attachment.attachPath}">复制链接</button>
+                        <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()"><@spring.message code="common.btn.delete" /></button>
+                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="${options.blog_url?if_exists}${attachment.attachPath}"><@spring.message code='admin.attachments.modal.form.btn.copy-path' /></button>
                     </div>
                 </form>
             </div>
@@ -81,9 +81,9 @@
 <script src="/static/js/app.js"></script>
 <script>
     function btn_delete() {
-        layer.msg('你确定要删除？', {
+        layer.msg('<@spring.message code="common.text.define-delete" />', {
             time: 0
-            ,btn: ['删除', '<@spring.message code="common.btn.cancel" />']
+            ,btn: ['<@spring.message code="common.btn.delete" />', '<@spring.message code="common.btn.cancel" />']
             ,yes: function(index){
                 layer.close(index);
                 $.ajax({
@@ -123,7 +123,7 @@
         var clipboard = new Clipboard('.btn-copy');
     });
     $('.btn-copy').click(function () {
-        showMsg("复制成功","success",1000)
+        showMsg("<@spring.message code='admin.attachments.modal.js.copy-success' />","success",1000)
     })
 </script>
 </html>

@@ -21,50 +21,50 @@
         <div class="col-lg-6 attachDesc">
             <div class="box box-solid">
                 <div class="box-header with-border">
-                    <h3 class="box-title">详细信息</h3>
+                    <h3 class="box-title"><@spring.message code='admin.pages.galleries.modal.title' /></h3>
                 </div>
                 <form action="/admin/page/gallery/save" method="post" class="form-horizontal" id="galleryForm">
                     <div class="box-body">
                         <input type="hidden" value="${gallery.galleryId?c}" name="galleryId">
                         <div class="form-group">
-                            <label for="galleryName" class="col-sm-2 control-label">图片名称：</label>
+                            <label for="galleryName" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-name' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="galleryName" name="galleryName" value="${gallery.galleryName}">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="galleryDesc" class="col-sm-2 control-label">图片描述：</label>
+                            <label for="galleryDesc" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-desc' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="galleryDesc" name="galleryDesc" value="${gallery.galleryDesc?if_exists}" >
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="galleryDate" class="col-sm-2 control-label">图片日期：</label>
+                            <label for="galleryDate" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-date' /></label>
                             <div class="col-sm-10">
                                 <input type="date" class="form-control" id="galleryDate" name="galleryDate" value="${gallery.galleryDate?if_exists}">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="galleryLocation" class="col-sm-2 control-label">拍摄地点：</label>
+                            <label for="galleryLocation" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-location' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="galleryLocation" name="galleryLocation" value="${gallery.galleryLocation?if_exists}" >
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="galleryUrl" class="col-sm-2 control-label">图片地址：</label>
+                            <label for="galleryUrl" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-url' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="galleryUrl" name="galleryUrl" value="${gallery.galleryUrl}">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="galleryUrl" class="col-sm-2 control-label">缩略图地址：</label>
+                            <label for="galleryUrl" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-thumbnail-url' /></label>
                             <div class="col-sm-10">
                                 <input type="text" class="form-control" id="galleryThumbnailUrl" name="galleryThumbnailUrl" value="${gallery.galleryThumbnailUrl}">
                             </div>
                         </div>
                     </div>
                     <div class="box-footer">
-                        <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()">永久删除</button>
+                        <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()"><@spring.message code='common.btn.delete' /></button>
                         <button type="button" class="btn btn-info btn-sm pull-right" onclick="btn_save()"><@spring.message code='common.btn.save' /></button>
                     </div>
                 </form>
@@ -81,9 +81,9 @@
 <script src="/static/js/app.js"></script>
 <script>
     function btn_delete() {
-        layer.msg('你确定要删除？', {
+        layer.msg('<@spring.message code="common.text.define-delete" />', {
             time: 0
-            ,btn: ['删除', '<@spring.message code="common.btn.cancel" />']
+            ,btn: ['<@spring.message code="common.btn.delete" />', '<@spring.message code="common.btn.cancel" />']
             ,yes: function(index){
                 layer.close(index);
                 $.ajax({
@@ -96,7 +96,7 @@
                     success: function (data) {
                         if(data.code==1){
                             $.toast({
-                                text: "删除成功！",
+                                text: data.msg,
                                 heading: '<@spring.message code="common.text.tips" />',
                                 icon: 'success',
                                 showHideTransition: 'fade',
@@ -112,7 +112,7 @@
                                 }
                             });
                         }else{
-                            showMsg("删除失败","error",2000);
+                            showMsg(data.msg,"error",2000);
                         }
                     }
                 });
