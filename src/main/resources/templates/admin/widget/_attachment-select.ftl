@@ -15,10 +15,10 @@
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
                 <li class="active">
-                    <a href="#allAttach" data-toggle="tab">所有附件</a>
+                    <a href="#allAttach" data-toggle="tab"><@spring.message code='admin.attachments.modal.select.tab.all-attach' /></a>
                 </li>
                 <li>
-                    <a href="#uploadAttach" data-toggle="tab">选择上传</a>
+                    <a href="#uploadAttach" data-toggle="tab"><@spring.message code='admin.attachments.modal.select.tab.upload' /></a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -33,7 +33,7 @@
                         </#list>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="no-margin pull-left">
-                                第${attachments.number+1}/${attachments.totalPages}页
+                                <@spring.message code='admin.pageinfo.text.no' />${attachments.number+1}/${attachments.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                             </div>
                             <ul class="pagination no-margin pull-right">
                                 <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select" ><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
@@ -79,7 +79,7 @@
         if(data.success=="1"){
             $("#uploadForm").hide(400);
             $.toast({
-                text: "上传成功！",
+                text: data.message,
                 heading: '<@spring.message code="common.text.tips" />',
                 icon: 'success',
                 showHideTransition: 'fade',

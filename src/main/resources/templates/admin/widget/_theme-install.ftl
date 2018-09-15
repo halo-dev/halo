@@ -25,10 +25,10 @@
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
                 <li class="active">
-                    <a href="#upload" data-toggle="tab">本地上传</a>
+                    <a href="#upload" data-toggle="tab"><@spring.message code='admin.themes.modal.install.tab.upload' /></a>
                 </li>
                 <li>
-                    <a href="#clone" data-toggle="tab">远程拉取</a>
+                    <a href="#clone" data-toggle="tab"><@spring.message code='admin.themes.modal.install.tab.pull' /></a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -48,23 +48,23 @@
                         <div class="box-body">
                             <div class="alert alert-info alert-dismissible" role="alert">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <strong>注意!</strong> 使用该功能必须安装Git，否则无法使用。更多主题请点击<a href="https://gitee.com/babyrui" target="_blank" class="alert-link">https://gitee.com/babyrui</a>.
+                                <strong><@spring.message code='common.text.tips' /></strong> <@spring.message code='admin.themes.modal.install.tips' />&nbsp;<a href="https://gitee.com/babyrui" target="_blank" class="alert-link">https://gitee.com/babyrui</a>.
                             </div>
                             <div class="form-group">
-                                <label for="remoteAddr" class="col-lg-2 col-sm-4 control-label">远程地址：</label>
+                                <label for="remoteAddr" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.themes.modal.install.form.remote-address' /></label>
                                 <div class="col-lg-4 col-sm-8">
                                     <input type="text" class="form-control" id="remoteAddr" name="remoteAddr">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="themeName" class="col-lg-2 col-sm-4 control-label">主题名称：</label>
+                                <label for="themeName" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.themes.modal.install.form.theme-name' /></label>
                                 <div class="col-lg-4 col-sm-8">
                                     <input type="text" class="form-control" id="themeName" name="themeName">
                                 </div>
                             </div>
                         </div>
                         <div class="box-footer">
-                            <button type="button" data-loading-text="安装中..." class="btn btn-primary btn-sm" onclick="pullAction()" id="btnInstall">安装</button>
+                            <button type="button" data-loading-text="<@spring.message code='admin.themes.modal.install.btn.installing' />" class="btn btn-primary btn-sm" onclick="pullAction()" id="btnInstall"><@spring.message code='admin.themes.modal.install.btn.install' /></button>
                         </div>
                     </form>
                 </div>
