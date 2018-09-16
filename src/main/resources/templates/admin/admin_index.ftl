@@ -340,16 +340,16 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="blog-data">博客数据</h4>
+                        <h4 class="modal-title" id="blog-data"><@spring.message code='admin.index.blog-data.title' /></h4>
                     </div>
                     <div class="modal-body">
-                        <p>「${options.blog_title?if_exists}」已经运行了<span id="blogStartDay"></span>天了。</p>
+                        <p>「${options.blog_title?if_exists}」<@spring.message code='admin.index.blog-data.days-count-before' /><span id="blogStartDay"></span><@spring.message code='admin.index.blog-data.days-count-after' /></p>
                         <p><@spring.message code='admin.index.blog-data.during' /></p>
-                        <p>累计发表了<@articleTag method="postsCount">${postsCount?default(0)}</@articleTag>篇文章。</p>
-                        <p>累计创建了<@commonTag method="tags">${tags?size}</@commonTag>个标签。</p>
-                        <p>累计获得了${commentCount}条评论。</p>
-                        <p>累计添加了<@commonTag method="links">${links?size}</@commonTag>个友链。</p>
-                        <p>文章总访问${postViewsSum?default(0L)}次。</p>
+                        <p><@spring.message code='admin.index.blog-data.posts-count-before' />&nbsp;<@articleTag method="postsCount">${postsCount?default(0)}</@articleTag>&nbsp;<@spring.message code='admin.index.blog-data.posts-count-after' /></p>
+                        <p><@spring.message code='admin.index.blog-data.tags-count-before' />&nbsp;<@commonTag method="tags">${tags?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.tags-count-after' /></p>
+                        <p><@spring.message code='admin.index.blog-data.comments-count-before' />&nbsp;${commentCount}&nbsp;<@spring.message code='admin.index.blog-data.comments-count-after' /></p>
+                        <p><@spring.message code='admin.index.blog-data.links-count-before' />&nbsp;<@commonTag method="links">${links?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.links-count-after' /></p>
+                        <p><@spring.message code='admin.index.blog-data.views-count-before' />&nbsp;${postViewsSum?default(0L)}&nbsp;<@spring.message code='admin.index.blog-data.views-count-after' /></p>
                         <p><@spring.message code='admin.index.blog-data.motto' /></p>
                     </div>
                     <div class="modal-footer">
@@ -370,7 +370,7 @@
             function openAllLogs() {
                 layer.open({
                     type: 2,
-                    title: '所有日志',
+                    title: '<@spring.message code="admin.index.widgets.text.all-logs" />',
                     shadeClose: true,
                     shade: 0.5,
                     maxmin: true,

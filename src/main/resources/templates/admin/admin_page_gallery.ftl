@@ -19,14 +19,14 @@
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.pages.galleries.title' /><small></small></h1>
             <a id="btnNewPicture" href="#">
-                添加图片
+                <@spring.message code='admin.pages.galleries.text.add-gallery' />
             </a>
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="/admin/page">页面管理</a></li>
-                <li class="active">图库页面</li>
+                <li><a data-pjax="true" href="/admin/page"><@spring.message code='admin.pages.title' /></a></li>
+                <li class="active"><@spring.message code='admin.pages.galleries.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -34,36 +34,36 @@
                 <div class="col-lg-12 col-xs-12" id="newPicturePanel" style="display: none">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">添加图片</h3>
+                            <h3 class="box-title"><@spring.message code='admin.pages.galleries.text.add-gallery' /></h3>
                         </div>
                         <form action="/admin/page/gallery/save" method="post" role="form" class="form-horizontal">
                             <div class="box-body">
                                 <div class="form-group">
-                                    <label for="galleryName" class="col-sm-2 control-label">图片标题：</label>
+                                    <label for="galleryName" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-name' /></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="galleryName" name="galleryName">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="galleryDesc" class="col-sm-2 control-label">图片描述：</label>
+                                    <label for="galleryDesc" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-desc' /></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="galleryDesc" name="galleryDesc">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="galleryDate" class="col-sm-2 control-label">拍摄日期（如有）：</label>
+                                    <label for="galleryDate" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-date' /></label>
                                     <div class="col-sm-4">
                                         <input type="date" class="form-control" id="galleryDate" name="galleryDate">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="galleryLocation" class="col-sm-2 control-label">拍摄地点（如有）：</label>
+                                    <label for="galleryLocation" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-location' /></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="galleryLocation" name="galleryLocation">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="galleryUrl" class="col-sm-2 control-label">图片地址：</label>
+                                    <label for="galleryUrl" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-url' /></label>
                                     <div class="col-sm-4">
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="galleryUrl" name="galleryUrl">
@@ -74,7 +74,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="galleryThumbnailUrl" class="col-sm-2 control-label">缩略图地址：</label>
+                                    <label for="galleryThumbnailUrl" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-thumbnail-url' /></label>
                                     <div class="col-sm-4">
                                         <input type="text" class="form-control" id="galleryThumbnailUrl" name="galleryThumbnailUrl">
                                     </div>
@@ -97,7 +97,7 @@
                 </#list>
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="no-margin pull-left">
-                        第${galleries.number+1}/${galleries.totalPages}页
+                        <@spring.message code='admin.pageinfo.text.no' />${galleries.number+1}/${galleries.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                     </div>
                     <ul class="pagination no-margin pull-right">
                         <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries" ><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
@@ -126,7 +126,7 @@
             function openDetail(id) {
                 layer.open({
                     type: 2,
-                    title: '图片详情',
+                    title: '<@spring.message code="admin.pages.galleries.modal.title" />',
                     shadeClose: true,
                     shade: 0.5,
                     area: ['90%', '90%'],

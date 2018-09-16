@@ -19,7 +19,9 @@
                         </#if>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header">你有${newComments?size}条新评论</li>
+                        <li class="header">
+                            <@spring.message code='admin.module.header.new-comments-before' /> ${newComments?size} <@spring.message code='admin.module.header.new-comments-after' />
+                        </li>
                         <li>
                             <ul class="menu">
                                 <#if newComments?size gt 0>

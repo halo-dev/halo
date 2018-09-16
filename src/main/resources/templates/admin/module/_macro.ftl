@@ -49,7 +49,9 @@
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/plugins/fileinput/fileinput.min.js"></script>
-<script src="/static/plugins/fileinput/zh.min.js"></script>
+<#if options.blog_locale?default('zh_CN')=='zh_CN'>
+    <script src="/static/plugins/fileinput/zh.min.js"></script>
+</#if>
 <script src="/static/js/app.js"></script>
 <@compress single_line=true>
 <script>
