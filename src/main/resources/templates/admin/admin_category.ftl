@@ -33,12 +33,12 @@
                                 <input type="hidden" name="cateId" value="${updateCategory.cateId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="exampleInputEmail1"><@spring.message code='admin.categories.form.cate-name' /></label>
+                                        <label for="cateName"><@spring.message code='admin.categories.form.cate-name' /></label>
                                         <input type="text" class="form-control" id="cateName" name="cateName" value="${updateCategory.cateName}">
                                         <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputPassword1"><@spring.message code='admin.categories.form.cate-url' /></label>
+                                        <label for="cateUrl"><@spring.message code='admin.categories.form.cate-url' /></label>
                                         <input type="text" class="form-control" id="cateUrl" name="cateUrl" value="${updateCategory.cateUrl}">
                                         <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                     </div>
@@ -60,12 +60,12 @@
                             <form action="/admin/category/save" method="post" role="form" id="cateAddForm" onsubmit="return checkCate()">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="exampleInputEmail1"><@spring.message code='admin.categories.form.cate-name' /></label>
+                                        <label for="cateName"><@spring.message code='admin.categories.form.cate-name' /></label>
                                         <input type="text" class="form-control" id="cateName" name="cateName" placeholder="">
                                         <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="exampleInputPassword1"><@spring.message code='admin.categories.form.cate-url' /></label>
+                                        <label for="cateUrl"><@spring.message code='admin.categories.form.cate-url' /></label>
                                         <input type="text" class="form-control" id="cateUrl" name="cateUrl" placeholder="">
                                         <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                     </div>
@@ -113,9 +113,9 @@
                                                     <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
                                                         <a href="#" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
                                                     <#else >
-                                                        <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs ">修改</a>
+                                                        <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
                                                     </#if>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId?c}')">删除</button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId?c}')"><@spring.message code='common.btn.delete' /></button>
                                                 </td>
                                             </tr>
                                         </#list>

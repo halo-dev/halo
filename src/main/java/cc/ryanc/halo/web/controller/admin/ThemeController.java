@@ -96,7 +96,6 @@ public class ThemeController extends BaseController {
             );
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-success", new Object[]{siteTheme}));
         } catch (Exception e) {
-            log.error("主题设置失败，当前主题为：{}", siteTheme);
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-failed"));
         }
     }

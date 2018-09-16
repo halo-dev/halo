@@ -13,8 +13,8 @@
                 <li>
                     <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="#">外观</a></li>
-                <li class="active">菜单管理</li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.themes.bread.appearance' /></a></li>
+                <li class="active"><@spring.message code='admin.menus.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -23,78 +23,78 @@
                     <div class="box box-primary">
                         <#if updateMenu??>
                             <div class="box-header with-border">
-                                <h3 class="box-title">修改菜单<#if updateMenu??>[${updateMenu.menuName}]</#if></h3>
+                                <h3 class="box-title"><@spring.message code='admin.menus.text.update-menu' /><#if updateMenu??>[${updateMenu.menuName}]</#if></h3>
                             </div>
                             <form action="/admin/menus/save" method="post" role="form" id="menuAddForm">
                                 <input type="hidden" name="menuId" value="${updateMenu.menuId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="menuName">名称</label>
+                                        <label for="menuName"><@spring.message code='admin.menus.form.menu-name' /></label>
                                         <input type="text" class="form-control" id="menuName" name="menuName" value="${updateMenu.menuName}">
-                                        <small>页面上所显示的名称</small>
+                                        <small><@spring.message code='admin.menus.form.menu-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuUrl">路径</label>
+                                        <label for="menuUrl"><@spring.message code='admin.menus.form.menu-url' /></label>
                                         <input type="text" class="form-control" id="menuUrl" name="menuUrl" value="${updateMenu.menuUrl}">
-                                        <small>*菜单的路径</small>
+                                        <small><@spring.message code='admin.menus.form.menu-url-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuSort">排序编号</label>
+                                        <label for="menuSort"><@spring.message code='admin.menus.form.menu-sort' /></label>
                                         <input type="number" class="form-control" id="menuSort" name="menuSort" value="${updateMenu.menuSort}">
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuIcon">图标</label>
+                                        <label for="menuIcon"><@spring.message code='admin.menus.form.menu-icon' /></label>
                                         <input type="text" class="form-control" id="menuIcon" name="menuIcon" value="${updateMenu.menuIcon}">
-                                        <small>*请根据主题的支持选填</small>
+                                        <small><@spring.message code='admin.menus.form.menu-icon-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuIcon">打开方式</label>
+                                        <label for="menuTarget"><@spring.message code='admin.menus.form.menu-target' /></label>
                                         <select class="form-control" id="menuTarget" name="menuTarget">
-                                            <option value="_self" ${((updateMenu.menuTarget?default("_self")=="_self")?string('selected',''))}>当前窗口</option>
-                                            <option value="_blank" ${((updateMenu.menuTarget?if_exists=="_blank")?string('selected',''))}>新窗口</option>
+                                            <option value="_self" ${((updateMenu.menuTarget?default("_self")=="_self")?string('selected',''))}><@spring.message code='admin.menus.form.menu-target-self' /></option>
+                                            <option value="_blank" ${((updateMenu.menuTarget?if_exists=="_blank")?string('selected',''))}><@spring.message code='admin.menus.form.menu-target-blank' /></option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定修改</button>
-                                    <a data-pjax="true" href="/admin/menus" class="btn btn-info btn-sm ">返回添加</a>
+                                    <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-edit' /></button>
+                                    <a data-pjax="true" href="/admin/menus" class="btn btn-info btn-sm "><@spring.message code='common.btn.back-to-add' /></a>
                                 </div>
                             </form>
                         <#else >
                             <div class="box-header with-border">
-                                <h3 class="box-title">添加菜单</h3>
+                                <h3 class="box-title"><@spring.message code='admin.menus.text.add-menu' /></h3>
                             </div>
                             <form action="/admin/menus/save" method="post" role="form" id="menuAddForm">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="menuName">名称</label>
+                                        <label for="menuName"><@spring.message code='admin.menus.form.menu-name' /></label>
                                         <input type="text" class="form-control" id="menuName" name="menuName">
-                                        <small>页面上所显示的名称</small>
+                                        <small><@spring.message code='admin.menus.form.menu-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuUrl">路径</label>
+                                        <label for="menuUrl"><@spring.message code='admin.menus.form.menu-url' /></label>
                                         <input type="text" class="form-control" id="menuUrl" name="menuUrl">
-                                        <small>*菜单的路径</small>
+                                        <small><@spring.message code='admin.menus.form.menu-url-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuSort">排序编号</label>
+                                        <label for="menuSort"><@spring.message code='admin.menus.form.menu-sort' /></label>
                                         <input type="text" class="form-control" id="menuSort" name="menuSort">
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuIcon">图标</label>
+                                        <label for="menuIcon"><@spring.message code='admin.menus.form.menu-icon' /></label>
                                         <input type="text" class="form-control" id="menuIcon" name="menuIcon">
-                                        <small>*请根据主题的支持选填</small>
+                                        <small><@spring.message code='admin.menus.form.menu-icon-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="menuIcon">打开方式</label>
+                                        <label for="menuTarget"><@spring.message code='admin.menus.form.menu-target' /></label>
                                         <select class="form-control" id="menuTarget" name="menuTarget">
-                                            <option value="_self">当前窗口</option>
-                                            <option value="_blank">新窗口</option>
+                                            <option value="_self"><@spring.message code='admin.menus.form.menu-target-self' /></option>
+                                            <option value="_blank"><@spring.message code='admin.menus.form.menu-target-blank' /></option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定添加</button>
+                                    <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-add' /></button>
                                 </div>
                             </form>
                         </#if>
@@ -103,7 +103,7 @@
                 <div class="col-md-7">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">所有菜单</h3>
+                            <h3 class="box-title"><@spring.message code='admin.menus.text.all-menus' /></h3>
                         </div>
                         <div class="box-body table-responsive">
                             <table class="table table-hover">
@@ -111,8 +111,8 @@
                                 <tr>
                                     <th><@spring.message code='common.th.name' /></th>
                                     <th><@spring.message code='common.th.url' /></th>
-                                    <th>排序</th>
-                                    <th>图标</th>
+                                    <th><@spring.message code='common.th.sort' /></th>
+                                    <th><@spring.message code='common.th.icon' /></th>
                                     <th><@spring.message code='common.th.name' /></th>
                                 </tr>
                                 </thead>
@@ -127,11 +127,11 @@
                                                 <td>${menu.menuIcon}</td>
                                                 <td>
                                                     <#if updateMenu?? && menu.menuId?c==updateMenu.menuId?c>
-                                                        <a href="#" class="btn btn-primary btn-xs " disabled="">正在修改</a>
+                                                        <a href="#" class="btn btn-primary btn-xs " disabled=""><@spring.message code='common.btn.editing' /></a>
                                                     <#else>
-                                                        <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId?c}" class="btn btn-primary btn-xs ">修改</a>
+                                                        <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
                                                     </#if>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId?c}')">删除</button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId?c}')"><@spring.message code='common.btn.delete' /></button>
                                                 </td>
                                             </tr>
                                         </#list>
@@ -152,7 +152,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                         <h4 class="modal-title"><@spring.message code='common.text.tips' /></h4>
                     </div>
-                    <div class="modal-body"><p>您确认要删除吗？</p></div>
+                    <div class="modal-body"><p><@spring.message code='common.text.define-delete' /></p></div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>
                         <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code='common.btn.cancel' /></button>
