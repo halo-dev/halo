@@ -76,10 +76,11 @@ Let's start: http://localhost:8090
 ## Themes
 
 In addition to the built-in [Anatole](https://github.com/hi-caicai/farbox-theme-Anatole) and [Material](https://github.com/viosey/hexo-theme-material), there are the following The theme is not integrated in the project. If you need it, please download it and upload it through the background.
-- [Vno](https://github.com/ruibaby/vno-halo) - From Jekyll,Author[Wei Wang](https://onevcat.com/)。
-- [Hux](https://github.com/ruibaby/hux-halo) - From Jekyll,Author[Xuan Huang](https://huangxuan.me/)。
-- [Story](https://github.com/ruibaby/story-halo) - From Typecho,Author[Trii Hsia](https://yumoe.com/)。
-- [NexT](https://github.com/ruibaby/next-halo) - From Hexo,Author[iissnan](https://notes.iissnan.com/)。
+- [Vno](https://github.com/ruibaby/vno-halo) - From Jekyll,Author [Wei Wang](https://onevcat.com/)。
+- [Hux](https://github.com/ruibaby/hux-halo) - From Jekyll,Author [Xuan Huang](https://huangxuan.me/)。
+- [Story](https://github.com/ruibaby/story-halo) - From Typecho,Author [Trii Hsia](https://yumoe.com/)。
+- [NexT](https://github.com/ruibaby/next-halo) - From Hexo,Author [iissnan](https://notes.iissnan.com/)。
+- [Casper](https://github.com/ruibaby/casper-halo) - From Ghost,Author [Ghost](https://github.com/TryGhost)。
 
 > Disclaimer: Do not accept any comments or suggestions on the functionality of the **Porting Theme**.
 
@@ -129,3 +130,5 @@ The birth of Halo is inseparable from the following projects:
 | Alipay  | Wechat  | Alipay Red envelope  |
 | :------------: | :------------: | :------------: |
 | <img src="https://cdn.ryanc.cc/img/github/donate/alipay.png" width="150"/>  | <img src="https://cdn.ryanc.cc/img/github/donate/wechat.png" width="150" />  | <img src="https://cdn.ryanc.cc/img/github/donate/hongbao.png" width="150" />  |
+
+
