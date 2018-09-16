@@ -76,7 +76,9 @@
 <script src="/static/plugins/jquery/jquery.min.js"></script>
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/fileinput/fileinput.min.js"></script>
+<#if options.blog_locale?default('zh_CN')=='zh_CN'>
 <script src="/static/plugins/fileinput/zh.min.js"></script>
+</#if>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/js/app.js"></script>
@@ -95,7 +97,7 @@
             allowedFileExtensions: ['zip'],
             maxFileCount: 1,
             enctype: 'multipart/form-data',
-            dropZoneTitle: '拖拽主题压缩包到这里 &hellip;<br>仅支持Zip格式',
+            dropZoneTitle: '<@spring.message code="admin.themes.modal.install.plugin.text" />',
             showClose: false
         }).on("fileuploaded",function (event,data,previewId,index) {
             var data = data.jqXHR.responseJSON;

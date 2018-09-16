@@ -126,7 +126,7 @@
                 <div class="modal-content message_align">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title">回复</h4>
+                        <h4 class="modal-title"><@spring.message code="common.btn.reply" /></h4>
                     </div>
                     <form method="post" action="/admin/comments/reply">
                         <div class="modal-body">
