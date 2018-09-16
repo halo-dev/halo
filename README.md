@@ -81,6 +81,7 @@ Let's start: http://localhost:8090
 - [Hux](https://github.com/ruibaby/hux-halo) - 来自Jekyll的一款主题，作者[Xuan Huang](https://huangxuan.me/)。
 - [Story](https://github.com/ruibaby/story-halo) - 来自Typecho的一款主题，作者[Trii Hsia](https://yumoe.com/)。
 - [NexT](https://github.com/ruibaby/next-halo) - 来自Hexo的一款主题，作者[iissnan](https://notes.iissnan.com/)。
+- [Casper](https://github.com/ruibaby/casper-halo) - 来自Ghost的一款主题，作者[Ghost](https://github.com/TryGhost)。
 
 > 声明：不接受任何对**移植主题**功能上的意见和建议。
 
@@ -132,3 +133,5 @@ Halo的诞生离不开下面这些项目：
 | 支付宝  | 微信  | 支付宝红包  |
 | :------------: | :------------: | :------------: |
 | <img src="https://cdn.ryanc.cc/img/github/donate/alipay.png" width="150"/>  | <img src="https://cdn.ryanc.cc/img/github/donate/wechat.png" width="150" />  | <img src="https://cdn.ryanc.cc/img/github/donate/hongbao.png" width="150" />  |
+
+
