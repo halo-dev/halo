@@ -20,8 +20,8 @@
                     <a data-pjax="true" href="#">
                         <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="#">文章管理</a></li>
-                <li class="active">标签</li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.posts.title' /></a></li>
+                <li class="active"><@spring.message code='admin.tags.title' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -30,49 +30,49 @@
                     <div class="box box-primary">
                         <#if updateTag??>
                             <div class="box-header with-border">
-                                <h3 class="box-title">修改标签<#if updateTag??>[${updateTag.tagName}]</#if></h3>
+                                <h3 class="box-title"><@spring.message code='admin.tags.text.edit-tag' /><#if updateTag??>[${updateTag.tagName}]</#if></h3>
                             </div>
                             <form action="/admin/tag/save" method="post" role="form">
                                 <input type="hidden" name="tagId" value="${updateTag.tagId?c}">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="tagName">名称</label>
+                                        <label for="tagName"><@spring.message code='admin.tags.form.tag-name' /></label>
                                         <input type="text" class="form-control" id="tagName" name="tagName" value="${updateTag.tagName}">
-                                        <small>页面上所显示的名称</small>
+                                        <small><@spring.message code='admin.tags.form.tag-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="tagUrl">路径名称</label>
+                                        <label for="tagUrl"><@spring.message code='admin.tags.form.tag-url' /></label>
                                         <input type="text" class="form-control" id="tagUrl" name="tagUrl" value="${updateTag.tagUrl}">
-                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                        <small><@spring.message code='admin.tags.form.tag-name-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定修改</button>
-                                    <a data-pjax="true" href="/admin/tag" class="btn btn-info btn-sm ">返回添加</a>
+                                    <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-edit' /></button>
+                                    <a data-pjax="true" href="/admin/tag" class="btn btn-info btn-sm "><@spring.message code='common.btn.back-to-add' /></a>
                                     <#if updateTag.posts?size = 0>
-                                    <a data-pjax="true" href="/admin/tag/remove?tagId=${updateTag.tagId?c}" class="btn btn-danger btn-sm  pull-right">删除</a>
+                                    <a data-pjax="true" href="/admin/tag/remove?tagId=${updateTag.tagId?c}" class="btn btn-danger btn-sm  pull-right"><@spring.message code='common.btn.delete' /></a>
                                     </#if>
                                 </div>
                             </form>
                         <#else >
                             <div class="box-header with-border">
-                                <h3 class="box-title">添加标签</h3>
+                                <h3 class="box-title"><@spring.message code='admin.tags.text.add-tag' /></h3>
                             </div>
                             <form action="/admin/tag/save" method="post" role="form" onsubmit="return checkTag()">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="tagName">名称</label>
+                                        <label for="tagName"><@spring.message code='admin.tags.form.tag-name' /></label>
                                         <input type="text" class="form-control" id="tagName" name="tagName">
-                                        <small>页面上所显示的名称</small>
+                                        <small><@spring.message code='admin.tags.form.tag-name-tips' /></small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="tagUrl">路径名称</label>
+                                        <label for="tagUrl"><@spring.message code='admin.tags.form.tag-url' /></label>
                                         <input type="text" class="form-control" id="tagUrl" name="tagUrl">
-                                        <small>*这是文章路径上显示的名称，最好为英文</small>
+                                        <small><@spring.message code='admin.tags.form.tag-name-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-primary btn-sm ">确定添加</button>
+                                    <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-add' /></button>
                                 </div>
                             </form>
                         </#if>
@@ -81,7 +81,7 @@
                 <div class="col-md-7">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">所有标签</h3>
+                            <h3 class="box-title"><@spring.message code='admin.tags.text.all-tags' /></h3>
                         </div>
                         <div class="box-body table-responsive">
                             <ul class="tags blue">
@@ -112,7 +112,7 @@
                         <h4 class="modal-title"><@spring.message code='common.text.tips' /></h4>
                     </div>
                     <div class="modal-body">
-                        <p>您确认要删除吗？</p>
+                        <p><@spring.message code='common.text.define-delete' /></p>
                     </div>
                     <div class="modal-footer">
                         <input type="hidden" id="url"/>

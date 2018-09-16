@@ -14,14 +14,14 @@
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.pages.title' /><small></small></h1>
             <a id="btnNewPage" href="/admin/page/new">
-                新建页面
+                <@spring.message code='admin.pages.btn.new-page' />
             </a>
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
-                <li><a data-pjax="true" href="#">页面管理</a></li>
-                <li class="active">所有页面</li>
+                <li><a data-pjax="true" href="#"><@spring.message code='admin.pages.title' /></a></li>
+                <li class="active"><@spring.message code='admin.pages.bread.all-pages' /></li>
             </ol>
         </section>
         <section class="content container-fluid">
@@ -30,10 +30,10 @@
                     <div class="nav-tabs-custom">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="#internal" data-toggle="tab">内置页面</a>
+                                <a href="#internal" data-toggle="tab"><@spring.message code='admin.pages.tab.Custom-page' /></a>
                             </li>
                             <li>
-                                <a href="#pages" data-toggle="tab">自定义页面</a>
+                                <a href="#pages" data-toggle="tab"><@spring.message code='admin.pages.tab.Custom-page' /></a>
                             </li>
                         </ul>
                         <div class="tab-content" style="padding: 0;">
@@ -49,19 +49,19 @@
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td>友情链接</td>
+                                            <td><@spring.message code='admin.pages.links' /></td>
                                             <td>/links</td>
                                             <td>
-                                                <a href="/links" class="btn btn-info btn-xs " target="_blank">预览</a>
-                                                <a data-pjax="true" href="/admin/page/links" class="btn btn-primary btn-xs ">配置</a>
+                                                <a href="/links" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
+                                                <a data-pjax="true" href="/admin/page/links" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>图库页面</td>
+                                            <td><@spring.message code='admin.pages.gallery' /></td>
                                             <td>/gallery</td>
                                             <td>
-                                                <a href="/gallery" class="btn btn-info btn-xs " target="_blank">预览</a>
-                                                <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs ">配置</a>
+                                                <a href="/gallery" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
+                                                <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
                                             </td>
                                         </tr>
                                         </tbody>
@@ -75,8 +75,8 @@
                                             <tr>
                                                 <th><@spring.message code='common.th.title' /></th>
                                                 <th><@spring.message code='common.th.url' /></th>
-                                                <th>评论</th>
-                                                <td>访问量</td>
+                                                <th><@spring.message code='common.th.comments' /></th>
+                                                <td><@spring.message code='common.th.views' /></td>
                                                 <th><@spring.message code='common.th.date' /></th>
                                                 <th><@spring.message code='common.th.control' /></th>
                                             </tr>
@@ -95,15 +95,15 @@
                                                     </td>
                                                     <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>
-                                                        <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank">预览</a>
-                                                        <a href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs ">编辑</a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','确定永久删除？(不可逆)')">永久删除</button>
+                                                        <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
+                                                        <a href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
                                                     </td>
                                                 </tr>
                                             </#list>
                                             <#else>
                                             <tr>
-                                                <td colspan="6" style="text-align: center;">暂无页面</td>
+                                                <td colspan="6" style="text-align: center;"><@spring.message code='common.text.no-data' /></td>
                                             </tr>
                                         </#if>
                                         </tbody>

@@ -23,16 +23,16 @@
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.posts.edit.title' /></h1>
             <a id="btnOpenAttach" href="#" onclick="openAttachCopy()">
-                附件库
+                <@spring.message code='admin.editor.btn.attachs' />
             </a>
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
                 </li>
                 <li>
-                    <a data-pjax="true" href="/admin/posts">文章管理</a>
+                    <a data-pjax="true" href="/admin/posts"><@spring.message code='admin.posts.title' /></a>
                 </li>
-                <li class="active">新建文章</li>
+                <li class="active"><@spring.message code='admin.posts.edit.title' /></li>
             </ol>
         </section>
         <section class="content">
@@ -44,13 +44,13 @@
                         <input type="hidden" id="postId" name="postId" value="">
                     </#if>
                     <div style="margin-bottom: 10px;">
-                        <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="请输入文章标题" onblur="autoComplateUrl();" value="<#if post??>${post.postTitle}</#if>">
+                        <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" value="<#if post??>${post.postTitle}</#if>">
                     </div>
                     <div style="display: block;margin-bottom: 10px;">
                         <span>
-                            永久链接：
+                            <@spring.message code='admin.editor.form.url' />
                             <a href="#">${options.blog_url}/archives/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
-                            <button class="btn btn-default btn-sm " id="btn_input_postUrl">编辑</button>
+                            <button class="btn btn-default btn-sm " id="btn_input_postUrl"><@spring.message code='common.btn.edit' /></button>
                             <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="urlOnBlurAuto()" style="display: none;"><@spring.message code='common.btn.define' /></button>
                         </span>
                     </div>
@@ -68,7 +68,7 @@
                 <div class="col-md-3">
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">发布</h3>
+                            <h3 class="box-title"><@spring.message code='admin.editor.text.push' /></h3>
                             <div class="box-tools">
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
                                     <i class="fa fa-minus"></i>
@@ -76,26 +76,26 @@
                             </div>
                         </div>
                         <div class="box-body">
-                            <label for="allowComment" class="control-label">开启评论：</label>
+                            <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
                             <select class="form-control" id="allowComment" name="allowComment">
-                                <option value="1" <#if post?? && post.allowComment?default(1)==1>selected</#if>>是</option>
-                                <option value="0" <#if post?? && post.allowComment?default(1)==0>selected</#if>>否</option>
+                                <option value="1" <#if post?? && post.allowComment?default(1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
+                                <option value="0" <#if post?? && post.allowComment?default(1)==0>selected</#if>><@spring.message code='common.select.no' /></option>
                             </select>
                         </div>
                         <div class="box-footer">
-                            <button onclick="push(1)" class="btn btn-default btn-sm ">保存草稿</button>
-                            <button onclick="push(0)" class="btn btn-primary btn-sm pull-right " data-loading-text="发布中...">
+                            <button onclick="push(1)" class="btn btn-default btn-sm "><@spring.message code='admin.editor.save-draft' /></button>
+                            <button onclick="push(0)" class="btn btn-primary btn-sm pull-right " data-loading-text="<@spring.message code='admin.editor.btn.pushing' />">
                             <#if post??>
-                                更新
-                                <#else>
-                                发布
+                                <@spring.message code='admin.editor.btn.update' />
+                            <#else>
+                                <@spring.message code='admin.editor.text.push' />
                             </#if>
                             </button>
                         </div>
                     </div>
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">分类目录</h3>
+                            <h3 class="box-title"><@spring.message code='admin.editor.text.category' /></h3>
                             <div class="box-tools">
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse" title="Collapse">
                                     <i class="fa fa-minus"></i>
@@ -130,7 +130,7 @@
                     </div>
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">标签</h3>
+                            <h3 class="box-title"><@spring.message code='admin.editor.text.tag' /></h3>
                             <div class="box-tools">
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse" title="Collapse">
                                     <i class="fa fa-minus"></i>
@@ -142,12 +142,12 @@
                             <select class="form-control" id="chooseTag" name="chooseTag">
                                 <@commonTag method="tags">
                                     <#if tags??>
-                                        <option value="">选择添加</option>
+                                        <option value=""><@spring.message code='admin.editor.select.tag.default' /></option>
                                         <#list tags as tag>
                                             <option value="${tag.tagName}">${tag.tagName}(${tag.posts?size})</option>
                                         </#list>
                                     <#else>
-                                        <option>暂无标签</option>
+                                        <option><@spring.message code='common.text.no-data' /></option>
                                     </#if>
                                 </@commonTag>
                             </select>
@@ -155,7 +155,7 @@
                     </div>
                     <div class="box box-primary">
                         <div class="box-header with-border">
-                            <h3 class="box-title">缩略图</h3>
+                            <h3 class="box-title"><@spring.message code='admin.editor.text.thumbnail' /></h3>
                             <div class="box-tools">
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
                                     <i class="fa fa-minus"></i>
@@ -183,7 +183,7 @@
             $('#tagList').tagEditor({
                 //initialTags: ['Hello', 'World', 'Example', 'Tags'],
                 delimiter: ',',
-                placeholder: '请输入标签',
+                placeholder: '<@spring.message code="admin.posts.edit.form.tag.placeholder" />',
                 forceLowercase: false
             });
 
@@ -279,7 +279,7 @@
              */
             function urlOnBlurAuto() {
                 if($('#newPostUrl').val()===""){
-                    showMsg("固定链接不能为空！","info",2000);
+                    showMsg("<@spring.message code='admin.editor.js.no-url' />","info",2000);
                     return;
                 }
                 $.ajax({
@@ -319,14 +319,14 @@
                 if(postTitle.val()){
                     Title = postTitle.val();
                 }else{
-                    showMsg("标题不能为空！","info",2000);
+                    showMsg("<@spring.message code='admin.editor.js.no-title' />","info",2000);
                     return;
                 }
                 $('input[name="categories"]:checked').each(function(){
                     cateList.push($(this).val());
                 });
                 if($('#postUrl').html()===""){
-                    showMsg("固定链接不能为空！","info",2000);
+                    showMsg("<@spring.message code='admin.editor.js.no-url' />","info",2000);
                     return;
                 }
                 $.ajax({
