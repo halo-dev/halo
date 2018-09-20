@@ -17,8 +17,7 @@ ${options.native_css?if_exists}
             <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" id="commentAuthorUrl" placeholder="网址(选填)">
         </div>
         <div class="comment-content">
-            <textarea class="comment-input-content" name="commentContent" id="commentContent"
-                      placeholder="${options.native_comment_placeholder?default('赶快评论一个吧！')}"></textarea>
+            <textarea class="comment-input-content" name="commentContent" id="commentContent" placeholder="${options.native_comment_placeholder?default('赶快评论一个吧！')}"></textarea>
             <div class="OwO"></div>
         </div>
         <div class="comment-footer">

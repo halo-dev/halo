@@ -13,6 +13,9 @@
             .form-horizontal .control-label{
                 text-align: left;
             }
+            .control-radio{
+                padding-top: 7px;
+            }
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.index.title' /></h1>
@@ -39,81 +42,123 @@
                                 <div class="col-sm-6 col-xs-6">
                                     <div class="form-group">
                                         <label for="widgetPostCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.post-count' />：</label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="true" ${((options.widget_postcount?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.display' />
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="false" ${((options.widget_postcount?default('true'))=='false')?string('checked','')}> <@spring.message code='common.radio.hide' />
-                                            </label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="true" ${((options.widget_postcount?default('true'))=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.display' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_postcount" id="widgetPostCount" value="false" ${((options.widget_postcount?default('true'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.hide' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="widgetCommentCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.comment-count' />：</label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="true" ${((options.widget_commentcount?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.display' />
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="false" ${((options.widget_commentcount?default('true'))=='false')?string('checked','')}> <@spring.message code='common.radio.hide' />
-                                            </label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="true" ${((options.widget_commentcount?default('true'))=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.display' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="false" ${((options.widget_commentcount?default('true'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.hide' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="widgetAttachmentCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.attachment-count' />：</label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="true" ${((options.widget_attachmentcount?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.display' />
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="false" ${((options.widget_attachmentcount?default('true'))=='false')?string('checked','')}> <@spring.message code='common.radio.hide' />
-                                            </label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="true" ${((options.widget_attachmentcount?default('true'))=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.display' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="false" ${((options.widget_attachmentcount?default('true'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.hide' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="widgetDayCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.day-count' />：</label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_daycount" id="widgetDayCount" value="true" ${((options.widget_daycount?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.display' />
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_daycount" id="widgetDayCount" value="false" ${((options.widget_daycount?default('true'))=='false')?string('checked','')}> <@spring.message code='common.radio.hide' />
-                                            </label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_daycount" id="widgetDayCount" value="true" ${((options.widget_daycount?default('true'))=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.display' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_daycount" id="widgetDayCount" value="false" ${((options.widget_daycount?default('true'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.hide' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-sm-6 col-xs-6">
                                     <div class="form-group">
                                         <label for="widgetPostLastest" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.post-lastest' />：</label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="true" ${((options.widget_postlastest?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.display' />
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="false" ${((options.widget_postlastest?default('true'))=='false')?string('checked','')}> <@spring.message code='common.radio.hide' />
-                                            </label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="true" ${((options.widget_postlastest?default('true'))=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.display' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="false" ${((options.widget_postlastest?default('true'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.hide' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="widgetCommentLastest" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.comment-lastest' />：</label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="true" ${((options.widget_commentlastest?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.display' />
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="false" ${((options.widget_commentlastest?default('true'))=='false')?string('checked','')}> <@spring.message code='common.radio.hide' />
-                                            </label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="true" ${((options.widget_commentlastest?default('true'))=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.display' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="false" ${((options.widget_commentlastest?default('true'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.hide' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="widgetLogsLastest" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.logs-lastest' />：</label>
-                                        <div class="col-sm-8">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="true" ${((options.widget_logslastest?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.display' />
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="false" ${((options.widget_logslastest?default('true'))=='false')?string('checked','')}> <@spring.message code='common.radio.hide' />
-                                            </label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="true" ${((options.widget_logslastest?default('true'))=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.display' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="false" ${((options.widget_logslastest?default('true'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.hide' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

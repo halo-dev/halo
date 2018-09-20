@@ -13,6 +13,9 @@
             .nav-tabs-custom > .nav-tabs > li.active {
                 border-top-color: #d2d6de;
             }
+            .control-radio{
+                padding-top: 7px;
+            }
         </style>
         <section class="content-header">
             <h1>
@@ -237,22 +240,31 @@
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" value="native" ${((options.comment_system?default('native'))=='native')?string('checked','')}> <@spring.message code='admin.setting.form.comment-system-native' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" value="valine" ${((options.comment_system?default('native'))=='valine')?string('checked','')}> Valine
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" value="disqus" ${((options.comment_system?default('native'))=='disqus')?string('checked','')}> Disqus
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" value="livere" ${((options.comment_system?default('native'))=='livere')?string('checked','')}> Livere
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="comment_system" value="changyan" ${((options.comment_system?default('native'))=='changyan')?string('checked','')}> <@spring.message code='admin.setting.form.comment-system-changyan' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_system" value="native" ${((options.comment_system?default('native'))=='native')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.comment-system-native' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_system" value="valine" ${((options.comment_system?default('native'))=='valine')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label>Valine</label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_system" value="disqus" ${((options.comment_system?default('native'))=='disqus')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label>Disqus</label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_system" value="livere" ${((options.comment_system?default('native'))=='livere')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label>Livere</label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -278,46 +290,70 @@
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.new-comment-need-check' /></label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="new_comment_need_check" value="true" ${((options.new_comment_need_check?default("true"))=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                    </label>
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="new_comment_need_check" value="false" ${((options.new_comment_need_check?if_exists)=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                    </label>
+                                                <div class="col-lg-4 col-sm-8 control-radio">
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="new_comment_need_check" value="true" ${((options.new_comment_need_check?default("true"))=='true')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.enable' /></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="new_comment_need_check" value="false" ${((options.new_comment_need_check?if_exists)=='false')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.disable' /></label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.new-comment-notice' /></label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="new_comment_notice" value="true" ${((options.new_comment_notice?if_exists)=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                    </label>
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="new_comment_notice" value="false" ${((options.new_comment_notice?if_exists)=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                    </label>
+                                                <div class="col-lg-4 col-sm-8 control-radio">
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="new_comment_notice" value="true" ${((options.new_comment_notice?if_exists)=='true')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.enable' /></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="new_comment_notice" value="false" ${((options.new_comment_notice?if_exists)=='false')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.disable' /></label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-pass-notice' /></label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="comment_pass_notice" value="true" ${((options.comment_pass_notice?if_exists)=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                    </label>
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="comment_pass_notice" value="false" ${((options.comment_pass_notice?if_exists)=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                    </label>
+                                                <div class="col-lg-4 col-sm-8 control-radio">
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="comment_pass_notice" value="true" ${((options.comment_pass_notice?if_exists)=='true')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.enable' /></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="comment_pass_notice" value="false" ${((options.comment_pass_notice?if_exists)=='false')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.disable' /></label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-reply-notice' /></label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="comment_reply_notice" value="true" ${((options.comment_reply_notice?if_exists)=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                    </label>
-                                                    <label class="radio-inline">
-                                                        <input type="radio" name="comment_reply_notice" value="false" ${((options.comment_reply_notice?if_exists)=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                    </label>
+                                                <div class="col-lg-4 col-sm-8 control-radio">
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="comment_reply_notice" value="true" ${((options.comment_reply_notice?if_exists)=='true')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.enable' /></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="pretty p-default p-round">
+                                                        <input type="radio" name="comment_reply_notice" value="false" ${((options.comment_reply_notice?if_exists)=='false')?string('checked','')}>
+                                                        <div class="state p-primary">
+                                                            <label><@spring.message code='common.radio.disable' /></label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -463,16 +499,25 @@
                                     <div class="box-body">
                                         <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.attach-choose' /></label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="attach_loc" value="server" ${((options.attach_loc?default('server'))=='server')?string('checked','')}> <@spring.message code='admin.setting.form.attach-loc-server' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc?if_exists)=='upyun')?string('checked','')} disabled="disabled"> <@spring.message code='admin.setting.form.attach-loc-upyun' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="attach_loc" value="qiniu" ${((options.attach_loc?if_exists)=='qiniu')?string('checked','')} disabled="disabled"> <@spring.message code='admin.setting.form.attach-loc-qiniu' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="attach_loc" value="server" ${((options.attach_loc?default('server'))=='server')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.attach-loc-server' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc?if_exists)=='upyun')?string('checked','')} disabled="disabled">
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.attach-loc-upyun' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="attach_loc" value="qiniu" ${((options.attach_loc?if_exists)=='qiniu')?string('checked','')} disabled="disabled">
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.attach-loc-qiniu' /></label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -554,35 +599,53 @@
                                     <div class="box-body">
                                         <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.admin-pjax' /></label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="admin_pjax" value="true" ${((options.admin_pjax?default('true'))=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="admin_pjax" value="false" ${((options.admin_pjax?if_exists)=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="admin_pjax" value="true" ${((options.admin_pjax?default('true'))=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="admin_pjax" value="false" ${((options.admin_pjax?if_exists)=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.admin-loading' /></label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="admin_loading" value="true" ${((options.admin_loading?if_exists)=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="admin_loading" value="false" ${((options.admin_loading?default('false'))=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="admin_loading" value="true" ${((options.admin_loading?if_exists)=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="admin_loading" value="false" ${((options.admin_loading?default('false'))=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.admin-layout' /></label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="admin_layout" value="" ${((options.admin_layout?default(''))=='')?string('checked','')}> <@spring.message code='admin.setting.form.admin-layout-normal' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="admin_layout" value="layout-boxed" ${((options.admin_layout?default(''))=='layout-boxed')?string('checked','')}> <@spring.message code='admin.setting.form.admin-layout-box' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="admin_layout" value="" ${((options.admin_layout?default(''))=='')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.admin-layout-normal' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="admin_layout" value="layout-boxed" ${((options.admin_layout?default(''))=='layout-boxed')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.admin-layout-box' /></label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -606,13 +669,19 @@
                                         </div>
                                         <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.sidebar-style' /></label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="sidebar_style" value="" ${((options.sidebar_style?default(''))=='')?string('checked','')}> <@spring.message code='admin.setting.form.sidebar-style-none' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="sidebar_style" value="sidebar-collapse" ${((options.sidebar_style?default(''))=='sidebar-collapse')?string('checked','')}> <@spring.message code='admin.setting.form.sidebar-style-collapse' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="sidebar_style" value="" ${((options.sidebar_style?default(''))=='')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.sidebar-style-none' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="sidebar_style" value="sidebar-collapse" ${((options.sidebar_style?default(''))=='sidebar-collapse')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='admin.setting.form.sidebar-style-collapse' /></label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -628,13 +697,19 @@
                                     <div class="box-body">
                                         <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.smtp-email-enable' /></label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="smtp_email_enable" value="true" ${((options.smtp_email_enable?default('false'))=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="smtp_email_enable" value="false" ${((options.smtp_email_enable?if_exists)=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="smtp_email_enable" value="true" ${((options.smtp_email_enable?default('false'))=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="smtp_email_enable" value="false" ${((options.smtp_email_enable?if_exists)=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -673,13 +748,19 @@
                                     <div class="box-body">
                                         <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.api-status' /></label>
-                                            <div class="col-lg-4 col-sm-8">
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="api_status" value="true" ${((options.api_status?if_exists)=='true')?string('checked','')}> <@spring.message code='common.radio.enable' />
-                                                </label>
-                                                <label class="radio-inline">
-                                                    <input type="radio" name="api_status" value="false" ${((options.api_status?default('false'))=='false')?string('checked','')}> <@spring.message code='common.radio.disable' />
-                                                </label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="api_status" value="true" ${((options.api_status?if_exists)=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="api_status" value="false" ${((options.api_status?default('false'))=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
