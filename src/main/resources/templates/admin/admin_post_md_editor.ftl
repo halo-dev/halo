@@ -109,17 +109,23 @@
                                         <#if post??>
                                             <#list categories as cate>
                                                 <li style="padding: 0;margin: 0px;list-style: none">
-                                                    <label>
-                                                        <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}" <#list post.categories as postCate><#if postCate.cateId = cate.cateId>checked="checked"</#if></#list>> ${cate.cateName}
-                                                    </label>
+                                                    <div class="pretty p-default">
+                                                        <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}" <#list post.categories as postCate><#if postCate.cateId = cate.cateId>checked="checked"</#if></#list>>
+                                                        <div class="state p-primary">
+                                                            <label>${cate.cateName}</label>
+                                                        </div>
+                                                    </div>
                                                 </li>
                                             </#list>
                                         <#else>
                                             <#list categories as cate>
                                                 <li style="padding: 0;margin: 0px;list-style: none">
-                                                    <label>
-                                                        <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}"> ${cate.cateName}
-                                                    </label>
+                                                    <div class="pretty p-default">
+                                                        <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}">
+                                                        <div class="state p-primary">
+                                                            <label>${cate.cateName}</label>
+                                                        </div>
+                                                    </div>
                                                 </li>
                                             </#list>
                                         </#if>
