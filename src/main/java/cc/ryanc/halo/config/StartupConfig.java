@@ -7,6 +7,7 @@ import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.cron.CronUtil;
+import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,16 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
     @Autowired
     private OptionsService optionsService;
 
+    @Autowired
+    private freemarker.template.Configuration configuration;
+
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        this.loadActiveTheme();
+        try {
+            this.loadActiveTheme();
+        } catch (TemplateModelException e) {
+            e.printStackTrace();
+        }
         this.loadOptions();
         this.loadThemes();
         this.loadOwo();
@@ -47,7 +55,7 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
     /**
      * 加载主题设置
      */
-    private void loadActiveTheme() {
+    private void loadActiveTheme() throws TemplateModelException {
         String themeValue = optionsService.findOneOption(BlogPropertiesEnum.THEME.getProp());
         if (StringUtils.isNotEmpty(themeValue) && !StringUtils.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
@@ -55,6 +63,7 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
             //以防万一
             BaseController.THEME = "anatole";
         }
+        configuration.setSharedVariable("themeName", BaseController.THEME);
     }
 
     /**

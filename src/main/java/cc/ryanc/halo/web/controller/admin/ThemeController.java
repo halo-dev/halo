@@ -19,6 +19,7 @@ import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,9 @@ public class ThemeController extends BaseController {
 
     @Autowired
     private LogsService logsService;
+
+    @Autowired
+    private Configuration configuration;
 
     @Autowired
     private LocaleMessageUtil localeMessageUtil;
@@ -92,6 +96,8 @@ public class ThemeController extends BaseController {
             BaseController.THEME = siteTheme;
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
+            configuration.setSharedVariable("themeName", siteTheme);
+            configuration.setSharedVariable("options", HaloConst.OPTIONS);
             log.info("已将主题改变为：{}", siteTheme);
             logsService.saveByLogs(
                     new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, ServletUtil.getClientIP(request), DateUtil.date())
