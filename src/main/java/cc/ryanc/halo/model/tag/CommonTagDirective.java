@@ -60,9 +60,6 @@ public class CommonTagDirective implements TemplateDirectiveModel {
                 case "newComments":
                     environment.setVariable("newComments", builder.build().wrap(commentService.findAllComments(1)));
                     break;
-                case "themeName":
-                    environment.setVariable("themeName", builder.build().wrap(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp())));
-                    break;
                 default:
                     break;
             }
