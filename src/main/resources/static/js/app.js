@@ -65,6 +65,9 @@ function initMenu() {
  * @param hideAfter
  */
 function showMsg(text,icon,hideAfter) {
+    if(heading==undefined){
+        var heading = "提示";
+    }
     $.toast({
         text: text,
         heading: heading,
