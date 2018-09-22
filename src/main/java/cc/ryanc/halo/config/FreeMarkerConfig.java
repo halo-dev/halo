@@ -1,5 +1,7 @@
 package cc.ryanc.halo.config;
 
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.tag.ArticleTagDirective;
 import cc.ryanc.halo.model.tag.CommonTagDirective;
 import cc.ryanc.halo.service.OptionsService;
@@ -46,6 +48,7 @@ public class FreeMarkerConfig {
             configuration.setSharedVariable("articleTag", articleTagDirective);
             configuration.setSharedVariable("options", optionsService.findAllOptions());
             configuration.setSharedVariable("user", userService.findUser());
+            configuration.setSharedVariable("themeName", HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         } catch (TemplateModelException e) {
             log.error("自定义标签加载失败：{}", e.getMessage());
         }

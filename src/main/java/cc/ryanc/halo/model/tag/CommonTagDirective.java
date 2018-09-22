@@ -1,5 +1,7 @@
 package cc.ryanc.halo.model.tag;
 
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.*;
 import freemarker.core.Environment;
 import freemarker.template.*;
@@ -57,6 +59,9 @@ public class CommonTagDirective implements TemplateDirectiveModel {
                     break;
                 case "newComments":
                     environment.setVariable("newComments", builder.build().wrap(commentService.findAllComments(1)));
+                    break;
+                case "themeName":
+                    environment.setVariable("themeName", builder.build().wrap(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp())));
                     break;
                 default:
                     break;
