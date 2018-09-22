@@ -153,11 +153,11 @@ public class AttachmentController {
 
                 //压缩图片
                 Thumbnails.of(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString()).size(256, 256).keepAspectRatio(false).toFile(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
-
+                String filePath = new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(fileName).toString();
                 //保存在数据库
                 Attachment attachment = new Attachment();
                 attachment.setAttachName(fileName);
-                attachment.setAttachPath(new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(fileName).toString());
+                attachment.setAttachPath(filePath);
                 attachment.setAttachSmallPath(new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
@@ -173,6 +173,7 @@ public class AttachmentController {
                 result.put("success", 1);
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
                 result.put("url", attachment.getAttachPath());
+                result.put("filename",filePath);
             } catch (Exception e) {
                 log.error("上传文件失败：{}", e.getMessage());
                 result.put("success", 0);
