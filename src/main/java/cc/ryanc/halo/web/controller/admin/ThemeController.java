@@ -90,6 +90,8 @@ public class ThemeController extends BaseController {
             optionsService.saveOption(BlogPropertiesEnum.THEME.getProp(), siteTheme);
             //设置主题
             BaseController.THEME = siteTheme;
+            HaloConst.OPTIONS.clear();
+            HaloConst.OPTIONS = optionsService.findAllOptions();
             log.info("已将主题改变为：{}", siteTheme);
             logsService.saveByLogs(
                     new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, ServletUtil.getClientIP(request), DateUtil.date())
