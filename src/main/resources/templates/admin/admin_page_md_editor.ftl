@@ -8,16 +8,16 @@
     <#include "module/_sidebar.ftl">
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/editor.md/css/editormd.min.css">
+        <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
         <style type="text/css">
-            #post_title{
-                font-weight: 400;
-            }
+            #post_title{font-weight: 400;}
             #btnOpenAttach{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
             #btnOpenAttach:hover{background:#3c8dbc;color:#fff}
-            .form-horizontal .control-label{
-                text-align: left;
-            }
+            .form-horizontal .control-label{text-align: left;}
+            .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
+            .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
+            .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
+            .editor-preview-active img,.editor-preview-active-side img{width: 100%;}
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;">
@@ -55,14 +55,16 @@
                             <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;"><@spring.message code='common.btn.define' /></button>
                         </span>
                     </div>
+</#compress>
                     <div class="box box-primary">
                         <!-- Editor.md编辑器 -->
                         <div class="box-body pad">
                             <div id="markdown-editor">
-                                <textarea style="display:none;"><#if post??>${post.postContentMd?if_exists}</#if></textarea>
+                                <textarea id="editorarea" style="display:none;"><#if post??>${post.postContentMd?if_exists}</#if></textarea>
                             </div>
                         </div>
                     </div>
+<#compress >
                 </div>
                 <div class="col-md-3">
                     <div class="box box-primary">
@@ -114,8 +116,38 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/editor.md/editormd.min.js"></script>
+        <script src="/static/plugins/simplemde/simplemde.min.js"></script>
+        <script src="/static/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
         <script>
+            /**
+             * 加载编辑器
+             */
+            var simplemde = new SimpleMDE({
+                element: document.getElementById("editorarea"),
+                autoDownloadFontAwesome: false,
+                autofocus: true,
+                autosave: {
+                    enabled: true,
+                    uniqueId: "editor-temp-page-<#if post??>${post.postId}<#else>1</#if>",
+                    delay: 10000
+                },
+                renderingConfig: {
+                    codeSyntaxHighlighting: true
+                },
+                showIcons: ["code", "table"],
+                status: true,
+                status: ["autosave", "lines", "words"],
+                tabSize: 4
+            });
+
+            /**
+             * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
+             */
+            $(function () {
+                inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+                    uploadUrl: "/admin/attachments/upload"
+                });
+            })
 
             /**
              * 打开附件
@@ -144,34 +176,6 @@
                     scrollbar: false
                 });
             }
-            var editor;
-            function loadEditor() {
-                editor = editormd("markdown-editor", {
-                    width: "100%",
-                    height: 620,
-                    syncScrolling: "single",
-                    path: "/static/plugins/editor.md/lib/",
-                    saveHTMLToTextarea: true,
-                    imageUpload : true,
-                    imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                    imageUploadURL : "/admin/attachments/upload/editor",
-                    htmlDecode: "script",
-                    tocStartLevel : 1,
-                    onfullscreen : function() {
-                        $("#markdown-editor").css("z-index","9999");
-                    },
-                    onfullscreenExit : function() {
-                        $("#markdown-editor").css("z-index","");
-                    }
-                    // toolbarIcons : function () {
-                    //     return editormd.toolbarModes["simple"];
-                    // }
-                });
-            }
-            $(document).ready(function () {
-                loadEditor();
-            });
-
             /**
              * 检测是否已经存在该链接
              * @constructor
@@ -235,13 +239,15 @@
                         'postStatus': status,
                         'postTitle': Title,
                         'postUrl' : $('#postUrl').html().toString(),
-                        'postContentMd': editor.getMarkdown(),
-                        'postContent': editor.getTextareaSavedHTML(),
+                        'postContentMd': simplemde.value(),
+                        'postContent': simplemde.markdown(simplemde.value()),
                         'postThumbnail': $('#selectImg').attr('src'),
                         'allowComment' : $('#allowComment').val()
                     },
                     success: function (data) {
                         if(data.code==1){
+                            //清除自动保存的内容
+                            simplemde.clearAutosavedValue();
                             $.toast({
                                 text: data.msg,
                                 heading: '<@spring.message code="common.text.tips" />',
@@ -294,7 +300,7 @@
                         'postId': $('#postId').val(),
                         'postTitle': Title,
                         'postUrl' : $('#postUrl').html().toString(),
-                        'postContentMd': editor.getMarkdown(),
+                        'postContentMd': simplemde.value(),
                         'postType' : "page"
                     },
                     success: function (data) {

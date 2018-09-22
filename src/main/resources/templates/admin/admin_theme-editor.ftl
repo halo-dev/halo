@@ -6,7 +6,12 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <link rel="stylesheet" href="/static/plugins/editor.md/css/editormd.min.css">
+        <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
+        <style type="text/css">
+            .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
+            .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
+            .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
+        </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
             <ol class="breadcrumb">
@@ -93,27 +98,23 @@
                 </div>
             </div>
         </section>
-        <script src="/static/plugins/editor.md/editormd.min.js"></script>
+        <script src="/static/plugins/simplemde/simplemde.min.js"></script>
         <script>
-            var editor;
-            function loadEditor() {
-                editor = editormd("theme-editor", {
-                    width: "100%",
-                    height: 620,
-                    syncScrolling: "single",
-                    path: "/static/plugins/editor.md/lib/",
-                    watch            : false,
-                    toolbar          : false,
-                    codeFold         : true,
-                    searchReplace    : true,
-                    placeholder      : "Enjoy coding!",
-                    value            : (localStorage.mode) ? $("#"+localStorage.mode.replace("text/", "")+"-code").val() : $("#html-code").val(),
-                    theme            : (localStorage.theme) ? localStorage.theme : "default",
-                    mode             : (localStorage.mode) ? localStorage.mode : "text/html"
-                });
-            }
-            $(document).ready(function () {
-                loadEditor();
+            /**
+             * 加载编辑器
+             */
+            var simplemde = new SimpleMDE({
+                element: document.getElementById("tplContent"),
+                autoDownloadFontAwesome: false,
+                autofocus: true,
+                renderingConfig: {
+                    codeSyntaxHighlighting: true
+                },
+                showIcons: ["code", "table"],
+                status: false,
+                tabSize: 4,
+                toolbar: false,
+                toolbarTips: false
             });
             function loadContent(tplName) {
                 if (tplName && tplName != '') {
@@ -125,12 +126,12 @@
                             tplName: tplName
                         },
                         success: function (data) {
-                            editor.setValue(data);
+                            simplemde.value(data);
                             $('#tplNameTitle').html(tplName);
                         }
                     });
                 } else {
-                    editor.setValue('');
+                    simplemde.value('');
                     $('#tplNameTitle').html('');
                 }
             }
@@ -142,7 +143,7 @@
                     async: false,
                     data:{
                         'tplName': $('#tplNameTitle').html(),
-                        'tplContent': editor.getValue()
+                        'tplContent': simplemde.value()
                     },
                     success: function (data) {
                         if(data.code==1){
