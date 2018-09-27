@@ -42,6 +42,7 @@ java -jar target/dist/halo/halo-latest.jar
 ```
 
 服务器快速部署（暂时仅支持CentOS）：
+
 ```bash
 # 安装Halo
 yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh 1
@@ -49,7 +50,7 @@ yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh
 sh halo-cli.sh 2
 ```
 
-> 注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件。
+> 注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题扫描和上传会有问题。
 
 Let's start: http://localhost:8090
 
@@ -118,6 +119,7 @@ Halo的诞生离不开下面这些项目：
 - [Animate](https://github.com/daneden/animate.css.git)：非常好用的css动效库
 - [Editor.md](https://github.com/pandao/editor.md.git)：Markdown前端编辑器，遗憾作者弃坑了
 - [Editor.md](https://github.com/hawtim/editor.md)：Editor.md，hawtim接过来维护的版本
+- [SimpleMDE - Markdown Editor](https://github.com/sparksuite/simplemde-markdown-editor)：简洁，功能够用，且轻量级的Markdown编辑器
 - [Bootstrap-FileInput](https://github.com/kartik-v/bootstrap-fileinput.git)：个人认为最好用的上传组件，没有之一
 - [Font-awesome](https://github.com/FortAwesome/Font-Awesome.git)：使用最广泛的字体图标库
 - [Jquery](https://github.com/jquery/jquery.git)：使用最广泛的JavaScript框架
