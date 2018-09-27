@@ -49,7 +49,7 @@ yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh
 sh halo-cli.sh 2
 ```
 
-> Note: If you use Idea, Eclipse and other IDEs to run, you need to install the Lombok plugin.
+> Note: If you use Idea, Eclipse and other IDEs to run, you need to install the Lombok plugin, In addition, JDK10 is not supported at the moment, and there are problems with themes scanning and uploading.
 
 Let's start: http://localhost:8090
 
@@ -117,12 +117,13 @@ The birth of Halo is inseparable from the following projects:
 - [Animate](https://github.com/daneden/animate.css.git)：Very easy to use css motion library.
 - [Editor.md](https://github.com/pandao/editor.md.git)：Markdown front-end editor, sorry for the author abandoned.
 - [Editor.md](https://github.com/hawtim/editor.md)：Editor.md, the version that hawtim took over to maintain.
+- [SimpleMDE - Markdown Editor](https://github.com/sparksuite/simplemde-markdown-editor)：Simple, functional, and lightweight Markdown editor.
 - [Bootstrap-FileInput](https://github.com/kartik-v/bootstrap-fileinput.git)：Personally think that the best upload component.
 - [Font-awesome](https://github.com/FortAwesome/Font-Awesome.git)：The most widely used font icon library.
 - [Jquery](https://github.com/jquery/jquery.git)：Use the widest range of JavaScript frameworks.
 - [Layer](https://github.com/sentsin/layer.git)：Personally think that the most practical and best-looking pop-up layer components.
 - [Jquery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：Message prompt component.
-- [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
+- [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax.****
 - [OwO](https://github.com/DIYgod/OwO)：Front-end expression library.
 
 ## Donate
