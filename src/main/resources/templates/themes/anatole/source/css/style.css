@@ -252,6 +252,21 @@ a:hover, a:active {
     color: #4786D6;
 }
 
+.tags-cloud {
+    background-color: #FFF;
+    margin: 30px;
+}
+
+.tags-cloud a {
+    font-size: 20px;
+    margin: 5px;
+}
+
+.tags-cloud a:hover {
+    color: #4786D6;
+    text-decoration: underline;
+}
+
 .post {
     background-color: #FFF;
     margin: 30px;
