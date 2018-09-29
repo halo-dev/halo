@@ -259,6 +259,7 @@ a:hover, a:active {
 
 .tags-cloud a {
     font-size: 20px;
+    margin: 5px;
 }
 
 .tags-cloud a:hover {
