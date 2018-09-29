@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Content;
 import com.sun.syndication.feed.rss.Item;
@@ -14,7 +15,6 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
@@ -62,7 +62,7 @@ public class HaloUtils {
         if (null != files) {
             for (File file : files) {
                 if (file.isFile()) {
-                    if (StringUtils.equals(file.getName(), ".DS_Store")) {
+                    if (StrUtil.equals(file.getName(), ".DS_Store")) {
                         continue;
                     }
                     backupDto = new BackupDto();
@@ -159,7 +159,7 @@ public class HaloUtils {
                 Theme theme = null;
                 for (File file : files) {
                     if (file.isDirectory()) {
-                        if (StringUtils.equals("__MACOSX", file.getName())) {
+                        if (StrUtil.equals("__MACOSX", file.getName())) {
                             continue;
                         }
                         theme = new Theme();

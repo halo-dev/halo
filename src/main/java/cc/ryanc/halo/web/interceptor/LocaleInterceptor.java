@@ -3,7 +3,7 @@ package cc.ryanc.halo.web.interceptor;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.LocaleEnum;
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,7 +23,7 @@ public class LocaleInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (StringUtils.equals(LocaleEnum.EN_US.getValue(), HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_LOCALE.getProp()))) {
+        if (StrUtil.equals(LocaleEnum.EN_US.getValue(), HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_LOCALE.getProp()))) {
             request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("en", "US"));
         } else {
             request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("zh", "CN"));

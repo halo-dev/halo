@@ -8,7 +8,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.util.PageUtil;
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -79,7 +79,7 @@ public class FrontTagController extends BaseController {
         }
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         Integer size = 10;
-        if (!StringUtils.isBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         Pageable pageable = PageRequest.of(page - 1, size, sort);

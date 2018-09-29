@@ -35,6 +35,9 @@
                         Halo<small style="font-size: 14px;"><@spring.message code='install.page.title'/></small>
                     </div>
                     <#if isInstall==false>
+                    <#if RequestParameters['lang']??>
+                        <#assign lang ="${RequestParameters['lang']}">
+                    </#if>
                     <form method="post" action="/install/do" class="form-horizontal" id="installForm">
                         <div class="box box-solid animated" id="installFirst">
                             <div class="box-body" style="padding: 30px;">
@@ -42,8 +45,8 @@
                                     <label for="blogLocale" class="col-sm-4 control-label"><@spring.message code='install.form.language'/></label>
                                     <div class="col-sm-8">
                                         <select class="form-control" id="blogLocale" name="blogLocale">
-                                            <option value="zh_CN" ${((options.blog_locale?default('zh_CN'))=='zh_CN')?string('selected','')}>简体中文</option>
-                                            <option value="en_US" ${((options.blog_locale?if_exists)=='en_US')?string('selected','')}>English</option>
+                                            <option value="zh_CN" <#if lang?default('zh_CN') = 'zh_CN'>selected</#if>>简体中文</option>
+                                            <option value="en_US" <#if lang?default('zh_CN') = 'en_US'>selected</#if>>English</option>
                                         </select>
                                     </div>
                                 </div>
@@ -308,6 +311,10 @@
                         }
                     },'json');
                 });
+        });
+        $('#blogLocale').on('change',function(){
+            var lang = $(this).val();
+            window.location.href="/install?lang="+lang;
         });
     </script>
     <#else>

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
@@ -66,6 +67,8 @@ public class MvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(localeInterceptor)
                 .addPathPatterns("/admin/**")
                 .addPathPatterns("/install");
+        registry.addInterceptor(localeChangeInterceptor())
+                .addPathPatterns("/install");
     }
 
     /**
@@ -102,5 +105,12 @@ public class MvcConfig implements WebMvcConfigurer {
         SessionLocaleResolver slr = new SessionLocaleResolver();
         slr.setDefaultLocale(Locale.CHINA);
         return slr;
+    }
+
+    @Bean
+    public LocaleChangeInterceptor localeChangeInterceptor() {
+        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        lci.setParamName("lang");
+        return lci;
     }
 }

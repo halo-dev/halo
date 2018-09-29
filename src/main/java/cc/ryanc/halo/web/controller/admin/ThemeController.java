@@ -17,11 +17,11 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.RuntimeUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
@@ -185,7 +185,7 @@ public class ThemeController extends BaseController {
     @ResponseBody
     public JsonResult cloneFromRemote(@RequestParam(value = "remoteAddr") String remoteAddr,
                                       @RequestParam(value = "themeName") String themeName) {
-        if (StringUtils.isBlank(remoteAddr) || StringUtils.isBlank(themeName)) {
+        if (StrUtil.isBlank(remoteAddr) || StrUtil.isBlank(themeName)) {
             return new JsonResult(0, localeMessageUtil.getMessage("code.admin.common.info-no-complete"));
         }
         try {
@@ -239,7 +239,7 @@ public class ThemeController extends BaseController {
                           @RequestParam("theme") String theme,
                           @RequestParam("hasUpdate") String hasUpdate) {
         model.addAttribute("themeDir", theme);
-        if (StringUtils.equals(hasUpdate, TrueFalseEnum.TRUE.getDesc())) {
+        if (StrUtil.equals(hasUpdate, TrueFalseEnum.TRUE.getDesc())) {
             model.addAttribute("hasUpdate", true);
         } else {
             model.addAttribute("hasUpdate", false);
@@ -294,7 +294,7 @@ public class ThemeController extends BaseController {
     @ResponseBody
     public JsonResult saveTpl(@RequestParam("tplName") String tplName,
                               @RequestParam("tplContent") String tplContent) {
-        if (StringUtils.isBlank(tplContent)) {
+        if (StrUtil.isBlank(tplContent)) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.edit.no-content"));
         }
         try {
