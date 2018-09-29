@@ -6,10 +6,10 @@ import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.cron.CronUtil;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -57,7 +57,7 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
      */
     private void loadActiveTheme() throws TemplateModelException {
         String themeValue = optionsService.findOneOption(BlogPropertiesEnum.THEME.getProp());
-        if (StringUtils.isNotEmpty(themeValue) && !StringUtils.equals(themeValue, null)) {
+        if (StrUtil.isNotEmpty(themeValue) && !StrUtil.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
         } else {
             //以防万一

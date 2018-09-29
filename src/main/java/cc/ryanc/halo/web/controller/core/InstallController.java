@@ -9,11 +9,11 @@ import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -69,7 +69,7 @@ public class InstallController {
     @GetMapping
     public String install(Model model) {
         try {
-            if (StringUtils.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
+            if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
                 model.addAttribute("isInstall", true);
             } else {
                 model.addAttribute("isInstall", false);
@@ -104,13 +104,13 @@ public class InstallController {
                              @RequestParam("userPwd") String userPwd,
                              HttpServletRequest request) {
         try {
-            if (StringUtils.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
+            if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
                 return false;
             }
             //创建新的用户
             User user = new User();
             user.setUserName(userName);
-            if (StringUtils.isBlank(userDisplayName)) {
+            if (StrUtil.isBlank(userDisplayName)) {
                 userDisplayName = userName;
             }
             user.setUserDisplayName(userDisplayName);

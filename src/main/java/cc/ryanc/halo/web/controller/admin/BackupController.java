@@ -12,9 +12,9 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,11 +63,11 @@ public class BackupController {
     @GetMapping
     public String backup(@RequestParam(value = "type", defaultValue = "resources") String type, Model model) {
         List<BackupDto> backups = null;
-        if (StringUtils.equals(type, BackupTypeEnum.RESOURCES.getDesc())) {
+        if (StrUtil.equals(type, BackupTypeEnum.RESOURCES.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.RESOURCES.getDesc());
-        } else if (StringUtils.equals(type, BackupTypeEnum.DATABASES.getDesc())) {
+        } else if (StrUtil.equals(type, BackupTypeEnum.DATABASES.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.DATABASES.getDesc());
-        } else if (StringUtils.equals(type, BackupTypeEnum.POSTS.getDesc())) {
+        } else if (StrUtil.equals(type, BackupTypeEnum.POSTS.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc());
         } else {
             backups = new ArrayList<>();
@@ -86,11 +86,11 @@ public class BackupController {
     @GetMapping(value = "doBackup")
     @ResponseBody
     public JsonResult doBackup(@RequestParam("type") String type) {
-        if (StringUtils.equals(BackupTypeEnum.RESOURCES.getDesc(), type)) {
+        if (StrUtil.equals(BackupTypeEnum.RESOURCES.getDesc(), type)) {
             return this.backupResources();
-        } else if (StringUtils.equals(BackupTypeEnum.DATABASES.getDesc(), type)) {
+        } else if (StrUtil.equals(BackupTypeEnum.DATABASES.getDesc(), type)) {
             return this.backupDatabase();
-        } else if (StringUtils.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
+        } else if (StrUtil.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
             return this.backupPosts();
         } else {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
@@ -205,10 +205,10 @@ public class BackupController {
                                   HttpSession session) {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        if (null == user.getUserEmail() || StringUtils.equals(user.getUserEmail(), "")) {
+        if (null == user.getUserEmail() || StrUtil.equals(user.getUserEmail(), "")) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.no-email"));
         }
-        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
+        if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.no-post"));
         }
         new EmailToAdmin(srcPath, user).start();
