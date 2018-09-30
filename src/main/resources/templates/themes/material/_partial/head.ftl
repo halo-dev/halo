@@ -1,5 +1,5 @@
 <#macro head title="" keywords="" description="">
-<#import "../../../common/macro/common_macro.ftl" as common>
+<#import "/common/macro/common_macro.ftl" as common>
 <head>
     <meta charset="utf-8">
     <!--
