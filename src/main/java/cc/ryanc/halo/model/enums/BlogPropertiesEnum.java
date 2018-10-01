@@ -143,7 +143,12 @@ public enum BlogPropertiesEnum {
     /**
      * 默认缩略图地址
      */
-    DEFAULT_THUMBNAIL("/static/images/thumbnail/thumbnail.png");
+    DEFAULT_THUMBNAIL("/static/images/thumbnail/thumbnail.png"),
+
+    /**
+     * 自动备份
+     */
+    AUTO_BACKUP("auto_backup");
 
     private String prop;
 
