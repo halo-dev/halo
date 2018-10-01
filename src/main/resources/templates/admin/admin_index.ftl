@@ -30,7 +30,6 @@
             </ol>
         </section>
         <section class="content container-fluid">
-            <!-- Small boxes (Stat box) -->
             <div class="row">
                 <div class="col-lg-12 col-xs-12" id="widgetOptionsPanel" style="display: none">
                     <div class="box box-primary">

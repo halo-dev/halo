@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.MailService;
+import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
@@ -14,15 +15,15 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
+import cn.hutool.cron.CronUtil;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
@@ -53,6 +54,11 @@ public class BackupController {
     @Autowired
     private LocaleMessageUtil localeMessageUtil;
 
+    @Autowired
+    private OptionsService optionsService;
+
+    @Autowired
+    private Configuration configuration;
 
     /**
      * 渲染备份页面
@@ -189,6 +195,33 @@ public class BackupController {
         } catch (Exception e) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
+    }
+
+    /**
+     * 备份设置
+     *
+     * @param autoBackup autoBackup
+     * @return 重定向到/admin/backup
+     */
+    @PostMapping(value = "backupOption")
+    public String backupOption(@RequestParam("auto_backup") String autoBackup) throws TemplateModelException {
+        if (StrUtil.equals(autoBackup, TrueFalseEnum.TRUE.getDesc())) {
+            if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.AUTO_BACKUP.getProp()), TrueFalseEnum.FALSE.getDesc())) {
+                optionsService.saveOption("auto_backup", TrueFalseEnum.TRUE.getDesc());
+                CronUtil.start();
+                log.info("The scheduled task starts successfully!");
+            }
+        } else {
+            if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.AUTO_BACKUP.getProp()), TrueFalseEnum.TRUE.getDesc())) {
+                optionsService.saveOption("auto_backup", TrueFalseEnum.FALSE.getDesc());
+                CronUtil.stop();
+                log.info("The scheduled task stops successfully!");
+            }
+        }
+        configuration.setSharedVariable("options", optionsService.findAllOptions());
+        HaloConst.OPTIONS.clear();
+        HaloConst.OPTIONS = optionsService.findAllOptions();
+        return "redirect:/admin/backup";
     }
 
     /**

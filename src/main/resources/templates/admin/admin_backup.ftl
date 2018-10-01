@@ -8,10 +8,21 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
+            #btnBackupOption{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
+            #btnBackupOption:hover{background:#3c8dbc;color:#fff}
             .resourceType,.databaseType,.postType{list-style:none;float:left;margin:0;padding-bottom:10px}
+            .form-horizontal .control-label{
+                text-align: left;
+            }
+            .control-radio{
+                padding-top: 7px;
+            }
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.backup.title' /></h1>
+            <a id="btnBackupOption" href="#">
+                <@spring.message code='admin.backup.text.setting' />
+            </a>
             <ol class="breadcrumb">
                 <li>
                     <a href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
@@ -22,6 +33,39 @@
         </section>
         <section class="content container-fluid">
             <div class="row">
+                <div class="col-lg-12 col-xs-12" id="backupOptionsPanel" style="display: none">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"><@spring.message code='admin.backup.text.setting' /></h3>
+                        </div>
+                        <form class="form-horizontal" id="backupOption" method="post" action="/admin/backup/backupOption">
+                            <div class="box-body">
+                                <div class="col-sm-6 col-xs-6">
+                                    <div class="form-group">
+                                        <label for="autoBackup" class="col-sm-4 control-label"><@spring.message code='admin.backup.form.auto-backup' /></label>
+                                        <div class="col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="auto_backup" id="autoBackup" value="true" ${((options.auto_backup?if_exists)=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.enable' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="auto_backup" id="autoBackup" value="false" ${((options.auto_backup?default('false'))=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.disable' /></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-primary pull-right" ><@spring.message code='common.btn.save' /></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <div class="col-xs-12">
                     <ul style="list-style: none;padding-left: 0">
                         <li class="resourceType">
@@ -225,6 +269,10 @@
                     }
                 });
             }
+
+            $('#btnBackupOption').click(function () {
+                $('#backupOptionsPanel').slideToggle(400);
+            });
         </script>
     </div>
     <#include "module/_footer.ftl">
