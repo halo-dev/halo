@@ -79,7 +79,7 @@
                                     <div class="pull-right btn-delete" style="display: none" onclick="modelShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
                                 </div>
                                 <div class="box-footer">
-                                    <span class="theme-title">${theme.themeName?if_exists?upper_case}</span>
+                                    <span class="theme-title">${theme.themeName?if_exists?cap_first}</span>
                                     <#if theme.hasOptions>
                                         <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}','<#if theme.hasUpdate>true<#else>false</#if>')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
                                     </#if>
