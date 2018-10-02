@@ -207,16 +207,16 @@ public class BackupController {
     public String backupOption(@RequestParam("auto_backup") String autoBackup) throws TemplateModelException {
         if (StrUtil.equals(autoBackup, TrueFalseEnum.TRUE.getDesc())) {
             if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.AUTO_BACKUP.getProp()), TrueFalseEnum.FALSE.getDesc())) {
-                optionsService.saveOption("auto_backup", TrueFalseEnum.TRUE.getDesc());
                 CronUtil.start();
                 log.info("The scheduled task starts successfully!");
             }
+            optionsService.saveOption("auto_backup", TrueFalseEnum.TRUE.getDesc());
         } else {
             if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.AUTO_BACKUP.getProp()), TrueFalseEnum.TRUE.getDesc())) {
-                optionsService.saveOption("auto_backup", TrueFalseEnum.FALSE.getDesc());
                 CronUtil.stop();
                 log.info("The scheduled task stops successfully!");
             }
+            optionsService.saveOption("auto_backup", TrueFalseEnum.FALSE.getDesc());
         }
         configuration.setSharedVariable("options", optionsService.findAllOptions());
         HaloConst.OPTIONS.clear();
