@@ -116,11 +116,6 @@ public enum BlogPropertiesEnum {
     BLOG_START("blog_start"),
 
     /**
-     * 博客评论系统
-     */
-    COMMENT_SYSTEM("comment_system"),
-
-    /**
      * 仪表盘部件 文章总数
      */
     WIDGET_POSTCOUNT("widget_postcount"),

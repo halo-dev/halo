@@ -171,9 +171,6 @@ public class InstallController {
             //建立网站时间
             optionsService.saveOption(BlogPropertiesEnum.BLOG_START.getProp(), HaloUtils.getStringDate("yyyy-MM-dd"));
 
-            //默认评论系统
-            optionsService.saveOption(BlogPropertiesEnum.COMMENT_SYSTEM.getProp(), "native");
-
             //默认不配置邮件系统
             optionsService.saveOption(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp(), TrueFalseEnum.FALSE.getDesc());
 
