@@ -11,6 +11,7 @@
             .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}
             #btnNewPost{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
             #btnNewPost:hover{background:#3c8dbc;color:#fff}
+            .pretty{margin: 0;}
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
@@ -20,7 +21,8 @@
             <ol class="breadcrumb">
                 <li>
                     <a data-pjax="true" href="/admin">
-                        <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
+                        <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' />
+                    </a>
                 </li>
                 <li><a data-pjax="true" href="#"><@spring.message code='admin.posts.title' /></a></li>
                 <li class="active"><@spring.message code='admin.posts.bread.all-posts' /></li>
@@ -43,10 +45,29 @@
                 </div>
                 <div class="col-xs-12">
                     <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" id="searchText" placeholder="请输入关键字" style="display: inline-block;">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-primary btn-sm">搜索</button>
+                                    <button type="button" class="btn btn-danger btn-sm">删除</button>
+                                </div>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+                            </div>
+                        </div>
                         <div class="box-body table-responsive">
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
+                                    <td>
+                                        <div class="pretty p-default">
+                                            <input id="checkAll" type="checkbox" class="minimal" name="ck" onclick="selectAll()">
+                                            <div class="state p-primary"><label></label></div>
+                                        </div>
+                                    </td>
                                     <th><@spring.message code='common.th.title' /></th>
                                     <th><@spring.message code='common.th.categories' /></th>
                                     <th><@spring.message code='common.th.tags' /></th>
@@ -60,6 +81,14 @@
                                     <#if posts.content?size gt 0>
                                         <#list posts.content as post>
                                             <tr>
+                                                <td>
+                                                    <div class="pretty p-default">
+                                                        <input name="cks" type="checkbox" class="minimal" value="${post.postId}" onclick="setSelectAll()">
+                                                        <div class="state p-primary">
+                                                            <label></label>
+                                                        </div>
+                                                    </div>
+                                                </td>
                                                 <#if post.postTitle?length gt 20>
                                                     <td>${post.postTitle?substring(0,20)}...</td>
                                                 <#else >
@@ -162,6 +191,23 @@
             function removeIt(){
                 var url=$.trim($("#url").val());
                 window.location.href=url;
+            }
+            function selectAll() {
+                if ($("input[name='ck']").prop("checked")) {
+                    $("input[type='checkbox'][name='cks']").prop("checked",true);//全选
+                } else {
+                    $("input[type='checkbox'][name='cks']").prop("checked",false);  //取消全选
+                }
+            }
+            function setSelectAll(){
+                if (!$("#checkAll").checked) {
+                    $("#checkAll").prop("checked", false);
+                }
+                var chsub = $("input[type='checkbox'][name='cks']").length;
+                var checkedsub = $("input[type='checkbox'][name='cks']:checked").length;
+                if (checkedsub == chsub) {
+                    $("#checkAll").prop("checked", true);
+                }
             }
         </script>
     </div>
