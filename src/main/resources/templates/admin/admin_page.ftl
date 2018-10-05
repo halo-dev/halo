@@ -7,13 +7,9 @@
     <!-- 菜单栏模块 -->
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
-        <style type="text/css" rel="stylesheet">
-            #btnNewPage{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnNewPage:hover{background:#3c8dbc;color:#fff}
-        </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.pages.title' /><small></small></h1>
-            <a id="btnNewPage" href="/admin/page/new">
+            <a class="btn-header" id="btnNewPage" href="/admin/page/new">
                 <@spring.message code='admin.pages.btn.new-page' />
             </a>
             <ol class="breadcrumb">
@@ -38,7 +34,7 @@
                         </ul>
                         <div class="tab-content" style="padding: 0;">
                             <div class="tab-pane active" id="internal">
-                                <div class="box-body table-responsive">
+                                <div class="box-body table-responsive no-padding">
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                         <tr>
@@ -69,7 +65,7 @@
                                 </div>
                             </div>
                             <div class="tab-pane" id="pages">
-                                <div class="box-body table-responsive">
+                                <div class="box-body table-responsive no-padding">
                                     <table class="table table-bordered table-hover">
                                         <thead>
                                             <tr>

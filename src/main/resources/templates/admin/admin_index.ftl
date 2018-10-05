@@ -8,8 +8,6 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
-            #btnWidgetsOption{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnWidgetsOption:hover{background:#3c8dbc;color:#fff}
             .form-horizontal .control-label{
                 text-align: left;
             }
@@ -19,7 +17,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.index.title' /></h1>
-            <a id="btnWidgetsOption" href="#">
+            <a class="btn-header" id="btnWidgetsOption" href="#">
                 <@spring.message code='admin.index.btn.widgets' />
             </a>
             <ol class="breadcrumb">
@@ -218,7 +216,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
                                     <tr>
@@ -268,7 +266,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
                                 <tr>
@@ -348,7 +346,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
                                     <tr>

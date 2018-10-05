@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div class="box box-primary">
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>

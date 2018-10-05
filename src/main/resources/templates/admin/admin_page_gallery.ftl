@@ -8,8 +8,6 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
-            #btnNewPicture{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnNewPicture:hover{background:#3c8dbc;color:#fff}
             .form-horizontal .control-label{
                 text-align: left;
             }
@@ -18,7 +16,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.pages.galleries.title' /><small></small></h1>
-            <a id="btnNewPicture" href="#">
+            <a class="btn-header" id="btnNewPicture" href="#">
                 <@spring.message code='admin.pages.galleries.text.add-gallery' />
             </a>
             <ol class="breadcrumb">

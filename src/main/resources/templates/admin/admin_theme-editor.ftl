@@ -44,7 +44,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title">${options.theme?default('halo')}主题</h3>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <div class="table-responsive mailbox-messages">
                                 <table class="table table-hover table-striped">
                                     <tbody>

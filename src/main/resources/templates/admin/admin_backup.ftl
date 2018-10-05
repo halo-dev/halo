@@ -8,8 +8,6 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
-            #btnBackupOption{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnBackupOption:hover{background:#3c8dbc;color:#fff}
             .resourceType,.databaseType,.postType{list-style:none;float:left;margin:0;padding-bottom:10px}
             .form-horizontal .control-label{
                 text-align: left;
@@ -20,7 +18,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.backup.title' /></h1>
-            <a id="btnBackupOption" href="#">
+            <a class="btn-header" id="btnBackupOption" href="#">
                 <@spring.message code='admin.backup.text.setting' />
             </a>
             <ol class="breadcrumb">
@@ -81,7 +79,7 @@
                 </div>
                 <div class="col-xs-12">
                     <div class="box box-primary">
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>

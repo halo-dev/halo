@@ -34,33 +34,13 @@
             #uploadForm{
                 display: none;
             }
-            #showForm{
-                margin-left: 4px;
-                padding: 3px 6px;
-                position: relative;
-                top: -4px;
-                border: 1px solid #ccc;
-                border-radius: 2px;
-                background: #fff;
-                text-shadow: none;
-                font-weight: 600;
-                font-size: 12px;
-                line-height: normal;
-                color: #3c8dbc;
-                cursor: pointer;
-                transition: all .2s ease-in-out;
-            }
-            #showForm:hover{
-                background: #3c8dbc;
-                color: #fff;
-            }
             .btn-delete:hover{
                 color: red;
             }
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.themes.title' /></h1>
-            <a id="showForm" href="#" onclick="openThemeInstall()">
+            <a class="btn-header" id="showForm" href="#" onclick="openThemeInstall()">
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.themes.btn.install' />
             </a>
             <ol class="breadcrumb">

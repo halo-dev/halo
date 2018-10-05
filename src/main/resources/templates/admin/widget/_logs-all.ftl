@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-lg-12 attachDesc" style="padding-top: 15px;">
             <div class="box box-solid">
-                <div class="box-body table-responsive">
+                <div class="box-body table-responsive no-padding">
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>

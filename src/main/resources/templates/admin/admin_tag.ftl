@@ -68,7 +68,7 @@
                                     <div class="form-group">
                                         <label for="tagUrl"><@spring.message code='admin.tags.form.tag-url' /></label>
                                         <input type="text" class="form-control" id="tagUrl" name="tagUrl">
-                                        <small><@spring.message code='admin.tags.form.tag-name-tips' /></small>
+                                        <small><@spring.message code='admin.tags.form.tag-url-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
