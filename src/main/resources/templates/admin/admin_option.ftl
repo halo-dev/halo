@@ -249,6 +249,23 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
+                                            <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-activate-power-mode' /></label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_activate_power_mode" value="true" ${((options.comment_activate_power_mode?if_exists)=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_activate_power_mode" value="false" ${((options.comment_activate_power_mode?default("false"))=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.new-comment-need-check' /></label>
                                             <div class="col-lg-4 col-sm-8 control-radio">
                                                 <div class="pretty p-default p-round">
