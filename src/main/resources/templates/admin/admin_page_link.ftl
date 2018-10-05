@@ -85,7 +85,7 @@
                 <div class="col-md-7">
                     <div class="box box-primary">
                         <div class="box-header with-border"><h3 class="box-title"><@spring.message code='admin.pages.links.text.all-links' /></h3></div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-hover">
                                 <thead>
                                 <tr>

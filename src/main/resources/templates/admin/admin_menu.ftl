@@ -105,8 +105,8 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.menus.text.all-menus' /></h3>
                         </div>
-                        <div class="box-body table-responsive">
-                            <table class="table table-hover">
+                        <div class="box-body table-responsive no-padding">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
                                     <th><@spring.message code='common.th.name' /></th>

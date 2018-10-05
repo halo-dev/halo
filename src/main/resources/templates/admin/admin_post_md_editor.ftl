@@ -12,8 +12,6 @@
         <link rel="stylesheet" href="/static/plugins/jquery-tageditor/jquery.tag-editor.css">
         <style type="text/css">
             #post_title{font-weight: 400;}
-            #btnOpenAttach{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnOpenAttach:hover{background:#3c8dbc;color:#fff}
             .form-horizontal .control-label{text-align: left;}
             .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
             .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
@@ -22,7 +20,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.posts.edit.title' /></h1>
-            <a id="btnOpenAttach" href="#" onclick="openAttachCopy()">
+            <a class="btn-header" id="btnOpenAttach" href="#" onclick="openAttachCopy()">
                 <@spring.message code='admin.editor.btn.attachs' />
             </a>
             <ol class="breadcrumb">

@@ -111,3 +111,34 @@
 ::-webkit-scrollbar-track {
     background-color: #eee;
 }
+
+.btn-header {
+    margin-left: 4px;
+    padding: 3px 6px;
+    position: relative;
+    top: -4px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    background: #fff;
+    text-shadow: none;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: normal;
+    color: #3c8dbc;
+    cursor: pointer;
+    transition: all .2s ease-in-out
+}
+
+.btn-header:hover{
+    background:#3c8dbc;color:#fff
+}
+
+.table-responsive{
+    border: none!important;
+}
+.table-bordered{
+    border: none!important;
+}
+.box{
+    border-top: none!important;
+}
