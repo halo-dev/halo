@@ -7,7 +7,6 @@ import cc.ryanc.halo.model.enums.AllowCommentEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.*;
-import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -169,7 +168,7 @@ public class InstallController {
             optionsService.saveOption(BlogPropertiesEnum.THEME.getProp(), "anatole");
 
             //建立网站时间
-            optionsService.saveOption(BlogPropertiesEnum.BLOG_START.getProp(), HaloUtils.getStringDate("yyyy-MM-dd"));
+            optionsService.saveOption(BlogPropertiesEnum.BLOG_START.getProp(), DateUtil.format(DateUtil.date(),"yyyy-MM-dd"));
 
             //默认不配置邮件系统
             optionsService.saveOption(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp(), TrueFalseEnum.FALSE.getDesc());
