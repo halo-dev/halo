@@ -1,3 +1,14 @@
+/**
+ * 全局函数
+ */
+$.extend({
+    halo: function () {
+    }
+});
+
+/**
+ * 适配移动端并初始化菜单
+ */
 $(document).ready(function () {
     if($(window).width()<1024){
         if($('body').hasClass('layout-boxed')){
@@ -10,10 +21,16 @@ $(document).ready(function () {
     initMenu();
 });
 
+/**
+ * pjax请求时点击菜单的事件
+ */
 $(document).on('pjax:clicked', function() {
     $('.content-wrapper').html("");
 });
 
+/**
+ * pjax请求时完成加载的事件
+ */
 $(document).on('pjax:complete',function () {
     initMenu();
 });
@@ -52,19 +69,19 @@ function initMenu() {
                 li.addClass("active");
                 $(this).parent().addClass("active");
             }else{
-                //li.removeClass("active");
                 $(this).parent().removeClass("active");
             }
         });
     });
 }
+
 /**
  * 提示框
  * @param text
  * @param icon
  * @param hideAfter
  */
-function showMsg(text,icon,hideAfter) {
+function showMsg(text, icon, hideAfter) {
     if(heading==undefined){
         var heading = "提示";
     }
@@ -84,19 +101,89 @@ function showMsg(text,icon,hideAfter) {
 }
 
 /**
- * 转义
- * @param str str
- * @returns {string}
+ * 普通提示框
+ *
+ * @param text 提示文字
+ * @param icon icon
+ * @param hideAfter 隐藏时间
  */
-function stringEncode(str){
-    var div=document.createElement('div');
-    if(div.innerText){
-        div.innerText=str;
-    }else{
-        div.textContent=str;
+$.halo.prototype.showMsg = function (text, icon, hideAfter) {
+    if (heading == undefined) {
+        var heading = "提示";
     }
-    return div.innerHTML;
-}
+    $.toast({
+        text: text,
+        heading: heading,
+        icon: icon,
+        showHideTransition: 'fade',
+        allowToastClose: true,
+        hideAfter: hideAfter,
+        stack: 1,
+        position: 'top-center',
+        textAlign: 'left',
+        loader: true,
+        loaderBg: '#ffffff'
+    });
+};
+
+/**
+ * 提示之后刷新页面
+ *
+ * @param text 提示文字
+ * @param icon icon
+ * @param hideAfter 隐藏时间
+ */
+$.halo.prototype.showMsgAndReload = function (text, icon, hideAfter) {
+    if (heading == undefined) {
+        var heading = "提示";
+    }
+    $.toast({
+        text: text,
+        heading: heading,
+        icon: icon,
+        showHideTransition: 'fade',
+        allowToastClose: true,
+        hideAfter: hideAfter,
+        stack: 1,
+        position: 'top-center',
+        textAlign: 'left',
+        loader: true,
+        loaderBg: '#ffffff',
+        afterHidden: function () {
+            window.location.reload();
+        }
+    });
+};
+
+/**
+ * 提示之后重定向
+ *
+ * @param text 提示文字
+ * @param icon icon
+ * @param hideAfter 隐藏时间
+ * @param url 重定向地址
+ */
+$.halo.prototype.showMsgAndRedirect = function (text, icon, hideAfter, url) {
+    if (heading == undefined) {
+        var heading = "提示";
+    }
+    $.toast({
+        text: text,
+        heading: heading,
+        icon: icon,
+        showHideTransition: 'fade',
+        allowToastClose: true,
+        hideAfter: hideAfter,
+        stack: 1,
+        position: 'top-center',
+        textAlign: 'left',
+        loader: true,
+        loaderBg: '#ffffff',
+        afterHidden: function () {
+            window.location.href = url;
+        }
+    });
+};
 
 /**
  * 保存设置选项
@@ -109,9 +196,9 @@ function saveOptions(option) {
         data: param,
         success: function (data) {
             if(data.code==1){
-                showMsg(data.msg,"success",1000);
+                halo.showMsg(data.msg,'success',1000);
             }else {
-                showMsg(data.msg,"error",1000);
+                halo.showMsg(data.msg,'error',2000);
             }
         }
     });

@@ -80,6 +80,7 @@
 <script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/js/app.js"></script>
 <script>
+    var halo = new $.halo();
     function btn_delete() {
         layer.msg('<@spring.message code="common.text.define-delete" />', {
             time: 0
@@ -112,7 +113,7 @@
                                 }
                             });
                         }else{
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
@@ -123,7 +124,7 @@
         var clipboard = new Clipboard('.btn-copy');
     });
     $('.btn-copy').click(function () {
-        showMsg("<@spring.message code='admin.attachments.modal.js.copy-success' />","success",1000)
+        halo.showMsg("<@spring.message code='admin.attachments.modal.js.copy-success' />",'success',1000);
     })
 </script>
 </html>

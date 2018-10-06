@@ -80,6 +80,7 @@
 <script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/js/app.js"></script>
 <script>
+    var halo = new $.halo();
     function btn_delete() {
         layer.msg('<@spring.message code="common.text.define-delete" />', {
             time: 0
@@ -95,24 +96,9 @@
                     },
                     success: function (data) {
                         if(data.code==1){
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    parent.location.reload();
-                                }
-                            });
+                            halo.showMsgAndReload(data.msg,'success',1000);
                         }else{
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });

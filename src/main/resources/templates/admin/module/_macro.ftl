@@ -56,6 +56,7 @@
 <script src="/static/js/app.js"></script>
 <@compress single_line=true>
 <script>
+    var halo = new $.halo();
     Pace.options = {
         restartOnRequestAfter: false
     };

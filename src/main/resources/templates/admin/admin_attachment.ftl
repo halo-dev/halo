@@ -78,22 +78,7 @@
                     var data = data.jqXHR.responseJSON;
                     if(data.success=="1"){
                         $("#uploadForm").hide(400);
-                        $.toast({
-                            text: data.message,
-                            heading: '<@spring.message code="common.text.tips" />',
-                            icon: 'success',
-                            showHideTransition: 'fade',
-                            allowToastClose: true,
-                            hideAfter: 1000,
-                            stack: 1,
-                            position: 'top-center',
-                            textAlign: 'left',
-                            loader: true,
-                            loaderBg: '#ffffff',
-                            afterHidden: function () {
-                                window.location.reload();
-                            }
-                        });
+                        halo.showMsgAndReload(data.message,'success',1000);
                     }
                 });
             }

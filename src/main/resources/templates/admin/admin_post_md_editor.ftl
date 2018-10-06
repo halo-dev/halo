@@ -286,7 +286,7 @@
              */
             function urlOnBlurAuto() {
                 if($('#newPostUrl').val()===""){
-                    showMsg("<@spring.message code='admin.editor.js.no-url' />","info",2000);
+                    halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                     return;
                 }
                 $.ajax({
@@ -298,7 +298,7 @@
                     },
                     success: function (data) {
                         if(data.code==0){
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                             return;
                         }else{
                             $('#postUrl').html($('#newPostUrl').val());
@@ -326,14 +326,14 @@
                 if(postTitle.val()){
                     Title = postTitle.val();
                 }else{
-                    showMsg("<@spring.message code='admin.editor.js.no-title' />","info",2000);
+                    halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
                     return;
                 }
                 $('input[name="categories"]:checked').each(function(){
                     cateList.push($(this).val());
                 });
                 if($('#postUrl').html()===""){
-                    showMsg("<@spring.message code='admin.editor.js.no-url' />","info",2000);
+                    halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                     return;
                 }
                 $.ajax({
@@ -356,36 +356,9 @@
                         if(data.code==1){
                             //清除自动保存的内容
                             simplemde.clearAutosavedValue();
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    window.location.href="/admin/posts";
-                                }
-                            });
+                            halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts');
                         }else{
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'error',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff'
-                            });
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
