@@ -114,7 +114,7 @@ public class BackupController {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
             }
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
-            String distName = "databases_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            String distName = "databases_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
             log.info("当前时间：{}，执行了数据库备份。", DateUtil.now());
@@ -137,7 +137,7 @@ public class BackupController {
             }
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
             String srcPath = path.getAbsolutePath();
-            String distName = "resources_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            String distName = "resources_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
             log.info("当前时间：{}，执行了资源文件备份。", DateUtil.now());
@@ -161,7 +161,7 @@ public class BackupController {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
             }
             //打包好的文件名
-            String distName = "posts_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            String distName = "posts_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName;
             for (Post post : posts) {
                 HaloUtils.postToFile(post.getPostContentMd(), srcPath, post.getPostTitle() + ".md");

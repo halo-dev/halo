@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.sun.syndication.feed.rss.Channel;
@@ -29,10 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -223,22 +220,6 @@ public class HaloUtils {
     }
 
     /**
-     * 获取当前时间
-     *
-     * @return 字符串
-     */
-    public static String getStringDate(String format) {
-        SimpleDateFormat formatter = new SimpleDateFormat(format);
-        String dateString = formatter.format(new Date());
-        return dateString;
-    }
-
-    public static String getStringDate(Date date, String format) {
-        Long unixTime = Long.parseLong(String.valueOf(date.getTime() / 1000));
-        return Instant.ofEpochSecond(unixTime).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern(format));
-    }
-
-    /**
      * 导出为文件
      *
      * @param data     内容
@@ -331,7 +312,7 @@ public class HaloUtils {
         String urlItem;
         String urlPath = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/";
         for (Post post : posts) {
-            urlItem = "<url><loc>" + urlPath + post.getPostUrl() + "</loc><lastmod>" + getStringDate(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX") + "</lastmod>" + "</url>";
+            urlItem = "<url><loc>" + urlPath + post.getPostUrl() + "</loc><lastmod>" + DateUtil.format(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX") + "</lastmod>" + "</url>";
             urlBody += urlItem;
         }
         return head + urlBody + "</urlset>";
