@@ -162,7 +162,7 @@
                 var desc = $('#cateDesc').val();
                 var result = true;
                 if(name==""||url==""||desc==""){
-                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
+                    halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                     result = false;
                 }
                 $.ajax({
@@ -174,7 +174,7 @@
                     },
                     success: function (data) {
                         if(data.code==0){
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                             result = false;
                         }
                     }

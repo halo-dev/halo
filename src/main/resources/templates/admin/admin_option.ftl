@@ -660,7 +660,6 @@
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
-                checkCommentOption();
                 checkAttachOption();
             });
 
@@ -692,9 +691,9 @@
                     },
                     success: function (data) {
                         if(data.code==1){
-                            showMsg(data.msg,"success",1000);
+                            halo.showMsg(data.msg,'success',1000);
                         }else{
-                            showMsg(data.msg,"success",2000);
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
@@ -712,21 +711,9 @@
                     },
                     success: function (data) {
                         if(data.code==1){
-                            showMsg(data.msg,"success",1000);
+                            halo.showMsg(data.msg,'success',1000);
                         }else{
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: icon,
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: hideAfter,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff'
-                            });
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
