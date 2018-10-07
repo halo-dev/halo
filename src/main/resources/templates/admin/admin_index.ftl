@@ -337,7 +337,7 @@
                                     <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                         <i class="fa fa-bars"></i></button>
                                     <ul class="dropdown-menu pull-right" role="menu">
-                                        <li><a href="#" onclick="openAllLogs()"><@spring.message code='common.btn.view-all' /></a></li>
+                                        <li><a href="#" onclick="halo.layerModal('/admin/logs','<@spring.message code="admin.index.widgets.text.all-logs" />')"><@spring.message code='common.btn.view-all' /></a></li>
                                         <li><a href="/admin/logs/clear"><@spring.message code='admin.index.widgets.btn.clear-logs' /></a></li>
                                     </ul>
                                     <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
@@ -409,18 +409,6 @@
                 $('#blogStart').html(days+1);
                 $('#blogStartDay').html(days+1);
             });
-            function openAllLogs() {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="admin.index.widgets.text.all-logs" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/logs',
-                    scrollbar: false
-                });
-            }
             $('#btnWidgetsOption').click(function () {
                 $('#widgetOptionsPanel').slideToggle(400);
             });

@@ -66,7 +66,7 @@
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="galleryUrl" name="galleryUrl">
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default " type="button" onclick="openAttach('galleryUrl')"><@spring.message code='common.btn.choose' /></button>
+                                                <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=galleryUrl','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                             </span>
                                         </div>
                                     </div>
@@ -87,7 +87,7 @@
             </div>
             <div class="row">
                 <#list galleries.content as gallery>
-                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="openDetail(${gallery.galleryId?c})">
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/page/gallery?galleryId=${gallery.galleryId?c}','<@spring.message code="admin.pages.galleries.modal.title" />')">
                         <a href="#" class="thumbnail">
                             <img src="${gallery.galleryThumbnailUrl?if_exists}" class="img-responsive">
                         </a>
@@ -110,28 +110,6 @@
             $('#btnNewPicture').click(function () {
                 $('#newPicturePanel').slideToggle(400);
             });
-            function openAttach(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+id,
-                    scrollbar: false
-                });
-            }
-            function openDetail(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="admin.pages.galleries.modal.title" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    area: ['90%', '90%'],
-                    content: '/admin/page/gallery?galleryId='+id,
-                    scrollbar: false
-                });
-            }
         </script>
     </div>
     <#include "module/_footer.ftl">

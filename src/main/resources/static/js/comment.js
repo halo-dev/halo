@@ -5,7 +5,7 @@ var s = new OwO({
     position: 'down',
     width: '100%',
     maxHeight: '210px',
-    api:"/static/plugins/OwO/OwO.min.json"
+    api: "/static/plugins/OwO/OwO.min.json"
 });
 $(document).ready(function () {
     $(".comment-list-one-head").each(function (i) {
@@ -27,10 +27,10 @@ $('#comment-submit').click(function () {
         $(".comment-message").fadeIn(1000);
         setTimeout(function () {
             $(".comment-message").fadeOut(1000);
-        },1500);
+        }, 1500);
         return;
     }
-    $(this).attr("disabled","disabled");
+    $(this).attr("disabled", "disabled");
     $(this).html("提交中...");
     $.ajax({
         type: 'POST',
@@ -49,11 +49,11 @@ $('#comment-submit').click(function () {
             localStorage.setItem('author', author.val());
             localStorage.setItem('email', email.val());
             localStorage.setItem('url', url.val());
-            if(data.code==1){
+            if (data.code == 1) {
                 $('.comment-input-content').val("");
-                $(".comment-message").html("<span>"+data.msg+"</span>");
-            }else{
-                $(".comment-message").html("<span style='color:red'>"+data.msg+"</span>");
+                $(".comment-message").html("<span>" + data.msg + "</span>");
+            } else {
+                $(".comment-message").html("<span style='color:red'>" + data.msg + "</span>");
             }
             $(".comment-message").fadeIn(1000);
             setTimeout(function () {
@@ -61,21 +61,21 @@ $('#comment-submit').click(function () {
                 $("#comment-submit").removeAttr("disabled");
                 $("#comment-submit").html("提交");
                 window.location.reload();
-            },1500);
+            }, 1500);
         }
     });
 });
 $('.comment-list-one-footer-reback').click(function () {
     var at = $(this).attr("at");
-    var commentParentAuthor = $('#comment-id-'+at).find(".comment-list-one-head-name").html();
+    var commentParentAuthor = $('#comment-id-' + at).find(".comment-list-one-head-name").html();
     $('#commentParent').val(at);
-    $('#commentContent').attr("placeholder","@"+commentParentAuthor);
+    $('#commentContent').attr("placeholder", "@" + commentParentAuthor);
     $(".comment-cancel-reply").show();
     $('#commentContent').focus();
 });
 $('.comment-cancel-reply').click(function () {
     $('#commentParent').val(0);
-    $('#commentContent').attr("placeholder","");
+    $('#commentContent').attr("placeholder", "");
     $(".comment-cancel-reply").hide();
 });
 
@@ -83,9 +83,9 @@ $('.comment-cancel-reply').click(function () {
  * 加载头像
  */
 function loadAvatar() {
-    $(".comment-author-avatar").attr("src","//gravatar.loli.net/avatar/"+md5(localStorage.getItem("email"))+"?s=256&d="+avatarType);
-    if($('input[name=commentAuthorEmail]').val()!='' && $('input[name=commentAuthorEmail]').val()!=null){
-        $(".comment-author-avatar").attr("src","//gravatar.loli.net/avatar/"+md5($('input[name=commentAuthorEmail]').val())+"?s=256&d="+avatarType);
+    $(".comment-author-avatar").attr("src", "//gravatar.loli.net/avatar/" + md5(localStorage.getItem("email")) + "?s=256&d=" + avatarType);
+    if ($('input[name=commentAuthorEmail]').val() != '' && $('input[name=commentAuthorEmail]').val() != null) {
+        $(".comment-author-avatar").attr("src", "//gravatar.loli.net/avatar/" + md5($('input[name=commentAuthorEmail]').val()) + "?s=256&d=" + avatarType);
     }
 }
 
@@ -95,15 +95,16 @@ function loadAvatar() {
  * @returns {string}
  */
 var parser = new UAParser();
-function show_ua(string){
+
+function show_ua(string) {
     parser.setUA(string);
     var uua = parser.getResult();
-    if(uua.os.version=='x86_64') {
+    if (uua.os.version == 'x86_64') {
         uua.os.version = 'x64';
     }
-    var browser = uua.browser.name+' '+uua.browser.version;
+    var browser = uua.browser.name + ' ' + uua.browser.version;
     var os = uua.os.name + ' ' + uua.os.version;
-    return '<span class="ua">'+browser+'</span><span class="ua">'+os+'</span>';
+    return '<span class="ua">' + browser + '</span><span class="ua">' + os + '</span>';
 }
 
 /**

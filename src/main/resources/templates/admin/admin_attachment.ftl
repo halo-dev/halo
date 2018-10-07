@@ -33,7 +33,7 @@
             </div>
             <div class="row">
                 <#list attachments.content as attachment>
-                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="openDetail(${attachment.attachId?c})">
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/attachments/attachment?attachId=${attachment.attachId?c}','<@spring.message code="admin.attachments.js.modal.detail-title" />')">
                         <a href="#" class="thumbnail">
                             <img src="${attachment.attachSmallPath?if_exists}" class="img-responsive">
                         </a>
@@ -53,18 +53,6 @@
             </div>
         </section>
         <script type="application/javascript">
-            function openDetail(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="admin.attachments.js.modal.detail-title" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/attachment?attachId='+id,
-                    scrollbar: false
-                });
-            }
             function loadFileInput() {
                 $('#uploadImg').fileinput({
                     language: 'zh',

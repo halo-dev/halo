@@ -94,7 +94,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="blogLogo" name="blog_logo" value="${options.blog_logo?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogLogo')"><@spring.message code='common.btn.choose' /></button>
+                                                        <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogLogo','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -105,7 +105,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="blogFavicon" name="blog_favicon" value="${options.blog_favicon?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogFavicon')"><@spring.message code='common.btn.choose' /></button>
+                                                        <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogFavicon','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -662,22 +662,6 @@
                 $('[data-toggle="tooltip"]').tooltip();
                 checkAttachOption();
             });
-
-            /**
-             * 打开附件
-             */
-            function openAttach(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+id,
-                    scrollbar: false
-                });
-            }
 
             /**
              * 更新所有文章的摘要
