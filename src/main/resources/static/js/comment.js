@@ -38,10 +38,10 @@ $('#comment-submit').click(function () {
         async: false,
         data: {
             'postId': $('input[name=postId]').val(),
-            'commentContent': $('textarea[name=commentContent]').val(),
-            'commentAuthor': $('input[name=commentAuthor]').val(),
-            'commentAuthorEmail': $('input[name=commentAuthorEmail]').val(),
-            'commentAuthorUrl': $('input[name=commentAuthorUrl]').val(),
+            'commentContent': formatContent(content.val()),
+            'commentAuthor': author.val(),
+            'commentAuthorEmail': email.val(),
+            'commentAuthorUrl': url.val(),
             'commentAgent': navigator.userAgent,
             'commentParent': $('input[name=commentParent]').val()
         },
@@ -78,12 +78,22 @@ $('.comment-cancel-reply').click(function () {
     $('#commentContent').attr("placeholder","");
     $(".comment-cancel-reply").hide();
 });
+
+/**
+ * 加载头像
+ */
 function loadAvatar() {
     $(".comment-author-avatar").attr("src","//gravatar.loli.net/avatar/"+md5(localStorage.getItem("email"))+"?s=256&d="+avatarType);
     if($('input[name=commentAuthorEmail]').val()!='' && $('input[name=commentAuthorEmail]').val()!=null){
         $(".comment-author-avatar").attr("src","//gravatar.loli.net/avatar/"+md5($('input[name=commentAuthorEmail]').val())+"?s=256&d="+avatarType);
     }
 }
+
+/**
+ * 格式化ua信息
+ * @param string
+ * @returns {string}
+ */
 var parser = new UAParser();
 function show_ua(string){
     parser.setUA(string);
@@ -94,4 +104,16 @@ function show_ua(string){
     var browser = uua.browser.name+' '+uua.browser.version;
     var os = uua.os.name + ' ' + uua.os.version;
     return '<span class="ua">'+browser+'</span><span class="ua">'+os+'</span>';
+}
+
+/**
+ * 格式化字符串
+ * @param a a
+ * @returns {*}
+ */
+function formatContent(a) {
+    a = a.replace(/\r\n/g, '<br/>');
+    a = a.replace(/\n/g, '<br/>');
+    a = a.replace(/\s/g, ' ');
+    return a;
 }

@@ -129,16 +129,16 @@
                         <h4 class="modal-title"><@spring.message code="common.btn.reply" /></h4>
                     </div>
                     <form method="post" action="/admin/comments/reply">
+                        <input type="hidden" id="commentId" name="commentId" value=""/>
+                        <input type="hidden" id="userAgent" name="userAgent" value=""/>
+                        <input type="hidden" id="postId" name="postId" value="" />
                         <div class="modal-body">
                             <textarea class="form-control comment-input-content" rows="5" id="commentContent" name="commentContent" style="resize: none"></textarea>
                             <div class="OwO"></div>
                         </div>
                         <div class="modal-footer">
-                            <input type="hidden" id="commentId" name="commentId" value=""/>
-                            <input type="hidden" id="userAgent" name="userAgent" value=""/>
-                            <input type="hidden" id="postId" name="postId" value="" />
                             <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code="common.btn.cancel" /></button>
-                            <button type="submit" class="btn btn-primary"><@spring.message code="common.btn.define" /></button>
+                            <button type="button" class="btn btn-primary" onclick="reply()"><@spring.message code="common.btn.define" /></button>
                         </div>
                     </form>
                 </div>
@@ -163,11 +163,48 @@
                 window.location.href=url;
             }
 
+            /**
+             * 显示回复模态框
+             *
+             * @param commentId commentId
+             * @param postId postId
+             */
             function replyShow(commentId,postId) {
                 $('#userAgent').val(navigator.userAgent);
                 $('#commentId').val(commentId);
                 $('#postId').val(postId);
                 $('#commentReplyModal').modal();
+            }
+
+            function reply() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/comments/reply',
+                    async: false,
+                    data: {
+                        'commentId': $("#commentId").val(),
+                        'userAgent': $("#userAgent").val(),
+                        'postId': $("#postId").val(),
+                        'commentContent': formatContent($("#commentContent").val())
+                    },
+                    success: function (data) {
+                        if(data.code==1){
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+
+            /**
+             * 格式化字符串
+             * @param a a
+             * @returns {*}
+             */
+            function formatContent(a) {
+                a = a.replace(/\r\n/g, '<br/>');
+                a = a.replace(/\n/g, '<br/>');
+                a = a.replace(/\s/g, ' ');
+                return a;
             }
         </script>
     </div>
