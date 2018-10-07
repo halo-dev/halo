@@ -40,7 +40,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.themes.title' /></h1>
-            <a class="btn-header" id="showForm" href="#" onclick="openThemeInstall()">
+            <a class="btn-header" id="showForm" href="#" onclick="halo.layerModal('/admin/themes/install','<@spring.message code="admin.themes.js.install-theme" />')">
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.themes.btn.install' />
             </a>
             <ol class="breadcrumb">
@@ -61,7 +61,7 @@
                                 <div class="box-footer">
                                     <span class="theme-title">${theme.themeName?if_exists?cap_first}</span>
                                     <#if theme.hasOptions>
-                                        <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="openSetting('${theme.themeName?if_exists}','<#if theme.hasUpdate>true<#else>false</#if>')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
+                                        <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="halo.layerModal('/admin/themes/options?theme=${theme.themeName?if_exists}&hasUpdate=<#if theme.hasUpdate>true<#else>false</#if>','${theme.themeName?if_exists} <@spring.message code="admin.themes.js.theme-setting" />')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
                                     </#if>
                                     <#if activeTheme != "${theme.themeName}">
                                         <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px"><@spring.message code='admin.themes.btn.enable' /></button>
@@ -104,21 +104,6 @@
             </div>
         </div>
         <script type="application/javascript">
-            /**
-             * 打开安装主题的窗口
-             */
-            function openThemeInstall() {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="admin.themes.js.install-theme" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/themes/install',
-                    scrollbar: false
-                });
-            }
 
             /**
              * 设置主题
@@ -138,24 +123,6 @@
                             halo.showMsg(data.msg,'error',2000);
                         }
                     }
-                });
-            }
-
-            /**
-             * 打开主题设置
-             *
-             * @param theme 主题名
-             */
-            function openSetting(theme,hasUpdate) {
-                layer.open({
-                    type: 2,
-                    title: theme+' <@spring.message code="admin.themes.js.theme-setting" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/themes/options?theme='+theme+'&hasUpdate='+hasUpdate,
-                    scrollbar: false
                 });
             }
             $('.theme-thumbnail').mouseover(function () {

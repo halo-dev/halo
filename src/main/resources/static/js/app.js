@@ -186,6 +186,38 @@ $.halo.prototype.showMsgAndRedirect = function (text, icon, hideAfter, url) {
 };
 
 /**
+ * 格式化字符串
+ *
+ * @param a a
+ * @returns {*} a
+ */
+$.halo.prototype.formatContent = function (a) {
+    a = a.replace(/\r\n/g, '<br/>');
+    a = a.replace(/\n/g, '<br/>');
+    a = a.replace(/\s/g, ' ');
+    return a;
+};
+
+/**
+ * layer弹出框
+ *
+ * @param url 地址
+ * @param title 标题
+ */
+$.halo.prototype.layerModal = function (url, title) {
+    layer.open({
+        type: 2,
+        title: title,
+        shadeClose: true,
+        shade: 0.5,
+        maxmin: true,
+        area: ['90%', '90%'],
+        content: url,
+        scrollbar: false
+    });
+};
+
+/**
  * 保存设置选项
  */
 function saveOptions(option) {

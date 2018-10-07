@@ -1,7 +1,7 @@
 .native-list-one-head a, .native-list-one-content a{
     /* color: #424242; */
     color: #7575d0;
-    opacity: 1;!important;
+    opacity: 1!important;
     -webkit-transition: all .15s linear;
     -moz-transition: all .15s linear;
     -o-transition: all .15s linear;

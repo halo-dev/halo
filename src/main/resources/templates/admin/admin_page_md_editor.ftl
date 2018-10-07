@@ -21,7 +21,7 @@
             <h1 style="display: inline-block;">
                 <@spring.message code='admin.pages.edit.title' />
             </h1>
-            <a class="btn-header" id="btnOpenAttach" href="#" onclick="openAttachCopy()">
+            <a class="btn-header" id="btnOpenAttach" href="#" onclick="halo.layerModal('/admin/attachments/select?type=post','<@spring.message code="common.js.all-attachment" />')">
                 <@spring.message code='admin.editor.btn.attachs' />
             </a>
             <ol class="breadcrumb">
@@ -104,9 +104,9 @@
                         <div class="box-body">
                             <div>
                                 <#if post??>
-                                    <img src="${post.postThumbnail?default("/static/images/thumbnail/thumbnail.png")}" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
+                                    <img src="${post.postThumbnail?default("/static/images/thumbnail/thumbnail.png")}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                                 <#else >
-                                    <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
+                                    <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                                 </#if>
                             </div>
                         </div>
@@ -147,33 +147,6 @@
                 });
             })
 
-            /**
-             * 打开附件
-             */
-            function openAttach(e) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+e,
-                    scrollbar: false
-                });
-            }
-            function openAttachCopy() {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?type=post',
-                    scrollbar: false
-                });
-            }
             /**
              * 检测是否已经存在该链接
              * @constructor

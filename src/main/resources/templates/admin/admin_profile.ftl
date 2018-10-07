@@ -77,7 +77,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('userAvatar')"><@spring.message code='common.btn.choose' /></button>
+                                                        <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=userAvatar','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -136,18 +136,6 @@
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
             });
-            function openAttach(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+id,
-                    scrollbar: false
-                });
-            }
             function saveUser(option) {
                 var param = $('#'+option).serialize();
                 $.ajax({

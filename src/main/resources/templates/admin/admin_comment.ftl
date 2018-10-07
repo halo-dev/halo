@@ -185,7 +185,7 @@
                         'commentId': $("#commentId").val(),
                         'userAgent': $("#userAgent").val(),
                         'postId': $("#postId").val(),
-                        'commentContent': formatContent($("#commentContent").val())
+                        'commentContent': halo.formatContent($("#commentContent").val())
                     },
                     success: function (data) {
                         if(data.code==1){
@@ -193,18 +193,6 @@
                         }
                     }
                 });
-            }
-
-            /**
-             * 格式化字符串
-             * @param a a
-             * @returns {*}
-             */
-            function formatContent(a) {
-                a = a.replace(/\r\n/g, '<br/>');
-                a = a.replace(/\n/g, '<br/>');
-                a = a.replace(/\s/g, ' ');
-                return a;
             }
         </script>
     </div>
