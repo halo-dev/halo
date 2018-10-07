@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommentStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -27,10 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -150,10 +148,11 @@ public class CommentController extends BaseController {
      *
      * @param commentId      被回复的评论
      * @param commentContent 回复的内容
-     * @return 重定向到/admin/comments
+     * @return JsonResult
      */
     @PostMapping(value = "/reply")
-    public String replyComment(@RequestParam("commentId") Long commentId,
+    @ResponseBody
+    public JsonResult replyComment(@RequestParam("commentId") Long commentId,
                                @RequestParam("postId") Long postId,
                                @RequestParam("commentContent") String commentContent,
                                @RequestParam("userAgent") String userAgent,
@@ -182,7 +181,7 @@ public class CommentController extends BaseController {
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
             comment.setCommentDate(DateUtil.date());
             String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a> ";
-            comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(commentContent)));
+            comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(commentContent).replace("&lt;br/&gt;", "<br/>")));
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
             comment.setCommentStatus(CommentStatusEnum.PUBLISHED.getCode());
@@ -191,10 +190,11 @@ public class CommentController extends BaseController {
 
             //邮件通知
             new EmailToAuthor(comment, lastComment, post, user, commentContent).start();
+            return new JsonResult(1, "回复成功！");
         } catch (Exception e) {
             log.error("回复评论失败：{}", e.getMessage());
+            return new JsonResult(0, "回复失败！");
         }
-        return "redirect:/admin/comments";
     }
 
     /**

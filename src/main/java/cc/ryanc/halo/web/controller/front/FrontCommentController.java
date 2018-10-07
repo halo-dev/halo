@@ -127,10 +127,10 @@ public class FrontCommentController {
             if (comment.getCommentParent() > 0) {
                 lastComment = commentService.findCommentById(comment.getCommentParent()).get();
                 String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a> ";
-                comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent())));
+                comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
             } else {
                 //将评论内容的字符专为安全字符
-                comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent())));
+                comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
             }
             if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
                 comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));
