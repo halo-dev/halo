@@ -66,7 +66,7 @@ Let's start: http://localhost:8090
 
 ## 下载部署
 
-> 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run-with-git-maven)或者[Wiki](https://github.com/ruibaby/halo/wiki)。
+> 如需部署到服务器，请参考[Halo部署教程](https://halo-doc.ryanc.cc/installation/)或者[Wiki](https://github.com/ruibaby/halo/wiki)。
 
 ## 文档
 
