@@ -76,31 +76,6 @@ function initMenu() {
 }
 
 /**
- * 提示框
- * @param text
- * @param icon
- * @param hideAfter
- */
-function showMsg(text, icon, hideAfter) {
-    if(heading==undefined){
-        var heading = "提示";
-    }
-    $.toast({
-        text: text,
-        heading: heading,
-        icon: icon,
-        showHideTransition: 'fade',
-        allowToastClose: true,
-        hideAfter: hideAfter,
-        stack: 1,
-        position: 'top-center',
-        textAlign: 'left',
-        loader: true,
-        loaderBg: '#ffffff'
-    });
-}
-
-/**
  * 普通提示框
  *
  * @param text 提示文字
@@ -184,6 +159,36 @@ $.halo.prototype.showMsgAndRedirect = function (text, icon, hideAfter, url) {
         }
     });
 };
+
+/**
+ * 提示之后 父页面重定向
+ * @param text text
+ * @param icon icon
+ * @param hideAfter hideAfter
+ * @param url url
+ */
+$.halo.prototype.showMsgAndParentRedirect = function (text, icon, hideAfter, url) {
+    if (heading == undefined) {
+        var heading = "提示";
+    }
+    $.toast({
+        text: text,
+        heading: heading,
+        icon: icon,
+        showHideTransition: 'fade',
+        allowToastClose: true,
+        hideAfter: hideAfter,
+        stack: 1,
+        position: 'top-center',
+        textAlign: 'left',
+        loader: true,
+        loaderBg: '#ffffff',
+        afterHidden: function () {
+            parent.location.href = url;
+        }
+    });
+};
+
 
 /**
  * 格式化字符串

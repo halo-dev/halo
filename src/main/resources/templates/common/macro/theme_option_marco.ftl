@@ -31,6 +31,12 @@
 <script src="/static/js/halo.js"></script>
 <#nested />
 <script>
+    var halo = new $.halo();
+    var heading = "<@spring.message code='common.text.tips' />";
+    /**
+     * 保存设置选项
+     * @param option option
+     */
     function saveThemeOptions(option) {
         var param = $('#'+option).serialize();
         $.ajax({
@@ -39,22 +45,49 @@
             data: param,
             success: function (data) {
                 if(data.code==1){
-                    showMsg(data.msg,"success",1000);
+                    halo.showMsg(data.msg, "success", 1000);
                 }else{
-                    showMsg(data.msg,"error",1000);
+                    halo.showMsg(data.msg, "error", 1000);
                 }
             }
         });
     }
+
+    /**
+     * 所有附件
+     * @param id id
+     */
     function openAttach(id) {
         layer.open({
             type: 2,
-            title: '所有附件',
+            title: '<@spring.message code="common.js.all-attachment" />',
             shadeClose: true,
             shade: 0.5,
             area: ['90%', '90%'],
             content: '/admin/attachments/select?id='+id,
             scrollbar: false
+        });
+    }
+
+    /**
+     * 更新主题
+     */
+    function updateTheme(theme, e) {
+        $(e).button('loading');
+        $.ajax({
+            type: 'get',
+            url: '/admin/themes/pull',
+            data: {
+                'themeName': theme
+            },
+            success: function (data) {
+                if (data.code == 1) {
+                    halo.showMsgAndParentRedirect(data.msg, 'success', 1000, '/admin/themes');
+                } else {
+                    halo.showMsg(data.msg, 'error', 2000);
+                    $(e).button('reset');
+                }
+            }
         });
     }
 </script>
