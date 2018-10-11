@@ -68,7 +68,7 @@
 </#if>
 <script src="/static/plugins/clipboard/clipboard.min.js"></script>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/js/app.js"></script>
+<script src="/static/js/halo.js"></script>
 <script>
     var halo = new $.halo();
     $('#uploadImg').fileinput({

@@ -67,7 +67,7 @@
 <script src="/static/plugins/fileinput/zh.min.js"></script>
 </#if>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/js/app.js"></script>
+<script src="/static/js/halo.js"></script>
 <script>
     var halo = new $.halo();
     $('#uploadImg').fileinput({
