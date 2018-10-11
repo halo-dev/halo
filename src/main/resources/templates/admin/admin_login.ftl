@@ -47,7 +47,7 @@
 <script src="/static/plugins/jquery/jquery.min.js"></script>
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/js/app.js"></script>
+<script src="/static/js/halo.js"></script>
 <script src="/static/js/login.js"></script>
 </html>
 </#compress>

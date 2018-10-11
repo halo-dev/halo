@@ -91,6 +91,11 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/backup/");
     }
 
+    /**
+     * 跨域
+     *
+     * @param registry registry
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -100,6 +105,11 @@ public class MvcConfig implements WebMvcConfigurer {
                 .allowedMethods("*");
     }
 
+    /**
+     * 国际化设置
+     *
+     * @return LocaleResolver
+     */
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver slr = new SessionLocaleResolver();
@@ -107,6 +117,11 @@ public class MvcConfig implements WebMvcConfigurer {
         return slr;
     }
 
+    /**
+     * 国际化参数拦截器
+     *
+     * @return LocaleChangeInterceptor
+     */
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
         LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
