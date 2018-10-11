@@ -488,17 +488,4 @@
         </div>
     </div>
 </div>
-<@option.import_js>
-<script src="/static/plugins/colorpicker/js/bootstrap-colorpicker.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#materialUiuxThemeColor').colorpicker();
-        $('#materialUiuxThemeSubColor').colorpicker();
-        $('#materialHyperLinkColor').colorpicker();
-        $('#materialButtonColor').colorpicker();
-        $('#materialGoogleColor').colorpicker();
-        $('#materialNprogressColor').colorpicker();
-        $('#materialBackgroundColor').colorpicker();
-    });
-</script>
-</@option.import_js>
+<@option.import_js />
