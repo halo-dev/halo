@@ -334,47 +334,6 @@
                     }
                 });
             }
-            // setInterval("autoPush()","60000");
-            /**
-             * 自动保存文章
-             */
-            function autoPush() {
-                var Title = "";
-                if(postTitle.val()){
-                    Title = postTitle.val();
-                }
-                $.ajax({
-                    type: 'POST',
-                    url: '/admin/posts/new/autoPush',
-                    async: false,
-                    data: {
-                        'postId': $('#postId').val(),
-                        'postTitle': Title,
-                        'postUrl' : $('#postUrl').html().toString(),
-                        'postContentMd': simplemde.value()
-                    },
-                    success: function (data) {
-                        if(!$("#post_title").val()){
-                            $("#post_title").val(data.result.postTitle);
-                        }
-                        if(!$("#postId").val()){
-                            $("#postId").val(data.result.postId);
-                        }
-                        if($("#postUrl").html()==''){
-                            $("#postUrl").html(data.result.postUrl);
-                        }
-                    }
-                });
-            }
-
-            /**
-             * Ctrl+C保存
-             */
-            $(document).keydown(function (event) {
-                if(event.ctrlKey&&event.keyCode === 83){
-                    autoPush();
-                }
-            });
         </script>
     </div>
     <#include "module/_footer.ftl">
