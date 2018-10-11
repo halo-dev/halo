@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -215,61 +214,6 @@ public class PostController extends BaseController {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
-
-
-    /**
-     * 自动保存文章为草稿
-     *
-     * @param postId        文章编号
-     * @param postTitle     文章标题
-     * @param postUrl       文章路径
-     * @param postContentMd 文章内容
-     * @param postType      文章类型
-     * @param session       session
-     * @return JsonResult
-     */
-    @PostMapping(value = "/new/autoPush")
-    @ResponseBody
-    public JsonResult autoPushPost(@RequestParam(value = "postId", defaultValue = "0") Long postId,
-                                   @RequestParam(value = "postTitle") String postTitle,
-                                   @RequestParam(value = "postUrl") String postUrl,
-                                   @RequestParam(value = "postContentMd") String postContentMd,
-                                   @RequestParam(value = "postType", defaultValue = "post") String postType,
-                                   HttpSession session) {
-        Post post = null;
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        if (postId == 0) {
-            post = new Post();
-        } else {
-            post = postService.findByPostId(postId).get();
-        }
-        try {
-            if (StrUtil.isBlank(postTitle)) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                post.setPostTitle("草稿：" + dateFormat.format(DateUtil.date()));
-            } else {
-                post.setPostTitle(postTitle);
-            }
-            if (StrUtil.isBlank(postUrl)) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                post.setPostUrl(dateFormat.format(DateUtil.date()));
-            } else {
-                post.setPostUrl(postUrl);
-            }
-            post.setPostId(postId);
-            post.setPostStatus(1);
-            post.setPostContentMd(postContentMd);
-            post.setPostType(postType);
-            post.setPostDate(DateUtil.date());
-            post.setPostUpdate(DateUtil.date());
-            post.setUser(user);
-        } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
-        }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"), postService.saveByPost(post));
-    }
-
 
     /**
      * 处理移至回收站的请求
