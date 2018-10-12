@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>${options.blog_title} | <@spring.message code='login.page.title' /></title>
+    <title>${options.blog_title!} | <@spring.message code='login.page.title' /></title>
     <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/plugins/animate/animate.min.css">
     <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
