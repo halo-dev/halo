@@ -116,11 +116,6 @@ public enum BlogPropertiesEnum {
     BLOG_START("blog_start"),
 
     /**
-     * 博客评论系统
-     */
-    COMMENT_SYSTEM("comment_system"),
-
-    /**
      * 仪表盘部件 文章总数
      */
     WIDGET_POSTCOUNT("widget_postcount"),
@@ -143,7 +138,12 @@ public enum BlogPropertiesEnum {
     /**
      * 默认缩略图地址
      */
-    DEFAULT_THUMBNAIL("/static/images/thumbnail/thumbnail.png");
+    DEFAULT_THUMBNAIL("/static/images/thumbnail/thumbnail.png"),
+
+    /**
+     * 自动备份
+     */
+    AUTO_BACKUP("auto_backup");
 
     private String prop;
 

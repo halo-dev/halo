@@ -11,10 +11,10 @@ import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -89,7 +89,7 @@ public class AttachmentController {
         Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
-        if (StringUtils.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
+        if (StrUtil.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
             return "admin/widget/_attachment-select-post";
         }
         return "admin/widget/_attachment-select";

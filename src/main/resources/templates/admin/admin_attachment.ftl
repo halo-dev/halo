@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.attachments.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.attachments.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -8,14 +8,12 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
-            #showForm{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #showForm:hover{background:#3c8dbc;color:#fff}
             .div-thumbnail{transition:all .5s ease-in-out;padding:10px}
             .thumbnail{margin-bottom:0}
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.attachments.title' /></h1>
-            <a id="showForm" href="#">
+            <a class="btn-header" id="showForm" href="#">
                 <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.attachments.btn.upload' />
             </a>
             <ol class="breadcrumb">
@@ -35,7 +33,7 @@
             </div>
             <div class="row">
                 <#list attachments.content as attachment>
-                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="openDetail(${attachment.attachId?c})">
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/attachments/attachment?attachId=${attachment.attachId?c}','<@spring.message code="admin.attachments.js.modal.detail-title" />')">
                         <a href="#" class="thumbnail">
                             <img src="${attachment.attachSmallPath?if_exists}" class="img-responsive">
                         </a>
@@ -55,18 +53,6 @@
             </div>
         </section>
         <script type="application/javascript">
-            function openDetail(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="admin.attachments.js.modal.detail-title" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/attachment?attachId='+id,
-                    scrollbar: false
-                });
-            }
             function loadFileInput() {
                 $('#uploadImg').fileinput({
                     language: 'zh',
@@ -80,22 +66,7 @@
                     var data = data.jqXHR.responseJSON;
                     if(data.success=="1"){
                         $("#uploadForm").hide(400);
-                        $.toast({
-                            text: data.message,
-                            heading: '<@spring.message code="common.text.tips" />',
-                            icon: 'success',
-                            showHideTransition: 'fade',
-                            allowToastClose: true,
-                            hideAfter: 1000,
-                            stack: 1,
-                            position: 'top-center',
-                            textAlign: 'left',
-                            loader: true,
-                            loaderBg: '#ffffff',
-                            afterHidden: function () {
-                                window.location.reload();
-                            }
-                        });
+                        halo.showMsgAndReload(data.message,'success',1000);
                     }
                 });
             }

@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.posts.edit.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.posts.edit.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -12,8 +12,6 @@
         <link rel="stylesheet" href="/static/plugins/jquery-tageditor/jquery.tag-editor.css">
         <style type="text/css">
             #post_title{font-weight: 400;}
-            #btnOpenAttach{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnOpenAttach:hover{background:#3c8dbc;color:#fff}
             .form-horizontal .control-label{text-align: left;}
             .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
             .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
@@ -22,7 +20,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.posts.edit.title' /></h1>
-            <a id="btnOpenAttach" href="#" onclick="openAttachCopy()">
+            <a class="btn-header" id="btnOpenAttach" href="#" onclick="halo.layerModal('/admin/attachments/select?type=post','<@spring.message code="common.js.all-attachment" />')">
                 <@spring.message code='admin.editor.btn.attachs' />
             </a>
             <ol class="breadcrumb">
@@ -49,7 +47,7 @@
                     <div style="display: block;margin-bottom: 10px;">
                         <span>
                             <@spring.message code='admin.editor.form.url' />
-                            <a href="#">${options.blog_url}/archives/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
+                            <a href="#">${options.blog_url!}/archives/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
                             <button class="btn btn-default btn-sm " id="btn_input_postUrl"><@spring.message code='common.btn.edit' /></button>
                             <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="urlOnBlurAuto()" style="display: none;"><@spring.message code='common.btn.define' /></button>
                         </span>
@@ -171,9 +169,9 @@
                         <div class="box-body">
                             <div>
                                 <#if post??>
-                                    <img src="${post.postThumbnail?default("/static/images/thumbnail/thumbnail.png")}" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
+                                    <img src="${post.postThumbnail?default("/static/images/thumbnail/thumbnail.png")}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                                 <#else >
-                                    <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="openAttach('selectImg')" style="cursor: pointer;">
+                                    <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                                 </#if>
                             </div>
                         </div>
@@ -243,35 +241,6 @@
             });
 
             /**
-             * 打开附件
-             */
-            function openAttach(e) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+e,
-                    scrollbar: false
-                });
-            }
-
-            function openAttachCopy() {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?type=post',
-                    scrollbar: false
-                });
-            }
-
-            /**
              * 自动填充路径，并且将汉字转化成拼音以-隔开
              */
             function autoComplateUrl() {
@@ -288,7 +257,7 @@
              */
             function urlOnBlurAuto() {
                 if($('#newPostUrl').val()===""){
-                    showMsg("<@spring.message code='admin.editor.js.no-url' />","info",2000);
+                    halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                     return;
                 }
                 $.ajax({
@@ -300,7 +269,7 @@
                     },
                     success: function (data) {
                         if(data.code==0){
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                             return;
                         }else{
                             $('#postUrl').html($('#newPostUrl').val());
@@ -328,14 +297,14 @@
                 if(postTitle.val()){
                     Title = postTitle.val();
                 }else{
-                    showMsg("<@spring.message code='admin.editor.js.no-title' />","info",2000);
+                    halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
                     return;
                 }
                 $('input[name="categories"]:checked').each(function(){
                     cateList.push($(this).val());
                 });
                 if($('#postUrl').html()===""){
-                    showMsg("<@spring.message code='admin.editor.js.no-url' />","info",2000);
+                    halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                     return;
                 }
                 $.ajax({
@@ -358,81 +327,13 @@
                         if(data.code==1){
                             //清除自动保存的内容
                             simplemde.clearAutosavedValue();
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    window.location.href="/admin/posts";
-                                }
-                            });
+                            halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts');
                         }else{
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'error',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff'
-                            });
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
             }
-            // setInterval("autoPush()","60000");
-            /**
-             * 自动保存文章
-             */
-            function autoPush() {
-                var Title = "";
-                if(postTitle.val()){
-                    Title = postTitle.val();
-                }
-                $.ajax({
-                    type: 'POST',
-                    url: '/admin/posts/new/autoPush',
-                    async: false,
-                    data: {
-                        'postId': $('#postId').val(),
-                        'postTitle': Title,
-                        'postUrl' : $('#postUrl').html().toString(),
-                        'postContentMd': simplemde.value()
-                    },
-                    success: function (data) {
-                        if(!$("#post_title").val()){
-                            $("#post_title").val(data.result.postTitle);
-                        }
-                        if(!$("#postId").val()){
-                            $("#postId").val(data.result.postId);
-                        }
-                        if($("#postUrl").html()==''){
-                            $("#postUrl").html(data.result.postUrl);
-                        }
-                    }
-                });
-            }
-
-            /**
-             * Ctrl+C保存
-             */
-            $(document).keydown(function (event) {
-                if(event.ctrlKey&&event.keyCode === 83){
-                    autoPush();
-                }
-            });
         </script>
     </div>
     <#include "module/_footer.ftl">

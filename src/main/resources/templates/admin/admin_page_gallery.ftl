@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.pages.galleries.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.pages.galleries.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -8,8 +8,6 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
-            #btnNewPicture{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnNewPicture:hover{background:#3c8dbc;color:#fff}
             .form-horizontal .control-label{
                 text-align: left;
             }
@@ -18,7 +16,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.pages.galleries.title' /><small></small></h1>
-            <a id="btnNewPicture" href="#">
+            <a class="btn-header" id="btnNewPicture" href="#">
                 <@spring.message code='admin.pages.galleries.text.add-gallery' />
             </a>
             <ol class="breadcrumb">
@@ -68,7 +66,7 @@
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="galleryUrl" name="galleryUrl">
                                             <span class="input-group-btn">
-                                                <button class="btn btn-default " type="button" onclick="openAttach('galleryUrl')"><@spring.message code='common.btn.choose' /></button>
+                                                <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=galleryUrl','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                             </span>
                                         </div>
                                     </div>
@@ -89,7 +87,7 @@
             </div>
             <div class="row">
                 <#list galleries.content as gallery>
-                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="openDetail(${gallery.galleryId?c})">
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/page/gallery?galleryId=${gallery.galleryId?c}','<@spring.message code="admin.pages.galleries.modal.title" />')">
                         <a href="#" class="thumbnail">
                             <img src="${gallery.galleryThumbnailUrl?if_exists}" class="img-responsive">
                         </a>
@@ -112,28 +110,6 @@
             $('#btnNewPicture').click(function () {
                 $('#newPicturePanel').slideToggle(400);
             });
-            function openAttach(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+id,
-                    scrollbar: false
-                });
-            }
-            function openDetail(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="admin.pages.galleries.modal.title" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    area: ['90%', '90%'],
-                    content: '/admin/page/gallery?galleryId='+id,
-                    scrollbar: false
-                });
-            }
         </script>
     </div>
     <#include "module/_footer.ftl">

@@ -50,7 +50,7 @@
 
     <!-- Share QQ -->
     <#if options.theme_material_sns_share_qq?if_exists=='true'>
-    <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=${options.blog_title}&title=${post.postTitle}&summary=${post.postSummary?if_exists}&pics=&url=${options.blog_url}/archives/${post.postUrl}" target="_blank">
+    <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=${options.blog_title!}&title=${post.postTitle}&summary=${post.postSummary?if_exists}&pics=&url=${options.blog_url}/archives/${post.postUrl}" target="_blank">
         <li class="mdl-menu__item">
             分享到QQ
         </li>

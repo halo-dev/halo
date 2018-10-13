@@ -66,7 +66,7 @@ Let's start: http://localhost:8090
 
 ## 下载部署
 
-> 如需部署到服务器，请参考[Halo部署教程](https://ryanc.cc/archives/halo-run-with-git-maven)或者[Wiki](https://github.com/ruibaby/halo/wiki)。
+> 如需部署到服务器，请参考[Halo部署教程](https://halo-doc.ryanc.cc/installation/)或者[Wiki](https://github.com/ruibaby/halo/wiki)。
 
 ## 文档
 
@@ -110,15 +110,12 @@ Halo的诞生离不开下面这些项目：
 - [Spring-data-jpa](https://github.com/spring-projects/spring-data-jpa.git)：不需要写sql语句的持久层框架
 - [Ehcache](http://www.ehcache.org/)：缓存框架
 - [Lombok](https://www.projectlombok.org/)：让代码更简洁
-- [Apache Commons](http://commons.apache.org/)：非常好用的Java工具库
 - [oh-my-email](https://github.com/biezhi/oh-my-email)：可能是最小的Java邮件发送库了，支持抄送、附件、模板等
 - [Hutool](https://github.com/looly/hutool)：一个Java基础工具类库
 - [Thumbnailator](https://github.com/coobird/thumbnailator)：缩略图生成库
 - [AdminLTE](https://github.com/almasaeed2010/AdminLTE)：基于Bootstrap的后台模板
 - [Bootstrap](https://github.com/twbs/bootstrap.git)：使用最广泛的前端ui框架
 - [Animate](https://github.com/daneden/animate.css.git)：非常好用的css动效库
-- [Editor.md](https://github.com/pandao/editor.md.git)：Markdown前端编辑器，遗憾作者弃坑了
-- [Editor.md](https://github.com/hawtim/editor.md)：Editor.md，hawtim接过来维护的版本
 - [SimpleMDE - Markdown Editor](https://github.com/sparksuite/simplemde-markdown-editor)：简洁，功能够用，且轻量级的Markdown编辑器
 - [Bootstrap-FileInput](https://github.com/kartik-v/bootstrap-fileinput.git)：个人认为最好用的上传组件，没有之一
 - [Font-awesome](https://github.com/FortAwesome/Font-Awesome.git)：使用最广泛的字体图标库

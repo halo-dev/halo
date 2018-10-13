@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.user.profile.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.user.profile.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -77,7 +77,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('userAvatar')"><@spring.message code='common.btn.choose' /></button>
+                                                        <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=userAvatar','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -136,18 +136,6 @@
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
             });
-            function openAttach(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+id,
-                    scrollbar: false
-                });
-            }
             function saveUser(option) {
                 var param = $('#'+option).serialize();
                 $.ajax({
@@ -156,24 +144,9 @@
                     data: param,
                     success: function (data) {
                         if(data.code==1){
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    window.location.reload();
-                                }
-                            });
+                            halo.showMsgAndReload(data.msg,'success',1000);
                         }else{
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
@@ -183,11 +156,11 @@
                 var newPass = $('#newPass').val();
                 var reNewPass = $('#reNewPass').val();
                 if(beforePass==""||newPass==""||reNewPass==""){
-                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
+                    halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                     return;
                 }
                 if(newPass!=reNewPass){
-                    showMsg("<@spring.message code='admin.user.profile.form.password.no-same' />","error",2000);
+                    halo.showMsg("<@spring.message code='admin.user.profile.form.password.no-same' />",'error',2000);
                     return;
                 }
                 var param = $('#passForm').serialize();
@@ -197,24 +170,9 @@
                     data: param,
                     success: function (data) {
                         if(data.code==1){
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    window.location.reload();
-                                }
-                            });
+                            halo.showMsgAndReload(data.msg,'success',1000);
                         }else{
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });

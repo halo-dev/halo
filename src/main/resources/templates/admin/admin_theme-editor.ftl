@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.themes.edit.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.themes.edit.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -44,7 +44,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title">${options.theme?default('halo')}主题</h3>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <div class="table-responsive mailbox-messages">
                                 <table class="table table-hover table-striped">
                                     <tbody>
@@ -147,33 +147,9 @@
                     },
                     success: function (data) {
                         if(data.code==1){
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff'
-                            });
+                            halo.showMsg(data.msg,'success',1000);
                         }else{
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'error',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 2000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff'
-                            });
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });

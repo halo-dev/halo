@@ -3,13 +3,14 @@ package cc.ryanc.halo.config;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.cron.CronUtil;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
@@ -47,9 +48,7 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
         this.loadOptions();
         this.loadThemes();
         this.loadOwo();
-        //启动定时任务
-        CronUtil.start();
-        log.info("The scheduled task starts successfully!");
+        this.autoBackup();
     }
 
     /**
@@ -57,7 +56,7 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
      */
     private void loadActiveTheme() throws TemplateModelException {
         String themeValue = optionsService.findOneOption(BlogPropertiesEnum.THEME.getProp());
-        if (StringUtils.isNotEmpty(themeValue) && !StringUtils.equals(themeValue, null)) {
+        if (StrUtil.isNotEmpty(themeValue) && !StrUtil.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
         } else {
             //以防万一
@@ -84,6 +83,18 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
         List<Theme> themes = HaloUtils.getThemes();
         if (null != themes) {
             HaloConst.THEMES = themes;
+        }
+    }
+
+    /**
+     * 启动定时备份
+     */
+    private void autoBackup() {
+        String autoBackup = optionsService.findOneOption(BlogPropertiesEnum.AUTO_BACKUP.getProp());
+        if (StrUtil.isNotEmpty(autoBackup) && StrUtil.equals(autoBackup, TrueFalseEnum.TRUE.getDesc())) {
+            //启动定时任务
+            CronUtil.start();
+            log.info("The scheduled task starts successfully!");
         }
     }
 

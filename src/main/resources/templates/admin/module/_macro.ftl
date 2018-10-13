@@ -53,9 +53,10 @@
 <#if options.blog_locale?default('zh_CN')=='zh_CN'>
     <script src="/static/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/js/app.js"></script>
+<script src="/static/js/halo.js"></script>
 <@compress single_line=true>
 <script>
+    var halo = new $.halo();
     Pace.options = {
         restartOnRequestAfter: false
     };

@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.pages.links.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.pages.links.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -85,7 +85,7 @@
                 <div class="col-md-7">
                     <div class="box box-primary">
                         <div class="box-header with-border"><h3 class="box-title"><@spring.message code='admin.pages.links.text.all-links' /></h3></div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-hover">
                                 <thead>
                                 <tr>
@@ -152,7 +152,7 @@
                 var name = $('#linkName').val();
                 var url = $('#linkUrl').val();
                 if(name==""||url==""){
-                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
+                    halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                     return false;
                 }
             }

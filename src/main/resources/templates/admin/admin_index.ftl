@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.index.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.index.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -8,8 +8,6 @@
     <#include "module/_sidebar.ftl">
     <div class="content-wrapper">
         <style type="text/css" rel="stylesheet">
-            #btnWidgetsOption{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnWidgetsOption:hover{background:#3c8dbc;color:#fff}
             .form-horizontal .control-label{
                 text-align: left;
             }
@@ -19,7 +17,7 @@
         </style>
         <section class="content-header">
             <h1 style="display: inline-block;"><@spring.message code='admin.index.title' /></h1>
-            <a id="btnWidgetsOption" href="#">
+            <a class="btn-header" id="btnWidgetsOption" href="#">
                 <@spring.message code='admin.index.btn.widgets' />
             </a>
             <ol class="breadcrumb">
@@ -30,7 +28,6 @@
             </ol>
         </section>
         <section class="content container-fluid">
-            <!-- Small boxes (Stat box) -->
             <div class="row">
                 <div class="col-lg-12 col-xs-12" id="widgetOptionsPanel" style="display: none">
                     <div class="box box-primary">
@@ -219,7 +216,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
                                     <tr>
@@ -269,7 +266,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
                                 <tr>
@@ -340,7 +337,7 @@
                                     <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                         <i class="fa fa-bars"></i></button>
                                     <ul class="dropdown-menu pull-right" role="menu">
-                                        <li><a href="#" onclick="openAllLogs()"><@spring.message code='common.btn.view-all' /></a></li>
+                                        <li><a href="#" onclick="halo.layerModal('/admin/logs','<@spring.message code="admin.index.widgets.text.all-logs" />')"><@spring.message code='common.btn.view-all' /></a></li>
                                         <li><a href="/admin/logs/clear"><@spring.message code='admin.index.widgets.btn.clear-logs' /></a></li>
                                     </ul>
                                     <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
@@ -349,7 +346,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover text-center">
                                 <thead>
                                     <tr>
@@ -412,18 +409,6 @@
                 $('#blogStart').html(days+1);
                 $('#blogStartDay').html(days+1);
             });
-            function openAllLogs() {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="admin.index.widgets.text.all-logs" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/logs',
-                    scrollbar: false
-                });
-            }
             $('#btnWidgetsOption').click(function () {
                 $('#widgetOptionsPanel').slideToggle(400);
             });

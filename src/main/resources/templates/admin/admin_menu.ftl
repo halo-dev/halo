@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.menus.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.menus.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -105,8 +105,8 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.menus.text.all-menus' /></h3>
                         </div>
-                        <div class="box-body table-responsive">
-                            <table class="table table-hover">
+                        <div class="box-body table-responsive no-padding">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
                                     <th><@spring.message code='common.th.name' /></th>
