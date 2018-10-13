@@ -5,7 +5,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.service.PostService;
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,7 +40,7 @@ public class FrontOthersController {
     @ResponseBody
     public String feed() {
         String rssPosts = HaloConst.OPTIONS.get(BlogPropertiesEnum.RSS_POSTS.getProp());
-        if (StringUtils.isBlank(rssPosts)) {
+        if (StrUtil.isBlank(rssPosts)) {
             rssPosts = "20";
         }
         //获取文章列表并根据时间排序

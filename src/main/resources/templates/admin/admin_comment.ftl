@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.comments.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.comments.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div class="box box-primary">
-                        <div class="box-body table-responsive">
+                        <div class="box-body table-responsive no-padding">
                             <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
@@ -129,16 +129,16 @@
                         <h4 class="modal-title"><@spring.message code="common.btn.reply" /></h4>
                     </div>
                     <form method="post" action="/admin/comments/reply">
+                        <input type="hidden" id="commentId" name="commentId" value=""/>
+                        <input type="hidden" id="userAgent" name="userAgent" value=""/>
+                        <input type="hidden" id="postId" name="postId" value="" />
                         <div class="modal-body">
                             <textarea class="form-control comment-input-content" rows="5" id="commentContent" name="commentContent" style="resize: none"></textarea>
                             <div class="OwO"></div>
                         </div>
                         <div class="modal-footer">
-                            <input type="hidden" id="commentId" name="commentId" value=""/>
-                            <input type="hidden" id="userAgent" name="userAgent" value=""/>
-                            <input type="hidden" id="postId" name="postId" value="" />
                             <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code="common.btn.cancel" /></button>
-                            <button type="submit" class="btn btn-primary"><@spring.message code="common.btn.define" /></button>
+                            <button type="button" class="btn btn-primary" onclick="reply()"><@spring.message code="common.btn.define" /></button>
                         </div>
                     </form>
                 </div>
@@ -163,11 +163,36 @@
                 window.location.href=url;
             }
 
+            /**
+             * 显示回复模态框
+             *
+             * @param commentId commentId
+             * @param postId postId
+             */
             function replyShow(commentId,postId) {
                 $('#userAgent').val(navigator.userAgent);
                 $('#commentId').val(commentId);
                 $('#postId').val(postId);
                 $('#commentReplyModal').modal();
+            }
+
+            function reply() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/comments/reply',
+                    async: false,
+                    data: {
+                        'commentId': $("#commentId").val(),
+                        'userAgent': $("#userAgent").val(),
+                        'postId': $("#postId").val(),
+                        'commentContent': halo.formatContent($("#commentContent").val())
+                    },
+                    success: function (data) {
+                        if(data.code==1){
+                            window.location.reload();
+                        }
+                    }
+                });
             }
         </script>
     </div>

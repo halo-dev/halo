@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.categories.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.categories.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -87,8 +87,8 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.categories.text.all-categories' /></h3>
                         </div>
-                        <div class="box-body table-responsive">
-                            <table class="table table-hover">
+                        <div class="box-body table-responsive no-padding">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                 <tr>
                                     <th><@spring.message code='common.th.name' /></th>
@@ -162,7 +162,7 @@
                 var desc = $('#cateDesc').val();
                 var result = true;
                 if(name==""||url==""||desc==""){
-                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
+                    halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                     result = false;
                 }
                 $.ajax({
@@ -174,7 +174,7 @@
                     },
                     success: function (data) {
                         if(data.code==0){
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                             result = false;
                         }
                     }

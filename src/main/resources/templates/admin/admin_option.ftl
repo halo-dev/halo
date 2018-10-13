@@ -1,5 +1,5 @@
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.setting.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.setting.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -94,7 +94,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="blogLogo" name="blog_logo" value="${options.blog_logo?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogLogo')"><@spring.message code='common.btn.choose' /></button>
+                                                        <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogLogo','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -105,7 +105,7 @@
                                                 <div class="input-group">
                                                     <input type="text" class="form-control selectData" id="blogFavicon" name="blog_favicon" value="${options.blog_favicon?if_exists}">
                                                     <span class="input-group-btn">
-                                                        <button class="btn btn-default " type="button" onclick="openAttach('blogFavicon')"><@spring.message code='common.btn.choose' /></button>
+                                                        <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogFavicon','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                     </span>
                                                 </div>
                                             </div>
@@ -235,256 +235,128 @@
                                 <form method="post" class="form-horizontal" id="commentOptions">
                                     <div class="box-body">
                                         <div class="form-group">
-                                            <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-system' />
-                                                <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.comment-system-tips' />" style="cursor: pointer">
+                                            <label for="nativeCommentAvatar" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.native-comment-avatar' /></label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <select class="form-control" id="nativeCommentAvatar" name="native_comment_avatar">
+                                                    <option value="mm" ${((options.native_comment_avatar?default('default'))=='mm')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-mm' /></option>
+                                                    <option value="identicon" ${((options.native_comment_avatar?default('default'))=='identicon')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-identicon' /></option>
+                                                    <option value="monsterid" ${((options.native_comment_avatar?default('default'))=='monsterid')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-monsterid' /></option>
+                                                    <option value="wavatar" ${((options.native_comment_avatar?default('default'))=='wavatar')?string('selected','')}>Wavatar</option>
+                                                    <option value="retro" ${((options.native_comment_avatar?default('default'))=='retro')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-retro' /></option>
+                                                    <option value="robohash" ${((options.native_comment_avatar?default('default'))=='robohash')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-robohash' /></option>
+                                                    <option value="blank" ${((options.native_comment_avatar?default('default'))=='blank')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-blank' /></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-activate-power-mode' /></label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_activate_power_mode" value="true" ${((options.comment_activate_power_mode?if_exists)=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_activate_power_mode" value="false" ${((options.comment_activate_power_mode?default("false"))=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.new-comment-need-check' /></label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="new_comment_need_check" value="true" ${((options.new_comment_need_check?default("true"))=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="new_comment_need_check" value="false" ${((options.new_comment_need_check?if_exists)=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.new-comment-notice' /></label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="new_comment_notice" value="true" ${((options.new_comment_notice?if_exists)=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="new_comment_notice" value="false" ${((options.new_comment_notice?if_exists)=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-pass-notice' /></label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_pass_notice" value="true" ${((options.comment_pass_notice?if_exists)=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_pass_notice" value="false" ${((options.comment_pass_notice?if_exists)=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-reply-notice' /></label>
+                                            <div class="col-lg-4 col-sm-8 control-radio">
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_reply_notice" value="true" ${((options.comment_reply_notice?if_exists)=='true')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.enable' /></label>
+                                                    </div>
+                                                </div>
+                                                <div class="pretty p-default p-round">
+                                                    <input type="radio" name="comment_reply_notice" value="false" ${((options.comment_reply_notice?if_exists)=='false')?string('checked','')}>
+                                                    <div class="state p-primary">
+                                                        <label><@spring.message code='common.radio.disable' /></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="indexComments" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.index-comments' />
+                                                <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.index-comments-tips' />" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                 </span>
                                             </label>
-                                            <div class="col-lg-4 col-sm-8 control-radio">
-                                                <div class="pretty p-default p-round">
-                                                    <input type="radio" name="comment_system" value="native" ${((options.comment_system?default('native'))=='native')?string('checked','')}>
-                                                    <div class="state p-primary">
-                                                        <label><@spring.message code='admin.setting.form.comment-system-native' /></label>
-                                                    </div>
-                                                </div>
-                                                <div class="pretty p-default p-round">
-                                                    <input type="radio" name="comment_system" value="valine" ${((options.comment_system?default('native'))=='valine')?string('checked','')}>
-                                                    <div class="state p-primary">
-                                                        <label>Valine</label>
-                                                    </div>
-                                                </div>
-                                                <div class="pretty p-default p-round">
-                                                    <input type="radio" name="comment_system" value="disqus" ${((options.comment_system?default('native'))=='disqus')?string('checked','')}>
-                                                    <div class="state p-primary">
-                                                        <label>Disqus</label>
-                                                    </div>
-                                                </div>
-                                                <div class="pretty p-default p-round">
-                                                    <input type="radio" name="comment_system" value="livere" ${((options.comment_system?default('native'))=='livere')?string('checked','')}>
-                                                    <div class="state p-primary">
-                                                        <label>Livere</label>
-                                                    </div>
-                                                </div>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="number" class="form-control" id="indexComments" name="index_comments" value="${options.index_comments?default('10')}">
                                             </div>
                                         </div>
-
-                                        <!-- 原生设置 -->
-                                        <div class="native-options" style="display: none">
-                                            <div class="form-group">
-                                                <label for="nativeCommentAvatar" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.native-comment-avatar' />
-                                                    <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.native-comment-avatar-tips' />" style="cursor: pointer">
-                                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                    </span>
-                                                </label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <select class="form-control" id="nativeCommentAvatar" name="native_comment_avatar">
-                                                        <option value="mm" ${((options.native_comment_avatar?default('default'))=='mm')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-mm' /></option>
-                                                        <option value="identicon" ${((options.native_comment_avatar?default('default'))=='identicon')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-identicon' /></option>
-                                                        <option value="monsterid" ${((options.native_comment_avatar?default('default'))=='monsterid')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-monsterid' /></option>
-                                                        <option value="wavatar" ${((options.native_comment_avatar?default('default'))=='wavatar')?string('selected','')}>Wavatar</option>
-                                                        <option value="retro" ${((options.native_comment_avatar?default('default'))=='retro')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-retro' /></option>
-                                                        <option value="robohash" ${((options.native_comment_avatar?default('default'))=='robohash')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-robohash' /></option>
-                                                        <option value="blank" ${((options.native_comment_avatar?default('default'))=='blank')?string('selected','')}><@spring.message code='admin.setting.form.native-comment-avatar-blank' /></option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.new-comment-need-check' /></label>
-                                                <div class="col-lg-4 col-sm-8 control-radio">
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="new_comment_need_check" value="true" ${((options.new_comment_need_check?default("true"))=='true')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.enable' /></label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="new_comment_need_check" value="false" ${((options.new_comment_need_check?if_exists)=='false')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.disable' /></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.new-comment-notice' /></label>
-                                                <div class="col-lg-4 col-sm-8 control-radio">
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="new_comment_notice" value="true" ${((options.new_comment_notice?if_exists)=='true')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.enable' /></label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="new_comment_notice" value="false" ${((options.new_comment_notice?if_exists)=='false')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.disable' /></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-pass-notice' /></label>
-                                                <div class="col-lg-4 col-sm-8 control-radio">
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="comment_pass_notice" value="true" ${((options.comment_pass_notice?if_exists)=='true')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.enable' /></label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="comment_pass_notice" value="false" ${((options.comment_pass_notice?if_exists)=='false')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.disable' /></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-reply-notice' /></label>
-                                                <div class="col-lg-4 col-sm-8 control-radio">
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="comment_reply_notice" value="true" ${((options.comment_reply_notice?if_exists)=='true')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.enable' /></label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="pretty p-default p-round">
-                                                        <input type="radio" name="comment_reply_notice" value="false" ${((options.comment_reply_notice?if_exists)=='false')?string('checked','')}>
-                                                        <div class="state p-primary">
-                                                            <label><@spring.message code='common.radio.disable' /></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="indexComments" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.index-comments' />
-                                                    <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.index-comments-tips' />" style="cursor: pointer">
-                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                </span>
-                                                </label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="number" class="form-control" id="indexComments" name="index_comments" value="${options.index_comments?default('10')}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="nativeCommentPlaceholder" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.native-comment-placeholder' /></label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="url" class="form-control" id="nativeCommentPlaceholder" name="native_comment_placeholder" value="${options.native_comment_placeholder?default('赶快评论一个吧！')}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="nativeCss" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-css' />
-                                                    <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.comment-css-tips' />" style="cursor: pointer">
-                                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                    </span>
-                                                </label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <textarea class="form-control" rows="5" id="nativeCss" name="native_css" style="resize: none">${options.native_css?if_exists}</textarea>
-                                                </div>
+                                        <div class="form-group">
+                                            <label for="nativeCommentPlaceholder" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.native-comment-placeholder' /></label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="url" class="form-control" id="nativeCommentPlaceholder" name="native_comment_placeholder" value="${options.native_comment_placeholder?default('赶快评论一个吧！')}">
                                             </div>
                                         </div>
-
-                                        <!-- valine选项 -->
-                                        <div class="valine-options" style="display: none">
-                                            <div class="form-group">
-                                                <label for="valineAppId" class="col-lg-2 col-sm-4 control-label">APP ID：</label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="valineAppId" name="valine_appid" value="${options.valine_appid?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="valineAppKey" class="col-lg-2 col-sm-4 control-label">APP KEY：</label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="valineAppKey" name="valine_appkey" value="${options.valine_appkey?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="valineAvatar" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.valine-avatar' /></label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="valineAvatar" name="valine_avatar" value="${options.valine_avatar?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="valinePlaceholder" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.valine-placeholder' /></label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="valinePlaceholder" name="valine_placeholder" value="${options.valine_placeholder?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="valineCss" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-css' />
-                                                    <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.comment-css-tips' />" style="cursor: pointer">
+                                        <div class="form-group">
+                                            <label for="nativeCss" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-css' />
+                                                <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.comment-css-tips' />" style="cursor: pointer">
                                                         <i class="fa fa-question-circle" aria-hidden="true"></i>
                                                     </span>
-                                                </label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <textarea class="form-control" rows="5" id="valineCss" name="valine_css" style="resize: none">${options.valine_css?if_exists}</textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- disqus选项 -->
-                                        <div class="disqus-options" style="display: none">
-                                            <div class="form-group">
-                                                <label for="disqusShortname" class="col-lg-2 col-sm-4 control-label">Disqus ShortName：</label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="disqusShortname" name="disqus_shortname" value="${options.disqus_shortname?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="disqusCss" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-css' />
-                                                    <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.comment-css-tips' />" style="cursor: pointer">
-                                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                    </span>
-                                                </label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <textarea class="form-control" rows="5" id="disqusCss" name="disqus_css" style="resize: none">${options.disqus_css?if_exists}</textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- livere选项 -->
-                                        <div class="livere-options" style="display: none">
-                                            <div class="form-group">
-                                                <label for="livereDataUid" class="col-lg-2 col-sm-4 control-label">livere data-uid：</label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="livereDataUid" name="livere_data_uid" value="${options.livere_data_uid?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="livereCss" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-css' />
-                                                    <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.comment-css-tips' />" style="cursor: pointer">
-                                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                    </span>
-                                                </label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <textarea class="form-control" rows="5" id="livereCss" name="livere_css" style="resize: none">${options.livere_css?if_exists}</textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- 畅言选项 -->
-                                        <div class="changyan-options" style="display: none">
-                                            <div class="form-group">
-                                                <label for="changyanAppId" class="col-lg-2 col-sm-4 control-label">APP ID：</label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="changyanAppId" name="changyan_appid" value="${options.changyan_appid?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="changyanConf" class="col-lg-2 col-sm-4 control-label">CONF：</label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <input type="text" class="form-control" id="changyanConf" name="changyan_conf" value="${options.changyan_conf?if_exists}">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="changyanCss" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.comment-css' />
-                                                    <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.comment-css-tips' />" style="cursor: pointer">
-                                                        <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                    </span>
-                                                </label>
-                                                <div class="col-lg-4 col-sm-8">
-                                                    <textarea class="form-control" rows="5" id="changyanCss" name="changyan_css" style="resize: none">${options.changyan_css?if_exists}</textarea>
-                                                </div>
+                                            </label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <textarea class="form-control" rows="5" id="nativeCss" name="native_css" style="resize: none">${options.native_css?if_exists}</textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -788,25 +660,8 @@
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
-                checkCommentOption();
                 checkAttachOption();
             });
-
-            /**
-             * 打开附件
-             */
-            function openAttach(id) {
-                layer.open({
-                    type: 2,
-                    title: '<@spring.message code="common.js.all-attachment" />',
-                    shadeClose: true,
-                    shade: 0.5,
-                    maxmin: true,
-                    area: ['90%', '90%'],
-                    content: '/admin/attachments/select?id='+id,
-                    scrollbar: false
-                });
-            }
 
             /**
              * 更新所有文章的摘要
@@ -820,9 +675,9 @@
                     },
                     success: function (data) {
                         if(data.code==1){
-                            showMsg(data.msg,"success",1000);
+                            halo.showMsg(data.msg,'success',1000);
                         }else{
-                            showMsg(data.msg,"success",2000);
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
@@ -840,60 +695,12 @@
                     },
                     success: function (data) {
                         if(data.code==1){
-                            showMsg(data.msg,"success",1000);
+                            halo.showMsg(data.msg,'success',1000);
                         }else{
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: icon,
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: hideAfter,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff'
-                            });
+                            halo.showMsg(data.msg,'error',2000);
                         }
                     }
                 });
-            }
-
-            /**
-             * 评论选项切换
-             */
-            function checkCommentOption() {
-                var native = $('input:radio[value=native]:checked').val();
-                var valine = $('input:radio[value=valine]:checked').val();
-                var disqus = $('input:radio[value=disqus]:checked').val();
-                var livere = $('input:radio[value=livere]:checked').val();
-                var changyan = $('input:radio[value=changyan]:checked').val();
-                if(native!=null){
-                    $('.native-options').show();
-                }else{
-                    $('.native-options').hide();
-                }
-                if(valine!=null){
-                    $('.valine-options').show();
-                }else{
-                    $('.valine-options').hide();
-                }
-                if(disqus!=null){
-                    $('.disqus-options').show();
-                }else{
-                    $('.disqus-options').hide();
-                }
-                if(livere!=null){
-                    $('.livere-options').show();
-                }else{
-                    $('.livere-options').hide();
-                }
-                if(changyan!=null){
-                    $('.changyan-options').show();
-                }else{
-                    $('.changyan-options').hide();
-                }
             }
 
             /**
@@ -943,9 +750,6 @@
                     $('body').removeClass('sidebar-collapse');
                 }
             }
-            $('input[name=comment_system]').click(function () {
-                checkCommentOption();
-            });
             $('input[name=attach_loc]').click(function () {
                 checkAttachOption();
             });

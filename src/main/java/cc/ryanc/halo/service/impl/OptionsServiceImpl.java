@@ -3,7 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Options;
 import cc.ryanc.halo.repository.OptionsRepository;
 import cc.ryanc.halo.service.OptionsService;
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,12 +46,12 @@ public class OptionsServiceImpl implements OptionsService {
     @Override
     public void saveOption(String key, String value) {
         Options options = null;
-        if (StringUtils.equals(value, "")) {
+        if (StrUtil.equals(value, "")) {
             options = new Options();
             options.setOptionName(key);
             this.removeOption(options);
         } else {
-            if (StringUtils.isNotEmpty(key)) {
+            if (StrUtil.isNotEmpty(key)) {
                 //如果查询到有该设置选项则做更新操作，反之保存新的设置选项
                 if (null == optionsRepository.findOptionsByOptionName(key)) {
                     options = new Options();

@@ -14,9 +14,9 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -159,7 +159,7 @@ public class PageController {
     @PostMapping(value = "/gallery/save")
     public String saveGallery(@ModelAttribute Gallery gallery) {
         try {
-            if (StringUtils.isEmpty(gallery.getGalleryThumbnailUrl())) {
+            if (StrUtil.isEmpty(gallery.getGalleryThumbnailUrl())) {
                 gallery.setGalleryThumbnailUrl(gallery.getGalleryUrl());
             }
             galleryService.saveByGallery(gallery);
@@ -238,7 +238,7 @@ public class PageController {
                 post.setPostUpdate(DateUtil.date());
             }
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
-            if (StringUtils.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
+            if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
                 post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
             postService.saveByPost(post);

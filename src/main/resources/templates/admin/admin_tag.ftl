@@ -1,6 +1,6 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title} | <@spring.message code='admin.tags.title' /></@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.tags.title' /></@head>
 <div class="wrapper">
     <!-- 顶部栏模块 -->
     <#include "module/_header.ftl">
@@ -43,7 +43,7 @@
                                     <div class="form-group">
                                         <label for="tagUrl"><@spring.message code='admin.tags.form.tag-url' /></label>
                                         <input type="text" class="form-control" id="tagUrl" name="tagUrl" value="${updateTag.tagUrl}">
-                                        <small><@spring.message code='admin.tags.form.tag-name-tips' /></small>
+                                        <small><@spring.message code='admin.tags.form.tag-url-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
@@ -68,7 +68,7 @@
                                     <div class="form-group">
                                         <label for="tagUrl"><@spring.message code='admin.tags.form.tag-url' /></label>
                                         <input type="text" class="form-control" id="tagUrl" name="tagUrl">
-                                        <small><@spring.message code='admin.tags.form.tag-name-tips' /></small>
+                                        <small><@spring.message code='admin.tags.form.tag-url-tips' /></small>
                                     </div>
                                 </div>
                                 <div class="box-footer">
@@ -136,7 +136,7 @@
                 var url = $('#tagUrl').val();
                 var result = true;
                 if(name==""||url==""){
-                    showMsg("<@spring.message code='common.js.info-no-complete' />","info",2000);
+                    halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                     result = false;
                 }
                 $.ajax({
@@ -148,7 +148,7 @@
                     },
                     success: function (data) {
                         if(data.code==0){
-                            showMsg(data.msg,"error",2000);
+                            halo.showMsg(data.msg,'error',2000);
                             result = false;
                         }
                     }

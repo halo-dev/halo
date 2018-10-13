@@ -81,8 +81,9 @@
 </#if>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/js/app.js"></script>
+<script src="/static/js/halo.js"></script>
 <script>
+    var halo = new $.halo();
     $(document).ready(function () {
         loadFileInput();
     });
@@ -103,36 +104,9 @@
             var data = data.jqXHR.responseJSON;
             if(data.code==1){
                 $("#uploadForm").hide(400);
-                $.toast({
-                    text: data.msg,
-                    heading: '<@spring.message code="common.text.tips" />',
-                    icon: 'success',
-                    showHideTransition: 'fade',
-                    allowToastClose: true,
-                    hideAfter: 1000,
-                    stack: 1,
-                    position: 'top-center',
-                    textAlign: 'left',
-                    loader: true,
-                    loaderBg: '#ffffff',
-                    afterHidden: function () {
-                        parent.location.href="/admin/themes";
-                    }
-                });
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/themes');
             }else{
-                $.toast({
-                    text: data.msg,
-                    heading: '<@spring.message code="common.text.tips" />',
-                    icon: 'error',
-                    showHideTransition: 'fade',
-                    allowToastClose: true,
-                    hideAfter: 1000,
-                    stack: 1,
-                    position: 'top-center',
-                    textAlign: 'left',
-                    loader: true,
-                    loaderBg: '#ffffff'
-                });
+                halo.showMsg(data.msg,'error',2000);
             }
         });
     }
@@ -144,19 +118,7 @@
         var remoteAddr = $("#remoteAddr").val();
         var themeName = $("#themeName").val();
         if(remoteAddr==null || themeName==null){
-            $.toast({
-                text: "<@spring.message code='common.js.info-no-complete' />",
-                heading: '<@spring.message code="common.text.tips" />',
-                icon: 'error',
-                showHideTransition: 'fade',
-                allowToastClose: true,
-                hideAfter: 1000,
-                stack: 1,
-                position: 'top-center',
-                textAlign: 'left',
-                loader: true,
-                loaderBg: '#ffffff'
-            });
+            halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
             return;
         }
         $('#btnInstall').button('loading');
@@ -169,24 +131,9 @@
             },
             success: function (data) {
                 if(data.code==1){
-                    $.toast({
-                        text: data.msg,
-                        heading: '<@spring.message code="common.text.tips" />',
-                        icon: 'success',
-                        showHideTransition: 'fade',
-                        allowToastClose: true,
-                        hideAfter: 1000,
-                        stack: 1,
-                        position: 'top-center',
-                        textAlign: 'left',
-                        loader: true,
-                        loaderBg: '#ffffff',
-                        afterHidden: function () {
-                            parent.location.href="/admin/themes";
-                        }
-                    });
+                    halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/themes');
                 }else {
-                    showMsg(data.msg,"error",1000);
+                    halo.showMsg(data.msg,'error',2000);
                     $('#btnInstall').button('reset');
                 }
             }

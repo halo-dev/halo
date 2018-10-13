@@ -17,10 +17,11 @@ import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
+import com.alibaba.druid.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +80,7 @@ public class PostController extends BaseController {
                 return url.substring(0, url.lastIndexOf("."));
             }
         }
-        return StringUtils.replaceAll(url, " ", "-");
+        return StrUtil.replace(url, " ", "-");
     }
 
     /**
@@ -172,7 +172,7 @@ public class PostController extends BaseController {
         try {
             //提取摘要
             int postSummary = 50;
-            if (StringUtils.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
+            if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
             }
             //文章摘要
@@ -197,13 +197,13 @@ public class PostController extends BaseController {
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
-            if (StringUtils.isNotEmpty(tagList)) {
-                List<Tag> tags = tagService.strListToTagList(StringUtils.deleteWhitespace(tagList));
+            if (StrUtil.isNotEmpty(tagList)) {
+                List<Tag> tags = tagService.strListToTagList(StrUtil.trim(tagList));
                 post.setTags(tags);
             }
             post.setPostUrl(urlFilter(post.getPostUrl()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
-            if (StringUtils.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
+            if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
                 post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
             postService.saveByPost(post);
@@ -214,61 +214,6 @@ public class PostController extends BaseController {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
-
-
-    /**
-     * 自动保存文章为草稿
-     *
-     * @param postId        文章编号
-     * @param postTitle     文章标题
-     * @param postUrl       文章路径
-     * @param postContentMd 文章内容
-     * @param postType      文章类型
-     * @param session       session
-     * @return JsonResult
-     */
-    @PostMapping(value = "/new/autoPush")
-    @ResponseBody
-    public JsonResult autoPushPost(@RequestParam(value = "postId", defaultValue = "0") Long postId,
-                                   @RequestParam(value = "postTitle") String postTitle,
-                                   @RequestParam(value = "postUrl") String postUrl,
-                                   @RequestParam(value = "postContentMd") String postContentMd,
-                                   @RequestParam(value = "postType", defaultValue = "post") String postType,
-                                   HttpSession session) {
-        Post post = null;
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        if (postId == 0) {
-            post = new Post();
-        } else {
-            post = postService.findByPostId(postId).get();
-        }
-        try {
-            if (StringUtils.isEmpty(postTitle)) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                post.setPostTitle("草稿：" + dateFormat.format(DateUtil.date()));
-            } else {
-                post.setPostTitle(postTitle);
-            }
-            if (StringUtils.isEmpty(postUrl)) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                post.setPostUrl(dateFormat.format(DateUtil.date()));
-            } else {
-                post.setPostUrl(postUrl);
-            }
-            post.setPostId(postId);
-            post.setPostStatus(1);
-            post.setPostContentMd(postContentMd);
-            post.setPostType(postType);
-            post.setPostDate(DateUtil.date());
-            post.setPostUpdate(DateUtil.date());
-            post.setUser(user);
-        } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
-        }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"), postService.saveByPost(post));
-    }
-
 
     /**
      * 处理移至回收站的请求
@@ -320,7 +265,7 @@ public class PostController extends BaseController {
         } catch (Exception e) {
             log.error("删除文章失败：{}", e.getMessage());
         }
-        if (StringUtils.equals(PostTypeEnum.POST_TYPE_POST.getDesc(), postType)) {
+        if (StrUtil.equals(PostTypeEnum.POST_TYPE_POST.getDesc(), postType)) {
             return "redirect:/admin/posts?status=2";
         }
         return "redirect:/admin/page";
@@ -385,7 +330,7 @@ public class PostController extends BaseController {
     @GetMapping(value = "/pushAllToBaidu")
     @ResponseBody
     public JsonResult pushAllToBaidu(@RequestParam("baiduToken") String baiduToken) {
-        if (StringUtils.isEmpty(baiduToken)) {
+        if (StrUtil.isBlank(baiduToken)) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.no-baidu-token"));
         }
         String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());

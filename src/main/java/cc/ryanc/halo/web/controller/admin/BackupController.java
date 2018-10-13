@@ -7,22 +7,23 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.MailService;
+import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
+import cn.hutool.cron.CronUtil;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
@@ -53,6 +54,11 @@ public class BackupController {
     @Autowired
     private LocaleMessageUtil localeMessageUtil;
 
+    @Autowired
+    private OptionsService optionsService;
+
+    @Autowired
+    private Configuration configuration;
 
     /**
      * 渲染备份页面
@@ -63,11 +69,11 @@ public class BackupController {
     @GetMapping
     public String backup(@RequestParam(value = "type", defaultValue = "resources") String type, Model model) {
         List<BackupDto> backups = null;
-        if (StringUtils.equals(type, BackupTypeEnum.RESOURCES.getDesc())) {
+        if (StrUtil.equals(type, BackupTypeEnum.RESOURCES.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.RESOURCES.getDesc());
-        } else if (StringUtils.equals(type, BackupTypeEnum.DATABASES.getDesc())) {
+        } else if (StrUtil.equals(type, BackupTypeEnum.DATABASES.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.DATABASES.getDesc());
-        } else if (StringUtils.equals(type, BackupTypeEnum.POSTS.getDesc())) {
+        } else if (StrUtil.equals(type, BackupTypeEnum.POSTS.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc());
         } else {
             backups = new ArrayList<>();
@@ -86,11 +92,11 @@ public class BackupController {
     @GetMapping(value = "doBackup")
     @ResponseBody
     public JsonResult doBackup(@RequestParam("type") String type) {
-        if (StringUtils.equals(BackupTypeEnum.RESOURCES.getDesc(), type)) {
+        if (StrUtil.equals(BackupTypeEnum.RESOURCES.getDesc(), type)) {
             return this.backupResources();
-        } else if (StringUtils.equals(BackupTypeEnum.DATABASES.getDesc(), type)) {
+        } else if (StrUtil.equals(BackupTypeEnum.DATABASES.getDesc(), type)) {
             return this.backupDatabase();
-        } else if (StringUtils.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
+        } else if (StrUtil.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
             return this.backupPosts();
         } else {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
@@ -108,7 +114,7 @@ public class BackupController {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
             }
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
-            String distName = "databases_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            String distName = "databases_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
             log.info("当前时间：{}，执行了数据库备份。", DateUtil.now());
@@ -131,7 +137,7 @@ public class BackupController {
             }
             File path = new File(ResourceUtils.getURL("classpath:").getPath());
             String srcPath = path.getAbsolutePath();
-            String distName = "resources_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            String distName = "resources_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
             log.info("当前时间：{}，执行了资源文件备份。", DateUtil.now());
@@ -155,7 +161,7 @@ public class BackupController {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
             }
             //打包好的文件名
-            String distName = "posts_backup_" + HaloUtils.getStringDate("yyyyMMddHHmmss");
+            String distName = "posts_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName;
             for (Post post : posts) {
                 HaloUtils.postToFile(post.getPostContentMd(), srcPath, post.getPostTitle() + ".md");
@@ -192,6 +198,33 @@ public class BackupController {
     }
 
     /**
+     * 备份设置
+     *
+     * @param autoBackup autoBackup
+     * @return 重定向到/admin/backup
+     */
+    @PostMapping(value = "backupOption")
+    public String backupOption(@RequestParam("auto_backup") String autoBackup) throws TemplateModelException {
+        if (StrUtil.equals(autoBackup, TrueFalseEnum.TRUE.getDesc())) {
+            if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.AUTO_BACKUP.getProp()), TrueFalseEnum.FALSE.getDesc())) {
+                CronUtil.start();
+                log.info("The scheduled task starts successfully!");
+            }
+            optionsService.saveOption("auto_backup", TrueFalseEnum.TRUE.getDesc());
+        } else {
+            if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.AUTO_BACKUP.getProp()), TrueFalseEnum.TRUE.getDesc())) {
+                CronUtil.stop();
+                log.info("The scheduled task stops successfully!");
+            }
+            optionsService.saveOption("auto_backup", TrueFalseEnum.FALSE.getDesc());
+        }
+        configuration.setSharedVariable("options", optionsService.findAllOptions());
+        HaloConst.OPTIONS.clear();
+        HaloConst.OPTIONS = optionsService.findAllOptions();
+        return "redirect:/admin/backup";
+    }
+
+    /**
      * 将备份发送到邮箱
      *
      * @param fileName 文件名
@@ -205,10 +238,10 @@ public class BackupController {
                                   HttpSession session) {
         String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        if (null == user.getUserEmail() || StringUtils.equals(user.getUserEmail(), "")) {
+        if (null == user.getUserEmail() || StrUtil.equals(user.getUserEmail(), "")) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.no-email"));
         }
-        if (StringUtils.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
+        if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.no-post"));
         }
         new EmailToAdmin(srcPath, user).start();
