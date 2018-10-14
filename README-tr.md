@@ -9,7 +9,7 @@
 [![Travis CI](https://img.shields.io/travis/ruibaby/halo.svg)](https://travis-ci.org/ruibaby/halo)
 
 ------------------------------
-🇨🇳[简体中文](./README.md) | 🇺🇸[English](./README-en-US.md) | <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/320px-Flag_of_Turkey.svg.png" alt="Turkish" style="width:15px;"/> Türkçe
+🇨🇳[简体中文](./README.md) | 🇺🇸[English](./README-en-US.md) | <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Turkish" height="14"/> Türkçe
 
 ## Katalog
 
