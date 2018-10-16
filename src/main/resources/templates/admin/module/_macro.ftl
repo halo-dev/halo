@@ -27,7 +27,7 @@
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme?default('skin-blue')} ${options.admin_layout?default('')} ${options.sidebar_style?default('')}">
 <#if options.admin_loading?default("false") == "true">
-<!-- 页面加载动画 -->
+<#-- 页面加载动画 -->
 <div id="loading">
     <div id="loading-center">
         <div id="loading-center-absolute">
@@ -39,9 +39,16 @@
     </div>
 </div>
 </#if>
+<div class="wrapper">
+<#-- 顶部栏模块 -->
+<#include "_header.ftl">
+<#-- 菜单栏模块 -->
+<#include "_sidebar.ftl">
 </#macro>
 
 <#macro footer>
+<#include "_footer.ftl">
+</div>
 <#if options.admin_pjax?default("true") == "true">
     <script src="/static/plugins/pjax/jquery.pjax.js"></script>
 </#if>
