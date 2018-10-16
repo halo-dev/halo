@@ -50,6 +50,15 @@ yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh
 sh halo-cli.sh 2
 ```
 
+Docker 部署：
+```bash
+# 拉取镜像
+docker pull ruibaby/halo
+
+# 运行
+docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+```
+
 > 注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题扫描和上传会有问题。
 
 Let's start: http://localhost:8090

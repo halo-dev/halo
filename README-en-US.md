@@ -49,6 +49,14 @@ yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh
 sh halo-cli.sh 2
 ```
 
+Docker：
+```bash
+# Pull image
+docker pull ruibaby/halo
+# run
+docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+```
+
 > Note: If you use Idea, Eclipse and other IDEs to run, you need to install the Lombok plugin, In addition, JDK10 is not supported at the moment, and there are problems with themes scanning and uploading.
 
 Let's start: http://localhost:8090
