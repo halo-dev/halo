@@ -1,6 +1,6 @@
 <@compress single_line=true>
 <link type="text/css" rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
-<link type="text/css" rel="stylesheet" href="/static/css/comment.css">
+<link type="text/css" rel="stylesheet" href="/static/css/comment.min.css">
 <style>
 ${options.native_css?if_exists}
 </style>
@@ -128,5 +128,5 @@ ${options.native_css?if_exists}
 <script>
     var avatarType = "${options.native_comment_avatar?default('mm')}";
 </script>
-<script src="/static/js/comment.js"></script>
+<script src="/static/js/comment.min.js"></script>
 </@compress>

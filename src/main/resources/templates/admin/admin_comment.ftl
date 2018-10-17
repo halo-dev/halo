@@ -85,12 +85,20 @@
                         <div class="no-margin pull-left">
                             <@spring.message code='admin.pageinfo.text.no' />${comments.number+1}/${comments.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                         </div>
-                        <ul class="pagination no-margin pull-right">
-                            <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
-                            <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number-1}"><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
-                            <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
-                            <li><a data-pjax="true" class="btn btn-sm <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
-                        </ul>
+                        <div class="btn-group pull-right btn-group-sm" role="group">
+                            <a data-pjax="true" class="btn btn-default <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}">
+                                <@spring.message code='admin.pageinfo.btn.first' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !comments.hasPrevious()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number-1}">
+                                <@spring.message code='admin.pageinfo.btn.pre' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.number+1}">
+                                <@spring.message code='admin.pageinfo.btn.next' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !comments.hasNext()>disabled</#if>" href="/admin/comments?status=${status}&page=${comments.totalPages-1}">
+                                <@spring.message code='admin.pageinfo.btn.last' />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -78,7 +78,7 @@
 <script src="/static/plugins/clipboard/clipboard.min.js"></script>
 <script src="/static/js/adminlte.min.js"></script>
 <script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/js/halo.js"></script>
+<script src="/static/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
     function btn_delete() {

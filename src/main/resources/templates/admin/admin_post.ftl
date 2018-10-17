@@ -120,12 +120,20 @@
                         <div class="no-margin pull-left">
                             <@spring.message code='admin.pageinfo.text.no' />${posts.number+1}/${posts.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                         </div>
-                        <ul class="pagination no-margin pull-right">
-                            <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
-                            <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}"><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
-                            <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
-                            <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
-                        </ul>
+                        <div class="btn-group pull-right btn-group-sm" role="group">
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}">
+                                <@spring.message code='admin.pageinfo.btn.first' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}">
+                                <@spring.message code='admin.pageinfo.btn.pre' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}">
+                                <@spring.message code='admin.pageinfo.btn.next' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}">
+                                <@spring.message code='admin.pageinfo.btn.last' />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
