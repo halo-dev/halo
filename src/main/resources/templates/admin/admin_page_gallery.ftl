@@ -92,12 +92,20 @@
                 <div class="no-margin pull-left">
                     <@spring.message code='admin.pageinfo.text.no' />${galleries.number+1}/${galleries.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                 </div>
-                <ul class="pagination no-margin pull-right">
-                    <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries" ><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
-                    <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number-1}" ><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
-                    <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
-                    <li><a data-pjax="true" class="btn btn-sm <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
-                </ul>
+                <div class="btn-group pull-right btn-group-sm" role="group">
+                    <a data-pjax="true" class="btn btn-default <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries" >
+                        <@spring.message code='admin.pageinfo.btn.first' />
+                    </a>
+                    <a data-pjax="true" class="btn btn-default <#if !galleries.hasPrevious()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number-1}" >
+                        <@spring.message code='admin.pageinfo.btn.pre' />
+                    </a>
+                    <a data-pjax="true" class="btn btn-default <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.number+1}">
+                        <@spring.message code='admin.pageinfo.btn.next' />
+                    </a>
+                    <a data-pjax="true" class="btn btn-default <#if !galleries.hasNext()>disabled</#if>" href="/admin/page/galleries?page=${galleries.totalPages-1}">
+                        <@spring.message code='admin.pageinfo.btn.last' />
+                    </a>
+                </div>
             </div>
         </div>
     </section>

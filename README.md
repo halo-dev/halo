@@ -9,7 +9,7 @@
 [![Travis CI](https://img.shields.io/travis/ruibaby/halo.svg)](https://travis-ci.org/ruibaby/halo)
 
 ------------------------------
-🇨🇳简体中文 | 🇺🇸[English](./README-en-US.md) | <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Turkish" height="14"/> [Türkçe](./README-tr.md)
+🇨🇳简体中文 | 🇺🇸[English](./docs/README-en-US.md) | <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Turkish" height="14"/> [Türkçe](./docs/README-tr.md)
 
 ## 目录
 

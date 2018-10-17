@@ -35,12 +35,20 @@
                             <div class="no-margin pull-left">
                                 <@spring.message code='admin.pageinfo.text.no' />${attachments.number+1}/${attachments.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                             </div>
-                            <ul class="pagination no-margin pull-right">
-                                <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select" ><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
-                                <li><a class="btn btn-sm <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}" ><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
-                                <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
-                                <li><a class="btn btn-sm <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
-                            </ul>
+                            <div class="btn-group pull-right btn-group-sm" role="group">
+                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select" >
+                                    <@spring.message code='admin.pageinfo.btn.first' />
+                                </a>
+                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}" >
+                                    <@spring.message code='admin.pageinfo.btn.pre' />
+                                </a>
+                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}">
+                                    <@spring.message code='admin.pageinfo.btn.next' />
+                                </a>
+                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}">
+                                    <@spring.message code='admin.pageinfo.btn.last' />
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -67,7 +75,7 @@
 <script src="/static/plugins/fileinput/zh.min.js"></script>
 </#if>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/js/halo.js"></script>
+<script src="/static/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
     $('#uploadImg').fileinput({

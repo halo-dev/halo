@@ -39,13 +39,19 @@
                     <div class="no-margin pull-left">
                         <@spring.message code='admin.pageinfo.text.no' />${logs.number+1}/${logs.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                     </div>
-                    <div class="no-margin pull-right">
-                        <ul class="pagination" style="margin: 0;">
-                            <li><a class="btn btn-sm <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs"><@spring.message code='admin.pageinfo.btn.first' /></a> </li>
-                            <li><a class="btn btn-sm <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs?page=${logs.number-1}"><@spring.message code='admin.pageinfo.btn.pre' /></a></li>
-                            <li><a class="btn btn-sm <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.number+1}"><@spring.message code='admin.pageinfo.btn.next' /></a></li>
-                            <li><a class="btn btn-sm <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.totalPages-1}"><@spring.message code='admin.pageinfo.btn.last' /></a> </li>
-                        </ul>
+                    <div class="btn-group pull-right btn-group-sm" role="group">
+                        <a class="btn btn-default <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs">
+                            <@spring.message code='admin.pageinfo.btn.first' />
+                        </a>
+                        <a class="btn btn-default <#if !logs.hasPrevious()>disabled</#if>" href="/admin/logs?page=${logs.number-1}">
+                            <@spring.message code='admin.pageinfo.btn.pre' />
+                        </a>
+                        <a class="btn btn-default <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.number+1}">
+                            <@spring.message code='admin.pageinfo.btn.next' />
+                        </a>
+                        <a class="btn btn-default <#if !logs.hasNext()>disabled</#if>" href="/admin/logs?page=${logs.totalPages-1}">
+                            <@spring.message code='admin.pageinfo.btn.last' />
+                        </a>
                     </div>
                 </div>
             </div>

@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="/static/plugins/pace/pace.min.css">
     <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
     <link rel="stylesheet" href="/static/css/skins/_all-skins.min.css">
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/loader.css">
+    <link rel="stylesheet" href="/static/css/style.min.css">
+    <link rel="stylesheet" href="/static/css/loader.min.css">
     <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
     <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
     <link rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
@@ -60,7 +60,7 @@
 <#if options.blog_locale?default('zh_CN')=='zh_CN'>
     <script src="/static/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/js/halo.js"></script>
+<script src="/static/js/halo.min.js"></script>
 <@compress single_line=true>
 <script>
     var halo = new $.halo();

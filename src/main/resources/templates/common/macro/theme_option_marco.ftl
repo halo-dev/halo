@@ -28,7 +28,7 @@
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/js/halo.js"></script>
+<script src="/static/js/halo.min.js"></script>
 <#nested />
 <script>
     var halo = new $.halo();
