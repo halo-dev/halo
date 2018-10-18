@@ -2,7 +2,7 @@ language: java
 jdk:
   - oraclejdk8
 script:
-  - mvn clean package -Pprod
+  - mvn clean package -Pci
 branches:
   only:
     - master
