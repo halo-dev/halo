@@ -7,6 +7,7 @@
 [![JDK](https://img.shields.io/badge/JDK-1.8-yellow.svg)](#)
 [![GitHub release](https://img.shields.io/github/release/ruibaby/halo.svg)](https://github.com/ruibaby/halo/releases)
 [![Travis CI](https://img.shields.io/travis/ruibaby/halo.svg)](https://travis-ci.org/ruibaby/halo)
+[![Docker Build Status](https://img.shields.io/docker/build/ruibaby/halo.svg)](https://hub.docker.com/r/ruibaby/halo/)
 
 ------------------------------
 🇨🇳[简体中文](../README.md) | 🇺🇸[English](./README-en-US.md) | <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Turkish" height="14"/> Türkçe
