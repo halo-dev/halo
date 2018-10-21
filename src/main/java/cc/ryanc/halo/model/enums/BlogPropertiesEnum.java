@@ -143,7 +143,12 @@ public enum BlogPropertiesEnum {
     /**
      * 自动备份
      */
-    AUTO_BACKUP("auto_backup");
+    AUTO_BACKUP("auto_backup"),
+
+    /**
+     * API Token
+     */
+    API_TOKEN("api_token");
 
     private String prop;
 

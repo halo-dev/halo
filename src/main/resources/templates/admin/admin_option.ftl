@@ -631,6 +631,17 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label for="apiToken" class="col-lg-2 col-sm-4 control-label">Api Token</label>
+                                        <div class="col-lg-4 col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="apiToken" name="api_token" value="${options.api_token?if_exists}">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default " id="btnUpdateToken" onclick="updateToken()" type="button"><@spring.message code='admin.setting.form.btn-update-token' /></button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="statisticsCode" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.statistics-code' />
                                             <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.statistics-code-tips' />" style="cursor: pointer">
                                                     <i class="fa fa-question-circle" aria-hidden="true"></i>
@@ -693,6 +704,19 @@
                         halo.showMsg(data.msg,'success',1000);
                     }else{
                         halo.showMsg(data.msg,'error',2000);
+                    }
+                }
+            });
+        }
+
+        function updateToken() {
+            $.ajax({
+                type: 'GET',
+                url: '/admin/getToken',
+                data: {},
+                success: function (data) {
+                    if(data.code==1){
+                        $("#apiToken").val(data.result);
                     }
                 }
             });

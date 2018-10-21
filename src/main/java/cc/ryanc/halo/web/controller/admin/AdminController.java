@@ -8,6 +8,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
+import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.*;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * <pre>
@@ -238,5 +240,17 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/halo")
     public String halo() {
         return "admin/admin_halo";
+    }
+
+    /**
+     * 获取一个Token
+     *
+     * @return JsonResult
+     */
+    @GetMapping(value = "/getToken")
+    @ResponseBody
+    public JsonResult getToken() {
+        String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
+        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
     }
 }
