@@ -251,6 +251,6 @@ public class AdminController extends BaseController {
     @ResponseBody
     public JsonResult getToken() {
         String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
-        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
     }
 }
