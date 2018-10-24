@@ -34,7 +34,7 @@ ${options.native_css?if_exists}
         <#if comments?? && comments?size gt 0>
             <#list comments?sort_by("commentDate") as comment>
                 <li class="comment-list-one" id="comment-id-${comment.commentId?c}" style="margin-left: 5px;">
-                    <img class="comment-list-one-img" style="width: 2rem;height: 2rem;" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
+                    <img class="comment-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
                     <section>
                         <div class="comment-list-one-head">
                             <a class="comment-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>

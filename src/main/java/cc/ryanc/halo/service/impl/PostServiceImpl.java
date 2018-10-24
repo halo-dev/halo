@@ -9,6 +9,7 @@ import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -103,7 +104,7 @@ public class PostServiceImpl implements PostService {
     public void updateAllSummary(Integer postSummary) {
         List<Post> posts = this.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
         for (Post post : posts) {
-            String text = HtmlUtil.cleanHtmlTag(post.getPostContent());
+            String text = StrUtil.trim(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (text.length() > postSummary) {
                 post.setPostSummary(text.substring(0, postSummary));
             } else {
