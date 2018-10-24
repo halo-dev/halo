@@ -176,7 +176,7 @@ public class PostController extends BaseController {
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
             }
             //文章摘要
-            String summaryText = HtmlUtil.cleanHtmlTag(post.getPostContent());
+            String summaryText = StrUtil.trim(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (summaryText.length() > postSummary) {
                 String summary = summaryText.substring(0, postSummary);
                 post.setPostSummary(summary);
