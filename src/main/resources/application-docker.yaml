@@ -8,7 +8,7 @@ server:
     directBuffers: true
 spring:
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
+    type: com.zaxxer.hikari.HikariDataSource
 
     # H2database 配置
     driver-class-name: org.h2.Driver
