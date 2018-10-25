@@ -20,7 +20,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
-import com.alibaba.druid.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -343,7 +342,7 @@ public class PostController extends BaseController {
             urls.append("\n");
         }
         String result = HaloUtils.baiduPost(blogUrl, baiduToken, urls.toString());
-        if (StringUtils.isEmpty(result)) {
+        if (StrUtil.isEmpty(result)) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-success"));
