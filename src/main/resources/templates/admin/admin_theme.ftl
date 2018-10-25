@@ -69,12 +69,7 @@
                 </#list>
                 <#else>
                 <div class="col-md-12">
-                    <h2>居然没有主题？</h2>
-                    <h2>你仿佛在逗我？</h2>
-                    <h2>赶紧去上传一个主题，不然前台会报错！</h2>
-                    <h2>No themes?</h2>
-                    <h2>You fang fu is douing me?</h2>
-                    <h2>Please upload a theme,Otherwise the page will be incorrect.</h2>
+                    <h2><@spring.message code='common.text.no-data' /></h2>
                 </div>
             </#if>
         </div>
@@ -88,7 +83,7 @@
                     <h4 class="modal-title"><@spring.message code='common.text.tips' /></h4>
                 </div>
                 <div class="modal-body">
-                    <p id="message">你确定要删除该主题？</p>
+                    <p id="message"><@spring.message code='common.text.define-delete' /></p>
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" id="url"/>
