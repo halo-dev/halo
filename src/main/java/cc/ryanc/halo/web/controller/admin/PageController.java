@@ -45,22 +45,17 @@ import java.util.Optional;
 public class PageController {
 
     @Autowired
+    LocaleMessageUtil localeMessageUtil;
+    @Autowired
     private LinkService linkService;
-
     @Autowired
     private GalleryService galleryService;
-
     @Autowired
     private PostService postService;
-
     @Autowired
     private LogsService logsService;
-
     @Autowired
     private HttpServletRequest request;
-
-    @Autowired
-    LocaleMessageUtil localeMessageUtil;
 
     /**
      * 页面管理页面
@@ -110,7 +105,7 @@ public class PageController {
         try {
             linkService.saveByLink(link);
         } catch (Exception e) {
-            log.error("保存/修改友情链接失败：{}", e.getMessage());
+            log.error("Save/modify friendship link failed: {}", e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -126,7 +121,7 @@ public class PageController {
         try {
             linkService.removeByLinkId(linkId);
         } catch (Exception e) {
-            log.error("删除友情链接失败：{}", e.getMessage());
+            log.error("Deleting a friendship link failed: {}", e.getMessage());
         }
         return "redirect:/admin/page/links";
     }
@@ -195,7 +190,7 @@ public class PageController {
         try {
             galleryService.removeByGalleryId(galleryId);
         } catch (Exception e) {
-            log.error("删除图片失败：{}", e.getMessage());
+            log.error("Failed to delete image: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
@@ -245,7 +240,7 @@ public class PageController {
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
-            log.error("保存页面失败：{}", e.getMessage());
+            log.error("Save page failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }

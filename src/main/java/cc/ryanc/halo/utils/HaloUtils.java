@@ -178,7 +178,7 @@ public class HaloUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("主题获取失败：{}", e.getMessage());
+            log.error("Themes scan failed：{}", e.getMessage());
         }
         return themes;
     }
@@ -214,7 +214,7 @@ public class HaloUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("获取主题模板失败：{}", e.getMessage());
+            log.error("Failed to get theme template: {}", e.getMessage());
         }
         return tpls;
     }

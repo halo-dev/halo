@@ -9,6 +9,7 @@ package cc.ryanc.halo.model.enums;
  * @date : 2018/7/9
  */
 public enum AllowCommentEnum {
+
     /**
      * 允许评论
      */

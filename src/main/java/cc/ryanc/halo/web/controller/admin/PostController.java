@@ -209,7 +209,7 @@ public class PostController extends BaseController {
             logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
-            log.error("保存文章失败：{}", e.getMessage());
+            log.error("Save article failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
@@ -224,9 +224,9 @@ public class PostController extends BaseController {
     public String moveToTrash(@RequestParam("postId") Long postId, @RequestParam("status") Integer status) {
         try {
             postService.updatePostStatus(postId, PostStatusEnum.RECYCLE.getCode());
-            log.info("编号为" + postId + "的文章已被移到回收站");
+            log.info("Article number {} has been moved to the recycle bin", postId);
         } catch (Exception e) {
-            log.error("删除文章到回收站失败：{}", e.getMessage());
+            log.error("Deleting article to recycle bin failed: {}", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -242,9 +242,9 @@ public class PostController extends BaseController {
                                 @RequestParam("status") Integer status) {
         try {
             postService.updatePostStatus(postId, PostStatusEnum.PUBLISHED.getCode());
-            log.info("编号为" + postId + "的文章已改变为发布状态");
+            log.info("Article number {} has been changed to release status", postId);
         } catch (Exception e) {
-            log.error("发布文章失败：{}", e.getMessage());
+            log.error("Publishing article failed: {}", e.getMessage());
         }
         return "redirect:/admin/posts?status=" + status;
     }
@@ -262,7 +262,7 @@ public class PostController extends BaseController {
             postService.removeByPostId(postId);
             logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST, post.get().getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
         } catch (Exception e) {
-            log.error("删除文章失败：{}", e.getMessage());
+            log.error("Delete article failed: {}", e.getMessage());
         }
         if (StrUtil.equals(PostTypeEnum.POST_TYPE_POST.getDesc(), postType)) {
             return "redirect:/admin/posts?status=2";
@@ -296,7 +296,7 @@ public class PostController extends BaseController {
         try {
             postService.updateAllSummary(postSummary);
         } catch (Exception e) {
-            log.error("更新摘要失败：{}", e.getMessage());
+            log.error("Update summary failed: {}", e.getMessage());
             e.printStackTrace();
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.update-failed"));
         }

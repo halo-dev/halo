@@ -46,7 +46,7 @@ public class MenuController {
         try {
             menuService.saveByMenu(menu);
         } catch (Exception e) {
-            log.error("保存菜单失败：{}" + e.getMessage());
+            log.error("Saving menu failed: {}" + e.getMessage());
         }
         return "redirect:/admin/menus";
     }
@@ -76,7 +76,7 @@ public class MenuController {
         try {
             menuService.removeByMenuId(menuId);
         } catch (Exception e) {
-            log.error("删除菜单失败：{}", e.getMessage());
+            log.error("Deleting menu failed: {}", e.getMessage());
         }
         return "redirect:/admin/menus";
     }

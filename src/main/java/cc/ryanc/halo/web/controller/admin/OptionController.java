@@ -60,10 +60,10 @@ public class OptionController {
             configuration.setSharedVariable("options", optionsService.findAllOptions());
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
-            log.info("所保存的设置选项列表：" + options);
+            log.info("List of saved options: " + options);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
-            log.error("保存设置选项失败：{}", e.getMessage());
+            log.error("Save settings option failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }

@@ -5,10 +5,7 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
-import cc.ryanc.halo.model.enums.CommentStatusEnum;
-import cc.ryanc.halo.model.enums.PostTypeEnum;
-import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
@@ -96,7 +93,7 @@ public class CommentController extends BaseController {
         try {
             commentService.updateCommentStatus(commentId, CommentStatusEnum.RECYCLE.getCode());
         } catch (Exception e) {
-            log.error("删除评论失败：{}", e.getMessage());
+            log.error("Delete comment failed: {}", e.getMessage());
         }
         return "redirect:/admin/comments?status=" + status + "&page=" + page;
     }
@@ -137,7 +134,7 @@ public class CommentController extends BaseController {
         try {
             commentService.removeByCommentId(commentId);
         } catch (Exception e) {
-            log.error("删除评论失败：{}", e.getMessage());
+            log.error("Delete comment failed: {}", e.getMessage());
         }
         return "redirect:/admin/comments?status=" + status + "&page=" + page;
     }
@@ -190,10 +187,10 @@ public class CommentController extends BaseController {
 
             //邮件通知
             new EmailToAuthor(comment, lastComment, post, user, commentContent).start();
-            return new JsonResult(1, "回复成功！");
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
         } catch (Exception e) {
-            log.error("回复评论失败：{}", e.getMessage());
-            return new JsonResult(0, "回复失败！");
+            log.error("Reply to comment failed: {}", e.getMessage());
+            return new JsonResult(ResultCodeEnum.FAIL.getCode());
         }
     }
 
@@ -278,7 +275,7 @@ public class CommentController extends BaseController {
                                 "您在" + HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "的评论已审核通过！", map, "common/mail_template/mail_passed.ftl");
                     }
                 } catch (Exception e) {
-                    log.error("邮件服务器未配置：{}", e.getMessage());
+                    log.error("Mail server not configured: {}", e.getMessage());
                 }
             }
         }

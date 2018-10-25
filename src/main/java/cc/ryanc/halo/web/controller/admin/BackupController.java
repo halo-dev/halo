@@ -117,10 +117,10 @@ public class BackupController {
             String distName = "databases_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
-            log.info("当前时间：{}，执行了数据库备份。", DateUtil.now());
+            log.info("Current time: {}, database backup was performed.", DateUtil.now());
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
-            log.error("备份数据库失败：{}", e.getMessage());
+            log.error("Backup database failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
@@ -140,10 +140,10 @@ public class BackupController {
             String distName = "resources_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
-            log.info("当前时间：{}，执行了资源文件备份。", DateUtil.now());
+            log.info("Current time: {}, the resource file backup was performed.", DateUtil.now());
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
-            log.error("备份资源文件失败：{}", e.getMessage());
+            log.error("Backup resource file failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
@@ -169,10 +169,10 @@ public class BackupController {
             //打包导出好的文章
             ZipUtil.zip(srcPath, srcPath + ".zip");
             FileUtil.del(srcPath);
-            log.info("当前时间：{}，执行了文章备份。", DateUtil.now());
+            log.info("Current time: {}, performed an article backup.", DateUtil.now());
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
-            log.error("备份文章失败：{}", e.getMessage());
+            log.error("Backup article failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
@@ -270,7 +270,7 @@ public class BackupController {
                 content.put("size", HaloUtils.parseSize(file.length()));
                 mailService.sendAttachMail(user.getUserEmail(), localeMessageUtil.getMessage("code.admin.backup.have-new-backup"), content, "common/mail_template/mail_attach.ftl", srcPath);
             } catch (Exception e) {
-                log.error("邮件服务器未配置：{}", e.getMessage());
+                log.error("Mail server not configured: {}", e.getMessage());
             }
         }
     }

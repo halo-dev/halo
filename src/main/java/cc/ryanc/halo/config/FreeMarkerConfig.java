@@ -47,7 +47,7 @@ public class FreeMarkerConfig {
             configuration.setSharedVariable("options", optionsService.findAllOptions());
             configuration.setSharedVariable("user", userService.findUser());
         } catch (TemplateModelException e) {
-            log.error("自定义标签加载失败：{}", e.getMessage());
+            log.error("Custom tags failed to load：{}", e.getMessage());
         }
     }
 }

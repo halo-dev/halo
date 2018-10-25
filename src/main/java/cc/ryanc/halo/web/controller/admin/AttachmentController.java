@@ -165,7 +165,7 @@ public class AttachmentController {
                 attachment.setAttachSize(HaloUtils.parseSize(new File(mediaPath, fileName).length()));
                 attachment.setAttachWh(HaloUtils.getImageWh(new File(mediaPath, fileName)));
                 attachmentService.saveByAttachment(attachment);
-                log.info("上传文件[{}]到[{}]成功", fileName, mediaPath.getAbsolutePath());
+                log.info("Upload file {} to {} successfully", fileName, mediaPath.getAbsolutePath());
                 logsService.saveByLogs(
                         new Logs(LogsRecord.UPLOAD_FILE, fileName, ServletUtil.getClientIP(request), DateUtil.date())
                 );
@@ -173,14 +173,14 @@ public class AttachmentController {
                 result.put("success", 1);
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
                 result.put("url", attachment.getAttachPath());
-                result.put("filename",filePath);
+                result.put("filename", filePath);
             } catch (Exception e) {
-                log.error("上传文件失败：{}", e.getMessage());
+                log.error("Upload file failed:{}", e.getMessage());
                 result.put("success", 0);
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
             }
         } else {
-            log.error("文件不能为空");
+            log.error("File cannot be empty!");
         }
         return result;
     }
@@ -223,17 +223,17 @@ public class AttachmentController {
             File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
             if (delFile.exists() && delFile.isFile()) {
                 if (delFile.delete() && delSmallFile.delete()) {
-                    log.info("删除文件[{}]成功！", delFileName);
+                    log.info("Delete file {} successfully!", delFileName);
                     logsService.saveByLogs(
                             new Logs(LogsRecord.REMOVE_FILE, delFileName, ServletUtil.getClientIP(request), DateUtil.date())
                     );
                 } else {
-                    log.error("删除附件[{}]失败！", delFileName);
+                    log.error("Deleting attachment {} failed!", delFileName);
                     return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
                 }
             }
         } catch (Exception e) {
-            log.error("删除附件[{}]失败:{}", delFileName, e.getMessage());
+            log.error("Deleting attachment {} failed: {}", delFileName, e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));

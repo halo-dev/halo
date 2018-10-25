@@ -70,7 +70,7 @@ public class UserController {
             configuration.setSharedVariable("user", userService.findUser());
             session.removeAttribute(HaloConst.USER_SESSION_KEY);
         } catch (Exception e) {
-            log.error("修改用户资料失败：{}", e.getMessage());
+            log.error("Failed to modify user profile: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.edit-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.edit-success"));
@@ -101,7 +101,7 @@ public class UserController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.old-password-error"));
             }
         } catch (Exception e) {
-            log.error("修改密码失败：{}", e.getMessage());
+            log.error("Password change failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.update-password-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.user.update-password-success"));
