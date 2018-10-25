@@ -181,7 +181,7 @@ public class FrontCommentController {
                     map.put("commentContent", comment.getCommentContent());
                     mailService.sendTemplateMail(userService.findUser().getUserEmail(), "有新的评论", map, "common/mail_template/mail_admin.ftl");
                 } catch (Exception e) {
-                    log.error("邮件服务器未配置：{}", e.getMessage());
+                    log.error("Mail server not configured: {}", e.getMessage());
                 }
             }
         }

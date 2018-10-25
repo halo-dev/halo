@@ -51,7 +51,7 @@ public class TagController {
         try {
             tagService.saveByTag(tag);
         } catch (Exception e) {
-            log.error("新增/修改标签失败：{}", e.getMessage());
+            log.error("Add/modify tag failed: {}", e.getMessage());
         }
         return "redirect:/admin/tag";
     }
@@ -83,7 +83,7 @@ public class TagController {
         try {
             tagService.removeByTagId(tagId);
         } catch (Exception e) {
-            log.error("删除标签失败：{}", e.getMessage());
+            log.error("Failed to delete tag: {}", e.getMessage());
         }
         return "redirect:/admin/tag";
     }

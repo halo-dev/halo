@@ -161,7 +161,7 @@ public class AdminController extends BaseController {
             //重置用户的登录状态为正常
             userService.updateUserNormal();
             logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
-            log.info("用户[{}]登录成功。", aUser.getUserDisplayName());
+            log.info("User {} login succeeded.", aUser.getUserDisplayName());
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
         } else {
             //更新失败次数
@@ -194,7 +194,7 @@ public class AdminController extends BaseController {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         session.removeAttribute(HaloConst.USER_SESSION_KEY);
         logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), ServletUtil.getClientIP(request), DateUtil.date()));
-        log.info("用户[{}]退出登录", user.getUserName());
+        log.info("User {} has logged out", user.getUserName());
         return "redirect:/admin/login";
     }
 
@@ -227,7 +227,7 @@ public class AdminController extends BaseController {
         try {
             logsService.removeAllLogs();
         } catch (Exception e) {
-            log.error("清除日志失败：{}" + e.getMessage());
+            log.error("Clear log failed:{}" + e.getMessage());
         }
         return "redirect:/admin";
     }

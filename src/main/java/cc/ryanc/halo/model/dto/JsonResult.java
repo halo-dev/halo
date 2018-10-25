@@ -29,6 +29,15 @@ public class JsonResult {
     private Object result;
 
     /**
+     * 只返回状态码
+     *
+     * @param code 状态码
+     */
+    public JsonResult(Integer code) {
+        this.code = code;
+    }
+
+    /**
      * 不返回数据的构造方法
      *
      * @param code 状态码

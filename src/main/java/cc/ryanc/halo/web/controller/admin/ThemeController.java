@@ -48,6 +48,8 @@ import java.util.List;
 @RequestMapping(value = "/admin/themes")
 public class ThemeController extends BaseController {
 
+    private static final String NOT_FOUND_GIT = "-bash: git: command not found";
+
     @Autowired
     private OptionsService optionsService;
 
@@ -59,8 +61,6 @@ public class ThemeController extends BaseController {
 
     @Autowired
     private LocaleMessageUtil localeMessageUtil;
-
-    private static final String NOT_FOUND_GIT = "-bash: git: command not found";
 
     /**
      * 渲染主题设置页面
@@ -98,7 +98,7 @@ public class ThemeController extends BaseController {
             HaloConst.OPTIONS = optionsService.findAllOptions();
             configuration.setSharedVariable("themeName", siteTheme);
             configuration.setSharedVariable("options", HaloConst.OPTIONS);
-            log.info("已将主题改变为：{}", siteTheme);
+            log.info("Changed theme to {}", siteTheme);
             logsService.saveByLogs(
                     new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, ServletUtil.getClientIP(request), DateUtil.date())
             );
@@ -125,7 +125,7 @@ public class ThemeController extends BaseController {
                 File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
                 File themePath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(file.getOriginalFilename()).toString());
                 file.transferTo(themePath);
-                log.info("上传主题成功，路径：" + themePath.getAbsolutePath());
+                log.info("Upload topic success, path is " + themePath.getAbsolutePath());
                 logsService.saveByLogs(
                         new Logs(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), ServletUtil.getClientIP(request), DateUtil.date())
                 );
@@ -134,11 +134,11 @@ public class ThemeController extends BaseController {
                 HaloConst.THEMES.clear();
                 HaloConst.THEMES = HaloUtils.getThemes();
             } else {
-                log.error("上传主题失败，没有选择文件");
+                log.error("Upload theme failed, no file selected");
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-no-file"));
             }
         } catch (Exception e) {
-            log.error("上传主题失败：{}", e.getMessage());
+            log.error("Upload theme failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-success"));
@@ -159,7 +159,7 @@ public class ThemeController extends BaseController {
             HaloConst.THEMES.clear();
             HaloConst.THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
-            log.error("删除主题失败：{}", e.getMessage());
+            log.error("Delete theme failed: {}", e.getMessage());
         }
         return "redirect:/admin/themes";
     }
@@ -186,22 +186,22 @@ public class ThemeController extends BaseController {
     public JsonResult cloneFromRemote(@RequestParam(value = "remoteAddr") String remoteAddr,
                                       @RequestParam(value = "themeName") String themeName) {
         if (StrUtil.isBlank(remoteAddr) || StrUtil.isBlank(themeName)) {
-            return new JsonResult(0, localeMessageUtil.getMessage("code.admin.common.info-no-complete"));
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.info-no-complete"));
         }
         try {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
             String cmdResult = RuntimeUtil.execForStr("git clone " + remoteAddr + " " + themePath.getAbsolutePath() + "/" + themeName);
             if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.no-git"));
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
             HaloConst.THEMES.clear();
             HaloConst.THEMES = HaloUtils.getThemes();
         } catch (FileNotFoundException e) {
-            log.error("克隆主题失败：{}", e.getMessage());
-            return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.clone-theme-failed") + e.getMessage());
+            log.error("Cloning theme failed: {}", e.getMessage());
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.clone-theme-failed") + e.getMessage());
         }
-        return new JsonResult(1, localeMessageUtil.getMessage("code.admin.common.install-success"));
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.install-success"));
     }
 
     /**
@@ -218,15 +218,15 @@ public class ThemeController extends BaseController {
             File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
             String cmdResult = RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName + " && git pull");
             if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.no-git"));
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
             HaloConst.THEMES.clear();
             HaloConst.THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
-            log.error("更新主题失败：{}", e.getMessage());
-            return new JsonResult(0, localeMessageUtil.getMessage("code.admin.theme.update-theme-failed") + e.getMessage());
+            log.error("Update theme failed: {}", e.getMessage());
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.update-theme-failed") + e.getMessage());
         }
-        return new JsonResult(1, localeMessageUtil.getMessage("code.admin.common.update-success"));
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
     }
 
     /**
@@ -278,7 +278,7 @@ public class ThemeController extends BaseController {
             FileReader fileReader = new FileReader(themesPath);
             tplContent = fileReader.readString();
         } catch (Exception e) {
-            log.error("获取模板文件错误：{}", e.getMessage());
+            log.error("Get template file error: {}", e.getMessage());
         }
         return tplContent;
     }
@@ -305,7 +305,7 @@ public class ThemeController extends BaseController {
             FileWriter fileWriter = new FileWriter(tplPath);
             fileWriter.write(tplContent);
         } catch (Exception e) {
-            log.error("模板保存失败：{}", e.getMessage());
+            log.error("Template save failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));

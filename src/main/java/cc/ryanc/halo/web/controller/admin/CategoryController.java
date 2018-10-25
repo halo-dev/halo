@@ -54,7 +54,7 @@ public class CategoryController {
         try {
             categoryService.saveByCategory(category);
         } catch (Exception e) {
-            log.error("修改分类失败：{}", e.getMessage());
+            log.error("Modify category failed: {}", e.getMessage());
         }
         return "redirect:/admin/category";
     }
@@ -86,7 +86,7 @@ public class CategoryController {
         try {
             categoryService.removeByCateId(cateId);
         } catch (Exception e) {
-            log.error("删除分类失败：{}", e.getMessage());
+            log.error("Delete category failed: {}", e.getMessage());
         }
         return "redirect:/admin/category";
     }

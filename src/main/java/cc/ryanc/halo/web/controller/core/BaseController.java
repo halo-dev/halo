@@ -1,5 +1,7 @@
 package cc.ryanc.halo.web.controller.core;
 
+import cn.hutool.core.text.StrBuilder;
+
 /**
  * <pre>
  *     Controller抽象类
@@ -22,7 +24,7 @@ public abstract class BaseController {
      * @return 返回拼接好的模板路径
      */
     public String render(String pageName) {
-        StringBuffer themeStr = new StringBuffer("themes/");
+        StrBuilder themeStr = new StrBuilder("themes/");
         themeStr.append(THEME);
         themeStr.append("/");
         return themeStr.append(pageName).toString();
