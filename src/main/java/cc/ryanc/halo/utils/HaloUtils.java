@@ -220,6 +220,33 @@ public class HaloUtils {
     }
 
     /**
+     * 获取定制模板
+     * 格式 page_xxx
+     *
+     * @return List
+     */
+    public static List<String> getCustomTpl(String theme) {
+        List<String> tpls = new ArrayList<>();
+        try {
+            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            //获取主题路径
+            File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
+            File[] themeFiles = themePath.listFiles();
+            if (null != themeFiles && themeFiles.length > 0) {
+                for (File file : themeFiles) {
+                    String[] split = StrUtil.removeSuffix(file.getName(), ".ftl").split("_");
+                    if (split.length == 2 && "page".equals(split[0])) {
+                        tpls.add(StrUtil.removeSuffix(file.getName(), ".ftl"));
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return tpls;
+    }
+
+    /**
      * 导出为文件
      *
      * @param data     内容

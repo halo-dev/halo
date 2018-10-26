@@ -130,6 +130,11 @@ public class Post implements Serializable {
      */
     private Integer allowComment = 0;
 
+    /**
+     * 指定渲染模板
+     */
+    private String customTpl;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date getPostDate() {
         return postDate;

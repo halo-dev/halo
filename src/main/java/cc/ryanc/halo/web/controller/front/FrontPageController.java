@@ -103,6 +103,11 @@ public class FrontPageController extends BaseController {
         model.addAttribute("commentsCount", comments.size());
         model.addAttribute("rainbow", rainbow);
         postService.updatePostView(post);
+
+        //如果设置了自定义模板，则渲染自定义模板
+        if(StrUtil.isNotEmpty(post.getCustomTpl())){
+            return this.render(post.getCustomTpl());
+        }
         return this.render("page");
     }
 }
