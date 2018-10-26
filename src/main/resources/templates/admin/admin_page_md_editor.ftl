@@ -69,11 +69,26 @@
                         </div>
                     </div>
                     <div class="box-body">
-                        <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
-                        <select class="form-control" id="allowComment" name="allowComment">
-                            <option value="1" <#if post?? && post.allowComment?default(1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
-                            <option value="0" <#if post?? && post.allowComment?default(1)==0>selected</#if>><@spring.message code='common.select.no' /></option>
-                        </select>
+                        <div class="form-group">
+                            <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
+                            <select class="form-control" id="allowComment" name="allowComment">
+                                <option value="1" <#if post?? && post.allowComment?default(1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
+                                <option value="0" <#if post?? && post.allowComment?default(1)==0>selected</#if>><@spring.message code='common.select.no' /></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="customTpl" class="control-label">自定义模板：</label>
+                            <select class="form-control" id="customTpl" name="customTpl">
+                                <#if customTpls?? && customTpls?size gt 0>
+                                    <option value="">选择模板</option>
+                                    <#list customTpls as tpl>
+                                    <option value="${tpl}" <#if post?? && post.customTpl?if_exists == "${tpl}">selected</#if>>${tpl}</option>
+                                    </#list>
+                                <#else>
+                                    <option value="">无自定义模板</option>
+                                </#if>
+                            </select>
+                        </div>
                     </div>
                     <div class="box-footer">
                         <button onclick="push(1)" class="btn btn-default btn-sm "><@spring.message code='admin.editor.save-draft' /></button>
@@ -207,7 +222,8 @@
                     'postContentMd': simplemde.value(),
                     'postContent': simplemde.markdown(simplemde.value()),
                     'postThumbnail': $('#selectImg').attr('src'),
-                    'allowComment' : $('#allowComment').val()
+                    'allowComment' : $('#allowComment').val(),
+                    'customTpl' : $("#customTpl").val()
                 },
                 success: function (data) {
                     if(data.code==1){

@@ -11,6 +11,7 @@ import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -196,14 +197,16 @@ public class PageController {
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
     }
 
-
     /**
      * 跳转到新建页面
      *
+     * @param model model
      * @return 模板路径admin/admin_page_md_editor
      */
     @GetMapping(value = "/new")
-    public String newPage() {
+    public String newPage(Model model) {
+        List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
+        model.addAttribute("customTpls",customTpls);
         return "admin/admin_page_md_editor";
     }
 
@@ -255,7 +258,9 @@ public class PageController {
     @GetMapping(value = "/edit")
     public String editPage(@RequestParam("pageId") Long pageId, Model model) {
         Optional<Post> post = postService.findByPostId(pageId);
+        List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("post", post.get());
+        model.addAttribute("customTpls",customTpls);
         return "admin/admin_page_md_editor";
     }
 
