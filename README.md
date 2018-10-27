@@ -42,13 +42,13 @@ mvn clean package -Pprod
 java -jar target/dist/halo/halo-latest.jar
 ```
 
-服务器快速部署（暂时仅支持CentOS）：
+服务器快速部署：
 
 ```bash
 # 安装Halo
-yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh 1
+yum install -y wget && wget https://git.io/fxHqp && bash halo-cli.sh -i
 # 更新Halo
-sh halo-cli.sh 2
+bash halo-cli.sh -u
 ```
 
 Docker 部署：

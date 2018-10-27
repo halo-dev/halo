@@ -42,12 +42,12 @@ mvn clean package -Pprod
 java -jar target/dist/halo/halo-latest.jar
 ```
 
-Rapid server deployment(Support for CentOS only):
+Rapid server deployment:
 ```bash
 # Install Halo
-yum install -y wget && wget http://static.ryanc.cc/halo-cli.sh && sh halo-cli.sh 1
+yum install -y wget && wget https://git.io/fxHqp && bash halo-cli.sh -i
 # Upgrade Halo
-sh halo-cli.sh 2
+bash halo-cli.sh -u
 ```
 
 Docker：
