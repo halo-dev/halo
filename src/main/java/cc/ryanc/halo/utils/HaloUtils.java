@@ -16,6 +16,8 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
@@ -34,7 +36,7 @@ import java.util.*;
 
 /**
  * <pre>
- *     常用工具
+ * 常用工具
  * </pre>
  *
  * @author : RYAN0UP
@@ -55,7 +57,7 @@ public class HaloUtils {
         File[] files = srcPath.listFiles();
         List<BackupDto> backupDtos = new ArrayList<>();
         BackupDto backupDto = null;
-        //遍历文件
+        // 遍历文件
         if (null != files) {
             for (File file : files) {
                 if (file.isFile()) {
@@ -109,7 +111,8 @@ public class HaloUtils {
      */
     public static Date getCreateTime(String srcPath) {
         Path path = Paths.get(srcPath);
-        BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+        BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class,
+                LinkOption.NOFOLLOW_LINKS);
         BasicFileAttributes attr;
         try {
             attr = basicview.readAttributes();
@@ -147,9 +150,9 @@ public class HaloUtils {
     public static List<Theme> getThemes() {
         List<Theme> themes = new ArrayList<>();
         try {
-            //获取项目根路径
+            // 获取项目根路径
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            //获取主题路径
+            // 获取主题路径
             File themesPath = new File(basePath.getAbsolutePath(), "templates/themes");
             File[] files = themesPath.listFiles();
             if (null != files) {
@@ -161,7 +164,8 @@ public class HaloUtils {
                         }
                         theme = new Theme();
                         theme.setThemeName(file.getName());
-                        File optionsPath = new File(themesPath.getAbsolutePath(), file.getName() + "/module/options.ftl");
+                        File optionsPath = new File(themesPath.getAbsolutePath(),
+                                file.getName() + "/module/options.ftl");
                         if (optionsPath.exists()) {
                             theme.setHasOptions(true);
                         } else {
@@ -192,9 +196,9 @@ public class HaloUtils {
     public static List<String> getTplName(String theme) {
         List<String> tpls = new ArrayList<>();
         try {
-            //获取项目根路径
+            // 获取项目根路径
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            //获取主题路径
+            // 获取主题路径
             File themesPath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
             File modulePath = new File(themesPath.getAbsolutePath(), "module");
             File[] baseFiles = themesPath.listFiles();
@@ -220,8 +224,7 @@ public class HaloUtils {
     }
 
     /**
-     * 获取定制模板
-     * 格式 page_xxx
+     * 获取定制模板 格式 page_xxx
      *
      * @return List
      */
@@ -229,7 +232,7 @@ public class HaloUtils {
         List<String> tpls = new ArrayList<>();
         try {
             File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            //获取主题路径
+            // 获取主题路径
             File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
             File[] themeFiles = themePath.listFiles();
             if (null != themeFiles && themeFiles.length > 0) {
@@ -284,6 +287,8 @@ public class HaloUtils {
      * @throws FeedException
      */
     public static String getRss(List<Post> posts) throws FeedException {
+        Assert.notEmpty(posts, "posts must not be empty");
+
         Channel channel = new Channel("rss_2.0");
         if (null == HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp())) {
             channel.setTitle("");
@@ -318,7 +323,8 @@ public class HaloUtils {
             value = new String(xmlChar);
             content.setValue(value);
             item.setContent(content);
-            item.setLink(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl());
+            item.setLink(
+                    HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl());
             item.setPubDate(post.getPostDate());
             items.add(item);
         }
@@ -334,12 +340,15 @@ public class HaloUtils {
      * @return String
      */
     public static String getSiteMap(List<Post> posts) {
+        Assert.notEmpty(posts, "post mut not be empty");
+
         String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
         String urlBody = "";
         String urlItem;
         String urlPath = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/";
         for (Post post : posts) {
-            urlItem = "<url><loc>" + urlPath + post.getPostUrl() + "</loc><lastmod>" + DateUtil.format(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX") + "</lastmod>" + "</url>";
+            urlItem = "<url><loc>" + urlPath + post.getPostUrl() + "</loc><lastmod>"
+                    + DateUtil.format(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX") + "</lastmod>" + "</url>";
             urlBody += urlItem;
         }
         return head + urlBody + "</urlset>";
@@ -365,6 +374,8 @@ public class HaloUtils {
      * @return String
      */
     public static String getHttpResponse(String enterUrl) {
+        Assert.hasText(enterUrl, "enter url must not be blank");
+
         BufferedReader in = null;
         StringBuffer result = null;
         try {
@@ -396,7 +407,6 @@ public class HaloUtils {
         return null;
     }
 
-
     /**
      * 百度主动推送
      *
@@ -406,29 +416,33 @@ public class HaloUtils {
      * @return String
      */
     public static String baiduPost(String blogUrl, String token, String urls) {
+        Assert.hasText(blogUrl, "blog url must not be blank");
+        Assert.hasText(token, "token must not be blank");
+        Assert.hasText(urls, "urls must not be blank");
+
         String url = "http://data.zz.baidu.com/urls?site=" + blogUrl + "&token=" + token;
         String result = "";
         PrintWriter out = null;
         BufferedReader in = null;
         try {
-            //建立URL之间的连接
+            // 建立URL之间的连接
             URLConnection conn = new URL(url).openConnection();
-            //设置通用的请求属性
+            // 设置通用的请求属性
             conn.setRequestProperty("Host", "data.zz.baidu.com");
             conn.setRequestProperty("User-Agent", "curl/7.12.1");
             conn.setRequestProperty("Content-Length", "83");
             conn.setRequestProperty("Content-Type", "text/plain");
 
-            //发送POST请求必须设置如下两行
+            // 发送POST请求必须设置如下两行
             conn.setDoInput(true);
             conn.setDoOutput(true);
 
-            //获取conn对应的输出流
+            // 获取conn对应的输出流
             out = new PrintWriter(conn.getOutputStream());
             out.print(urls.trim());
-            //进行输出流的缓冲
+            // 进行输出流的缓冲
             out.flush();
-            //通过BufferedReader输入流来读取Url的响应
+            // 通过BufferedReader输入流来读取Url的响应
             in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
