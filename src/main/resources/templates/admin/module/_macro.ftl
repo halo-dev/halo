@@ -1,4 +1,5 @@
 <#macro head>
+<#import "/common/macro/common_macro.ftl" as common>
 <!DOCTYPE html>
 <html>
 <head>
