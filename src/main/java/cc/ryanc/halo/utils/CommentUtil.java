@@ -1,14 +1,17 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.domain.Comment;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
+import cc.ryanc.halo.model.domain.Comment;
+
 /**
  * <pre>
- *     拼装评论
+ * 拼装评论
  * </pre>
  *
  * @author : RYAN0UP
@@ -23,6 +26,10 @@ public class CommentUtil {
      * @return List
      */
     public static List<Comment> getComments(List<Comment> commentsRoot) {
+        if (CollectionUtils.isEmpty(commentsRoot)) {
+            return Collections.emptyList();
+        }
+
         List<Comment> commentsResult = new ArrayList<>();
 
         for (Comment comment : commentsRoot) {
@@ -34,7 +41,7 @@ public class CommentUtil {
         for (Comment comment : commentsResult) {
             comment.setChildComments(getChild(comment.getCommentId(), commentsRoot));
         }
-        //集合倒序，最新的评论在最前面
+        // 集合倒序，最新的评论在最前面
         Collections.reverse(commentsResult);
         return commentsResult;
     }
@@ -47,6 +54,12 @@ public class CommentUtil {
      * @return List
      */
     private static List<Comment> getChild(Long id, List<Comment> commentsRoot) {
+        Assert.notNull(id, "comment id must not be null");
+
+        if (CollectionUtils.isEmpty(commentsRoot)) {
+            return null;
+        }
+
         List<Comment> commentsChild = new ArrayList<>();
         for (Comment comment : commentsRoot) {
             if (comment.getCommentParent() != 0) {
