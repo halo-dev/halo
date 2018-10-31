@@ -238,7 +238,7 @@
                                                     <span class="label bg-red"><@spring.message code='common.status.recycle-bin' /></span>
                                                 </#if>
                                             </td>
-                                            <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
+                                            <td><@common.timeline datetime="${post.postDate?if_exists}"?datetime /></td>
                                         </tr>
                                     </#list>
                                 <#else>
@@ -310,7 +310,7 @@
                                             <#break >
                                             </#switch>
                                         </td>
-                                        <td>${comment.commentDate?string("yyyy-MM-dd HH:mm")}</td>
+                                        <td><@common.timeline datetime="${comment.commentDate}"?datetime /></td>
                                     </tr>
                                 </#list>
                                 <#else>
