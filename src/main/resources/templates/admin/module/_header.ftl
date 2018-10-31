@@ -35,7 +35,7 @@
                                             </div>
                                             <h4>
                                                 ${comment.commentAuthor}
-                                                <small> ${comment.commentDate?string("yyyy/MM/dd HH:mm")}</small>
+                                                <small> <@common.timeline datetime="${comment.commentDate}"?datetime /></small>
                                             </h4>
                                             <object>${comment.commentContent}</object>
                                         </a>
