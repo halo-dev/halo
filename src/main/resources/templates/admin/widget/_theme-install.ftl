@@ -104,7 +104,7 @@
             var data = data.jqXHR.responseJSON;
             if(data.code==1){
                 $("#uploadForm").hide(400);
-                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/themes');
+                halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/themes');
             }else{
                 halo.showMsg(data.msg,'error',2000);
             }
@@ -131,7 +131,7 @@
             },
             success: function (data) {
                 if(data.code==1){
-                    halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/themes');
+                    halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/themes');
                 }else {
                     halo.showMsg(data.msg,'error',2000);
                     $('#btnInstall').button('reset');
