@@ -2,14 +2,6 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.index.title' /></@head>
 <div class="content-wrapper">
-    <style type="text/css" rel="stylesheet">
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-        .control-radio{
-            padding-top: 7px;
-        }
-    </style>
     <section class="content-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.index.title' /></h1>
         <a class="btn-header" id="btnWidgetsOption" href="#">
@@ -266,7 +258,7 @@
                             <thead>
                             <tr>
                                 <th><@spring.message code='common.th.comment-author' /></th>
-                                <th><@spring.message code='common.th.comment-page' /></th>
+                                <th width="20%"><@spring.message code='common.th.comment-page' /></th>
                                 <th width="30%"><@spring.message code='common.th.content' /></th>
                                 <th><@spring.message code='common.th.status' /></th>
                                 <th><@spring.message code='common.th.date' /></th>

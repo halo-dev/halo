@@ -45,7 +45,7 @@
                                     <#list comments.content as comment>
                                         <tr>
                                             <td><a href="${comment.commentAuthorUrl}" target="_blank">${comment.commentAuthor}</a></td>
-                                            <td>${comment.commentContent}</td>
+                                            <td><p>${comment.commentContent}</p></td>
                                             <td>
                                                 <#if comment.post.postType == "post">
                                                     <a target="_blank" href="/archives/${comment.post.postUrl}#comment-id-${comment.commentId?c}">${comment.post.postTitle}</a>

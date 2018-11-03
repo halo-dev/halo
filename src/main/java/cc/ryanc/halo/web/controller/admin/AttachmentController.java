@@ -95,6 +95,17 @@ public class AttachmentController {
         return "admin/widget/_attachment-select";
     }
 
+
+    /**
+     * 上传附件窗口
+     *
+     * @return String
+     */
+    @GetMapping(value = "/uploadModal")
+    public String uploadModal(){
+        return "admin/widget/_attachment-upload";
+    }
+
     /**
      * 上传附件
      *
@@ -106,32 +117,6 @@ public class AttachmentController {
     @ResponseBody
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
-        return uploadAttachment(file, request);
-    }
-
-    /**
-     * editor.md上传图片
-     *
-     * @param file    file
-     * @param request request
-     * @return Map
-     */
-    @PostMapping(value = "/upload/editor", produces = {"application/json;charset=UTF-8"})
-    @ResponseBody
-    public Map<String, Object> editorUpload(@RequestParam("editormd-image-file") MultipartFile file,
-                                            HttpServletRequest request) {
-        return uploadAttachment(file, request);
-    }
-
-
-    /**
-     * 上传图片
-     *
-     * @param file    file
-     * @param request request
-     * @return Map
-     */
-    private Map<String, Object> uploadAttachment(MultipartFile file, HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>(3);
         if (!file.isEmpty()) {
             try {

@@ -4,12 +4,6 @@
 <div class="content-wrapper">
     <style type="text/css" rel="stylesheet">
         .resourceType,.databaseType,.postType{list-style:none;float:left;margin:0;padding-bottom:10px}
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-        .control-radio{
-            padding-top: 7px;
-        }
     </style>
     <section class="content-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.backup.title' /></h1>
