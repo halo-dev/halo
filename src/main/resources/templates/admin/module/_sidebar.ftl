@@ -44,7 +44,7 @@
             </li>
             <li>
                 <a data-pjax="true" href="/admin/attachments">
-                    <i class="fa fa-camera"></i>
+                    <i class="fa fa-picture-o"></i>
                     <span><@spring.message code='admin.menu.attachments' /></span>
                 </a>
             </li>

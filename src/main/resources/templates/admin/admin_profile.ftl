@@ -2,11 +2,6 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.user.profile.title' /></@head>
 <div class="content-wrapper">
-    <style>
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-    </style>
     <section class="content-header">
         <h1>
             <@spring.message code='admin.user.profile.title' />

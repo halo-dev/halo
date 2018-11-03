@@ -3,9 +3,6 @@
 <@head>${options.blog_title!} | <@spring.message code='admin.pages.galleries.title' /></@head>
 <div class="content-wrapper">
     <style type="text/css" rel="stylesheet">
-        .form-horizontal .control-label{
-            text-align: left;
-        }
         .div-thumbnail{transition:all .5s ease-in-out;padding:10px}
         .thumbnail{margin-bottom:0}
     </style>

@@ -148,3 +148,11 @@
 .box {
     border-top: none !important;
 }
+
+.form-horizontal .control-label {
+    text-align: left;
+}
+
+.control-radio {
+    padding-top: 7px;
+}

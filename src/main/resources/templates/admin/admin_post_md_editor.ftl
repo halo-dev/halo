@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="/static/plugins/jquery-tageditor/jquery.tag-editor.css">
     <style type="text/css">
         #post_title{font-weight: 400;}
-        .form-horizontal .control-label{text-align: left;}
         .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
         .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
         .CodeMirror, .CodeMirror-scroll {min-height: 480px;}

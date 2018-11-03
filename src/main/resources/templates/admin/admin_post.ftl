@@ -57,11 +57,13 @@
                                 <#if posts.content?size gt 0>
                                     <#list posts.content as post>
                                         <tr>
-                                            <#if post.postTitle?length gt 20>
-                                                <td>${post.postTitle?substring(0,20)}...</td>
-                                            <#else >
-                                                <td>${post.postTitle}</td>
-                                            </#if>
+                                            <td>
+                                                <#if post.postStatus==0>
+                                                    <a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a>
+                                                <#else>
+                                                    ${post.postTitle}
+                                                </#if>
+                                            </td>
                                             <td>
                                                 <#if post.categories?size gt 0>
                                                     <#list post.categories as cate>
@@ -90,7 +92,6 @@
                                             <td>
                                                 <#switch post.postStatus>
                                                     <#case 0>
-                                                        <a href="/archives/${post.postUrl}" class="btn btn-primary btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
                                                         <a href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs "><@spring.message code='common.btn.edit' /></a>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                         <#break >
