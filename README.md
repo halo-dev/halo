@@ -12,7 +12,7 @@
 ------------------------------
 🇨🇳简体中文 | 🇺🇸[English](./docs/README-en-US.md) | <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Turkish" height="14"/> [Türkçe](./docs/README-tr.md)
 
-## 目录
+<details><summary>目录</summary>
 
 - [简介](#简介)
 - [快速开始](#快速开始)
@@ -24,6 +24,8 @@
 - [后续功能](#后续功能)
 - [感谢](#感谢)
 - [捐赠](#捐赠)
+
+</details>
 
 ## 简介
 
@@ -46,7 +48,7 @@ java -jar target/dist/halo/halo-latest.jar
 
 ```bash
 # 安装Halo
-yum install -y wget && wget https://git.io/fxHqp && bash halo-cli.sh -i
+yum install -y wget && wget https://raw.githubusercontent.com/ruibaby/halo-cli/master/halo-cli.sh && bash halo-cli.sh -i
 # 更新Halo
 bash halo-cli.sh -u
 ```
