@@ -6,6 +6,9 @@ server:
     worker-threads: 36
     buffer-size: 1024
     directBuffers: true
+  servlet:
+    session:
+      timeout: 86400s
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
