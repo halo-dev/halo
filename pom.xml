@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.6.RELEASE</version>
+		<version>2.1.0.RELEASE</version>
 		<relativePath/>
 	</parent>
 
@@ -152,6 +152,12 @@
 			<groupId>com.qiniu</groupId>
 			<artifactId>qiniu-java-sdk</artifactId>
 			<version>${qiniu-java-sdk.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>okhttp</artifactId>
+					<groupId>com.squareup.okhttp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- 图片操作 -->
