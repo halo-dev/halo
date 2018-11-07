@@ -82,15 +82,13 @@
                     <div class="box-header with-border"><h3 class="box-title"><@spring.message code='admin.pages.links.text.all-links' /></h3></div>
                     <div class="box-body table-responsive no-padding">
                         <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.name' /></th>
-                                <th><@spring.message code='common.th.site' /></th>
-                                <th><@spring.message code='common.th.desc' /></th>
-                                <th><@spring.message code='common.th.control' /></th>
-                            </tr>
-                            </thead>
                             <tbody>
+                                <tr>
+                                    <th><@spring.message code='common.th.name' /></th>
+                                    <th><@spring.message code='common.th.site' /></th>
+                                    <th><@spring.message code='common.th.desc' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
+                                </tr>
                                 <@commonTag method="links">
                                     <#if links?? && links?size gt 0>
                                         <#list links as link>

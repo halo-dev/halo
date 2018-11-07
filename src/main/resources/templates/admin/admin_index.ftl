@@ -204,15 +204,13 @@
                         </div>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover text-center">
-                            <thead>
+                        <table class="table table-hover text-center">
+                            <tbody>
                                 <tr>
                                     <th width="50%"><@spring.message code='common.th.title' /></th>
                                     <th><@spring.message code='common.th.status' /></th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                            </thead>
-                            <tbody>
                                 <#if postTopFive??>
                                     <#list postTopFive as post>
                                         <tr>
@@ -254,17 +252,15 @@
                         </div>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover text-center">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.comment-author' /></th>
-                                <th width="20%"><@spring.message code='common.th.comment-page' /></th>
-                                <th width="30%"><@spring.message code='common.th.content' /></th>
-                                <th><@spring.message code='common.th.status' /></th>
-                                <th><@spring.message code='common.th.date' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover text-center">
                             <tbody>
+                                <tr>
+                                    <th><@spring.message code='common.th.comment-author' /></th>
+                                    <th width="20%"><@spring.message code='common.th.comment-page' /></th>
+                                    <th width="30%"><@spring.message code='common.th.content' /></th>
+                                    <th><@spring.message code='common.th.status' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                </tr>
                                 <#if comments??>
                                 <#list comments as comment>
                                     <tr>
@@ -334,16 +330,14 @@
                         </div>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover text-center">
-                            <thead>
+                        <table class="table table-hover text-center">
+                            <tbody>
                                 <tr>
                                     <th><@spring.message code='common.th.action' /></th>
                                     <th><@spring.message code='common.th.result' /></th>
                                     <th>IP</th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                            </thead>
-                            <tbody>
                                 <#if logs??>
                                 <#list logs as log>
                                     <tr>

@@ -30,39 +30,37 @@
                     <div class="tab-content" style="padding: 0;">
                         <div class="tab-pane active" id="internal">
                             <div class="box-body table-responsive no-padding">
-                                <table class="table table-bordered table-hover">
-                                    <thead>
-                                    <tr>
-                                        <th><@spring.message code='common.th.title' /></th>
-                                        <th><@spring.message code='common.th.url' /></th>
-                                        <th><@spring.message code='common.th.control' /></th>
-                                    </tr>
-                                    </thead>
+                                <table class="table table-hover">
                                     <tbody>
-                                    <tr>
-                                        <td><@spring.message code='admin.pages.links' /></td>
-                                        <td>/links</td>
-                                        <td>
-                                            <a href="/links" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
-                                            <a data-pjax="true" href="/admin/page/links" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><@spring.message code='admin.pages.gallery' /></td>
-                                        <td>/gallery</td>
-                                        <td>
-                                            <a href="/gallery" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
-                                            <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <th><@spring.message code='common.th.title' /></th>
+                                            <th><@spring.message code='common.th.url' /></th>
+                                            <th><@spring.message code='common.th.control' /></th>
+                                        </tr>
+                                        <tr>
+                                            <td><@spring.message code='admin.pages.links' /></td>
+                                            <td>/links</td>
+                                            <td>
+                                                <a href="/links" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
+                                                <a data-pjax="true" href="/admin/page/links" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><@spring.message code='admin.pages.gallery' /></td>
+                                            <td>/gallery</td>
+                                            <td>
+                                                <a href="/gallery" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
+                                                <a data-pjax="true" href="/admin/page/galleries" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="tab-pane" id="pages">
                             <div class="box-body table-responsive no-padding">
-                                <table class="table table-bordered table-hover">
-                                    <thead>
+                                <table class="table table-hover">
+                                    <tbody>
                                         <tr>
                                             <th><@spring.message code='common.th.title' /></th>
                                             <th><@spring.message code='common.th.url' /></th>
@@ -71,32 +69,30 @@
                                             <th><@spring.message code='common.th.date' /></th>
                                             <th><@spring.message code='common.th.control' /></th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                    <#if pages?size gt 0>
-                                        <#list pages as page>
+                                        <#if pages?size gt 0>
+                                            <#list pages as page>
+                                                <tr>
+                                                    <td>${page.postTitle}</td>
+                                                    <td>/p/${page.postUrl}</td>
+                                                    <td>
+                                                        <span class="label" style="background-color: #d6cdcd;">${page.comments?size}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="label" style="background-color: #d6cdcd;">${page.postViews}</span>
+                                                    </td>
+                                                    <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
+                                                    <td>
+                                                        <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
+                                                        <a href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
+                                                    </td>
+                                                </tr>
+                                            </#list>
+                                            <#else>
                                             <tr>
-                                                <td>${page.postTitle}</td>
-                                                <td>/p/${page.postUrl}</td>
-                                                <td>
-                                                    <span class="label" style="background-color: #d6cdcd;">${page.comments?size}</span>
-                                                </td>
-                                                <td>
-                                                    <span class="label" style="background-color: #d6cdcd;">${page.postViews}</span>
-                                                </td>
-                                                <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
-                                                <td>
-                                                    <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
-                                                    <a href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
-                                                </td>
+                                                <td colspan="6" style="text-align: center;"><@spring.message code='common.text.no-data' /></td>
                                             </tr>
-                                        </#list>
-                                        <#else>
-                                        <tr>
-                                            <td colspan="6" style="text-align: center;"><@spring.message code='common.text.no-data' /></td>
-                                        </tr>
-                                    </#if>
+                                        </#if>
                                     </tbody>
                                 </table>
                             </div>

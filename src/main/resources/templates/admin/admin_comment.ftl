@@ -30,17 +30,15 @@
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.comment-author' /></th>
-                                <th width="50%"><@spring.message code='common.th.content' /></th>
-                                <th><@spring.message code='common.th.comment-page' /></th>
-                                <th><@spring.message code='common.th.date' /></th>
-                                <th><@spring.message code='common.th.control' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover">
                             <tbody>
+                                <tr>
+                                    <th><@spring.message code='common.th.comment-author' /></th>
+                                    <th width="50%"><@spring.message code='common.th.content' /></th>
+                                    <th><@spring.message code='common.th.comment-page' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
+                                </tr>
                                 <#if comments.content?size gt 0>
                                     <#list comments.content as comment>
                                         <tr>
