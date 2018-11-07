@@ -83,39 +83,37 @@
                         <h3 class="box-title"><@spring.message code='admin.categories.text.all-categories' /></h3>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.name' /></th>
-                                <th><@spring.message code='common.th.url' /></th>
-                                <th><@spring.message code='common.th.desc' /></th>
-                                <th><@spring.message code='common.th.posts-count' /></th>
-                                <th><@spring.message code='common.th.control' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover">
                             <tbody>
-                            <@commonTag method="categories">
-                                <#if categories?? && categories?size gt 0>
-                                    <#list categories as cate>
-                                        <tr>
-                                            <td>${cate.cateName}</td>
-                                            <td>${cate.cateUrl}</td>
-                                            <td>${(cate.cateDesc)!}</td>
-                                            <td>
-                                                <span class="label" style="background-color: #d6cdcd;">${cate.posts?size}</span>
-                                            </td>
-                                            <td>
-                                                <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
-                                                    <a href="#" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
-                                                <#else >
-                                                    <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
-                                                </#if>
-                                                <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId?c}')"><@spring.message code='common.btn.delete' /></button>
-                                            </td>
-                                        </tr>
-                                    </#list>
-                                </#if>
-                            </@commonTag>
+                                <tr>
+                                    <th><@spring.message code='common.th.name' /></th>
+                                    <th><@spring.message code='common.th.url' /></th>
+                                    <th><@spring.message code='common.th.desc' /></th>
+                                    <th><@spring.message code='common.th.posts-count' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
+                                </tr>
+                                <@commonTag method="categories">
+                                    <#if categories?? && categories?size gt 0>
+                                        <#list categories as cate>
+                                            <tr>
+                                                <td>${cate.cateName}</td>
+                                                <td>${cate.cateUrl}</td>
+                                                <td>${(cate.cateDesc)!}</td>
+                                                <td>
+                                                    <span class="label" style="background-color: #d6cdcd;">${cate.posts?size}</span>
+                                                </td>
+                                                <td>
+                                                    <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
+                                                        <a href="#" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
+                                                    <#else >
+                                                        <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
+                                                    </#if>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId?c}')"><@spring.message code='common.btn.delete' /></button>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    </#if>
+                                </@commonTag>
                             </tbody>
                         </table>
                     </div>

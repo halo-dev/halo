@@ -12,8 +12,8 @@
         <div class="col-lg-12 attachDesc" style="padding-top: 15px;">
             <div class="box box-solid">
                 <div class="box-body table-responsive no-padding">
-                    <table class="table table-bordered table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <tbody>
                             <tr>
                                 <th><@spring.message code='admin.logs.th.log-id' /></th>
                                 <th><@spring.message code='admin.logs.th.log-action' /></th>
@@ -21,8 +21,6 @@
                                 <th>IP</th>
                                 <th><@spring.message code='admin.logs.th.log-datetime' /></th>
                             </tr>
-                        </thead>
-                        <tbody>
                             <#list logs.content as log>
                                 <tr>
                                     <td>${log.logId}</td>

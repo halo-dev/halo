@@ -101,37 +101,35 @@
                         <h3 class="box-title"><@spring.message code='admin.menus.text.all-menus' /></h3>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.name' /></th>
-                                <th><@spring.message code='common.th.url' /></th>
-                                <th><@spring.message code='common.th.sort' /></th>
-                                <th><@spring.message code='common.th.icon' /></th>
-                                <th><@spring.message code='common.th.name' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover">
                             <tbody>
-                            <@commonTag method="menus">
-                                <#if menus?? && menus?size gt 0>
-                                    <#list menus as menu>
-                                        <tr>
-                                            <td>${menu.menuName}</td>
-                                            <td>${menu.menuUrl}</td>
-                                            <td>${(menu.menuSort)!}</td>
-                                            <td>${menu.menuIcon}</td>
-                                            <td>
-                                                <#if updateMenu?? && menu.menuId?c==updateMenu.menuId?c>
-                                                    <a href="#" class="btn btn-primary btn-xs " disabled=""><@spring.message code='common.btn.editing' /></a>
-                                                <#else>
-                                                    <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
-                                                </#if>
-                                                <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId?c}')"><@spring.message code='common.btn.delete' /></button>
-                                            </td>
-                                        </tr>
-                                    </#list>
-                                </#if>
-                            </@commonTag>
+                                <tr>
+                                    <th><@spring.message code='common.th.name' /></th>
+                                    <th><@spring.message code='common.th.url' /></th>
+                                    <th><@spring.message code='common.th.sort' /></th>
+                                    <th><@spring.message code='common.th.icon' /></th>
+                                    <th><@spring.message code='common.th.name' /></th>
+                                </tr>
+                                <@commonTag method="menus">
+                                    <#if menus?? && menus?size gt 0>
+                                        <#list menus as menu>
+                                            <tr>
+                                                <td>${menu.menuName}</td>
+                                                <td>${menu.menuUrl}</td>
+                                                <td>${(menu.menuSort)!}</td>
+                                                <td>${menu.menuIcon}</td>
+                                                <td>
+                                                    <#if updateMenu?? && menu.menuId?c==updateMenu.menuId?c>
+                                                        <a href="#" class="btn btn-primary btn-xs " disabled=""><@spring.message code='common.btn.editing' /></a>
+                                                    <#else>
+                                                        <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
+                                                    </#if>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId?c}')"><@spring.message code='common.btn.delete' /></button>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    </#if>
+                                </@commonTag>
                             </tbody>
                         </table>
                     </div>

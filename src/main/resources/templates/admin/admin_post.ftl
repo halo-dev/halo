@@ -41,19 +41,17 @@
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.title' /></th>
-                                <th><@spring.message code='common.th.categories' /></th>
-                                <th><@spring.message code='common.th.tags' /></th>
-                                <th><@spring.message code='common.th.comments' /></th>
-                                <th><@spring.message code='common.th.views' /></th>
-                                <th><@spring.message code='common.th.date' /></th>
-                                <th><@spring.message code='common.th.control' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover">
                             <tbody>
+                                <tr>
+                                    <th><@spring.message code='common.th.title' /></th>
+                                    <th><@spring.message code='common.th.categories' /></th>
+                                    <th><@spring.message code='common.th.tags' /></th>
+                                    <th><@spring.message code='common.th.comments' /></th>
+                                    <th><@spring.message code='common.th.views' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
+                                </tr>
                                 <#if posts.content?size gt 0>
                                     <#list posts.content as post>
                                         <tr>
