@@ -33,7 +33,7 @@
             color: red;
         }
     </style>
-    <section class="content-header">
+    <section class="content-header animated fadeIn">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.title' /></h1>
         <a class="btn-header" id="showForm" href="#" onclick="halo.layerModal('/admin/themes/install','<@spring.message code="admin.themes.js.install-theme" />')">
             <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.themes.btn.install' />
@@ -44,7 +44,7 @@
             <li class="active"><@spring.message code='admin.themes.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid animated fadeIn">
         <div class="row">
             <#if themes?? && (themes?size>0)>
                 <#list themes as theme>

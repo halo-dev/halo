@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.menus.title' /></@head>
 <div class="content-wrapper">
-    <section class="content-header">
+    <section class="content-header animated fadeIn">
         <h1 style="display: inline-block;"><@spring.message code='admin.menus.title' /></h1>
         <ol class="breadcrumb">
             <li>
@@ -12,7 +12,7 @@
             <li class="active"><@spring.message code='admin.menus.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid animated fadeIn">
         <div class="row">
             <div class="col-md-5">
                 <div class="box box-primary">

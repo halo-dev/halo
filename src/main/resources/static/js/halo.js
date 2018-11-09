@@ -25,13 +25,6 @@ $(document).ready(function () {
  * pjax请求时点击菜单的事件
  */
 $(document).on('pjax:clicked', function() {
-    $('.content-wrapper').html("");
-});
-
-/**
- * pjax请求时完成加载的事件
- */
-$(document).on('pjax:complete',function () {
     initMenu();
 });
 

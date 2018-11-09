@@ -5,7 +5,7 @@
     <style type="text/css" rel="stylesheet">
         .resourceType,.databaseType,.postType{list-style:none;float:left;margin:0;padding-bottom:10px}
     </style>
-    <section class="content-header">
+    <section class="content-header animated fadeIn">
         <h1 style="display: inline-block;"><@spring.message code='admin.backup.title' /></h1>
         <a class="btn-header" id="btnBackupOption" href="#">
             <@spring.message code='admin.backup.text.setting' />
@@ -18,7 +18,7 @@
             <li class="active"><@spring.message code='admin.backup.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid animated fadeIn">
         <div class="row">
             <div class="col-lg-12 col-xs-12" id="backupOptionsPanel" style="display: none">
                 <div class="box box-primary">

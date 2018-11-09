@@ -7,7 +7,7 @@
         .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
         .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
     </style>
-    <section class="content-header">
+    <section class="content-header animated fadeIn">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
         <ol class="breadcrumb">
             <li>
@@ -17,7 +17,7 @@
             <li class="active">主题编辑</li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid animated fadeIn">
         <div class="row">
             <div class="col-md-9">
                 <div class="box box-primary">

@@ -84,6 +84,7 @@ public class Comment implements Serializable {
     /**
      * 评论者ua信息
      */
+    @Column(length = 512)
     private String commentAgent;
 
     /**

@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.user.profile.title' /></@head>
 <div class="content-wrapper">
-    <section class="content-header">
+    <section class="content-header animated fadeIn">
         <h1>
             <@spring.message code='admin.user.profile.title' />
             <small></small>
@@ -17,7 +17,7 @@
         </ol>
     </section>
     <!-- tab选项卡 -->
-    <section class="content container-fluid">
+    <section class="content container-fluid animated fadeIn">
         <div class="row">
             <div class="col-md-12">
                 <div class="nav-tabs-custom">
