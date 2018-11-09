@@ -11,7 +11,7 @@
         .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
         .editor-preview-active img,.editor-preview-active-side img{width: 100%;}
     </style>
-    <section class="content-header">
+    <section class="content-header animated fadeIn">
         <h1 style="display: inline-block;"><@spring.message code='admin.posts.edit.title' /></h1>
         <a class="btn-header" id="btnOpenAttach" href="#" onclick="halo.layerModal('/admin/attachments/select?type=post','<@spring.message code="common.js.all-attachment" />')">
             <@spring.message code='admin.editor.btn.attachs' />
@@ -26,7 +26,7 @@
             <li class="active"><@spring.message code='admin.posts.edit.title' /></li>
         </ol>
     </section>
-    <section class="content">
+    <section class="content animated fadeIn">
         <div class="row">
             <div class="col-md-9">
                 <#if post??>

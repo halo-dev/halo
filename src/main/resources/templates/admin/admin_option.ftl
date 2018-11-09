@@ -2,17 +2,11 @@
 <@head>${options.blog_title!} | <@spring.message code='admin.setting.title' /></@head>
 <div class="content-wrapper">
     <style type="text/css" rel="stylesheet">
-        .form-horizontal .control-label{
-            text-align: left;
-        }
         .nav-tabs-custom > .nav-tabs > li.active {
             border-top-color: #d2d6de;
         }
-        .control-radio{
-            padding-top: 7px;
-        }
     </style>
-    <section class="content-header">
+    <section class="content-header animated fadeIn">
         <h1>
             <@spring.message code='admin.setting.title' />
             <small></small>
@@ -27,7 +21,7 @@
         </ol>
     </section>
     <!-- tab选项卡 -->
-    <section class="content container-fluid">
+    <section class="content container-fluid animated fadeIn">
         <div class="row">
             <div class="col-md-12">
                 <div class="nav-tabs-custom">
@@ -367,12 +361,12 @@
                                     <div class="form-group">
                                         <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.attach-choose' /></label>
                                         <div class="col-lg-4 col-sm-8 control-radio">
-                                            <div class="pretty p-default p-round">
-                                                <input type="radio" name="attach_loc" value="server" ${((options.attach_loc?default('server'))=='server')?string('checked','')}>
-                                                <div class="state p-primary">
-                                                    <label><@spring.message code='admin.setting.form.attach-loc-server' /></label>
-                                                </div>
-                                            </div>
+                                            <#--<div class="pretty p-default p-round">-->
+                                                <#--<input type="radio" name="attach_loc" value="server" ${((options.attach_loc?default('server'))=='server')?string('checked','')}>-->
+                                                <#--<div class="state p-primary">-->
+                                                    <#--<label><@spring.message code='admin.setting.form.attach-loc-server' /></label>-->
+                                                <#--</div>-->
+                                            <#--</div>-->
                                             <div class="pretty p-default p-round">
                                                 <input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc?if_exists)=='upyun')?string('checked','')} disabled="disabled">
                                                 <div class="state p-primary">
@@ -389,9 +383,9 @@
                                     </div>
 
                                     <!-- 原生设置 -->
-                                    <div class="server-options" style="display: none">
+                                    <#--<div class="server-options" style="display: none">-->
 
-                                    </div>
+                                    <#--</div>-->
 
                                     <!-- 又拍云选项 -->
                                     <div class="upyun-options" style="display: none">
