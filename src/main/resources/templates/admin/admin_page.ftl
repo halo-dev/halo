@@ -21,10 +21,10 @@
                 <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
                         <li class="active">
-                            <a href="#internal" data-toggle="tab"><@spring.message code='admin.pages.tab.Custom-page' /></a>
+                            <a href="#internal" data-toggle="tab"><@spring.message code='admin.pages.tab.internal-page' /></a>
                         </li>
                         <li>
-                            <a href="#pages" data-toggle="tab"><@spring.message code='admin.pages.tab.Custom-page' /></a>
+                            <a href="#pages" data-toggle="tab"><@spring.message code='admin.pages.tab.custom-page' /></a>
                         </li>
                     </ul>
                     <div class="tab-content" style="padding: 0;">
