@@ -16,7 +16,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6 attachImg">
-            <img src="${attachment.attachPath?if_exists}" style="width: 100%;">
+            <img src="${attachment.attachPath!}" style="width: 100%;">
         </div>
         <div class="col-lg-6 attachDesc">
             <div class="box box-solid">
@@ -28,43 +28,43 @@
                         <div class="form-group">
                             <label for="attachName" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-name' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachName" value="${attachment.attachName?if_exists}">
+                                <input type="text" class="form-control" id="attachName" value="${attachment.attachName!}">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="attachType" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-type' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachType" value="${attachment.attachType?if_exists}" disabled>
+                                <input type="text" class="form-control" id="attachType" value="${attachment.attachType!}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="attachPath" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-path' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachPath" value="${attachment.attachPath?if_exists}" disabled>
+                                <input type="text" class="form-control" id="attachPath" value="${attachment.attachPath!}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="attachCreated" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-created' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachCreated" value="${attachment.attachCreated?if_exists}" disabled>
+                                <input type="text" class="form-control" id="attachCreated" value="${attachment.attachCreated!}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="attachStorage" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-storage' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachStorage" value="${attachment.attachSize?if_exists}" disabled>
+                                <input type="text" class="form-control" id="attachStorage" value="${attachment.attachSize!}" disabled>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="attachSize" class="col-sm-2 control-label"><@spring.message code='admin.attachments.modal.form.attach-size' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="attachSize" value="${attachment.attachWh?if_exists}" disabled>
+                                <input type="text" class="form-control" id="attachSize" value="${attachment.attachWh!}" disabled>
                             </div>
                         </div>
                     </div>
                     <div class="box-footer">
                         <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()"><@spring.message code="common.btn.delete" /></button>
-                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="${options.blog_url?if_exists}${attachment.attachPath}"><@spring.message code='admin.attachments.modal.form.btn.copy-path' /></button>
+                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="${options.blog_url!}${attachment.attachPath}"><@spring.message code='admin.attachments.modal.form.btn.copy-path' /></button>
                     </div>
                 </form>
             </div>

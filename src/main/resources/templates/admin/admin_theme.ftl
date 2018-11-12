@@ -50,16 +50,16 @@
                 <#list themes as theme>
                     <div class="col-md-6 col-lg-3 col theme-body">
                         <div class="box box-solid">
-                            <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName?if_exists}/screenshot.png)">
+                            <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName!}/screenshot.png)">
                                 <div class="pull-right btn-delete" style="display: none" onclick="modelShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
                             </div>
                             <div class="box-footer">
-                                <span class="theme-title">${theme.themeName?if_exists?cap_first}</span>
+                                <span class="theme-title">${theme.themeName!?cap_first}</span>
                                 <#if theme.hasOptions>
-                                    <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="halo.layerModal('/admin/themes/options?theme=${theme.themeName?if_exists}&hasUpdate=<#if theme.hasUpdate>true<#else>false</#if>','${theme.themeName?if_exists} <@spring.message code="admin.themes.js.theme-setting" />')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
+                                    <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="halo.layerModal('/admin/themes/options?theme=${theme.themeName!}&hasUpdate=<#if theme.hasUpdate>true<#else>false</#if>','${theme.themeName!} <@spring.message code="admin.themes.js.theme-setting" />')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
                                 </#if>
                                 <#if activeTheme != "${theme.themeName}">
-                                    <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px"><@spring.message code='admin.themes.btn.enable' /></button>
+                                    <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName!}')" style="display: none;margin-right: 3px"><@spring.message code='admin.themes.btn.enable' /></button>
                                     <#else>
                                     <button class="btn btn-default btn-sm pull-right btn-theme-enable" style="display: none;margin-right: 3px" disabled><@spring.message code='admin.themes.btn.activated' /></button>
                                 </#if>

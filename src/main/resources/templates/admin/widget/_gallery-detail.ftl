@@ -16,7 +16,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6 attachImg">
-            <img src="${gallery.galleryUrl?if_exists}" style="width: 100%;">
+            <img src="${gallery.galleryUrl!}" style="width: 100%;">
         </div>
         <div class="col-lg-6 attachDesc">
             <div class="box box-solid">
@@ -35,19 +35,19 @@
                         <div class="form-group">
                             <label for="galleryDesc" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-desc' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="galleryDesc" name="galleryDesc" value="${gallery.galleryDesc?if_exists}" >
+                                <input type="text" class="form-control" id="galleryDesc" name="galleryDesc" value="${gallery.galleryDesc!}" >
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="galleryDate" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-date' /></label>
                             <div class="col-sm-10">
-                                <input type="date" class="form-control" id="galleryDate" name="galleryDate" value="${gallery.galleryDate?if_exists}">
+                                <input type="date" class="form-control" id="galleryDate" name="galleryDate" value="${gallery.galleryDate!}">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="galleryLocation" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-location' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="galleryLocation" name="galleryLocation" value="${gallery.galleryLocation?if_exists}" >
+                                <input type="text" class="form-control" id="galleryLocation" name="galleryLocation" value="${gallery.galleryLocation!}" >
                             </div>
                         </div>
                         <div class="form-group">

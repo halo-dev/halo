@@ -50,7 +50,7 @@
                     <!-- Editor.md编辑器 -->
                     <div class="box-body pad">
                         <div id="markdown-editor">
-                            <textarea id="editorarea" style="display:none;"><#if post??>${post.postContentMd?if_exists}</#if></textarea>
+                            <textarea id="editorarea" style="display:none;"><#if post??>${post.postContentMd!}</#if></textarea>
                         </div>
                     </div>
                 </div>
@@ -69,8 +69,8 @@
                     <div class="box-body">
                         <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
                         <select class="form-control" id="allowComment" name="allowComment">
-                            <option value="1" <#if post?? && post.allowComment?default(1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
-                            <option value="0" <#if post?? && post.allowComment?default(1)==0>selected</#if>><@spring.message code='common.select.no' /></option>
+                            <option value="1" <#if post?? && (post.allowComment!1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
+                            <option value="0" <#if post?? && (post.allowComment!)==0>selected</#if>><@spring.message code='common.select.no' /></option>
                         </select>
                     </div>
                     <div class="box-footer">
@@ -162,7 +162,7 @@
                     <div class="box-body">
                         <div>
                             <#if post??>
-                                <img src="${post.postThumbnail?default("/static/images/thumbnail/thumbnail.png")}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
+                                <img src="${post.postThumbnail!'/static/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                             <#else >
                                 <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                             </#if>

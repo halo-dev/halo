@@ -28,8 +28,8 @@
     <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/plugins/OwO/OwO.min.js"></script>
 </head>
-<body class="hold-transition sidebar-mini ${options.admin_theme?default('skin-blue')} ${options.admin_layout?default('')} ${options.sidebar_style?default('')}">
-<#if options.admin_loading?default("false") == "true">
+<body class="hold-transition sidebar-mini ${options.admin_theme!'skin-blue'} ${options.admin_layout!''} ${options.sidebar_style!''}">
+<#if (options.admin_loading!'false') == 'true'>
 <#-- 页面加载动画 -->
 <div id="loading">
     <div id="loading-center">
@@ -52,7 +52,7 @@
 <#macro footer>
 <#include "_footer.ftl">
 </div>
-<#if options.admin_pjax?default("true") == "true">
+<#if (options.admin_pjax!'true') == 'true'>
     <script src="/static/plugins/pjax/jquery.pjax.js"></script>
 </#if>
 <script src="/static/plugins/pace/pace.min.js"></script>
@@ -60,7 +60,7 @@
 <script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
 <script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/plugins/fileinput/fileinput.min.js"></script>
-<#if options.blog_locale?default('zh_CN')=='zh_CN'>
+<#if (options.blog_locale!'zh_CN') == 'zh_CN'>
     <script src="/static/plugins/fileinput/zh.min.js"></script>
 </#if>
 <script src="/static/js/halo.min.js"></script>
@@ -71,10 +71,10 @@
         restartOnRequestAfter: false
     };
     $(document).ajaxStart(function() {Pace.restart();});
-    <#if options.admin_pjax?default("true") == "true">
+    <#if (options.admin_pjax!'true') == 'true'>
         $(document).pjax('a[data-pjax=true]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});
     </#if>
-    <#if options.admin_loading?default("false") == "true">
+    <#if (options.admin_loading!'false') == 'true'>
         $(window).on('load', function(){
             $('body').addClass('loaded');
             setTimeout(function () {

@@ -86,7 +86,7 @@
                                             <td>
                                                 <span class="label" style="background-color: #d6cdcd;">${post.postViews}</span>
                                             </td>
-                                            <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
+                                            <td>${post.postDate!?string("yyyy-MM-dd HH:mm")}</td>
                                             <td>
                                                 <#switch post.postStatus>
                                                     <#case 0>
