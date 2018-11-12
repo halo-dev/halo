@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <#list attachments.content as attachment>
-                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/attachments/attachment?attachId=${attachment.attachId?c}','<@spring.message code="admin.attachments.js.modal.detail-title" />')">
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/attachments/attachment?attachId=${attachment.attachId?c}','<@spring.message code="admin.attachments.modal.detail-title" />')">
                     <a href="#" class="thumbnail">
                         <img src="${attachment.attachSmallPath?if_exists}" class="img-responsive">
                     </a>
