@@ -6,10 +6,7 @@ import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <pre>
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/pages")
 public class ApiPageController {

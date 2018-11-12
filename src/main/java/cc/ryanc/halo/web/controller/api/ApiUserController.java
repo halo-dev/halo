@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/user")
 public class ApiUserController {
