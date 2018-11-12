@@ -32,8 +32,8 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="general">
                             <form method="post" class="form-horizontal" id="profileForm">
-                                <input type="hidden" name="userId" value="${user.userId?if_exists}">
-                                <input type="hidden" id="userPass" name="userPass" value="${user.userPass?if_exists}">
+                                <input type="hidden" name="userId" value="${user.userId!}">
+                                <input type="hidden" id="userPass" name="userPass" value="${user.userPass!}">
                                 <div class="box-body">
                                     <div class="form-group">
                                         <label for="userName" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.username' />
@@ -42,7 +42,7 @@
                                             </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <input type="text" class="form-control" id="userName" name="userName" value="${user.userName?if_exists}">
+                                            <input type="text" class="form-control" id="userName" name="userName" value="${user.userName!}">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -52,20 +52,20 @@
                                             </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <input type="text" class="form-control" id="userDisplayName" name="userDisplayName" value="${user.userDisplayName?if_exists}">
+                                            <input type="text" class="form-control" id="userDisplayName" name="userDisplayName" value="${user.userDisplayName!}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="userEmail" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.email' /></label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <input type="email" class="form-control" id="userEmail" name="userEmail" value="${user.userEmail?if_exists}">
+                                            <input type="email" class="form-control" id="userEmail" name="userEmail" value="${user.userEmail!}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="userAvatar" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.avatar' /></label>
                                         <div class="col-lg-4 col-sm-8">
                                             <div class="input-group">
-                                                <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
+                                                <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar!}">
                                                 <span class="input-group-btn">
                                                     <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=userAvatar','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                 </span>
@@ -79,7 +79,7 @@
                                             </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <textarea class="form-control" rows="3" id="userDesc" name="userDesc" style="resize: none">${user.userDesc?if_exists}</textarea>
+                                            <textarea class="form-control" rows="3" id="userDesc" name="userDesc" style="resize: none">${user.userDesc!}</textarea>
                                         </div>
                                     </div>
                                 </div>

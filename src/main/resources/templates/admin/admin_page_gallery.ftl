@@ -81,7 +81,7 @@
             <#list galleries.content as gallery>
                 <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/page/gallery?galleryId=${gallery.galleryId?c}','<@spring.message code="admin.pages.galleries.modal.title" />')">
                     <a href="#" class="thumbnail">
-                        <img src="${gallery.galleryThumbnailUrl?if_exists}" class="img-responsive">
+                        <img src="${gallery.galleryThumbnailUrl!}" class="img-responsive">
                     </a>
                 </div>
             </#list>

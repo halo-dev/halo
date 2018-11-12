@@ -51,7 +51,7 @@
                     <!-- Editor.md编辑器 -->
                     <div class="box-body pad">
                         <div id="markdown-editor">
-                            <textarea id="editorarea" style="display:none;"><#if post??>${post.postContentMd?if_exists}</#if></textarea>
+                            <textarea id="editorarea" style="display:none;"><#if post??>${post.postContentMd!}</#if></textarea>
                         </div>
                     </div>
                 </div>
@@ -71,8 +71,8 @@
                         <div class="form-group">
                             <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
                             <select class="form-control" id="allowComment" name="allowComment">
-                                <option value="1" <#if post?? && post.allowComment?default(1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
-                                <option value="0" <#if post?? && post.allowComment?default(1)==0>selected</#if>><@spring.message code='common.select.no' /></option>
+                                <option value="1" <#if post?? && (post.allowComment!1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
+                                <option value="0" <#if post?? && (post.allowComment!)==0>selected</#if>><@spring.message code='common.select.no' /></option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -81,7 +81,7 @@
                                 <#if customTpls?? && customTpls?size gt 0>
                                     <option value="">选择模板</option>
                                     <#list customTpls as tpl>
-                                    <option value="${tpl}" <#if post?? && post.customTpl?if_exists == "${tpl}">selected</#if>>${tpl}</option>
+                                    <option value="${tpl}" <#if post?? && (post.customTpl!) == '${tpl}'>selected</#if>>${tpl}</option>
                                     </#list>
                                 <#else>
                                     <option value="">无自定义模板</option>
@@ -112,7 +112,7 @@
                     <div class="box-body">
                         <div>
                             <#if post??>
-                                <img src="${post.postThumbnail?default("/static/images/thumbnail/thumbnail.png")}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
+                                <img src="${post.postThumbnail!'/static/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                             <#else >
                                 <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                             </#if>

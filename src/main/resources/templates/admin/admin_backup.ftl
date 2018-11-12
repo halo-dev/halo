@@ -32,13 +32,13 @@
                                     <label for="autoBackup" class="col-sm-4 control-label"><@spring.message code='admin.backup.form.auto-backup' /></label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="auto_backup" id="autoBackup" value="true" ${((options.auto_backup?if_exists)=='true')?string('checked','')}>
+                                            <input type="radio" name="auto_backup" id="autoBackup" value="true" ${((options.auto_backup!)=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.enable' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="auto_backup" id="autoBackup" value="false" ${((options.auto_backup?default('false'))=='false')?string('checked','')}>
+                                            <input type="radio" name="auto_backup" id="autoBackup" value="false" ${((options.auto_backup!'false')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.disable' /></label>
                                             </div>

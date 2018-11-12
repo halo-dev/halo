@@ -45,8 +45,8 @@
                                 <div class="form-group">
                                     <label for="menuTarget"><@spring.message code='admin.menus.form.menu-target' /></label>
                                     <select class="form-control" id="menuTarget" name="menuTarget">
-                                        <option value="_self" ${((updateMenu.menuTarget?default("_self")=="_self")?string('selected',''))}><@spring.message code='admin.menus.form.menu-target-self' /></option>
-                                        <option value="_blank" ${((updateMenu.menuTarget?if_exists=="_blank")?string('selected',''))}><@spring.message code='admin.menus.form.menu-target-blank' /></option>
+                                        <option value="_self" ${((updateMenu.menuTarget!'_self')=='_self')?string('selected','')}><@spring.message code='admin.menus.form.menu-target-self' /></option>
+                                        <option value="_blank" ${((updateMenu.menuTarget!)=='_blank')?string('selected','')}><@spring.message code='admin.menus.form.menu-target-blank' /></option>
                                     </select>
                                 </div>
                             </div>

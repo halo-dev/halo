@@ -26,7 +26,7 @@
                     <div class="row">
                         <#list attachments.content as attachment>
                             <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 div-thumbnail">
-                                <a href="#" class="thumbnail" data-clipboard-text="${options.blog_url?if_exists}${attachment.attachPath}">
+                                <a href="#" class="thumbnail" data-clipboard-text="${options.blog_url!}${attachment.attachPath}">
                                     <img src="${attachment.attachSmallPath}" class="img-responsive">
                                 </a>
                             </div>
@@ -71,7 +71,7 @@
 <script src="/static/plugins/jquery/jquery.min.js"></script>
 <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/plugins/fileinput/fileinput.min.js"></script>
-<#if options.blog_locale?default('zh_CN')=='zh_CN'>
+<#if (options.blog_locale!'zh_CN')=='zh_CN'>
 <script src="/static/plugins/fileinput/zh.min.js"></script>
 </#if>
 <script src="/static/plugins/clipboard/clipboard.min.js"></script>
