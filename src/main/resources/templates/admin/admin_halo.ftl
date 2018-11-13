@@ -10,7 +10,7 @@
             font-size: 16px;
         }
     </style>
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.halo.title' /></h1>
         <ol class="breadcrumb">
             <li>
@@ -19,7 +19,7 @@
             <li class="active"><@spring.message code='admin.halo.bread.active' /></li>
         </ol>
     </section>
-    <section class="content container-fluid animated fadeIn">
+    <section class="content container-fluid" id="animated-content">
         <div id='write' class='is-mac'>
             <blockquote style="font-size: 14px;">
                 <p><@spring.message code='admin.halo.content.p1' />😉</p>

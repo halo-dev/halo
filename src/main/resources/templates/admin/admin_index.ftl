@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.index.title' /></@head>
 <div class="content-wrapper">
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.index.title' /></h1>
         <a class="btn-header" id="btnWidgetsOption" href="#">
             <@spring.message code='admin.index.btn.widgets' />
@@ -14,7 +14,7 @@
             <li class="active"><@spring.message code='admin.index.bread.active' /></li>
         </ol>
     </section>
-    <section class="content container-fluid animated fadeIn">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-lg-12 col-xs-12" id="widgetOptionsPanel" style="display: none">
                 <div class="box box-primary">

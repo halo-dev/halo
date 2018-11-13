@@ -6,7 +6,7 @@
             border-top-color: #d2d6de;
         }
     </style>
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1>
             <@spring.message code='admin.setting.title' />
             <small></small>
@@ -21,7 +21,7 @@
         </ol>
     </section>
     <!-- tab选项卡 -->
-    <section class="content container-fluid animated fadeIn">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-md-12">
                 <div class="nav-tabs-custom">
