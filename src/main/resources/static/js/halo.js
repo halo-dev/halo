@@ -6,6 +6,33 @@ $.extend({
     }
 });
 
+$.fn.extend({
+    animateCss: function(animationName, callback) {
+        var animationEnd = (function(el) {
+            var animations = {
+                animation: 'animationend',
+                OAnimation: 'oAnimationEnd',
+                MozAnimation: 'mozAnimationEnd',
+                WebkitAnimation: 'webkitAnimationEnd'
+            };
+
+            for (var t in animations) {
+                if (el.style[t] !== undefined) {
+                    return animations[t];
+                }
+            }
+        })(document.createElement('div'));
+
+        this.addClass('animated ' + animationName).one(animationEnd, function() {
+            $(this).removeClass('animated ' + animationName);
+
+            if (typeof callback === 'function') callback();
+        });
+
+        return this;
+    }
+});
+
 /**
  * 适配移动端并初始化菜单
  */
@@ -19,6 +46,7 @@ $(document).ready(function () {
         }
     }
     initMenu();
+    $("#animated-header,#animated-content").animateCss("fadeIn");
 });
 
 /**
@@ -26,6 +54,10 @@ $(document).ready(function () {
  */
 $(document).on('pjax:clicked', function() {
     initMenu();
+});
+
+$(document).on('pjax:complete',function () {
+    $("#animated-header,#animated-content").animateCss("fadeIn");
 });
 
 /**

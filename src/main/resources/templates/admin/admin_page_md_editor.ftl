@@ -10,7 +10,7 @@
         .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
         .editor-preview-active img,.editor-preview-active-side img{width: 100%;}
     </style>
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;">
             <@spring.message code='admin.pages.edit.title' />
         </h1>
@@ -27,7 +27,7 @@
             <li class="active"><@spring.message code='admin.pages.edit.title' /></li>
         </ol>
     </section>
-    <section class="content animated fadeIn">
+    <section class="content" id="animated-content">
         <div class="row">
             <div class="col-md-9">
                 <#if post??>

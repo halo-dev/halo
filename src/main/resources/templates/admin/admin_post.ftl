@@ -6,7 +6,7 @@
         .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}
         .pretty{margin: 0;}
     </style>
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
         <a data-pjax="false" class="btn-header" id="btnNewPost" href="/admin/posts/new">
             <@spring.message code='admin.posts.btn.new-post' />
@@ -21,7 +21,7 @@
             <li class="active"><@spring.message code='admin.posts.bread.all-posts' /></li>
         </ol>
     </section>
-    <section class="content container-fluid animated fadeIn">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-xs-12">
                 <ul style="list-style: none;padding-left: 0">

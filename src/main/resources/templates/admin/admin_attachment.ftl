@@ -6,7 +6,7 @@
         .div-thumbnail{transition:all .5s ease-in-out;padding:10px}
         .thumbnail{margin-bottom:0}
     </style>
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.attachments.title' /></h1>
         <a class="btn-header" id="showForm" href="#">
             <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.attachments.btn.upload' />
@@ -16,7 +16,7 @@
             <li class="active"><@spring.message code='admin.attachments.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid animated fadeIn">
+    <section class="content container-fluid" id="animated-content">
         <div class="row" id="uploadForm" style="display: none;">
             <div class="col-md-12">
                 <div class="form-group">

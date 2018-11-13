@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.pages.links.title' /></@head>
 <div class="content-wrapper">
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1><@spring.message code='admin.pages.links.title' /><small></small></h1>
         <ol class="breadcrumb">
             <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i><@spring.message code='admin.index.bread.index' /></a></li>
@@ -10,7 +10,7 @@
             <li class="active"><@spring.message code='admin.pages.links.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid animated fadeIn">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-md-5">
                 <div class="box box-primary">

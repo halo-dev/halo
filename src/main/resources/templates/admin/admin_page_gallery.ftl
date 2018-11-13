@@ -6,7 +6,7 @@
         .div-thumbnail{transition:all .5s ease-in-out;padding:10px}
         .thumbnail{margin-bottom:0}
     </style>
-    <section class="content-header animated fadeIn">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.pages.galleries.title' /><small></small></h1>
         <a class="btn-header" id="btnNewPicture" href="#">
             <@spring.message code='admin.pages.galleries.text.add-gallery' />
@@ -19,7 +19,7 @@
             <li class="active"><@spring.message code='admin.pages.galleries.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid animated fadeIn">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-lg-12 col-xs-12" id="newPicturePanel" style="display: none">
                 <div class="box box-primary">
