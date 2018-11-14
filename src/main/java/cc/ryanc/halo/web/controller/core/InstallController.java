@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.enums.AllowCommentEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.utils.MarkdownUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -131,7 +132,7 @@ public class InstallController {
             post.setPostTitle("Hello Halo!");
             post.setPostContentMd("# Hello Halo!\n" +
                     "欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
-            post.setPostContent("<h1 id=\"h1-hello-halo-\"><a name=\"Hello Halo!\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>Hello Halo!</h1><p>欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。</p>\n");
+            post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             post.setPostSummary("欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
             post.setPostStatus(0);
             post.setPostDate(DateUtil.date());

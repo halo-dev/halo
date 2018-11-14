@@ -310,7 +310,6 @@
                     'postTitle': Title,
                     'postUrl' : $('#postUrl').html().toString(),
                     'postContentMd': simplemde.value(),
-                    'postContent': simplemde.markdown(simplemde.value()),
                     'postThumbnail': $('#selectImg').attr('src'),
                     'cateList' : cateList.toString(),
                     'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),

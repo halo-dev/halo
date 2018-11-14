@@ -476,23 +476,6 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.admin-loading' /></label>
-                                        <div class="col-lg-4 col-sm-8 control-radio">
-                                            <div class="pretty p-default p-round">
-                                                <input type="radio" name="admin_loading" value="true" ${((options.admin_loading!)=='true')?string('checked','')}>
-                                                <div class="state p-primary">
-                                                    <label><@spring.message code='common.radio.enable' /></label>
-                                                </div>
-                                            </div>
-                                            <div class="pretty p-default p-round">
-                                                <input type="radio" name="admin_loading" value="false" ${((options.admin_loading!'false')=='false')?string('checked','')}>
-                                                <div class="state p-primary">
-                                                    <label><@spring.message code='common.radio.disable' /></label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
                                         <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.admin-layout' /></label>
                                         <div class="col-lg-4 col-sm-8 control-radio">
                                             <div class="pretty p-default p-round">
@@ -588,7 +571,7 @@
                                     <div class="form-group">
                                         <label for="emailSmtpPassword" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.email-smtp-password' /></label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <input type="password" class="form-control" id="emailSmtpPassword" name="mail_smtp_password" value="${options.mail_smtp_password!}" current-password>
+                                            <input type="password" class="form-control" id="emailSmtpPassword" name="mail_smtp_password" value="${options.mail_smtp_password!}" autocomplete="current-password">
                                         </div>
                                     </div>
                                     <div class="form-group">

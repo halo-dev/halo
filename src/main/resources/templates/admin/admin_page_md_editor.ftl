@@ -219,7 +219,6 @@
                     'postTitle': Title,
                     'postUrl' : $('#postUrl').html().toString(),
                     'postContentMd': simplemde.value(),
-                    'postContent': simplemde.markdown(simplemde.value()),
                     'postThumbnail': $('#selectImg').attr('src'),
                     'allowComment' : $('#allowComment').val(),
                     'customTpl' : $("#customTpl").val()

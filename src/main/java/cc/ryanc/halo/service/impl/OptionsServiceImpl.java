@@ -5,6 +5,7 @@ import cc.ryanc.halo.repository.OptionsRepository;
 import cc.ryanc.halo.service.OptionsService;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -25,12 +26,15 @@ public class OptionsServiceImpl implements OptionsService {
     @Autowired
     private OptionsRepository optionsRepository;
 
+    private static final String POSTS_CACHE_NAME = "posts";
+
     /**
      * 批量保存设置
      *
      * @param options options
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void saveOptions(Map<String, String> options) {
         if (null != options && !options.isEmpty()) {
             options.forEach((k, v) -> saveOption(k, v));

@@ -115,7 +115,7 @@ Let's start: http://localhost:8090
 Halo的诞生离不开下面这些项目：
 
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/)：个人认为最强大的Java IDE，没有之一
-- [Spring Boot](https://github.com/spring-projects/spring-boot)：Spring的微服务框架
+- [Spring Boot](https://github.com/spring-projects/spring-boot)：Spring的快速开发框架
 - [Freemarker](https://freemarker.apache.org/)：模板引擎，使页面静态化
 - [H2 Database](https://github.com/h2database/h2database)：嵌入式数据库，无需安装
 - [Druid](https://github.com/alibaba/druid)：阿里开发的连接池

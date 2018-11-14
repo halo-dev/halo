@@ -23,10 +23,10 @@
     <div class="login-body animated">
         <form>
             <div class="form-group animated fadeInUp" style="animation-delay: 0.1s">
-                <input type="text" class="form-control" name="loginName" id="login-name" placeholder="<@spring.message code='login.form.loginName' />">
+                <input type="text" class="form-control" name="loginName" id="login-name" placeholder="<@spring.message code='login.form.loginName' />" autocomplete="username">
             </div>
             <div class="form-group animated fadeInUp" style="animation-delay: 0.2s">
-                <input type="password" class="form-control" name="loginPwd" id="login-pwd" placeholder="<@spring.message code='login.form.loginPwd' />">
+                <input type="password" class="form-control" name="loginPwd" id="login-pwd" placeholder="<@spring.message code='login.form.loginPwd' />" autocomplete="current-password">
             </div>
             <#--<div class="row control animated fadeInUp" style="animation-delay: 0.3s">-->
                 <#--<div class="col-xs-6">-->
