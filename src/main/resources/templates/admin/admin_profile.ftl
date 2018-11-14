@@ -95,19 +95,19 @@
                                     <div class="form-group">
                                         <label for="beforePass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.old-password' /></label>
                                         <div class="col-sm-4">
-                                            <input type="password" class="form-control" id="beforePass" name="beforePass">
+                                            <input type="password" class="form-control" id="beforePass" name="beforePass" autocomplete="current-password">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="newPass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.new-password' /></label>
                                         <div class="col-sm-4">
-                                            <input type="password" class="form-control" id="newPass" name="newPass">
+                                            <input type="password" class="form-control" id="newPass" name="newPass" autocomplete="new-password">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="reNewPass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.confirm-password' /></label>
                                         <div class="col-sm-4">
-                                            <input type="password" class="form-control" id="reNewPass" name="reNewPass">
+                                            <input type="password" class="form-control" id="reNewPass" name="reNewPass" autocomplete="new-password">
                                         </div>
                                     </div>
                                 </div>

@@ -104,7 +104,7 @@ public class PostServiceImpl implements PostService {
     public void updateAllSummary(Integer postSummary) {
         List<Post> posts = this.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
         for (Post post : posts) {
-            String text = StrUtil.trim(HtmlUtil.cleanHtmlTag(post.getPostContent()));
+            String text = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (text.length() > postSummary) {
                 post.setPostSummary(text.substring(0, postSummary));
             } else {

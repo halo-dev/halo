@@ -40,6 +40,7 @@
 		<qiniu-java-sdk.version>7.2.14</qiniu-java-sdk.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
 		<jaxb-api.version>2.3.0</jaxb-api.version>
+		<commonmark.version>0.12.1</commonmark.version>
 	</properties>
 
 	<dependencies>
@@ -172,6 +173,23 @@
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 			<version>${jaxb-api.version}</version>
+		</dependency>
+
+		<!-- Markdown渲染 -->
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark-ext-gfm-tables</artifactId>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark-ext-yaml-front-matter</artifactId>
+			<version>${commonmark.version}</version>
 		</dependency>
 
 	</dependencies>

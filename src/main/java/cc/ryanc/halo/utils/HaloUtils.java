@@ -84,17 +84,17 @@ public class HaloUtils {
      * @return String
      */
     public static String parseSize(long size) {
-        if (size < CommonParamsEnum.NOT_FOUND.getValue()) {
+        if (size < CommonParamsEnum.BYTE.getValue()) {
             return String.valueOf(size) + "B";
         } else {
             size = size / 1024;
         }
-        if (size < CommonParamsEnum.NOT_FOUND.getValue()) {
+        if (size < CommonParamsEnum.BYTE.getValue()) {
             return String.valueOf(size) + "KB";
         } else {
             size = size / 1024;
         }
-        if (size < CommonParamsEnum.NOT_FOUND.getValue()) {
+        if (size < CommonParamsEnum.BYTE.getValue()) {
             size = size * 100;
             return String.valueOf((size / 100)) + "." + String.valueOf((size % 100)) + "MB";
         } else {

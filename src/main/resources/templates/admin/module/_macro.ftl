@@ -29,19 +29,6 @@
     <script src="/static/plugins/OwO/OwO.min.js"></script>
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme!'skin-blue'} ${options.admin_layout!''} ${options.sidebar_style!''}">
-<#if (options.admin_loading!'false') == 'true'>
-<#-- 页面加载动画 -->
-<div id="loading">
-    <div id="loading-center">
-        <div id="loading-center-absolute">
-            <div class="object" id="object_one"></div>
-            <div class="object" id="object_two"></div>
-            <div class="object" id="object_three"></div>
-            <div class="object" id="object_four"></div>
-        </div>
-    </div>
-</div>
-</#if>
 <div class="wrapper">
 <#-- 顶部栏模块 -->
 <#include "_header.ftl">
@@ -53,7 +40,7 @@
 <#include "_footer.ftl">
 </div>
 <#if (options.admin_pjax!'true') == 'true'>
-    <script src="/static/plugins/pjax/jquery.pjax.js"></script>
+<script src="/static/plugins/pjax/jquery.pjax.js"></script>
 </#if>
 <script src="/static/plugins/pace/pace.min.js"></script>
 <script src="/static/js/adminlte.min.js"></script>
@@ -61,26 +48,15 @@
 <script src="/static/plugins/layer/layer.js"></script>
 <script src="/static/plugins/fileinput/fileinput.min.js"></script>
 <#if (options.blog_locale!'zh_CN') == 'zh_CN'>
-    <script src="/static/plugins/fileinput/zh.min.js"></script>
+<script src="/static/plugins/fileinput/zh.min.js"></script>
 </#if>
 <script src="/static/js/halo.min.js"></script>
 <@compress single_line=true>
 <script>
     var halo = new $.halo();
-    Pace.options = {
-        restartOnRequestAfter: false
-    };
     $(document).ajaxStart(function() {Pace.restart();});
     <#if (options.admin_pjax!'true') == 'true'>
         $(document).pjax('a[data-pjax=true]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});
-    </#if>
-    <#if (options.admin_loading!'false') == 'true'>
-        $(window).on('load', function(){
-            $('body').addClass('loaded');
-            setTimeout(function () {
-                $('#loading').remove();
-            },500);
-        });
     </#if>
     var heading = "<@spring.message code='common.text.tips' />";
 </script>

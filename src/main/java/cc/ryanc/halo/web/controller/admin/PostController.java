@@ -14,6 +14,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
+import cc.ryanc.halo.utils.MarkdownUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -169,13 +170,14 @@ public class PostController extends BaseController {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         String msg = localeMessageUtil.getMessage("code.admin.common.save-success");
         try {
+            post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             //提取摘要
             int postSummary = 50;
             if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
             }
             //文章摘要
-            String summaryText = StrUtil.trim(HtmlUtil.cleanHtmlTag(post.getPostContent()));
+            String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (summaryText.length() > postSummary) {
                 String summary = summaryText.substring(0, postSummary);
                 post.setPostSummary(summary);
@@ -210,6 +212,7 @@ public class PostController extends BaseController {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("Save article failed: {}", e.getMessage());
+            e.printStackTrace();
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
