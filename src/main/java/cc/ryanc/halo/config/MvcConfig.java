@@ -106,7 +106,8 @@ public class MvcConfig implements WebMvcConfigurer {
                         "access-control-allow-methods",
                         "access-control-allow-origin",
                         "access-control-max-age",
-                        "X-Frame-Options")
+                        "X-Frame-Options",
+                        "token")
                 .allowCredentials(false).maxAge(3600);
     }
 
