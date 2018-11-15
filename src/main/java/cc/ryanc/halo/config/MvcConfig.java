@@ -99,10 +99,15 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowCredentials(true)
                 .allowedHeaders("*")
                 .allowedOrigins("*")
-                .allowedMethods("*");
+                .allowedMethods("GET", "POST")
+                .exposedHeaders("access-control-allow-headers",
+                        "access-control-allow-methods",
+                        "access-control-allow-origin",
+                        "access-control-max-age",
+                        "X-Frame-Options")
+                .allowCredentials(false).maxAge(3600);
     }
 
     /**
