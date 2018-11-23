@@ -23,16 +23,20 @@ import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -187,14 +191,15 @@ public class PostController extends BaseController {
             //添加文章时，添加文章时间和修改文章时间为当前时间，修改文章时，只更新修改文章时间
             if (null != post.getPostId()) {
                 Post oldPost = postService.findByPostId(post.getPostId()).get();
-                post.setPostDate(oldPost.getPostDate());
-                post.setPostUpdate(DateUtil.date());
+                if (null == post.getPostDate()) {
+                    post.setPostDate(DateUtil.date());
+                }
                 post.setPostViews(oldPost.getPostViews());
                 msg = localeMessageUtil.getMessage("code.admin.common.update-success");
             } else {
                 post.setPostDate(DateUtil.date());
-                post.setPostUpdate(DateUtil.date());
             }
+            post.setPostUpdate(DateUtil.date());
             post.setUser(user);
             List<Category> categories = categoryService.strListToCateList(cateList);
             post.setCategories(categories);
@@ -349,5 +354,11 @@ public class PostController extends BaseController {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-failed"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-success"));
+    }
+
+    @InitBinder
+    public void initBinder(ServletRequestDataBinder binder) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(sdf, true));
     }
 }

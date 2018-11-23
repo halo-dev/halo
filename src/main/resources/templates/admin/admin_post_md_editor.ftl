@@ -4,6 +4,7 @@
 <div class="content-wrapper">
     <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
     <link rel="stylesheet" href="/static/plugins/jquery-tageditor/jquery.tag-editor.css">
+    <link rel="stylesheet" href="/static/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
         #post_title{font-weight: 400;}
         .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
@@ -67,11 +68,21 @@
                         </div>
                     </div>
                     <div class="box-body">
-                        <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
-                        <select class="form-control" id="allowComment" name="allowComment">
-                            <option value="1" <#if post?? && (post.allowComment!1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
-                            <option value="0" <#if post?? && (post.allowComment!)==0>selected</#if>><@spring.message code='common.select.no' /></option>
-                        </select>
+                        <div class="form-group">
+                            <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
+                            <select class="form-control" id="allowComment" name="allowComment">
+                                <option value="1" <#if post?? && (post.allowComment!1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
+                                <option value="0" <#if post?? && (post.allowComment!)==0>selected</#if>><@spring.message code='common.select.no' /></option>
+                            </select>
+                        </div>
+                        <#if post??>
+                            <div class="form-group">
+                                <label for="postDate" class="control-label">发布时间：</label>
+                                <input type="text" class="form-control" id="postDate" name="postDate" value="${post.postDate!?string('yyyy-MM-dd HH:mm')}">
+                            </div>
+                        <#else>
+                            <input type="hidden" class="form-control" id="postDate" name="postDate">
+                        </#if>
                     </div>
                     <div class="box-footer">
                         <button onclick="push(1)" class="btn btn-default btn-sm "><@spring.message code='admin.editor.save-draft' /></button>
@@ -177,7 +188,18 @@
     <script src="/static/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
     <script src="/static/plugins/jquery-tageditor/jquery.caret.min.js"></script>
     <script src="/static/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
+    <script src="/static/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script>
+        <#if post??>
+        $('#postDate').datetimepicker({
+            format: 'yyyy-mm-dd hh:ii',
+            language: 'zh-CN',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1
+        });
+        </#if>
         /**
          * 加载编辑器
          */
@@ -313,7 +335,8 @@
                     'postThumbnail': $('#selectImg').attr('src'),
                     'cateList' : cateList.toString(),
                     'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
-                    'allowComment' : $('#allowComment').val()
+                    'allowComment' : $('#allowComment').val(),
+                    'postDate' : $("#postDate").val()
                 },
                 success: function (data) {
                     if(data.code==1){

@@ -3,6 +3,7 @@
 <@head>${options.blog_title!} | <@spring.message code='admin.pages.edit.title' /></@head>
 <div class="content-wrapper">
     <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
         #post_title{font-weight: 400;}
         .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
@@ -75,6 +76,14 @@
                                 <option value="0" <#if post?? && (post.allowComment!)==0>selected</#if>><@spring.message code='common.select.no' /></option>
                             </select>
                         </div>
+                        <#if post??>
+                            <div class="form-group">
+                                <label for="postDate" class="control-label">发布时间：</label>
+                                <input type="text" class="form-control" id="postDate" name="postDate" value="${post.postDate!?string('yyyy-MM-dd HH:mm')}">
+                            </div>
+                        <#else>
+                            <input type="hidden" class="form-control" id="postDate" name="postDate">
+                        </#if>
                         <div class="form-group">
                             <label for="customTpl" class="control-label">自定义模板：</label>
                             <select class="form-control" id="customTpl" name="customTpl">
@@ -124,7 +133,18 @@
     </section>
     <script src="/static/plugins/simplemde/simplemde.min.js"></script>
     <script src="/static/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
+    <script src="/static/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script>
+        <#if post??>
+        $('#postDate').datetimepicker({
+            format: 'yyyy-mm-dd hh:ii',
+            language: 'zh-CN',
+            weekStart: 1,
+            todayBtn: 1,
+            autoclose: 1
+        });
+        </#if>
         /**
          * 加载编辑器
          */
@@ -221,7 +241,8 @@
                     'postContentMd': simplemde.value(),
                     'postThumbnail': $('#selectImg').attr('src'),
                     'allowComment' : $('#allowComment').val(),
-                    'customTpl' : $("#customTpl").val()
+                    'customTpl' : $("#customTpl").val(),
+                    'postDate' : $("#postDate").val()
                 },
                 success: function (data) {
                     if(data.code==1){
