@@ -156,13 +156,13 @@ public class CommentController extends BaseController {
                                HttpServletRequest request,
                                HttpSession session) {
         try {
-            Post post = postService.findByPostId(postId).get();
+            Post post = postService.findByPostId(postId).orElse(new Post());
 
             //博主信息
             User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
             //被回复的评论
-            Comment lastComment = commentService.findCommentById(commentId).get();
+            Comment lastComment = commentService.findCommentById(commentId).orElse(new Comment());
 
             //修改被回复的评论的状态
             lastComment.setCommentStatus(CommentStatusEnum.PUBLISHED.getCode());
