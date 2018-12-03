@@ -11,6 +11,9 @@ import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.ImageUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 /**
  * <pre>
@@ -118,41 +117,85 @@ public class AttachmentController {
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>(3);
+        String dateString = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
         if (!file.isEmpty()) {
             try {
                 //用户目录
-                String userPath = System.getProperties().getProperty("user.home") + "/halo";
-                //upload的路径
-                StringBuffer sbMedia = new StringBuffer("upload/");
-                //获取当前年月以创建目录，如果没有该目录则创建
-                sbMedia.append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
-                File mediaPath = new File(userPath, sbMedia.toString());
-                if (!mediaPath.exists()) {
-                    mediaPath.mkdirs();
-                }
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                String nameWithOutSuffix = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", "") + dateFormat.format(DateUtil.date()) + new Random().nextInt(1000);
-                String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
-                String fileName = nameWithOutSuffix + "." + fileSuffix;
-                file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName));
+                StrBuilder uploadPath = new StrBuilder(System.getProperties().getProperty("user.home"));
+                uploadPath.append("/halo/");
+                uploadPath.append("upload/");
 
-                //压缩图片
-                Thumbnails.of(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString()).size(256, 256).keepAspectRatio(false).toFile(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
-                String filePath = new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(fileName).toString();
+                //获取当前年月以创建目录，如果没有该目录则创建
+                uploadPath.append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
+                File mediaPath = new File(uploadPath.toString());
+                if (!mediaPath.exists()) {
+                    if (!mediaPath.mkdirs()) {
+                        result.put("success",0);
+                        return result;
+                    }
+                }
+
+                //不带后缀
+                StrBuilder nameWithOutSuffix = new StrBuilder(file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", ""));
+                nameWithOutSuffix.append(dateString);
+                nameWithOutSuffix.append(new Random().nextInt(1000));
+
+                //文件后缀
+                String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+
+                //带后缀
+                StrBuilder fileName = new StrBuilder(nameWithOutSuffix);
+                fileName.append(".");
+                fileName.append(fileSuffix);
+                file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName.toString()));
+
+                //文件原路径
+                StrBuilder fullPath = new StrBuilder(mediaPath.getAbsolutePath());
+                fullPath.append("/");
+                fullPath.append(fileName);
+
+                //压缩文件路径
+                StrBuilder fullSmallPath = new StrBuilder(mediaPath.getAbsolutePath());
+                fullSmallPath.append("/");
+                fullSmallPath.append(nameWithOutSuffix);
+                fullSmallPath.append("_small.");
+                fullSmallPath.append(fileSuffix);
+
+                //压缩文件
+                Thumbnails.of(fullPath.toString()).size(256, 256).keepAspectRatio(false).toFile(fullSmallPath.toString());
+
+                //映射路径
+                StrBuilder filePath = new StrBuilder("/upload/");
+                filePath.append(DateUtil.thisYear());
+                filePath.append("/");
+                filePath.append(DateUtil.thisMonth());
+                filePath.append("/");
+                filePath.append(fileName);
+
+                //缩略图映射路径
+                StrBuilder fileSmallPath = new StrBuilder("/upload/");
+                fileSmallPath.append(DateUtil.thisYear());
+                fileSmallPath.append("/");
+                fileSmallPath.append(DateUtil.thisMonth());
+                fileSmallPath.append("/");
+                fileSmallPath.append(nameWithOutSuffix);
+                fileSmallPath.append("_small.");
+                fileSmallPath.append(fileSuffix);
+
                 //保存在数据库
                 Attachment attachment = new Attachment();
-                attachment.setAttachName(fileName);
-                attachment.setAttachPath(filePath);
-                attachment.setAttachSmallPath(new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
+                attachment.setAttachName(fileName.toString());
+                attachment.setAttachPath(filePath.toString());
+                attachment.setAttachSmallPath(fileSmallPath.toString());
                 attachment.setAttachType(file.getContentType());
-                attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
+                attachment.setAttachSuffix(new StrBuilder(".").append(fileSuffix).toString());
                 attachment.setAttachCreated(DateUtil.date());
-                attachment.setAttachSize(HaloUtils.parseSize(new File(mediaPath, fileName).length()));
-                attachment.setAttachWh(HaloUtils.getImageWh(new File(mediaPath, fileName)));
+                attachment.setAttachSize(HaloUtils.parseSize(new File(fullPath.toString()).length()));
+                attachment.setAttachWh(HaloUtils.getImageWh(new File(fullPath.toString())));
                 attachmentService.saveByAttachment(attachment);
                 log.info("Upload file {} to {} successfully", fileName, mediaPath.getAbsolutePath());
                 logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_FILE, fileName, ServletUtil.getClientIP(request), DateUtil.date())
+                        new Logs(LogsRecord.UPLOAD_FILE, fileName.toString(), ServletUtil.getClientIP(request), DateUtil.date())
                 );
 
                 result.put("success", 1);
@@ -171,6 +214,25 @@ public class AttachmentController {
     }
 
     /**
+     * 添加外部url附件
+     *
+     * @param attachment attachment
+     * @return JsonResult
+     */
+    @PostMapping(value = "/addFromUrl")
+    @ResponseBody
+    public JsonResult addFromUrl(@ModelAttribute(value = "attachment") Attachment attachment) {
+        attachment.setAttachCreated(new Date());
+        attachment.setAttachOrigin(1);
+        attachment = attachmentService.saveByAttachment(attachment);
+        if (null != attachment) {
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
+        } else {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+        }
+    }
+
+    /**
      * 处理获取附件详情的请求
      *
      * @param model    model
@@ -180,7 +242,7 @@ public class AttachmentController {
     @GetMapping(value = "/attachment")
     public String attachmentDetail(Model model, @RequestParam("attachId") Long attachId) {
         Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
-        model.addAttribute("attachment", attachment.get());
+        model.addAttribute("attachment", attachment.orElse(new Attachment()));
         return "admin/widget/_attachment-detail";
     }
 

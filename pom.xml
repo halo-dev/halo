@@ -35,7 +35,7 @@
 		<lombok.version>1.18.2</lombok.version>
 		<ehcache.version>3.6.0</ehcache.version>
 		<rome.version>1.0</rome.version>
-		<hutool-all.version>4.1.19</hutool-all.version>
+		<hutool-all.version>4.2.1</hutool-all.version>
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
 		<qiniu-java-sdk.version>7.2.14</qiniu-java-sdk.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
