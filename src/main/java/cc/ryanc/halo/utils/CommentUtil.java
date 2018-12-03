@@ -1,13 +1,12 @@
 package cc.ryanc.halo.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import cc.ryanc.halo.model.domain.Comment;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import cc.ryanc.halo.model.domain.Comment;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * <pre>
