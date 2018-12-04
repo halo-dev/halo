@@ -361,20 +361,20 @@
                                     <div class="form-group">
                                         <label class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.attach-choose' /></label>
                                         <div class="col-lg-4 col-sm-8 control-radio">
-                                            <#--<div class="pretty p-default p-round">-->
-                                                <#--<input type="radio" name="attach_loc" value="server" ${((options.attach_loc!'server')=='server')?string('checked','')}>-->
-                                                <#--<div class="state p-primary">-->
-                                                    <#--<label><@spring.message code='admin.setting.form.attach-loc-server' /></label>-->
-                                                <#--</div>-->
-                                            <#--</div>-->
                                             <div class="pretty p-default p-round">
-                                                <input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc!)=='upyun')?string('checked','')} disabled="disabled">
+                                                <input type="radio" name="attach_loc" value="server" ${((options.attach_loc!'server')=='server')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='admin.setting.form.attach-loc-server' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="attach_loc" value="upyun" ${((options.attach_loc!)=='upyun')?string('checked','')} >
                                                 <div class="state p-primary">
                                                     <label><@spring.message code='admin.setting.form.attach-loc-upyun' /></label>
                                                 </div>
                                             </div>
                                             <div class="pretty p-default p-round">
-                                                <input type="radio" name="attach_loc" value="qiniu" ${((options.attach_loc!)=='qiniu')?string('checked','')} disabled="disabled">
+                                                <input type="radio" name="attach_loc" value="qiniu" ${((options.attach_loc!)=='qiniu')?string('checked','')} >
                                                 <div class="state p-primary">
                                                     <label><@spring.message code='admin.setting.form.attach-loc-qiniu' /></label>
                                                 </div>
@@ -383,9 +383,9 @@
                                     </div>
 
                                     <!-- 原生设置 -->
-                                    <#--<div class="server-options" style="display: none">-->
+                                    <div class="server-options" style="display: none">
 
-                                    <#--</div>-->
+                                    </div>
 
                                     <!-- 又拍云选项 -->
                                     <div class="upyun-options" style="display: none">
@@ -419,6 +419,12 @@
                                                 <input type="text" class="form-control" id="upyunOssSrc" name="upyun_oss_src" value="${options.upyun_oss_src!}">
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label for="upyunOssSmall" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.upyun-oss-small' /></label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="upyunOssSmall" name="upyun_oss_small" value="${options.upyun_oss_small!}">
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- 七牛云 -->
@@ -445,6 +451,12 @@
                                             <label for="qiniuBucket" class="col-lg-2 col-sm-4 control-label">Bucket：</label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <input type="text" class="form-control" id="qiniuBucket" name="qiniu_bucket" value="${options.qiniu_bucket!}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="qiniuSmallUrl" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.qiniu-small-url' /></label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="qiniuSamllUrl" name="qiniu_small_url" value="${options.qiniu_small_url!}">
                                             </div>
                                         </div>
                                     </div>
