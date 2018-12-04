@@ -51,8 +51,10 @@ public class HaloUtils {
      * @return List
      */
     public static List<BackupDto> getBackUps(String dir) {
-        String srcPathStr = System.getProperties().getProperty("user.home") + "/halo/backup/" + dir;
-        File srcPath = new File(srcPathStr);
+        StrBuilder srcPathStr = new StrBuilder(System.getProperties().getProperty("user.home"));
+        srcPathStr.append("/halo/backup/");
+        srcPathStr.append(dir);
+        File srcPath = new File(srcPathStr.toString());
         File[] files = srcPath.listFiles();
         List<BackupDto> backupDtos = new ArrayList<>();
         BackupDto backupDto = null;
@@ -283,7 +285,7 @@ public class HaloUtils {
      *
      * @param posts posts
      * @return String
-     * @throws FeedException
+     * @throws FeedException FeedException
      */
     public static String getRss(List<Post> posts) throws FeedException {
         Assert.notEmpty(posts, "posts must not be empty");
@@ -380,13 +382,17 @@ public class HaloUtils {
         Assert.hasText(token, "token must not be blank");
         Assert.hasText(urls, "urls must not be blank");
 
-        String url = "http://data.zz.baidu.com/urls?site=" + blogUrl + "&token=" + token;
-        String result = "";
+        StrBuilder url = new StrBuilder("http://data.zz.baidu.com/urls?site=");
+        url.append(blogUrl);
+        url.append("&token=");
+        url.append(token);
+
+        StrBuilder result = new StrBuilder();
         PrintWriter out = null;
         BufferedReader in = null;
         try {
             // 建立URL之间的连接
-            URLConnection conn = new URL(url).openConnection();
+            URLConnection conn = new URL(url.toString()).openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("Host", "data.zz.baidu.com");
             conn.setRequestProperty("User-Agent", "curl/7.12.1");
@@ -406,7 +412,7 @@ public class HaloUtils {
             in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
-                result += line;
+                result.append(line);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -422,7 +428,7 @@ public class HaloUtils {
                 ex.printStackTrace();
             }
         }
-        return result;
+        return result.toString();
     }
 
 }
