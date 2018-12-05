@@ -148,7 +148,12 @@ public enum BlogPropertiesEnum {
     /**
      * API Token
      */
-    API_TOKEN("api_token");
+    API_TOKEN("api_token"),
+
+    /**
+     * 附件存储位置
+     */
+    ATTACH_LOC("attach_loc");
 
     private String prop;
 

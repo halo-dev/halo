@@ -1,16 +1,17 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.domain.Options;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.QiNiuPutSet;
 import cc.ryanc.halo.model.enums.AttachLocationEnum;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.repository.AttachmentRepository;
-import cc.ryanc.halo.repository.OptionsRepository;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.Md5Util;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
 import com.UpYun;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -56,9 +57,6 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Autowired
     private AttachmentRepository attachmentRepository;
-
-    @Autowired
-    private OptionsRepository optionsRepository;
 
     /**
      * 新增附件信息
@@ -129,11 +127,11 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Map<String, String> upload(MultipartFile file, HttpServletRequest request) {
         Map<String, String> resultMap;
-        Options options = optionsRepository.findOptionsByOptionName("attach_loc");
-        if (options == null) {
+        String attachLoc = HaloConst.OPTIONS.get(BlogPropertiesEnum.ATTACH_LOC.getProp());
+        if (StrUtil.isEmpty(attachLoc)) {
             return null;
         }
-        switch (options.getOptionValue()) {
+        switch (attachLoc) {
             case "server":
                 resultMap = this.attachUpload(file, request);
                 break;
@@ -255,19 +253,19 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             Configuration cfg = new Configuration(Zone.zone0());
             String key = Md5Util.getMD5Checksum(file);
-            Options accessKey = optionsRepository.findOptionsByOptionName("qiniu_access_key");
-            Options secretKey = optionsRepository.findOptionsByOptionName("qiniu_secret_key");
-            Options domain = optionsRepository.findOptionsByOptionName("qiniu_domain");
-            Options bucket = optionsRepository.findOptionsByOptionName("qiniu_bucket");
-            Options smallUrl = optionsRepository.findOptionsByOptionName("qiniu_small_url");
+            String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
+            String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
+            String domain = HaloConst.OPTIONS.get("qiniu_domain");
+            String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
+            String smallUrl = HaloConst.OPTIONS.get("qiniu_small_url");
             if (accessKey == null || secretKey == null || domain == null || bucket == null) {
                 return resultMap;
             }
-            Auth auth = Auth.create(accessKey.getOptionValue(), secretKey.getOptionValue());
+            Auth auth = Auth.create(accessKey, secretKey);
             StringMap putPolicy = new StringMap();
             putPolicy.put("returnBody", "{\"size\":$(fsize),\"w\":$(imageInfo.width),\"h\":$(imageInfo.height)}");
-            String upToken = auth.uploadToken(bucket.getOptionValue(), null, 3600, putPolicy);
-            String localTempDir = Paths.get(System.getenv("java.io.tmpdir"), bucket.getOptionValue()).toString();
+            String upToken = auth.uploadToken(bucket, null, 3600, putPolicy);
+            String localTempDir = Paths.get(System.getenv("java.io.tmpdir"), bucket).toString();
             QiNiuPutSet putSet = new QiNiuPutSet();
             try {
                 FileRecorder fileRecorder = new FileRecorder(localTempDir);
@@ -288,10 +286,10 @@ public class AttachmentServiceImpl implements AttachmentService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String filePath = domain.getOptionValue().contains("http://") ? domain.getOptionValue().trim() : ("http://" + domain.getOptionValue().trim()) + "/" + key;
+            String filePath = domain.trim() + "/" + key;
             resultMap.put("fileName", file.getOriginalFilename());
             resultMap.put("filePath", filePath.trim());
-            resultMap.put("smallPath", smallUrl == null ? filePath.trim() : (filePath + smallUrl.getOptionValue()).trim());
+            resultMap.put("smallPath", smallUrl == null ? filePath.trim() : (filePath + smallUrl).trim());
             resultMap.put("suffix", file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.')));
             resultMap.put("size", HaloUtils.parseSize(file.getSize()));
             resultMap.put("wh", putSet.getW() + "x" + putSet.getH());
@@ -314,26 +312,26 @@ public class AttachmentServiceImpl implements AttachmentService {
         Map<String, String> resultMap = new HashMap<>(6);
         try {
             String key = Md5Util.getMD5Checksum(file);
-            Options ossSrc = optionsRepository.findOptionsByOptionName("upyun_oss_src");
-            Options ossPwd = optionsRepository.findOptionsByOptionName("upyun_oss_pwd");
-            Options bucket = optionsRepository.findOptionsByOptionName("upyun_oss_bucket");
-            Options domain = optionsRepository.findOptionsByOptionName("upyun_oss_domain");
-            Options operator = optionsRepository.findOptionsByOptionName("upyun_oss_operator");
-            Options smallUrl = optionsRepository.findOptionsByOptionName("upyun_oss_small");
+            String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
+            String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
+            String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
+            String domain = HaloConst.OPTIONS.get("upyun_oss_domain");
+            String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
+            String smallUrl = HaloConst.OPTIONS.get("upyun_oss_small");
             if (ossSrc == null || ossPwd == null || domain == null || bucket == null || operator == null) {
                 return resultMap;
             }
             String fileName = file.getOriginalFilename();
             String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
-            UpYun upYun = new UpYun(bucket.getOptionValue(), operator.getOptionValue(), ossPwd.getOptionValue());
+            UpYun upYun = new UpYun(bucket, operator, ossPwd);
             upYun.setTimeout(60);
             upYun.setApiDomain(UpYun.ED_AUTO);
             upYun.setDebug(true);
-            upYun.writeFile(ossSrc.getOptionValue() + key + "." + fileSuffix, file.getBytes(), true, null);
-            String filePath = domain.getOptionValue().contains("http://") ? domain.getOptionValue().trim() : ("http://" + domain.getOptionValue().trim() + ossSrc.getOptionValue() + key + "." + fileSuffix);
+            upYun.writeFile(ossSrc + key + fileSuffix, file.getBytes(), true, null);
+            String filePath = domain.trim() + ossSrc + key + fileSuffix;
             String smallPath = filePath;
             if (smallUrl != null) {
-                smallPath += smallUrl.getOptionValue();
+                smallPath += smallUrl;
             }
             BufferedImage image = ImageIO.read(file.getInputStream());
             if (image != null) {
@@ -362,16 +360,16 @@ public class AttachmentServiceImpl implements AttachmentService {
     public boolean deleteQiNiuAttachment(String key) {
         boolean flag = true;
         Configuration cfg = new Configuration(Zone.zone0());
-        Options accessKey = optionsRepository.findOptionsByOptionName("qiniu_access_key");
-        Options secretKey = optionsRepository.findOptionsByOptionName("qiniu_secret_key");
-        Options bucket = optionsRepository.findOptionsByOptionName("qiniu_bucket");
+        String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
+        String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
+        String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
         if (accessKey == null || secretKey == null || bucket == null) {
             return false;
         }
-        Auth auth = Auth.create(accessKey.getOptionValue(), secretKey.getOptionValue());
+        Auth auth = Auth.create(accessKey, secretKey);
         BucketManager bucketManager = new BucketManager(auth, cfg);
         try {
-            bucketManager.delete(bucket.getOptionValue(), key);
+            bucketManager.delete(bucket, key);
         } catch (QiniuException ex) {
             System.err.println(ex.code());
             System.err.println(ex.response.toString());
@@ -389,17 +387,17 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public boolean deleteUpYunAttachment(String fileName) {
         boolean flag = true;
-        Options ossSrc = optionsRepository.findOptionsByOptionName("upyun_oss_src");
-        Options ossPwd = optionsRepository.findOptionsByOptionName("upyun_oss_pwd");
-        Options bucket = optionsRepository.findOptionsByOptionName("upyun_oss_bucket");
-        Options operator = optionsRepository.findOptionsByOptionName("upyun_oss_operator");
+        String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
+        String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
+        String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
+        String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
         if (ossSrc == null || ossPwd == null || bucket == null || operator == null) {
             return false;
         }
-        UpYun upYun = new UpYun(bucket.getOptionValue(), operator.getOptionValue(), ossPwd.getOptionValue());
+        UpYun upYun = new UpYun(bucket, operator, ossPwd);
         upYun.setApiDomain(UpYun.ED_AUTO);
         try {
-            flag = upYun.deleteFile(ossSrc.getOptionValue() + fileName);
+            flag = upYun.deleteFile(ossSrc + fileName);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (UpException e) {
