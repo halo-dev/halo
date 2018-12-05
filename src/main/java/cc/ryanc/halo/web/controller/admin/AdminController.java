@@ -20,7 +20,6 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,7 +159,7 @@ public class AdminController extends BaseController {
             session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
             //重置用户的登录状态为正常
             userService.updateUserNormal();
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
+            logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, request);
             log.info("User {} login succeeded.", aUser.getUserDisplayName());
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
         } else {
@@ -170,14 +169,7 @@ public class AdminController extends BaseController {
             if (errorCount >= CommonParamsEnum.FIVE.getValue()) {
                 userService.updateUserLoginEnable(TrueFalseEnum.FALSE.getDesc());
             }
-            logsService.saveByLogs(
-                    new Logs(
-                            LogsRecord.LOGIN,
-                            LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]",
-                            ServletUtil.getClientIP(request),
-                            DateUtil.date()
-                    )
-            );
+            logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]", request);
             Object[] args = {(5 - errorCount)};
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.failed", args));
         }
@@ -193,7 +185,7 @@ public class AdminController extends BaseController {
     public String logOut(HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         session.removeAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), ServletUtil.getClientIP(request), DateUtil.date()));
+        logsService.save(LogsRecord.LOGOUT, user.getUserName(), request);
         log.info("User {} has logged out", user.getUserName());
         return "redirect:/admin/login";
     }

@@ -1,6 +1,9 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.*;
+import cc.ryanc.halo.model.domain.Category;
+import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
@@ -19,7 +22,6 @@ import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,7 +215,7 @@ public class PostController extends BaseController {
                 post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_POST, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
+            logsService.save(LogsRecord.PUSH_POST, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("Save article failed: {}", e.getMessage());
@@ -268,7 +270,7 @@ public class PostController extends BaseController {
         try {
             Optional<Post> post = postService.findByPostId(postId);
             postService.removeByPostId(postId);
-            logsService.saveByLogs(new Logs(LogsRecord.REMOVE_POST, post.get().getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
+            logsService.save(LogsRecord.REMOVE_POST, post.get().getPostTitle(), request);
         } catch (Exception e) {
             log.error("Delete article failed: {}", e.getMessage());
         }

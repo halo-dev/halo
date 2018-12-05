@@ -1,6 +1,9 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.*;
+import cc.ryanc.halo.model.domain.Gallery;
+import cc.ryanc.halo.model.domain.Link;
+import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
@@ -17,7 +20,6 @@ import cc.ryanc.halo.utils.MarkdownUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -211,7 +213,7 @@ public class PageController {
     @GetMapping(value = "/new")
     public String newPage(Model model) {
         List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
-        model.addAttribute("customTpls",customTpls);
+        model.addAttribute("customTpls", customTpls);
         return "admin/admin_page_md_editor";
     }
 
@@ -247,7 +249,7 @@ public class PageController {
                 post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
             postService.saveByPost(post);
-            logsService.saveByLogs(new Logs(LogsRecord.PUSH_PAGE, post.getPostTitle(), ServletUtil.getClientIP(request), DateUtil.date()));
+            logsService.save(LogsRecord.PUSH_PAGE, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
             log.error("Save page failed: {}", e.getMessage());
@@ -267,7 +269,7 @@ public class PageController {
         Optional<Post> post = postService.findByPostId(pageId);
         List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("post", post.orElse(new Post()));
-        model.addAttribute("customTpls",customTpls);
+        model.addAttribute("customTpls", customTpls);
         return "admin/admin_page_md_editor";
     }
 

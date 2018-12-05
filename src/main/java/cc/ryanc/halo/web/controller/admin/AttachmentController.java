@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -11,7 +10,6 @@ import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -116,13 +114,12 @@ public class AttachmentController {
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>(3);
-        System.out.println("源地址" + file.getOriginalFilename() + "类型" + file.getContentType() + "文件名" + file.getName() + "文件大小" + file.getSize());
         if (!file.isEmpty()) {
             try {
                 Map<String, String> resultMap = attachmentService.upload(file, request);
                 if (resultMap == null || resultMap.isEmpty()) {
-                    log.error("文件上传失败");
-                    result.put("success", 0);
+                    log.error("File upload failed");
+                    result.put("success", ResultCodeEnum.FAIL.getCode());
                     result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
                     return result;
                 }
@@ -139,16 +136,14 @@ public class AttachmentController {
                 attachment.setAttachLocation(resultMap.get("location"));
                 attachmentService.saveByAttachment(attachment);
                 log.info("Upload file {} to {} successfully", resultMap.get("fileName"), resultMap.get("filePath"));
-                logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_FILE, resultMap.get("fileName"), ServletUtil.getClientIP(request), DateUtil.date())
-                );
-                result.put("success", 1);
+                result.put("success", ResultCodeEnum.SUCCESS.getCode());
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
                 result.put("url", attachment.getAttachPath());
                 result.put("filename", resultMap.get("filePath"));
+                logsService.save(LogsRecord.UPLOAD_FILE, resultMap.get("fileName"), request);
             } catch (Exception e) {
                 log.error("Upload file failed:{}", e.getMessage());
-                result.put("success", 0);
+                result.put("success", ResultCodeEnum.FAIL.getCode());
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
             }
         } else {
@@ -216,9 +211,7 @@ public class AttachmentController {
             }
             if (flag) {
                 log.info("Delete file {} successfully!", delFileName);
-                logsService.saveByLogs(
-                        new Logs(LogsRecord.REMOVE_FILE, delFileName, ServletUtil.getClientIP(request), DateUtil.date())
-                );
+                logsService.save(LogsRecord.REMOVE_FILE, delFileName, request);
             } else {
                 log.error("Deleting attachment {} failed!", delFileName);
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));

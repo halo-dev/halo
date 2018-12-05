@@ -3,11 +3,14 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.repository.LogsRepository;
 import cc.ryanc.halo.service.LogsService;
+import cn.hutool.extra.servlet.ServletUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,23 +31,18 @@ public class LogsServiceImpl implements LogsService {
     /**
      * 保存日志
      *
-     * @param logs logs
-     * @return Logs
+     * @param logTitle   logTitle
+     * @param logContent logContent
+     * @param request    request
      */
     @Override
-    public Logs saveByLogs(Logs logs) {
-        return logsRepository.save(logs);
-    }
-
-    /**
-     * 根据编号移除
-     *
-     * @param logsId logsId
-     */
-    @Override
-    public void removeByLogsId(Long logsId) {
-        Optional<Logs> logs = this.findLogsByLogsId(logsId);
-        logsRepository.delete(logs.get());
+    public void save(String logTitle, String logContent, HttpServletRequest request) {
+        Logs logs = new Logs();
+        logs.setLogTitle(logTitle);
+        logs.setLogContent(logContent);
+        logs.setLogCreated(new Date());
+        logs.setLogIp(ServletUtil.getClientIP(request));
+        logsRepository.save(logs);
     }
 
     /**

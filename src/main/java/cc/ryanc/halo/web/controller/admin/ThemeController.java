@@ -1,6 +1,5 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
@@ -12,14 +11,12 @@ import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,9 +96,7 @@ public class ThemeController extends BaseController {
             configuration.setSharedVariable("themeName", siteTheme);
             configuration.setSharedVariable("options", HaloConst.OPTIONS);
             log.info("Changed theme to {}", siteTheme);
-            logsService.saveByLogs(
-                    new Logs(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, ServletUtil.getClientIP(request), DateUtil.date())
-            );
+            logsService.save(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-success", new Object[]{siteTheme}));
         } catch (Exception e) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-failed"));
@@ -126,9 +121,7 @@ public class ThemeController extends BaseController {
                 File themePath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(file.getOriginalFilename()).toString());
                 file.transferTo(themePath);
                 log.info("Upload topic success, path is " + themePath.getAbsolutePath());
-                logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), ServletUtil.getClientIP(request), DateUtil.date())
-                );
+                logsService.save(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), request);
                 ZipUtil.unzip(themePath, new File(basePath.getAbsolutePath(), "templates/themes/"));
                 FileUtil.del(themePath);
                 HaloConst.THEMES.clear();

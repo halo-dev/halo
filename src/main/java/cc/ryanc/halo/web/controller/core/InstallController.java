@@ -11,7 +11,6 @@ import cc.ryanc.halo.utils.MarkdownUtils;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,7 +159,7 @@ public class InstallController {
             optionsService.saveOption(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
 
             //语言设置
-            optionsService.saveOption(BlogPropertiesEnum.BLOG_LOCALE.getProp(),blogLocale);
+            optionsService.saveOption(BlogPropertiesEnum.BLOG_LOCALE.getProp(), blogLocale);
             //保存博客标题和博客地址设置
             optionsService.saveOption(BlogPropertiesEnum.BLOG_TITLE.getProp(), blogTitle);
             optionsService.saveOption(BlogPropertiesEnum.BLOG_URL.getProp(), blogUrl);
@@ -169,7 +168,7 @@ public class InstallController {
             optionsService.saveOption(BlogPropertiesEnum.THEME.getProp(), "anatole");
 
             //建立网站时间
-            optionsService.saveOption(BlogPropertiesEnum.BLOG_START.getProp(), DateUtil.format(DateUtil.date(),"yyyy-MM-dd"));
+            optionsService.saveOption(BlogPropertiesEnum.BLOG_START.getProp(), DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
 
             //默认不配置邮件系统
             optionsService.saveOption(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp(), TrueFalseEnum.FALSE.getDesc());
@@ -180,14 +179,7 @@ public class InstallController {
             optionsService.saveOption(BlogPropertiesEnum.COMMENT_REPLY_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
 
             //更新日志
-            logsService.saveByLogs(
-                    new Logs(
-                            LogsRecord.INSTALL,
-                            "安装成功，欢迎使用Halo。",
-                            ServletUtil.getClientIP(request),
-                            DateUtil.date()
-                    )
-            );
+            logsService.save(LogsRecord.INSTALL, "安装成功，欢迎使用Halo。", request);
 
             Menu menuIndex = new Menu();
             menuIndex.setMenuName("首页");
