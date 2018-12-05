@@ -61,47 +61,53 @@ public interface AttachmentService {
 
     /**
      * 上传转发
-     * @param file
-     * @param request
-     * @return
+     *
+     * @param file    file
+     * @param request request
+     * @return Map
      */
-    Map<String,String> upload(MultipartFile file, HttpServletRequest request);
+    Map<String, String> upload(MultipartFile file, HttpServletRequest request);
 
     /**
-     * 原生上传
-     * @param file
-     * @param request
-     * @return
+     * 原生服务器上传
+     *
+     * @param file    file
+     * @param request request
+     * @return Map
      */
-    Map<String,String> attachUpload(MultipartFile file, HttpServletRequest request);
+    Map<String, String> attachUpload(MultipartFile file, HttpServletRequest request);
 
     /**
      * 七牛云上传
-     * @param file
-     * @param request
-     * @return
+     *
+     * @param file    file
+     * @param request request
+     * @return Map
      */
-    Map<String,String> attachQiNiuUpload(MultipartFile file, HttpServletRequest request);
+    Map<String, String> attachQiNiuUpload(MultipartFile file, HttpServletRequest request);
 
     /**
      * 又拍云上传
-     * @param file
-     * @param request
-     * @return
+     *
+     * @param file    file
+     * @param request request
+     * @return Map
      */
-    Map<String,String> attachUpYunUpload(MultipartFile file, HttpServletRequest request);
+    Map<String, String> attachUpYunUpload(MultipartFile file, HttpServletRequest request);
 
     /**
      * 七牛云删除附件
-     * @param key
-     * @return
+     *
+     * @param key key
+     * @return boolean
      */
     boolean deleteQiNiuAttachment(String key);
 
     /**
      * 又拍云删除附件
-     * @param fileName
-     * @return
+     *
+     * @param fileName fileName
+     * @return boolean
      */
     boolean deleteUpYunAttachment(String fileName);
 }

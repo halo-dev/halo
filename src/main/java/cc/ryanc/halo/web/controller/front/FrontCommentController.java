@@ -13,6 +13,7 @@ import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.utils.OwoUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -126,8 +127,13 @@ public class FrontCommentController {
             }
             if (comment.getCommentParent() > 0) {
                 lastComment = commentService.findCommentById(comment.getCommentParent()).get();
-                String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a> ";
-                comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
+                StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
+                buildContent.append(lastComment.getCommentId());
+                buildContent.append("'>@");
+                buildContent.append(lastComment.getCommentAuthor());
+                buildContent.append("</a> ");
+                buildContent.append(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
+                comment.setCommentContent(buildContent.toString());
             } else {
                 //将评论内容的字符专为安全字符
                 comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
@@ -170,13 +176,18 @@ public class FrontCommentController {
                 try {
                     //发送邮件到博主
                     Map<String, Object> map = new HashMap<>(5);
+                    StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
+                        pageUrl.append("/archives/");
+                    } else {
+                        pageUrl.append("/p/");
+                    }
+                    pageUrl.append(post.getPostUrl());
+                    pageUrl.append("#comment-id-");
+                    pageUrl.append(comment.getCommentId());
+                    map.put("pageUrl", pageUrl.toString());
                     map.put("author", userService.findUser().getUserDisplayName());
                     map.put("pageName", post.getPostTitle());
-                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    }
                     map.put("visitor", comment.getCommentAuthor());
                     map.put("commentContent", comment.getCommentContent());
                     mailService.sendTemplateMail(userService.findUser().getUserEmail(), "有新的评论", map, "common/mail_template/mail_admin.ftl");
@@ -207,14 +218,20 @@ public class FrontCommentController {
             if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.TRUE.getDesc()) && StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp()), TrueFalseEnum.TRUE.getDesc())) {
                 if (Validator.isEmail(lastComment.getCommentAuthorEmail())) {
                     Map<String, Object> map = new HashMap<>(8);
+                    StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
+                        pageUrl.append("/archives/");
+
+                    } else {
+                        pageUrl.append("/p/");
+                    }
+                    pageUrl.append(post.getPostUrl());
+                    pageUrl.append("#comment-id-");
+                    pageUrl.append(comment.getCommentId());
+                    map.put("pageUrl",  pageUrl.toString());
                     map.put("blogTitle", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()));
                     map.put("commentAuthor", lastComment.getCommentAuthor());
                     map.put("pageName", lastComment.getPost().getPostTitle());
-                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    }
                     map.put("commentContent", lastComment.getCommentContent());
                     map.put("replyAuthor", comment.getCommentAuthor());
                     map.put("replyContent", comment.getCommentContent());

@@ -8,6 +8,7 @@ import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.Content;
@@ -16,14 +17,12 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.WireFeedOutput;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -52,8 +51,10 @@ public class HaloUtils {
      * @return List
      */
     public static List<BackupDto> getBackUps(String dir) {
-        String srcPathStr = System.getProperties().getProperty("user.home") + "/halo/backup/" + dir;
-        File srcPath = new File(srcPathStr);
+        StrBuilder srcPathStr = new StrBuilder(System.getProperties().getProperty("user.home"));
+        srcPathStr.append("/halo/backup/");
+        srcPathStr.append(dir);
+        File srcPath = new File(srcPathStr.toString());
         File[] files = srcPath.listFiles();
         List<BackupDto> backupDtos = new ArrayList<>();
         BackupDto backupDto = null;
@@ -284,7 +285,7 @@ public class HaloUtils {
      *
      * @param posts posts
      * @return String
-     * @throws FeedException
+     * @throws FeedException FeedException
      */
     public static String getRss(List<Post> posts) throws FeedException {
         Assert.notEmpty(posts, "posts must not be empty");
@@ -341,17 +342,18 @@ public class HaloUtils {
      */
     public static String getSiteMap(List<Post> posts) {
         Assert.notEmpty(posts, "post mut not be empty");
-
-        String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
-        String urlBody = "";
-        String urlItem;
+        StrBuilder head = new StrBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
+        StrBuilder urlBody = new StrBuilder();
         String urlPath = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/";
         for (Post post : posts) {
-            urlItem = "<url><loc>" + urlPath + post.getPostUrl() + "</loc><lastmod>"
-                    + DateUtil.format(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX") + "</lastmod>" + "</url>";
-            urlBody += urlItem;
+            urlBody.append("<url><loc>");
+            urlBody.append(urlPath);
+            urlBody.append(post.getPostUrl());
+            urlBody.append("</loc><lastmod>");
+            urlBody.append(DateUtil.format(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
+            urlBody.append("</lastmod></url>");
         }
-        return head + urlBody + "</urlset>";
+        return head.append(urlBody).append("</urlset>").toString();
     }
 
     /**
@@ -368,46 +370,6 @@ public class HaloUtils {
     }
 
     /**
-     * 访问路径获取json数据
-     *
-     * @param enterUrl 路径
-     * @return String
-     */
-    public static String getHttpResponse(String enterUrl) {
-        Assert.hasText(enterUrl, "enter url must not be blank");
-
-        BufferedReader in = null;
-        StringBuffer result = null;
-        try {
-            URI uri = new URI(enterUrl);
-            URL url = uri.toURL();
-            URLConnection connection = url.openConnection();
-            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("Charset", "utf-8");
-            connection.connect();
-            result = new StringBuffer();
-            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            while ((line = in.readLine()) != null) {
-                result.append(line);
-            }
-            return result.toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    /**
      * 百度主动推送
      *
      * @param blogUrl 博客地址
@@ -420,13 +382,17 @@ public class HaloUtils {
         Assert.hasText(token, "token must not be blank");
         Assert.hasText(urls, "urls must not be blank");
 
-        String url = "http://data.zz.baidu.com/urls?site=" + blogUrl + "&token=" + token;
-        String result = "";
+        StrBuilder url = new StrBuilder("http://data.zz.baidu.com/urls?site=");
+        url.append(blogUrl);
+        url.append("&token=");
+        url.append(token);
+
+        StrBuilder result = new StrBuilder();
         PrintWriter out = null;
         BufferedReader in = null;
         try {
             // 建立URL之间的连接
-            URLConnection conn = new URL(url).openConnection();
+            URLConnection conn = new URL(url.toString()).openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("Host", "data.zz.baidu.com");
             conn.setRequestProperty("User-Agent", "curl/7.12.1");
@@ -446,7 +412,7 @@ public class HaloUtils {
             in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
-                result += line;
+                result.append(line);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -462,7 +428,7 @@ public class HaloUtils {
                 ex.printStackTrace();
             }
         }
-        return result;
+        return result.toString();
     }
 
 }

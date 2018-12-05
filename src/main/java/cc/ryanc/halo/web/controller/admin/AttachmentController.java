@@ -8,13 +8,11 @@ import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,15 +25,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 
-import static cc.ryanc.halo.model.enums.AttachLocationEnum.QINIU;
-import static cc.ryanc.halo.model.enums.AttachLocationEnum.SERVER;
-import static cc.ryanc.halo.model.enums.AttachLocationEnum.UPYUN;
+import static cc.ryanc.halo.model.enums.AttachLocationEnum.*;
 
 /**
  * <pre>
@@ -106,7 +100,7 @@ public class AttachmentController {
      * @return String
      */
     @GetMapping(value = "/uploadModal")
-    public String uploadModal(){
+    public String uploadModal() {
         return "admin/widget/_attachment-upload";
     }
 
@@ -122,11 +116,11 @@ public class AttachmentController {
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>(3);
-        System.out.println("源地址"+file.getOriginalFilename()+"类型"+file.getContentType()+"文件名"+file.getName()+"文件大小"+file.getSize());
+        System.out.println("源地址" + file.getOriginalFilename() + "类型" + file.getContentType() + "文件名" + file.getName() + "文件大小" + file.getSize());
         if (!file.isEmpty()) {
             try {
-                Map<String,String> resultMap = attachmentService.upload(file,request);
-                if(resultMap == null || resultMap.isEmpty()){
+                Map<String, String> resultMap = attachmentService.upload(file, request);
+                if (resultMap == null || resultMap.isEmpty()) {
                     log.error("文件上传失败");
                     result.put("success", 0);
                     result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
@@ -195,8 +189,8 @@ public class AttachmentController {
         try {
             //删除数据库中的内容
             attachmentService.removeByAttachId(attachId);
-            if(attachLocation!=null){
-                if(attachLocation.equals(SERVER.getDesc())){
+            if (attachLocation != null) {
+                if (attachLocation.equals(SERVER.getDesc())) {
                     String delSmallFileName = delFileName.substring(0, delFileName.lastIndexOf('.')) + "_small" + attachment.get().getAttachSuffix();
                     //删除文件
                     String userPath = System.getProperties().getProperty("user.home") + "/halo";
@@ -204,32 +198,28 @@ public class AttachmentController {
                     File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
                     File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
                     if (delFile.exists() && delFile.isFile()) {
-                        if (delFile.delete() && delSmallFile.delete()) {
-                            flag = true;
-                        } else {
-                            flag = false;
-                        }
+                        flag = delFile.delete() && delSmallFile.delete();
                     }
-                }else if(attachLocation.equals(QINIU.getDesc())){
+                } else if (attachLocation.equals(QINIU.getDesc())) {
                     //七牛删除
                     String attachPath = attachment.get().getAttachPath();
-                    String key =attachPath.substring(attachPath.lastIndexOf("/")+1);
+                    String key = attachPath.substring(attachPath.lastIndexOf("/") + 1);
                     flag = attachmentService.deleteQiNiuAttachment(key);
-                }else if(attachLocation.equals(UPYUN.getDesc())){
+                } else if (attachLocation.equals(UPYUN.getDesc())) {
                     //又拍删除
                     String attachPath = attachment.get().getAttachPath();
-                    String fileName =attachPath.substring(attachPath.lastIndexOf("/")+1);
+                    String fileName = attachPath.substring(attachPath.lastIndexOf("/") + 1);
                     flag = attachmentService.deleteUpYunAttachment(fileName);
-                }else{
+                } else {
                     //..
                 }
             }
-            if(flag){
+            if (flag) {
                 log.info("Delete file {} successfully!", delFileName);
                 logsService.saveByLogs(
                         new Logs(LogsRecord.REMOVE_FILE, delFileName, ServletUtil.getClientIP(request), DateUtil.date())
                 );
-            }else{
+            } else {
                 log.error("Deleting attachment {} failed!", delFileName);
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
             }
