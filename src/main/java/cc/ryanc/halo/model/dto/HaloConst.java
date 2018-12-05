@@ -34,4 +34,9 @@ public class HaloConst {
      * user_session
      */
     public static String USER_SESSION_KEY = "user_session";
+
+    /**
+     * 文章阅读数缓存
+     */
+    public static Map<Long,Long> POSTS_VIEWS = new HashMap<>();
 }

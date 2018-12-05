@@ -275,4 +275,11 @@ public interface PostService {
      * @return String
      */
     String buildSiteMap(List<Post> posts);
+
+    /**
+     * 缓存阅读数
+     *
+     * @param postId postId
+     */
+    void cacheViews(Long postId);
 }

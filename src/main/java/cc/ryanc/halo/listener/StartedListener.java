@@ -1,9 +1,8 @@
-package cc.ryanc.halo.config;
+package cc.ryanc.halo.listener;
 
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
-import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -22,15 +21,15 @@ import java.util.Map;
 
 /**
  * <pre>
- *     应用启动的时候所执行的方法
+ *     应用启动完成后所执行的方法
  * </pre>
  *
  * @author : RYAN0UP
- * @date : 2017/12/22
+ * @date : 2018/12/5
  */
 @Slf4j
 @Configuration
-public class StartupConfig implements ApplicationListener<ApplicationStartedEvent> {
+public class StartedListener implements ApplicationListener<ApplicationStartedEvent> {
 
     @Autowired
     private OptionsService optionsService;
@@ -48,7 +47,9 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
         this.loadOptions();
         this.loadThemes();
         this.loadOwo();
-        this.autoBackup();
+        //启动定时任务
+        CronUtil.start();
+        log.info("The scheduled task starts successfully!");
     }
 
     /**
@@ -83,18 +84,6 @@ public class StartupConfig implements ApplicationListener<ApplicationStartedEven
         List<Theme> themes = HaloUtils.getThemes();
         if (null != themes) {
             HaloConst.THEMES = themes;
-        }
-    }
-
-    /**
-     * 启动定时备份
-     */
-    private void autoBackup() {
-        String autoBackup = optionsService.findOneOption(BlogPropertiesEnum.AUTO_BACKUP.getProp());
-        if (StrUtil.isNotEmpty(autoBackup) && StrUtil.equals(autoBackup, TrueFalseEnum.TRUE.getDesc())) {
-            //启动定时任务
-            CronUtil.start();
-            log.info("The scheduled task starts successfully!");
         }
     }
 

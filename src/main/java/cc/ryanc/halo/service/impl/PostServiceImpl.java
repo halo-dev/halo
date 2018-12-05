@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
+import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.repository.PostRepository;
@@ -463,5 +464,19 @@ public class PostServiceImpl implements PostService {
     @Override
     public String buildSiteMap(List<Post> posts) {
         return HaloUtils.getSiteMap(posts);
+    }
+
+    /**
+     * 缓存阅读数
+     *
+     * @param postId postId
+     */
+    @Override
+    public void cacheViews(Long postId) {
+        if (null != HaloConst.POSTS_VIEWS.get(postId)) {
+            HaloConst.POSTS_VIEWS.put(postId, HaloConst.POSTS_VIEWS.get(postId) + 1);
+        } else {
+            HaloConst.POSTS_VIEWS.put(postId, 1L);
+        }
     }
 }
