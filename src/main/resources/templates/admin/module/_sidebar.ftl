@@ -24,7 +24,7 @@
                 </a>
                 <ul class="treeview-menu" style="">
                     <li><a data-pjax="true" href="/admin/posts"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.all-posts' /></a></li>
-                    <li><a data-pjax="false" href="/admin/posts/new"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.new-post' /></a></li>
+                    <li><a data-pjax="false" href="/admin/posts/write"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.new-post' /></a></li>
                     <li><a data-pjax="true" href="/admin/category"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.categories' /></a></li>
                     <li><a data-pjax="true" href="/admin/tag"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.tags' /></a></li>
                 </ul>

@@ -137,6 +137,7 @@
     color: #fff
 }
 
+/** data table */
 .table-responsive {
     border: none !important;
 }
@@ -149,10 +150,26 @@
     border-top: none !important;
 }
 
+/** form */
 .form-horizontal .control-label {
-    text-align: left;
+    text-align: left!important;
 }
 
+/** radio */
 .control-radio {
-    padding-top: 7px;
+    padding-top: 7px!important;
+}
+
+/** editor */
+.CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {
+    background: none!important;
+}
+.CodeMirror-fullscreen,.editor-toolbar.fullscreen{
+    z-index: 1030!important;
+}
+.CodeMirror, .CodeMirror-scroll {
+    min-height: 480px!important;
+}
+.editor-preview-active img,.editor-preview-active-side img{
+    width: 100%!important;
 }

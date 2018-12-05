@@ -2,11 +2,6 @@
 <@head>${options.blog_title!} | <@spring.message code='admin.themes.edit.title' /></@head>
 <div class="content-wrapper">
     <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
-    <style type="text/css">
-        .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
-        .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
-        .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
-    </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
         <ol class="breadcrumb">

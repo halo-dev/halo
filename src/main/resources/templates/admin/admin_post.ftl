@@ -8,7 +8,7 @@
     </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
-        <a data-pjax="false" class="btn-header" id="btnNewPost" href="/admin/posts/new">
+        <a data-pjax="false" class="btn-header" id="btnNewPost" href="/admin/posts/write">
             <@spring.message code='admin.posts.btn.new-post' />
         </a>
         <ol class="breadcrumb">

@@ -1,8 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
@@ -11,10 +9,8 @@ import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
-import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.MarkdownUtils;
@@ -57,12 +53,6 @@ public class PostController extends BaseController {
 
     @Autowired
     private PostService postService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private TagService tagService;
 
     @Autowired
     private LogsService logsService;
@@ -148,7 +138,7 @@ public class PostController extends BaseController {
     @GetMapping(value = "/view")
     public String viewPost(@RequestParam("postId") Long postId, Model model) {
         Optional<Post> post = postService.findByPostId(postId);
-        model.addAttribute("post", post.get());
+        model.addAttribute("post", post.orElse(new Post()));
         return this.render("post");
     }
 
@@ -157,32 +147,48 @@ public class PostController extends BaseController {
      *
      * @return 模板路径admin/admin_editor
      */
-    @GetMapping(value = "/new")
-    public String newPost() {
-        return "admin/admin_post_md_editor";
+    @GetMapping(value = "/write")
+    public String writePost() {
+        return "admin/admin_post_new";
+    }
+
+    /**
+     * 跳转到编辑文章页面
+     *
+     * @param postId 文章编号
+     * @param model  model
+     * @return 模板路径admin/admin_editor
+     */
+    @GetMapping(value = "/edit")
+    public String editPost(@RequestParam("postId") Long postId, Model model) {
+        Optional<Post> post = postService.findByPostId(postId);
+        model.addAttribute("post", post.get());
+        return "admin/admin_post_edit";
     }
 
     /**
      * 添加文章
      *
-     * @param post     Post实体
+     * @param post     post
      * @param cateList 分类列表
-     * @param tagList  标签列表
+     * @param tagList  标签
      * @param session  session
      */
-    @PostMapping(value = "/new/push")
+    @PostMapping(value = "/save")
     @ResponseBody
-    public JsonResult pushPost(@ModelAttribute Post post, @RequestParam("cateList") List<String> cateList, @RequestParam("tagList") String tagList, HttpSession session) {
+    public JsonResult save(@ModelAttribute Post post,
+                           @RequestParam("cateList") List<String> cateList,
+                           @RequestParam("tagList") String tagList,
+                           HttpSession session) {
         User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        String msg = localeMessageUtil.getMessage("code.admin.common.save-success");
         try {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
-            //提取摘要
+            //摘要字数
             int postSummary = 50;
             if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
                 postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
             }
-            //文章摘要
+            //设置文章摘要
             String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (summaryText.length() > postSummary) {
                 String summary = summaryText.substring(0, postSummary);
@@ -190,25 +196,11 @@ public class PostController extends BaseController {
             } else {
                 post.setPostSummary(summaryText);
             }
-            //添加文章时，添加文章时间和修改文章时间为当前时间，修改文章时，只更新修改文章时间
-            if (null != post.getPostId()) {
-                Post oldPost = postService.findByPostId(post.getPostId()).get();
-                if (null == post.getPostDate()) {
-                    post.setPostDate(DateUtil.date());
-                }
-                post.setPostViews(oldPost.getPostViews());
-                msg = localeMessageUtil.getMessage("code.admin.common.update-success");
-            } else {
-                post.setPostDate(DateUtil.date());
-            }
+            post.setPostDate(DateUtil.date());
             post.setPostUpdate(DateUtil.date());
             post.setUser(user);
-            List<Category> categories = categoryService.strListToCateList(cateList);
-            post.setCategories(categories);
-            if (StrUtil.isNotEmpty(tagList)) {
-                List<Tag> tags = tagService.strListToTagList(StrUtil.trim(tagList));
-                post.setTags(tags);
-            }
+
+            post = postService.buildCategoriesAndTags(post, cateList, tagList);
             post.setPostUrl(urlFilter(post.getPostUrl()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
@@ -216,11 +208,43 @@ public class PostController extends BaseController {
             }
             postService.saveByPost(post);
             logsService.save(LogsRecord.PUSH_POST, post.getPostTitle(), request);
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
             log.error("Save article failed: {}", e.getMessage());
             e.printStackTrace();
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+        }
+    }
+
+    /**
+     * 更新
+     *
+     * @param post     post
+     * @param cateList 分类目录
+     * @param tagList  标签
+     * @param session  session
+     * @return JsonResult
+     */
+    @PostMapping(value = "/update")
+    @ResponseBody
+    public JsonResult update(@ModelAttribute Post post,
+                             @RequestParam("cateList") List<String> cateList,
+                             @RequestParam("tagList") String tagList) {
+        //old data
+        Post oldPost = postService.findByPostId(post.getPostId()).orElse(new Post());
+        post.setPostUpdate(new Date());
+        post.setPostViews(oldPost.getPostViews());
+        post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
+        post.setUser(oldPost.getUser());
+        if (null == post.getPostDate()) {
+            post.setPostDate(new Date());
+        }
+        post = postService.buildCategoriesAndTags(post, cateList, tagList);
+        post = postService.saveByPost(post);
+        if (null != post) {
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
+        } else {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.update-failed"));
         }
     }
 
@@ -278,20 +302,6 @@ public class PostController extends BaseController {
             return "redirect:/admin/posts?status=2";
         }
         return "redirect:/admin/page";
-    }
-
-    /**
-     * 跳转到编辑文章页面
-     *
-     * @param postId 文章编号
-     * @param model  model
-     * @return 模板路径admin/admin_editor
-     */
-    @GetMapping(value = "/edit")
-    public String editPost(@RequestParam("postId") Long postId, Model model) {
-        Optional<Post> post = postService.findByPostId(postId);
-        model.addAttribute("post", post.get());
-        return "admin/admin_post_md_editor";
     }
 
     /**

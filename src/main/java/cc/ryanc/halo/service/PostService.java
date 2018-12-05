@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 import java.util.List;
@@ -282,4 +283,14 @@ public interface PostService {
      * @param postId postId
      */
     void cacheViews(Long postId);
+
+    /**
+     * 组装分类目录和标签
+     *
+     * @param post     post
+     * @param cateList cateList
+     * @param tagList  tagList
+     * @return Post Post
+     */
+    Post buildCategoriesAndTags(Post post, List<String> cateList, @RequestParam("tagList") String tagList);
 }
