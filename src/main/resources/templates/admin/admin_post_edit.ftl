@@ -6,11 +6,7 @@
     <link rel="stylesheet" href="/static/plugins/jquery-tageditor/jquery.tag-editor.css">
     <link rel="stylesheet" href="/static/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
-        #post_title{font-weight: 400;}
-        .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
-        .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
-        .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
-        .editor-preview-active img,.editor-preview-active-side img{width: 100%;}
+        #postTitle{font-weight: 400;}
     </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.posts.edit.title' /></h1>
@@ -30,18 +26,14 @@
     <section class="content" id="animated-content">
         <div class="row">
             <div class="col-md-9">
-                <#if post??>
-                    <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
-                <#else>
-                    <input type="hidden" id="postId" name="postId" value="">
-                </#if>
+                <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
                 <div style="margin-bottom: 10px;">
-                    <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" value="<#if post??>${post.postTitle}</#if>">
+                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" value="${post.postTitle!}">
                 </div>
                 <div style="display: block;margin-bottom: 10px;">
                     <span>
                         <@spring.message code='admin.editor.form.url' />
-                        <a href="#">${options.blog_url!}/archives/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
+                        <a href="#">${options.blog_url!}/archives/<span id="postUrl">${post.postUrl!}</span>/</a>
                         <button class="btn btn-default btn-sm " id="btn_input_postUrl"><@spring.message code='common.btn.edit' /></button>
                         <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="urlOnBlurAuto()" style="display: none;"><@spring.message code='common.btn.define' /></button>
                     </span>
@@ -51,7 +43,7 @@
                     <!-- Editor.md编辑器 -->
                     <div class="box-body pad">
                         <div id="markdown-editor">
-                            <textarea id="editorarea" style="display:none;"><#if post??>${post.postContentMd!}</#if></textarea>
+                            <textarea id="editorarea" style="display:none;">${post.postContentMd!}</textarea>
                         </div>
                     </div>
                 </div>
@@ -71,27 +63,19 @@
                         <div class="form-group">
                             <label for="allowComment" class="control-label"><@spring.message code='admin.editor.allow-comment' /></label>
                             <select class="form-control" id="allowComment" name="allowComment">
-                                <option value="1" <#if post?? && (post.allowComment!1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
-                                <option value="0" <#if post?? && (post.allowComment!)==0>selected</#if>><@spring.message code='common.select.no' /></option>
+                                <option value="1" <#if (post.allowComment!1)==1>selected</#if>><@spring.message code='common.select.yes' /></option>
+                                <option value="0" <#if (post.allowComment!)==0>selected</#if>><@spring.message code='common.select.no' /></option>
                             </select>
                         </div>
-                        <#if post??>
-                            <div class="form-group">
-                                <label for="postDate" class="control-label">发布时间：</label>
-                                <input type="text" class="form-control" id="postDate" name="postDate" value="${post.postDate!?string('yyyy-MM-dd HH:mm')}">
-                            </div>
-                        <#else>
-                            <input type="hidden" class="form-control" id="postDate" name="postDate">
-                        </#if>
+                        <div class="form-group">
+                            <label for="postDate" class="control-label">发布时间：</label>
+                            <input type="text" class="form-control" id="postDate" name="postDate" value="${post.postDate!?string('yyyy-MM-dd HH:mm')}">
+                        </div>
                     </div>
                     <div class="box-footer">
                         <button onclick="push(1)" class="btn btn-default btn-sm "><@spring.message code='admin.editor.save-draft' /></button>
                         <button onclick="push(0)" class="btn btn-primary btn-sm pull-right " data-loading-text="<@spring.message code='admin.editor.btn.pushing' />">
-                        <#if post??>
                             <@spring.message code='admin.editor.btn.update' />
-                        <#else>
-                            <@spring.message code='admin.editor.text.push' />
-                        </#if>
                         </button>
                     </div>
                 </div>
@@ -108,8 +92,7 @@
                         <div class="form-group">
                             <ul style="list-style: none;padding: 0px;margin: 0px;">
                                 <@commonTag method="categories">
-                                    <#if post??>
-                                        <#list categories as cate>
+                                    <#list categories as cate>
                                             <li style="padding: 0;margin: 0px;list-style: none">
                                                 <div class="pretty p-default">
                                                     <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}" <#list post.categories as postCate><#if postCate.cateId = cate.cateId>checked="checked"</#if></#list>>
@@ -118,19 +101,7 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                        </#list>
-                                    <#else>
-                                        <#list categories as cate>
-                                            <li style="padding: 0;margin: 0px;list-style: none">
-                                                <div class="pretty p-default">
-                                                    <input name="categories" id="categories" type="checkbox" class="minimal" value="${cate.cateId?c}">
-                                                    <div class="state p-primary">
-                                                        <label>${cate.cateName}</label>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </#list>
-                                    </#if>
+                                    </#list>
                                 </@commonTag>
                             </ul>
                         </div>
@@ -172,11 +143,7 @@
                     </div>
                     <div class="box-body">
                         <div>
-                            <#if post??>
-                                <img src="${post.postThumbnail!'/static/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
-                            <#else >
-                                <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
-                            </#if>
+                            <img src="${post.postThumbnail!'/static/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                         </div>
                     </div>
                 </div>
@@ -192,7 +159,7 @@
     <script src="/static/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script>
-        <#if post??>
+
         $('#postDate').datetimepicker({
             format: 'yyyy-mm-dd hh:ii',
             language: 'zh-CN',
@@ -200,7 +167,6 @@
             todayBtn: 1,
             autoclose: 1
         });
-        </#if>
 
         MathJax.Hub.Config({
             tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
@@ -217,7 +183,7 @@
             autofocus: true,
             autosave: {
                 enabled: true,
-                uniqueId: "editor-temp-<#if post??>${post.postId}<#else>1</#if>",
+                uniqueId: "editor-temp-${post.postId!}",
                 delay: 10000
             },
             renderingConfig: {
@@ -248,7 +214,6 @@
          * 初始化标签
          */
         $('#tagList').tagEditor({
-            //initialTags: ['Hello', 'World', 'Example', 'Tags'],
             delimiter: ',',
             placeholder: '<@spring.message code="admin.posts.edit.form.tag.placeholder" />',
             forceLowercase: false
@@ -257,12 +222,10 @@
         /**
          * 加载该文章已有的标签
          */
-        <#if post??>
-            <#if post.tags?size gt 0>
-                <#list post.tags as tag>
-                $('#tagList').tagEditor('addTag','${tag.tagName}');
-                </#list>
-            </#if>
+        <#if post.tags?size gt 0>
+            <#list post.tags as tag>
+            $('#tagList').tagEditor('addTag','${tag.tagName}');
+            </#list>
         </#if>
 
         $('#chooseTag').change(function () {
@@ -273,9 +236,9 @@
          * 自动填充路径，并且将汉字转化成拼音以-隔开
          */
         function autoComplateUrl() {
-            var titleVal = $("#post_title").val();
+            var titleVal = $("#postTitle").val();
             if(titleVal!="" && titleVal!=null && $("#postUrl").html()==''){
-                var result = $("#post_title").toPinyin().toLowerCase();
+                var result = $("#postTitle").toPinyin().toLowerCase();
                 $("#postUrl").html(result.substring(0,result.length-1));
             }
         }
@@ -314,7 +277,7 @@
             $(this).hide();
             $('#btn_change_postUrl').show();
         });
-        var postTitle = $("#post_title");
+        var postTitle = $("#postTitle");
         var cateList = new Array();
 
         /**
@@ -338,7 +301,7 @@
             }
             $.ajax({
                 type: 'POST',
-                url: '/admin/posts/new/push',
+                url: '/admin/posts/update',
                 async: false,
                 data: {
                     'postId': $('#postId').val(),

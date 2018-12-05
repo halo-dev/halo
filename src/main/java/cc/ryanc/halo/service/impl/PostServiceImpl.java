@@ -8,7 +8,9 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.repository.PostRepository;
+import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
@@ -42,6 +44,12 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private TagService tagService;
 
     /**
      * 保存文章
@@ -478,5 +486,24 @@ public class PostServiceImpl implements PostService {
         } else {
             HaloConst.POSTS_VIEWS.put(postId, 1L);
         }
+    }
+
+    /**
+     * 组装分类目录和标签
+     *
+     * @param post     post
+     * @param cateList cateList
+     * @param tagList  tagList
+     * @return Post Post
+     */
+    @Override
+    public Post buildCategoriesAndTags(Post post, List<String> cateList, String tagList) {
+        List<Category> categories = categoryService.strListToCateList(cateList);
+        post.setCategories(categories);
+        if (StrUtil.isNotEmpty(tagList)) {
+            List<Tag> tags = tagService.strListToTagList(StrUtil.trim(tagList));
+            post.setTags(tags);
+        }
+        return post;
     }
 }
