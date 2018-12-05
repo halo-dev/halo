@@ -64,7 +64,7 @@
                     </div>
                     <div class="box-footer">
                         <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()"><@spring.message code="common.btn.delete" /></button>
-                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="<#if attachment.attachLocation?? || attachment.attachLocation == 'SERVER'>${options.blog_url!}</#if>${attachment.attachPath}"><@spring.message code='admin.attachments.modal.form.btn.copy-path' /></button>
+                        <button type="button" class="btn btn-info btn-sm pull-right btn-copy" data-clipboard-text="<#if !attachment.attachLocation?? || attachment.attachLocation! == 'SERVER'>${options.blog_url!}</#if>${attachment.attachPath}"><@spring.message code='admin.attachments.modal.form.btn.copy-path' /></button>
                     </div>
                 </form>
             </div>

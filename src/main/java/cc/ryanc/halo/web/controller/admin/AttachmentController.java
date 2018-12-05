@@ -54,7 +54,7 @@ public class AttachmentController {
     private LocaleMessageUtil localeMessageUtil;
 
     /**
-     * 获取upload的所有图片资源并渲染页面
+     * 复印件列表
      *
      * @param model model
      * @return 模板路径admin/admin_attachment
