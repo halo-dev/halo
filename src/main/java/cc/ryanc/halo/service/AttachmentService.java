@@ -3,8 +3,11 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.domain.Attachment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -55,4 +58,50 @@ public interface AttachmentService {
      * @return Attachment
      */
     Attachment removeByAttachId(Long attachId);
+
+    /**
+     * 上传转发
+     * @param file
+     * @param request
+     * @return
+     */
+    Map<String,String> upload(MultipartFile file, HttpServletRequest request);
+
+    /**
+     * 原生上传
+     * @param file
+     * @param request
+     * @return
+     */
+    Map<String,String> attachUpload(MultipartFile file, HttpServletRequest request);
+
+    /**
+     * 七牛云上传
+     * @param file
+     * @param request
+     * @return
+     */
+    Map<String,String> attachQiNiuUpload(MultipartFile file, HttpServletRequest request);
+
+    /**
+     * 又拍云上传
+     * @param file
+     * @param request
+     * @return
+     */
+    Map<String,String> attachUpYunUpload(MultipartFile file, HttpServletRequest request);
+
+    /**
+     * 七牛云删除附件
+     * @param key
+     * @return
+     */
+    boolean deleteQiNiuAttachment(String key);
+
+    /**
+     * 又拍云删除附件
+     * @param fileName
+     * @return
+     */
+    boolean deleteUpYunAttachment(String fileName);
 }

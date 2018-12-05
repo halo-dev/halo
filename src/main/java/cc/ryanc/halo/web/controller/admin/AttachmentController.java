@@ -33,6 +33,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import static cc.ryanc.halo.model.enums.AttachLocationEnum.QINIU;
+import static cc.ryanc.halo.model.enums.AttachLocationEnum.SERVER;
+import static cc.ryanc.halo.model.enums.AttachLocationEnum.UPYUN;
+
 /**
  * <pre>
  *     后台附件控制器
@@ -118,47 +122,36 @@ public class AttachmentController {
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
         Map<String, Object> result = new HashMap<>(3);
+        System.out.println("源地址"+file.getOriginalFilename()+"类型"+file.getContentType()+"文件名"+file.getName()+"文件大小"+file.getSize());
         if (!file.isEmpty()) {
             try {
-                //用户目录
-                String userPath = System.getProperties().getProperty("user.home") + "/halo";
-                //upload的路径
-                StringBuffer sbMedia = new StringBuffer("upload/");
-                //获取当前年月以创建目录，如果没有该目录则创建
-                sbMedia.append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
-                File mediaPath = new File(userPath, sbMedia.toString());
-                if (!mediaPath.exists()) {
-                    mediaPath.mkdirs();
+                Map<String,String> resultMap = attachmentService.upload(file,request);
+                if(resultMap == null || resultMap.isEmpty()){
+                    log.error("文件上传失败");
+                    result.put("success", 0);
+                    result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
+                    return result;
                 }
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                String nameWithOutSuffix = file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", "") + dateFormat.format(DateUtil.date()) + new Random().nextInt(1000);
-                String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
-                String fileName = nameWithOutSuffix + "." + fileSuffix;
-                file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName));
-
-                //压缩图片
-                Thumbnails.of(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString()).size(256, 256).keepAspectRatio(false).toFile(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
-                String filePath = new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(fileName).toString();
                 //保存在数据库
                 Attachment attachment = new Attachment();
-                attachment.setAttachName(fileName);
-                attachment.setAttachPath(filePath);
-                attachment.setAttachSmallPath(new StringBuffer("/upload/").append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
+                attachment.setAttachName(resultMap.get("fileName"));
+                attachment.setAttachPath(resultMap.get("filePath"));
+                attachment.setAttachSmallPath(resultMap.get("smallPath"));
                 attachment.setAttachType(file.getContentType());
-                attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
+                attachment.setAttachSuffix(resultMap.get("suffix"));
                 attachment.setAttachCreated(DateUtil.date());
-                attachment.setAttachSize(HaloUtils.parseSize(new File(mediaPath, fileName).length()));
-                attachment.setAttachWh(HaloUtils.getImageWh(new File(mediaPath, fileName)));
+                attachment.setAttachSize(resultMap.get("size"));
+                attachment.setAttachWh(resultMap.get("wh"));
+                attachment.setAttachLocation(resultMap.get("location"));
                 attachmentService.saveByAttachment(attachment);
-                log.info("Upload file {} to {} successfully", fileName, mediaPath.getAbsolutePath());
+                log.info("Upload file {} to {} successfully", resultMap.get("fileName"), resultMap.get("filePath"));
                 logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_FILE, fileName, ServletUtil.getClientIP(request), DateUtil.date())
+                        new Logs(LogsRecord.UPLOAD_FILE, resultMap.get("fileName"), ServletUtil.getClientIP(request), DateUtil.date())
                 );
-
                 result.put("success", 1);
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
                 result.put("url", attachment.getAttachPath());
-                result.put("filename", filePath);
+                result.put("filename", resultMap.get("filePath"));
             } catch (Exception e) {
                 log.error("Upload file failed:{}", e.getMessage());
                 result.put("success", 0);
@@ -196,28 +189,52 @@ public class AttachmentController {
     public JsonResult removeAttachment(@RequestParam("attachId") Long attachId,
                                        HttpServletRequest request) {
         Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
+        String attachLocation = attachment.get().getAttachLocation();
         String delFileName = attachment.get().getAttachName();
-        String delSmallFileName = delFileName.substring(0, delFileName.lastIndexOf('.')) + "_small" + attachment.get().getAttachSuffix();
+        boolean flag = true;
         try {
             //删除数据库中的内容
             attachmentService.removeByAttachId(attachId);
-            //删除文件
-            String userPath = System.getProperties().getProperty("user.home") + "/halo";
-            File mediaPath = new File(userPath, attachment.get().getAttachPath().substring(0, attachment.get().getAttachPath().lastIndexOf('/')));
-            File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
-            File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
-            if (delFile.exists() && delFile.isFile()) {
-                if (delFile.delete() && delSmallFile.delete()) {
-                    log.info("Delete file {} successfully!", delFileName);
-                    logsService.saveByLogs(
-                            new Logs(LogsRecord.REMOVE_FILE, delFileName, ServletUtil.getClientIP(request), DateUtil.date())
-                    );
-                } else {
-                    log.error("Deleting attachment {} failed!", delFileName);
-                    return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
+            if(attachLocation!=null){
+                if(attachLocation.equals(SERVER.getDesc())){
+                    String delSmallFileName = delFileName.substring(0, delFileName.lastIndexOf('.')) + "_small" + attachment.get().getAttachSuffix();
+                    //删除文件
+                    String userPath = System.getProperties().getProperty("user.home") + "/halo";
+                    File mediaPath = new File(userPath, attachment.get().getAttachPath().substring(0, attachment.get().getAttachPath().lastIndexOf('/')));
+                    File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
+                    File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
+                    if (delFile.exists() && delFile.isFile()) {
+                        if (delFile.delete() && delSmallFile.delete()) {
+                            flag = true;
+                        } else {
+                            flag = false;
+                        }
+                    }
+                }else if(attachLocation.equals(QINIU.getDesc())){
+                    //七牛删除
+                    String attachPath = attachment.get().getAttachPath();
+                    String key =attachPath.substring(attachPath.lastIndexOf("/")+1);
+                    flag = attachmentService.deleteQiNiuAttachment(key);
+                }else if(attachLocation.equals(UPYUN.getDesc())){
+                    //又拍删除
+                    String attachPath = attachment.get().getAttachPath();
+                    String fileName =attachPath.substring(attachPath.lastIndexOf("/")+1);
+                    flag = attachmentService.deleteUpYunAttachment(fileName);
+                }else{
+                    //..
                 }
             }
+            if(flag){
+                log.info("Delete file {} successfully!", delFileName);
+                logsService.saveByLogs(
+                        new Logs(LogsRecord.REMOVE_FILE, delFileName, ServletUtil.getClientIP(request), DateUtil.date())
+                );
+            }else{
+                log.error("Deleting attachment {} failed!", delFileName);
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
+            }
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Deleting attachment {} failed: {}", delFileName, e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }

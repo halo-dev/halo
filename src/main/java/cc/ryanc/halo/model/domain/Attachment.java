@@ -70,4 +70,9 @@ public class Attachment implements Serializable {
      * 附件长宽
      */
     private String attachWh;
+
+    /**
+     * 附件存储地址
+     */
+    private String attachLocation;
 }
