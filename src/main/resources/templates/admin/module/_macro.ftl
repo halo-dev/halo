@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
     <link rel="stylesheet" href="/static/css/skins/_all-skins.min.css">
     <link rel="stylesheet" href="/static/css/style.min.css">
-    <link rel="stylesheet" href="/static/css/loader.min.css">
     <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
     <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
     <link rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
