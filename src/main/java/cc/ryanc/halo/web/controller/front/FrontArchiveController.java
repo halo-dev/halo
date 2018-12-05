@@ -78,7 +78,7 @@ public class FrontArchiveController extends BaseController {
         if (null == posts) {
             return this.renderNotFound();
         }
-        model.addAttribute("is_archives",true);
+        model.addAttribute("is_archives", true);
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -99,7 +99,7 @@ public class FrontArchiveController extends BaseController {
         if (null == posts) {
             return this.renderNotFound();
         }
-        model.addAttribute("is_archives",true);
+        model.addAttribute("is_archives", true);
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -113,7 +113,7 @@ public class FrontArchiveController extends BaseController {
      */
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl,
-                          @RequestParam(value = "cp",defaultValue = "1") Integer cp,
+                          @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
         Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
         if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
@@ -153,15 +153,15 @@ public class FrontArchiveController extends BaseController {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
-        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
+        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
         int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
-        model.addAttribute("is_post",true);
+        model.addAttribute("is_post", true);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("tagWords", CollUtil.join(tagWords, ","));
-        postService.updatePostView(post);
+        postService.cacheViews(post.getPostId());
         return this.render("post");
     }
 }

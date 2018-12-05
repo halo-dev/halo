@@ -76,7 +76,7 @@ public class FrontPageController extends BaseController {
      */
     @GetMapping(value = "/p/{postUrl}")
     public String getPage(@PathVariable(value = "postUrl") String postUrl,
-                          @RequestParam(value = "cp",defaultValue = "1") Integer cp,
+                          @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
         Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null == post) {
@@ -95,17 +95,17 @@ public class FrontPageController extends BaseController {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
-        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
+        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
         int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
-        model.addAttribute("is_page",true);
+        model.addAttribute("is_page", true);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
         model.addAttribute("rainbow", rainbow);
-        postService.updatePostView(post);
+        postService.cacheViews(post.getPostId());
 
         //如果设置了自定义模板，则渲染自定义模板
-        if(StrUtil.isNotEmpty(post.getCustomTpl())){
+        if (StrUtil.isNotEmpty(post.getCustomTpl())) {
             return this.render(post.getCustomTpl());
         }
         return this.render("page");
