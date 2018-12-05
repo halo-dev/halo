@@ -150,11 +150,11 @@ public class CommentController extends BaseController {
     @PostMapping(value = "/reply")
     @ResponseBody
     public JsonResult replyComment(@RequestParam("commentId") Long commentId,
-                               @RequestParam("postId") Long postId,
-                               @RequestParam("commentContent") String commentContent,
-                               @RequestParam("userAgent") String userAgent,
-                               HttpServletRequest request,
-                               HttpSession session) {
+                                   @RequestParam("postId") Long postId,
+                                   @RequestParam("commentContent") String commentContent,
+                                   @RequestParam("userAgent") String userAgent,
+                                   HttpServletRequest request,
+                                   HttpSession session) {
         try {
             Post post = postService.findByPostId(postId).orElse(new Post());
 

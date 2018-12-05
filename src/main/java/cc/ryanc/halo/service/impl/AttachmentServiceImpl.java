@@ -223,7 +223,6 @@ public class AttachmentServiceImpl implements AttachmentService {
             fileSmallPath.append("_small.");
             fileSmallPath.append(fileSuffix);
 
-
             String size = HaloUtils.parseSize(new File(fullPath.toString()).length());
             String wh = HaloUtils.getImageWh(new File(fullPath.toString()));
 
@@ -258,7 +257,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             String domain = HaloConst.OPTIONS.get("qiniu_domain");
             String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
             String smallUrl = HaloConst.OPTIONS.get("qiniu_small_url");
-            if (accessKey == null || secretKey == null || domain == null || bucket == null) {
+            if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket)) {
                 return resultMap;
             }
             Auth auth = Auth.create(accessKey, secretKey);
@@ -318,7 +317,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             String domain = HaloConst.OPTIONS.get("upyun_oss_domain");
             String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
             String smallUrl = HaloConst.OPTIONS.get("upyun_oss_small");
-            if (ossSrc == null || ossPwd == null || domain == null || bucket == null || operator == null) {
+            if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
                 return resultMap;
             }
             String fileName = file.getOriginalFilename();
@@ -363,7 +362,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
         String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
         String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
-        if (accessKey == null || secretKey == null || bucket == null) {
+        if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(bucket)) {
             return false;
         }
         Auth auth = Auth.create(accessKey, secretKey);
@@ -391,7 +390,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
         String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
         String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
-        if (ossSrc == null || ossPwd == null || bucket == null || operator == null) {
+        if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
             return false;
         }
         UpYun upYun = new UpYun(bucket, operator, ossPwd);
