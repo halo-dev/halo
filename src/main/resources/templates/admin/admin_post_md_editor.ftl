@@ -190,6 +190,7 @@
     <script src="/static/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
     <script src="/static/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
     <script src="/static/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script>
         <#if post??>
         $('#postDate').datetimepicker({
@@ -200,6 +201,13 @@
             autoclose: 1
         });
         </#if>
+
+        MathJax.Hub.Config({
+            tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+        });
+
+        var QUEUE = MathJax.Hub.queue;
+
         /**
          * 加载编辑器
          */
@@ -215,8 +223,14 @@
             renderingConfig: {
                 codeSyntaxHighlighting: true
             },
+            previewRender: function(plainText) {
+                var preview = document.getElementsByClassName("editor-preview-side")[0];
+                preview.innerHTML = this.parent.markdown(plainText);
+                preview.setAttribute('id','editor-preview');
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"editor-preview"]);
+                return preview.innerHTML;
+            },
             showIcons: ["code", "table"],
-            status: true,
             status: ["autosave", "lines", "words"],
             tabSize: 4
         });
