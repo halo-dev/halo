@@ -35,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Category saveByCategory(Category category) {
+    public Category save(Category category) {
         return categoryRepository.save(category);
     }
 
@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Category removeByCateId(Long cateId) {
+    public Category remove(Long cateId) {
         Optional<Category> category = this.findByCateId(cateId);
         categoryRepository.delete(category.get());
         return category.get();
@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return List
      */
     @Override
-    public List<Category> findAllCategories() {
+    public List<Category> findAll() {
         return categoryRepository.findAll();
     }
 

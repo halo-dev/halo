@@ -50,9 +50,8 @@ public class CategoryController {
      */
     @PostMapping(value = "/save")
     public String saveCategory(@ModelAttribute Category category) {
-
         try {
-            categoryService.saveByCategory(category);
+            categoryService.save(category);
         } catch (Exception e) {
             log.error("Modify category failed: {}", e.getMessage());
         }
@@ -84,7 +83,7 @@ public class CategoryController {
     @GetMapping(value = "/remove")
     public String removeCategory(@RequestParam("cateId") Long cateId) {
         try {
-            categoryService.removeByCateId(cateId);
+            categoryService.remove(cateId);
         } catch (Exception e) {
             log.error("Delete category failed: {}", e.getMessage());
         }

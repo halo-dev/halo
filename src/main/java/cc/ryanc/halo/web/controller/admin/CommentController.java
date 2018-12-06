@@ -13,6 +13,7 @@ import cc.ryanc.halo.utils.OwoUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.servlet.ServletUtil;
@@ -70,7 +71,7 @@ public class CommentController extends BaseController {
                            @RequestParam(value = "size", defaultValue = "10") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Comment> comments = commentService.findAllComments(status, pageable);
+        Page<Comment> comments = commentService.findAll(status,pageable);
         model.addAttribute("comments", comments);
         model.addAttribute("publicCount", commentService.getCountByStatus(CommentStatusEnum.PUBLISHED.getCode()));
         model.addAttribute("checkCount", commentService.getCountByStatus(CommentStatusEnum.CHECKING.getCode()));
@@ -132,7 +133,7 @@ public class CommentController extends BaseController {
                              @RequestParam("status") Integer status,
                              @RequestParam(value = "page", defaultValue = "0") Integer page) {
         try {
-            commentService.removeByCommentId(commentId);
+            commentService.remove(commentId);
         } catch (Exception e) {
             log.error("Delete comment failed: {}", e.getMessage());
         }
@@ -166,7 +167,7 @@ public class CommentController extends BaseController {
 
             //修改被回复的评论的状态
             lastComment.setCommentStatus(CommentStatusEnum.PUBLISHED.getCode());
-            commentService.saveByComment(lastComment);
+            commentService.save(lastComment);
 
             //保存评论
             Comment comment = new Comment();
@@ -177,13 +178,20 @@ public class CommentController extends BaseController {
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
             comment.setCommentDate(DateUtil.date());
-            String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a> ";
-            comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(commentContent).replace("&lt;br/&gt;", "<br/>")));
+
+            StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
+            buildContent.append(lastComment.getCommentId());
+            buildContent.append("'>@");
+            buildContent.append(lastComment.getCommentAuthor());
+            buildContent.append("</a> ");
+            buildContent.append(OwoUtil.markToImg(HtmlUtil.escape(commentContent).replace("&lt;br/&gt;", "<br/>")));
+
+            comment.setCommentContent(buildContent.toString());
             comment.setCommentAgent(userAgent);
             comment.setCommentParent(commentId);
             comment.setCommentStatus(CommentStatusEnum.PUBLISHED.getCode());
             comment.setIsAdmin(1);
-            commentService.saveByComment(comment);
+            commentService.save(comment);
 
             //邮件通知
             new EmailToAuthor(comment, lastComment, post, user, commentContent).start();
@@ -221,11 +229,18 @@ public class CommentController extends BaseController {
                     map.put("blogTitle", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()));
                     map.put("commentAuthor", lastComment.getCommentAuthor());
                     map.put("pageName", lastComment.getPost().getPostTitle());
+
+                    StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
                     if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        pageUrl.append("/archives/");
                     } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                        pageUrl.append("/p/");
                     }
+                    pageUrl.append(post.getPostUrl());
+                    pageUrl.append("#comment-id-");
+                    pageUrl.append(comment.getCommentId());
+
+                    map.put("pageUrl",pageUrl.toString());
                     map.put("commentContent", lastComment.getCommentContent());
                     map.put("replyAuthor", user.getUserDisplayName());
                     map.put("replyContent", commentContent);
@@ -260,11 +275,18 @@ public class CommentController extends BaseController {
                 try {
                     if (status == 1 && Validator.isEmail(comment.getCommentAuthorEmail())) {
                         Map<String, Object> map = new HashMap<>(6);
+
+                        StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
                         if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
-                            map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                            pageUrl.append("/archives/");
                         } else {
-                            map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
+                            pageUrl.append("/p/");
                         }
+                        pageUrl.append(post.getPostUrl());
+                        pageUrl.append("#comment-id-");
+                        pageUrl.append(comment.getCommentId());
+
+                        map.put("pageUrl",pageUrl.toString());
                         map.put("pageName", post.getPostTitle());
                         map.put("commentContent", comment.getCommentContent());
                         map.put("blogUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));

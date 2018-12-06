@@ -32,7 +32,7 @@ public class ApiCategoryController {
      */
     @GetMapping
     public JsonResult categories() {
-        List<Category> categories = categoryService.findAllCategories();
+        List<Category> categories = categoryService.findAll();
         if (null != categories && categories.size() > 0) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), categories);
         } else {

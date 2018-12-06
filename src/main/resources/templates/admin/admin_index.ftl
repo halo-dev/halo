@@ -183,7 +183,7 @@
             <#if (options.widget_daycount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetDayCountBody">
                 <div class="small-box bg-red">
-                    <div class="inner"><h3 id="blogStart"></h3><p><@spring.message code='admin.index.widgets.day-count' /></p></div>
+                    <div class="inner"><h3 id="blogStart">${hadDays!}</h3><p><@spring.message code='admin.index.widgets.day-count' /></p></div>
                     <div class="icon"><i class="ion ion-pie-graph"></i></div>
                     <a href="#" class="small-box-footer" data-toggle="modal" data-target="#blogInfo">${options.blog_start!'0000-00-00'} <i class="fa fa-star"></i></a>
                 </div>
@@ -366,7 +366,7 @@
                     <h4 class="modal-title" id="blog-data"><@spring.message code='admin.index.blog-data.title' /></h4>
                 </div>
                 <div class="modal-body">
-                    <p>「${options.blog_title!}」<@spring.message code='admin.index.blog-data.days-count-before' /><span id="blogStartDay"></span><@spring.message code='admin.index.blog-data.days-count-after' /></p>
+                    <p>「${options.blog_title!}」<@spring.message code='admin.index.blog-data.days-count-before' /><span id="blogStartDay">${hadDays!}</span><@spring.message code='admin.index.blog-data.days-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.during' /></p>
                     <p><@spring.message code='admin.index.blog-data.posts-count-before' />&nbsp;<@articleTag method="postsCount">${postsCount!0}</@articleTag>&nbsp;<@spring.message code='admin.index.blog-data.posts-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.tags-count-before' />&nbsp;<@commonTag method="tags">${tags?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.tags-count-after' /></p>
@@ -382,14 +382,6 @@
         </div>
     </div>
     <script type="application/javascript">
-        $(document).ready(function () {
-            var dateBegin = new Date("${options.blog_start!'0000-00-00'}");
-            var dateEnd = new Date();
-            var parseDate = dateEnd.getTime() - dateBegin.getTime();
-            var days = Math.floor(parseDate/(24*3600*1000));
-            $('#blogStart').html(days+1);
-            $('#blogStartDay').html(days+1);
-        });
         $('#btnWidgetsOption').click(function () {
             $('#widgetOptionsPanel').slideToggle(400);
         });

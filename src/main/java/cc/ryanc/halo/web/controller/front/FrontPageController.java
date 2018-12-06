@@ -52,7 +52,7 @@ public class FrontPageController extends BaseController {
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model) {
-        List<Gallery> galleries = galleryService.findAllGalleries();
+        List<Gallery> galleries = galleryService.findAll();
         model.addAttribute("galleries", galleries);
         return this.render("gallery");
     }

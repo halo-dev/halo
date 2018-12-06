@@ -24,7 +24,7 @@ public class PostSyncTask {
             post = postService.findByPostId(key).orElse(null);
             if (null != post) {
                 post.setPostViews(post.getPostViews() + HaloConst.POSTS_VIEWS.get(key));
-                postService.saveByPost(post);
+                postService.save(post);
                 count++;
             }
         }

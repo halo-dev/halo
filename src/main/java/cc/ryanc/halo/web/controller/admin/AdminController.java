@@ -7,10 +7,7 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.CommonParamsEnum;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
-import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -82,7 +79,7 @@ public class AdminController extends BaseController {
     public String index(Model model) {
 
         //查询评论的条数
-        Integer commentCount = commentService.findAllComments().size();
+        Long commentCount = commentService.getCount();
         model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
@@ -98,11 +95,16 @@ public class AdminController extends BaseController {
         model.addAttribute("comments", comments);
 
         //附件数量
-        model.addAttribute("mediaCount", attachmentService.findAllAttachments().size());
+        model.addAttribute("mediaCount", attachmentService.getCount());
 
         //文章阅读总数
         Long postViewsSum = postService.getPostViews();
         model.addAttribute("postViewsSum", postViewsSum);
+
+        //成立天数
+        Date blogStart = DateUtil.parse(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
+        long hadDays = DateUtil.between(blogStart, DateUtil.date(), DateUnit.DAY);
+        model.addAttribute("hadDays",hadDays);
         return "admin/admin_index";
     }
 
@@ -204,7 +206,7 @@ public class AdminController extends BaseController {
                        @RequestParam(value = "size", defaultValue = "10") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "logId");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Logs> logs = logsService.findAllLogs(pageable);
+        Page<Logs> logs = logsService.findAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
@@ -217,7 +219,7 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logs/clear")
     public String logsClear() {
         try {
-            logsService.removeAllLogs();
+            logsService.removeAll();
         } catch (Exception e) {
             log.error("Clear log failed:{}" + e.getMessage());
         }

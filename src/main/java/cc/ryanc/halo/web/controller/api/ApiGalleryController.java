@@ -33,7 +33,7 @@ public class ApiGalleryController {
      */
     @GetMapping
     public JsonResult galleries() {
-        List<Gallery> galleries = galleryService.findAllGalleries();
+        List<Gallery> galleries = galleryService.findAll();
         if (null != galleries && galleries.size() > 0) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), galleries);
         } else {

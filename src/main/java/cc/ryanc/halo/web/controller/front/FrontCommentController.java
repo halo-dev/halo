@@ -141,7 +141,7 @@ public class FrontCommentController {
             if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
                 comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));
             }
-            commentService.saveByComment(comment);
+            commentService.save(comment);
             if (comment.getCommentParent() > 0) {
                 new EmailToParent(comment, lastComment, post).start();
                 new EmailToAdmin(comment, post).start();

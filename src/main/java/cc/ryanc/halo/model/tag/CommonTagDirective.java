@@ -46,19 +46,19 @@ public class CommonTagDirective implements TemplateDirectiveModel {
             String method = map.get(METHOD_KEY).toString();
             switch (method) {
                 case "menus":
-                    environment.setVariable("menus", builder.build().wrap(menuService.findAllMenus()));
+                    environment.setVariable("menus", builder.build().wrap(menuService.findAll()));
                     break;
                 case "categories":
-                    environment.setVariable("categories", builder.build().wrap(categoryService.findAllCategories()));
+                    environment.setVariable("categories", builder.build().wrap(categoryService.findAll()));
                     break;
                 case "tags":
-                    environment.setVariable("tags", builder.build().wrap(tagService.findAllTags()));
+                    environment.setVariable("tags", builder.build().wrap(tagService.findAll()));
                     break;
                 case "links":
-                    environment.setVariable("links", builder.build().wrap(linkService.findAllLinks()));
+                    environment.setVariable("links", builder.build().wrap(linkService.findAll()));
                     break;
                 case "newComments":
-                    environment.setVariable("newComments", builder.build().wrap(commentService.findAllComments(1)));
+                    environment.setVariable("newComments", builder.build().wrap(commentService.findAll(1)));
                     break;
                 default:
                     break;

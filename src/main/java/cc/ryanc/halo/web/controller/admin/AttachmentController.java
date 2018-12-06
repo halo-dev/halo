@@ -63,7 +63,7 @@ public class AttachmentController {
                               @RequestParam(value = "size", defaultValue = "18") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "attachId");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
+        Page<Attachment> attachments = attachmentService.findAll(pageable);
         model.addAttribute("attachments", attachments);
         return "admin/admin_attachment";
     }
@@ -82,7 +82,7 @@ public class AttachmentController {
                                    @RequestParam(value = "type", defaultValue = "normal") String type) {
         Sort sort = new Sort(Sort.Direction.DESC, "attachId");
         Pageable pageable = PageRequest.of(page, 18, sort);
-        Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
+        Page<Attachment> attachments = attachmentService.findAll(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
         if (StrUtil.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
@@ -134,7 +134,7 @@ public class AttachmentController {
                 attachment.setAttachSize(resultMap.get("size"));
                 attachment.setAttachWh(resultMap.get("wh"));
                 attachment.setAttachLocation(resultMap.get("location"));
-                attachmentService.saveByAttachment(attachment);
+                attachmentService.save(attachment);
                 log.info("Upload file {} to {} successfully", resultMap.get("fileName"), resultMap.get("filePath"));
                 result.put("success", ResultCodeEnum.SUCCESS.getCode());
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
@@ -183,7 +183,7 @@ public class AttachmentController {
         boolean flag = true;
         try {
             //删除数据库中的内容
-            attachmentService.removeByAttachId(attachId);
+            attachmentService.remove(attachId);
             if (attachLocation != null) {
                 if (attachLocation.equals(SERVER.getDesc())) {
                     String delSmallFileName = delFileName.substring(0, delFileName.lastIndexOf('.')) + "_small" + attachment.get().getAttachSuffix();

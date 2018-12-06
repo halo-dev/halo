@@ -28,7 +28,7 @@ public interface PostService {
      * @param post Post
      * @return Post
      */
-    Post saveByPost(Post post);
+    Post save(Post post);
 
     /**
      * 根据编号删除文章
@@ -36,7 +36,7 @@ public interface PostService {
      * @param postId postId
      * @return Post
      */
-    Post removeByPostId(Long postId);
+    Post remove(Long postId);
 
     /**
      * 修改文章状态
@@ -48,13 +48,6 @@ public interface PostService {
     Post updatePostStatus(Long postId, Integer status);
 
     /**
-     * 修改文章阅读量
-     *
-     * @param post post
-     */
-    void updatePostView(Post post);
-
-    /**
      * 批量修改摘要
      *
      * @param postSummary postSummary
@@ -62,21 +55,12 @@ public interface PostService {
     void updateAllSummary(Integer postSummary);
 
     /**
-     * 获取文章列表 分页
-     *
-     * @param postType post or page
-     * @param pageable 分页信息
-     * @return Page
-     */
-    Page<Post> findAllPosts(String postType, Pageable pageable);
-
-    /**
      * 获取文章列表 不分页
      *
      * @param postType post or page
      * @return List
      */
-    List<Post> findAllPosts(String postType);
+    List<Post> findAll(String postType);
 
     /**
      * 模糊查询文章
