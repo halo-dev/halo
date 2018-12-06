@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <pre>
@@ -49,7 +48,7 @@ public class LogsServiceImpl implements LogsService {
      * 移除所有日志
      */
     @Override
-    public void removeAllLogs() {
+    public void removeAll() {
         logsRepository.deleteAll();
     }
 
@@ -60,7 +59,7 @@ public class LogsServiceImpl implements LogsService {
      * @return Page
      */
     @Override
-    public Page<Logs> findAllLogs(Pageable pageable) {
+    public Page<Logs> findAll(Pageable pageable) {
         return logsRepository.findAll(pageable);
     }
 
@@ -72,16 +71,5 @@ public class LogsServiceImpl implements LogsService {
     @Override
     public List<Logs> findLogsLatest() {
         return logsRepository.findTopFive();
-    }
-
-    /**
-     * 根据编号查询
-     *
-     * @param logsId logsId
-     * @return Optional
-     */
-    @Override
-    public Optional<Logs> findLogsByLogsId(Long logsId) {
-        return logsRepository.findById(logsId);
     }
 }

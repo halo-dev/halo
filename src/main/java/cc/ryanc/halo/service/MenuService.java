@@ -21,14 +21,14 @@ public interface MenuService {
      * @param menu menu
      * @return Menu
      */
-    Menu saveByMenu(Menu menu);
+    Menu save(Menu menu);
 
     /**
      * 查询所有菜单
      *
      * @return List
      */
-    List<Menu> findAllMenus();
+    List<Menu> findAll();
 
     /**
      * 删除菜单
@@ -36,7 +36,7 @@ public interface MenuService {
      * @param menuId menuId
      * @return Menu
      */
-    Menu removeByMenuId(Long menuId);
+    Menu remove(Long menuId);
 
     /**
      * 根据编号查询菜单

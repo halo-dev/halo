@@ -147,8 +147,8 @@ public class BackupController {
      * @return JsonResult
      */
     public JsonResult backupPosts() {
-        List<Post> posts = postService.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
-        posts.addAll(postService.findAllPosts(PostTypeEnum.POST_TYPE_PAGE.getDesc()));
+        List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
+        posts.addAll(postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc()));
         try {
             if (HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");

@@ -59,7 +59,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post saveByPost(Post post) {
+    public Post save(Post post) {
         return postRepository.save(post);
     }
 
@@ -71,7 +71,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post removeByPostId(Long postId) {
+    public Post remove(Long postId) {
         Optional<Post> post = this.findByPostId(postId);
         postRepository.delete(post.get());
         return post.get();
@@ -93,17 +93,6 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 修改文章阅读量
-     *
-     * @param post post
-     */
-    @Override
-    public void updatePostView(Post post) {
-        post.setPostViews(post.getPostViews() + 1);
-        postRepository.save(post);
-    }
-
-    /**
      * 批量更新文章摘要
      *
      * @param postSummary postSummary
@@ -111,7 +100,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void updateAllSummary(Integer postSummary) {
-        List<Post> posts = this.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
+        List<Post> posts = this.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
         for (Post post : posts) {
             String text = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (text.length() > postSummary) {
@@ -124,18 +113,6 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 获取文章列表 分页
-     *
-     * @param postType post or page
-     * @param pageable 分页信息
-     * @return Page
-     */
-    @Override
-    public Page<Post> findAllPosts(String postType, Pageable pageable) {
-        return postRepository.findPostsByPostType(postType, pageable);
-    }
-
-    /**
      * 获取文章列表 不分页
      *
      * @param postType post or page
@@ -143,7 +120,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_type_'+#postType")
-    public List<Post> findAllPosts(String postType) {
+    public List<Post> findAll(String postType) {
         return postRepository.findPostsByPostType(postType);
     }
 

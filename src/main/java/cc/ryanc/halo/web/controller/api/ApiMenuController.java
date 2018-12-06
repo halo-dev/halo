@@ -35,7 +35,7 @@ public class ApiMenuController {
      */
     @GetMapping
     public JsonResult menus() {
-        List<Menu> menus = menuService.findAllMenus();
+        List<Menu> menus = menuService.findAll();
         if (null != menus && menus.size() > 0) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), menus);
         } else {

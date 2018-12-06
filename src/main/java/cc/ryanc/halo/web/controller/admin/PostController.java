@@ -206,7 +206,7 @@ public class PostController extends BaseController {
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
                 post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
-            postService.saveByPost(post);
+            postService.save(post);
             logsService.save(LogsRecord.PUSH_POST, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
@@ -240,7 +240,7 @@ public class PostController extends BaseController {
             post.setPostDate(new Date());
         }
         post = postService.buildCategoriesAndTags(post, cateList, tagList);
-        post = postService.saveByPost(post);
+        post = postService.save(post);
         if (null != post) {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
         } else {
@@ -293,7 +293,7 @@ public class PostController extends BaseController {
     public String removePost(@RequestParam("postId") Long postId, @RequestParam("postType") String postType) {
         try {
             Optional<Post> post = postService.findByPostId(postId);
-            postService.removeByPostId(postId);
+            postService.remove(postId);
             logsService.save(LogsRecord.REMOVE_POST, post.get().getPostTitle(), request);
         } catch (Exception e) {
             log.error("Delete article failed: {}", e.getMessage());
@@ -353,7 +353,7 @@ public class PostController extends BaseController {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.no-baidu-token"));
         }
         String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
-        List<Post> posts = postService.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
+        List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
         StringBuilder urls = new StringBuilder();
         for (Post post : posts) {
             urls.append(blogUrl);

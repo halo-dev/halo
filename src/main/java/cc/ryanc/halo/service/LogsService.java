@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <pre>
@@ -30,7 +29,7 @@ public interface LogsService {
     /**
      * 移除所有日志
      */
-    void removeAllLogs();
+    void removeAll();
 
     /**
      * 查询所有日志并分页
@@ -38,7 +37,7 @@ public interface LogsService {
      * @param pageable pageable
      * @return Page
      */
-    Page<Logs> findAllLogs(Pageable pageable);
+    Page<Logs> findAll(Pageable pageable);
 
     /**
      * 查询最新的五条日志
@@ -46,12 +45,4 @@ public interface LogsService {
      * @return List
      */
     List<Logs> findLogsLatest();
-
-    /**
-     * 根据编号查询
-     *
-     * @param logsId logsId
-     * @return Optional
-     */
-    Optional<Logs> findLogsByLogsId(Long logsId);
 }

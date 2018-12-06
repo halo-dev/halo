@@ -44,7 +44,7 @@ public class MenuController {
     @PostMapping(value = "/save")
     public String saveMenu(@ModelAttribute Menu menu) {
         try {
-            menuService.saveByMenu(menu);
+            menuService.save(menu);
         } catch (Exception e) {
             log.error("Saving menu failed: {}" + e.getMessage());
         }
@@ -74,7 +74,7 @@ public class MenuController {
     @GetMapping(value = "/remove")
     public String removeMenu(@RequestParam("menuId") Long menuId) {
         try {
-            menuService.removeByMenuId(menuId);
+            menuService.remove(menuId);
         } catch (Exception e) {
             log.error("Deleting menu failed: {}", e.getMessage());
         }

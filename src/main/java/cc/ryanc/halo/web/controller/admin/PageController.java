@@ -73,7 +73,7 @@ public class PageController {
      */
     @GetMapping
     public String pages(Model model) {
-        List<Post> posts = postService.findAllPosts(PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc());
         model.addAttribute("pages", posts);
         return "admin/admin_page";
     }
@@ -111,7 +111,7 @@ public class PageController {
     @PostMapping(value = "/links/save")
     public String saveLink(@ModelAttribute Link link) {
         try {
-            linkService.saveByLink(link);
+            linkService.save(link);
         } catch (Exception e) {
             log.error("Save/modify friendship link failed: {}", e.getMessage());
         }
@@ -127,7 +127,7 @@ public class PageController {
     @GetMapping(value = "/links/remove")
     public String removeLink(@RequestParam("linkId") Long linkId) {
         try {
-            linkService.removeByLinkId(linkId);
+            linkService.remove(linkId);
         } catch (Exception e) {
             log.error("Deleting a friendship link failed: {}", e.getMessage());
         }
@@ -148,7 +148,7 @@ public class PageController {
                           @RequestParam(value = "size", defaultValue = "18") Integer size) {
         Sort sort = new Sort(Sort.Direction.DESC, "galleryId");
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Gallery> galleries = galleryService.findAllGalleries(pageable);
+        Page<Gallery> galleries = galleryService.findAll(pageable);
         model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
     }
@@ -165,7 +165,7 @@ public class PageController {
             if (StrUtil.isEmpty(gallery.getGalleryThumbnailUrl())) {
                 gallery.setGalleryThumbnailUrl(gallery.getGalleryUrl());
             }
-            galleryService.saveByGallery(gallery);
+            galleryService.save(gallery);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -196,7 +196,7 @@ public class PageController {
     @ResponseBody
     public JsonResult removeGallery(@RequestParam("galleryId") Long galleryId) {
         try {
-            galleryService.removeByGalleryId(galleryId);
+            galleryService.remove(galleryId);
         } catch (Exception e) {
             log.error("Failed to delete image: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
@@ -248,7 +248,7 @@ public class PageController {
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
                 post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
-            postService.saveByPost(post);
+            postService.save(post);
             logsService.save(LogsRecord.PUSH_PAGE, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {

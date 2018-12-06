@@ -66,7 +66,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Attachment saveByAttachment(Attachment attachment) {
+    public Attachment save(Attachment attachment) {
         return attachmentRepository.save(attachment);
     }
 
@@ -77,7 +77,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @Cacheable(value = ATTACHMENTS_CACHE_NAME, key = "'attachment'")
-    public List<Attachment> findAllAttachments() {
+    public List<Attachment> findAll() {
         return attachmentRepository.findAll();
     }
 
@@ -88,7 +88,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return Page
      */
     @Override
-    public Page<Attachment> findAllAttachments(Pageable pageable) {
+    public Page<Attachment> findAll(Pageable pageable) {
         return attachmentRepository.findAll(pageable);
     }
 
@@ -111,7 +111,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Attachment removeByAttachId(Long attachId) {
+    public Attachment remove(Long attachId) {
         Optional<Attachment> attachment = this.findByAttachId(attachId);
         attachmentRepository.delete(attachment.get());
         return attachment.get();
@@ -403,5 +403,15 @@ public class AttachmentServiceImpl implements AttachmentService {
             e.printStackTrace();
         }
         return flag;
+    }
+
+    /**
+     * 获取附件总数
+     *
+     * @return Long
+     */
+    @Override
+    public Long getCount() {
+        return attachmentRepository.count();
     }
 }

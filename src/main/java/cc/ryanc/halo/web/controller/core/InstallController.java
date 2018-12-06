@@ -115,14 +115,14 @@ public class InstallController {
             user.setUserDisplayName(userDisplayName);
             user.setUserEmail(userEmail);
             user.setUserPass(SecureUtil.md5(userPwd));
-            userService.saveByUser(user);
+            userService.save(user);
 
             //默认分类
             Category category = new Category();
             category.setCateName("未分类");
             category.setCateUrl("default");
             category.setCateDesc("未分类");
-            categoryService.saveByCategory(category);
+            categoryService.save(category);
 
             //第一篇文章
             Post post = new Post();
@@ -139,7 +139,7 @@ public class InstallController {
             post.setUser(user);
             post.setCategories(categories);
             post.setAllowComment(AllowCommentEnum.ALLOW.getCode());
-            postService.saveByPost(post);
+            postService.save(post);
 
             //第一个评论
             Comment comment = new Comment();
@@ -154,7 +154,7 @@ public class InstallController {
             comment.setCommentStatus(0);
             comment.setCommentAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
             comment.setIsAdmin(0);
-            commentService.saveByComment(comment);
+            commentService.save(comment);
 
             optionsService.saveOption(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
 
@@ -186,14 +186,14 @@ public class InstallController {
             menuIndex.setMenuUrl("/");
             menuIndex.setMenuSort(1);
             menuIndex.setMenuIcon("");
-            menuService.saveByMenu(menuIndex);
+            menuService.save(menuIndex);
 
             Menu menuArchive = new Menu();
             menuArchive.setMenuName("归档");
             menuArchive.setMenuUrl("/archives");
             menuArchive.setMenuSort(2);
             menuArchive.setMenuIcon("");
-            menuService.saveByMenu(menuArchive);
+            menuService.save(menuArchive);
 
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();

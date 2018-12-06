@@ -35,7 +35,7 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Tag saveByTag(Tag tag) {
+    public Tag save(Tag tag) {
         return tagRepository.save(tag);
     }
 
@@ -47,7 +47,7 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Tag removeByTagId(Long tagId) {
+    public Tag remove(Long tagId) {
         Optional<Tag> tag = findByTagId(tagId);
         tagRepository.delete(tag.get());
         return tag.get();
@@ -59,7 +59,7 @@ public class TagServiceImpl implements TagService {
      * @return List
      */
     @Override
-    public List<Tag> findAllTags() {
+    public List<Tag> findAll() {
         return tagRepository.findAll();
     }
 
@@ -115,7 +115,7 @@ public class TagServiceImpl implements TagService {
                 nt = new Tag();
                 nt.setTagName(tag);
                 nt.setTagUrl(tag);
-                tagsList.add(saveByTag(nt));
+                tagsList.add(save(nt));
             }
         }
         return tagsList;

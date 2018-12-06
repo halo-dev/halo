@@ -49,7 +49,7 @@ public class TagController {
     @PostMapping(value = "/save")
     public String saveTag(@ModelAttribute Tag tag) {
         try {
-            tagService.saveByTag(tag);
+            tagService.save(tag);
         } catch (Exception e) {
             log.error("Add/modify tag failed: {}", e.getMessage());
         }
@@ -81,7 +81,7 @@ public class TagController {
     @GetMapping(value = "/remove")
     public String removeTag(@RequestParam("tagId") Long tagId) {
         try {
-            tagService.removeByTagId(tagId);
+            tagService.remove(tagId);
         } catch (Exception e) {
             log.error("Failed to delete tag: {}", e.getMessage());
         }

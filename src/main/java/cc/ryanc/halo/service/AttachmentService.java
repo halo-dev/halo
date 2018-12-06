@@ -26,14 +26,14 @@ public interface AttachmentService {
      * @param attachment attachment
      * @return Attachment
      */
-    Attachment saveByAttachment(Attachment attachment);
+    Attachment save(Attachment attachment);
 
     /**
      * 查询所有附件信息
      *
      * @return List
      */
-    List<Attachment> findAllAttachments();
+    List<Attachment> findAll();
 
     /**
      * 查询所有附件，分页
@@ -41,7 +41,7 @@ public interface AttachmentService {
      * @param pageable pageable
      * @return Page
      */
-    Page<Attachment> findAllAttachments(Pageable pageable);
+    Page<Attachment> findAll(Pageable pageable);
 
     /**
      * 根据编号查询
@@ -57,7 +57,7 @@ public interface AttachmentService {
      * @param attachId attachId
      * @return Attachment
      */
-    Attachment removeByAttachId(Long attachId);
+    Attachment remove(Long attachId);
 
     /**
      * 上传转发
@@ -110,4 +110,11 @@ public interface AttachmentService {
      * @return boolean
      */
     boolean deleteUpYunAttachment(String fileName);
+
+    /**
+     * 获取附件总数
+     *
+     * @return Long
+     */
+    Long getCount();
 }
