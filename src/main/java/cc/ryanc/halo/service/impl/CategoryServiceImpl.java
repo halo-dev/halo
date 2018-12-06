@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.repository.CategoryRepository;
 import cc.ryanc.halo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ import java.util.Optional;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
+    private static final String POSTS_CACHE_NAME = "posts";
+
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -31,6 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return Category
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Category saveByCategory(Category category) {
         return categoryRepository.save(category);
     }
@@ -42,6 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @return Category
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Category removeByCateId(Long cateId) {
         Optional<Category> category = this.findByCateId(cateId);
         categoryRepository.delete(category.get());
