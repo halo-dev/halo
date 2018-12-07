@@ -22,16 +22,16 @@ services:
       - 8090:8090
     environment:
       - VIRTUAL_PORT=8090 #监听的端口
-      - VIRTUAL_HOST=127.0.0.1  #监听的地址
-      - LETSENCRYPT_HOST=127.0.0.1 #证书的域名
+      - VIRTUAL_HOST=localhost  #监听的地址
+      - LETSENCRYPT_HOST=localhost #证书的域名
       - LETSENCRYPT_EMAIL=i@example.com #证书所有者的邮箱，快过期时会提醒
     volumes:
       - ~/halo:/root/halo
 
-  nginx-gen:
+  docker-gen:
     restart: always
     image: jwilder/docker-gen
-    container_name: nginx-gen
+    container_name: docker-gen
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /etc/nginx/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
@@ -48,3 +48,6 @@ services:
       - nginx
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/certs:/etc/nginx/certs:rw
+    environment:
+      - NGINX_DOCKER_GEN_CONTAINER=docker-gen
