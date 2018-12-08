@@ -47,7 +47,8 @@ java -jar target/dist/halo/halo-latest.jar
 Rapid server deploy etme:
 ```bash
 # Install Halo
-yum install -y wget && wget https://raw.githubusercontent.com/ruibaby/halo-cli/master/halo-cli.sh && bash halo-cli.sh -i
+yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
+
 # Upgrade Halo
 bash halo-cli.sh -u
 ```
@@ -56,8 +57,21 @@ Docker：
 ```bash
 # Pull image
 docker pull ruibaby/halo
+
 # run
 docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+```
+
+Docker Compose：
+```bash
+# Docker-compose.yaml dosyasını edinin
+yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
+
+# Docker-compose.yaml dosyasını değiştirin, kendi alan adınız için VIRTUAL_HOST, LETSENCRYPT_HOST değerini değiştirin ve kendi posta kutunuz için LETSENCRYPT_EMAIL adresini değiştirin.
+vim docker-compose.yaml
+
+# run
+docker-compose up -d
 ```
 
 > Not: Eğer çalıştırmak için Idea, Eclipse ve diğer IDE leri kullanırsanız, Lombok eklentisini yüklemeniz gerekir. Ayrıca JDK 10 şu anda desteklenmiyor ve temaların taranması ve yüklenmesi ile ilgili sorunlar var.
