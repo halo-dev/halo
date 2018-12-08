@@ -1,0 +1,19 @@
+<% if (!has_config('comment.app_id') || !has_config('comment.app_key')) { %>
+<div class="notification is-danger">
+    You forgot to set the <code>app_id</code> or <code>app_key</code> for Valine. Please set it in <code>_config.yml</code>.
+</div>
+<% } else { %>
+<div id="valine-thread"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script>
+    new Valine({
+        el: '#valine-thread' ,
+        notify: <%= get_config('comment.notify') %>,
+        verify: <%= get_config('comment.verify') %>,
+        app_id: '<%= get_config('comment.app_id') %>',
+        app_key: '<%= get_config('comment.app_key') %>',
+        placeholder: '<%= get_config('comment.placeholder') %>'
+    });
+</script>
+<% } %>

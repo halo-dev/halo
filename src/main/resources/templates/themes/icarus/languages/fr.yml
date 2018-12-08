@@ -1,0 +1,37 @@
+common:
+    archive:
+        one: 'Archive'
+        other: 'Archives'
+    category:
+        one: 'Catégorie'
+        other: 'Catégories'
+    tag:
+        one: 'Tag'
+        other: 'Tags'
+    post:
+        one: 'Article'
+        other: 'Articles'
+    prev: 'Préc'
+    next: 'Suiv'
+widget:
+    follow: 'SUIVRE'
+    recents: 'Récents'
+    links: 'Liens'
+    tag_cloud: 'Nuage de tags'
+    catalogue: 'Catalogue'
+article:
+    more: 'Read More'
+    comments: 'Commentaires'
+    read: 'read'
+    about: 'About'
+    words: 'words'
+search:
+    search: 'Search'
+    hint: 'Type something...'
+insight:
+    hint: 'Type something...'
+    posts: 'Articles'
+    pages: 'Pages'
+    categories: 'Catégories'
+    tags: 'Tags'
+    untitled: '(Untitled)'

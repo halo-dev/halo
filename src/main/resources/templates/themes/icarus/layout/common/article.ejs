@@ -1,0 +1,103 @@
+<div class="card">
+    <% if (has_thumbnail(post)) { %>
+    <div class="card-image">
+        <%- index ? '<a href="' + url_for(post.link ? post.link : post.path) + '"' : '<span ' %> class="image is-7by1">
+            <img class="thumbnail" src="<%= get_thumbnail(post) %>" alt="<%= post.title %>">
+        <%- index ? '</a>' : '</span>' %>
+    </div>
+    <% } %>
+    <div class="card-content article <%= post.hasOwnProperty('direction') ? post.direction : '' %>">
+        <% if (post.layout != 'page') { %>
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="<%= date_xml(post.date) %>"><%= date(post.date) %></time>
+                <% if (post.categories && post.categories.length) { %>
+                <div class="level-item">
+                <%- list_categories(post.categories, {
+                    class: 'has-link-grey ',
+                    show_count: false,
+                    style: 'none',
+                    separator: '&nbsp;/&nbsp;'
+                }) %>
+                </div>
+                <% } %>
+                <% if (!has_config('article.readtime') || get_config('article.readtime') === true) { %>
+                <span class="level-item has-text-grey">
+                    <% const words = word_count(post._content); %>
+                    <% const time = duration((words / 150.0) * 60, 'seconds') %>
+                    <%= `${ time.locale(get_config('language', 'en')).humanize() } ${ __('article.read')} (${ __('article.about') } ${ words } ${ __('article.words') })` %>
+                </span>
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            <% if (index) { %>
+                <a class="has-link-black-ter" href="<%- url_for(post.link ? post.link : post.path) %>"><%= post.title %></a>
+            <% } else { %>
+                <%= post.title %>
+            <% } %>
+        </h1>
+        <div class="content">
+            <%- index && post.excerpt ? post.excerpt : post.content %>
+        </div>
+        <% if (!index && post.tags && post.tags.length) { %>
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <%- list_tags(post.tags, {
+                        class: 'has-link-grey ',
+                        show_count: false,
+                        style: 'link'
+                    }) %>
+                </div>
+            </div>
+        </div>
+        <% } %>
+        <% if (index && post.excerpt) { %>
+        <div class="level is-mobile">
+            <div class="level-start">
+                <div class="level-item">
+                <a class="button is-size-7 is-light" href="<%- url_for(post.path) %>#more"><%= __('article.more') %></a>
+                </div>
+            </div>
+        </div>
+        <% } %>
+        <% if (!index && has_config('share.type')) { %>
+        <%- partial('share/' + get_config('share.type')) %>
+        <% } %>
+    </div>
+</div>
+
+<% if (!index && (post.prev || post.next)) { %>
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        <% if (post.prev){ %>
+        <div class="level-start">
+            <a class="level level-item has-link-grey <%= !post.prev ? 'is-hidden-mobile' : '' %> article-nav-prev" href="<%- url_for(post.prev.path) %>">
+                <i class="level-item fas fa-chevron-left"></i>
+                <span class="level-item"><%= post.prev.title %></span>
+            </a>
+        </div>
+        <% } %>
+        <% if (post.next){ %>
+        <div class="level-end">
+            <a class="level level-item has-link-grey <%= !post.next ? 'is-hidden-mobile' : '' %> article-nav-next" href="<%- url_for(post.next.path) %>">
+                <span class="level-item"><%= post.next.title %></span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        <% } %>
+    </div>
+</div>
+<% } %>
+
+<% if (!index && has_config('comment.type')) { %>
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal"><%= __('article.comments') %></h3>
+        <%- partial('comment/' + get_config('comment.type')) %>
+    </div>
+</div>
+<% } %>

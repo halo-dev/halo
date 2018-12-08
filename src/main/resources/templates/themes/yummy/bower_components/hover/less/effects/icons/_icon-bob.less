@@ -1,0 +1,42 @@
+/* Icon Bob */
+.keyframes(~"@{nameSpace}-icon-bob", {
+	0% {
+		.prefixed(transform, translateY(-6px));
+	}
+	50% {
+		.prefixed(transform, translateY(-2px));
+	}
+	100% {
+		.prefixed(transform, translateY(-6px));
+	}
+});
+
+.keyframes(~"@{nameSpace}-icon-bob-float", {
+	100% {
+		.prefixed(transform, translateY(-6px));
+	}
+});
+
+.icon-bob() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+
+	.hvr-icon {
+		.prefixed(transform, translateZ(0));
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			.prefixed(animation-name, ~"@{nameSpace}-icon-bob-float, @{nameSpace}-icon-bob");
+			.prefixed(animation-duration, ~".3s, 1.5s");
+			.prefixed(animation-delay, ~"0s, .3s");
+			.prefixed(animation-timing-function, ~"ease-out, ease-in-out");
+			.prefixed(animation-iteration-count, ~"1, infinite");
+			.prefixed(animation-fill-mode, ~"forwards");
+			.prefixed(animation-direction, ~"normal, alternate");
+		}
+	}
+}

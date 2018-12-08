@@ -1,0 +1,37 @@
+common:
+    archive:
+        one: 'アーカイブ'
+        other: 'アーカイブ'
+    category:
+        one: 'カテゴリ'
+        other: 'カテゴリ'
+    tag:
+        one: 'タグ'
+        other: 'タグ'
+    post:
+        one: '投稿'
+        other: '投稿'
+    prev: '前'
+    next: '次'
+widget:
+    follow: 'フォローする'
+    recents: '最近の記事'
+    links: 'リンク'
+    tag_cloud: 'タグクラウド'
+    catalogue: 'カタログ'
+article:
+    more: 'Read More'
+    comments: 'コメント'
+    read: 'read'
+    about: 'About'
+    words: 'words'
+search:
+    search: 'Search'
+    hint: 'Type something...'
+insight:
+    hint: 'Type something...'
+    posts: '投稿'
+    pages: 'Pages'
+    categories: 'カテゴリ'
+    tags: 'タグ'
+    untitled: '(Untitled)'

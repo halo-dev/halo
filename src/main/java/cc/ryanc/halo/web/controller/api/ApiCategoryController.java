@@ -28,6 +28,24 @@ public class ApiCategoryController {
     /**
      * 获取所有分类
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": [
+     *         {
+     *             "cateId": "",
+     *             "cateName": "",
+     *             "cateUrl": "",
+     *             "cateDesc": ""
+     *         }
+     *     ]
+     * }
+     *     </pre>
+     * </p>
+     *
      * @return JsonResult
      */
     @GetMapping
@@ -42,6 +60,22 @@ public class ApiCategoryController {
 
     /**
      * 获取单个分类的信息
+     *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": {
+     *         "cateId": "",
+     *         "cateName": "",
+     *         "cateUrl": "",
+     *         "cateDesc": ""
+     *     }
+     * }
+     *     </pre>
+     * </p>
      *
      * @param cateUrl 分类路径
      * @return JsonResult

@@ -1,0 +1,32 @@
+<% if (get_widgets(position).length) { %>
+<% function side_column_class() {
+    switch (column_count()) {
+        case 2:
+            return 'is-4-tablet is-4-desktop is-4-widescreen';
+        case 3:
+            return 'is-4-tablet is-4-desktop is-3-widescreen';
+    }
+    return '';
+} %>
+<% function visibility_class() {
+    if (column_count() === 3 && position === 'right') {
+        return 'is-hidden-touch is-hidden-desktop-only';
+    }
+    return '';
+} %>
+<% function order_class() {
+    return position === 'left' ? 'has-order-1' : 'has-order-3';
+} %>
+<div class="column <%= side_column_class() %> <%= visibility_class() %> <%= order_class() %> column-<%= position %>">
+    <% get_widgets(position).forEach(widget => {%>
+        <%- partial('widget/' + widget.type, { widget, post: page }) %>
+    <% }) %>
+    <% if (position === 'left') { %>
+        <div class="card card-transparent is-hidden-widescreen">
+        <% get_widgets('right').forEach(widget => {%>
+            <%- partial('widget/' + widget.type, { widget, post: page }) %>
+        <% }) %>
+        </div>
+    <% } %>
+</div>
+<% } %>

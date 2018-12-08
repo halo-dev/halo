@@ -1,0 +1,12 @@
+/* Rotate */
+.rotate() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+	.prefixed(transition-property, transform);
+
+	&:hover,
+	&:focus,
+	&:active {
+		.prefixed(transform, rotate(4deg));
+	}
+}

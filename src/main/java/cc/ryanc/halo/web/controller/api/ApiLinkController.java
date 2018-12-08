@@ -31,6 +31,25 @@ public class ApiLinkController {
     /**
      * 获取所有友情链接
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": [
+     *         {
+     *             "linkId": ,
+     *             "linkName": "",
+     *             "linkUrl": "",
+     *             "linkPic": "",
+     *             "linkDesc": ""
+     *         }
+     *     ]
+     * }
+     *     </pre>
+     * </p>
+     *
      * @return JsonResult
      */
     @GetMapping

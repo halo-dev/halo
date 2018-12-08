@@ -1,0 +1,22 @@
+<% if (has_config('comment.shortname')) { %>
+<script>
+    var disqus_config = function () {
+        this.page.url = '<%= page.permalink %>';
+        this.page.identifier = '<%= page.disqusId || page.path %>';
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + '<%= get_config('comment.shortname') %>' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<% } %>
+<div id="disqus_thread">
+    <% if (!has_config('comment.shortname')) { %>
+    <div class="notification is-danger">
+        You forgot to set the <code>shortname</code> for Disqus. Please set it in <code>_config.yml</code>.
+    </div>
+    <% } %>
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>

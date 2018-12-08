@@ -1,0 +1,345 @@
+family-serif = "Ubuntu", "Roboto", "Open Sans", "Microsoft YaHei", serif
+family-mono = "Source Code Pro", monospace, "Microsoft YaHei"
+
+/* ---------------------------------
+ *       Override CSS Framework
+ * --------------------------------- */
+html
+    font-size: 14px
+
+body
+    font-family: family-serif
+    background-color: #f7f7f7
+
+@media screen and (min-width: 1280px)
+    .is-1-column .container
+    .is-2-column .container
+        max-width: 960px
+        width: 960px
+@media screen and (min-width: 1472px)
+    .is-2-column .container
+        max-width: 1152px
+        width: 1152px
+    .is-1-column .container
+        max-width: 960px
+        width: 960px
+
+@media screen and (max-width: 768px)
+    .section
+        padding: 1.5rem 1rem
+
+.column-main,
+.column-left,
+.column-right
+    align-self: flex-start
+    &.is-sticky
+        position: sticky
+        top: .75rem
+
+.card
+    overflow: hidden
+    border-radius: 4px
+    transform-origin: center top
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05), 0 0 1px rgba(0,0,0,0.1)
+    & + .card
+        margin-top: 1.5rem
+    &.card-transparent
+        overflow: visible
+        box-shadow: none
+        background: transparent
+
+img.thumbnail
+    object-fit: cover
+    width: 100%
+    height: 100%
+
+.navbar-logo,
+.footer-logo
+    img
+        max-height: 1.75rem
+
+.navbar-main
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05)
+    .navbar-menu,
+    .navbar-start,
+    .navbar-end
+        align-items: stretch
+        display: flex
+        padding: 0
+    .navbar-menu
+        flex-grow: 1
+        flex-shrink: 0
+        overflow-x: auto
+    .navbar-start
+        justify-content: flex-start
+        margin-right: auto
+    .navbar-end
+        justify-content: flex-end
+        margin-left: auto
+    .navbar-item
+        display: flex
+        align-items: center
+        padding: 1.25rem 0.75rem
+        &.is-active
+            color: hsl(217, 71%, 53%)
+            background-color: transparent
+    @media screen and (max-width: 1087px)
+        .navbar-menu
+            justify-content: center
+            box-shadow: none
+        .navbar-start
+            margin-right: 0
+        .navbar-end
+            margin-left: 0
+
+.footer
+    background: white
+    .field
+        .button
+            background: transparent
+
+.widget
+    .media
+        border: none
+    .media + .media
+        margin-top: 0
+    .menu-list li ul
+        margin-right: 0
+    .menu-list a.level
+        display: flex
+
+.pagination
+    .pagination-link:not(.is-current), .pagination-previous, .pagination-next
+        background: white
+        border: none
+    .pagination-link, .pagination-previous, .pagination-next
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05)
+
+.post-navigation
+    justify-content: space-around
+    .level-item
+        margin-bottom: 0
+
+.timeline
+    margin-left: 1rem
+    padding-left: 1.5rem
+    padding-top: 1rem
+    border-left: 1px solid hsl(0, 0%, 86%)
+    .media
+        position: relative
+        &:before,
+        &:last-child:after
+            content: ''
+            display: block
+            position: absolute
+            left: calc(-5px - 1.5rem)
+        &:before
+            width: 9px
+            height: 9px
+            top: 1.3rem
+            background: hsl(0, 0%, 86%)
+            border-radius: 50%
+        &:first-child:before
+            top: 0.3rem
+        &:last-child:after
+            top: calc(1.3rem + 9px)
+            width: 9px
+            bottom: 0
+            background: white
+        &:first-child:last-child:after
+            top: calc(0.3rem + 9px)
+
+.article
+    .article-meta
+        margin-bottom: 0.5rem !important
+    .content
+        font-size: 1.1rem
+        blockquote.pullquote
+            float: right
+            max-width: 50%
+            font-size: 1.15rem
+            position: relative
+
+.rtl
+     direction: rtl
+     .level
+        &, &.is-mobile
+            .level-item:not(:last-child)
+                margin-left: 0.75rem
+                margin-right: 0
+
+/* ---------------------------------
+ *         Custom modifiers
+ * --------------------------------- */
+.is-size-7
+    font-size: 0.85rem !important
+
+.is-7by1
+    padding-top: 42.8%
+    img
+        bottom: 0
+        left: 0
+        position: absolute
+        right: 0
+        top: 0
+
+.is-overflow-x-auto
+    overflow-x: auto !important
+
+.is-flex-grow
+    flex-grow: 1 !important
+
+.is-flex-wrap
+    flex-wrap: wrap !important
+
+.is-flex-start
+    justify-content: start !important
+
+.is-flex-center
+    justify-content: center !important
+
+.is-flex-middle
+    align-items: center !important
+
+.has-order-1
+    order: 1
+
+.has-order-2
+    order: 2
+
+.has-order-3
+    order: 3
+
+.has-mr-6
+    margin-right: 0.5em !important
+
+.has-mb-6
+    margin-bottom: 0.5em !important
+
+.has-mr-7
+    margin-right: 0.25em !important
+
+.has-link-grey,
+.has-link-black-ter
+    transition: 0.2s ease
+    &:hover
+        color: hsl(217, 71%, 53%) !important
+
+.has-link-grey
+    color: hsl(0, 0%, 48%) !important
+
+.has-link-black-ter
+    color: hsl(0, 0%, 14%) !important
+
+@media screen and (max-width: 768px)
+    .has-text-centered-mobile
+        text-align: center !important
+    .is-flex-center-mobile
+        justify-content: center !important
+    .has-mt-5-mobile
+        margin-top: 1em !important
+
+/* ---------------------------------
+ *         Font icon fixes
+ * --------------------------------- */
+.fa, .fab, .fal, .far, .fas
+    line-height: inherit
+
+/* ---------------------------------
+ *        Fix content elements
+ * --------------------------------- */
+.content
+    h1, h2, h3, h4, h5, h6
+        font-weight: 400
+    h1
+        font-size: 1.75em
+    h2
+        font-size: 1.5em
+    h3
+        font-size: 1.25em
+    h4
+        font-size: 1.125em
+    h5
+        font-size: 1em
+    code, pre
+        font-size: 0.85em
+        font-family: family-mono
+    code
+        color: hsl(348, 100%, 61%)
+        background: transparent
+        padding: 0
+    blockquote
+        footer
+            strong + cite
+                margin-left: 0.5em
+
+/* ---------------------------------
+ *        Fix code highlight
+ * --------------------------------- */
+figure.highlight
+    padding: 0
+    width: 100%
+    margin: 1em 0 1em !important
+
+    pre,
+    table tr:hover
+        color: inherit
+        background: transparent
+
+    table
+        width: auto
+
+    pre
+        padding: 0
+        overflow: visible
+
+        .line
+            line-height: 1.5rem
+
+    figcaption,
+    .gutter
+        background: rgba(200, 200, 200, 0.15)
+
+    figcaption
+        padding: .3em .75em
+        text-align: left
+        font-style: normal
+        font-size: .8em
+
+        span
+            font-weight: 500
+            font-family: family-mono
+
+        a
+            float: right
+            color: #9a9a9a
+
+    .gutter
+        text-align: right
+
+    .tag,
+    .title,
+    .number,
+    .section
+        display: inherit
+        font: inherit
+        margin: inherit
+        padding: inherit
+        background: inherit
+        height: inherit
+        text-align: inherit
+        vertical-align: inherit
+        min-width: inherit
+        border-radius: inherit
+
+/* ---------------------------------
+ *        Fix Gist Snippet
+ * --------------------------------- */
+.gist
+    table
+        tr:hover
+            background: transparent
+        td
+            border: none
+    .file
+        all: initial

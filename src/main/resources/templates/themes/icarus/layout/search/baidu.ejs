@@ -1,0 +1,29 @@
+<%- css('css/search') %>
+<div class="searchbox">
+    <div class="searchbox-container">
+        <div class="searchbox-input-wrapper">
+            <form class="search-form">
+                <input name="wd" type="text" class="searchbox-input" placeholder="<%= __('search.hint') %>" />
+                <span class="searchbox-close searchbox-selectable"><i class="fa fa-times-circle"></i></span>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    (function ($) {
+        $('.search-form').on('submit', function (e) {
+            var keyword = $('.searchbox-input[name="wd"]').val();
+            window.location = 'https://www.baidu.com/s?wd=site:<%= config.url.replace(/http(s)*:\/\//, "") %> ' + keyword;
+            return false;
+        });
+    })(jQuery);
+    (function (document, $) {
+        $(document).on('click', '.navbar-main .search', function () {
+            $('.searchbox').toggleClass('show');
+        }).on('click', '.searchbox .searchbox-mask', function () {
+            $('.searchbox').removeClass('show');
+        }).on('click', '.searchbox-close', function () {
+            $('.searchbox').removeClass('show');
+        });
+    })(document, jQuery);
+</script>

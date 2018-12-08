@@ -1,0 +1,29 @@
+<div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="<%= __('insight.hint') %>" />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: '<%= __("insight.posts") %>',
+                PAGES: '<%= __("insight.pages") %>',
+                CATEGORIES: '<%= __("insight.categories") %>',
+                TAGS: '<%= __("insight.tags") %>',
+                UNTITLED: '<%= __("insight.untitled") %>',
+            },
+            CONTENT_URL: '<%- url_for("/content.json")%>',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<%- js('js/insight') %>
+<%- css('css/search') %>
+<%- css('css/insight') %>

@@ -1,0 +1,47 @@
+/* Icon Wobble Vertical */
+.keyframes(~"@{nameSpace}-icon-wobble-vertical", {
+	16.65% {
+		.prefixed(transform, translateY(6px));
+	}
+
+	33.3% {
+		.prefixed(transform, translateY(-5px));
+	}
+
+	49.95% {
+		.prefixed(transform, translateY(4px));
+	}
+
+	66.6% {
+		.prefixed(transform, translateY(-2px));
+	}
+
+	83.25% {
+		.prefixed(transform, translateY(1px));
+	}
+
+	100% {
+		.prefixed(transform, translateY(0));
+	}
+});
+
+.icon-wobble-vertical() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+
+	.hvr-icon {
+		.prefixed(transform, translateZ(0));
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			.prefixed(animation-name, ~"@{nameSpace}-icon-wobble-vertical");
+			.prefixed(animation-duration, 1s);
+			.prefixed(animation-timing-function, ease-in-out);
+			.prefixed(animation-iteration-count, 1);
+		}
+	}
+}

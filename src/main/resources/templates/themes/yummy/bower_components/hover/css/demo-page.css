@@ -1,0 +1,578 @@
+/*
+ * Hover.css - Demo Page
+ * Author: Ian Lunn @IanLunn
+ * Author URL: http://ianlunn.co.uk/
+ * Github: https://github.com/IanLunn/Hover
+ * Hover.css Copyright Ian Lunn 2017.
+ */
+
+/**
+ * The following are default styles for the demo page,
+ * you don't need to include these on your own site.
+ */
+
+@import url(http://fonts.googleapis.com/css?family=Roboto);
+
+body {
+  margin: 0;
+  padding: 40px 0 0 0;
+  font-family: sans-serif;
+  color: #333;
+  line-height: 140%;
+}
+
+hr {
+  margin-top: 2em;
+  background-color: #ddd;
+  border: none;
+  height: 1px;
+}
+
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-size: .875em;
+  font-weight: 700;
+}
+nav li {
+  list-style: none;
+  display: block;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+@media only screen and (min-width: 768px) {
+  nav li {
+    display: inline-block;
+  }
+}
+
+.sep {
+  color: #ddd;
+  margin: 0 4px;
+}
+
+.carbon-ad.ad {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  max-width: 320px;
+  margin: 0 auto;
+  margin-top: 6em;
+  padding: 1em 2.5em;
+  padding-top: 2em;
+  text-align: center;
+  font-size: 14px;
+}
+
+.carbon-ad-label {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  margin-bottom: 2px;
+  font-size: 11px;
+  text-align: center;
+  color: #999;
+}
+
+.carbon-ad .carbon-poweredby {
+  margin-bottom: 0;
+  font-size: 12px;
+}
+
+.carbon-ad .carbon-img {
+  margin: 0 auto;
+  margin-bottom: .625em;
+  background: white;
+}
+
+.carbon-ad img {
+  display: block;
+  border: solid 1px #ddd;
+}
+
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.browsehappy {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    padding: 1em;
+    background: black;
+    color: white;
+    text-align: center;
+}
+
+img {
+  border: none;
+}
+
+small {
+    display: block;
+}
+
+p,
+[class^="hvr-"] {
+    font-family: 'Roboto', sans-serif;
+}
+
+[class^="hvr-"] {
+  margin: .4em;
+  padding: 1em;
+  cursor: pointer;
+  background: #e1e1e1;
+  text-decoration: none;
+  color: #666;
+  /* Prevent highlight colour when element is tapped */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+  /* Smooth fonts */
+  -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.aligncenter {
+  text-align: center;
+}
+
+.sup {
+    vertical-align: super;
+    margin-left: -1em;
+    padding: .21875em;
+    line-height: 100%;
+    font-size: .21875em;
+    border: #eee solid 1px;
+    border-radius: 4px;
+    color: inherit;
+}
+
+.sup:hover {
+    background: #eee;
+}
+
+a {
+    color: #2098D1;
+    text-decoration: none;
+}
+
+.footer a:hover,
+.nav:hover {
+    color: #207AD1;
+}
+
+.nav {
+  display: inline-block;
+  font-size: .8em;
+}
+
+.nav.hvr-icon-down,
+.nav.hvr-icon-forward {
+  padding-right: 1.2em;
+}
+
+.nav.hvr-icon-down::before,
+.nav.hvr-icon-forward::before {
+  right: 0;
+}
+
+.nav:hover,
+.nav:focus,
+.nav:active {
+  text-decoration: none;
+}
+
+.intro {
+  max-width: 680px;
+  margin: 20px auto 0 auto;
+}
+
+.button.cta {
+  display: inline-block;
+  position: relative;
+  margin: 1.2em 0 1em 0;
+  padding: 1em;
+  background: #2098D1;
+  border: none;
+  text-decoration: none;
+  font-weight: 700;
+  color: white;
+}
+
+.effects {
+  margin-top: 6em;
+}
+
+h1 {
+  text-align: center;
+  font-size: 3em;
+}
+
+h2 {
+  margin-top: 2em;
+}
+
+h3 {
+  margin: 0;
+}
+
+.about {
+  border-top: #333 solid 2px;
+  border-bottom: #333 solid 2px;
+}
+
+.footer {
+  overflow: hidden;
+  width: auto;
+  margin-top: 6em;
+  font-size: .9em;
+}
+
+.footer a {
+  text-decoration: none;
+}
+
+.credit {
+  font-size: .8em;
+  font-weight: normal;
+}
+
+.licenses {
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+
+.licenses:after {
+  display: block;
+  content: '';
+  clear: both;
+}
+
+.license {
+  display: block !important;
+  margin-bottom: 20px;
+  text-align: center;
+  border: #2098D1 solid 1px;
+}
+
+.license:focus,
+.license:hover {
+  border-color: #207AD1;
+}
+
+.license:focus .button,
+.license:hover .button {
+  background-color: #207AD1;
+  color: white;
+}
+
+.license__content {
+  padding: 25px 10px;
+}
+
+.license__title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.4;
+}
+
+.license__title div {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.license__desc {
+  margin-top: 30px;
+  margin-bottom: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.license__button.cta {
+  display: block;
+  margin: 0;
+  font-size: 22px;
+}
+
+@media only screen and (min-width: 568px) {
+  .license {
+    width: 48%;
+    float: left;
+  }
+
+  .license:nth-child(2) {
+    float: right;
+  }
+
+  .license__content {
+    padding: 40px 10px;
+  }
+}
+
+.download {
+  margin-top: 2.6em;
+}
+
+.social-button {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.twitter-follow-button {
+    display: block;
+    margin: 0 auto;
+}
+
+.follow {
+    margin-bottom: 20px;
+    line-height: 200%;
+}
+
+.made-by {
+  display: block;
+  margin-top: 3em;
+  padding-top: 3em;
+  padding-bottom: 1em;
+  font-family: $fontFeature;
+  font-size: 1.125em;
+  text-align: center;
+  line-height: 1.6;
+  background: #181818;
+  color: #777;
+}
+
+.made-by svg {
+  display: block;
+}
+
+.made-by ul,
+.made-by p {
+  margin: 0;
+  padding: 0;
+}
+
+.made-by ul {
+  margin-bottom: .25em;
+}
+
+.made-by li {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.made-by p {
+  margin-top: .4em;
+  font-size: .875em;
+}
+
+.made-by a {
+  display: inline-block;
+  padding: 0 .125em;
+  color: #B1B1B1;
+  transition-duration: .2s;
+  transition-property: color;
+}
+
+.made-by a:focus,
+.made-by a:hover {
+  color: white;
+}
+
+.made-by i {
+  font-size: 26px;
+  height: 30px;
+}
+
+.made-by .follow {
+  margin-top: 2em;
+}
+
+.made-by .follow iframe {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: .5em;
+}
+
+.made-by small {
+  display: block;
+  margin-top: 3em;
+  font-size: .625em;
+}
+
+@-webkit-keyframes circle {
+  50% {
+    -webkit-transform: scale(1.26923077);
+    transform: scale(1.26923077);
+  }
+}
+
+@keyframes circle {
+  50% {
+    transform: scale(1.26923077);
+  }
+}
+
+@-webkit-keyframes initials {
+  50% {
+    -webkit-transform: translateY(-8px) translateZ(0);
+    transform: translateY(-8px) translateZ(0);
+  }
+}
+
+@keyframes initials {
+  50% {
+    transform: translateY(-8px) translateZ(0);
+  }
+}
+
+.ild-ident {
+  display: block;
+}
+
+.ild-ident svg {
+  display: block;
+  overflow: visible;
+  transform: scale(1) translateZ(0);
+}
+
+.ild-ident .circle-holder {
+  transform: translate(-7px, -7px);
+}
+
+.ild-ident .circle {
+  transform: translate(7px, 7px);
+}
+
+.ild-ident .active .i {
+  animation: initials .4s ease-in-out;
+}
+
+.ild-ident .active .l {
+  animation: initials .4s .2s ease-in-out;
+}
+
+.ild-ident .active .circle {
+  animation: circle .5s .1s ease-in-out;
+}
+
+#forkongithub {
+    display: none;
+}
+
+#forkongithub a {
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+  font-family: arial, sans-serif;
+  text-align: center;
+  font-weight: bold;
+  padding: 5px 40px;
+  font-size: 1rem;
+  line-height: 2rem;
+  position: relative;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+}
+
+#forkongithub a:hover,
+#forkongithub a:focus,
+#forkongithub a:active {
+  background: #2098D1;
+  color: #fff;
+}
+
+#forkongithub a::before,
+#forkongithub a::after {
+  content: "";
+  width: 100%;
+  display: block;
+  position: absolute;
+  top: 1px;
+  left: 0;
+  height: 1px;
+  background: #fff;
+}
+
+#forkongithub a::after {
+  bottom: 1px;
+  top: auto;
+}
+
+.ad {
+  margin-top: 3.5em;
+  padding: 3em 1.5em;
+  background: #f8f8f8;
+  text-align: center;
+}
+
+.ad h2 {
+  margin: 0;
+  margin-bottom: 2em;
+  line-height: 1.4;
+  font-size: 1.2em;
+}
+
+.ad a {
+  display: inline-block;
+  margin: 0 auto 2em auto;
+}
+
+.ad__preview {
+  font-size: 0;
+}
+
+.ad__preview a {
+  display: block;
+  width: 75%;
+}
+
+.ad__preview img {
+  width: 100%;
+}
+
+@media only screen and (min-width: 360px) {
+  h1 {
+    font-size: 4em;
+  }
+}
+
+@media screen and (min-width: 640px) {
+  #forkongithub {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    width: 200px;
+    overflow: hidden;
+    height: 200px;
+  }
+
+  #forkongithub a {
+    width: 200px;
+    position: absolute;
+    top: 60px;
+    right: -60px;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.8);
+  }
+
+  .ad__preview a {
+    display: inline-block;
+    width: 32%;
+  }
+
+  .ad__preview .second {
+    margin: 0 2%;
+  }
+}

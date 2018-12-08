@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html <%- has_config('language') ? ' lang="' + get_config('language').substring(0, 2) + '"' : '' %>>
+<head>
+    <%- partial('common/head') %>
+</head>
+<body class="is-<%= column_count() %>-column">
+    <%- partial('common/navbar', { page }) %>
+    <% function main_column_class() {
+        switch (column_count()) {
+            case 1:
+                return 'is-12';
+            case 2:
+                return 'is-8-tablet is-8-desktop is-8-widescreen';
+            case 3:
+                return 'is-8-tablet is-8-desktop is-6-widescreen'
+        }
+        return '';
+    } %>
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column <%= main_column_class() %> has-order-2 column-main"><%- body %></div>
+                <%- partial('common/widget', { position: 'left' }) %>
+                <%- partial('common/widget', { position: 'right' }) %>
+            </div>
+        </div>
+    </section>
+    <%- partial('common/footer') %>
+    <%- partial('common/scripts') %>
+
+    <% if (has_config('search.type')) { %>
+    <%- partial('search/' + get_config('search.type')) %>
+    <% } %>
+</body>
+</html>

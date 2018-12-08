@@ -1,0 +1,25 @@
+/* Bubble Left */
+.bubble-left() {
+	.hacks();
+	position: relative;
+
+	&:before {
+		pointer-events: none;
+		position: absolute;
+		z-index: -1;
+		content: '';
+		border-style: solid;
+		.prefixed(transition-duration, @mediumDuration);
+		.prefixed(transition-property, transform);
+		top: calc(~"50%" - @tipHeight);
+		left: 0;
+		border-width: @tipHeight @tipWidth @tipHeight 0;
+		border-color: transparent @tipColor transparent transparent;
+	}
+
+	&:hover:before,
+	&:focus:before,
+	&:active:before {
+		.prefixed(transform, translateX(-(@tipWidth)));
+	}
+}

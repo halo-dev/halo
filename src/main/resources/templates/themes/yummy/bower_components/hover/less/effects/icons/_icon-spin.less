@@ -1,0 +1,19 @@
+/* Icon Spin */
+.icon-spin() {
+	.hacks();
+
+	.hvr-icon {
+		.prefixed(transition-duration, 1s);
+		.prefixed(transition-property, transform);
+		.prefixed(transition-timing-function, ease-in-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			.prefixed(transform, rotate(360deg));
+		}
+	}
+}

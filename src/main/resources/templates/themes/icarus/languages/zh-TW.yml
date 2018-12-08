@@ -1,0 +1,37 @@
+common:
+    archive:
+        one: '歸檔'
+        other: '歸檔'
+    category:
+        one: '分類'
+        other: '分類'
+    tag:
+        one: '標籤'
+        other: '標籤'
+    post:
+        one: '文章'
+        other: '文章'
+    prev: '上一頁'
+    next: '下一頁'
+widget:
+    follow: '關注我'
+    recents: '最新文章'
+    links: '連結'
+    tag_cloud: '標籤雲'
+    catalogue: '文章目錄'
+article:
+    more: '繼續閱讀'
+    comments: '評論'
+    read: 'read'
+    about: 'About'
+    words: 'words'
+search:
+    search: '搜索'
+    hint: 'Type something...'
+insight:
+    hint: 'Type something...'
+    posts: '文章'
+    pages: 'Pages'
+    categories: '分類'
+    tags: '標籤'
+    untitled: '(Untitled)'

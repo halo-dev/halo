@@ -28,6 +28,23 @@ public class ApiTagController {
     /**
      * 获取所有标签
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": [
+     *         {
+     *             "tagId": ,
+     *             "tagName": "",
+     *             "tagUrl": ""
+     *         }
+     *     ]
+     * }
+     *     </pre>
+     * </p>
+     *
      * @return JsonResult
      */
     @GetMapping
@@ -42,6 +59,21 @@ public class ApiTagController {
 
     /**
      * 获取单个标签的信息
+     *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": {
+     *         "tagId": ,
+     *         "tagName": "",
+     *         "tagUrl": ""
+     *     }
+     * }
+     *     </pre>
+     * </p>
      *
      * @param tagUrl tagUrl
      * @return JsonResult

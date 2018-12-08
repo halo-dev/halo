@@ -1,0 +1,47 @@
+/* Icon Wobble Vertical */
+@include keyframes(#{$nameSpace}-icon-wobble-vertical) {
+	16.65% {
+		@include prefixed(transform, translateY(6px));
+	}
+
+	33.3% {
+		@include prefixed(transform, translateY(-5px));
+	}
+
+	49.95% {
+		@include prefixed(transform, translateY(4px));
+	}
+
+	66.6% {
+		@include prefixed(transform, translateY(-2px));
+	}
+
+	83.25% {
+		@include prefixed(transform, translateY(1px));
+	}
+
+	100% {
+		@include prefixed(transform, translateY(0));
+	}
+}
+
+@mixin icon-wobble-vertical {
+	@include hacks();
+	@include prefixed(transition-duration, $mediumDuration);
+
+	.hvr-icon {
+		@include prefixed(transform, translateZ(0));
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			@include prefixed(animation-name, #{$nameSpace}-icon-wobble-vertical);
+			@include prefixed(animation-duration, 1s);
+			@include prefixed(animation-timing-function, ease-in-out);
+			@include prefixed(animation-iteration-count, 1);
+		}
+	}
+}

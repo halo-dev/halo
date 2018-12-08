@@ -31,6 +31,26 @@ public class ApiMenuController {
     /**
      * 获取所有菜单
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": [
+     *         {
+     *             "menuId": ,
+     *             "menuName": "",
+     *             "menuUrl": "",
+     *             "menuSort": ,
+     *             "menuIcon": "",
+     *             "menuTarget":
+     *         }
+     *     ]
+     * }
+     *     </pre>
+     * </p>
+     *
      * @return JsonResult
      */
     @GetMapping

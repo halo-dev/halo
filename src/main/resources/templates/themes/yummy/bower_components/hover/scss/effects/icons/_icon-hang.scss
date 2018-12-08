@@ -1,0 +1,42 @@
+/* Icon Hang */
+@include keyframes(#{$nameSpace}-icon-hang) {
+	0% {
+		@include prefixed(transform, translateY(6px));
+	}
+	50% {
+		@include prefixed(transform, translateY(2px));
+	}
+	100% {
+		@include prefixed(transform, translateY(6px));
+	}
+}
+
+@include keyframes(#{$nameSpace}-icon-hang-sink) {
+	100% {
+		@include prefixed(transform, translateY(6px));
+	}
+}
+
+@mixin icon-hang {
+	@include hacks();
+	@include prefixed(transition-duration, $mediumDuration);
+
+	.hvr-icon {
+		@include prefixed(transform, translateZ(0));
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			@include prefixed(animation-name, "#{$nameSpace}-icon-hang-sink, #{$nameSpace}-icon-hang");
+			@include prefixed(animation-duration, ".3s, 1.5s");
+			@include prefixed(animation-delay, "0s, .3s");
+			@include prefixed(animation-timing-function, "ease-out, ease-in-out");
+			@include prefixed(animation-iteration-count, "1, infinite");
+			@include prefixed(animation-fill-mode, "forwards");
+			@include prefixed(animation-direction, "normal, alternate");
+		}
+	}
+}

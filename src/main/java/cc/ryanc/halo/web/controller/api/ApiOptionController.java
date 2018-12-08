@@ -28,6 +28,31 @@ public class ApiOptionController {
     /**
      * 获取所有设置选项
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": {
+     *         "blog_start": "",
+     *         "blog_locale": "",
+     *         "blog_url": "",
+     *         "api_token": "",
+     *         "api_status": "",
+     *         "blog_title": "",
+     *         "new_comment_notice": "",
+     *         "smtp_email_enable": "",
+     *         "attach_loc": "",
+     *         "theme": "",
+     *         "comment_reply_notice": "",
+     *         "is_install": "",
+     *         "comment_pass_notice": ""
+     *     }
+     * }
+     *     </pre>
+     * </p>
+     *
      * @return JsonResult
      */
     @GetMapping
@@ -44,6 +69,17 @@ public class ApiOptionController {
 
     /**
      * 获取单个设置项
+     *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": ""
+     * }
+     *     </pre>
+     * </p>
      *
      * @param optionName 设置选项名称
      * @return JsonResult

@@ -1,0 +1,35 @@
+/* Ripple Out */
+.keyframes(~"@{nameSpace}-ripple-out", {
+	100% {
+		top: -(6px + 6px);
+		right: -(6px + 6px);
+		bottom: -(6px + 6px);
+		left: -(6px + 6px);
+		opacity: 0;
+	}
+});
+
+.ripple-out() {
+	@outerBorderWidth: 6px;
+	@innerBorderWidth: 6px;
+
+	.hacks();
+	position: relative;
+
+	&:before {
+		content: '';
+		position: absolute;
+		border: @primaryColor solid @outerBorderWidth;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		.prefixed(animation-duration, 1s);
+	}
+
+	&:hover:before,
+	&:focus:before,
+	&:active:before {
+		.prefixed(animation-name, ~"@{nameSpace}-ripple-out");
+	}
+}

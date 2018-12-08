@@ -1,0 +1,33 @@
+/* Rectangle Out */
+@mixin rectangle-out {
+	@include hacks();
+	position: relative;
+	background: $primaryColor;
+	@include prefixed(transition-property, color);
+	@include prefixed(transition-duration, $mediumDuration);
+
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: $activeColor;
+		@include prefixed(transform, scale(0));
+		@include prefixed(transition-property, transform);
+		@include prefixed(transition-duration, $mediumDuration);
+		@include prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: white;
+
+		&:before {
+			@include prefixed(transform, scale(1));
+		}
+	}
+}

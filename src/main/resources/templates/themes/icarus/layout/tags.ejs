@@ -1,0 +1,23 @@
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                <%= _p('common.tag', Infinity) %>
+            </h3>
+            <ul class="menu-list">
+                <% _list_tags().forEach(tag => { %>
+                <li>
+                    <a class="level is-marginless" href="<%= tag.url %>">
+                        <span class="level-start">
+                            <span class="level-item"><%= tag.name %></span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag"><%= tag.count %></span>
+                        </span>
+                    </a>
+                </li>
+                <% }) %>
+            </ul>
+        </div>
+    </div>
+</div>

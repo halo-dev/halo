@@ -1,0 +1,30 @@
+/* Bubble Float Top */
+@mixin bubble-float-top {
+	@include hacks();
+	position: relative;
+	@include prefixed(transition-duration, $mediumDuration);
+	@include prefixed(transition-property, transform);
+
+	&:before {
+		position: absolute;
+		z-index: -1;
+		content: '';
+		left: calc(50% - #{$tipWidth});
+		top: 0;
+		border-style: solid;
+		border-width: 0 $tipWidth $tipHeight $tipWidth;
+		border-color: transparent transparent $tipColor transparent;
+		@include prefixed(transition-duration, $mediumDuration);
+		@include prefixed(transition-property, transform);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		@include prefixed(transform, translateY($tipHeight));
+
+		&:before {
+			@include prefixed(transform, translateY(-($tipHeight)));
+		}
+	}
+}

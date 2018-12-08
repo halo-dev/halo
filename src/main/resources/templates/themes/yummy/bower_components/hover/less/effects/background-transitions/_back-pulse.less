@@ -1,0 +1,26 @@
+/* Back Pulse */
+.keyframes(~"@{nameSpace}-back-pulse", {
+	50% {
+		background-color: rgba(32, 152, 209, .75);
+	}
+});
+
+.back-pulse() {
+	.hacks();
+	overflow: hidden;
+	.prefixed(transition-duration, @slowDuration);
+	.prefixed(transition-property, "color, background-color");
+
+	&:hover,
+	&:focus,
+	&:active {
+		.prefixed(animation-name, ~"@{nameSpace}-back-pulse");
+		.prefixed(animation-duration, 1s);
+		.prefixed(animation-delay, @slowDuration);
+		.prefixed(animation-timing-function, linear);
+		.prefixed(animation-iteration-count, infinite);
+		background-color: @activeColor;
+		background-color: rgba(32, 152, 209, 1);
+		color: white;
+	}
+}

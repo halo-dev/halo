@@ -1,0 +1,34 @@
+<% if (site.posts.length) { %>
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            <%= __('widget.recents') %>
+        </h3>
+        <% site.posts.sort('date', -1).limit(5).each(post => { %>
+        <article class="media">
+            <% if (!has_config('article.thumbnail') || get_config('article.thumbnail') !== false) { %>
+            <a href="<%- url_for((post.link?post.link:post.path)) %>" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="<%= get_thumbnail(post) %>" alt="<%= post.title %>">
+                </p>
+            </a>
+            <% } %>
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="<%= date_xml(post.date) %>"><%= date(post.date) %></time></div>
+                    <a href="<%- url_for((post.link?post.link:post.path)) %>" class="has-link-black-ter is-size-6"><%= post.title %></a>
+                    <p class="is-size-7 is-uppercase">
+                        <%- list_categories(post.categories, {
+                            show_count: false,
+                            class: 'has-link-grey ',
+                            depth:2,
+                            style: 'none',
+                            separator: ' / '}) %>
+                    </p>
+                </div>
+            </div>
+        </article>
+        <% }) %>
+    </div>
+</div>
+<% } %>
