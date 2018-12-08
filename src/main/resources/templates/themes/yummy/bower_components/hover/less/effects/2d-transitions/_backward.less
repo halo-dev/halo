@@ -1,0 +1,12 @@
+/* Backward */
+.backward() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+	.prefixed(transition-property, transform);
+
+	&:hover,
+	&:focus,
+	&:active {
+		.prefixed(transform, translateX(-8px));
+	}
+}

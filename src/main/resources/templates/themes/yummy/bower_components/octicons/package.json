@@ -1,0 +1,23 @@
+{
+  "name": "octicons",
+  "version": "3.5.0",
+  "description": "GitHub's icon font",
+  "main": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/github/octicons.git"
+  },
+  "keywords": [
+    "GitHub",
+    "icons",
+    "font",
+    "web font",
+    "icon font"
+  ],
+  "author": "GitHub <support@github.com>",
+  "license": "(OFL-1.1 AND MIT)",
+  "bugs": {
+    "url": "https://github.com/github/octicons/issues"
+  },
+  "homepage": "https://octicons.github.com"
+}

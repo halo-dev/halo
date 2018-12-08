@@ -1,0 +1,27 @@
+/* Trim */
+.trim() {
+	@outerBorderWidth: 4px;
+	@innerBorderWidth: 4px;
+
+	.hacks();
+	position: relative;
+
+	&:before {
+		content: '';
+		position: absolute;
+		border: white solid @innerBorderWidth;
+		top: @outerBorderWidth;
+		left: @outerBorderWidth;
+		right: @outerBorderWidth;
+		bottom: @outerBorderWidth;
+		opacity: 0;
+		.prefixed(transition-duration, @mediumDuration);
+		.prefixed(transition-property, opacity);
+	}
+
+	&:hover:before,
+	&:focus:before,
+	&:active:before {
+		opacity: 1;
+	}
+}

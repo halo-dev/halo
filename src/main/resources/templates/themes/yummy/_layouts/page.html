@@ -1,0 +1,9 @@
+---
+layout: default
+---
+{% include jumbotron.html %}
+<article class="post container">
+
+    {{ content }}
+
+</article>

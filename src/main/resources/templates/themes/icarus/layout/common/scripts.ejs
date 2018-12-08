@@ -1,0 +1,11 @@
+<%- js(cdn('jquery', '3.3.1', 'dist/jquery.min.js')) %>
+<%- js(cdn('moment', '2.22.2', 'min/moment-with-locales.min.js')) %>
+<script>moment.locale("<%= get_config('language', 'en') %>");</script>
+
+<% if (has_config('plugins')) { %>
+    <% for (let plugin in get_config('plugins')) { %>
+    <%- partial('plugin/' + plugin, { head: false, plugin: get_config('plugins')[plugin] }) %>
+    <% } %>
+<% } %>
+
+<%- js('js/main') %>

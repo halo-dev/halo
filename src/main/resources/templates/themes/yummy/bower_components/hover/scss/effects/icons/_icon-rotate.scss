@@ -1,0 +1,23 @@
+/* Icon Rotate */
+@mixin icon-rotate {
+	$duration: $mediumDuration;
+
+	@include hacks();
+	@include prefixed(transition-duration, $duration);
+
+	.hvr-icon {
+		@include prefixed(transform, translateZ(0));
+		@include prefixed(transition-duration, $duration);
+		@include prefixed(transition-property, transform);
+		@include prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			@include prefixed(transform, rotate(20deg));
+		}
+	}
+}

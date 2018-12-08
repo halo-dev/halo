@@ -1,0 +1,33 @@
+/* Rectangle Out */
+.rectangle-out() {
+	.hacks();
+	position: relative;
+	background: @primaryColor;
+	.prefixed(transition-property, color);
+	.prefixed(transition-duration, @mediumDuration);
+
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: @activeColor;
+		.prefixed(transform, scale(0));
+		.prefixed(transition-property, transform);
+		.prefixed(transition-duration, @mediumDuration);
+		.prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: white;
+
+		&:before {
+			.prefixed(transform, scale(1));
+		}
+	}
+}

@@ -1,0 +1,57 @@
+.ins-section-container {
+    position: relative;
+    background: #f7f7f7;
+}
+
+.ins-section {
+    font-size: 14px;
+    line-height: 16px;
+}
+
+.ins-section .ins-section-header, .ins-section .ins-search-item {
+    padding: 8px 15px;
+}
+
+.ins-section .ins-section-header {
+    color: #9a9a9a;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.ins-section .ins-slug {
+    margin-left: 5px;
+    color: #9a9a9a;
+}
+
+.ins-section .ins-slug:before {
+    content: '(';
+}
+
+.ins-section .ins-slug:after {
+    content: ')';
+}
+
+.ins-section .ins-search-item header, .ins-section .ins-search-item .ins-search-preview {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.ins-section .ins-search-item header .ins-title {
+    margin-left: 8px;
+}
+
+.ins-section .ins-search-item .ins-search-preview {
+    height: 15px;
+    font-size: 12px;
+    color: #9a9a9a;
+    margin: 5px 0 0 20px;
+}
+
+.ins-section .ins-search-item:hover, .ins-section .ins-search-item.active {
+    color: #fff;
+    background: #3273dc;
+}
+
+.ins-section .ins-search-item:hover .ins-slug, .ins-section .ins-search-item.active .ins-slug, .ins-section .ins-search-item:hover .ins-search-preview, .ins-section .ins-search-item.active .ins-search-preview {
+    color: #fff;
+}

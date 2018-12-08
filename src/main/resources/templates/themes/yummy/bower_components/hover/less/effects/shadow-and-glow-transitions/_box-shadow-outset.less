@@ -1,0 +1,12 @@
+/* Box Shadow Outset */
+.box-shadow-outset() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+	.prefixed(transition-property, box-shadow);
+
+	&:hover,
+	&:focus,
+	&:active {
+		box-shadow: 2px 2px 2px @shadowColor;
+	}
+}

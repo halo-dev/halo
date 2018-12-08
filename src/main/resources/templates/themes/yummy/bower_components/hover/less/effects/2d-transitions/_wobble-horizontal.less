@@ -1,0 +1,39 @@
+/* Wobble Horizontal */
+.keyframes(~"@{nameSpace}-wobble-horizontal", {
+	16.65% {
+		.prefixed(transform, translateX(8px));
+	}
+
+	33.3% {
+		.prefixed(transform, translateX(-6px));
+	}
+
+	49.95% {
+		.prefixed(transform, translateX(4px));
+	}
+
+	66.6% {
+		.prefixed(transform, translateX(-2px));
+	}
+
+	83.25% {
+		.prefixed(transform, translateX(1px));
+	}
+
+	100% {
+		.prefixed(transform, translateX(0));
+	}
+});
+
+.wobble-horizontal() {
+	.hacks();
+
+	&:hover,
+	&:focus,
+	&:active {
+		.prefixed(animation-name, ~"@{nameSpace}-wobble-horizontal");
+		.prefixed(animation-duration, 1s);
+		.prefixed(animation-timing-function, ease-in-out);
+		.prefixed(animation-iteration-count, 1);
+	}
+}

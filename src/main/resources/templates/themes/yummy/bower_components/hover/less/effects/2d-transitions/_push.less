@@ -1,0 +1,23 @@
+/* Push */
+.keyframes(~"@{nameSpace}-push", {
+	50% {
+		.prefixed(transform, scale(.8));
+	}
+
+	100% {
+		.prefixed(transform, scale(1));
+	}
+});
+
+.push() {
+	.hacks();
+
+	&:hover,
+	&:focus,
+	&:active {
+		.prefixed(animation-name, ~"@{nameSpace}-push");
+		.prefixed(animation-duration, .3s);
+		.prefixed(animation-timing-function, linear);
+		.prefixed(animation-iteration-count, 1);
+	}
+}

@@ -1,0 +1,30 @@
+/* Icon Push */
+.keyframes(~"@{nameSpace}-icon-push", {
+	50% {
+		.prefixed(transform, scale(.5));
+	}
+});
+
+.icon-push() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+
+	.hvr-icon {
+		.prefixed(transform, translateZ(0));
+		.prefixed(transition-duration, @mediumDuration);
+		.prefixed(transition-property, transform);
+		.prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			.prefixed(animation-name, ~"@{nameSpace}-icon-push");
+			.prefixed(animation-duration, @mediumDuration);
+			.prefixed(animation-timing-function, linear);
+			.prefixed(animation-iteration-count, 1);
+		}
+	}
+}

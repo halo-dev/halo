@@ -1,0 +1,6 @@
+{
+  "name": "underscore",
+  "main": "underscore.js",
+  "keywords": ["util", "functional", "server", "client", "browser"],
+  "ignore" : ["docs", "test", "*.yml", "CNAME", "index.html", "favicon.ico", "CONTRIBUTING.md", ".*", "package.json", "karma.*"]
+}

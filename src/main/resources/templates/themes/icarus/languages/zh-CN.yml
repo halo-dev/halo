@@ -1,0 +1,39 @@
+common:
+    archive:
+        one: '文档'
+        other: '文档'
+    category:
+        one: '分类'
+        other: '分类'
+    tag:
+        one: '标签'
+        other: '标签'
+    post:
+        one: '文章'
+        other: '文章'
+    prev: '上一页'
+    next: '下一页'
+widget:
+    follow: '关注我'
+    recents: '最新文章'
+    links: '链接'
+    tag_cloud: '标签云'
+    catalogue: '目录'
+article:
+    more: '阅读更多'
+    comments: '评论'
+    read: '读完'
+    about: '大约'
+    words: '个字'
+plugin:
+    backtotop: '回到顶端'
+search:
+    search: '搜索'
+    hint: '想要查找什么...'
+insight:
+    hint: '想要查找什么...'
+    posts: '文章'
+    pages: '页面'
+    categories: '分类'
+    tags: '标签'
+    untitled: '(无标题)'

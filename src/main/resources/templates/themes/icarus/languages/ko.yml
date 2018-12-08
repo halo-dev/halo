@@ -1,0 +1,37 @@
+common:
+    archive:
+        one: '아카이브'
+        other: '아카이브'
+    category:
+        one: '카테고리'
+        other: '카테고리'
+    tag:
+        one: '태그'
+        other: '태그'
+    post:
+        one: '포스트'
+        other: '포스트'
+    prev: '이전'
+    next: '다음'
+widget:
+    follow: '팔로우'
+    recents: '최근 글'
+    links: '링크'
+    tag_cloud: '태그 클라우드'
+    catalogue: '카탈로그'
+article:
+    more: '자세히 보기'
+    comments: '댓글'
+    read: 'read'
+    about: 'About'
+    words: 'words'
+search:
+    search: 'Search'
+    hint: 'Type something...'
+insight:
+    hint: 'Type something...'
+    posts: '포스트'
+    pages: 'Pages'
+    categories: '카테고리'
+    tags: '태그'
+    untitled: '(Untitled)'

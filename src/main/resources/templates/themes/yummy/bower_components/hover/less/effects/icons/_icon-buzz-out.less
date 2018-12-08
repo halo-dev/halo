@@ -1,0 +1,63 @@
+/* Icon Buzz Out */
+.keyframes(~"@{nameSpace}-icon-buzz-out", {
+	10% {
+		.prefixed(transform, translateX(3px) rotate(2deg));
+	}
+
+	20% {
+		.prefixed(transform, translateX(-3px) rotate(-2deg));
+	}
+
+	30% {
+		.prefixed(transform, translateX(3px) rotate(2deg));
+	}
+
+	40% {
+		.prefixed(transform, translateX(-3px) rotate(-2deg));
+	}
+
+	50% {
+		.prefixed(transform, translateX(2px) rotate(1deg));
+	}
+
+	60% {
+		.prefixed(transform, translateX(-2px) rotate(-1deg));
+	}
+
+	70% {
+		.prefixed(transform, translateX(2px) rotate(1deg));
+	}
+
+	80% {
+		.prefixed(transform, translateX(-2px) rotate(-1deg));
+	}
+
+	90% {
+		.prefixed(transform, translateX(1px) rotate(0));
+	}
+
+	100% {
+		.prefixed(transform, translateX(-1px) rotate(0));
+	}
+});
+
+.icon-buzz-out() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+
+	.hvr-icon {
+		.prefixed(transform, translateZ(0));
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			.prefixed(animation-name, ~"@{nameSpace}-icon-buzz-out");
+			.prefixed(animation-duration, .75s);
+			.prefixed(animation-timing-function, linear);
+			.prefixed(animation-iteration-count, 1);
+		}
+	}
+}

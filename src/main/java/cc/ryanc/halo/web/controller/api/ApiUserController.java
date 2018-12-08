@@ -29,6 +29,23 @@ public class ApiUserController {
     /**
      * 获取博主信息
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": {
+     *         "userId": ,
+     *         "userDisplayName": "",
+     *         "userEmail": "",
+     *         "userAvatar": "",
+     *         "userDesc": ""
+     *     }
+     * }
+     *     </pre>
+     * </p>
+     *
      * @return JsonResult
      */
     @GetMapping

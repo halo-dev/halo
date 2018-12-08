@@ -1,0 +1,12 @@
+/* Round Corners */
+.round-corners() {
+	.hacks();
+	.prefixed(transition-duration, @mediumDuration);
+	.prefixed(transition-property, border-radius);
+
+	&:hover,
+	&:focus,
+	&:active {
+		border-radius: 1em;
+	}
+}

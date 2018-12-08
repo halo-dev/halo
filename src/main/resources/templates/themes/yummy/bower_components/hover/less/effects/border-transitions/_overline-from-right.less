@@ -1,0 +1,31 @@
+/* Overline From Right */
+.overline-from-right() {
+	@duration: @mediumDuration;
+
+	.hacks();
+	position: relative;
+	overflow: hidden;
+
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		left: 100%;
+		right: 0;
+		top: 0;
+		background: @activeColor;
+		height: 4px;
+		.prefixed(transition-property, "left");
+		.prefixed(transition-duration, @duration);
+		.prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		&:before {
+			left: 0;
+		}
+	}
+}

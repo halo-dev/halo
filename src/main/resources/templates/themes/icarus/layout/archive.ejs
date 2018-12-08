@@ -1,0 +1,56 @@
+<% function buildArchive(posts, year, month = null) {
+    const time = moment([page.year, page.month ? page.month - 1 : null].filter(i => i !== null)); %>
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="tag is-link">
+        <%= month === null ? year : time.locale(get_config('language', 'en')).format('MMMM YYYY') %>
+        </h3>
+        <div class="timeline">
+        <% posts.each(post => { %>
+            <article class="media">
+                <% if (has_thumbnail(post)) { %>
+                <a href="<%- url_for((post.link?post.link:post.path)) %>" class="media-left">
+                    <p class="image is-64x64">
+                        <img class="thumbnail" src="<%= get_thumbnail(post) %>" alt="<%= post.title %>">
+                    </p>
+                </a>
+                <% } %>
+                <div class="media-content">
+                    <div class="content">
+                        <time class="has-text-grey is-size-7 is-block is-uppercase" datetime="<%= date_xml(post.date) %>"><%= date(post.date) %></time>
+                        <a href="<%- url_for((post.link?post.link:post.path)) %>" class="has-link-black-ter is-size-6"><%= post.title %></a>
+                        <div class="level article-meta is-mobile">
+                            <div class="level-left">
+                                <% if (post.categories && post.categories.length) { %>
+                                <div class="level-item is-size-7 is-uppercase">
+                                <%- list_categories(post.categories, {
+                                    class: 'has-link-grey ',
+                                    show_count: false,
+                                    style: 'none',
+                                    separator: ' / '
+                                }) %>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        <% }) %>
+        </div>
+    </div>
+</div>
+<% }
+if (!page.year) {
+    let years = {};
+    page.posts.each(p => years[p.date.year()] = null);
+    for (let year of Object.keys(years).sort((a, b) => b - a)) {
+        let posts = page.posts.filter(p => p.date.year() == year); %>
+        <%- buildArchive(posts, year, null) %>
+    <% }
+} else { %>
+<%- buildArchive(page.posts, page.year, page.month) %>
+<% } %>
+<% if (page.total > 1) { %>
+    <%- partial('common/paginator') %>
+<% } %>

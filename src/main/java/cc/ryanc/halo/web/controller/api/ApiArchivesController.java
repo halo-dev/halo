@@ -31,6 +31,45 @@ public class ApiArchivesController {
     /**
      * 根据年份归档
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": [
+     *         {
+     *             "year": "",
+     *             "month": "",
+     *             "count": "",
+     *             "posts": [
+     *                 {
+     *                     "postId": "",
+     *                     "user": {},
+     *                     "postTitle": "",
+     *                     "postType": "",
+     *                     "postContentMd": "",
+     *                     "postContent": "",
+     *                     "postUrl": "",
+     *                     "postSummary": "",
+     *                     "categories": [],
+     *                     "tags": [],
+     *                     "comments": [],
+     *                     "postThumbnail": "",
+     *                     "postDate": "",
+     *                     "postUpdate": "",
+     *                     "postStatus": 0,
+     *                     "postViews": 0,
+     *                     "allowComment": 1,
+     *                     "customTpl": ""
+     *                 }
+     *             ]
+     *         }
+     *     ]
+     * }
+     *     </pre>
+     * </p>
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/year")
@@ -45,6 +84,45 @@ public class ApiArchivesController {
 
     /**
      * 根据月份归档
+     *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": [
+     *         {
+     *             "year": "",
+     *             "month": "",
+     *             "count": "",
+     *             "posts": [
+     *                 {
+     *                     "postId": "",
+     *                     "user": {},
+     *                     "postTitle": "",
+     *                     "postType": "",
+     *                     "postContentMd": "",
+     *                     "postContent": "",
+     *                     "postUrl": "",
+     *                     "postSummary": "",
+     *                     "categories": [],
+     *                     "tags": [],
+     *                     "comments": [],
+     *                     "postThumbnail": "",
+     *                     "postDate": "",
+     *                     "postUpdate": "",
+     *                     "postStatus": 0,
+     *                     "postViews": 0,
+     *                     "allowComment": 1,
+     *                     "customTpl": ""
+     *                 }
+     *             ]
+     *         }
+     *     ]
+     * }
+     *     </pre>
+     * </p>
      *
      * @return JsonResult
      */

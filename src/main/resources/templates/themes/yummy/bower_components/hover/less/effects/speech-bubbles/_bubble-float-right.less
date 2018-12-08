@@ -1,0 +1,30 @@
+/* Bubble Float Right */
+.bubble-float-right() {
+	.hacks();
+	position: relative;
+	.prefixed(transition-duration, @mediumDuration);
+	.prefixed(transition-property, transform);
+
+	&:before {
+		position: absolute;
+		z-index: -1;
+		top: calc(~"50%" - @tipHeight);
+		right: 0;
+		content: '';
+		border-style: solid;
+		border-width: @tipHeight 0 @tipHeight @tipWidth;
+		border-color: transparent transparent transparent @tipColor;
+		.prefixed(transition-duration, @mediumDuration);
+		.prefixed(transition-property, transform);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		.prefixed(transform, translateX(-(@tipWidth)));
+
+		&:before {
+			.prefixed(transform, translateX(@tipWidth));
+		}
+	}
+}

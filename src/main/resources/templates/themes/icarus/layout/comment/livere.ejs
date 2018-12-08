@@ -1,0 +1,22 @@
+<% if (!has_config('comment.uid')) { %>
+<div class="notification is-danger">
+    You forgot to set the <code>uid</code> for LiveRe. Please set it in <code>_config.yml</code>.
+</div>
+<% } else { %>
+<div id="lv-container" data-id="city" data-uid="<%= get_config('comment.uid') %>">
+    <script type="text/javascript">
+        (function(d, s) {
+            var j, e = d.getElementsByTagName(s)[0];
+
+            if (typeof LivereTower === 'function') { return; }
+
+            j = d.createElement(s);
+            j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+            j.async = true;
+
+            e.parentNode.insertBefore(j, e);
+        })(document, 'script');
+    </script>
+    <noscript> Please activate JavaScript for write a comment in LiveRe</noscript>
+</div>
+<% } %>

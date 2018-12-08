@@ -1,0 +1,37 @@
+common:
+    archive:
+        one: 'Arşiv'
+        other: 'Arşivler'
+    category:
+        one: 'Kategori'
+        other: 'Kategoriler'
+    tag:
+        one: 'Etiket'
+        other: 'Etiketler'
+    post:
+        one: 'Gönderi'
+        other: 'Gönderiler'
+    prev: 'Önceki'
+    next: 'Sonraki'
+widget:
+    follow: 'TAKİP ET'
+    recents: 'Son'
+    links: 'Linkler'
+    tag_cloud: 'Etiket bulutu'
+    catalogue: 'Katalog'
+article:
+    more: 'Daha fazla oku'
+    comments: 'Yorumlar'
+    read: 'read'
+    about: 'About'
+    words: 'words'
+search:
+    search: 'Search'
+    hint: 'Bir şeyler yaz...'
+insight:
+    hint: 'Bir şeyler yaz...'
+    posts: 'Gönderiler'
+    pages: 'Sayfalar'
+    categories: 'Kategoriler'
+    tags: 'Etiketler'
+    untitled: '(Başlıksız)'

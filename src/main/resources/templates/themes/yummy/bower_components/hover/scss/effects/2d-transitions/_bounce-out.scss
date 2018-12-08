@@ -1,0 +1,12 @@
+/* Bounce Out */
+@mixin bounce-out {
+	@include hacks();
+	@include prefixed(transition-duration, $slowDuration);
+
+	&:hover,
+	&:focus,
+	&:active {
+		@include prefixed(transform, scale(.8));
+		@include prefixed(transition-timing-function, cubic-bezier(.47,2.02,.31,-0.36));
+	}
+}

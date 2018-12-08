@@ -1,0 +1,37 @@
+common:
+    archive:
+        one: 'Arsip'
+        other: 'Arsip'
+    category:
+        one: 'Kategori'
+        other: 'Kategori'
+    tag:
+        one: 'tag'
+        other: 'tag'
+    post:
+        one: 'pos'
+        other: 'pos'
+    prev: 'Sebelumnya'
+    next: 'Berikutnya'
+widget:
+    follow: 'IKUTI'
+    recents: 'Terbaru'
+    links: 'tautan'
+    tag_cloud: 'awan tag'
+    catalogue: 'Catalogue'
+article:
+    more: 'Read More'
+    comments: 'Komentar'
+    read: 'read'
+    about: 'About'
+    words: 'words'
+search:
+    search: 'Search'
+    hint: 'Tulis Sesuatu..'
+insight:
+    hint: 'Tulis Sesuatu..'
+    posts: 'Pos'
+    pages: 'Halaman'
+    categories: 'Kategori'
+    tags: 'Tag'
+    untitled: 'Tanpa Judul'

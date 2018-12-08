@@ -1,0 +1,31 @@
+/* Icon Pulse */
+@include keyframes(#{$nameSpace}-icon-pulse) {
+	25% {
+		@include prefixed(transform, scale(1.3));
+	}
+
+	75% {
+		@include prefixed(transform, scale(.8));
+	}
+}
+
+@mixin icon-pulse {
+	@include hacks();
+
+	.hvr-icon {
+		@include prefixed(transform, translateZ(0));
+		@include prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			@include prefixed(animation-name, #{$nameSpace}-icon-pulse);
+			@include prefixed(animation-duration, 1s);
+			@include prefixed(animation-timing-function, linear);
+			@include prefixed(animation-iteration-count, infinite);
+		}
+	}
+}

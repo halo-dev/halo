@@ -35,6 +35,65 @@ public class ApiPostController {
     /**
      * 获取文章列表 分页
      *
+     * <p>
+     *     result api
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": {
+     *         "content": [
+     *             {
+     *                 "postId": ,
+     *                 "user": {},
+     *                 "postTitle": "",
+     *                 "postType": "",
+     *                 "postContentMd": "",
+     *                 "postContent": "",
+     *                 "postUrl": "",
+     *                 "postSummary": "",
+     *                 "categories": [],
+     *                 "tags": [],
+     *                 "comments": [],
+     *                 "postThumbnail": "",
+     *                 "postDate": "",
+     *                 "postUpdate": "",
+     *                 "postStatus": 0,
+     *                 "postViews": 0,
+     *                 "allowComment": 1,
+     *                 "customTpl": ""
+     *             }
+     *         ],
+     *         "pageable": {
+     *             "sort": {
+     *                 "sorted": true,
+     *                 "unsorted": false,
+     *                 "empty": false
+     *             },
+     *             "offset": 0,
+     *             "pageSize": 10,
+     *             "pageNumber": 0,
+     *             "unpaged": false,
+     *             "paged": true
+     *         },
+     *         "last": true,
+     *         "totalElements": 1,
+     *         "totalPages": 1,
+     *         "size": 10,
+     *         "number": 0,
+     *         "first": true,
+     *         "numberOfElements": 1,
+     *         "sort": {
+     *             "sorted": true,
+     *             "unsorted": false,
+     *             "empty": false
+     *         },
+     *         "empty": false
+     *     }
+     * }
+     *     </pre>
+     * </p>
+     *
      * @param page 页码
      * @return JsonResult
      */
@@ -55,6 +114,36 @@ public class ApiPostController {
 
     /**
      * 获取单个文章信息
+     *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": {
+     *         "postId": ,
+     *         "user": {},
+     *         "postTitle": "",
+     *         "postType": "",
+     *         "postContentMd": "",
+     *         "postContent": "",
+     *         "postUrl": "",
+     *         "postSummary": "",
+     *         "categories": [],
+     *         "tags": [],
+     *         "comments": [],
+     *         "postThumbnail": "",
+     *         "postDate": "",
+     *         "postUpdate": "",
+     *         "postStatus": 0,
+     *         "postViews": 0,
+     *         "allowComment": 1,
+     *         "customTpl": ""
+     *     }
+     * }
+     *     </pre>
+     * </p>
      *
      * @param postId 文章编号
      * @return JsonResult

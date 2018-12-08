@@ -27,6 +27,36 @@ public class ApiPageController {
     /**
      * 获取单个页面
      *
+     * <p>
+     *     result json:
+     *     <pre>
+     * {
+     *     "code": 200,
+     *     "msg": "OK",
+     *     "result": {
+     *         "postId": ,
+     *         "user": {},
+     *         "postTitle": "",
+     *         "postType": "",
+     *         "postContentMd": "",
+     *         "postContent": "",
+     *         "postUrl": "",
+     *         "postSummary": ,
+     *         "categories": [],
+     *         "tags": [],
+     *         "comments": [],
+     *         "postThumbnail": "",
+     *         "postDate": "",
+     *         "postUpdate": "",
+     *         "postStatus": 0,
+     *         "postViews": 0,
+     *         "allowComment": 1,
+     *         "customTpl": ""
+     *     }
+     * }
+     *     </pre>
+     * </p>
+     *
      * @param postId postId
      * @return JsonResult
      */

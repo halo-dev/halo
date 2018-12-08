@@ -1,0 +1,23 @@
+/* Icon Rotate */
+.icon-rotate() {
+	@duration: @mediumDuration;
+
+	.hacks();
+	.prefixed(transition-duration, @duration);
+
+	.hvr-icon {
+		.prefixed(transform, translateZ(0));
+		.prefixed(transition-duration, @duration);
+		.prefixed(transition-property, transform);
+		.prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		.hvr-icon {
+			.prefixed(transform, rotate(20deg));
+		}
+	}
+}

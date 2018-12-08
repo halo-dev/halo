@@ -1,0 +1,32 @@
+/* Underline Reveal */
+@mixin underline-reveal {
+	$duration: $mediumDuration;
+
+	@include hacks();
+	position: relative;
+	overflow: hidden;
+
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: $activeColor;
+		height: 4px;
+		@include prefixed(transform, translateY(4px));
+		@include prefixed(transition-property, transform);
+		@include prefixed(transition-duration, $duration);
+		@include prefixed(transition-timing-function, ease-out);
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		&:before {
+			@include prefixed(transform, translateY(0));
+		}
+	}
+}
