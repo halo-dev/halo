@@ -64,6 +64,9 @@ docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
 
 Docker Compose：
 ```bash
+# Download the Nginx Profile Template
+curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
+
 # get docker-compose.yaml
 yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 

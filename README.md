@@ -65,6 +65,9 @@ docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
 
 Docker Compose 部署：
 ```bash
+# 下载 Nginx 配置文件模板
+curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
+
 # 获取 docker-compose.yaml 文件
 yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
