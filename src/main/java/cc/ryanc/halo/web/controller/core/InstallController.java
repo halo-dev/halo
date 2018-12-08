@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.AllowCommentEnum;
+import cc.ryanc.halo.model.enums.AttachLocationEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.*;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <pre>
@@ -156,27 +159,19 @@ public class InstallController {
             comment.setIsAdmin(0);
             commentService.save(comment);
 
-            optionsService.saveOption(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
-
-            //语言设置
-            optionsService.saveOption(BlogPropertiesEnum.BLOG_LOCALE.getProp(), blogLocale);
-            //保存博客标题和博客地址设置
-            optionsService.saveOption(BlogPropertiesEnum.BLOG_TITLE.getProp(), blogTitle);
-            optionsService.saveOption(BlogPropertiesEnum.BLOG_URL.getProp(), blogUrl);
-
-            //设置默认主题
-            optionsService.saveOption(BlogPropertiesEnum.THEME.getProp(), "anatole");
-
-            //建立网站时间
-            optionsService.saveOption(BlogPropertiesEnum.BLOG_START.getProp(), DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
-
-            //默认不配置邮件系统
-            optionsService.saveOption(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp(), TrueFalseEnum.FALSE.getDesc());
-
-            //新评论，审核通过，回复，默认不通知
-            optionsService.saveOption(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
-            optionsService.saveOption(BlogPropertiesEnum.COMMENT_PASS_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
-            optionsService.saveOption(BlogPropertiesEnum.COMMENT_REPLY_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
+            Map<String, String> options = new HashMap<>();
+            options.put(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
+            options.put(BlogPropertiesEnum.BLOG_LOCALE.getProp(), blogLocale);
+            options.put(BlogPropertiesEnum.BLOG_TITLE.getProp(), blogTitle);
+            options.put(BlogPropertiesEnum.BLOG_URL.getProp(), blogUrl);
+            options.put(BlogPropertiesEnum.THEME.getProp(), "anatole");
+            options.put(BlogPropertiesEnum.BLOG_START.getProp(), DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
+            options.put(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp(), TrueFalseEnum.FALSE.getDesc());
+            options.put(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
+            options.put(BlogPropertiesEnum.COMMENT_PASS_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
+            options.put(BlogPropertiesEnum.COMMENT_REPLY_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
+            options.put(BlogPropertiesEnum.ATTACH_LOC.getProp(), AttachLocationEnum.SERVER.getDesc());
+            optionsService.saveOptions(options);
 
             //更新日志
             logsService.save(LogsRecord.INSTALL, "安装成功，欢迎使用Halo。", request);
@@ -197,8 +192,7 @@ public class InstallController {
 
             HaloConst.OPTIONS.clear();
             HaloConst.OPTIONS = optionsService.findAllOptions();
-
-            configuration.setSharedVariable("options", optionsService.findAllOptions());
+            configuration.setSharedVariable("options", HaloConst.OPTIONS);
             configuration.setSharedVariable("user", userService.findUser());
         } catch (Exception e) {
             log.error(e.getMessage());

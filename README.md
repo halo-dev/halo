@@ -48,7 +48,8 @@ java -jar target/dist/halo/halo-latest.jar
 
 ```bash
 # 安装Halo
-yum install -y wget && wget https://raw.githubusercontent.com/ruibaby/halo-cli/master/halo-cli.sh && bash halo-cli.sh -i
+yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
+
 # 更新Halo
 bash halo-cli.sh -u
 ```
@@ -60,6 +61,18 @@ docker pull ruibaby/halo
 
 # 运行
 docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+```
+
+Docker Compose 部署：
+```bash
+# 获取 docker-compose.yaml 文件
+yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
+
+# 修改 docker-compose.yaml,修改VIRTUAL_HOST,LETSENCRYPT_HOST为自己的域名,修改LETSENCRYPT_EMAIL为自己的邮箱。
+vim docker-compose.yaml
+
+# 运行
+docker-compose up -d
 ```
 
 > 注意：如使用Idea，Eclipse等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题扫描和上传会有问题。

@@ -16,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * <pre>
  *     文章API
@@ -43,7 +41,7 @@ public class ApiPostController {
     @GetMapping(value = "/page/{page}")
     public JsonResult posts(@PathVariable(value = "page") Integer page) {
         Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Integer size = 10;
+        int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
@@ -53,16 +51,6 @@ public class ApiPostController {
             return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
         }
         return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), posts);
-    }
-
-    @GetMapping(value = "/hot")
-    public JsonResult hotPosts() {
-        List<Post> posts = postService.hotPosts();
-        if (null != posts && posts.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), posts);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
     }
 
     /**
