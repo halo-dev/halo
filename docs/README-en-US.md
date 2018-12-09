@@ -91,6 +91,8 @@ Let's start: http://localhost:8090
 
 [KingYiFan'S Blog](https://blog.cnbuilder.cn)
 
+[AquanBlog](https://blog.eunji.cn/)
+
 ## Download
 
 > For deployment to the server, please refer to [Halo部署教程](https://halo-doc.ryanc.cc/installation/) or [Wiki](https://github.com/ruibaby/halo/wiki).
@@ -122,7 +124,7 @@ In addition to the built-in [Anatole](https://github.com/hi-caicai/farbox-theme-
 
 - [x] Article reading statistics
 - [ ] Article overhead
-- [ ] Integrate cloud services such as Qiniu yun or Upyun
+- [x] Integrate cloud services such as Qiniu yun or Upyun
 
 ## Thanks
 

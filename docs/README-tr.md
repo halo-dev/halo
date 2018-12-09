@@ -92,6 +92,8 @@ Hadi başlayalım: http://localhost:8090
 
 [KingYiFan'ın Bloğu](https://blog.cnbuilder.cn)
 
+[AquanBlog](https://blog.eunji.cn/)
+
 ## İndir
 
 > Sunucuya deploy etmek için gözat: [Halo部署教程](https://halo-doc.ryanc.cc/installation/) veya [Wiki](https://github.com/ruibaby/halo/wiki).
@@ -123,7 +125,7 @@ Hadi başlayalım: http://localhost:8090
 
 - [x] Makale okunma istatistikleri
 - [ ] Makale üstü
-- [ ] Qiniu ve Upyun gibi bulut servisleri entegresi
+- [x] Qiniu ve Upyun gibi bulut servisleri entegresi
 
 ## Teşekkür
 
