@@ -33,7 +33,7 @@
 
 轻快，简洁，功能强大，使用Java开发的博客系统。
 
-> QQ交流群: 162747721，Telegram交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog)
+> QQ交流群: 162747721，Telegram交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog)，[WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
 
 ## 快速开始
 
@@ -92,6 +92,8 @@ Let's start: http://localhost:8090
 
 [KingYiFan'S Blog](https://blog.cnbuilder.cn)
 
+[AquanBlog](https://blog.eunji.cn/)
+
 ## 下载部署
 
 > 如需部署到服务器，请参考[Halo部署教程](https://halo-doc.ryanc.cc/installation/)或者[Wiki](https://github.com/ruibaby/halo/wiki)。
@@ -124,7 +126,7 @@ Let's start: http://localhost:8090
 
 - [x] 文章阅读统计
 - [ ] 文章顶置
-- [ ] 集成又拍云，七牛云等云服务
+- [x] 集成又拍云，七牛云等云服务
 
 ## 感谢
 
