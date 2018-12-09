@@ -227,7 +227,7 @@ public class AdminController extends BaseController {
     }
 
     /**
-     * 不可描述的页面
+     * Halo关于页面
      *
      * @return 模板路径admin/admin_halo
      */

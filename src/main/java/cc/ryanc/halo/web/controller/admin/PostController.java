@@ -239,6 +239,19 @@ public class PostController extends BaseController {
         if (null == post.getPostDate()) {
             post.setPostDate(new Date());
         }
+        //摘要字数
+        int postSummary = 50;
+        if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
+            postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
+        }
+        //设置文章摘要
+        String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
+        if (summaryText.length() > postSummary) {
+            String summary = summaryText.substring(0, postSummary);
+            post.setPostSummary(summary);
+        } else {
+            post.setPostSummary(summaryText);
+        }
         post = postService.buildCategoriesAndTags(post, cateList, tagList);
         post = postService.save(post);
         if (null != post) {
