@@ -36,16 +36,16 @@
                                 <@spring.message code='admin.pageinfo.text.no' />${attachments.number+1}/${attachments.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                             </div>
                             <div class="btn-group pull-right btn-group-sm" role="group">
-                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select" >
+                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?id=${id}" >
                                     <@spring.message code='admin.pageinfo.btn.first' />
                                 </a>
-                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}" >
+                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}&id=${id}" >
                                     <@spring.message code='admin.pageinfo.btn.pre' />
                                 </a>
-                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}">
+                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}&id=${id}">
                                     <@spring.message code='admin.pageinfo.btn.next' />
                                 </a>
-                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}">
+                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}&id=${id}">
                                     <@spring.message code='admin.pageinfo.btn.last' />
                                 </a>
                             </div>
@@ -86,12 +86,9 @@
         maxFileCount: 10,
         enctype : 'multipart/form-data',
         showClose: false
-    }).on("fileuploaded",function (event,data,previewId,index) {
-        var data = data.jqXHR.responseJSON;
-        if(data.success=="1"){
-            $("#uploadForm").hide(400);
-            halo.showMsgAndReload(data.message,'success',1000);
-        }
+    }).on("filebatchuploadcomplete",function (event, files, extra) {
+        $("#uploadForm").hide(400);
+        halo.showMsgAndReload('上传成功！','success',1000);
     });
     function doTransport(url) {
         parent.$('#${id}').val(url);

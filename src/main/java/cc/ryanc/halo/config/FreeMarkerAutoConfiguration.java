@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
  */
 @Slf4j
 @Configuration
-public class FreeMarkerConfig {
+public class FreeMarkerAutoConfiguration {
 
     @Autowired
     private freemarker.template.Configuration configuration;

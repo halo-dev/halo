@@ -103,12 +103,9 @@
             maxFileCount: 100,
             enctype : 'multipart/form-data',
             showClose: false
-        }).on("fileuploaded",function (event,data,previewId,index) {
-            var data = data.jqXHR.responseJSON;
-            if(data.success=="1"){
-                $("#uploadForm").hide(400);
-                halo.showMsgAndParentRedirect(data.message,'success',1000,"/admin/attachments");
-            }
+        }).on("filebatchuploadcomplete",function (event, files, extra) {
+            $("#uploadForm").hide(400);
+            halo.showMsgAndReload('上传成功！','success',1000);
         });
     }
 
