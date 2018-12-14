@@ -30,7 +30,7 @@ import java.util.Locale;
 @EnableWebMvc
 @ComponentScan(basePackages = "cc.ryanc.halo.web.controller")
 @PropertySource(value = "classpath:application.yaml", ignoreResourceNotFound = true, encoding = "UTF-8")
-public class MvcConfig implements WebMvcConfigurer {
+public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
     @Autowired
     private LoginInterceptor loginInterceptor;
