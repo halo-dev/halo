@@ -8,7 +8,7 @@
             <li>
                 <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.themes.bread.appearance' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.themes.bread.appearance' /></a></li>
             <li class="active"><@spring.message code='admin.menus.title' /></li>
         </ol>
     </section>
@@ -120,7 +120,7 @@
                                                 <td>${menu.menuIcon}</td>
                                                 <td>
                                                     <#if updateMenu?? && menu.menuId?c==updateMenu.menuId?c>
-                                                        <a href="#" class="btn btn-primary btn-xs " disabled=""><@spring.message code='common.btn.editing' /></a>
+                                                        <a href="javascript:void(0)" class="btn btn-primary btn-xs " disabled=""><@spring.message code='common.btn.editing' /></a>
                                                     <#else>
                                                         <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
                                                     </#if>

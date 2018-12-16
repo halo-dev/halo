@@ -55,6 +55,14 @@ public interface CategoryService {
     Category findByCateUrl(String cateUrl);
 
     /**
+     * 根据分类名称查询
+     *
+     * @param cateName 分类名称
+     * @return Category
+     */
+    Category findByCateName(String cateName);
+
+    /**
      * 将分类字符串集合转化为Category泛型集合
      *
      * @param strings strings

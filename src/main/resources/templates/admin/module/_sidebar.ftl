@@ -17,7 +17,7 @@
                 </a>
             </li>
             <li class="treeview">
-                <a data-pjax="true" href="#">
+                <a data-pjax="true" href="javascript:void(0)">
                     <i class="fa  fa-book"></i>
                     <span><@spring.message code='admin.menu.posts' /></span>
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
@@ -30,7 +30,7 @@
                 </ul>
             </li>
             <li class="treeview">
-                <a data-pjax="true" href="#">
+                <a data-pjax="true" href="javascript:void(0)">
                     <i class="fa fa-desktop"></i>
                     <span><@spring.message code='admin.menu.pages' /></span>
                     <span class="pull-right-container">
@@ -60,7 +60,7 @@
                 </a>
             </li>
             <li class="treeview">
-                <a data-pjax="true" href="#">
+                <a data-pjax="true" href="javascript:void(0)">
                     <i class="fa fa-paint-brush"></i>
                     <span><@spring.message code='admin.menu.appearance' /></span>
                     <span class="pull-right-container">
@@ -74,7 +74,7 @@
                 </ul>
             </li>
             <li class="treeview">
-                <a data-pjax="true" href="#">
+                <a data-pjax="true" href="javascript:void(0)">
                     <i class="fa fa-user-o"></i>
                     <span><@spring.message code='admin.menu.user' /></span>
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
@@ -84,7 +84,7 @@
                 </ul>
             </li>
             <li class="treeview">
-                <a data-pjax="true" href="#">
+                <a data-pjax="true" href="javascript:void(0)">
                     <i class="fa fa-cog"></i>
                     <span><@spring.message code='admin.menu.settings' /></span>
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
@@ -92,6 +92,7 @@
                 <ul class="treeview-menu">
                     <li><a data-pjax="true" href="/admin/option"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.blog-settings' /></a></li>
                     <li><a data-pjax="true" href="/admin/backup"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.blog-backup' /></a></li>
+                    <li><a data-pjax="true" href="/admin/tools"><i class="fa fa-circle-o"></i>小工具</a></li>
                 </ul>
             </li>
         </ul>

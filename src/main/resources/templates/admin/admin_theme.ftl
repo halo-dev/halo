@@ -35,12 +35,12 @@
     </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.title' /></h1>
-        <a class="btn-header" id="showForm" href="#" onclick="halo.layerModal('/admin/themes/install','<@spring.message code="admin.themes.js.install-theme" />')">
+        <a class="btn-header" id="showForm" href="javascript:void(0)" onclick="halo.layerModal('/admin/themes/install','<@spring.message code="admin.themes.js.install-theme" />')">
             <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.themes.btn.install' />
         </a>
         <ol class="breadcrumb">
             <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a></li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.themes.bread.appearance' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.themes.bread.appearance' /></a></li>
             <li class="active"><@spring.message code='admin.themes.title' /></li>
         </ol>
     </section>

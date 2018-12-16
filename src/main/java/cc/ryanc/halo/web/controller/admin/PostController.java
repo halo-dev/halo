@@ -253,6 +253,10 @@ public class PostController extends BaseController {
             post.setPostSummary(summaryText);
         }
         post = postService.buildCategoriesAndTags(post, cateList, tagList);
+        //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
+        if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
+            post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
+        }
         post = postService.save(post);
         if (null != post) {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));

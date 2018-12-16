@@ -12,7 +12,7 @@
                 <a data-pjax="true" href="/admin">
                     <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.categories.bread.posts' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.categories.bread.posts' /></a></li>
             <li class="active"><@spring.message code='admin.categories.title' /></li>
         </ol>
     </section>
@@ -104,7 +104,7 @@
                                                 </td>
                                                 <td>
                                                     <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
-                                                        <a href="#" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
+                                                        <a href="javascript:void(0)" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
                                                     <#else >
                                                         <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
                                                     </#if>
