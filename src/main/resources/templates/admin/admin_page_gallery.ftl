@@ -8,7 +8,7 @@
     </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.pages.galleries.title' /><small></small></h1>
-        <a class="btn-header" id="btnNewPicture" href="#">
+        <a class="btn-header" id="btnNewPicture" href="javascript:void(0)">
             <@spring.message code='admin.pages.galleries.text.add-gallery' />
         </a>
         <ol class="breadcrumb">
@@ -80,7 +80,7 @@
         <div class="row">
             <#list galleries.content as gallery>
                 <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/page/gallery?galleryId=${gallery.galleryId?c}','<@spring.message code="admin.pages.galleries.modal.title" />')">
-                    <a href="#" class="thumbnail">
+                    <a href="javascript:void(0)" class="thumbnail">
                         <img src="${gallery.galleryThumbnailUrl!}" class="img-responsive">
                     </a>
                 </div>

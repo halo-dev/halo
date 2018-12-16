@@ -11,7 +11,7 @@
             <li>
                 <a href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a href="#"><@spring.message code='admin.backup.bread.setting' /></a></li>
+            <li><a href="javascript:void(0)"><@spring.message code='admin.backup.bread.setting' /></a></li>
             <li class="active"><@spring.message code='admin.backup.title' /></li>
         </ol>
     </section>

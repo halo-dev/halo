@@ -8,7 +8,7 @@
     </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.attachments.title' /></h1>
-        <a class="btn-header" id="showForm" href="#">
+        <a class="btn-header" id="showForm" href="javascript:void(0)">
             <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.attachments.btn.upload' />
         </a>
         <ol class="breadcrumb">
@@ -29,7 +29,7 @@
         <div class="row">
             <#list attachments.content as attachment>
                 <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/attachments/attachment?attachId=${attachment.attachId?c}','<@spring.message code="admin.attachments.modal.detail-title" />')">
-                    <a href="#" class="thumbnail">
+                    <a href="javascript:void(0)" class="thumbnail">
                         <img src="${attachment.attachSmallPath!}" class="img-responsive">
                     </a>
                 </div>

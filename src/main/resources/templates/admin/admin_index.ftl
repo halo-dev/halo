@@ -4,7 +4,7 @@
 <div class="content-wrapper">
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.index.title' /></h1>
-        <a class="btn-header" id="btnWidgetsOption" href="#">
+        <a class="btn-header" id="btnWidgetsOption" href="javascript:void(0)">
             <@spring.message code='admin.index.btn.widgets' />
         </a>
         <ol class="breadcrumb">
@@ -185,7 +185,7 @@
                 <div class="small-box bg-red">
                     <div class="inner"><h3 id="blogStart">${hadDays!}</h3><p><@spring.message code='admin.index.widgets.day-count' /></p></div>
                     <div class="icon"><i class="ion ion-pie-graph"></i></div>
-                    <a href="#" class="small-box-footer" data-toggle="modal" data-target="#blogInfo">${options.blog_start!'0000-00-00'} <i class="fa fa-star"></i></a>
+                    <a href="javascript:void(0)" class="small-box-footer" data-toggle="modal" data-target="#blogInfo">${options.blog_start!'0000-00-00'} <i class="fa fa-star"></i></a>
                 </div>
             </div>
             </#if>
@@ -320,7 +320,7 @@
                                 <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-bars"></i></button>
                                 <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#" onclick="halo.layerModal('/admin/logs','<@spring.message code="admin.index.widgets.text.all-logs" />')"><@spring.message code='common.btn.view-all' /></a></li>
+                                    <li><a href="javascript:void(0)" onclick="halo.layerModal('/admin/logs','<@spring.message code="admin.index.widgets.text.all-logs" />')"><@spring.message code='common.btn.view-all' /></a></li>
                                     <li><a href="/admin/logs/clear"><@spring.message code='admin.index.widgets.btn.clear-logs' /></a></li>
                                 </ul>
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">

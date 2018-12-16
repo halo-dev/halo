@@ -8,7 +8,7 @@
             <li>
                 <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#">外观</a></li>
+            <li><a data-pjax="true" href="javascript:void(0)">外观</a></li>
             <li class="active">主题编辑</li>
         </ol>
     </section>
@@ -40,7 +40,7 @@
                                 <tbody>
                                     <#list tpls as tpl>
                                         <tr style="cursor: pointer">
-                                            <td class="mailbox-name" onclick="loadContent('${tpl}')"><a href="#">${tpl}</a></td>
+                                            <td class="mailbox-name" onclick="loadContent('${tpl}')"><a href="javascript:void(0)">${tpl}</a></td>
                                             <td class="mailbox-subject">
                                                 <#switch tpl>
                                                     <#case "index.ftl">

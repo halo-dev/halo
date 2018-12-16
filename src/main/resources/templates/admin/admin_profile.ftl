@@ -12,7 +12,7 @@
                 <a data-pjax="true" href="/admin">
                     <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.user.profile.bread.user' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.user.profile.bread.user' /></a></li>
             <li class="active"><@spring.message code='admin.user.profile.title' /></li>
         </ol>
     </section>

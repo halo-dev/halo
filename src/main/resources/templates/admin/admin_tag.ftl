@@ -12,10 +12,10 @@
         </h1>
         <ol class="breadcrumb">
             <li>
-                <a data-pjax="true" href="#">
+                <a data-pjax="true" href="javascript:void(0)">
                     <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.posts.title' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.posts.title' /></a></li>
             <li class="active"><@spring.message code='admin.tags.title' /></li>
         </ol>
     </section>

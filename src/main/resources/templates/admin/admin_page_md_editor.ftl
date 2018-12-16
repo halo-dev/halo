@@ -15,12 +15,12 @@
         <h1 style="display: inline-block;">
             <@spring.message code='admin.pages.edit.title' />
         </h1>
-        <a class="btn-header" id="btnOpenAttach" href="#" onclick="halo.layerModal('/admin/attachments/select?type=post','<@spring.message code="common.js.all-attachment" />')">
+        <a class="btn-header" id="btnOpenAttach" href="javascript:void(0)" onclick="halo.layerModal('/admin/attachments/select?type=post','<@spring.message code="common.js.all-attachment" />')">
             <@spring.message code='admin.editor.btn.attachs' />
         </a>
         <ol class="breadcrumb">
             <li>
-                <a data-pjax="true" href="#"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
+                <a data-pjax="true" href="javascript:void(0)"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
             <li>
                 <a data-pjax="true" href="/admin/page"><@spring.message code='admin.pages.title' /></a>
@@ -42,7 +42,7 @@
                 <div style="display: block;margin-bottom: 10px;">
                     <span>
                         <@spring.message code='admin.editor.form.url' />
-                        <a href="#">${options.blog_url}/p/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
+                        <a href="javascript:void(0)">${options.blog_url}/p/<span id="postUrl"><#if post??>${post.postUrl}</#if></span>/</a>
                         <button class="btn btn-default btn-sm " id="btn_input_postUrl"><@spring.message code='common.btn.edit' /></button>
                         <button class="btn btn-default btn-sm " id="btn_change_postUrl" onclick="UrlOnBlurAuto()" style="display: none;"><@spring.message code='common.btn.define' /></button>
                     </span>
