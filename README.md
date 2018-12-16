@@ -11,7 +11,7 @@
 </p>
 
 ------------------------------
-🇨🇳简体中文 | 🇺🇸[English](./docs/README-en-US.md) | <img src="https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg" alt="Turkish" height="14"/> [Türkçe](./docs/README-tr.md)
+🇨🇳简体中文 | 🇺🇸[English](./docs/README-en-US.md)
 
 ## 简介
 
@@ -108,9 +108,9 @@ Halo 的诞生离不开下面这些项目：
 - [SimpleMDE - Markdown Editor](https://github.com/sparksuite/simplemde-markdown-editor)：简洁，功能够用，且轻量级的 Markdown 编辑器
 - [Bootstrap-FileInput](https://github.com/kartik-v/bootstrap-fileinput.git)：基于 Bootstrap 的文件上传组件
 - [Font-awesome](https://github.com/FortAwesome/Font-Awesome.git)：使用最广泛的字体图标库
-- [Jquery](https://github.com/jquery/jquery.git)：使用最广泛的 JavaScript 框架
+- [JQuery](https://github.com/jquery/jquery.git)：使用最广泛的 JavaScript 框架
 - [Layer](https://github.com/sentsin/layer.git)：个人认为最实用最好看的弹出层组件，没有之一
-- [Jquery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：消息提示组件
+- [JQuery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：消息提示组件
 - [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
 - [OwO](https://github.com/DIYgod/OwO)：前端表情库
 
@@ -124,12 +124,12 @@ Halo 的诞生离不开下面这些项目：
 
 ## 界面展示
 
-![](https://cdn.ryanc.cc/img/github/picturehalo-index.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-install.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-login.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-admin.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-edit-post.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-attachment.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-comment.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-theme.png)
-![](https://cdn.ryanc.cc/img/github/picturehalo-options.png)
+![](https://i.loli.net/2018/12/16/5c15b6edb9a49.png)
+![](https://i.loli.net/2018/12/16/5c15b6ee08333.png)
+![](https://i.loli.net/2018/12/16/5c15b6ec853af.png)
+![](https://i.loli.net/2018/12/16/5c15b6ec50238.png)
+![](https://i.loli.net/2018/12/16/5c15b6ed4057a.png)
+![](https://i.loli.net/2018/12/16/5c15b6eb01f2d.png)
+![](https://i.loli.net/2018/12/16/5c15b6eb98898.png)
+![](https://i.loli.net/2018/12/16/5c15b6eb3b506.png)
+![](https://i.loli.net/2018/12/16/5c15b6ebf29fd.png)
