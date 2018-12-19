@@ -6,10 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <title>${options.blog_title!} | <@spring.message code='login.page.title' /></title>
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/animate/animate.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/css/style.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/animate/animate.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/style.min.css">
     <style>
         body{background-color:#f5f5f5}*{outline:0}label{color:#4b1c0f}.login-form{max-width:380px;margin-top:10%}.login-logo{font-size:56px;text-align:center;margin-bottom:25px;font-weight:500;color:#444;text-shadow:#b2baba .1em .1em .2em}.login-body{padding:20px;background-color:#fff;-o-box-shadow:-4px 7px 46px 2px rgba(0,0,0,.1);box-shadow:-4px 7px 46px 2px rgba(0,0,0,.1)}.login-button{background-color:#fff;border-radius:0;border:1px solid #000;transition:all .5s ease-in-out}.login-button:hover{border:1px solid #fff;background-color:#000;color:#fff}.form-group{padding-bottom:25px}#login-name,#login-pwd{border-radius:0}.control{padding-bottom:5px}
     </style>
@@ -44,10 +44,10 @@
 <script>
     var heading = "<@spring.message code='common.text.tips' />";
 </script>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/js/halo.min.js"></script>
-<script src="/static/js/login.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-backend/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/halo-backend/js/halo.min.js"></script>
+<script src="/static/halo-backend/js/login.min.js"></script>
 </html>
 </#compress>
