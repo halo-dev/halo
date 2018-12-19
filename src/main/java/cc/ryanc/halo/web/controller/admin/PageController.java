@@ -246,7 +246,7 @@ public class PageController {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-                post.setPostThumbnail("/static/halo-backend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
+                post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
             postService.save(post);
             logsService.save(LogsRecord.PUSH_PAGE, post.getPostTitle(), request);
