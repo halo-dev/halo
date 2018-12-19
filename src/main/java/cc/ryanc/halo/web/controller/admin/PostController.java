@@ -204,7 +204,7 @@ public class PostController extends BaseController {
             post.setPostUrl(urlFilter(post.getPostUrl()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-                post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
+                post.setPostThumbnail("/static/halo-backend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
             }
             postService.save(post);
             logsService.save(LogsRecord.PUSH_POST, post.getPostTitle(), request);
@@ -255,7 +255,7 @@ public class PostController extends BaseController {
         post = postService.buildCategoriesAndTags(post, cateList, tagList);
         //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
         if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-            post.setPostThumbnail("/static/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
+            post.setPostThumbnail("/static/halo-backend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
         }
         post = postService.save(post);
         if (null != post) {

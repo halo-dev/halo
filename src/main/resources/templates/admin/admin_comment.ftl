@@ -152,7 +152,7 @@
             position: 'down',
             width: '100%',
             maxHeight: '210px',
-            api:"/static/plugins/OwO/OwO.min.json"
+            api:"/static/halo-common/OwO/OwO.min.json"
         });
         function modelShow(url,message) {
             $('#url').val(url);

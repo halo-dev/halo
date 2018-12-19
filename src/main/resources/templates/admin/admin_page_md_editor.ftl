@@ -2,8 +2,8 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.pages.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
-    <link rel="stylesheet" href="/static/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
         #post_title{font-weight: 400;}
         .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
@@ -121,9 +121,9 @@
                     <div class="box-body">
                         <div>
                             <#if post??>
-                                <img src="${post.postThumbnail!'/static/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
+                                <img src="${post.postThumbnail!'/static/halo-backend/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                             <#else >
-                                <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
+                                <img src="/static/halo-backend/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                             </#if>
                         </div>
                     </div>
@@ -131,10 +131,10 @@
             </div>
         </div>
     </section>
-    <script src="/static/plugins/simplemde/simplemde.min.js"></script>
-    <script src="/static/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
-    <script src="/static/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="/static/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
+    <script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
+    <script src="/static/halo-backend/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="/static/halo-backend/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
     <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script>
         <#if post??>

@@ -1,6 +1,6 @@
 <@compress single_line=true>
-<link type="text/css" rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
-<link type="text/css" rel="stylesheet" href="/static/css/comment.min.css">
+<link type="text/css" rel="stylesheet" href="/static/halo-common/OwO/OwO.min.css">
+<link type="text/css" rel="stylesheet" href="/static/halo-frontend/css/comment.min.css">
 <style>
 ${options.native_css!}
 </style>
@@ -113,12 +113,12 @@ ${options.native_css!}
         </#if>
     </div>
 </div>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/md5/md5.min.js"></script>
-<script src="/static/plugins/ua-parser/ua-parser.min.js"></script>
-<script src="/static/plugins/OwO/OwO.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-frontend/plugins/md5/md5.min.js"></script>
+<script src="/static/halo-frontend/plugins/ua-parser/ua-parser.min.js"></script>
+<script src="/static/halo-common/OwO/OwO.min.js"></script>
 <#if (options.comment_activate_power_mode!'false') == "true">
-<script src="/static/plugins/activate-power-mode/activate-power-mode.js"></script>
+<script src="/static/halo-frontend/plugins/activate-power-mode/activate-power-mode.js"></script>
 <script>
     POWERMODE.colorful = true;
     POWERMODE.shake = false;
@@ -128,5 +128,5 @@ ${options.native_css!}
 <script>
     var avatarType = "${options.native_comment_avatar!'mm'}";
 </script>
-<script src="/static/js/comment.min.js"></script>
+<script src="/static/halo-frontend/js/comment.min.js"></script>
 </@compress>

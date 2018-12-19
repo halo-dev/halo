@@ -2,8 +2,8 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.posts.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
-    <link rel="stylesheet" href="/static/plugins/jquery-tageditor/jquery.tag-editor.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.css">
     <style type="text/css">
         #postTitle{font-weight: 400;}
     </style>
@@ -137,18 +137,18 @@
                     </div>
                     <div class="box-body">
                         <div>
-                            <img src="/static/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
+                            <img src="/static/halo-backend/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    <script src="/static/plugins/simplemde/simplemde.min.js"></script>
-    <script src="/static/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
-    <script src="/static/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
-    <script src="/static/plugins/jquery-tageditor/jquery.caret.min.js"></script>
-    <script src="/static/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
+    <script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
+    <script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
+    <script src="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
+    <script src="/static/halo-backend/plugins/jquery-tageditor/jquery.caret.min.js"></script>
+    <script src="/static/halo-backend/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
     <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script>
 

@@ -53,12 +53,12 @@
                 </@commonTag>
                 <li class="dropdown user user-menu">
                     <a href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/images/default.png</#if>" class="user-image" alt="User Image">
+                        <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/halo-backend/images/default.png</#if>" class="user-image" alt="User Image">
                         <span class="hidden-xs">${user.userDisplayName!}</span>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="user-header">
-                            <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/images/default.png</#if>" class="img-circle" alt="User Image">
+                            <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar}<#else >/static/halo-backend/images/default.png</#if>" class="img-circle" alt="User Image">
                             <p>${user.userDisplayName!}</p>
                         </li>
                         <li class="user-footer">

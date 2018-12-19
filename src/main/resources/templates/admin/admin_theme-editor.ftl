@@ -1,7 +1,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.themes.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
         <ol class="breadcrumb">
@@ -88,7 +88,7 @@
             </div>
         </div>
     </section>
-    <script src="/static/plugins/simplemde/simplemde.min.js"></script>
+    <script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
     <script>
         /**
          * 加载编辑器
