@@ -129,7 +129,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         Map<String, String> resultMap;
         String attachLoc = HaloConst.OPTIONS.get(BlogPropertiesEnum.ATTACH_LOC.getProp());
         if (StrUtil.isEmpty(attachLoc)) {
-            return null;
+            attachLoc = "server";
         }
         switch (attachLoc) {
             case "server":

@@ -49,7 +49,6 @@
 <#if (options.blog_locale!'zh_CN') == 'zh_CN'>
 <script src="/static/halo-backend/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/halo-backend/plugins/quicklink/quicklink.js"></script>
 <script src="/static/halo-backend/js/halo.min.js"></script>
 <@compress single_line=true>
 <script>
@@ -58,7 +57,6 @@
     <#if (options.admin_pjax!'true') == 'true'>
         $(document).pjax('a[data-pjax=true]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});
     </#if>
-    quicklink();
     var heading = "<@spring.message code='common.text.tips' />";
 </script>
 </@compress>
