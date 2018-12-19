@@ -25,21 +25,21 @@
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="menuName"><@spring.message code='admin.menus.form.menu-name' /></label>
-                                    <input type="text" class="form-control" id="menuName" name="menuName" value="${updateMenu.menuName}">
+                                    <input type="text" class="form-control" id="menuName" name="menuName" value="${updateMenu.menuName!}">
                                     <small><@spring.message code='admin.menus.form.menu-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="menuUrl"><@spring.message code='admin.menus.form.menu-url' /></label>
-                                    <input type="text" class="form-control" id="menuUrl" name="menuUrl" value="${updateMenu.menuUrl}">
+                                    <input type="text" class="form-control" id="menuUrl" name="menuUrl" value="${updateMenu.menuUrl!}">
                                     <small><@spring.message code='admin.menus.form.menu-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="menuSort"><@spring.message code='admin.menus.form.menu-sort' /></label>
-                                    <input type="number" class="form-control" id="menuSort" name="menuSort" value="${updateMenu.menuSort}">
+                                    <input type="number" class="form-control" id="menuSort" name="menuSort" value="${updateMenu.menuSort!}">
                                 </div>
                                 <div class="form-group">
                                     <label for="menuIcon"><@spring.message code='admin.menus.form.menu-icon' /></label>
-                                    <input type="text" class="form-control" id="menuIcon" name="menuIcon" value="${updateMenu.menuIcon}">
+                                    <input type="text" class="form-control" id="menuIcon" name="menuIcon" value="${updateMenu.menuIcon!}">
                                     <small><@spring.message code='admin.menus.form.menu-icon-tips' /></small>
                                 </div>
                                 <div class="form-group">
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="menuSort"><@spring.message code='admin.menus.form.menu-sort' /></label>
-                                    <input type="text" class="form-control" id="menuSort" name="menuSort">
+                                    <input type="number" class="form-control" id="menuSort" name="menuSort">
                                 </div>
                                 <div class="form-group">
                                     <label for="menuIcon"><@spring.message code='admin.menus.form.menu-icon' /></label>
@@ -112,7 +112,7 @@
                                 </tr>
                                 <@commonTag method="menus">
                                     <#if menus?? && menus?size gt 0>
-                                        <#list menus as menu>
+                                        <#list menus?sort_by('menuSort') as menu>
                                             <tr>
                                                 <td>${menu.menuName}</td>
                                                 <td>${menu.menuUrl}</td>
