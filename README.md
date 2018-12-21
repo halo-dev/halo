@@ -1,4 +1,4 @@
-<h1 align="center"><a href="https://halo-doc.ryanc.cc" target="_blank">Halo</a></h1>
+![](https://cdn.ryanc.cc/img/github/picturehalo-logo-github.png)
 
 > Halo 可能是最好的 Java 博客系统。
 
