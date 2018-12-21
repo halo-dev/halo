@@ -1,4 +1,4 @@
-![](https://cdn.ryanc.cc/img/github/picturehalo-logo-github.png)
+![](https://i.loli.net/2018/12/21/5c1cd34849751.png)
 
 > Halo may be the best Java blog system.
 
