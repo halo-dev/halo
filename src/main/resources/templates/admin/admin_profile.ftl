@@ -128,44 +128,34 @@
         });
         function saveUser(option) {
             var param = $('#'+option).serialize();
-            $.ajax({
-                type: 'post',
-                url: '/admin/profile/save',
-                data: param,
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.post('/admin/profile/save',param,function (data) {
+                if(data.code === 1){
+                    halo.showMsgAndReload(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
         function changPass() {
             var beforePass = $('#beforePass').val();
             var newPass = $('#newPass').val();
             var reNewPass = $('#reNewPass').val();
-            if(beforePass==""||newPass==""||reNewPass==""){
+            if(beforePass===""||newPass===""||reNewPass===""){
                 halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                 return;
             }
-            if(newPass!=reNewPass){
+            if(newPass!==reNewPass){
                 halo.showMsg("<@spring.message code='admin.user.profile.form.password.no-same' />",'error',2000);
                 return;
             }
             var param = $('#passForm').serialize();
-            $.ajax({
-                type: 'post',
-                url: '/admin/profile/changePass',
-                data: param,
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.post('/admin/profile/changePass',param,function (data) {
+                if(data.code === 1){
+                    halo.showMsgAndReload(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
     </script>
     </@compress>

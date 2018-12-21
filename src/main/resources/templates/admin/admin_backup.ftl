@@ -76,21 +76,13 @@
          * 备份
          */
         function btn_backup(type) {
-            $.ajax({
-                type: 'GET',
-                url: '/admin/backup/doBackup',
-                async: false,
-                data: {
-                    'type' : type
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.get('/admin/backup/doBackup',{'type' : type},function(data) {
+                if(data.code === 1){
+                    halo.showMsgAndReload(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
 
         /**
@@ -100,44 +92,32 @@
          * @param type
          */
         function sendToEmail(fileName,type) {
-            $.ajax({
-                type: 'GET',
-                url: '/admin/backup/sendToEmail',
-                async: false,
-                data: {
-                    'type' : type,
-                    'fileName' : fileName
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsg(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.get('/admin/backup/sendToEmail',{
+                'type' : type,
+                'fileName' : fileName
+            },function(data) {
+                if(data.code === 1){
+                    halo.showMsg(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
 
         /**
          * 删除备份
          */
         function delBackup(fileName,type) {
-            $.ajax({
-                type: 'GET',
-                url: '/admin/backup/delBackup',
-                async: false,
-                data: {
-                    'type' : type,
-                    'fileName' : fileName
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.get('/admin/backup/delBackup',{
+                'type' : type,
+                'fileName' : fileName
+            },function(data) {
+                if(data.code === 1){
+                    halo.showMsgAndReload(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
 
         $('#btnBackupOption').click(function () {

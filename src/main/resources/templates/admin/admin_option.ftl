@@ -662,53 +662,34 @@
          * 更新所有文章的摘要
          */
         function updateAllSummary() {
-            $.ajax({
-                type: 'GET',
-                url: '/admin/posts/updateSummary',
-                data: {
-                    postSummary : $('#postSummary').val()
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsg(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.get('/admin/posts/updateSummary',{'postSummary' : $('#postSummary').val()},function (data) {
+                if(data.code === 1){
+                    halo.showMsg(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
 
         /**
          * 主动提交文章到百度
          */
         function pushAllToBaidu() {
-            $.ajax({
-                type: 'GET',
-                url: '/admin/posts/pushAllToBaidu',
-                data: {
-                    baiduToken : $('#baiduToken').val()
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsg(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.get('/admin/posts/pushAllToBaidu',{'baiduToken' : $('#baiduToken').val()},function (data) {
+                if(data.code === 1){
+                    halo.showMsg(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
 
         function updateToken() {
-            $.ajax({
-                type: 'GET',
-                url: '/admin/getToken',
-                data: {},
-                success: function (data) {
-                    if(data.code==1){
-                        $("#apiToken").val(data.result);
-                    }
+            $.get('/admin/getToken',function (data) {
+                if(data.code === 1){
+                    $("#apiToken").val(data.result);
                 }
-            });
+            },'JSON');
         }
 
         /**

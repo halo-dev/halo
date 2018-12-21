@@ -154,24 +154,16 @@
             var url = $('#cateUrl').val();
             var desc = $('#cateDesc').val();
             var result = true;
-            if(name==""||url==""||desc==""){
+            if(name===""||url===""||desc===""){
                 halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                 result = false;
             }
-            $.ajax({
-                type: 'GET',
-                url: '/admin/category/checkUrl',
-                async: false,
-                data: {
-                    'cateUrl' : url
-                },
-                success: function (data) {
-                    if(data.code==0){
-                        halo.showMsg(data.msg,'error',2000);
-                        result = false;
-                    }
+            $.get('/admin/category/checkUrl',{'cateUrl' : url},function(data) {
+                if(data.code === 0){
+                    halo.showMsg(data.msg,'error',2000);
+                    result = false;
                 }
-            });
+            },'JSON');
             return result;
         }
     </script>

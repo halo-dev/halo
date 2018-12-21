@@ -187,35 +187,28 @@
             inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
                 uploadUrl: "/admin/attachments/upload"
             });
-        })
+        });
 
         /**
          * 检测是否已经存在该链接
          * @constructor
          */
         function UrlOnBlurAuto() {
-            if($('#newPostUrl').val()===""){
+            var newPostUrl = $('#newPostUrl');
+            if(newPostUrl.val()===""){
                 halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                 return;
             }
-            $.ajax({
-                type: 'GET',
-                url: '/admin/page/checkUrl',
-                async: false,
-                data: {
-                    'postUrl': $('#newPostUrl').val()
-                },
-                success: function (data) {
-                    if(data.code==0){
-                        halo.showMsg(data.msg,'error',2000);
-                        return;
-                    }else{
-                        $('#postUrl').html($('#newPostUrl').val());
-                        $('#btn_change_postUrl').hide();
-                        $('#btn_input_postUrl').show();
-                    }
+            $.get('/admin/page/checkUrl',{'postUrl': newPostUrl.val()},function (data) {
+                if(data.code === 0){
+                    halo.showMsg(data.msg,'error',2000);
+                    return;
+                }else{
+                    $('#postUrl').html(newPostUrl.val());
+                    $('#btn_change_postUrl').hide();
+                    $('#btn_input_postUrl').show();
                 }
-            });
+            },'JSON');
         }
         $('#btn_input_postUrl').click(function () {
             $('#postUrl').html("<input type='text' id='newPostUrl' onblur='UrlOnBlurAuto()' value=''>");
@@ -243,31 +236,26 @@
                 halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                 return;
             }
-            $.ajax({
-                type: 'POST',
-                url: '/admin/page/new/push',
-                async: false,
-                data: {
-                    'postId': $('#postId').val(),
-                    'postStatus': status,
-                    'postTitle': Title,
-                    'postUrl' : $('#postUrl').html().toString(),
-                    'postContentMd': simplemde.value(),
-                    'postThumbnail': $('#selectImg').attr('src'),
-                    'allowComment' : $('#allowComment').val(),
-                    'customTpl' : $("#customTpl").val(),
-                    'postDate' : $("#postDate").val()
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        //清除自动保存的内容
-                        simplemde.clearAutosavedValue();
-                        halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/page');
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+
+            $.post('/admin/page/new/push',{
+                'postId': $('#postId').val(),
+                'postStatus': status,
+                'postTitle': Title,
+                'postUrl' : $('#postUrl').html().toString(),
+                'postContentMd': simplemde.value(),
+                'postThumbnail': $('#selectImg').attr('src'),
+                'allowComment' : $('#allowComment').val(),
+                'customTpl' : $("#customTpl").val(),
+                'postDate' : $("#postDate").val()
+            },function (data) {
+                if(data.code===1){
+                    //清除自动保存的内容
+                    simplemde.clearAutosavedValue();
+                    halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/page');
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
     </script>
 </div>

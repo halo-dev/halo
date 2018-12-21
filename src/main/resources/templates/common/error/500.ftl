@@ -45,10 +45,8 @@
 </div>
 </body>
 <script src="//cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <@compress single_line=true>
-    <script>
-        eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$.o(\'m://q.8.n/?1=4%y%z%B.5.9%d.e%f%g%h%i%j%k\',l(b){6 a=b.p[0].1;6 c=$(\'.r\');c.t("u-v","1(4://s.w.5.x"+a+")");c.2(\'3 A\');$(\'.7-C\').2(\'3 D\');$(\'.7-E\').2(\'3 F\')});',42,42,'|url|addClass|animated|http|bing|var|infos|afeld|com||||2FHPImageArchive|aspx|3Fformat|3Djs|26idx|3D0|26n|3D1|function|https|me|get|images|jsonp|fullscreen||css|background|image|cn|net|3A|2F|fadeIn|2Fcn|h1|shake|h2|fadeInDown'.split('|'),0,{}))
-    </script>
-    </@compress>
+<script>
+    eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$.o(\'m://q.8.n/?1=4%y%z%B.5.9%d.e%f%g%h%i%j%k\',l(b){6 a=b.p[0].1;6 c=$(\'.r\');c.t("u-v","1(4://s.w.5.x"+a+")");c.2(\'3 A\');$(\'.7-C\').2(\'3 D\');$(\'.7-E\').2(\'3 F\')});',42,42,'|url|addClass|animated|http|bing|var|infos|afeld|com||||2FHPImageArchive|aspx|3Fformat|3Djs|26idx|3D0|26n|3D1|function|https|me|get|images|jsonp|fullscreen||css|background|image|cn|net|3A|2F|fadeIn|2Fcn|h1|shake|h2|fadeInDown'.split('|'),0,{}))
+</script>
 </html>
 </#compress>

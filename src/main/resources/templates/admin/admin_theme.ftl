@@ -100,32 +100,29 @@
          * @param site_theme 主题名
          */
         function setTheme(site_theme) {
-            $.ajax({
-                type: 'get',
-                url: '/admin/themes/set',
-                data: {
-                    'siteTheme': site_theme
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.get('/admin/themes/set',{'siteTheme': site_theme},function(data) {
+                if(data.code === 1){
+                    halo.showMsgAndReload(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
-        $('.theme-thumbnail').mouseover(function () {
+
+        var themeThumbnail = $('.theme-thumbnail');
+        var themeBody = $('.theme-body');
+
+        themeThumbnail.mouseover(function () {
             $(this).children('.btn-delete').show();
         });
-        $('.theme-thumbnail').mouseleave(function () {
+        themeThumbnail.mouseleave(function () {
             $(this).children('.btn-delete').hide();
         });
-        $('.theme-body').mouseover(function () {
+        themeBody.mouseover(function () {
             $(this).find(".theme-thumbnail").css("opacity","0.8");
             $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").show();
         });
-        $('.theme-body').mouseleave(function () {
+        themeBody.mouseleave(function () {
             $(this).find(".theme-thumbnail").css("opacity","1");
             $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").hide();
         });

@@ -2,11 +2,9 @@ package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.AllowCommentEnum;
-import cc.ryanc.halo.model.enums.AttachLocationEnum;
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
-import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import cn.hutool.core.date.DateUtil;
@@ -66,6 +64,7 @@ public class InstallController {
      * 渲染安装页面
      *
      * @param model model
+     *
      * @return 模板路径
      */
     @GetMapping
@@ -93,21 +92,22 @@ public class InstallController {
      * @param userEmail       用户邮箱
      * @param userPwd         用户密码
      * @param request         request
-     * @return true：安装成功，false：安装失败
+     *
+     * @return JsonResult
      */
     @PostMapping(value = "/do")
     @ResponseBody
-    public boolean doInstall(@RequestParam("blogLocale") String blogLocale,
-                             @RequestParam("blogTitle") String blogTitle,
-                             @RequestParam("blogUrl") String blogUrl,
-                             @RequestParam("userName") String userName,
-                             @RequestParam("userDisplayName") String userDisplayName,
-                             @RequestParam("userEmail") String userEmail,
-                             @RequestParam("userPwd") String userPwd,
-                             HttpServletRequest request) {
+    public JsonResult doInstall(@RequestParam("blogLocale") String blogLocale,
+                                @RequestParam("blogTitle") String blogTitle,
+                                @RequestParam("blogUrl") String blogUrl,
+                                @RequestParam("userName") String userName,
+                                @RequestParam("userDisplayName") String userDisplayName,
+                                @RequestParam("userEmail") String userEmail,
+                                @RequestParam("userPwd") String userPwd,
+                                HttpServletRequest request) {
         try {
             if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
-                return false;
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), "该博客已初始化，不能再次安装！");
             }
             //创建新的用户
             User user = new User();
@@ -151,7 +151,7 @@ public class InstallController {
             comment.setCommentAuthorEmail("i@ryanc.cc");
             comment.setCommentAuthorUrl("https://ryanc.cc");
             comment.setCommentAuthorIp("127.0.0.1");
-            comment.setCommentAuthorAvatarMd5("7cc7f29278071bd4dce995612d428834");
+            comment.setCommentAuthorAvatarMd5(SecureUtil.md5("i@ryanc.cc"));
             comment.setCommentDate(DateUtil.date());
             comment.setCommentContent("欢迎，欢迎！");
             comment.setCommentStatus(0);
@@ -180,14 +180,12 @@ public class InstallController {
             menuIndex.setMenuName("首页");
             menuIndex.setMenuUrl("/");
             menuIndex.setMenuSort(1);
-            menuIndex.setMenuIcon("");
             menuService.save(menuIndex);
 
             Menu menuArchive = new Menu();
             menuArchive.setMenuName("归档");
             menuArchive.setMenuUrl("/archives");
             menuArchive.setMenuSort(2);
-            menuArchive.setMenuIcon("");
             menuService.save(menuArchive);
 
             HaloConst.OPTIONS.clear();
@@ -196,8 +194,8 @@ public class InstallController {
             configuration.setSharedVariable("user", userService.findUser());
         } catch (Exception e) {
             log.error(e.getMessage());
-            return false;
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), e.getMessage());
         }
-        return true;
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "安装成功！");
     }
 }
