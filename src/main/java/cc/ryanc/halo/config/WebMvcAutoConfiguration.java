@@ -52,6 +52,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/admin.*")
                 .addPathPatterns("/admin/**")
                 .addPathPatterns("/backup/**")
                 .excludePathPatterns("/admin/login")
@@ -65,6 +66,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(apiInterceptor)
                 .addPathPatterns("/api/**");
         registry.addInterceptor(localeInterceptor)
+                .addPathPatterns("/admin.*")
                 .addPathPatterns("/admin/**")
                 .addPathPatterns("/install");
         registry.addInterceptor(localeChangeInterceptor())
