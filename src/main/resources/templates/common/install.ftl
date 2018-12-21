@@ -301,15 +301,15 @@
                     e.preventDefault();
                     var $form = $(e.target);
                     var bv = $form.data('bootstrapValidator');
-                    $.post($form.attr('action'),$form.serialize(),function (result) {
-                        if(result==true){
+                    $.post($form.attr('action'),$form.serialize(),function (data) {
+                        if(data.code === 1){
                             $('#installFirst').hide();
                             $('#installSuccess').show();
                         }else{
                             $('#installFirst').hide();
                             $('#installError').show();
                         }
-                    },'json');
+                    },'JSON');
                 });
         });
         $('#blogLocale').on('change',function(){

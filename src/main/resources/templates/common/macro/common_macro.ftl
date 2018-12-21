@@ -2,12 +2,12 @@
 
 <#-- 统计代码 -->
 <#macro statistics>
-    ${options.statistics_code?if_exists}
+    ${options.statistics_code!}
 </#macro>
 
 <#-- 页脚信息 -->
 <#macro footer_info>
-    ${options.blog_footer_info?if_exists}
+    ${options.blog_footer_info!}
 </#macro>
 
 <#-- favicon -->

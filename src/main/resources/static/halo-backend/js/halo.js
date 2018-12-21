@@ -7,8 +7,8 @@ $.extend({
 });
 
 $.fn.extend({
-    animateCss: function(animationName, callback) {
-        var animationEnd = (function(el) {
+    animateCss: function (animationName, callback) {
+        var animationEnd = (function (el) {
             var animations = {
                 animation: 'animationend',
                 OAnimation: 'oAnimationEnd',
@@ -23,7 +23,7 @@ $.fn.extend({
             }
         })(document.createElement('div'));
 
-        this.addClass('animated ' + animationName).one(animationEnd, function() {
+        this.addClass('animated ' + animationName).one(animationEnd, function () {
             $(this).removeClass('animated ' + animationName);
 
             if (typeof callback === 'function') callback();
@@ -37,11 +37,11 @@ $.fn.extend({
  * 适配移动端并初始化菜单
  */
 $(document).ready(function () {
-    if($(window).width()<1024){
-        if($('body').hasClass('layout-boxed')){
+    if ($(window).width() < 1024) {
+        if ($('body').hasClass('layout-boxed')) {
             $('body').removeClass('layout-boxed');
         }
-        if($('body').hasClass('sidebar-collapse')){
+        if ($('body').hasClass('sidebar-collapse')) {
             $('body').removeClass('sidebar-collapse');
         }
     }
@@ -52,11 +52,11 @@ $(document).ready(function () {
 /**
  * pjax请求时点击菜单的事件
  */
-$(document).on('pjax:clicked', function() {
+$(document).on('pjax:clicked', function () {
     initMenu();
 });
 
-$(document).on('pjax:complete',function () {
+$(document).on('pjax:complete', function () {
     $("#animated-header,#animated-content").animateCss("fadeIn");
 });
 
@@ -65,35 +65,35 @@ $(document).on('pjax:complete',function () {
  */
 function initMenu() {
     var pathName = location.pathname;
-    if(pathName=="/admin/posts/edit"){
-        pathName="/admin/posts/new";
+    if (pathName === "/admin/posts/edit") {
+        pathName = "/admin/posts/new";
     }
-    if(pathName=="/admin/category/edit"){
-        pathName="/admin/category";
+    if (pathName === "/admin/category/edit") {
+        pathName = "/admin/category";
     }
-    if(pathName=="/admin/tag/edit"){
-        pathName="/admin/tag";
+    if (pathName === "/admin/tag/edit") {
+        pathName = "/admin/tag";
     }
-    if(pathName=="/admin/page/edit"){
-        pathName="/admin/page/new";
+    if (pathName === "/admin/page/edit") {
+        pathName = "/admin/page/new";
     }
-    if(pathName=="/admin/page/links"){
-        pathName="/admin/page";
+    if (pathName === "/admin/page/links") {
+        pathName = "/admin/page";
     }
-    if(pathName=="/admin/page/galleries"){
-        pathName="/admin/page";
+    if (pathName === "/admin/page/galleries") {
+        pathName = "/admin/page";
     }
-    if(pathName=="/admin/menus/edit"){
-        pathName="/admin/menus";
+    if (pathName === "/admin/menus/edit") {
+        pathName = "/admin/menus";
     }
     $(".sidebar-menu").children().each(function () {
         var li = $(this);
         li.find('a').each(function () {
             var href = $(this).attr("href");
-            if (pathName == href) {
+            if (pathName === href) {
                 li.addClass("active");
                 $(this).parent().addClass("active");
-            }else{
+            } else {
                 $(this).parent().removeClass("active");
             }
         });
@@ -251,17 +251,12 @@ $.halo.prototype.layerModal = function (url, title) {
  * 保存设置选项
  */
 function saveOptions(option) {
-    var param = $('#'+option).serialize();
-    $.ajax({
-        type: 'post',
-        url: '/admin/option/save',
-        data: param,
-        success: function (data) {
-            if(data.code==1){
-                halo.showMsg(data.msg,'success',1000);
-            }else {
-                halo.showMsg(data.msg,'error',2000);
-            }
+    var param = $('#' + option).serialize();
+    $.post('/admin/option/save', param, function (data) {
+        if (data.code === 1) {
+            halo.showMsg(data.msg, 'success', 1000);
+        } else {
+            halo.showMsg(data.msg, 'error', 2000);
         }
-    });
+    }, 'JSON');
 }

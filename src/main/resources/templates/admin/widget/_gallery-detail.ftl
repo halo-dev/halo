@@ -87,21 +87,13 @@
             ,btn: ['<@spring.message code="common.btn.delete" />', '<@spring.message code="common.btn.cancel" />']
             ,yes: function(index){
                 layer.close(index);
-                $.ajax({
-                    type: 'GET',
-                    url: '/admin/page/gallery/remove',
-                    async: false,
-                    data:{
-                        galleryId : ${gallery.galleryId?c}
-                    },
-                    success: function (data) {
-                        if(data.code==1){
-                            halo.showMsgAndReload(data.msg,'success',1000);
-                        }else{
-                            halo.showMsg(data.msg,'error',2000);
-                        }
+                $.get('/admin/page/gallery/remove',{'galleryId' : ${gallery.galleryId?c}},function (data) {
+                    if(data.code === 1){
+                        halo.showMsgAndReload(data.msg,'success',1000);
+                    }else{
+                        halo.showMsg(data.msg,'error',2000);
                     }
-                });
+                },'JSON');
             }
         });
     }

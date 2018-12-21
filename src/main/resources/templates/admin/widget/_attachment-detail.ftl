@@ -87,36 +87,13 @@
             ,btn: ['<@spring.message code="common.btn.delete" />', '<@spring.message code="common.btn.cancel" />']
             ,yes: function(index){
                 layer.close(index);
-                $.ajax({
-                    type: 'GET',
-                    url: '/admin/attachments/remove',
-                    async: false,
-                    data:{
-                        attachId : ${attachment.attachId?c}
-                    },
-                    success: function (data) {
-                        if(data.code==1){
-                            $.toast({
-                                text: data.msg,
-                                heading: '<@spring.message code="common.text.tips" />',
-                                icon: 'success',
-                                showHideTransition: 'fade',
-                                allowToastClose: true,
-                                hideAfter: 1000,
-                                stack: 1,
-                                position: 'top-center',
-                                textAlign: 'left',
-                                loader: true,
-                                loaderBg: '#ffffff',
-                                afterHidden: function () {
-                                    parent.location.reload();
-                                }
-                            });
-                        }else{
-                            halo.showMsg(data.msg,'error',2000);
-                        }
+                $.get('/admin/attachments/remove',{'attachId' : ${attachment.attachId?c}},function (data) {
+                    if(data.code === 1){
+                        halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/attachments');
+                    }else{
+                        halo.showMsg(data.msg,'error',2000);
                     }
-                });
+                },'JSON');
             }
         });
     }

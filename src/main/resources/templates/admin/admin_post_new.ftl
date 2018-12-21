@@ -192,29 +192,32 @@
             inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
                 uploadUrl: "/admin/attachments/upload"
             });
-        })
+        });
+
+        var tagList = $('#tagList');
 
         /**
          * 初始化标签
          */
-        $('#tagList').tagEditor({
+        tagList.tagEditor({
             delimiter: ',',
             placeholder: '<@spring.message code="admin.posts.edit.form.tag.placeholder" />',
             forceLowercase: false
         });
 
         $('#chooseTag').change(function () {
-            $('#tagList').tagEditor('addTag',$(this).val());
+            tagList.tagEditor('addTag',$(this).val());
         });
 
         /**
          * 自动填充路径，并且将汉字转化成拼音以-隔开
          */
         function autoComplateUrl() {
-            var titleVal = $("#postTitle").val();
-            if(titleVal!="" && titleVal!=null && $("#postUrl").html()==''){
-                var result = $("#postTitle").toPinyin().toLowerCase();
-                $("#postUrl").html(result.substring(0,result.length-1));
+            var titleVal = $("#postTitle");
+            var postUrl = $("#postUrl");
+            if(titleVal.val()!=="" && titleVal.val() !== null && postUrl.html()===''){
+                var result = titleVal.toPinyin().toLowerCase();
+                postUrl.html(result.substring(0,result.length-1));
             }
         }
 
@@ -223,32 +226,26 @@
          * @constructor
          */
         function urlOnBlurAuto() {
-            if($('#newPostUrl').val()===""){
+            var newPostUrl = $('#newPostUrl');
+            if(newPostUrl.val()===""){
                 halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                 return;
             }
-            $.ajax({
-                type: 'GET',
-                url: '/admin/posts/checkUrl',
-                async: false,
-                data: {
-                    'postUrl': $('#newPostUrl').val()
-                },
-                success: function (data) {
-                    if(data.code==0){
-                        halo.showMsg(data.msg,'error',2000);
-                        return;
-                    }else{
-                        $('#postUrl').html($('#newPostUrl').val());
-                        $('#btn_change_postUrl').hide();
-                        $('#btn_input_postUrl').show();
-                    }
+
+            $.get('/admin/posts/checkUrl',{'postUrl': newPostUrl.val()},function (data) {
+                if(data.code===0){
+                    halo.showMsg(data.msg,'error',2000);
+                    return;
+                }else{
+                    $('#postUrl').html(newPostUrl.val());
+                    $('#btn_change_postUrl').hide();
+                    $('#btn_input_postUrl').show();
                 }
-            });
+            },'JSON')
         }
         $('#btn_input_postUrl').click(function () {
-            var postUrl = $("#postUrl").html();
-            $('#postUrl').html("<input type='text' id='newPostUrl' onblur='urlOnBlurAuto()' value='"+postUrl+"'>");
+            var postUrl = $("#postUrl");
+            postUrl.html("<input type='text' id='newPostUrl' onblur='urlOnBlurAuto()' value='"+postUrl.html()+"'>");
             $(this).hide();
             $('#btn_change_postUrl').show();
         });
@@ -274,30 +271,24 @@
                 halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                 return;
             }
-            $.ajax({
-                type: 'POST',
-                url: '/admin/posts/save',
-                async: false,
-                data: {
-                    'postStatus': status,
-                    'postTitle': Title,
-                    'postUrl' : $('#postUrl').html().toString(),
-                    'postContentMd': simplemde.value(),
-                    'postThumbnail': $('#selectImg').attr('src'),
-                    'cateList' : cateList.toString(),
-                    'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
-                    'allowComment' : $('#allowComment').val()
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        //清除自动保存的内容
-                        simplemde.clearAutosavedValue();
-                        halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts');
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.post('/admin/posts/save',{
+                'postStatus': status,
+                'postTitle': Title,
+                'postUrl' : $('#postUrl').html().toString(),
+                'postContentMd': simplemde.value(),
+                'postThumbnail': $('#selectImg').attr('src'),
+                'cateList' : cateList.toString(),
+                'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
+                'allowComment' : $('#allowComment').val()
+            },function (data) {
+                if(data.code === 1){
+                    //清除自动保存的内容
+                    simplemde.clearAutosavedValue();
+                    halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts');
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
     </script>
 </div>

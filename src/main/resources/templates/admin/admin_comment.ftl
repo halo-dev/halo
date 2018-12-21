@@ -178,22 +178,16 @@
         }
 
         function reply() {
-            $.ajax({
-                type: 'POST',
-                url: '/admin/comments/reply',
-                async: false,
-                data: {
-                    'commentId': $("#commentId").val(),
-                    'userAgent': $("#userAgent").val(),
-                    'postId': $("#postId").val(),
-                    'commentContent': halo.formatContent($("#commentContent").val())
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        window.location.reload();
-                    }
+            $.post('/admin/comments/reply',{
+                'commentId': $("#commentId").val(),
+                'userAgent': $("#userAgent").val(),
+                'postId': $("#postId").val(),
+                'commentContent': halo.formatContent($("#commentContent").val())
+            },function(data) {
+                if(data.code === 1){
+                    window.location.reload();
                 }
-            });
+            },'JSON');
         }
     </script>
 </div>

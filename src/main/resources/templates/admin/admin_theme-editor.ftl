@@ -107,42 +107,29 @@
             toolbarTips: false
         });
         function loadContent(tplName) {
-            if (tplName && tplName != '') {
-                $.ajax({
-                    type: 'GET',
-                    url: '/admin/themes/getTpl',
-                    async: false,
-                    data: {
-                        tplName: tplName
-                    },
-                    success: function (data) {
-                        simplemde.value(data);
-                        $('#tplNameTitle').html(tplName);
-                    }
-                });
+            var tplNameTitle = $('#tplNameTitle');
+            if (tplName && tplName !== '') {
+                $.get('/admin/themes/getTpl',{'tplName': tplName},function (data) {
+                    simplemde.value(data);
+                    tplNameTitle.html(tplName);
+                })
             } else {
                 simplemde.value('');
-                $('#tplNameTitle').html('');
+                tplNameTitle.html('');
             }
         }
 
         function saveTpl() {
-            $.ajax({
-                type: 'POST',
-                url: '/admin/themes/editor/save',
-                async: false,
-                data:{
-                    'tplName': $('#tplNameTitle').html(),
-                    'tplContent': simplemde.value()
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsg(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
+            $.post('/admin/themes/editor/save',{
+                'tplName': $('#tplNameTitle').html(),
+                'tplContent': simplemde.value()
+            },function (data) {
+                if(data.code === 1){
+                    halo.showMsg(data.msg,'success',1000);
+                }else{
+                    halo.showMsg(data.msg,'error',2000);
                 }
-            });
+            },'JSON');
         }
     </script>
 </div>

@@ -102,7 +102,7 @@
             showClose: false
         }).on("fileuploaded",function (event,data,previewId,index) {
             var data = data.jqXHR.responseJSON;
-            if(data.code==1){
+            if(data.code === 1){
                 $("#uploadForm").hide(400);
                 halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/themes');
             }else{
@@ -117,27 +117,23 @@
     function pullAction() {
         var remoteAddr = $("#remoteAddr").val();
         var themeName = $("#themeName").val();
-        if(remoteAddr==null || themeName==null){
+        var btnInstall = $('#btnInstall');
+        if(remoteAddr===null || themeName===null){
             halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
             return;
         }
-        $('#btnInstall').button('loading');
-        $.ajax({
-            type: 'post',
-            url: '/admin/themes/clone',
-            data: {
-                remoteAddr : remoteAddr,
-                themeName: themeName
-            },
-            success: function (data) {
-                if(data.code==1){
-                    halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/themes');
-                }else {
-                    halo.showMsg(data.msg,'error',2000);
-                    $('#btnInstall').button('reset');
-                }
+        btnInstall.button('loading');
+        $.post('/admin/themes/clone',{
+            'remoteAddr' : remoteAddr,
+            'themeName': themeName
+        },function (data) {
+            if(data.code === 1){
+                halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/themes');
+            }else {
+                halo.showMsg(data.msg,'error',2000);
+                btnInstall.button('reset');
             }
-        });
+        },'JSON');
     }
 </script>
 </html>

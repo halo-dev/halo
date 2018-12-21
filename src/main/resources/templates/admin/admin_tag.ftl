@@ -130,24 +130,16 @@
             var name = $('#tagName').val();
             var url = $('#tagUrl').val();
             var result = true;
-            if(name==""||url==""){
+            if(name===""||url===""){
                 halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
                 result = false;
             }
-            $.ajax({
-                type: 'GET',
-                url: '/admin/tag/checkUrl',
-                async: false,
-                data: {
-                    'tagUrl' : url
-                },
-                success: function (data) {
-                    if(data.code==0){
-                        halo.showMsg(data.msg,'error',2000);
-                        result = false;
-                    }
+            $.get('/admin/tag/checkUrl',{'tagUrl' : url},function(data) {
+                if(data.code === 0){
+                    halo.showMsg(data.msg,'error',2000);
+                    result = false;
                 }
-            });
+            },'JSON');
             return result;
         }
     </script>
