@@ -114,10 +114,10 @@
                                     <#if menus?? && menus?size gt 0>
                                         <#list menus?sort_by('menuSort') as menu>
                                             <tr>
-                                                <td>${menu.menuName}</td>
-                                                <td>${menu.menuUrl}</td>
-                                                <td>${(menu.menuSort)!}</td>
-                                                <td>${menu.menuIcon}</td>
+                                                <td>${menu.menuName!}</td>
+                                                <td>${menu.menuUrl!}</td>
+                                                <td>${menu.menuSort!}</td>
+                                                <td>${menu.menuIcon!}</td>
                                                 <td>
                                                     <#if updateMenu?? && menu.menuId?c==updateMenu.menuId?c>
                                                         <a href="javascript:void(0)" class="btn btn-primary btn-xs " disabled=""><@spring.message code='common.btn.editing' /></a>
