@@ -180,12 +180,14 @@ public class InstallController {
             menuIndex.setMenuName("首页");
             menuIndex.setMenuUrl("/");
             menuIndex.setMenuSort(1);
+            menuIndex.setMenuIcon(" ");
             menuService.save(menuIndex);
 
             Menu menuArchive = new Menu();
             menuArchive.setMenuName("归档");
             menuArchive.setMenuUrl("/archives");
             menuArchive.setMenuSort(2);
+            menuArchive.setMenuIcon(" ");
             menuService.save(menuArchive);
 
             HaloConst.OPTIONS.clear();
