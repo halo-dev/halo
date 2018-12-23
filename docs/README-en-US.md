@@ -119,9 +119,9 @@ The birth of Halo is inseparable from the following projects：
 
 > If Halo is helpful to you, ask the author to have a ☕.
 
-| Alipay  | Wechat  | Alipay Red envelope  |
-| :------------: | :------------: | :------------: |
-| <img src="https://cdn.ryanc.cc/img/github/donate/alipay.png" width="150"/>  | <img src="https://cdn.ryanc.cc/img/github/donate/wechat.png" width="150" />  | <img src="https://cdn.ryanc.cc/img/github/donate/hongbao.png" width="150" />  |
+| AliPay/WeChat/QQ/PayPal  |
+| :------------: |
+| <img src="https://i.loli.net/2018/12/23/5c1f68ce9b884.png" width="200"/>  |
 
 ## Interface display
 
