@@ -118,9 +118,9 @@ Halo 的诞生离不开下面这些项目：
 
 > 如果 Halo 对你有帮助，可以请作者喝杯☕️。
 
-| 支付宝  | 微信  | 支付宝红包  |
-| :------------: | :------------: | :------------: |
-| <img src="https://cdn.ryanc.cc/img/github/donate/alipay.png" width="150"/>  | <img src="https://cdn.ryanc.cc/img/github/donate/wechat.png" width="150" />  | <img src="https://cdn.ryanc.cc/img/github/donate/hongbao.png" width="150" />  |
+| 支付宝/微信/QQ  |
+| :------------: |
+| <img src="https://i.loli.net/2018/12/23/5c1f68ce9b884.png" width="200"/>  |
 
 ## 界面展示
 
