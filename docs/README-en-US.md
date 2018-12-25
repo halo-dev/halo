@@ -50,7 +50,7 @@ curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /
 # Get the docker-compose.yaml
 yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
-# Modify docker-compose.yaml, modify VIRTUAL_HOST, LETSENCRYPT_HOST for your own domain name, and modify LETSENCRYPT_I@RYANC.CC to your own mailbox.
+# Modify docker-compose.yaml, modify VIRTUAL_HOST, LETSENCRYPT_HOST for your own domain name, and modify LETSENCRYPT_EMAIL to your own mailbox.
 
 # run
 docker-compose up -d
