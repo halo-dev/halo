@@ -21,6 +21,12 @@
 
 > QQ 交流群: 162747721 | Telegram 交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog) | [WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
 
+## 演示站点
+
+> 前台地址：[https://demo.halo.run](https://demo.halo.run) 
+> 后台地址：[https://demo.halo.run/admin](https://demo.halo.run/admin)
+> 用户名：admin，密码：123456
+
 ## 快速开始
 
 服务器快速部署：
