@@ -106,11 +106,12 @@
             </div>
         </div>
     </section>
-    <script type="application/javascript">
-        $('#btnNewPicture').click(function () {
-            $('#newPicturePanel').slideToggle(400);
-        });
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $('#btnNewPicture').click(function () {
+        $('#newPicturePanel').slideToggle(400);
+    });
+</script>
+</@footer>
 </#compress>

@@ -1,7 +1,5 @@
 package cc.ryanc.halo.model.tag;
 
-import cc.ryanc.halo.model.dto.HaloConst;
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.*;
 import freemarker.core.Environment;
 import freemarker.template.*;

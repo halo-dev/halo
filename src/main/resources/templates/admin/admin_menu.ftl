@@ -154,30 +154,35 @@
             </div>
         </div>
     </div>
-    <script>
-        function modelShow(url) {
-            $('#url').val(url);
-            $('#removeMenuModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-
-        /**
-         * 保存
-         */
-        function save() {
-            var param = $('#menuSaveForm').serialize();
-            $.post('/admin/menus/save', param, function (data) {
-                if (data.code === 1) {
-                    halo.showMsgAndRedirect(data.msg, 'success', 1000,'/admin/menus');
-                } else {
-                    halo.showMsg(data.msg, 'error', 2000);
-                }
-            }, 'JSON');
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url) {
+        $('#url').val(url);
+        $('#removeMenuModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+
+    /**
+     * 保存
+     */
+    function save() {
+        var param = $('#menuSaveForm').serialize();
+        $.post('/admin/menus/save', param, function (data) {
+            if (data.code === 1) {
+                halo.showMsgAndRedirect(data.msg, 'success', 1000,'/admin/menus',"${options.admin_pjax!'true'}");
+            } else {
+                halo.showMsg(data.msg, 'error', 2000);
+            }
+        }, 'JSON');
+    }
+</script>
+</@footer>
 </#compress>

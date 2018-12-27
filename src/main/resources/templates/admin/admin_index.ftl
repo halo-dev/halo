@@ -381,11 +381,12 @@
             </div>
         </div>
     </div>
-    <script type="application/javascript">
-        $('#btnWidgetsOption').click(function () {
-            $('#widgetOptionsPanel').slideToggle(400);
-        });
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $('#btnWidgetsOption').click(function () {
+        $('#widgetOptionsPanel').slideToggle(400);
+    });
+</script>
+</@footer>
 </#compress>

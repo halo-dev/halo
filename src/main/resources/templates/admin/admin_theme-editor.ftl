@@ -88,49 +88,49 @@
             </div>
         </div>
     </section>
-    <script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
-    <script>
-        /**
-         * 加载编辑器
-         */
-        var simplemde = new SimpleMDE({
-            element: document.getElementById("tplContent"),
-            autoDownloadFontAwesome: false,
-            autofocus: true,
-            renderingConfig: {
-                codeSyntaxHighlighting: true
-            },
-            showIcons: ["code", "table"],
-            status: false,
-            tabSize: 4,
-            toolbar: false,
-            toolbarTips: false
-        });
-        function loadContent(tplName) {
-            var tplNameTitle = $('#tplNameTitle');
-            if (tplName && tplName !== '') {
-                $.get('/admin/themes/getTpl',{'tplName': tplName},function (data) {
-                    simplemde.value(data);
-                    tplNameTitle.html(tplName);
-                })
-            } else {
-                simplemde.value('');
-                tplNameTitle.html('');
-            }
-        }
-
-        function saveTpl() {
-            $.post('/admin/themes/editor/save',{
-                'tplName': $('#tplNameTitle').html(),
-                'tplContent': simplemde.value()
-            },function (data) {
-                if(data.code === 1){
-                    halo.showMsg(data.msg,'success',1000);
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    /**
+     * 加载编辑器
+     */
+    var simplemde = new SimpleMDE({
+        element: document.getElementById("tplContent"),
+        autoDownloadFontAwesome: false,
+        autofocus: true,
+        renderingConfig: {
+            codeSyntaxHighlighting: true
+        },
+        showIcons: ["code", "table"],
+        status: false,
+        tabSize: 4,
+        toolbar: false,
+        toolbarTips: false
+    });
+    function loadContent(tplName) {
+        var tplNameTitle = $('#tplNameTitle');
+        if (tplName && tplName !== '') {
+            $.get('/admin/themes/getTpl',{'tplName': tplName},function (data) {
+                simplemde.value(data);
+                tplNameTitle.html(tplName);
+            })
+        } else {
+            simplemde.value('');
+            tplNameTitle.html('');
+        }
+    }
+
+    function saveTpl() {
+        $.post('/admin/themes/editor/save',{
+            'tplName': $('#tplNameTitle').html(),
+            'tplContent': simplemde.value()
+        },function (data) {
+            if(data.code === 1){
+                halo.showMsg(data.msg,'success',1000);
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+</script>
+</@footer>

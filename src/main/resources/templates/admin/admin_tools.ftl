@@ -62,5 +62,7 @@
         </div>
     </section>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script"></script>
+</@footer>
 </#compress>

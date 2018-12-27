@@ -132,24 +132,29 @@
             </div>
         </div>
     </div>
-    <script>
-        function modelShow(url) {
-            $('#url').val(url);
-            $('#removeLinkModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-        function isNull() {
-            var name = $('#linkName').val();
-            var url = $('#linkUrl').val();
-            if(name===""||url===""){
-                halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
-                return false;
-            }
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url) {
+        $('#url').val(url);
+        $('#removeLinkModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+    function isNull() {
+        var name = $('#linkName').val();
+        var url = $('#linkUrl').val();
+        if(name===""||url===""){
+            halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
+            return false;
+        }
+    }
+</script>
+</@footer>
 </#compress>

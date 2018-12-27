@@ -131,13 +131,10 @@
             </div>
         </div>
     </section>
-    <script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
-    <script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
-    <script src="/static/halo-backend/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-    <script src="/static/halo-backend/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
-    <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-    <script>
-        <#if post??>
+</div>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    <#if post??>
         $('#postDate').datetimepicker({
             format: 'yyyy-mm-dd hh:ii',
             language: 'zh-CN',
@@ -145,115 +142,114 @@
             todayBtn: 1,
             autoclose: 1
         });
-        </#if>
+    </#if>
 
-        MathJax.Hub.Config({
-            tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+    });
+
+    var QUEUE = MathJax.Hub.queue;
+
+    /**
+     * 加载编辑器
+     */
+    var simplemde = new SimpleMDE({
+        element: document.getElementById("editorarea"),
+        autoDownloadFontAwesome: false,
+        autofocus: true,
+        autosave: {
+            enabled: true,
+            uniqueId: "editor-temp-page-<#if post??>${post.postId}<#else>1</#if>",
+            delay: 10000
+        },
+        renderingConfig: {
+            codeSyntaxHighlighting: true
+        },
+        previewRender: function(plainText) {
+            var preview = document.getElementsByClassName("editor-preview-side")[0];
+            preview.innerHTML = this.parent.markdown(plainText);
+            preview.setAttribute('id','editor-preview');
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"editor-preview"]);
+            return preview.innerHTML;
+        },
+        showIcons: ["code", "table"],
+        status: ["autosave", "lines", "words"],
+        tabSize: 4
+    });
+
+    /**
+     * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
+     */
+    $(function () {
+        inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+            uploadUrl: "/admin/attachments/upload"
         });
+    });
 
-        var QUEUE = MathJax.Hub.queue;
-
-        /**
-         * 加载编辑器
-         */
-        var simplemde = new SimpleMDE({
-            element: document.getElementById("editorarea"),
-            autoDownloadFontAwesome: false,
-            autofocus: true,
-            autosave: {
-                enabled: true,
-                uniqueId: "editor-temp-page-<#if post??>${post.postId}<#else>1</#if>",
-                delay: 10000
-            },
-            renderingConfig: {
-                codeSyntaxHighlighting: true
-            },
-            previewRender: function(plainText) {
-                var preview = document.getElementsByClassName("editor-preview-side")[0];
-                preview.innerHTML = this.parent.markdown(plainText);
-                preview.setAttribute('id','editor-preview');
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"editor-preview"]);
-                return preview.innerHTML;
-            },
-            showIcons: ["code", "table"],
-            status: ["autosave", "lines", "words"],
-            tabSize: 4
-        });
-
-        /**
-         * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
-         */
-        $(function () {
-            inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
-                uploadUrl: "/admin/attachments/upload"
-            });
-        });
-
-        /**
-         * 检测是否已经存在该链接
-         * @constructor
-         */
-        function UrlOnBlurAuto() {
-            var newPostUrl = $('#newPostUrl');
-            if(newPostUrl.val()===""){
-                halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
-                return;
-            }
-            $.get('/admin/page/checkUrl',{'postUrl': newPostUrl.val()},function (data) {
-                if(data.code === 0){
-                    halo.showMsg(data.msg,'error',2000);
-                    return;
-                }else{
-                    $('#postUrl').html(newPostUrl.val());
-                    $('#btn_change_postUrl').hide();
-                    $('#btn_input_postUrl').show();
-                }
-            },'JSON');
+    /**
+     * 检测是否已经存在该链接
+     * @constructor
+     */
+    function UrlOnBlurAuto() {
+        var newPostUrl = $('#newPostUrl');
+        if(newPostUrl.val()===""){
+            halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
+            return;
         }
-        $('#btn_input_postUrl').click(function () {
-            $('#postUrl').html("<input type='text' id='newPostUrl' onblur='UrlOnBlurAuto()' value=''>");
-            $(this).hide();
-            $('#btn_change_postUrl').show();
-        });
-
-
-        /**
-         * 提交文章
-         * @param status 文章状态
-         */
-        function push(status) {
-            var postTitle = $("#postTitle");
-            var postUrl = $("#postUrl");
-            if(!postTitle.val()){
-                halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
+        $.get('/admin/page/checkUrl',{'postUrl': newPostUrl.val()},function (data) {
+            if(data.code === 0){
+                halo.showMsg(data.msg,'error',2000);
                 return;
+            }else{
+                $('#postUrl').html(newPostUrl.val());
+                $('#btn_change_postUrl').hide();
+                $('#btn_input_postUrl').show();
             }
-            if(!postUrl.html()){
-                halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
-                return;
-            }
+        },'JSON');
+    }
+    $('#btn_input_postUrl').click(function () {
+        $('#postUrl').html("<input type='text' id='newPostUrl' onblur='UrlOnBlurAuto()' value=''>");
+        $(this).hide();
+        $('#btn_change_postUrl').show();
+    });
 
-            $.post('/admin/page/new/push',{
-                'postId': $('#postId').val(),
-                'postStatus': status,
-                'postTitle': postTitle.val(),
-                'postUrl' : postUrl.html().toString(),
-                'postContentMd': simplemde.value(),
-                'postThumbnail': $('#selectImg').attr('src'),
-                'allowComment' : $('#allowComment').val(),
-                'customTpl' : $("#customTpl").val(),
-                'postDate' : $("#postDate").val()
-            },function (data) {
-                if(data.code===1){
-                    //清除自动保存的内容
-                    simplemde.clearAutosavedValue();
-                    halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/page');
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
+
+    /**
+     * 提交文章
+     * @param status 文章状态
+     */
+    function push(status) {
+        var postTitle = $("#postTitle");
+        var postUrl = $("#postUrl");
+        if(!postTitle.val()){
+            halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
+            return;
         }
-    </script>
-</div>
-<@footer></@footer>
+        if(!postUrl.html()){
+            halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
+            return;
+        }
+
+        $.post('/admin/page/new/push',{
+            'postId': $('#postId').val(),
+            'postStatus': status,
+            'postTitle': postTitle.val(),
+            'postUrl' : postUrl.html().toString(),
+            'postContentMd': simplemde.value(),
+            'postThumbnail': $('#selectImg').attr('src'),
+            'allowComment' : $('#allowComment').val(),
+            'customTpl' : $("#customTpl").val(),
+            'postDate' : $("#postDate").val()
+        },function (data) {
+            if(data.code===1){
+                //清除自动保存的内容
+                simplemde.clearAutosavedValue();
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/page',"${options.admin_pjax!'true'}");
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+</script>
+</@footer>
 </#compress>

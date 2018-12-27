@@ -144,151 +144,146 @@
             </div>
         </div>
     </section>
-    <script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
-    <script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
-    <script src="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
-    <script src="/static/halo-backend/plugins/jquery-tageditor/jquery.caret.min.js"></script>
-    <script src="/static/halo-backend/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
-    <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-    <script>
-
-        MathJax.Hub.Config({
-            tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
-        });
-
-        var QUEUE = MathJax.Hub.queue;
-
-        /**
-         * 加载编辑器
-         */
-        var simplemde = new SimpleMDE({
-            element: document.getElementById("editorarea"),
-            autoDownloadFontAwesome: false,
-            autofocus: true,
-            autosave: {
-                enabled: true,
-                uniqueId: "editor-temp",
-                delay: 10000
-            },
-            renderingConfig: {
-                codeSyntaxHighlighting: true
-            },
-            previewRender: function(plainText) {
-                var preview = document.getElementsByClassName("editor-preview-side")[0];
-                preview.innerHTML = this.parent.markdown(plainText);
-                preview.setAttribute('id','editor-preview');
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"editor-preview"]);
-                return preview.innerHTML;
-            },
-            showIcons: ["code", "table"],
-            status: ["autosave", "lines", "words"],
-            tabSize: 4
-        });
-
-        /**
-         * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
-         */
-        $(function () {
-            inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
-                uploadUrl: "/admin/attachments/upload"
-            });
-        });
-
-        var tagList = $('#tagList');
-
-        /**
-         * 初始化标签
-         */
-        tagList.tagEditor({
-            delimiter: ',',
-            placeholder: '<@spring.message code="admin.posts.edit.form.tag.placeholder" />',
-            forceLowercase: false
-        });
-
-        $('#chooseTag').change(function () {
-            tagList.tagEditor('addTag',$(this).val());
-        });
-
-        /**
-         * 自动填充路径，并且将汉字转化成拼音以-隔开
-         */
-        function autoComplateUrl() {
-            var titleVal = $("#postTitle");
-            var postUrl = $("#postUrl");
-            if(titleVal.val()!=="" && titleVal.val() !== null && postUrl.html()===''){
-                var result = titleVal.toPinyin().toLowerCase();
-                postUrl.html(result.substring(0,result.length-1));
-            }
-        }
-
-        /**
-         * 检测是否已经存在该链接
-         * @constructor
-         */
-        function urlOnBlurAuto() {
-            var newPostUrl = $('#newPostUrl');
-            if(newPostUrl.val()===""){
-                halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
-                return;
-            }
-
-            $.get('/admin/posts/checkUrl',{'postUrl': newPostUrl.val()},function (data) {
-                if(data.code===0){
-                    halo.showMsg(data.msg,'error',2000);
-                    return;
-                }else{
-                    $('#postUrl').html(newPostUrl.val());
-                    $('#btn_change_postUrl').hide();
-                    $('#btn_input_postUrl').show();
-                }
-            },'JSON')
-        }
-        $('#btn_input_postUrl').click(function () {
-            var postUrl = $("#postUrl");
-            postUrl.html("<input type='text' id='newPostUrl' onblur='urlOnBlurAuto()' value='"+postUrl.html()+"'>");
-            $(this).hide();
-            $('#btn_change_postUrl').show();
-        });
-
-        /**
-         * 提交文章
-         * @param status 文章状态
-         */
-        function push(status) {
-            var postTitle = $("#postTitle");
-            var postUrl = $("#postUrl");
-            var cateList = new Array();
-            if(!postTitle.val()){
-                halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
-                return;
-            }
-            if(!postUrl.html()){
-                halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
-                return;
-            }
-            $('input[name="categories"]:checked').each(function(){
-                cateList.push($(this).val());
-            });
-            $.post('/admin/posts/save',{
-                'postStatus': status,
-                'postTitle': postTitle.val(),
-                'postUrl' : postUrl.html().toString(),
-                'postContentMd': simplemde.value(),
-                'postThumbnail': $('#selectImg').attr('src'),
-                'cateList' : cateList.toString(),
-                'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
-                'allowComment' : $('#allowComment').val()
-            },function (data) {
-                if(data.code === 1){
-                    //清除自动保存的内容
-                    simplemde.clearAutosavedValue();
-                    halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts');
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+    });
+
+    var QUEUE = MathJax.Hub.queue;
+
+    /**
+     * 加载编辑器
+     */
+    var simplemde = new SimpleMDE({
+        element: document.getElementById("editorarea"),
+        autoDownloadFontAwesome: false,
+        autofocus: true,
+        autosave: {
+            enabled: true,
+            uniqueId: "editor-temp",
+            delay: 10000
+        },
+        renderingConfig: {
+            codeSyntaxHighlighting: true
+        },
+        previewRender: function(plainText) {
+            var preview = document.getElementsByClassName("editor-preview-side")[0];
+            preview.innerHTML = this.parent.markdown(plainText);
+            preview.setAttribute('id','editor-preview');
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,"editor-preview"]);
+            return preview.innerHTML;
+        },
+        showIcons: ["code", "table"],
+        status: ["autosave", "lines", "words"],
+        tabSize: 4
+    });
+
+    /**
+     * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
+     */
+    $(function () {
+        inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+            uploadUrl: "/admin/attachments/upload"
+        });
+    });
+
+    var tagList = $('#tagList');
+
+    /**
+     * 初始化标签
+     */
+    tagList.tagEditor({
+        delimiter: ',',
+        placeholder: '<@spring.message code="admin.posts.edit.form.tag.placeholder" />',
+        forceLowercase: false
+    });
+
+    $('#chooseTag').change(function () {
+        tagList.tagEditor('addTag',$(this).val());
+    });
+
+    /**
+     * 自动填充路径，并且将汉字转化成拼音以-隔开
+     */
+    function autoComplateUrl() {
+        var titleVal = $("#postTitle");
+        var postUrl = $("#postUrl");
+        if(titleVal.val()!=="" && titleVal.val() !== null && postUrl.html()===''){
+            var result = titleVal.toPinyin().toLowerCase();
+            postUrl.html(result.substring(0,result.length-1));
+        }
+    }
+
+    /**
+     * 检测是否已经存在该链接
+     * @constructor
+     */
+    function urlOnBlurAuto() {
+        var newPostUrl = $('#newPostUrl');
+        if(newPostUrl.val()===""){
+            halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
+            return;
+        }
+
+        $.get('/admin/posts/checkUrl',{'postUrl': newPostUrl.val()},function (data) {
+            if(data.code===0){
+                halo.showMsg(data.msg,'error',2000);
+                return;
+            }else{
+                $('#postUrl').html(newPostUrl.val());
+                $('#btn_change_postUrl').hide();
+                $('#btn_input_postUrl').show();
+            }
+        },'JSON')
+    }
+    $('#btn_input_postUrl').click(function () {
+        var postUrl = $("#postUrl");
+        postUrl.html("<input type='text' id='newPostUrl' onblur='urlOnBlurAuto()' value='"+postUrl.html()+"'>");
+        $(this).hide();
+        $('#btn_change_postUrl').show();
+    });
+
+    /**
+     * 提交文章
+     * @param status 文章状态
+     */
+    function push(status) {
+        var postTitle = $("#postTitle");
+        var postUrl = $("#postUrl");
+        var cateList = new Array();
+        if(!postTitle.val()){
+            halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
+            return;
+        }
+        if(!postUrl.html()){
+            halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
+            return;
+        }
+        $('input[name="categories"]:checked').each(function(){
+            cateList.push($(this).val());
+        });
+        $.post('/admin/posts/save',{
+            'postStatus': status,
+            'postTitle': postTitle.val(),
+            'postUrl' : postUrl.html().toString(),
+            'postContentMd': simplemde.value(),
+            'postThumbnail': $('#selectImg').attr('src'),
+            'cateList' : cateList.toString(),
+            'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
+            'allowComment' : $('#allowComment').val()
+        },function (data) {
+            if(data.code === 1){
+                //清除自动保存的内容
+                simplemde.clearAutosavedValue();
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts',"${options.admin_pjax!'true'}");
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+</script>
+</@footer>
 </#compress>

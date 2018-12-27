@@ -117,32 +117,37 @@
             </div>
         </div>
     </div>
-    <script>
-        function modelShow(url) {
-            $('#url').val(url);
-            $('#removeCateModal').modal();
+</div>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url) {
+        $('#url').val(url);
+        $('#removeCateModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+    function checkTag() {
+        var name = $('#tagName').val();
+        var url = $('#tagUrl').val();
+        var result = true;
+        if(name===""||url===""){
+            halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
+            result = false;
         }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-        function checkTag() {
-            var name = $('#tagName').val();
-            var url = $('#tagUrl').val();
-            var result = true;
-            if(name===""||url===""){
-                halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
+        $.get('/admin/tag/checkUrl',{'tagUrl' : url},function(data) {
+            if(data.code === 0){
+                halo.showMsg(data.msg,'error',2000);
                 result = false;
             }
-            $.get('/admin/tag/checkUrl',{'tagUrl' : url},function(data) {
-                if(data.code === 0){
-                    halo.showMsg(data.msg,'error',2000);
-                    result = false;
-                }
-            },'JSON');
-            return result;
-        }
-    </script>
-</div>
-<@footer></@footer>
+        },'JSON');
+        return result;
+    }
+</script>
+</@footer>
 </#compress>

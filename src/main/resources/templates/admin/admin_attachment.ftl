@@ -2,6 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.attachments.title' /></@head>
 <div class="content-wrapper">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/fileinput/fileinput.min.css">
     <style type="text/css" rel="stylesheet">
         .div-thumbnail{transition:all .5s ease-in-out;padding:10px}
         .thumbnail{margin-bottom:0}
@@ -55,33 +56,24 @@
             </div>
         </div>
     </section>
-    <script type="application/javascript">
-        function loadFileInput() {
-            $('#uploadImg').fileinput({
-                language: 'zh',
-                uploadUrl: '/admin/attachments/upload',
-                uploadAsync: true,
-                allowedFileExtensions: ['jpg','gif','png','jpeg','svg','psd'],
-                maxFileCount: 100,
-                enctype : 'multipart/form-data',
-                showClose: false
-            }).on("filebatchuploadcomplete",function (event, files, extra) {
-                $("#uploadForm").hide(400);
-                halo.showMsgAndReload('上传成功！','success',1000);
-            });
-        }
-        $(document).ready(function () {
-            loadFileInput();
-        });
-        <#if (options.admin_pjax!'true') == 'true'>
-        $(document).on('pjax:complete',function () {
-            loadFileInput();
-        });
-        </#if>
-        $("#showForm").click(function(){
-            $("#uploadForm").slideToggle(400);
-        });
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $('#uploadImg').fileinput({
+        language: 'zh',
+        uploadUrl: '/admin/attachments/upload',
+        uploadAsync: true,
+        allowedFileExtensions: ['jpg','gif','png','jpeg','svg','psd'],
+        maxFileCount: 100,
+        enctype : 'multipart/form-data',
+        showClose: false
+    }).on("filebatchuploadcomplete",function (event, files, extra) {
+        $("#uploadForm").hide(400);
+        halo.showMsgAndRedirect('上传成功！','success',1000,'/admin/attachments',"${options.admin_pjax!'true'}");
+    });
+    $("#showForm").click(function(){
+        $("#uploadForm").slideToggle(400);
+    });
+</script>
+</@footer>
 </#compress>
