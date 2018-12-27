@@ -6,7 +6,7 @@
         <h1 style="display: inline-block;"><@spring.message code='admin.menus.title' /></h1>
         <ol class="breadcrumb">
             <li>
-                <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
+                <a data-pjax="true" href="/admin/"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
             <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.themes.bread.appearance' /></a></li>
             <li class="active"><@spring.message code='admin.menus.title' /></li>
@@ -20,7 +20,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.menus.text.update-menu' /><#if updateMenu??>[${updateMenu.menuName}]</#if></h3>
                         </div>
-                        <form action="/admin/menus/save" method="post" role="form" id="menuAddForm">
+                        <form role="form" id="menuSaveForm">
                             <input type="hidden" name="menuId" value="${updateMenu.menuId?c}">
                             <div class="box-body">
                                 <div class="form-group">
@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="menuSort"><@spring.message code='admin.menus.form.menu-sort' /></label>
-                                    <input type="number" class="form-control" id="menuSort" name="menuSort" value="${updateMenu.menuSort!}">
+                                    <input type="number" class="form-control" id="menuSort" name="menuSort" value="${updateMenu.menuSort?c}">
                                 </div>
                                 <div class="form-group">
                                     <label for="menuIcon"><@spring.message code='admin.menus.form.menu-icon' /></label>
@@ -51,7 +51,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-edit' /></button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-edit' /></button>
                                 <a data-pjax="true" href="/admin/menus" class="btn btn-info btn-sm "><@spring.message code='common.btn.back-to-add' /></a>
                             </div>
                         </form>
@@ -59,7 +59,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.menus.text.add-menu' /></h3>
                         </div>
-                        <form action="/admin/menus/save" method="post" role="form" id="menuAddForm">
+                        <form role="form" id="menuSaveForm">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="menuName"><@spring.message code='admin.menus.form.menu-name' /></label>
@@ -89,7 +89,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-add' /></button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-add' /></button>
                             </div>
                         </form>
                     </#if>
@@ -116,7 +116,7 @@
                                             <tr>
                                                 <td>${menu.menuName!}</td>
                                                 <td>${menu.menuUrl!}</td>
-                                                <td>${menu.menuSort!}</td>
+                                                <td>${menu.menuSort?c}</td>
                                                 <td>${menu.menuIcon!}</td>
                                                 <td>
                                                     <#if updateMenu?? && menu.menuId?c==updateMenu.menuId?c>
@@ -162,6 +162,20 @@
         function removeIt(){
             var url=$.trim($("#url").val());
             window.location.href=url;
+        }
+
+        /**
+         * 保存
+         */
+        function save() {
+            var param = $('#menuSaveForm').serialize();
+            $.post('/admin/menus/save', param, function (data) {
+                if (data.code === 1) {
+                    halo.showMsgAndRedirect(data.msg, 'success', 1000,'/admin/menus');
+                } else {
+                    halo.showMsg(data.msg, 'error', 2000);
+                }
+            }, 'JSON');
         }
     </script>
 </div>
