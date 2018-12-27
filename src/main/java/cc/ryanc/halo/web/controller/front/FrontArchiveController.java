@@ -53,6 +53,7 @@ public class FrontArchiveController extends BaseController {
      * 文章归档
      *
      * @param model model
+     *
      * @return 模板路径
      */
     @GetMapping
@@ -65,6 +66,7 @@ public class FrontArchiveController extends BaseController {
      *
      * @param model model
      * @param page  page 当前页码
+     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "page/{page}")
@@ -89,6 +91,7 @@ public class FrontArchiveController extends BaseController {
      * @param model model
      * @param year  year 年份
      * @param month month 月份
+     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "{year}/{month}")
@@ -109,6 +112,7 @@ public class FrontArchiveController extends BaseController {
      *
      * @param postUrl 文章路径名
      * @param model   model
+     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "{postUrl}")
@@ -147,7 +151,7 @@ public class FrontArchiveController extends BaseController {
             }
         }
         //默认显示10条
-        Integer size = 10;
+        int size = 10;
         //获取每页评论条数
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));

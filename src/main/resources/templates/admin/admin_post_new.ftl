@@ -249,32 +249,30 @@
             $(this).hide();
             $('#btn_change_postUrl').show();
         });
-        var postTitle = $("#postTitle");
-        var cateList = new Array();
 
         /**
          * 提交文章
          * @param status 文章状态
          */
         function push(status) {
-            var Title = "";
-            if(postTitle.val()){
-                Title = postTitle.val();
-            }else{
+            var postTitle = $("#postTitle");
+            var postUrl = $("#postUrl");
+            var cateList = new Array();
+            if(!postTitle.val()){
                 halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
+                return;
+            }
+            if(!postUrl.html()){
+                halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                 return;
             }
             $('input[name="categories"]:checked').each(function(){
                 cateList.push($(this).val());
             });
-            if($('#postUrl').html()===""){
-                halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
-                return;
-            }
             $.post('/admin/posts/save',{
                 'postStatus': status,
-                'postTitle': Title,
-                'postUrl' : $('#postUrl').html().toString(),
+                'postTitle': postTitle.val(),
+                'postUrl' : postUrl.html().toString(),
                 'postContentMd': simplemde.value(),
                 'postThumbnail': $('#selectImg').attr('src'),
                 'cateList' : cateList.toString(),

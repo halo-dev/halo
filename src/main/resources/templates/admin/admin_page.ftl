@@ -66,6 +66,7 @@
                                             <th><@spring.message code='common.th.url' /></th>
                                             <th><@spring.message code='common.th.comments' /></th>
                                             <td><@spring.message code='common.th.views' /></td>
+                                            <th><@spring.message code='common.th.status' /></th>
                                             <th><@spring.message code='common.th.date' /></th>
                                             <th><@spring.message code='common.th.control' /></th>
                                         </tr>
@@ -79,6 +80,15 @@
                                                     </td>
                                                     <td>
                                                         <span class="label" style="background-color: #d6cdcd;">${page.postViews}</span>
+                                                    </td>
+                                                    <td>
+                                                        <#if page.postStatus==0>
+                                                            <span class="label bg-green"><@spring.message code='common.status.published' /></span>
+                                                        <#elseif page.postStatus==1>
+                                                            <span class="label bg-yellow"><@spring.message code='common.status.draft' /></span>
+                                                        <#else>
+                                                            <span class="label bg-red"><@spring.message code='common.status.recycle-bin' /></span>
+                                                        </#if>
                                                     </td>
                                                     <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>

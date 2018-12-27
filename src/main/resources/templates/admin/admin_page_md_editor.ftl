@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
     <link rel="stylesheet" href="/static/halo-backend/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
-        #post_title{font-weight: 400;}
+        #postTitle{font-weight: 400;}
         .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
         .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
         .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
@@ -37,7 +37,7 @@
                     <input type="hidden" id="postId" name="postId" value="">
                 </#if>
                 <div style="margin-bottom: 10px;">
-                    <input type="text" class="form-control input-lg" id="post_title" name="post_title" placeholder="<@spring.message code='admin.pages.edit.form.title.placeholder' />" value="<#if post??>${post.postTitle}</#if>">
+                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.pages.edit.form.title.placeholder' />" value="<#if post??>${post.postTitle}</#if>">
                 </div>
                 <div style="display: block;margin-bottom: 10px;">
                     <span>
@@ -215,24 +215,20 @@
             $(this).hide();
             $('#btn_change_postUrl').show();
         });
-        var postTitle = $("#post_title");
+
 
         /**
          * 提交文章
          * @param status 文章状态
          */
         function push(status) {
-            var Title = "";
-            if(postTitle.val()){
-                Title = postTitle.val();
-            }else{
+            var postTitle = $("#postTitle");
+            var postUrl = $("#postUrl");
+            if(!postTitle.val()){
                 halo.showMsg("<@spring.message code='admin.editor.js.no-title' />",'info',2000);
                 return;
             }
-            $('input[name="categories"]:checked').each(function(){
-                cateList.push($(this).val());
-            });
-            if($('#postUrl').html()===""){
+            if(!postUrl.html()){
                 halo.showMsg("<@spring.message code='admin.editor.js.no-url' />",'info',2000);
                 return;
             }
@@ -240,8 +236,8 @@
             $.post('/admin/page/new/push',{
                 'postId': $('#postId').val(),
                 'postStatus': status,
-                'postTitle': Title,
-                'postUrl' : $('#postUrl').html().toString(),
+                'postTitle': postTitle.val(),
+                'postUrl' : postUrl.html().toString(),
                 'postContentMd': simplemde.value(),
                 'postThumbnail': $('#selectImg').attr('src'),
                 'allowComment' : $('#allowComment').val(),
