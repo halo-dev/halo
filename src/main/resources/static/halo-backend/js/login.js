@@ -9,7 +9,7 @@ function btn_login() {
     var name = $("#login-name");
     var pwd = $("#login-pwd");
     btnLogin.button('loading');
-    if (name === "" || pwd === "") {
+    if (name.val() === "" || pwd.val() === "") {
         halo.showMsg("请输入完整信息！", 'info', 2000);
         btnLogin.button('reset');
     } else {
