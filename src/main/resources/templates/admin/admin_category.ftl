@@ -29,17 +29,17 @@
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="cateName"><@spring.message code='admin.categories.form.cate-name' /></label>
-                                    <input type="text" class="form-control" id="cateName" name="cateName" value="${updateCategory.cateName}">
+                                    <input type="text" class="form-control" id="cateName" name="cateName" value="${updateCategory.cateName!}">
                                     <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="cateUrl"><@spring.message code='admin.categories.form.cate-url' /></label>
-                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl" value="${updateCategory.cateUrl}">
+                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl" value="${updateCategory.cateUrl!}">
                                     <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="cateDesc" class="control-label"><@spring.message code='admin.categories.form.cate-desc' /></label>
-                                    <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none">${updateCategory.cateDesc}</textarea>
+                                    <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none">${updateCategory.cateDesc!}</textarea>
                                     <small><@spring.message code='admin.categories.form.cate-desc-tips' /></small>
                                 </div>
                             </div>
@@ -96,9 +96,9 @@
                                     <#if categories?? && categories?size gt 0>
                                         <#list categories as cate>
                                             <tr>
-                                                <td>${cate.cateName}</td>
-                                                <td>${cate.cateUrl}</td>
-                                                <td>${(cate.cateDesc)!}</td>
+                                                <td>${cate.cateName!}</td>
+                                                <td>${cate.cateUrl!}</td>
+                                                <td>${cate.cateDesc!}</td>
                                                 <td>
                                                     <span class="label" style="background-color: #d6cdcd;">${cate.posts?size}</span>
                                                 </td>
