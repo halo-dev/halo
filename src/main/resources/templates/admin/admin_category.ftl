@@ -140,33 +140,38 @@
             </div>
         </div>
     </div>
-    <script>
-        function modelShow(url) {
-            $('#url').val(url);
-            $('#removeCateModal').modal();
+</div>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url) {
+        $('#url').val(url);
+        $('#removeCateModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+    function checkCate() {
+        var name = $('#cateName').val();
+        var url = $('#cateUrl').val();
+        var desc = $('#cateDesc').val();
+        var result = true;
+        if(name===""||url===""||desc===""){
+            halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
+            result = false;
         }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-        function checkCate() {
-            var name = $('#cateName').val();
-            var url = $('#cateUrl').val();
-            var desc = $('#cateDesc').val();
-            var result = true;
-            if(name===""||url===""||desc===""){
-                halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
+        $.get('/admin/category/checkUrl',{'cateUrl' : url},function(data) {
+            if(data.code === 0){
+                halo.showMsg(data.msg,'error',2000);
                 result = false;
             }
-            $.get('/admin/category/checkUrl',{'cateUrl' : url},function(data) {
-                if(data.code === 0){
-                    halo.showMsg(data.msg,'error',2000);
-                    result = false;
-                }
-            },'JSON');
-            return result;
-        }
-    </script>
-</div>
-<@footer></@footer>
+        },'JSON');
+        return result;
+    }
+</script>
+</@footer>
 </#compress>

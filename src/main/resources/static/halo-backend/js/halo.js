@@ -37,6 +37,7 @@ $.fn.extend({
  * 适配移动端并初始化菜单
  */
 $(document).ready(function () {
+    $("#animated-header,#animated-content").animateCss("fadeIn");
     if ($(window).width() < 1024) {
         if ($('body').hasClass('layout-boxed')) {
             $('body').removeClass('layout-boxed');
@@ -46,18 +47,11 @@ $(document).ready(function () {
         }
     }
     initMenu();
-    $("#animated-header,#animated-content").animateCss("fadeIn");
 });
 
-/**
- * pjax请求时点击菜单的事件
- */
-$(document).on('pjax:clicked', function () {
+document.addEventListener('pjax:complete', function () {
+    $("#animated-header,#animated-content").animateCss("fadeIn");
     initMenu();
-});
-
-$(document).on('pjax:complete', function () {
-    $("#animated-header,#animated-content").animateCss("fadeIn");
 });
 
 /**
@@ -163,7 +157,7 @@ $.halo.prototype.showMsgAndReload = function (text, icon, hideAfter) {
  * @param hideAfter 隐藏时间
  * @param url 重定向地址
  */
-$.halo.prototype.showMsgAndRedirect = function (text, icon, hideAfter, url) {
+$.halo.prototype.showMsgAndRedirect = function (text, icon, hideAfter, url, isPjax) {
     if (heading == undefined) {
         var heading = "提示";
     }
@@ -180,7 +174,11 @@ $.halo.prototype.showMsgAndRedirect = function (text, icon, hideAfter, url) {
         loader: true,
         loaderBg: '#ffffff',
         afterHidden: function () {
-            window.location.href = url;
+            if (isPjax === 'true') {
+                pjax.loadUrl(url);
+            } else {
+                window.location.href = url;
+            }
         }
     });
 };

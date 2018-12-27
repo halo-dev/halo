@@ -2,6 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.comments.title' /></@head>
 <div class="content-wrapper">
+    <link rel="stylesheet" href="/static/halo-common/OwO/OwO.min.css">
     <style type="text/css" rel="stylesheet">
         .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}s
     </style>
@@ -129,7 +130,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                     <h4 class="modal-title"><@spring.message code="common.btn.reply" /></h4>
                 </div>
-                <form method="post" action="/admin/comments/reply">
+                <form>
                     <input type="hidden" id="commentId" name="commentId" value=""/>
                     <input type="hidden" id="userAgent" name="userAgent" value=""/>
                     <input type="hidden" id="postId" name="postId" value="" />
@@ -145,51 +146,56 @@
             </div>
         </div>
     </div>
-    <script>
-        var s = new OwO({
-            container: document.getElementsByClassName('OwO')[0],
-            target: document.getElementsByClassName('comment-input-content')[0],
-            position: 'down',
-            width: '100%',
-            maxHeight: '210px',
-            api:"/static/halo-common/OwO/OwO.min.json"
-        });
-        function modelShow(url,message) {
-            $('#url').val(url);
-            $('#message').html(message);
-            $('#removeCommentModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-
-        /**
-         * 显示回复模态框
-         *
-         * @param commentId commentId
-         * @param postId postId
-         */
-        function replyShow(commentId,postId) {
-            $('#userAgent').val(navigator.userAgent);
-            $('#commentId').val(commentId);
-            $('#postId').val(postId);
-            $('#commentReplyModal').modal();
-        }
-
-        function reply() {
-            $.post('/admin/comments/reply',{
-                'commentId': $("#commentId").val(),
-                'userAgent': $("#userAgent").val(),
-                'postId': $("#postId").val(),
-                'commentContent': halo.formatContent($("#commentContent").val())
-            },function(data) {
-                if(data.code === 1){
-                    window.location.reload();
-                }
-            },'JSON');
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    var s = new OwO({
+        container: document.getElementsByClassName('OwO')[0],
+        target: document.getElementsByClassName('comment-input-content')[0],
+        position: 'down',
+        width: '100%',
+        maxHeight: '210px',
+        api:"/static/halo-common/OwO/OwO.min.json"
+    });
+    function modelShow(url,message) {
+        $('#url').val(url);
+        $('#message').html(message);
+        $('#removeCommentModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+
+    /**
+     * 显示回复模态框
+     *
+     * @param commentId commentId
+     * @param postId postId
+     */
+    function replyShow(commentId,postId) {
+        $('#userAgent').val(navigator.userAgent);
+        $('#commentId').val(commentId);
+        $('#postId').val(postId);
+        $('#commentReplyModal').modal();
+    }
+
+    function reply() {
+        $.post('/admin/comments/reply',{
+            'commentId': $("#commentId").val(),
+            'userAgent': $("#userAgent").val(),
+            'postId': $("#postId").val(),
+            'commentContent': halo.formatContent($("#commentContent").val())
+        },function(data) {
+            if(data.code === 1){
+                window.location.reload();
+            }
+        },'JSON');
+    }
+</script>
+</@footer>
 </#compress>

@@ -93,14 +93,14 @@
                                                     <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>
                                                         <a href="/p/${page.postUrl}" class="btn btn-info btn-xs " target="_blank"><@spring.message code='common.btn.view' /></a>
-                                                        <a href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                                        <a data-pjax="true" href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
                                                     </td>
                                                 </tr>
                                             </#list>
                                             <#else>
                                             <tr>
-                                                <td colspan="6" style="text-align: center;"><@spring.message code='common.text.no-data' /></td>
+                                                <td colspan="7" style="text-align: center;"><@spring.message code='common.text.no-data' /></td>
                                             </tr>
                                         </#if>
                                     </tbody>
@@ -131,17 +131,22 @@
             </div>
         </div>
     </div>
-    <script>
-        function modelShow(url,message) {
-            $('#url').val(url);
-            $('#message').html(message);
-            $('#removePostModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url,message) {
+        $('#url').val(url);
+        $('#message').html(message);
+        $('#removePostModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+</script>
+</@footer>
 </#compress>

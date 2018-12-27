@@ -8,7 +8,7 @@
     </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
-        <a data-pjax="false" class="btn-header" id="btnNewPost" href="/admin/posts/write">
+        <a data-pjax="true" class="btn-header" id="btnNewPost" href="/admin/posts/write">
             <@spring.message code='admin.posts.btn.new-post' />
         </a>
         <ol class="breadcrumb">
@@ -90,17 +90,17 @@
                                             <td>
                                                 <#switch post.postStatus>
                                                     <#case 0>
-                                                        <a href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs "><@spring.message code='common.btn.edit' /></a>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                         <#break >
                                                     <#case 1>
-                                                        <a href="/admin/posts/edit?postId=${post.postId?c}"
+                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}"
                                                            class="btn btn-info btn-xs "><@spring.message code="common.btn.edit" /></a>
                                                         <button class="btn btn-primary btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-release-post" />')"><@spring.message code='common.btn.release' /></button>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                         <#break >
                                                     <#case 2>
-                                                        <a href="/admin/posts/revert?postId=${post.postId?c}&status=2" class="btn btn-primary btn-xs "><@spring.message code='common.btn.reduction' /></a>
+                                                        <a data-pjax="true" href="/admin/posts/revert?postId=${post.postId?c}&status=2" class="btn btn-primary btn-xs "><@spring.message code='common.btn.reduction' /></a>
                                                         <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId?c}&postType=${post.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
                                                         <#break >
                                                 </#switch>
@@ -157,17 +157,22 @@
             </div>
         </div>
     </div>
-    <script>
-        function modelShow(url,message) {
-            $('#url').val(url);
-            $('#message').html(message);
-            $('#removePostModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url,message) {
+        $('#url').val(url);
+        $('#message').html(message);
+        $('#removePostModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+</script>
+</@footer>
 </#compress>

@@ -19,7 +19,7 @@ function btn_login() {
         },function (data) {
             localStorage.setItem('loginName', name.val());
             if (data.code === 1) {
-                halo.showMsgAndRedirect(data.msg, 'success', 1000, '/admin');
+                halo.showMsgAndRedirect(data.msg, 'success', 1000, '/admin','false');
             } else {
                 loginBody.addClass('animate shake');
                 $.toast({

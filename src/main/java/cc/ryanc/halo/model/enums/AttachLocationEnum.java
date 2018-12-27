@@ -13,17 +13,17 @@ public enum AttachLocationEnum {
     /**
      * 服务器
      */
-    SERVER(0,"SERVER"),
+    SERVER(0,"server"),
 
     /**
      * 七牛
      */
-    QINIU(1,"QINIU"),
+    QINIU(1,"qiniu"),
 
     /**
      * 又拍云
      */
-    UPYUN(2,"UPYUN");
+    UPYUN(2,"upyun");
 
     private Integer code;
     private String desc;

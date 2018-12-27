@@ -5,7 +5,7 @@
                 <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar!}<#else >/static/halo-backend/images/default.png</#if>" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
-                <p>${user.userDisplayName!}</p><a href="/admin/profile"><i class="fa fa-circle text-success"></i><@spring.message code='admin.menu.profile' /></a>
+                <p>${user.userDisplayName!}</p><a data-pjax="true" href="/admin/profile"><i class="fa fa-circle text-success"></i><@spring.message code='admin.menu.profile' /></a>
             </div>
         </div>
         <ul class="sidebar-menu" data-widget="tree">
@@ -18,13 +18,13 @@
             </li>
             <li class="treeview">
                 <a data-pjax="true" href="javascript:void(0)">
-                    <i class="fa  fa-book"></i>
+                    <i class="fa fa-book"></i>
                     <span><@spring.message code='admin.menu.posts' /></span>
                     <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
                 </a>
                 <ul class="treeview-menu" style="">
                     <li><a data-pjax="true" href="/admin/posts"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.all-posts' /></a></li>
-                    <li><a data-pjax="false" href="/admin/posts/write"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.new-post' /></a></li>
+                    <li><a data-pjax="true" href="/admin/posts/write"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.new-post' /></a></li>
                     <li><a data-pjax="true" href="/admin/category"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.categories' /></a></li>
                     <li><a data-pjax="true" href="/admin/tag"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.tags' /></a></li>
                 </ul>
@@ -39,7 +39,7 @@
                 </a>
                 <ul class="treeview-menu">
                     <li><a data-pjax="true" href="/admin/page"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.all-pages' /></a></li>
-                    <li><a data-pjax="false" href="/admin/page/new"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.new-page' /></a></li>
+                    <li><a data-pjax="true" href="/admin/page/new"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.new-page' /></a></li>
                 </ul>
             </li>
             <li>
@@ -70,7 +70,7 @@
                 <ul class="treeview-menu">
                     <li><a data-pjax="true" href="/admin/themes"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.themes' /></a></li>
                     <li><a data-pjax="true" href="/admin/menus"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.menus' /></a></li>
-                    <li><a data-pjax="false" href="/admin/themes/editor"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.edit-theme' /></a></li>
+                    <li><a data-pjax="true" href="/admin/themes/editor"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.edit-theme' /></a></li>
                 </ul>
             </li>
             <li class="treeview">

@@ -651,121 +651,120 @@
             </div>
         </div>
     </section>
-    <@compress single_line=true>
-    <script>
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
-            checkAttachOption();
-        });
-
-        /**
-         * 更新所有文章的摘要
-         */
-        function updateAllSummary() {
-            $.get('/admin/posts/updateSummary',{'postSummary' : $('#postSummary').val()},function (data) {
-                if(data.code === 1){
-                    halo.showMsg(data.msg,'success',1000);
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
-        }
-
-        /**
-         * 主动提交文章到百度
-         */
-        function pushAllToBaidu() {
-            $.get('/admin/posts/pushAllToBaidu',{'baiduToken' : $('#baiduToken').val()},function (data) {
-                if(data.code === 1){
-                    halo.showMsg(data.msg,'success',1000);
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
-        }
-
-        function updateToken() {
-            $.get('/admin/getToken',function (data) {
-                if(data.code === 1){
-                    $("#apiToken").val(data.result);
-                }
-            },'JSON');
-        }
-
-        /**
-         * 附件选项切换
-         */
-        function checkAttachOption() {
-            var server = $('input:radio[value=server]:checked').val();
-            var upyun = $('input:radio[value=upyun]:checked').val();
-            var qiniu = $('input:radio[value=qiniu]:checked').val();
-            if(server!=null){
-                $('.server-options').show();
-            }else{
-                $('.server-options').hide();
-            }
-            if(upyun!=null){
-                $('.upyun-options').show();
-            }else{
-                $('.upyun-options').hide();
-            }
-            if(qiniu!=null){
-                $('.qiniu-options').show();
-            }else{
-                $('.qiniu-options').hide();
-            }
-        }
-
-        /**
-         * 后台布局切换
-         */
-        function viewLayout() {
-            var layout = $('input:radio[value=layout-boxed]:checked').val();
-            if(layout!=null){
-                $('body').addClass('layout-boxed');
-            }else{
-                $('body').removeClass('layout-boxed');
-            }
-        }
-
-        /**
-         * 预览侧边栏
-         */
-        function viewSideBar() {
-            var layout = $('input:radio[value=sidebar-collapse]:checked').val();
-            if(layout!=null){
-                $('body').addClass('sidebar-collapse');
-            }else{
-                $('body').removeClass('sidebar-collapse');
-            }
-        }
-        $('input[name=attach_loc]').click(function () {
-            checkAttachOption();
-        });
-        $('input[name=admin_layout]').click(function () {
-            viewLayout();
-        });
-        $('input[name=sidebar_style]').click(function () {
-            viewSideBar();
-        });
-
-        /**
-         * 预览后台样式切换
-         */
-        $(function () {
-            var beforeTheme;
-            $('#adminTheme').change(function () {
-                if($('body').hasClass("${options.admin_theme!'skin-blue'}")){
-                    $('body').removeClass("${options.admin_theme!'skin-blue'}");
-                }
-                if(beforeTheme!=null){
-                    $('body').removeClass(beforeTheme);
-                }
-                $('body').addClass($(this).val());
-                beforeTheme = $(this).val();
-            })
-        })
-    </script>
-    </@compress>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        checkAttachOption();
+    });
+
+    /**
+     * 更新所有文章的摘要
+     */
+    function updateAllSummary() {
+        $.get('/admin/posts/updateSummary',{'postSummary' : $('#postSummary').val()},function (data) {
+            if(data.code === 1){
+                halo.showMsg(data.msg,'success',1000);
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+
+    /**
+     * 主动提交文章到百度
+     */
+    function pushAllToBaidu() {
+        $.get('/admin/posts/pushAllToBaidu',{'baiduToken' : $('#baiduToken').val()},function (data) {
+            if(data.code === 1){
+                halo.showMsg(data.msg,'success',1000);
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+
+    function updateToken() {
+        $.get('/admin/getToken',function (data) {
+            if(data.code === 1){
+                $("#apiToken").val(data.result);
+            }
+        },'JSON');
+    }
+
+    /**
+     * 附件选项切换
+     */
+    function checkAttachOption() {
+        var server = $('input:radio[value=server]:checked').val();
+        var upyun = $('input:radio[value=upyun]:checked').val();
+        var qiniu = $('input:radio[value=qiniu]:checked').val();
+        if(server!=null){
+            $('.server-options').show();
+        }else{
+            $('.server-options').hide();
+        }
+        if(upyun!=null){
+            $('.upyun-options').show();
+        }else{
+            $('.upyun-options').hide();
+        }
+        if(qiniu!=null){
+            $('.qiniu-options').show();
+        }else{
+            $('.qiniu-options').hide();
+        }
+    }
+
+    /**
+     * 后台布局切换
+     */
+    function viewLayout() {
+        var layout = $('input:radio[value=layout-boxed]:checked').val();
+        if(layout!=null){
+            $('body').addClass('layout-boxed');
+        }else{
+            $('body').removeClass('layout-boxed');
+        }
+    }
+
+    /**
+     * 预览侧边栏
+     */
+    function viewSideBar() {
+        var layout = $('input:radio[value=sidebar-collapse]:checked').val();
+        if(layout!=null){
+            $('body').addClass('sidebar-collapse');
+        }else{
+            $('body').removeClass('sidebar-collapse');
+        }
+    }
+    $('input[name=attach_loc]').click(function () {
+        checkAttachOption();
+    });
+    $('input[name=admin_layout]').click(function () {
+        viewLayout();
+    });
+    $('input[name=sidebar_style]').click(function () {
+        viewSideBar();
+    });
+
+    /**
+     * 预览后台样式切换
+     */
+    $(function () {
+        var beforeTheme;
+        $('#adminTheme').change(function () {
+            if($('body').hasClass("${options.admin_theme!'skin-blue'}")){
+                $('body').removeClass("${options.admin_theme!'skin-blue'}");
+            }
+            if(beforeTheme!=null){
+                $('body').removeClass(beforeTheme);
+            }
+            $('body').addClass($(this).val());
+            beforeTheme = $(this).val();
+        })
+    })
+</script>
+</@footer>

@@ -71,59 +71,60 @@
             </div>
         </div>
     </section>
-    <script>
-        /**
-         * 备份
-         */
-        function btn_backup(type) {
-            $.get('/admin/backup/doBackup',{'type' : type},function(data) {
-                if(data.code === 1){
-                    halo.showMsgAndReload(data.msg,'success',1000);
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
-        }
-
-        /**
-         * 发送备份到邮箱
-         *
-         * @param fileName
-         * @param type
-         */
-        function sendToEmail(fileName,type) {
-            $.get('/admin/backup/sendToEmail',{
-                'type' : type,
-                'fileName' : fileName
-            },function(data) {
-                if(data.code === 1){
-                    halo.showMsg(data.msg,'success',1000);
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
-        }
-
-        /**
-         * 删除备份
-         */
-        function delBackup(fileName,type) {
-            $.get('/admin/backup/delBackup',{
-                'type' : type,
-                'fileName' : fileName
-            },function(data) {
-                if(data.code === 1){
-                    halo.showMsgAndReload(data.msg,'success',1000);
-                }else{
-                    halo.showMsg(data.msg,'error',2000);
-                }
-            },'JSON');
-        }
-
-        $('#btnBackupOption').click(function () {
-            $('#backupOptionsPanel').slideToggle(400);
-        });
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    /**
+     * 备份
+     */
+    function btn_backup(type) {
+        $.get('/admin/backup/doBackup',{'type' : type},function(data) {
+            if(data.code === 1){
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/backup?type=${type}',"${options.admin_pjax!'true'}");
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+
+    /**
+     * 发送备份到邮箱
+     *
+     * @param fileName
+     * @param type
+     */
+    function sendToEmail(fileName,type) {
+        $.get('/admin/backup/sendToEmail',{
+            'type' : type,
+            'fileName' : fileName
+        },function(data) {
+            if(data.code === 1){
+                halo.showMsg(data.msg,'success',1000);
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+
+    /**
+     * 删除备份
+     */
+    function delBackup(fileName,type) {
+        $.get('/admin/backup/delBackup',{
+            'type' : type,
+            'fileName' : fileName
+        },function(data) {
+            if(data.code === 1){
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/backup?type=${type}',"${options.admin_pjax!'true'}");
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+
+    $('#btnBackupOption').click(function () {
+        $('#backupOptionsPanel').slideToggle(400);
+    });
+</script>
+</@footer>
 </#compress>

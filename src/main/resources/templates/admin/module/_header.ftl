@@ -29,7 +29,7 @@
                                 <#list newComments?sort_by("commentDate")?reverse as comment>
                                 <#assign x = x+1>
                                     <li>
-                                        <a href="/admin/comments?status=1">
+                                        <a data-pjax="true" href="/admin/comments?status=1">
                                             <div class="pull-left">
                                                 <img src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?default("hash")}?s=256&d=${options.native_comment_avatar?default("mm")}" class="img-circle" alt="User Image">
                                             </div>
@@ -47,7 +47,7 @@
                                 </#if>
                             </ul>
                         </li>
-                        <li class="footer"><a href="/admin/comments?status=1"><@spring.message code='admin.module.header.btn.view-all-comments' /></a></li>
+                        <li class="footer"><a data-pjax="true" href="/admin/comments?status=1"><@spring.message code='admin.module.header.btn.view-all-comments' /></a></li>
                     </ul>
                 </li>
                 </@commonTag>
