@@ -1,13 +1,13 @@
 var halo = new $.halo();
 $(document).ready(function () {
-    $("#login-name").val(localStorage.getItem("loginName"));
+    $("#loginName").val(localStorage.getItem("loginName"));
 });
 
-function btn_login() {
-    var btnLogin = $('#btn-login');
+function doLogin() {
+    var btnLogin = $('#btnLogin');
     var loginBody = $('.login-body');
-    var name = $("#login-name");
-    var pwd = $("#login-pwd");
+    var name = $("#loginName");
+    var pwd = $("#loginPwd");
     btnLogin.button('loading');
     if (name.val() === "" || pwd.val() === "") {
         halo.showMsg("请输入完整信息！", 'info', 2000);
@@ -46,6 +46,6 @@ function btn_login() {
 
 $(document).keydown(function (event) {
     if (event.keyCode === 13) {
-        btn_login();
+        doLogin();
     }
 });
