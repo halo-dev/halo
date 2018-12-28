@@ -7,7 +7,7 @@ ENV TZ=Asia/Shanghai \
 DB_USER="admin" \
 DB_PASSWORD="123456"
 
-RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo $TZ > /etc/timezone
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
 
 RUN cd /tmp && mvn package -Pci && mv target/dist/halo/* /opt/halo/ \
     && rm -rf /tmp/* && rm -rf ~/.m2
