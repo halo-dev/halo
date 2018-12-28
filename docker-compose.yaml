@@ -25,6 +25,8 @@ services:
       - VIRTUAL_HOST=localhost  #监听的地址
       - LETSENCRYPT_HOST=localhost #证书的域名
       - LETSENCRYPT_EMAIL=i@example.com #证书所有者的邮箱，快过期时会提醒
+      - DB_USER=admin
+      - DB_PASSWORD=123456
     volumes:
       - ~/halo:/root/halo
 
