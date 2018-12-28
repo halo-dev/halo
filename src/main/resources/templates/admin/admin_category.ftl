@@ -24,7 +24,7 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.categories.text.edit-category' /> <#if updateCategory??>[${updateCategory.cateName}]</#if></h3>
                         </div>
-                        <form action="/admin/category/save" method="post" role="form" id="cateAddForm">
+                        <form role="form" id="cateSaveForm">
                             <input type="hidden" name="cateId" value="${updateCategory.cateId?c}">
                             <div class="box-body">
                                 <div class="form-group">
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-edit' /></button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-edit' /></button>
                                 <a data-pjax="true" href="/admin/category" class="btn btn-info btn-sm "><@spring.message code='common.btn.back-to-add' /></a>
                             </div>
                         </form>
@@ -52,16 +52,16 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.categories.text.add-category' /></h3>
                         </div>
-                        <form action="/admin/category/save" method="post" role="form" id="cateAddForm" onsubmit="return checkCate()">
+                        <form role="form" id="cateSaveForm">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="cateName"><@spring.message code='admin.categories.form.cate-name' /></label>
-                                    <input type="text" class="form-control" id="cateName" name="cateName" placeholder="">
+                                    <input type="text" class="form-control" id="cateName" name="cateName">
                                     <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="cateUrl"><@spring.message code='admin.categories.form.cate-url' /></label>
-                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl" placeholder="">
+                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl">
                                     <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-add' /></button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-add' /></button>
                             </div>
                         </form>
                     </#if>
@@ -155,22 +155,15 @@
             window.location.href = url;
         </#if>
     }
-    function checkCate() {
-        var name = $('#cateName').val();
-        var url = $('#cateUrl').val();
-        var desc = $('#cateDesc').val();
-        var result = true;
-        if(name===""||url===""||desc===""){
-            halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
-            result = false;
-        }
-        $.get('/admin/category/checkUrl',{'cateUrl' : url},function(data) {
-            if(data.code === 0){
+    function save() {
+        var param = $("#cateSaveForm").serialize();
+        $.post('/admin/category/save',param,function (data) {
+            if (data.code === 1) {
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/category',"${options.admin_pjax!'true'}");
+            } else {
                 halo.showMsg(data.msg,'error',2000);
-                result = false;
             }
         },'JSON');
-        return result;
     }
 </script>
 </@footer>

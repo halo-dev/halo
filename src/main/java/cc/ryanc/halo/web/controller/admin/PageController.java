@@ -29,11 +29,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -69,6 +72,7 @@ public class PageController {
      * 页面管理页面
      *
      * @param model model
+     *
      * @return 模板路径admin/admin_page
      */
     @GetMapping
@@ -93,12 +97,13 @@ public class PageController {
      *
      * @param model  model
      * @param linkId linkId 友情链接编号
+     *
      * @return String 模板路径admin/admin_page_link
      */
     @GetMapping(value = "/links/edit")
     public String toEditLink(Model model, @RequestParam("linkId") Long linkId) {
         Optional<Link> link = linkService.findByLinkId(linkId);
-        model.addAttribute("updateLink", link.get());
+        model.addAttribute("updateLink", link.orElse(new Link()));
         return "admin/admin_page_link";
     }
 
@@ -106,22 +111,29 @@ public class PageController {
      * 处理添加/修改友链的请求并渲染页面
      *
      * @param link Link实体
-     * @return 重定向到/admin/page/links
+     *
+     * @return JsonResult
      */
     @PostMapping(value = "/links/save")
-    public String saveLink(@ModelAttribute Link link) {
-        try {
-            linkService.save(link);
-        } catch (Exception e) {
-            log.error("Save/modify friendship link failed: {}", e.getMessage());
+    @ResponseBody
+    public JsonResult saveLink(@Valid Link link, BindingResult result) {
+        if (result.hasErrors()) {
+            for (ObjectError error : result.getAllErrors()) {
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+            }
         }
-        return "redirect:/admin/page/links";
+        link = linkService.save(link);
+        if (null == link) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+        }
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
     }
 
     /**
      * 处理删除友情链接的请求并重定向
      *
      * @param linkId 友情链接编号
+     *
      * @return 重定向到/admin/page/links
      */
     @GetMapping(value = "/links/remove")
@@ -140,6 +152,7 @@ public class PageController {
      * @param model model
      * @param page  当前页码
      * @param size  每页显示的条数
+     *
      * @return 模板路径admin/admin_page_gallery
      */
     @GetMapping(value = "/galleries")
@@ -157,6 +170,7 @@ public class PageController {
      * 保存图片
      *
      * @param gallery gallery
+     *
      * @return 重定向到/admin/page/gallery
      */
     @PostMapping(value = "/gallery/save")
@@ -177,6 +191,7 @@ public class PageController {
      *
      * @param model     model
      * @param galleryId 图片编号
+     *
      * @return 模板路径admin/widget/_gallery-detail
      */
     @GetMapping(value = "/gallery")
@@ -190,6 +205,7 @@ public class PageController {
      * 删除图库中的图片
      *
      * @param galleryId 图片编号
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/gallery/remove")
@@ -208,6 +224,7 @@ public class PageController {
      * 跳转到新建页面
      *
      * @param model model
+     *
      * @return 模板路径admin/admin_page_md_editor
      */
     @GetMapping(value = "/new")
@@ -262,6 +279,7 @@ public class PageController {
      *
      * @param pageId 页面编号
      * @param model  model
+     *
      * @return admin/admin_page_md_editor
      */
     @GetMapping(value = "/edit")
@@ -277,6 +295,7 @@ public class PageController {
      * 检查该路径是否已经存在
      *
      * @param postUrl postUrl
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/checkUrl")

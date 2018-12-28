@@ -16,62 +16,62 @@
                 <div class="box box-primary">
                     <#if updateLink??>
                         <div class="box-header with-border"><h3 class="box-title"><@spring.message code='admin.pages.links.text.edit-link' /></h3></div>
-                        <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
+                        <form role="form" id="linkSaveForm">
                             <input type="hidden" name="linkId" value="${updateLink.linkId?c}">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="linkName"><@spring.message code='admin.pages.links.form.link-name' /></label>
-                                    <input type="text" class="form-control" id="linkName" name="linkName" value="${updateLink.linkName}">
+                                    <input type="text" class="form-control" id="linkName" name="linkName" value="${updateLink.linkName!}">
                                     <small><@spring.message code='admin.pages.links.form.link-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="linkUrl"><@spring.message code='admin.pages.links.form.link-url' /></label>
-                                    <input type="url" class="form-control" id="linkUrl" name="linkUrl" value="${updateLink.linkUrl}">
+                                    <input type="url" class="form-control" id="linkUrl" name="linkUrl" value="${updateLink.linkUrl!}">
                                     <small><@spring.message code='admin.pages.links.form.link-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="linkPic">LOGO</label>
-                                    <input type="text" class="form-control" id="linkPic" name="linkPic" value="${updateLink.linkPic}">
+                                    <input type="text" class="form-control" id="linkPic" name="linkPic" value="${updateLink.linkPic!}">
                                     <small><@spring.message code='admin.pages.links.form.link-pic-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="linkDesc"><@spring.message code='admin.pages.links.form.link-desc' /></label>
-                                    <textarea class="form-control" rows="3" id="linkDesc" name="linkDesc" style="resize: none">${updateLink.linkDesc}</textarea>
+                                    <textarea class="form-control" rows="3" id="linkDesc" name="linkDesc" style="resize: none">${updateLink.linkDesc!}</textarea>
                                     <small><@spring.message code='admin.pages.links.form.link-desc-tips' /></small>
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-edit' /></button>
-                                <a data-pjax="true" href="/admin/page/links" class="btn btn-info btn-sm "><@spring.message code='common.btn.back-to-add' /></a>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-edit' /></button>
+                                <a data-pjax="true" href="/admin/page/links" class="btn btn-info btn-sm"><@spring.message code='common.btn.back-to-add' /></a>
                             </div>
                         </form>
                     <#else>
                         <div class="box-header with-border"><h3 class="box-title"><@spring.message code='admin.pages.links.text.add-link' /></h3></div>
-                        <form action="/admin/page/links/save" method="post" role="form" onsubmit="return isNull()">
+                        <form role="form" id="linkSaveForm">
                             <div class="box-body">
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1"><@spring.message code='admin.pages.links.form.link-name' /></label>
+                                    <label for="linkName"><@spring.message code='admin.pages.links.form.link-name' /></label>
                                     <input type="text" class="form-control" id="linkName" name="linkName" >
                                     <small><@spring.message code='admin.pages.links.form.link-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputPassword1"><@spring.message code='admin.pages.links.form.link-url' /></label>
+                                    <label for="linkUrl"><@spring.message code='admin.pages.links.form.link-url' /></label>
                                     <input type="text" class="form-control" id="linkUrl" name="linkUrl" >
                                     <small><@spring.message code='admin.pages.links.form.link-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputPassword1">LOGO</label>
+                                    <label for="linkPic">LOGO</label>
                                     <input type="text" class="form-control" id="linkPic" name="linkPic" >
                                     <small><@spring.message code='admin.pages.links.form.link-pic-tips' /></small>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputPassword1"><@spring.message code='admin.pages.links.form.link-desc' /></label>
+                                    <label for="linkDesc"><@spring.message code='admin.pages.links.form.link-desc' /></label>
                                     <textarea class="form-control" rows="3" id="linkDesc" name="linkDesc" style="resize: none"></textarea>
                                     <small><@spring.message code='admin.pages.links.form.link-desc-tips' /></small>
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-add' /></button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-add' /></button>
                             </div>
                         </form>
                     </#if>
@@ -147,13 +147,15 @@
             window.location.href = url;
         </#if>
     }
-    function isNull() {
-        var name = $('#linkName').val();
-        var url = $('#linkUrl').val();
-        if(name===""||url===""){
-            halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
-            return false;
-        }
+    function save() {
+        var param = $("#linkSaveForm").serialize();
+        $.post("/admin/page/links/save",param,function (data) {
+            if (data.code === 1) {
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/page/links',"${options.admin_pjax!'true'}");
+            } else {
+                halo.showMsg(data.msg,'error',2000);
+            }
+        })
     }
 </script>
 </@footer>
