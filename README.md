@@ -56,7 +56,11 @@ curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /
 # 获取 docker-compose.yaml 文件
 yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
-# 修改 docker-compose.yaml,修改 VIRTUAL_HOST,LETSENCRYPT_HOST 为自己的域名,修改 LETSENCRYPT_EMAIL 为自己的邮箱。
+# 修改 docker-compose.yaml
+# 1. 修改 VIRTUAL_HOST,LETSENCRYPT_HOST 为自己的域名。
+# 2. 修改 LETSENCRYPT_EMAIL 为自己的邮箱。
+# 3. 修改 DB_USER 数据库用户名，注意：这是自定义的，请不要使用默认的！下面数据库密码同理。
+# 4. 修改 DB_PASSWORD 数据库密码。
 
 # 运行
 docker-compose up -d
