@@ -77,7 +77,7 @@ public class PageController {
      */
     @GetMapping
     public String pages(Model model) {
-        List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        final List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc());
         model.addAttribute("pages", posts);
         return "admin/admin_page";
     }
@@ -102,7 +102,7 @@ public class PageController {
      */
     @GetMapping(value = "/links/edit")
     public String toEditLink(Model model, @RequestParam("linkId") Long linkId) {
-        Optional<Link> link = linkService.findByLinkId(linkId);
+        final Optional<Link> link = linkService.findByLinkId(linkId);
         model.addAttribute("updateLink", link.orElse(new Link()));
         return "admin/admin_page_link";
     }
@@ -159,9 +159,9 @@ public class PageController {
     public String gallery(Model model,
                           @RequestParam(value = "page", defaultValue = "0") Integer page,
                           @RequestParam(value = "size", defaultValue = "18") Integer size) {
-        Sort sort = new Sort(Sort.Direction.DESC, "galleryId");
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Gallery> galleries = galleryService.findAll(pageable);
+        final Sort sort = new Sort(Sort.Direction.DESC, "galleryId");
+        final Pageable pageable = PageRequest.of(page, size, sort);
+        final Page<Gallery> galleries = galleryService.findAll(pageable);
         model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
     }
@@ -196,8 +196,8 @@ public class PageController {
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model, @RequestParam("galleryId") Long galleryId) {
-        Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
-        model.addAttribute("gallery", gallery.get());
+        final Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
+        model.addAttribute("gallery", gallery.orElse(new Gallery()));
         return "admin/widget/_gallery-detail";
     }
 
@@ -229,7 +229,7 @@ public class PageController {
      */
     @GetMapping(value = "/new")
     public String newPage(Model model) {
-        List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
+        final List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("customTpls", customTpls);
         return "admin/admin_page_md_editor";
     }
@@ -246,11 +246,11 @@ public class PageController {
         String msg = localeMessageUtil.getMessage("code.admin.common.save-success");
         try {
             //发表用户
-            User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+            final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
             post.setUser(user);
             post.setPostType(PostTypeEnum.POST_TYPE_PAGE.getDesc());
             if (null != post.getPostId()) {
-                Post oldPost = postService.findByPostId(post.getPostId()).get();
+                final Post oldPost = postService.findByPostId(post.getPostId()).get();
                 if (null == post.getPostDate()) {
                     post.setPostDate(DateUtil.date());
                 }
@@ -284,8 +284,8 @@ public class PageController {
      */
     @GetMapping(value = "/edit")
     public String editPage(@RequestParam("pageId") Long pageId, Model model) {
-        Optional<Post> post = postService.findByPostId(pageId);
-        List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
+        final Optional<Post> post = postService.findByPostId(pageId);
+        final List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("post", post.orElse(new Post()));
         model.addAttribute("customTpls", customTpls);
         return "admin/admin_page_md_editor";
@@ -301,7 +301,7 @@ public class PageController {
     @GetMapping(value = "/checkUrl")
     @ResponseBody
     public JsonResult checkUrlExists(@RequestParam("postUrl") String postUrl) {
-        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null != post) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
         }

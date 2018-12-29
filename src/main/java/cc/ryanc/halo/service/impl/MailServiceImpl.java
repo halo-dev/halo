@@ -70,7 +70,7 @@ public class MailServiceImpl implements MailService {
                 HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         String text = "";
         try {
-            Template template = freeMarker.getConfiguration().getTemplate(templateName);
+            final Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
             OhMyEmail.subject(subject)
                     .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
@@ -101,7 +101,7 @@ public class MailServiceImpl implements MailService {
         File file = new File(attachSrc);
         String text = "";
         try {
-            Template template = freeMarker.getConfiguration().getTemplate(templateName);
+            final Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
             OhMyEmail.subject(subject)
                     .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))

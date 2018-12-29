@@ -36,7 +36,7 @@ public class LogsServiceImpl implements LogsService {
      */
     @Override
     public void save(String logTitle, String logContent, HttpServletRequest request) {
-        Logs logs = new Logs();
+        final Logs logs = new Logs();
         logs.setLogTitle(logTitle);
         logs.setLogContent(logContent);
         logs.setLogCreated(new Date());

@@ -17,7 +17,7 @@ public class PostSyncTask {
      * 将缓存的图文浏览数写入数据库
      */
     public void postSync() {
-        PostService postService = SpringUtil.getBean(PostService.class);
+        final PostService postService = SpringUtil.getBean(PostService.class);
         Post post = null;
         int count = 0;
         for (Long key : HaloConst.POSTS_VIEWS.keySet()) {

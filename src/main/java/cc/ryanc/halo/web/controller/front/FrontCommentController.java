@@ -65,15 +65,16 @@ public class FrontCommentController {
      * 获取文章的评论
      *
      * @param postId postId 文章编号
+     *
      * @return List
      */
     @GetMapping(value = "/getComment/{postId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public List<Comment> getComment(@PathVariable Long postId) {
-        Optional<Post> post = postService.findByPostId(postId);
-        Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        Pageable pageable = PageRequest.of(0, 999, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
+        final Optional<Post> post = postService.findByPostId(postId);
+        final Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
+        final Pageable pageable = PageRequest.of(0, 999, sort);
+        final List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.orElse(new Post()), pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
         return CommentUtil.getComments(comments);
     }
 
@@ -82,15 +83,16 @@ public class FrontCommentController {
      *
      * @param page 页码
      * @param post 当前文章
+     *
      * @return List
      */
     @GetMapping(value = "/loadComment")
     @ResponseBody
     public List<Comment> loadComment(@RequestParam(value = "page") Integer page,
                                      @RequestParam(value = "post") Post post) {
-        Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        Pageable pageable = PageRequest.of(page - 1, 10, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
+        final Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
+        final Pageable pageable = PageRequest.of(page - 1, 10, sort);
+        final List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
         return comments;
     }
 
@@ -100,6 +102,7 @@ public class FrontCommentController {
      * @param comment comment实体
      * @param post    post实体
      * @param request request
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/newComment")
@@ -115,7 +118,7 @@ public class FrontCommentController {
         }
         try {
             Comment lastComment = null;
-            post = postService.findByPostId(post.getPostId()).get();
+            post = postService.findByPostId(post.getPostId()).orElse(new Post());
             comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
             comment.setCommentDate(DateUtil.date());
@@ -126,8 +129,8 @@ public class FrontCommentController {
                 comment.setCommentAuthorAvatarMd5(SecureUtil.md5(comment.getCommentAuthorEmail()));
             }
             if (comment.getCommentParent() > 0) {
-                lastComment = commentService.findCommentById(comment.getCommentParent()).get();
-                StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
+                lastComment = commentService.findCommentById(comment.getCommentParent()).orElse(new Comment());
+                final StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
                 buildContent.append(lastComment.getCommentId());
                 buildContent.append("'>@");
                 buildContent.append(lastComment.getCommentAuthor());
@@ -175,8 +178,8 @@ public class FrontCommentController {
             if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.TRUE.getDesc()) && StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp()), TrueFalseEnum.TRUE.getDesc())) {
                 try {
                     //发送邮件到博主
-                    Map<String, Object> map = new HashMap<>(5);
-                    StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+                    final Map<String, Object> map = new HashMap<>(5);
+                    final StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
                     if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
                         pageUrl.append("/archives/");
                     } else {
@@ -217,8 +220,8 @@ public class FrontCommentController {
             //发送通知给对方
             if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.TRUE.getDesc()) && StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp()), TrueFalseEnum.TRUE.getDesc())) {
                 if (Validator.isEmail(lastComment.getCommentAuthorEmail())) {
-                    Map<String, Object> map = new HashMap<>(8);
-                    StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+                    final Map<String, Object> map = new HashMap<>(8);
+                    final StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
                     if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
                         pageUrl.append("/archives/");
 
@@ -228,7 +231,7 @@ public class FrontCommentController {
                     pageUrl.append(post.getPostUrl());
                     pageUrl.append("#comment-id-");
                     pageUrl.append(comment.getCommentId());
-                    map.put("pageUrl",  pageUrl.toString());
+                    map.put("pageUrl", pageUrl.toString());
                     map.put("blogTitle", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()));
                     map.put("commentAuthor", lastComment.getCommentAuthor());
                     map.put("pageName", lastComment.getPost().getPostTitle());

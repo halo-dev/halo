@@ -14,6 +14,7 @@ import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
@@ -63,6 +64,7 @@ public class ThemeController extends BaseController {
      * 渲染主题设置页面
      *
      * @param model model
+     *
      * @return 模板路径admin/admin_theme
      */
     @GetMapping
@@ -79,6 +81,7 @@ public class ThemeController extends BaseController {
      *
      * @param siteTheme 主题名称
      * @param request   request
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/set")
@@ -108,6 +111,7 @@ public class ThemeController extends BaseController {
      * 上传主题
      *
      * @param file 文件
+     *
      * @return JsonResult
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -117,8 +121,8 @@ public class ThemeController extends BaseController {
         try {
             if (!file.isEmpty()) {
                 //获取项目根路径
-                File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-                File themePath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(file.getOriginalFilename()).toString());
+                final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+                final File themePath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(file.getOriginalFilename()).toString());
                 file.transferTo(themePath);
                 log.info("Upload topic success, path is " + themePath.getAbsolutePath());
                 logsService.save(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), request);
@@ -141,13 +145,14 @@ public class ThemeController extends BaseController {
      * 删除主题
      *
      * @param themeName 主题文件夹名
+     *
      * @return string 重定向到/admin/themes
      */
     @GetMapping(value = "/remove")
     public String removeTheme(@RequestParam("themeName") String themeName) {
         try {
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + themeName);
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + themeName);
             FileUtil.del(themePath);
             HaloConst.THEMES.clear();
             HaloConst.THEMES = HaloUtils.getThemes();
@@ -172,6 +177,7 @@ public class ThemeController extends BaseController {
      *
      * @param remoteAddr 远程地址
      * @param themeName  主题名称
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/clone")
@@ -182,9 +188,9 @@ public class ThemeController extends BaseController {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.info-no-complete"));
         }
         try {
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
-            String cmdResult = RuntimeUtil.execForStr("git clone " + remoteAddr + " " + themePath.getAbsolutePath() + "/" + themeName);
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
+            final String cmdResult = RuntimeUtil.execForStr("git clone " + remoteAddr + " " + themePath.getAbsolutePath() + "/" + themeName);
             if (NOT_FOUND_GIT.equals(cmdResult)) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
@@ -201,15 +207,16 @@ public class ThemeController extends BaseController {
      * 更新主题
      *
      * @param themeName 主题名
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/pull")
     @ResponseBody
     public JsonResult pullFromRemote(@RequestParam(value = "themeName") String themeName) {
         try {
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
-            String cmdResult = RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName + " && git pull");
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
+            final String cmdResult = RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName, "git pull");
             if (NOT_FOUND_GIT.equals(cmdResult)) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
@@ -244,11 +251,12 @@ public class ThemeController extends BaseController {
      * 编辑主题
      *
      * @param model model
+     *
      * @return 模板路径admin/admin_theme-editor
      */
     @GetMapping(value = "/editor")
     public String editor(Model model) {
-        List<String> tpls = HaloUtils.getTplName(BaseController.THEME);
+        final List<String> tpls = HaloUtils.getTplName(BaseController.THEME);
         model.addAttribute("tpls", tpls);
         return "admin/admin_theme-editor";
     }
@@ -257,6 +265,7 @@ public class ThemeController extends BaseController {
      * 获取模板文件内容
      *
      * @param tplName 模板文件名
+     *
      * @return 模板内容
      */
     @GetMapping(value = "/getTpl", produces = "text/text;charset=UTF-8")
@@ -265,10 +274,14 @@ public class ThemeController extends BaseController {
         String tplContent = "";
         try {
             //获取项目根路径
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取主题路径
-            File themesPath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(BaseController.THEME).append("/").append(tplName).toString());
-            FileReader fileReader = new FileReader(themesPath);
+            final StrBuilder themePath = new StrBuilder("templates/themes/");
+            themePath.append(BaseController.THEME);
+            themePath.append("/");
+            themePath.append(tplName);
+            final File themesPath = new File(basePath.getAbsolutePath(), themePath.toString());
+            final FileReader fileReader = new FileReader(themesPath);
             tplContent = fileReader.readString();
         } catch (Exception e) {
             log.error("Get template file error: {}", e.getMessage());
@@ -281,6 +294,7 @@ public class ThemeController extends BaseController {
      *
      * @param tplName    模板名称
      * @param tplContent 模板内容
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/editor/save")
@@ -292,10 +306,14 @@ public class ThemeController extends BaseController {
         }
         try {
             //获取项目根路径
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             //获取主题路径
-            File tplPath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(BaseController.THEME).append("/").append(tplName).toString());
-            FileWriter fileWriter = new FileWriter(tplPath);
+            final StrBuilder themePath = new StrBuilder("templates/themes/");
+            themePath.append(BaseController.THEME);
+            themePath.append("/");
+            themePath.append(tplName);
+            final File tplPath = new File(basePath.getAbsolutePath(), themePath.toString());
+            final FileWriter fileWriter = new FileWriter(tplPath);
             fileWriter.write(tplContent);
         } catch (Exception e) {
             log.error("Template save failed: {}", e.getMessage());

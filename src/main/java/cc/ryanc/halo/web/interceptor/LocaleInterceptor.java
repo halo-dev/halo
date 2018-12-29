@@ -23,6 +23,10 @@ public class LocaleInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        final Object attribute = request.getSession().getAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME);
+        if (null != attribute) {
+            return true;
+        }
         if (StrUtil.equals(LocaleEnum.EN_US.getValue(), HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_LOCALE.getProp()))) {
             request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, new Locale("en", "US"));
         } else {

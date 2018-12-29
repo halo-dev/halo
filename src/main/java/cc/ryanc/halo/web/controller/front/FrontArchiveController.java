@@ -74,9 +74,9 @@ public class FrontArchiveController extends BaseController {
                            @PathVariable(value = "page") Integer page) {
 
         //所有文章数据，分页，material主题适用
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Pageable pageable = PageRequest.of(page - 1, 5, sort);
-        Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Pageable pageable = PageRequest.of(page - 1, 5, sort);
+        final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
             return this.renderNotFound();
         }
@@ -98,7 +98,7 @@ public class FrontArchiveController extends BaseController {
     public String archives(Model model,
                            @PathVariable(value = "year") String year,
                            @PathVariable(value = "month") String month) {
-        Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
+        final Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
         if (null == posts) {
             return this.renderNotFound();
         }
@@ -119,16 +119,16 @@ public class FrontArchiveController extends BaseController {
     public String getPost(@PathVariable String postUrl,
                           @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
-        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
+        final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
         if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
             return this.renderNotFound();
         }
         //获得当前文章的发布日期
-        Date postDate = post.getPostDate();
+        final Date postDate = post.getPostDate();
         //查询当前文章日期之前的所有文章
-        List<Post> beforePosts = postService.findByPostDateBefore(postDate);
+        final List<Post> beforePosts = postService.findByPostDateBefore(postDate);
         //查询当前文章日期之后的所有文章
-        List<Post> afterPosts = postService.findByPostDateAfter(postDate);
+        final List<Post> afterPosts = postService.findByPostDateAfter(postDate);
 
         if (null != beforePosts && beforePosts.size() > 0) {
             model.addAttribute("beforePost", beforePosts.get(beforePosts.size() - 1));
@@ -143,8 +143,8 @@ public class FrontArchiveController extends BaseController {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
         //获取文章的标签用作keywords
-        List<Tag> tags = post.getTags();
-        List<String> tagWords = new ArrayList<>();
+        final List<Tag> tags = post.getTags();
+        final List<String> tagWords = new ArrayList<>();
         if (tags != null) {
             for (Tag tag : tags) {
                 tagWords.add(tag.getTagName());
@@ -157,8 +157,8 @@ public class FrontArchiveController extends BaseController {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
-        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
-        int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
+        final ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
+        final int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
         model.addAttribute("is_post", true);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);

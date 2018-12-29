@@ -74,7 +74,7 @@ public class ApiArchivesController {
      */
     @GetMapping(value = "/year")
     public JsonResult archivesYear() {
-        List<Archive> archives = postService.findPostGroupByYear();
+        final List<Archive> archives = postService.findPostGroupByYear();
         if (null != archives && archives.size() > 0) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archives);
         } else {
@@ -128,7 +128,7 @@ public class ApiArchivesController {
      */
     @GetMapping(value = "/year/month")
     public JsonResult archivesYearAndMonth() {
-        List<Archive> archives = postService.findPostGroupByYearAndMonth();
+        final List<Archive> archives = postService.findPostGroupByYearAndMonth();
         if (null != archives && archives.size() > 0) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archives);
         } else {

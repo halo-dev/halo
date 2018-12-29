@@ -92,7 +92,7 @@ public class UserController {
                                  @ModelAttribute("userId") Long userId,
                                  HttpSession session) {
         try {
-            User user = userService.findByUserIdAndUserPass(userId, SecureUtil.md5(beforePass));
+            final User user = userService.findByUserIdAndUserPass(userId, SecureUtil.md5(beforePass));
             if (null != user) {
                 user.setUserPass(SecureUtil.md5(newPass));
                 userService.save(user);

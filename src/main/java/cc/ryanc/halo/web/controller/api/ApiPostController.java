@@ -36,8 +36,8 @@ public class ApiPostController {
      * 获取文章列表 分页
      *
      * <p>
-     *     result api
-     *     <pre>
+     * result api
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -95,17 +95,18 @@ public class ApiPostController {
      * </p>
      *
      * @param page 页码
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/page/{page}")
     public JsonResult posts(@PathVariable(value = "page") Integer page) {
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
             return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
         }
@@ -116,8 +117,8 @@ public class ApiPostController {
      * 获取单个文章信息
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -146,11 +147,12 @@ public class ApiPostController {
      * </p>
      *
      * @param postId 文章编号
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/{postId}")
     public JsonResult posts(@PathVariable(value = "postId") Long postId) {
-        Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_POST.getDesc());
+        final Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_POST.getDesc());
         if (null != post) {
             postService.cacheViews(post.getPostId());
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), post);

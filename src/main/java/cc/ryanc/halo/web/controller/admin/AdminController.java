@@ -78,38 +78,39 @@ public class AdminController extends BaseController {
      *
      * @param model   model
      * @param session session
+     *
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
     public String index(Model model) {
 
         //查询评论的条数
-        Long commentCount = commentService.getCount();
+        final Long commentCount = commentService.getCount();
         model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
-        List<Post> postsLatest = postService.findPostLatest();
+        final List<Post> postsLatest = postService.findPostLatest();
         model.addAttribute("postTopFive", postsLatest);
 
         //查询最新的日志
-        List<Logs> logsLatest = logsService.findLogsLatest();
+        final List<Logs> logsLatest = logsService.findLogsLatest();
         model.addAttribute("logs", logsLatest);
 
         //查询最新的评论
-        List<Comment> comments = commentService.findCommentsLatest();
+        final List<Comment> comments = commentService.findCommentsLatest();
         model.addAttribute("comments", comments);
 
         //附件数量
         model.addAttribute("mediaCount", attachmentService.getCount());
 
         //文章阅读总数
-        Long postViewsSum = postService.getPostViews();
+        final Long postViewsSum = postService.getPostViews();
         model.addAttribute("postViewsSum", postViewsSum);
 
         //成立天数
-        Date blogStart = DateUtil.parse(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
-        long hadDays = DateUtil.between(blogStart, DateUtil.date(), DateUnit.DAY);
-        model.addAttribute("hadDays",hadDays);
+        final Date blogStart = DateUtil.parse(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
+        final long hadDays = DateUtil.between(blogStart, DateUtil.date(), DateUnit.DAY);
+        model.addAttribute("hadDays", hadDays);
         return "admin/admin_index";
     }
 
@@ -117,11 +118,12 @@ public class AdminController extends BaseController {
      * 处理跳转到登录页的请求
      *
      * @param session session
+     *
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
     public String login(HttpSession session) {
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
         if (null != user) {
             return "redirect:/admin";
@@ -135,6 +137,7 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
+     *
      * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
@@ -143,13 +146,13 @@ public class AdminController extends BaseController {
                                @ModelAttribute("loginPwd") String loginPwd,
                                HttpSession session) {
         //已注册账号，单用户，只有一个
-        User aUser = userService.findUser();
+        final User aUser = userService.findUser();
         //首先判断是否已经被禁用已经是否已经过了10分钟
         Date loginLast = DateUtil.date();
         if (null != aUser.getLoginLast()) {
             loginLast = aUser.getLoginLast();
         }
-        Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
+        final Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
         if (StrUtil.equals(aUser.getLoginEnable(), TrueFalseEnum.FALSE.getDesc()) && (between < CommonParamsEnum.TEN.getValue())) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.disabled"));
         }
@@ -171,13 +174,13 @@ public class AdminController extends BaseController {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
         } else {
             //更新失败次数
-            Integer errorCount = userService.updateUserLoginError();
+            final Integer errorCount = userService.updateUserLoginError();
             //超过五次禁用账户
             if (errorCount >= CommonParamsEnum.FIVE.getValue()) {
                 userService.updateUserLoginEnable(TrueFalseEnum.FALSE.getDesc());
             }
             logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]", request);
-            Object[] args = {(5 - errorCount)};
+            final Object[] args = {(5 - errorCount)};
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.failed", args));
         }
     }
@@ -186,11 +189,12 @@ public class AdminController extends BaseController {
      * 退出登录 销毁session
      *
      * @param session session
+     *
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         session.removeAttribute(HaloConst.USER_SESSION_KEY);
         logsService.save(LogsRecord.LOGOUT, user.getUserName(), request);
         log.info("User {} has logged out", user.getUserName());
@@ -203,15 +207,16 @@ public class AdminController extends BaseController {
      * @param model model model
      * @param page  page 当前页码
      * @param size  size 每页条数
+     *
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
     public String logs(Model model,
                        @RequestParam(value = "page", defaultValue = "0") Integer page,
                        @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        Sort sort = new Sort(Sort.Direction.DESC, "logId");
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Logs> logs = logsService.findAll(pageable);
+        final Sort sort = new Sort(Sort.Direction.DESC, "logId");
+        final Pageable pageable = PageRequest.of(page, size, sort);
+        final Page<Logs> logs = logsService.findAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
@@ -249,7 +254,7 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/getToken")
     @ResponseBody
     public JsonResult getToken() {
-        String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
+        final String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
     }
 
@@ -279,6 +284,7 @@ public class AdminController extends BaseController {
      *
      * @param file    file
      * @param request request
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/tools/markdownImport")
@@ -286,14 +292,14 @@ public class AdminController extends BaseController {
     public JsonResult markdownImport(@RequestParam("file") MultipartFile file,
                                      HttpServletRequest request,
                                      HttpSession session) throws IOException {
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        String markdown = IoUtil.read(file.getInputStream(), "UTF-8");
-        String content = MarkdownUtils.renderMarkdown(markdown);
-        Map<String, List<String>> frontMatters = MarkdownUtils.getFrontMatter(markdown);
-        Post post = new Post();
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final String markdown = IoUtil.read(file.getInputStream(), "UTF-8");
+        final String content = MarkdownUtils.renderMarkdown(markdown);
+        final Map<String, List<String>> frontMatters = MarkdownUtils.getFrontMatter(markdown);
+        final Post post = new Post();
         List<String> elementValue = null;
-        List<Tag> tags = new ArrayList<>();
-        List<Category> categories = new ArrayList<>();
+        final List<Tag> tags = new ArrayList<>();
+        final List<Category> categories = new ArrayList<>();
         Tag tag = null;
         Category category = null;
         if (frontMatters.size() > 0) {
@@ -345,9 +351,9 @@ public class AdminController extends BaseController {
         if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
             postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
         }
-        String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
+        final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
         if (summaryText.length() > postSummary) {
-            String summary = summaryText.substring(0, postSummary);
+            final String summary = summaryText.substring(0, postSummary);
             post.setPostSummary(summary);
         } else {
             post.setPostSummary(summaryText);

@@ -159,7 +159,7 @@
         autofocus: true,
         autosave: {
             enabled: true,
-            uniqueId: "editor-temp-page-<#if post??>${post.postId}<#else>1</#if>",
+            uniqueId: "editor-temp-page-<#if post??>${post.postId?c}<#else>1</#if>",
             delay: 10000
         },
         renderingConfig: {

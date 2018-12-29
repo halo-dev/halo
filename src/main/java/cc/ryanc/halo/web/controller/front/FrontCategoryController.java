@@ -44,11 +44,12 @@ public class FrontCategoryController extends BaseController {
      * 分类列表页面
      *
      * @param model model
+     *
      * @return String
      */
     @GetMapping
     public String categories(Model model) {
-        List<Category> categories = categoryService.findAll();
+        final List<Category> categories = categoryService.findAll();
         model.addAttribute("categories", categories);
         return this.render("categories");
     }
@@ -58,6 +59,7 @@ public class FrontCategoryController extends BaseController {
      *
      * @param model   model
      * @param cateUrl cateUrl
+     *
      * @return string
      */
     @GetMapping(value = "{cateUrl}")
@@ -72,25 +74,26 @@ public class FrontCategoryController extends BaseController {
      * @param model   model
      * @param cateUrl 分类目录路径
      * @param page    页码
+     *
      * @return String
      */
     @GetMapping("{cateUrl}/page/{page}")
     public String categories(Model model,
                              @PathVariable("cateUrl") String cateUrl,
                              @PathVariable("page") Integer page) {
-        Category category = categoryService.findByCateUrl(cateUrl);
+        final Category category = categoryService.findByCateUrl(cateUrl);
         if (null == category) {
             return this.renderNotFound();
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Integer size = 10;
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Post> posts = postService.findPostByCategories(category, pageable);
-        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-        model.addAttribute("is_categories",true);
+        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Page<Post> posts = postService.findPostByCategories(category, pageable);
+        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+        model.addAttribute("is_categories", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("category", category);

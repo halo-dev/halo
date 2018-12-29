@@ -29,7 +29,7 @@ public class ArticleTagDirective implements TemplateDirectiveModel {
 
     @Override
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
-        DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
+        final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
         if (map.containsKey(METHOD_KEY)) {
             String method = map.get(METHOD_KEY).toString();
             switch (method) {

@@ -24,7 +24,7 @@ public abstract class BaseController {
      * @return 返回拼接好的模板路径
      */
     public String render(String pageName) {
-        StrBuilder themeStr = new StrBuilder("themes/");
+        final StrBuilder themeStr = new StrBuilder("themes/");
         themeStr.append(THEME);
         themeStr.append("/");
         return themeStr.append(pageName).toString();

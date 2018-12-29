@@ -50,7 +50,7 @@ public class ApiUserController {
      */
     @GetMapping
     public JsonResult user() {
-        User user = userService.findUser();
+        final User user = userService.findUser();
         return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), user);
     }
 }

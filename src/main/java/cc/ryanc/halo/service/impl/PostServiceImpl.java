@@ -72,7 +72,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Post remove(Long postId) {
-        Optional<Post> post = this.findByPostId(postId);
+        final Optional<Post> post = this.findByPostId(postId);
         postRepository.delete(post.get());
         return post.get();
     }
@@ -87,7 +87,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Post updatePostStatus(Long postId, Integer status) {
-        Optional<Post> post = this.findByPostId(postId);
+        final Optional<Post> post = this.findByPostId(postId);
         post.get().setPostStatus(status);
         return postRepository.save(post.get());
     }
@@ -100,7 +100,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void updateAllSummary(Integer postSummary) {
-        List<Post> posts = this.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
+        final List<Post> posts = this.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
         for (Post post : posts) {
             String text = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (text.length() > postSummary) {
@@ -251,8 +251,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_year_month'")
     public List<Archive> findPostGroupByYearAndMonth() {
-        List<Object[]> objects = postRepository.findPostGroupByYearAndMonth();
-        List<Archive> archives = new ArrayList<>();
+        final List<Object[]> objects = postRepository.findPostGroupByYearAndMonth();
+        final List<Archive> archives = new ArrayList<>();
         Archive archive = null;
         for (Object[] obj : objects) {
             archive = new Archive();
@@ -273,8 +273,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_year'")
     public List<Archive> findPostGroupByYear() {
-        List<Object[]> objects = postRepository.findPostGroupByYear();
-        List<Archive> archives = new ArrayList<>();
+        final List<Object[]> objects = postRepository.findPostGroupByYear();
+        final List<Archive> archives = new ArrayList<>();
         Archive archive = null;
         for (Object[] obj : objects) {
             archive = new Archive();
@@ -385,15 +385,15 @@ public class PostServiceImpl implements PostService {
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_related_'+#post.getPostId()")
     public List<Post> relatedPosts(Post post) {
         //获取当前文章的所有标签
-        List<Tag> tags = post.getTags();
-        List<Post> tempPosts = new ArrayList<>();
+        final List<Tag> tags = post.getTags();
+        final List<Post> tempPosts = new ArrayList<>();
         for (Tag tag : tags) {
             tempPosts.addAll(postRepository.findPostsByTags(tag));
         }
         //去掉当前的文章
         tempPosts.remove(post);
         //去掉重复的文章
-        List<Post> allPosts = new ArrayList<>();
+        final List<Post> allPosts = new ArrayList<>();
         for (int i = 0; i < tempPosts.size(); i++) {
             if (!allPosts.contains(tempPosts.get(i))) {
                 allPosts.add(tempPosts.get(i));
@@ -475,10 +475,10 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Post buildCategoriesAndTags(Post post, List<String> cateList, String tagList) {
-        List<Category> categories = categoryService.strListToCateList(cateList);
+        final List<Category> categories = categoryService.strListToCateList(cateList);
         post.setCategories(categories);
         if (StrUtil.isNotEmpty(tagList)) {
-            List<Tag> tags = tagService.strListToTagList(StrUtil.trim(tagList));
+            final List<Tag> tags = tagService.strListToTagList(StrUtil.trim(tagList));
             post.setTags(tags);
         }
         return post;

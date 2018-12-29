@@ -29,8 +29,8 @@ public class ApiOptionController {
      * 获取所有设置选项
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -57,7 +57,7 @@ public class ApiOptionController {
      */
     @GetMapping
     public JsonResult options() {
-        Map<String, String> options = optionsService.findAllOptions();
+        final Map<String, String> options = optionsService.findAllOptions();
         //去掉隐私元素
         options.remove(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp());
         options.remove(BlogPropertiesEnum.MAIL_FROM_NAME.getProp());
@@ -71,8 +71,8 @@ public class ApiOptionController {
      * 获取单个设置项
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -82,11 +82,12 @@ public class ApiOptionController {
      * </p>
      *
      * @param optionName 设置选项名称
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/{optionName}")
     public JsonResult option(@PathVariable(value = "optionName") String optionName) {
-        String optionValue = optionsService.findOneOption(optionName);
+        final String optionValue = optionsService.findOneOption(optionName);
         return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), optionValue);
     }
 }
