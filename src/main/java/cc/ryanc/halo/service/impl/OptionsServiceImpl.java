@@ -88,8 +88,8 @@ public class OptionsServiceImpl implements OptionsService {
      */
     @Override
     public Map<String, String> findAllOptions() {
-        Map<String, String> options = new HashMap<>();
-        List<Options> optionsList = optionsRepository.findAll();
+        final Map<String, String> options = new HashMap<>();
+        final List<Options> optionsList = optionsRepository.findAll();
         if (null != optionsList) {
             optionsList.forEach(option -> options.put(option.getOptionName(), option.getOptionValue()));
         }
@@ -104,7 +104,7 @@ public class OptionsServiceImpl implements OptionsService {
      */
     @Override
     public String findOneOption(String key) {
-        Options options = optionsRepository.findOptionsByOptionName(key);
+        final Options options = optionsRepository.findOptionsByOptionName(key);
         if (null != options) {
             return options.getOptionValue();
         }

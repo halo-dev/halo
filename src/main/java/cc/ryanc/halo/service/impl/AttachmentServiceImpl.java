@@ -157,17 +157,17 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     public Map<String, String> attachUpload(MultipartFile file, HttpServletRequest request) {
-        Map<String, String> resultMap = new HashMap<>(6);
-        String dateString = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
+        final Map<String, String> resultMap = new HashMap<>(6);
+        final String dateString = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
         try {
             //用户目录
-            StrBuilder uploadPath = new StrBuilder(System.getProperties().getProperty("user.home"));
+            final StrBuilder uploadPath = new StrBuilder(System.getProperties().getProperty("user.home"));
             uploadPath.append("/halo/");
             uploadPath.append("upload/");
 
             //获取当前年月以创建目录，如果没有该目录则创建
             uploadPath.append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
-            File mediaPath = new File(uploadPath.toString());
+            final File mediaPath = new File(uploadPath.toString());
             if (!mediaPath.exists()) {
                 if (!mediaPath.mkdirs()) {
                     resultMap.put("success", "0");
@@ -176,27 +176,27 @@ public class AttachmentServiceImpl implements AttachmentService {
             }
 
             //不带后缀
-            StrBuilder nameWithOutSuffix = new StrBuilder(file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", ""));
+            final StrBuilder nameWithOutSuffix = new StrBuilder(file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", ""));
             nameWithOutSuffix.append(dateString);
             nameWithOutSuffix.append(new Random().nextInt(1000));
 
             //文件后缀
-            String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+            final String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
 
             //带后缀
-            StrBuilder fileName = new StrBuilder(nameWithOutSuffix);
+            final StrBuilder fileName = new StrBuilder(nameWithOutSuffix);
             fileName.append(".");
             fileName.append(fileSuffix);
 
             file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName.toString()));
 
             //文件原路径
-            StrBuilder fullPath = new StrBuilder(mediaPath.getAbsolutePath());
+            final StrBuilder fullPath = new StrBuilder(mediaPath.getAbsolutePath());
             fullPath.append("/");
             fullPath.append(fileName);
 
             //压缩文件路径
-            StrBuilder fullSmallPath = new StrBuilder(mediaPath.getAbsolutePath());
+            final StrBuilder fullSmallPath = new StrBuilder(mediaPath.getAbsolutePath());
             fullSmallPath.append("/");
             fullSmallPath.append(nameWithOutSuffix);
             fullSmallPath.append("_small.");
@@ -206,7 +206,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             Thumbnails.of(fullPath.toString()).size(256, 256).keepAspectRatio(false).toFile(fullSmallPath.toString());
 
             //映射路径
-            StrBuilder filePath = new StrBuilder("/upload/");
+            final StrBuilder filePath = new StrBuilder("/upload/");
             filePath.append(DateUtil.thisYear());
             filePath.append("/");
             filePath.append(DateUtil.thisMonth());
@@ -214,7 +214,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             filePath.append(fileName);
 
             //缩略图映射路径
-            StrBuilder fileSmallPath = new StrBuilder("/upload/");
+            final StrBuilder fileSmallPath = new StrBuilder("/upload/");
             fileSmallPath.append(DateUtil.thisYear());
             fileSmallPath.append("/");
             fileSmallPath.append(DateUtil.thisMonth());
@@ -223,8 +223,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             fileSmallPath.append("_small.");
             fileSmallPath.append(fileSuffix);
 
-            String size = HaloUtils.parseSize(new File(fullPath.toString()).length());
-            String wh = HaloUtils.getImageWh(new File(fullPath.toString()));
+            final String size = HaloUtils.parseSize(new File(fullPath.toString()).length());
+            final String wh = HaloUtils.getImageWh(new File(fullPath.toString()));
 
             resultMap.put("fileName", fileName.toString());
             resultMap.put("filePath", filePath.toString());
@@ -248,32 +248,32 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     public Map<String, String> attachQiNiuUpload(MultipartFile file, HttpServletRequest request) {
-        Map<String, String> resultMap = new HashMap<>(6);
+        final Map<String, String> resultMap = new HashMap<>(6);
         try {
-            Configuration cfg = new Configuration(Zone.zone0());
-            String key = Md5Util.getMD5Checksum(file);
-            String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
-            String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
-            String domain = HaloConst.OPTIONS.get("qiniu_domain");
-            String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
-            String smallUrl = HaloConst.OPTIONS.get("qiniu_small_url");
+            final Configuration cfg = new Configuration(Zone.zone0());
+            final String key = Md5Util.getMD5Checksum(file);
+            final String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
+            final String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
+            final String domain = HaloConst.OPTIONS.get("qiniu_domain");
+            final String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
+            final String smallUrl = HaloConst.OPTIONS.get("qiniu_small_url");
             if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket)) {
                 return resultMap;
             }
-            Auth auth = Auth.create(accessKey, secretKey);
-            StringMap putPolicy = new StringMap();
+            final Auth auth = Auth.create(accessKey, secretKey);
+            final StringMap putPolicy = new StringMap();
             putPolicy.put("returnBody", "{\"size\":$(fsize),\"w\":$(imageInfo.width),\"h\":$(imageInfo.height)}");
-            String upToken = auth.uploadToken(bucket, null, 3600, putPolicy);
-            String localTempDir = Paths.get(System.getenv("java.io.tmpdir"), bucket).toString();
+            final String upToken = auth.uploadToken(bucket, null, 3600, putPolicy);
+            final String localTempDir = Paths.get(System.getenv("java.io.tmpdir"), bucket).toString();
             QiNiuPutSet putSet = new QiNiuPutSet();
             try {
-                FileRecorder fileRecorder = new FileRecorder(localTempDir);
-                UploadManager uploadManager = new UploadManager(cfg, fileRecorder);
-                Response response = uploadManager.put(file.getInputStream(), key, upToken, null, null);
+                final FileRecorder fileRecorder = new FileRecorder(localTempDir);
+                final UploadManager uploadManager = new UploadManager(cfg, fileRecorder);
+                final Response response = uploadManager.put(file.getInputStream(), key, upToken, null, null);
                 //解析上传成功的结果
                 putSet = new Gson().fromJson(response.bodyString(), QiNiuPutSet.class);
             } catch (QiniuException e) {
-                Response r = e.response;
+                final Response r = e.response;
                 System.err.println(r.toString());
                 try {
                     System.err.println(r.bodyString());
@@ -285,7 +285,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String filePath = domain.trim() + "/" + key;
+            final String filePath = domain.trim() + "/" + key;
             resultMap.put("fileName", file.getOriginalFilename());
             resultMap.put("filePath", filePath.trim());
             resultMap.put("smallPath", smallUrl == null ? filePath.trim() : (filePath + smallUrl).trim());
@@ -308,31 +308,31 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     public Map<String, String> attachUpYunUpload(MultipartFile file, HttpServletRequest request) {
-        Map<String, String> resultMap = new HashMap<>(6);
+        final Map<String, String> resultMap = new HashMap<>(6);
         try {
-            String key = Md5Util.getMD5Checksum(file);
-            String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
-            String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
-            String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
-            String domain = HaloConst.OPTIONS.get("upyun_oss_domain");
-            String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
-            String smallUrl = HaloConst.OPTIONS.get("upyun_oss_small");
+            final String key = Md5Util.getMD5Checksum(file);
+            final String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
+            final String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
+            final String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
+            final String domain = HaloConst.OPTIONS.get("upyun_oss_domain");
+            final String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
+            final String smallUrl = HaloConst.OPTIONS.get("upyun_oss_small");
             if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
                 return resultMap;
             }
-            String fileName = file.getOriginalFilename();
-            String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
-            UpYun upYun = new UpYun(bucket, operator, ossPwd);
+            final String fileName = file.getOriginalFilename();
+            final String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
+            final UpYun upYun = new UpYun(bucket, operator, ossPwd);
             upYun.setTimeout(60);
             upYun.setApiDomain(UpYun.ED_AUTO);
             upYun.setDebug(true);
             upYun.writeFile(ossSrc + key + fileSuffix, file.getBytes(), true, null);
-            String filePath = domain.trim() + ossSrc + key + fileSuffix;
+            final String filePath = domain.trim() + ossSrc + key + fileSuffix;
             String smallPath = filePath;
             if (smallUrl != null) {
                 smallPath += smallUrl;
             }
-            BufferedImage image = ImageIO.read(file.getInputStream());
+            final BufferedImage image = ImageIO.read(file.getInputStream());
             if (image != null) {
                 resultMap.put("wh", image.getWidth() + "x" + image.getHeight());
             }
@@ -358,15 +358,15 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public boolean deleteQiNiuAttachment(String key) {
         boolean flag = true;
-        Configuration cfg = new Configuration(Zone.zone0());
-        String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
-        String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
-        String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
+        final Configuration cfg = new Configuration(Zone.zone0());
+        final String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
+        final String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
+        final String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
         if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(bucket)) {
             return false;
         }
-        Auth auth = Auth.create(accessKey, secretKey);
-        BucketManager bucketManager = new BucketManager(auth, cfg);
+        final Auth auth = Auth.create(accessKey, secretKey);
+        final BucketManager bucketManager = new BucketManager(auth, cfg);
         try {
             bucketManager.delete(bucket, key);
         } catch (QiniuException ex) {
@@ -386,14 +386,14 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public boolean deleteUpYunAttachment(String fileName) {
         boolean flag = true;
-        String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
-        String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
-        String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
-        String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
+        final String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
+        final String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
+        final String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
+        final String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
         if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
             return false;
         }
-        UpYun upYun = new UpYun(bucket, operator, ossPwd);
+        final UpYun upYun = new UpYun(bucket, operator, ossPwd);
         upYun.setApiDomain(UpYun.ED_AUTO);
         try {
             flag = upYun.deleteFile(ossSrc + fileName);

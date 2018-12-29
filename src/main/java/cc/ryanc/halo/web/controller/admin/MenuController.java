@@ -75,7 +75,7 @@ public class MenuController {
      */
     @GetMapping(value = "/edit")
     public String updateMenu(@RequestParam("menuId") Long menuId, Model model) {
-        Menu menu = menuService.findByMenuId(menuId).orElse(new Menu());
+        final Menu menu = menuService.findByMenuId(menuId).orElse(new Menu());
         model.addAttribute("updateMenu", menu);
         return "/admin/admin_menu";
     }

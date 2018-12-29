@@ -55,15 +55,16 @@ public class AttachmentController {
      * 复印件列表
      *
      * @param model model
+     *
      * @return 模板路径admin/admin_attachment
      */
     @GetMapping
     public String attachments(Model model,
                               @RequestParam(value = "page", defaultValue = "0") Integer page,
                               @RequestParam(value = "size", defaultValue = "18") Integer size) {
-        Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Attachment> attachments = attachmentService.findAll(pageable);
+        final Sort sort = new Sort(Sort.Direction.DESC, "attachId");
+        final Pageable pageable = PageRequest.of(page, size, sort);
+        final Page<Attachment> attachments = attachmentService.findAll(pageable);
         model.addAttribute("attachments", attachments);
         return "admin/admin_attachment";
     }
@@ -73,6 +74,7 @@ public class AttachmentController {
      *
      * @param model model
      * @param page  page 当前页码
+     *
      * @return 模板路径admin/widget/_attachment-select
      */
     @GetMapping(value = "/select")
@@ -80,9 +82,9 @@ public class AttachmentController {
                                    @RequestParam(value = "page", defaultValue = "0") Integer page,
                                    @RequestParam(value = "id", defaultValue = "none") String id,
                                    @RequestParam(value = "type", defaultValue = "normal") String type) {
-        Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        Pageable pageable = PageRequest.of(page, 18, sort);
-        Page<Attachment> attachments = attachmentService.findAll(pageable);
+        final Sort sort = new Sort(Sort.Direction.DESC, "attachId");
+        final Pageable pageable = PageRequest.of(page, 18, sort);
+        final Page<Attachment> attachments = attachmentService.findAll(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
         if (StrUtil.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
@@ -107,16 +109,17 @@ public class AttachmentController {
      *
      * @param file    file
      * @param request request
+     *
      * @return Map
      */
     @PostMapping(value = "/upload", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
-        Map<String, Object> result = new HashMap<>(3);
+        final Map<String, Object> result = new HashMap<>(3);
         if (!file.isEmpty()) {
             try {
-                Map<String, String> resultMap = attachmentService.upload(file, request);
+                final Map<String, String> resultMap = attachmentService.upload(file, request);
                 if (resultMap == null || resultMap.isEmpty()) {
                     log.error("File upload failed");
                     result.put("success", ResultCodeEnum.FAIL.getCode());
@@ -157,12 +160,13 @@ public class AttachmentController {
      *
      * @param model    model
      * @param attachId 附件编号
+     *
      * @return 模板路径admin/widget/_attachment-detail
      */
     @GetMapping(value = "/attachment")
     public String attachmentDetail(Model model, @RequestParam("attachId") Long attachId) {
-        Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
-        model.addAttribute("attachment", attachment.get());
+        final Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
+        model.addAttribute("attachment", attachment.orElse(new Attachment()));
         return "admin/widget/_attachment-detail";
     }
 
@@ -171,6 +175,7 @@ public class AttachmentController {
      *
      * @param attachId 附件编号
      * @param request  request
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/remove")

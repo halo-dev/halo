@@ -29,7 +29,7 @@ public class CommentUtil {
             return Collections.emptyList();
         }
 
-        List<Comment> commentsResult = new ArrayList<>();
+        final List<Comment> commentsResult = new ArrayList<>();
 
         for (Comment comment : commentsRoot) {
             if (comment.getCommentParent() == 0) {
@@ -59,7 +59,7 @@ public class CommentUtil {
             return null;
         }
 
-        List<Comment> commentsChild = new ArrayList<>();
+        final List<Comment> commentsChild = new ArrayList<>();
         for (Comment comment : commentsRoot) {
             if (comment.getCommentParent() != 0) {
                 if (comment.getCommentParent().equals(id)) {

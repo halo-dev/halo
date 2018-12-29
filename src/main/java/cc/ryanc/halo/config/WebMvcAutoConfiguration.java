@@ -120,7 +120,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
+        final SessionLocaleResolver slr = new SessionLocaleResolver();
         slr.setDefaultLocale(Locale.CHINA);
         return slr;
     }
@@ -132,7 +132,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        final LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
         lci.setParamName("lang");
         return lci;
     }

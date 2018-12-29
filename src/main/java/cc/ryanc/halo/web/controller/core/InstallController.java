@@ -110,7 +110,7 @@ public class InstallController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), "该博客已初始化，不能再次安装！");
             }
             //创建新的用户
-            User user = new User();
+            final User user = new User();
             user.setUserName(userName);
             if (StrUtil.isBlank(userDisplayName)) {
                 userDisplayName = userName;
@@ -121,15 +121,15 @@ public class InstallController {
             userService.save(user);
 
             //默认分类
-            Category category = new Category();
+            final Category category = new Category();
             category.setCateName("未分类");
             category.setCateUrl("default");
             category.setCateDesc("未分类");
             categoryService.save(category);
 
             //第一篇文章
-            Post post = new Post();
-            List<Category> categories = new ArrayList<>();
+            final Post post = new Post();
+            final List<Category> categories = new ArrayList<>();
             categories.add(category);
             post.setPostTitle("Hello Halo!");
             post.setPostContentMd("# Hello Halo!\n" +
@@ -145,7 +145,7 @@ public class InstallController {
             postService.save(post);
 
             //第一个评论
-            Comment comment = new Comment();
+            final Comment comment = new Comment();
             comment.setPost(post);
             comment.setCommentAuthor("ruibaby");
             comment.setCommentAuthorEmail("i@ryanc.cc");
@@ -159,7 +159,7 @@ public class InstallController {
             comment.setIsAdmin(0);
             commentService.save(comment);
 
-            Map<String, String> options = new HashMap<>();
+            final Map<String, String> options = new HashMap<>();
             options.put(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
             options.put(BlogPropertiesEnum.BLOG_LOCALE.getProp(), blogLocale);
             options.put(BlogPropertiesEnum.BLOG_TITLE.getProp(), blogTitle);
@@ -176,14 +176,14 @@ public class InstallController {
             //更新日志
             logsService.save(LogsRecord.INSTALL, "安装成功，欢迎使用Halo。", request);
 
-            Menu menuIndex = new Menu();
+            final Menu menuIndex = new Menu();
             menuIndex.setMenuName("首页");
             menuIndex.setMenuUrl("/");
             menuIndex.setMenuSort(1);
             menuIndex.setMenuIcon(" ");
             menuService.save(menuIndex);
 
-            Menu menuArchive = new Menu();
+            final Menu menuArchive = new Menu();
             menuArchive.setMenuName("归档");
             menuArchive.setMenuUrl("/archives");
             menuArchive.setMenuSort(2);

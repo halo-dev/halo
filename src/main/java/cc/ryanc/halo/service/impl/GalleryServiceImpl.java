@@ -50,7 +50,7 @@ public class GalleryServiceImpl implements GalleryService {
     @Override
     @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Gallery remove(Long galleryId) {
-        Optional<Gallery> gallery = this.findByGalleryId(galleryId);
+        final Optional<Gallery> gallery = this.findByGalleryId(galleryId);
         galleryRepository.delete(gallery.get());
         return gallery.get();
     }

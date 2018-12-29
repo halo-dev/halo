@@ -60,20 +60,19 @@ public class FrontIndexController extends BaseController {
     @GetMapping(value = "page/{page}")
     public String index(Model model,
                         @PathVariable(value = "page") Integer page) {
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         //默认显示10条
         int size = 10;
-        //尝试加载设置选项，用于设置显示条数
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         //所有文章数据，分页
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Post> posts = postService.findPostByStatus(pageable);
+        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Page<Post> posts = postService.findPostByStatus(pageable);
         if (null == posts) {
             return this.renderNotFound();
         }
-        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_index",true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
@@ -89,7 +88,7 @@ public class FrontIndexController extends BaseController {
      */
     @GetMapping(value = "search")
     public String search(@RequestParam("keyword") String keyword, Model model) {
-        Page<Post> posts = postService.searchByKeywords(keyword, null);
+        final Page<Post> posts = postService.searchByKeywords(keyword, null);
         model.addAttribute("posts", posts);
         return this.render("index");
     }

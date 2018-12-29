@@ -28,8 +28,8 @@ public class ApiPageController {
      * 获取单个页面
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -58,11 +58,12 @@ public class ApiPageController {
      * </p>
      *
      * @param postId postId
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/{postId}")
     public JsonResult pages(@PathVariable(value = "postId") Long postId) {
-        Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        final Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null != post) {
             postService.cacheViews(post.getPostId());
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), post);

@@ -44,10 +44,10 @@ public class FrontOthersController {
             rssPosts = "20";
         }
         //获取文章列表并根据时间排序
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
-        Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        List<Post> posts = postsPage.getContent();
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
+        final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        final List<Post> posts = postsPage.getContent();
         return postService.buildRss(posts);
     }
 
@@ -60,10 +60,10 @@ public class FrontOthersController {
     @ResponseBody
     public String siteMap() {
         //获取文章列表并根据时间排序
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Pageable pageable = PageRequest.of(0, 999, sort);
-        Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        List<Post> posts = postsPage.getContent();
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Pageable pageable = PageRequest.of(0, 999, sort);
+        final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        final List<Post> posts = postsPage.getContent();
         return postService.buildSiteMap(posts);
     }
 }

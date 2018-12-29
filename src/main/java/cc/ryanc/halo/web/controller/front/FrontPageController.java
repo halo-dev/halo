@@ -49,7 +49,7 @@ public class FrontPageController extends BaseController {
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model) {
-        List<Gallery> galleries = galleryService.findAll();
+        final List<Gallery> galleries = galleryService.findAll();
         model.addAttribute("galleries", galleries);
         return this.render("gallery");
     }
@@ -76,7 +76,7 @@ public class FrontPageController extends BaseController {
     public String getPage(@PathVariable(value = "postUrl") String postUrl,
                           @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
-        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
             return this.renderNotFound();
         }
@@ -88,13 +88,12 @@ public class FrontPageController extends BaseController {
         }
         //默认显示10条
         int size = 10;
-        //获取每页评论条数
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
-        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
-        int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
+        final ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
+        final int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
         model.addAttribute("is_page", true);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);

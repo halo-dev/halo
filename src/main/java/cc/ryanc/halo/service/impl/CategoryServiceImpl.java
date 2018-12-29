@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Category remove(Long cateId) {
-        Optional<Category> category = this.findByCateId(cateId);
+        final Optional<Category> category = this.findByCateId(cateId);
         categoryRepository.delete(category.get());
         return category.get();
     }
@@ -107,7 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (null == strings) {
             return null;
         }
-        List<Category> categories = new ArrayList<>();
+        final List<Category> categories = new ArrayList<>();
         Optional<Category> category = null;
         for (String str : strings) {
             category = findByCateId(Long.parseLong(str));

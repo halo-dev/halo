@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User findUser() {
-        List<User> users = userRepository.findAll();
+        final List<User> users = userRepository.findAll();
         if (users != null && users.size() > 0) {
             return users.get(0);
         } else {
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserLoginEnable(String enable) {
-        User user = this.findUser();
+        final User user = this.findUser();
         user.setLoginEnable(enable);
         userRepository.save(user);
     }
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User updateUserLoginLast(Date lastDate) {
-        User user = this.findUser();
+        final User user = this.findUser();
         user.setLoginLast(lastDate);
         userRepository.save(user);
         return user;
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Integer updateUserLoginError() {
-        User user = this.findUser();
+        final User user = this.findUser();
         user.setLoginError((user.getLoginError() == null ? 0 : user.getLoginError()) + 1);
         userRepository.save(user);
         return user.getLoginError();
@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User updateUserNormal() {
-        User user = this.findUser();
+        final User user = this.findUser();
         user.setLoginEnable(TrueFalseEnum.TRUE.getDesc());
         user.setLoginError(0);
         user.setLoginLast(new Date());

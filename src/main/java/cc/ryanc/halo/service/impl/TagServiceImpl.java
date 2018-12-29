@@ -48,7 +48,7 @@ public class TagServiceImpl implements TagService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Tag remove(Long tagId) {
-        Optional<Tag> tag = findByTagId(tagId);
+        final Optional<Tag> tag = findByTagId(tagId);
         tagRepository.delete(tag.get());
         return tag.get();
     }
@@ -104,10 +104,10 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public List<Tag> strListToTagList(String tagList) {
-        String[] tags = tagList.split(",");
-        List<Tag> tagsList = new ArrayList<>();
+        final String[] tags = tagList.split(",");
+        final List<Tag> tagsList = new ArrayList<>();
         for (String tag : tags) {
-            Tag t = findTagByTagName(tag);
+            final Tag t = findTagByTagName(tag);
             Tag nt = null;
             if (null != t) {
                 tagsList.add(t);

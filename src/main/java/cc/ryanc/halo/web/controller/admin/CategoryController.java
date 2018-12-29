@@ -104,7 +104,7 @@ public class CategoryController {
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model, @RequestParam("cateId") Long cateId) {
-        Optional<Category> category = categoryService.findByCateId(cateId);
+        final Optional<Category> category = categoryService.findByCateId(cateId);
         model.addAttribute("updateCategory", category.orElse(new Category()));
         return "admin/admin_category";
     }

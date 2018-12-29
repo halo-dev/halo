@@ -56,7 +56,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * 加载主题设置
      */
     private void loadActiveTheme() throws TemplateModelException {
-        String themeValue = optionsService.findOneOption(BlogPropertiesEnum.THEME.getProp());
+        final String themeValue = optionsService.findOneOption(BlogPropertiesEnum.THEME.getProp());
         if (StrUtil.isNotEmpty(themeValue) && !StrUtil.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
         } else {
@@ -70,7 +70,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * 加载设置选项
      */
     private void loadOptions() {
-        Map<String, String> options = optionsService.findAllOptions();
+        final Map<String, String> options = optionsService.findAllOptions();
         if (options != null && !options.isEmpty()) {
             HaloConst.OPTIONS = options;
         }
@@ -81,7 +81,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void loadThemes() {
         HaloConst.THEMES.clear();
-        List<Theme> themes = HaloUtils.getThemes();
+        final List<Theme> themes = HaloUtils.getThemes();
         if (null != themes) {
             HaloConst.THEMES = themes;
         }
@@ -91,7 +91,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * 加载OwO表情
      */
     private void loadOwo() {
-        Map<String, String> map = new HashMap<>(135);
+        final Map<String, String> map = new HashMap<>(135);
         map.put("@[nico]", "<img src='/static/halo-common/OwO/paopao/nico.png' alt='nico.png' style='vertical-align: middle;'>");
         map.put("@[OK]", "<img src='/static/halo-common/OwO/paopao/OK.png' alt='OK.png' style='vertical-align: middle;'>");
         map.put("@[what]", "<img src='/static/halo-common/OwO/paopao/what.png' alt='what.png' style='vertical-align: middle;'>");

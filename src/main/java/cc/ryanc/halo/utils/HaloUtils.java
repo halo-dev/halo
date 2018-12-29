@@ -48,15 +48,16 @@ public class HaloUtils {
      * 获取备份文件信息
      *
      * @param dir dir
+     *
      * @return List
      */
     public static List<BackupDto> getBackUps(String dir) {
-        StrBuilder srcPathStr = new StrBuilder(System.getProperties().getProperty("user.home"));
+        final StrBuilder srcPathStr = new StrBuilder(System.getProperties().getProperty("user.home"));
         srcPathStr.append("/halo/backup/");
         srcPathStr.append(dir);
-        File srcPath = new File(srcPathStr.toString());
-        File[] files = srcPath.listFiles();
-        List<BackupDto> backupDtos = new ArrayList<>();
+        final File srcPath = new File(srcPathStr.toString());
+        final File[] files = srcPath.listFiles();
+        final List<BackupDto> backupDtos = new ArrayList<>();
         BackupDto backupDto = null;
         // 遍历文件
         if (null != files) {
@@ -82,25 +83,26 @@ public class HaloUtils {
      * 转换文件大小
      *
      * @param size size
+     *
      * @return String
      */
     public static String parseSize(long size) {
         if (size < CommonParamsEnum.BYTE.getValue()) {
-            return String.valueOf(size) + "B";
+            return size + "B";
         } else {
             size = size / 1024;
         }
         if (size < CommonParamsEnum.BYTE.getValue()) {
-            return String.valueOf(size) + "KB";
+            return size + "KB";
         } else {
             size = size / 1024;
         }
         if (size < CommonParamsEnum.BYTE.getValue()) {
             size = size * 100;
-            return String.valueOf((size / 100)) + "." + String.valueOf((size % 100)) + "MB";
+            return size / 100 + "." + size % 100 + "MB";
         } else {
             size = size * 100 / 1024;
-            return String.valueOf((size / 100)) + "." + String.valueOf((size % 100)) + "GB";
+            return size / 100 + "." + size % 100 + "GB";
         }
     }
 
@@ -108,21 +110,21 @@ public class HaloUtils {
      * 获取文件创建时间
      *
      * @param srcPath 文件绝对路径
+     *
      * @return 时间
      */
     public static Date getCreateTime(String srcPath) {
-        Path path = Paths.get(srcPath);
-        BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class,
-                LinkOption.NOFOLLOW_LINKS);
+        final Path path = Paths.get(srcPath);
+        final BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
         BasicFileAttributes attr;
         try {
             attr = basicview.readAttributes();
-            Date createDate = new Date(attr.creationTime().toMillis());
+            final Date createDate = new Date(attr.creationTime().toMillis());
             return createDate;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance();
         cal.set(1970, 0, 1, 0, 0, 0);
         return cal.getTime();
     }
@@ -131,11 +133,12 @@ public class HaloUtils {
      * 获取文件长和宽
      *
      * @param file file
+     *
      * @return String
      */
     public static String getImageWh(File file) {
         try {
-            BufferedImage image = ImageIO.read(new FileInputStream(file));
+            final BufferedImage image = ImageIO.read(new FileInputStream(file));
             return image.getWidth() + "x" + image.getHeight();
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,13 +152,13 @@ public class HaloUtils {
      * @return List
      */
     public static List<Theme> getThemes() {
-        List<Theme> themes = new ArrayList<>();
+        final List<Theme> themes = new ArrayList<>();
         try {
             // 获取项目根路径
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             // 获取主题路径
-            File themesPath = new File(basePath.getAbsolutePath(), "templates/themes");
-            File[] files = themesPath.listFiles();
+            final File themesPath = new File(basePath.getAbsolutePath(), "templates/themes");
+            final File[] files = themesPath.listFiles();
             if (null != files) {
                 Theme theme = null;
                 for (File file : files) {
@@ -192,18 +195,19 @@ public class HaloUtils {
      * 获取主题下的模板文件名
      *
      * @param theme theme
+     *
      * @return List
      */
     public static List<String> getTplName(String theme) {
-        List<String> tpls = new ArrayList<>();
+        final List<String> tpls = new ArrayList<>();
         try {
             // 获取项目根路径
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             // 获取主题路径
-            File themesPath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
-            File modulePath = new File(themesPath.getAbsolutePath(), "module");
-            File[] baseFiles = themesPath.listFiles();
-            File[] moduleFiles = modulePath.listFiles();
+            final File themesPath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
+            final File modulePath = new File(themesPath.getAbsolutePath(), "module");
+            final File[] baseFiles = themesPath.listFiles();
+            final File[] moduleFiles = modulePath.listFiles();
             if (null != moduleFiles) {
                 for (File file : moduleFiles) {
                     if (file.isFile() && file.getName().endsWith(".ftl")) {
@@ -230,12 +234,12 @@ public class HaloUtils {
      * @return List
      */
     public static List<String> getCustomTpl(String theme) {
-        List<String> tpls = new ArrayList<>();
+        final List<String> tpls = new ArrayList<>();
         try {
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             // 获取主题路径
-            File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
-            File[] themeFiles = themePath.listFiles();
+            final File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
+            final File[] themeFiles = themePath.listFiles();
             if (null != themeFiles && themeFiles.length > 0) {
                 for (File file : themeFiles) {
                     String[] split = StrUtil.removeSuffix(file.getName(), ".ftl").split("_");
@@ -261,7 +265,7 @@ public class HaloUtils {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         try {
-            File file = new File(filePath);
+            final File file = new File(filePath);
             if (!file.exists()) {
                 file.mkdirs();
             }
@@ -284,13 +288,15 @@ public class HaloUtils {
      * 生成rss
      *
      * @param posts posts
+     *
      * @return String
+     *
      * @throws FeedException FeedException
      */
     public static String getRss(List<Post> posts) throws FeedException {
         Assert.notEmpty(posts, "posts must not be empty");
 
-        Channel channel = new Channel("rss_2.0");
+        final Channel channel = new Channel("rss_2.0");
         if (null == HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp())) {
             channel.setTitle("");
         } else {
@@ -307,13 +313,13 @@ public class HaloUtils {
             channel.setDescription(HaloConst.OPTIONS.get(BlogPropertiesEnum.SEO_DESC.getProp()));
         }
         channel.setLanguage("zh-CN");
-        List<Item> items = new ArrayList<>();
+        final List<Item> items = new ArrayList<>();
         for (Post post : posts) {
-            Item item = new Item();
+            final Item item = new Item();
             item.setTitle(post.getPostTitle());
-            Content content = new Content();
+            final Content content = new Content();
             String value = post.getPostContent();
-            char[] xmlChar = value.toCharArray();
+            final char[] xmlChar = value.toCharArray();
             for (int i = 0; i < xmlChar.length; ++i) {
                 if (xmlChar[i] > 0xFFFD) {
                     xmlChar[i] = ' ';
@@ -324,13 +330,12 @@ public class HaloUtils {
             value = new String(xmlChar);
             content.setValue(value);
             item.setContent(content);
-            item.setLink(
-                    HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl());
+            item.setLink(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl());
             item.setPubDate(post.getPostDate());
             items.add(item);
         }
         channel.setItems(items);
-        WireFeedOutput out = new WireFeedOutput();
+        final WireFeedOutput out = new WireFeedOutput();
         return out.outputString(channel);
     }
 
@@ -338,13 +343,14 @@ public class HaloUtils {
      * 获取sitemap
      *
      * @param posts posts
+     *
      * @return String
      */
     public static String getSiteMap(List<Post> posts) {
         Assert.notEmpty(posts, "post mut not be empty");
-        StrBuilder head = new StrBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
-        StrBuilder urlBody = new StrBuilder();
-        String urlPath = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/";
+        final StrBuilder head = new StrBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
+        final StrBuilder urlBody = new StrBuilder();
+        final String urlPath = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/";
         for (Post post : posts) {
             urlBody.append("<url><loc>");
             urlBody.append(urlPath);
@@ -364,7 +370,7 @@ public class HaloUtils {
      * @param password password
      */
     public static void configMail(String smtpHost, String userName, String password) {
-        Properties properties = OhMyEmail.defaultConfig(false);
+        final Properties properties = OhMyEmail.defaultConfig(false);
         properties.setProperty("mail.smtp.host", smtpHost);
         OhMyEmail.config(properties, userName, password);
     }
@@ -375,6 +381,7 @@ public class HaloUtils {
      * @param blogUrl 博客地址
      * @param token   百度推送token
      * @param urls    文章路径
+     *
      * @return String
      */
     public static String baiduPost(String blogUrl, String token, String urls) {
@@ -382,17 +389,17 @@ public class HaloUtils {
         Assert.hasText(token, "token must not be blank");
         Assert.hasText(urls, "urls must not be blank");
 
-        StrBuilder url = new StrBuilder("http://data.zz.baidu.com/urls?site=");
+        final StrBuilder url = new StrBuilder("http://data.zz.baidu.com/urls?site=");
         url.append(blogUrl);
         url.append("&token=");
         url.append(token);
 
-        StrBuilder result = new StrBuilder();
+        final StrBuilder result = new StrBuilder();
         PrintWriter out = null;
         BufferedReader in = null;
         try {
             // 建立URL之间的连接
-            URLConnection conn = new URL(url.toString()).openConnection();
+            final URLConnection conn = new URL(url.toString()).openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("Host", "data.zz.baidu.com");
             conn.setRequestProperty("User-Agent", "curl/7.12.1");

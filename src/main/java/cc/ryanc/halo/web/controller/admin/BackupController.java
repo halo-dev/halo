@@ -57,6 +57,7 @@ public class BackupController {
      * 渲染备份页面
      *
      * @param model model
+     *
      * @return 模板路径admin/admin_backup
      */
     @GetMapping
@@ -80,6 +81,7 @@ public class BackupController {
      * 执行备份
      *
      * @param type 备份类型
+     *
      * @return JsonResult
      */
     @GetMapping(value = "doBackup")
@@ -106,8 +108,8 @@ public class BackupController {
             if (HaloUtils.getBackUps(BackupTypeEnum.DATABASES.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
             }
-            String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
-            String distName = "databases_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
+            final String srcPath = System.getProperties().getProperty("user.home") + "/halo/";
+            final String distName = "databases_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
             log.info("Current time: {}, database backup was performed.", DateUtil.now());
@@ -128,9 +130,9 @@ public class BackupController {
             if (HaloUtils.getBackUps(BackupTypeEnum.RESOURCES.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/resources/");
             }
-            File path = new File(ResourceUtils.getURL("classpath:").getPath());
-            String srcPath = path.getAbsolutePath();
-            String distName = "resources_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
+            final File path = new File(ResourceUtils.getURL("classpath:").getPath());
+            final String srcPath = path.getAbsolutePath();
+            final String distName = "resources_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
             log.info("Current time: {}, the resource file backup was performed.", DateUtil.now());
@@ -147,15 +149,15 @@ public class BackupController {
      * @return JsonResult
      */
     public JsonResult backupPosts() {
-        List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
+        final List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
         posts.addAll(postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc()));
         try {
             if (HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
             }
             //打包好的文件名
-            String distName = "posts_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
-            String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName;
+            final String distName = "posts_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
+            final String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName;
             for (Post post : posts) {
                 HaloUtils.postToFile(post.getPostContentMd(), srcPath, post.getPostTitle() + ".md");
             }
@@ -175,13 +177,14 @@ public class BackupController {
      *
      * @param fileName 文件名
      * @param type     备份类型
+     *
      * @return JsonResult
      */
     @GetMapping(value = "delBackup")
     @ResponseBody
     public JsonResult delBackup(@RequestParam("fileName") String fileName,
                                 @RequestParam("type") String type) {
-        String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
+        final String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         try {
             FileUtil.del(srcPath);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
@@ -195,6 +198,7 @@ public class BackupController {
      *
      * @param fileName 文件名
      * @param type     备份类型
+     *
      * @return JsonResult
      */
     @GetMapping(value = "sendToEmail")
@@ -202,9 +206,9 @@ public class BackupController {
     public JsonResult sendToEmail(@RequestParam("fileName") String fileName,
                                   @RequestParam("type") String type,
                                   HttpSession session) {
-        String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        if (null == user.getUserEmail() || StrUtil.equals(user.getUserEmail(), "")) {
+        final String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        if (null == user.getUserEmail() || StrUtil.isEmpty(user.getUserEmail())) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.no-email"));
         }
         if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
@@ -228,8 +232,8 @@ public class BackupController {
 
         @Override
         public void run() {
-            File file = new File(srcPath);
-            Map<String, Object> content = new HashMap<>(3);
+            final File file = new File(srcPath);
+            final Map<String, Object> content = new HashMap<>(3);
             try {
                 content.put("fileName", file.getName());
                 content.put("createAt", HaloUtils.getCreateTime(srcPath));
