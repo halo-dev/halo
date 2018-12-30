@@ -7,7 +7,7 @@
         </div>
         <div class="post-content">
             <div class="p_part">
-                <p>${post.postSummary?if_exists}...</p>
+                <p>${post.postSummary!}...</p>
             </div>
             <div class="p_part">
                 <p></p>
