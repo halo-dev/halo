@@ -216,7 +216,7 @@ public class ThemeController extends BaseController {
         try {
             final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             final File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
-            final String cmdResult = RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName, "git pull");
+            final String cmdResult = RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName + " && git pull");
             if (NOT_FOUND_GIT.equals(cmdResult)) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
