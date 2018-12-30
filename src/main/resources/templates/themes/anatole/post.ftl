@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="${post.postTitle} · ${options.blog_title?default('Anatole')}" keywords="${post.postTitle},${options.seo_keywords?default('Anatole')},${tagWords}" description="${post.postSummary?if_exists}"></@head>
+<@head title="${post.postTitle!} · ${options.blog_title!'Anatole'}" keywords="${post.postTitle!},${options.seo_keywords!'Anatole'},${tagWords!}" description="${post.postSummary!}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <link href="/anatole/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
@@ -44,7 +44,7 @@
                         </h3>
                     </div>
                     <div class="post-content">
-                        ${post.postContent?if_exists}
+                        ${post.postContent!}
                     </div>
                     <div class="post-footer">
                         <div class="meta">
@@ -73,7 +73,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${options.blog_url}/archives/${post.postUrl} ,${options.blog_title?if_exists},${post.postTitle},;"
+                        <a href="http://twitter.com/home?status=${options.blog_url}/archives/${post.postUrl} ,${options.blog_title!},${post.postTitle},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
