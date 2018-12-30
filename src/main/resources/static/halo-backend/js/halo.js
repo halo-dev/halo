@@ -60,7 +60,7 @@ document.addEventListener('pjax:complete', function () {
 function initMenu() {
     var pathName = location.pathname;
     if (pathName === "/admin/posts/edit") {
-        pathName = "/admin/posts/new";
+        pathName = "/admin/posts/write";
     }
     if (pathName === "/admin/category/edit") {
         pathName = "/admin/category";
