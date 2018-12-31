@@ -198,4 +198,15 @@ public class CommentServiceImpl implements CommentService {
     public Long getCount() {
         return commentRepository.count();
     }
+
+    /**
+     * 获取最近的评论
+     *
+     * @param limit limit
+     * @return List
+     */
+    @Override
+    public List<Comment> getRecentComments(int limit) {
+        return commentRepository.getCommentsByLimit(limit);
+    }
 }

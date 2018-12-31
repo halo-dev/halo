@@ -1,6 +1,6 @@
-package cc.ryanc.halo.model.method;
+package cc.ryanc.halo.model.freemarker.method;
 
-import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.CommentService;
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
@@ -14,13 +14,13 @@ import java.util.List;
  * @date : 2018/12/31
  */
 @Component
-public class RecentPostsMethod implements TemplateMethodModelEx {
+public class RecentCommentsMethod implements TemplateMethodModelEx {
 
     @Autowired
-    private PostService postService;
+    private CommentService commentService;
 
     /**
-     * 获取最近的文章
+     * 获取最近的评论
      *
      * @param arguments 参数
      * @return Object
@@ -30,6 +30,6 @@ public class RecentPostsMethod implements TemplateMethodModelEx {
     public Object exec(List arguments) throws TemplateModelException {
         SimpleNumber argOne = (SimpleNumber) arguments.get(0);
         int limit = argOne.getAsNumber().intValue();
-        return postService.getRecentPosts(limit);
+        return commentService.getRecentComments(limit);
     }
 }

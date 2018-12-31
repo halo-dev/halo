@@ -1,6 +1,8 @@
-package cc.ryanc.halo.model.tag;
+package cc.ryanc.halo.model.freemarker.tag;
 
-import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.model.enums.PostStatusEnum;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.service.PostService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,24 +20,12 @@ import java.util.Map;
  * @date : 2018/4/26
  */
 @Component
-public class CommonTagDirective implements TemplateDirectiveModel {
+public class ArticleTagDirective implements TemplateDirectiveModel {
 
     private static final String METHOD_KEY = "method";
 
     @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private CommentService commentService;
-
-    @Autowired
-    private TagService tagService;
-
-    @Autowired
-    private LinkService linkService;
+    private PostService postService;
 
     @Override
     public void execute(Environment environment, Map map, TemplateModel[] templateModels, TemplateDirectiveBody templateDirectiveBody) throws TemplateException, IOException {
@@ -43,20 +33,17 @@ public class CommonTagDirective implements TemplateDirectiveModel {
         if (map.containsKey(METHOD_KEY)) {
             String method = map.get(METHOD_KEY).toString();
             switch (method) {
-                case "menus":
-                    environment.setVariable("menus", builder.build().wrap(menuService.findAll()));
+                case "postsCount":
+                    environment.setVariable("postsCount", builder.build().wrap(postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc()).size()));
                     break;
-                case "categories":
-                    environment.setVariable("categories", builder.build().wrap(categoryService.findAll()));
+                case "archives":
+                    environment.setVariable("archives", builder.build().wrap(postService.findPostGroupByYearAndMonth()));
                     break;
-                case "tags":
-                    environment.setVariable("tags", builder.build().wrap(tagService.findAll()));
+                case "archivesLess":
+                    environment.setVariable("archivesLess", builder.build().wrap(postService.findPostGroupByYear()));
                     break;
-                case "links":
-                    environment.setVariable("links", builder.build().wrap(linkService.findAll()));
-                    break;
-                case "newComments":
-                    environment.setVariable("newComments", builder.build().wrap(commentService.findAll(1)));
+                case "hotPosts":
+                    environment.setVariable("hotPosts", builder.build().wrap(postService.hotPosts()));
                     break;
                 default:
                     break;

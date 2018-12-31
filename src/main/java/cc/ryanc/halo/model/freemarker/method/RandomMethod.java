@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.method;
+package cc.ryanc.halo.model.freemarker.method;
 
 import cn.hutool.core.util.RandomUtil;
 import freemarker.template.SimpleNumber;

@@ -27,7 +27,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @return List
      */
-    @Query(value = "SELECT * FROM halo_post where post_type='post' ORDER BY post_date DESC LIMIT 5", nativeQuery = true)
+    @Query(value = "SELECT * FROM HALO_POST WHERE POST_TYPE='post' ORDER BY POST_DATE DESC LIMIT 5", nativeQuery = true)
     List<Post> findTopFive();
 
     /**
@@ -195,7 +195,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param pageable 分页信息
      * @return Page
      */
-    @Query(value = "select * from halo_post where post_status = 0 and post_type='post' and post_title like '%=:keyword%' or post_content like '%=:keyword%'", nativeQuery = true)
+    @Query(value = "SELECT * FROM HALO_POST WHERE POST_STATUS = 0 AND POST_TYPE='post' AND POST_TITLE LIKE '%=:keyword%' OR POST_CONTENT LIKE '%=:keyword%'", nativeQuery = true)
     Page<Post> findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(String keyword, Pageable pageable);
 
     /**
@@ -211,7 +211,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @return Long
      */
-    @Query(value = "select sum(post_views) from halo_post", nativeQuery = true)
+    @Query(value = "SELECT SUM(POST_VIEWS) FROM HALO_POST", nativeQuery = true)
     Long getPostViewsSum();
 
     /**
