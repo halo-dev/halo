@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -78,7 +79,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      *
      * @return List
      */
-    @Query(value = "SELECT * FROM halo_comment ORDER BY comment_date DESC LIMIT 5", nativeQuery = true)
+    @Query(value = "SELECT * FROM HALO_COMMENT ORDER BY COMMENT_DATE DESC LIMIT 5", nativeQuery = true)
     List<Comment> findTopFive();
 
     /**
@@ -88,4 +89,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return 评论数量
      */
     Integer countAllByCommentStatus(Integer status);
+
+    /**
+     * 获取指定条数的评论
+     *
+     * @param limit 条数
+     * @return List
+     */
+    @Query(value = "SELECT * FROM HALO_COMMENT WHERE COMMENT_STATUS = 0 ORDER BY COMMENT_DATE DESC LIMIT :limit",nativeQuery = true)
+    List<Comment> getCommentsByLimit(@Param(value = "limit") int limit);
 }

@@ -132,4 +132,12 @@ public interface CommentService {
      * @return Long
      */
     Long getCount();
+
+    /**
+     * 获取最近的评论
+     *
+     * @param limit limit
+     * @return List
+     */
+    List<Comment> getRecentComments(int limit);
 }

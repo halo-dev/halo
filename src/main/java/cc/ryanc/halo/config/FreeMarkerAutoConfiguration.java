@@ -1,9 +1,10 @@
 package cc.ryanc.halo.config;
 
-import cc.ryanc.halo.model.method.RandomMethod;
-import cc.ryanc.halo.model.method.RecentPostsMethod;
-import cc.ryanc.halo.model.tag.ArticleTagDirective;
-import cc.ryanc.halo.model.tag.CommonTagDirective;
+import cc.ryanc.halo.model.freemarker.method.RandomMethod;
+import cc.ryanc.halo.model.freemarker.method.RecentCommentsMethod;
+import cc.ryanc.halo.model.freemarker.method.RecentPostsMethod;
+import cc.ryanc.halo.model.freemarker.tag.ArticleTagDirective;
+import cc.ryanc.halo.model.freemarker.tag.CommonTagDirective;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.service.UserService;
 import freemarker.template.TemplateModelException;
@@ -46,6 +47,9 @@ public class FreeMarkerAutoConfiguration {
     @Autowired
     private RecentPostsMethod recentPostsMethod;
 
+    @Autowired
+    private RecentCommentsMethod recentCommentsMethod;
+
     @PostConstruct
     public void setSharedVariable() {
         try {
@@ -56,6 +60,7 @@ public class FreeMarkerAutoConfiguration {
             configuration.setSharedVariable("user", userService.findUser());
             configuration.setSharedVariable("randomMethod", randomMethod);
             configuration.setSharedVariable("recentPostsMethod", recentPostsMethod);
+            configuration.setSharedVariable("recentCommentsMethod", recentCommentsMethod);
         } catch (TemplateModelException e) {
             log.error("Custom tags failed to load：{}", e.getMessage());
         }
