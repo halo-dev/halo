@@ -2,11 +2,11 @@
 
     <!-- Author Avatar -->
     <div id="author-avatar">
-        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" width="44px" height="44px" alt="Author Avatar"/>
+        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" width="44px" height="44px" alt="Author Avatar"/>
     </div>
     <!-- Author Name & Date -->
     <div>
-        <strong>${user.userDisplayName?default('halo')}</strong>
+        <strong>${user.userDisplayName!'Halo'}</strong>
         <span>${post.postDate?string("MM月 dd,yyyy")}</span>
     </div>
 
