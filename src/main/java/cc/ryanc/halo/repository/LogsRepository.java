@@ -21,6 +21,6 @@ public interface LogsRepository extends JpaRepository<Logs, Long> {
      *
      * @return List
      */
-    @Query(value = "SELECT * FROM halo_logs ORDER BY log_created DESC LIMIT 5", nativeQuery = true)
+    @Query(value = "SELECT * FROM HALO_LOGS ORDER BY LOG_CREATED DESC LIMIT 5", nativeQuery = true)
     List<Logs> findTopFive();
 }
