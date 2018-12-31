@@ -483,4 +483,15 @@ public class PostServiceImpl implements PostService {
         }
         return post;
     }
+
+    /**
+     * 获取最近的文章
+     *
+     * @param limit 条数
+     * @return List
+     */
+    @Override
+    public List<Post> getRecentPosts(int limit) {
+        return postRepository.getPostsByLimit(limit);
+    }
 }

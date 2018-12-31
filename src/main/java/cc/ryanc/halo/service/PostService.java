@@ -277,4 +277,12 @@ public interface PostService {
      * @return Post Post
      */
     Post buildCategoriesAndTags(Post post, List<String> cateList, @RequestParam("tagList") String tagList);
+
+    /**
+     * 获取最近的文章
+     *
+     * @param limit 条数
+     * @return List
+     */
+    List<Post> getRecentPosts(int limit);
 }
