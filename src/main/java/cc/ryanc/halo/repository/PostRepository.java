@@ -222,4 +222,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @return 文章数量
      */
     Integer countAllByPostStatusAndPostType(Integer status, String postType);
+
+    /**
+     * 获取指定条数的文章
+     *
+     * @param limit 条数
+     * @return List
+     */
+    @Query(value = "SELECT * FROM HALO_POST WHERE POST_STATUS = 0 AND POST_TYPE = 'post' ORDER BY POST_DATE DESC LIMIT :limit",nativeQuery = true)
+    List<Post> getPostsByLimit(@Param(value = "limit") int limit);
 }
