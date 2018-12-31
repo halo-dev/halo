@@ -2,7 +2,7 @@
     var randomNum;
 
     var locatePost = $('.locate-thumbnail-symbol').next();
-    for(var i = 0; i < ${options.index_posts?if_exists}; i++) {
+    for(var i = 0; i < ${options.index_posts!}; i++) {
         randomNum = Math.floor(Math.random() * 19 + 1);
 
         locatePost.children('.post_thumbnail-random').attr('id', 'random_thumbnail-'+randomNum);

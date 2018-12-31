@@ -12,7 +12,7 @@
     }
 
     a {
-        color: ${options.theme_material_uiux_hyperlink_color?default("#00838F")};
+        color: ${options.theme_material_uiux_hyperlink_color!'#00838F'};
     }
 
     .mdl-card__media,
@@ -22,13 +22,13 @@
     #scheme-Paradox .sidebar_archives-count,
     #scheme-Paradox .sidebar-colored .sidebar-header,
     #scheme-Paradox .sidebar-colored .sidebar-badge{
-        background-color: ${options.theme_material_uiux_theme_color?default("#0097A7")} !important;
+        background-color: ${options.theme_material_uiux_theme_color!'#0097A7'} !important;
     }
 
     /* Sidebar User Drop Down Menu Text Color */
     #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:hover,
     #scheme-Paradox .sidebar-colored .sidebar-nav>.dropdown>.dropdown-menu>li>a:focus {
-        color: ${options.theme_material_uiux_theme_color?default("#0097A7")} !important;
+        color: ${options.theme_material_uiux_theme_color!'#0097A7'} !important;
     }
 
     #post_entry-right-info,
@@ -41,29 +41,29 @@
     .sidebar-colored .sidebar-nav > .open > a:hover,
     .sidebar-colored .sidebar-nav > .open > a:focus,
     #ds-reset #ds-ctx .ds-ctx-entry .ds-ctx-head a {
-        color: ${options.theme_material_uiux_theme_color?default("#0097A7")} !important;
+        color: ${options.theme_material_uiux_theme_color!'#0097A7'} !important;
     }
 
     .toTop {
-        background: ${options.theme_material_uiux_button_color?default("#757575")} !important;
+        background: ${options.theme_material_uiux_button_color!'#757575'} !important;
     }
 
     .material-layout .material-post>.material-nav,
     .material-layout .material-index>.material-nav,
     .material-nav a {
-        color: ${options.theme_material_uiux_button_color?default("#757575")};
+        color: ${options.theme_material_uiux_button_color!'#757575'};
     }
 
     #scheme-Paradox .MD-burger-layer {
-        background-color: ${options.theme_material_uiux_button_color?default("#757575")};
+        background-color: ${options.theme_material_uiux_button_color!'#757575'};
     }
 
     #scheme-Paradox #post-toc-trigger-btn {
-        color: ${options.theme_material_uiux_button_color?default("#757575")};
+        color: ${options.theme_material_uiux_button_color!'#757575'};
     }
 
     .post-toc a:hover {
-        color: ${options.theme_material_uiux_hyperlink_color?default("#00838F")};
+        color: ${options.theme_material_uiux_hyperlink_color!'#00838F'};
         text-decoration: underline;
     }
 
@@ -71,10 +71,10 @@
 
 
 <!-- Theme Background Related-->
-<#if options.theme_material_background_bing?default('false')=="true">
+<#if (options.theme_material_background_bing!'false')=="true">
     <style>
         body {
-            background-color: ${options.theme_material_background_purecolor?default("#F5F5F5")};
+            background-color: ${options.theme_material_background_purecolor!'#F5F5F5'};
         }
 
         /* blog_info bottom background */
@@ -85,7 +85,7 @@
 <#elseif !options.theme_material_background_bgimg??>
     <style>
         body{
-            background-color: ${options.theme_material_background_purecolor?default("#F5F5F5")};
+            background-color: ${options.theme_material_background_purecolor!'#F5F5F5'};
         }
 
         /* blog_info bottom background */
@@ -96,7 +96,7 @@
 <#else >
     <style>
         body{
-            background-image: url(${options.theme_material_background_bgimg?if_exists});
+            background-image: url(${options.theme_material_background_bgimg!});
         }
     </style>
 </#if>
@@ -105,10 +105,10 @@
 
 <!-- Fade Effect -->
 
-<#if options.theme_material_other_js_fade?default('true')=='true'>
+<#if (options.theme_material_other_js_fade!'true')=='true'>
 <style>
     .fade {
-        transition: all ${options.theme_material_uiux_nprogress_buffer?default('800')}ms linear;
+        transition: all ${options.theme_material_uiux_nprogress_buffer!'800'}ms linear;
         -webkit-transform: translate3d(0,0,0);
         -moz-transform: translate3d(0,0,0);
         -ms-transform: translate3d(0,0,0);

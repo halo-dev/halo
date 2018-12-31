@@ -1,19 +1,19 @@
 <#list posts.content as post>
 <!-- Paradox Thumbnail -->
-<div class="post_entry-module mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp mdl-cell mdl-cell--12-col fade out">
+<div class="post_entry-module mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation!2}dp mdl-cell mdl-cell--12-col fade out">
     <!-- Post Thumbnail -->
     <!-- Random Thumbnail -->
-    <#if post.postThumbnail?if_exists == "${options.blog_url}/static/images/thumbnail.png">
+    <#if (post.postThumbnail!) == "${options.blog_url}/static/images/thumbnail.png">
     <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
     <#else>
-    <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50 lazy" data-original="${post.postThumbnail?if_exists}">
+    <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50 lazy" data-original="${post.postThumbnail!}">
     </#if>
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/archives/${post.postUrl}">${post.postTitle?if_exists}</a></p>
+        <p class="article-headline-p"><a href="/archives/${post.postUrl}">${post.postTitle!}</a></p>
     </div>
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
-        ${post.postSummary?if_exists}
+        ${post.postSummary!}
         &nbsp;&nbsp;&nbsp;
         <span>
             <a href="/archives/${post.postUrl}" target="_self">阅读全文</a>
@@ -24,11 +24,11 @@
         <div id="post_entry-left-info" class="mdl-card__supporting-text meta mdl-color-text--grey-600 ">
             <!-- Author Avatar -->
             <div id="author-avatar">
-                <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" width="44px" height="44px"
-                     alt="${user.userDisplayName?default('none')}'s avatar">
+                <img src="${user.userAvatar!'/material/source/img/avatar.png'}" width="44px" height="44px"
+                     alt="${user.userDisplayName!'Halo'}'s avatar">
             </div>
             <div>
-                <strong>${user.userDisplayName?default('Material')}</strong>
+                <strong>${user.userDisplayName!'Material'}</strong>
                 <span>${post.postDate?string("MM月 dd,yyyy")}</span>
             </div>
         </div>
