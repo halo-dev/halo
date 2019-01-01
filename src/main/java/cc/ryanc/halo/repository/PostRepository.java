@@ -27,7 +27,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @return List
      */
-    @Query(value = "SELECT * FROM HALO_POST WHERE POST_TYPE='post' ORDER BY POST_DATE DESC LIMIT 5", nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_post WHERE post_type='post' ORDER BY post_date DESC LIMIT 5", nativeQuery = true)
     List<Post> findTopFive();
 
     /**
@@ -119,7 +119,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @return List
      */
-    @Query(value = "SELECT YEAR(POST_DATE) AS YEAR,MONTH(POST_DATE) AS MONTH,COUNT(*) AS COUNT FROM HALO_POST WHERE POST_STATUS=0 and POST_TYPE='post' GROUP BY YEAR(post_date),MONTH(POST_DATE) ORDER BY YEAR DESC,MONTH DESC", nativeQuery = true)
+    @Query(value = "SELECT YEAR(post_date) AS YEAR,MONTH(post_date) AS MONTH,COUNT(*) AS COUNT FROM halo_post WHERE post_status=0 and post_type='post' GROUP BY YEAR(post_date),MONTH(post_date) ORDER BY YEAR DESC,MONTH DESC", nativeQuery = true)
     List<Object[]> findPostGroupByYearAndMonth();
 
     /**
@@ -127,7 +127,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @return List
      */
-    @Query(value = "SELECT YEAR(POST_DATE) AS YEAR,COUNT(*) AS COUNT FROM HALO_POST WHERE POST_STATUS=0 AND POST_TYPE='post' GROUP BY YEAR(POST_DATE) ORDER BY YEAR DESC", nativeQuery = true)
+    @Query(value = "SELECT YEAR(post_date) AS YEAR,COUNT(*) AS COUNT FROM halo_post WHERE post_status=0 AND post_type='post' GROUP BY YEAR(post_date) ORDER BY YEAR DESC", nativeQuery = true)
     List<Object[]> findPostGroupByYear();
 
     /**
@@ -137,7 +137,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param month month
      * @return List
      */
-    @Query(value = "SELECT *,YEAR(POST_DATE) AS YEAR,MONTH(POST_DATE) AS MONTH FROM HALO_POST WHERE POST_STATUS=0 and POST_TYPE='post' AND YEAR(POST_DATE)=:year AND MONTH(POST_DATE)=:month ORDER BY POST_DATE DESC", nativeQuery = true)
+    @Query(value = "SELECT *,YEAR(post_date) AS YEAR,MONTH(post_date) AS MONTH FROM halo_post WHERE post_status=0 and post_type='post' AND YEAR(post_date)=:year AND MONTH(post_date)=:month ORDER BY post_date DESC", nativeQuery = true)
     List<Post> findPostByYearAndMonth(@Param("year") String year, @Param("month") String month);
 
     /**
@@ -146,7 +146,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param year year
      * @return List
      */
-    @Query(value = "SELECT *,YEAR(post_date) AS YEAR FROM HALO_POST WHERE POST_STATUS=0 AND POST_TYPE='post' AND YEAR(POST_DATE)=:year ORDER BY POST_DATE DESC", nativeQuery = true)
+    @Query(value = "SELECT *,YEAR(post_date) AS YEAR FROM halo_post WHERE post_status=0 AND post_type='post' AND YEAR(post_date)=:year ORDER BY post_date DESC", nativeQuery = true)
     List<Post> findPostByYear(@Param("year") String year);
 
     /**
@@ -157,7 +157,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param pageable pageable
      * @return Page
      */
-    @Query(value = "SELECT * FROM HALO_POST WHERE POST_STATUS=0 and POST_TYPE='post' AND YEAR(POST_DATE)=:year AND MONTH(POST_DATE)=:month ORDER BY POST_DATE DESC", countQuery = "SELECT COUNT(*) FROM HALO_POST WHERE POST_STATUS=0 AND YEAR(POST_DATE)=:year AND MONTH(POST_DATE)=:month", nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_post WHERE post_status=0 and post_type='post' AND YEAR(post_date)=:year AND MONTH(post_date)=:month ORDER BY post_date DESC", countQuery = "SELECT COUNT(*) FROM halo_post WHERE post_status=0 AND YEAR(post_date)=:year AND MONTH(post_date)=:month", nativeQuery = true)
     Page<Post> findPostByYearAndMonth(@Param("year") String year, @Param("month") String month, Pageable pageable);
 
     /**
@@ -195,7 +195,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param pageable 分页信息
      * @return Page
      */
-    @Query(value = "SELECT * FROM HALO_POST WHERE POST_STATUS = 0 AND POST_TYPE='post' AND POST_TITLE LIKE '%=:keyword%' OR POST_CONTENT LIKE '%=:keyword%'", nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type='post' AND post_title LIKE '%=:keyword%' OR post_content LIKE '%=:keyword%'", nativeQuery = true)
     Page<Post> findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(String keyword, Pageable pageable);
 
     /**
@@ -229,6 +229,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param limit 条数
      * @return List
      */
-    @Query(value = "SELECT * FROM HALO_POST WHERE POST_STATUS = 0 AND POST_TYPE = 'post' ORDER BY POST_DATE DESC LIMIT :limit",nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type = 'post' ORDER BY post_date DESC LIMIT :limit",nativeQuery = true)
     List<Post> getPostsByLimit(@Param(value = "limit") int limit);
 }
