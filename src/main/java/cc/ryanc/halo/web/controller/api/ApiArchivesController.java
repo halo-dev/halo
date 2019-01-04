@@ -135,4 +135,23 @@ public class ApiArchivesController {
             return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
         }
     }
+
+    /**
+     * @Author Aquan
+     * @Description 返回所有文章
+     * @Date 2019.1.4 11:06
+     * @Param
+     * @return JsonResult
+     **/
+    @GetMapping(value = "/all")
+    public JsonResult archivesAllPost() {
+        final List<Archive> archive = postService.findAllPost();
+        if (null != archive && archive.size() > 0) {
+            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archive);
+        } else {
+            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
+        }
+    }
+
+
 }
