@@ -130,6 +130,29 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT YEAR(post_date) AS YEAR,COUNT(*) AS COUNT FROM halo_post WHERE post_status=0 AND post_type='post' GROUP BY YEAR(post_date) ORDER BY YEAR DESC", nativeQuery = true)
     List<Object[]> findPostGroupByYear();
 
+
+    /**
+     * @Author Aquan
+     * @Description 查询文章归档信息 查询所有文章
+     * @Date 2019.1.4 11:19
+     * @Param
+     * @return List
+     **/
+    @Query(value = "SELECT *,YEAR(post_date) AS YEAR FROM halo_post WHERE post_status=0 AND post_type='post' ORDER BY post_date DESC", nativeQuery = true)
+    List<Post> findAllPost();
+
+    /**
+     * @Author Aquan
+     * @Description 查询文章总数
+     * @Date 2019.1.4 15:03
+     * @Param
+     * @return Integer
+     **/
+    @Query(value = "SELECT count(1) AS COUNT FROM halo_post WHERE post_status=0 AND post_type='post'", nativeQuery = true)
+    Integer totalAllPostCount();
+
+
+
     /**
      * 根据年份和月份查询文章
      *

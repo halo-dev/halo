@@ -162,6 +162,16 @@ public interface PostService {
     List<Archive> findPostGroupByYear();
 
     /**
+     * @Author Aquan
+     * @Description 查询归档信息 查看所有文章
+     * @Date 2019.1.4 11:14
+     * @Param
+     * @return List
+     **/
+    List<Archive> findAllPost();
+
+
+    /**
      * 根据年份和月份查询文章
      *
      * @param year  year
