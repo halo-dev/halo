@@ -234,7 +234,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @return Long
      */
-    @Query(value = "SELECT SUM(POST_VIEWS) FROM HALO_POST", nativeQuery = true)
+    @Query(value = "SELECT SUM(POST_VIEWS) FROM halo_post", nativeQuery = true)
     Long getPostViewsSum();
 
     /**
