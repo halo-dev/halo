@@ -22,6 +22,13 @@
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <#if options.admin_layout_boxed_background??>
+    <style>
+        .layout-boxed {
+            background: url(${options.admin_layout_boxed_background!}) repeat fixed!important;
+        }
+    </style>
+    </#if>
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme!'skin-blue'} ${options.admin_layout!''} ${options.sidebar_style!''}">
 <div class="wrapper">
