@@ -58,7 +58,7 @@
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="galleryUrl" name="galleryUrl">
                                         <span class="input-group-btn">
-                                            <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=galleryUrl','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
+                                            <button class="btn btn-default btn-flat" type="button" onclick="halo.layerModal('/admin/attachments/select?id=galleryUrl','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                         </span>
                                     </div>
                                 </div>
