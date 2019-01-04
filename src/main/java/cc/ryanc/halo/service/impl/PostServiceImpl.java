@@ -287,6 +287,29 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * @Author Aquan
+     * @Description 查询归档信息 返回所有文章
+     * @Date 2019.1.4 11:16
+     * @Param
+     * @return List
+     **/
+    @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_all'")
+    public List<Archive> findAllPost() {
+        final List<Post> posts = postRepository.findAllPost();
+        final Integer count = postRepository.totalAllPostCount();
+        final List<Archive> archives = new ArrayList<>();
+        Archive archive = null;
+        archive = new Archive();
+        archive.setCount(String.valueOf(count));
+        archive.setPosts(posts);
+        archives.add(archive);
+
+        return archives;
+    }
+
+
+    /**
      * 根据年份和月份查询文章
      *
      * @param year  year
