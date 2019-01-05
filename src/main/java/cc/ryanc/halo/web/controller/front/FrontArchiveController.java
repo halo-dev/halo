@@ -125,16 +125,17 @@ public class FrontArchiveController extends BaseController {
         }
         //获得当前文章的发布日期
         final Date postDate = post.getPostDate();
-        //查询当前文章日期之前的所有文章
-        final List<Post> beforePosts = postService.findByPostDateBefore(postDate);
-        //查询当前文章日期之后的所有文章
-        final List<Post> afterPosts = postService.findByPostDateAfter(postDate);
-
-        if (null != beforePosts && beforePosts.size() > 0) {
-            model.addAttribute("beforePost", beforePosts.get(beforePosts.size() - 1));
+        final Post prePost = postService.getPrePost(postDate);
+        final Post nextPost = postService.getNextPost(postDate);
+        if (null != prePost) {
+            //兼容老版本主题
+            model.addAttribute("beforePost", prePost);
+            model.addAttribute("prePost",prePost);
         }
-        if (null != afterPosts && afterPosts.size() > 0) {
-            model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
+        if (null != nextPost) {
+            //兼容老版本主题
+            model.addAttribute("afterPost", nextPost);
+            model.addAttribute("nextPost",nextPost);
         }
         List<Comment> comments = null;
         if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
