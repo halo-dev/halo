@@ -60,7 +60,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         if (StrUtil.isNotEmpty(themeValue) && !StrUtil.equals(themeValue, null)) {
             BaseController.THEME = themeValue;
         } else {
-            //以防万一
+            //如果没有设置主题，则默认
             BaseController.THEME = "anatole";
         }
         configuration.setSharedVariable("themeName", BaseController.THEME);

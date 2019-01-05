@@ -55,6 +55,7 @@ public class PostServiceImpl implements PostService {
      * 保存文章
      *
      * @param post Post
+     *
      * @return Post
      */
     @Override
@@ -67,6 +68,7 @@ public class PostServiceImpl implements PostService {
      * 根据编号移除文章
      *
      * @param postId postId
+     *
      * @return Post
      */
     @Override
@@ -82,6 +84,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param postId postId
      * @param status status
+     *
      * @return Post
      */
     @Override
@@ -116,6 +119,7 @@ public class PostServiceImpl implements PostService {
      * 获取文章列表 不分页
      *
      * @param postType post or page
+     *
      * @return List
      */
     @Override
@@ -129,6 +133,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param keyWord  keyword
      * @param pageable pageable
+     *
      * @return List
      */
     @Override
@@ -142,6 +147,7 @@ public class PostServiceImpl implements PostService {
      * @param status   0，1，2
      * @param postType post or page
      * @param pageable 分页信息
+     *
      * @return Page
      */
     @Override
@@ -153,6 +159,7 @@ public class PostServiceImpl implements PostService {
      * 根据文章状态查询 分页，首页分页
      *
      * @param pageable pageable
+     *
      * @return Page
      */
     @Override
@@ -166,6 +173,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param status   0，1，2
      * @param postType post or page
+     *
      * @return List
      */
     @Override
@@ -178,6 +186,7 @@ public class PostServiceImpl implements PostService {
      * 根据编号查询文章
      *
      * @param postId postId
+     *
      * @return Optional
      */
     @Override
@@ -189,6 +198,7 @@ public class PostServiceImpl implements PostService {
      * 根据编号和类型查询文章
      *
      * @param postId postId
+     *
      * @return Post
      */
     @Override
@@ -201,6 +211,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param postUrl  路径
      * @param postType post or page
+     *
      * @return Post
      */
     @Override
@@ -221,27 +232,28 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 查询之后的文章
+     * 获取下一篇文章 较新
      *
-     * @param postDate 发布时间
-     * @return List
+     * @param postDate postDate
+     *
+     * @return Post
      */
     @Override
-    public List<Post> findByPostDateAfter(Date postDate) {
-        return postRepository.findByPostDateAfterAndPostStatusAndPostTypeOrderByPostDateDesc(postDate, PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc());
+    public Post getNextPost(Date postDate) {
+        return postRepository.queryNextPost(postDate);
     }
 
     /**
-     * 查询Id之前的文章
+     * 获取下一篇文章 较老
      *
-     * @param postDate 发布时间
-     * @return List
+     * @param postDate postDate
+     *
+     * @return Post
      */
     @Override
-    public List<Post> findByPostDateBefore(Date postDate) {
-        return postRepository.findByPostDateBeforeAndPostStatusAndPostTypeOrderByPostDateAsc(postDate, PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc());
+    public Post getPrePost(Date postDate) {
+        return postRepository.queryPrePost(postDate);
     }
-
 
     /**
      * 查询归档信息 根据年份和月份
@@ -287,11 +299,12 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
+     * @return List
+     *
      * @Author Aquan
      * @Description 查询归档信息 返回所有文章
      * @Date 2019.1.4 11:16
      * @Param
-     * @return List
      **/
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_all'")
@@ -314,6 +327,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param year  year
      * @param month month
+     *
      * @return List
      */
     @Override
@@ -326,6 +340,7 @@ public class PostServiceImpl implements PostService {
      * 根据年份查询文章
      *
      * @param year year
+     *
      * @return List
      */
     @Override
@@ -340,6 +355,7 @@ public class PostServiceImpl implements PostService {
      * @param year     year year
      * @param month    month month
      * @param pageable pageable pageable
+     *
      * @return Page
      */
     @Override
@@ -353,6 +369,7 @@ public class PostServiceImpl implements PostService {
      * @param category category
      * @param status   status
      * @param pageable pageable
+     *
      * @return Page
      */
     @Override
@@ -367,6 +384,7 @@ public class PostServiceImpl implements PostService {
      * @param tag      tag
      * @param status   status
      * @param pageable pageable
+     *
      * @return Page
      */
     @Override
@@ -380,6 +398,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param keyword  关键词
      * @param pageable 分页信息
+     *
      * @return Page
      */
     @Override
@@ -402,6 +421,7 @@ public class PostServiceImpl implements PostService {
      * 当前文章的相似文章
      *
      * @param post post
+     *
      * @return List
      */
     @Override
@@ -439,6 +459,7 @@ public class PostServiceImpl implements PostService {
      * 根据文章状态查询数量
      *
      * @param status 文章状态
+     *
      * @return 文章数量
      */
     @Override
@@ -450,6 +471,7 @@ public class PostServiceImpl implements PostService {
      * 生成rss
      *
      * @param posts posts
+     *
      * @return String
      */
     @Override
@@ -467,6 +489,7 @@ public class PostServiceImpl implements PostService {
      * 生成sitemap
      *
      * @param posts posts
+     *
      * @return String
      */
     @Override
@@ -494,6 +517,7 @@ public class PostServiceImpl implements PostService {
      * @param post     post
      * @param cateList cateList
      * @param tagList  tagList
+     *
      * @return Post Post
      */
     @Override
@@ -511,6 +535,7 @@ public class PostServiceImpl implements PostService {
      * 获取最近的文章
      *
      * @param limit 条数
+     *
      * @return List
      */
     @Override

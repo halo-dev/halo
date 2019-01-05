@@ -79,14 +79,14 @@
                 </div>
                 <div class="pagination">
                     <ul class="clearfix">
-                        <#if afterPost??>
+                        <#if nextPost??>
                         <li class="pre pagbuttons">
-                            <a class="btn" role="navigation" href="/archives/${afterPost.postUrl}" title="${afterPost.postTitle}">上一篇</a>
+                            <a class="btn" role="navigation" href="/archives/${nextPost.postUrl}" title="${nextPost.postTitle}">上一篇</a>
                         </li>
                         </#if>
-                        <#if beforePost??>
+                        <#if prePost??>
                         <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="/archives/${beforePost.postUrl}" title="${beforePost.postTitle}">下一篇</a>
+                            <a class="btn" role="navigation" href="/archives/${prePost.postUrl}" title="${prePost.postTitle}">下一篇</a>
                         </li>
                         </#if>
                     </ul>
