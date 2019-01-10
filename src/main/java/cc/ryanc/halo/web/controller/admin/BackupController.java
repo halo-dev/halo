@@ -172,13 +172,15 @@ public class BackupController {
                 content.append("thumbnail: ").append(post.getPostThumbnail()).append("\n");
                 if(post.getTags().size()>0){
                     content.append("tags:").append("\n");
-                    for (Tag tag : post.getTags()) {
+                    final List<Tag> tags = post.getTags();
+                    for (Tag tag : tags) {
                         content.append("  - ").append(tag.getTagName()).append("\n");
                     }
                 }
                 if(post.getCategories().size()>0){
                     content.append("categories:").append("\n");
-                    for (Category category : post.getCategories()) {
+                    final List<Category> categories = post.getCategories();
+                    for (Category category : categories) {
                         content.append("  - ").append(category.getCateName()).append("\n");
                     }
                 }
