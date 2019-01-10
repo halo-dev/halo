@@ -1,6 +1,8 @@
 package cc.ryanc.halo.web.controller.admin;
 
+import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.HaloConst;
@@ -12,6 +14,7 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -103,7 +106,7 @@ public class BackupController {
      *
      * @return 重定向到/admin/backup
      */
-    public JsonResult backupDatabase() {
+    private JsonResult backupDatabase() {
         try {
             if (HaloUtils.getBackUps(BackupTypeEnum.DATABASES.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/databases/");
@@ -121,11 +124,11 @@ public class BackupController {
     }
 
     /**
-     * 备份资源文件 重要
+     * 备份资源文件
      *
      * @return JsonResult
      */
-    public JsonResult backupResources() {
+    private JsonResult backupResources() {
         try {
             if (HaloUtils.getBackUps(BackupTypeEnum.RESOURCES.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
                 FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/resources/");
@@ -148,22 +151,46 @@ public class BackupController {
      *
      * @return JsonResult
      */
-    public JsonResult backupPosts() {
+    private JsonResult backupPosts() {
         final List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
         posts.addAll(postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc()));
         try {
+            final StrBuilder rootDir = new StrBuilder(System.getProperties().getProperty("user.home"));
+            rootDir.append("/halo/backup/posts/");
             if (HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc()).size() > CommonParamsEnum.TEN.getValue()) {
-                FileUtil.del(System.getProperties().getProperty("user.home") + "/halo/backup/posts/");
+                FileUtil.del(rootDir.toString());
             }
             //打包好的文件名
-            final String distName = "posts_backup_" + DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
-            final String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/posts/" + distName;
+            final StrBuilder distName = new StrBuilder("posts_backup_");
+            distName.append(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss"));
+            final StrBuilder srcPath = rootDir.append(distName);
+            final StrBuilder content = new StrBuilder("---\n");
             for (Post post : posts) {
-                HaloUtils.postToFile(post.getPostContentMd(), srcPath, post.getPostTitle() + ".md");
+                content.append("title: ").append(post.getPostTitle()).append("\n");
+                content.append("date: ").append(post.getPostDate()).append("\n");
+                content.append("updated: ").append(post.getPostUpdate()).append("\n");
+                content.append("thumbnail: ").append(post.getPostThumbnail()).append("\n");
+                if(post.getTags().size()>0){
+                    content.append("tags:").append("\n");
+                    for (Tag tag : post.getTags()) {
+                        content.append("  - ").append(tag.getTagName()).append("\n");
+                    }
+                }
+                if(post.getCategories().size()>0){
+                    content.append("categories:").append("\n");
+                    for (Category category : post.getCategories()) {
+                        content.append("  - ").append(category.getCateName()).append("\n");
+                    }
+                }
+                content.append("---\n\n");
+                content.append(post.getPostContentMd());
+                HaloUtils.postToFile(content.toString(), srcPath.toString(), post.getPostTitle() + ".md");
+                content.clear();
+                content.append("---\n");
             }
             //打包导出好的文章
-            ZipUtil.zip(srcPath, srcPath + ".zip");
-            FileUtil.del(srcPath);
+            ZipUtil.zip(srcPath.toString(), srcPath.toString() + ".zip");
+            FileUtil.del(srcPath.toString());
             log.info("Current time: {}, performed an article backup.", DateUtil.now());
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
