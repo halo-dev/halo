@@ -183,23 +183,8 @@ public class PostController extends BaseController {
         final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         try {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
-            //摘要字数
-            int postSummary = 50;
-            if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
-                postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
-            }
-            //设置文章摘要
-            final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
-            if (summaryText.length() > postSummary) {
-                final String summary = summaryText.substring(0, postSummary);
-                post.setPostSummary(summary);
-            } else {
-                post.setPostSummary(summaryText);
-            }
             post.setPostDate(DateUtil.date());
-            post.setPostUpdate(DateUtil.date());
             post.setUser(user);
-
             post = postService.buildCategoriesAndTags(post, cateList, tagList);
             post.setPostUrl(urlFilter(post.getPostUrl()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
@@ -232,25 +217,11 @@ public class PostController extends BaseController {
                              @RequestParam("tagList") String tagList) {
         //old data
         final Post oldPost = postService.findByPostId(post.getPostId()).orElse(new Post());
-        post.setPostUpdate(new Date());
         post.setPostViews(oldPost.getPostViews());
         post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
         post.setUser(oldPost.getUser());
         if (null == post.getPostDate()) {
             post.setPostDate(new Date());
-        }
-        //摘要字数
-        int postSummary = 50;
-        if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
-            postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
-        }
-        //设置文章摘要
-        final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
-        if (summaryText.length() > postSummary) {
-            final String summary = summaryText.substring(0, postSummary);
-            post.setPostSummary(summary);
-        } else {
-            post.setPostSummary(summaryText);
         }
         post = postService.buildCategoriesAndTags(post, cateList, tagList);
         //当没有选择文章缩略图的时候，自动分配一张内置的缩略图

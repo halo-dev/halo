@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.text.StrBuilder;
 import freemarker.template.Template;
 import io.github.biezhi.ome.OhMyEmail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,14 +69,14 @@ public class MailServiceImpl implements MailService {
                 HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
                 HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
                 HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
-        String text = "";
+        StrBuilder text = new StrBuilder();
         try {
             final Template template = freeMarker.getConfiguration().getTemplate(templateName);
-            text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
+            text.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, content));
             OhMyEmail.subject(subject)
                     .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
-                    .html(text)
+                    .html(text.toString())
                     .send();
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,14 +100,14 @@ public class MailServiceImpl implements MailService {
                 HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
                 HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         File file = new File(attachSrc);
-        String text = "";
+        StrBuilder text = new StrBuilder();
         try {
             final Template template = freeMarker.getConfiguration().getTemplate(templateName);
-            text = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
+            text.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, content));
             OhMyEmail.subject(subject)
                     .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
-                    .html(text)
+                    .html(text.toString())
                     .attach(file, file.getName())
                     .send();
         } catch (Exception e) {

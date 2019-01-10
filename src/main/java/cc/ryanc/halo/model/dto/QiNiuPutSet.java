@@ -13,7 +13,18 @@ import lombok.Data;
 @Data
 public class QiNiuPutSet {
 
+    /**
+     * 图片大小
+     */
     private Long size;
+
+    /**
+     * 长
+     */
     private Integer w;
+
+    /**
+     * 宽
+     */
     private Integer h;
 }

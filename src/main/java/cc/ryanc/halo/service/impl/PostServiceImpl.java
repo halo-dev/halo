@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.repository.PostRepository;
@@ -12,6 +13,7 @@ import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,18 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Post save(Post post) {
+        int postSummary = 50;
+        if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
+            postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
+        }
+        final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
+        if (summaryText.length() > postSummary) {
+            final String summary = summaryText.substring(0, postSummary);
+            post.setPostSummary(summary);
+        } else {
+            post.setPostSummary(summaryText);
+        }
+        post.setPostUpdate(DateUtil.date());
         return postRepository.save(post);
     }
 

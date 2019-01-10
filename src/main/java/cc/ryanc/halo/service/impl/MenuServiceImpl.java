@@ -62,8 +62,8 @@ public class MenuServiceImpl implements MenuService {
     @CacheEvict(value = MENUS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Menu remove(Long menuId) {
         final Optional<Menu> menu = this.findByMenuId(menuId);
-        menuRepository.delete(menu.get());
-        return menu.get();
+        menuRepository.delete(menu.orElse(null));
+        return menu.orElse(null);
     }
 
     /**
