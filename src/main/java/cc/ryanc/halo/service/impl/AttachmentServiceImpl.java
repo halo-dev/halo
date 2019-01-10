@@ -113,8 +113,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Attachment remove(Long attachId) {
         Optional<Attachment> attachment = this.findByAttachId(attachId);
-        attachmentRepository.delete(attachment.get());
-        return attachment.get();
+        attachmentRepository.delete(attachment.orElse(null));
+        return attachment.orElse(null);
     }
 
     /**

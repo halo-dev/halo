@@ -54,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
     @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Optional<Comment> remove(Long commentId) {
         final Optional<Comment> comment = this.findCommentById(commentId);
-        commentRepository.delete(comment.get());
+        commentRepository.delete(comment.orElse(null));
         return comment;
     }
 

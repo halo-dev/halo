@@ -347,17 +347,6 @@ public class AdminController extends BaseController {
         post.setTags(tags);
         post.setCategories(categories);
         post.setPostUrl(StrUtil.removeSuffix(file.getOriginalFilename(), ".md"));
-        int postSummary = 50;
-        if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
-            postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
-        }
-        final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
-        if (summaryText.length() > postSummary) {
-            final String summary = summaryText.substring(0, postSummary);
-            post.setPostSummary(summary);
-        } else {
-            post.setPostSummary(summaryText);
-        }
         if (null == post.getPostDate()) {
             post.setPostDate(new Date());
         }

@@ -49,8 +49,8 @@ public class CategoryServiceImpl implements CategoryService {
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Category remove(Long cateId) {
         final Optional<Category> category = this.findByCateId(cateId);
-        categoryRepository.delete(category.get());
-        return category.get();
+        categoryRepository.delete(category.orElse(null));
+        return category.orElse(null);
     }
 
     /**
