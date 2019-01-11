@@ -18,7 +18,6 @@ import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -121,7 +120,7 @@ public class PostController extends BaseController {
             //排序规则
             final Sort sort = new Sort(Sort.Direction.DESC, "postId");
             final Pageable pageable = PageRequest.of(page, size, sort);
-            model.addAttribute("posts", postService.searchPosts(keyword, pageable));
+            model.addAttribute("posts", postService.searchPosts(keyword,PostTypeEnum.POST_TYPE_POST.getDesc(),PostStatusEnum.PUBLISHED.getCode(),pageable));
         } catch (Exception e) {
             log.error("未知错误：{}", e.getMessage());
         }

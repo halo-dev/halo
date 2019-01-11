@@ -57,7 +57,6 @@ public class PostServiceImpl implements PostService {
      * 保存文章
      *
      * @param post Post
-     *
      * @return Post
      */
     @Override
@@ -82,7 +81,6 @@ public class PostServiceImpl implements PostService {
      * 根据编号移除文章
      *
      * @param postId postId
-     *
      * @return Post
      */
     @Override
@@ -98,7 +96,6 @@ public class PostServiceImpl implements PostService {
      *
      * @param postId postId
      * @param status status
-     *
      * @return Post
      */
     @Override
@@ -133,7 +130,6 @@ public class PostServiceImpl implements PostService {
      * 获取文章列表 不分页
      *
      * @param postType post or page
-     *
      * @return List
      */
     @Override
@@ -145,14 +141,23 @@ public class PostServiceImpl implements PostService {
     /**
      * 模糊查询文章
      *
-     * @param keyWord  keyword
-     * @param pageable pageable
-     *
-     * @return List
+     * @param keyword    关键词
+     * @param postType   文章类型
+     * @param postStatus 文章状态
+     * @param pageable   分页信息
+     * @return Page
      */
     @Override
-    public List<Post> searchPosts(String keyWord, Pageable pageable) {
-        return postRepository.findByPostTitleLike(keyWord, pageable);
+    public Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable) {
+        return postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
+                postType,
+                postStatus,
+                "%" + keyword + "%",
+                postType,
+                postStatus,
+                "%" + keyword + "%",
+                pageable
+        );
     }
 
     /**
@@ -161,7 +166,6 @@ public class PostServiceImpl implements PostService {
      * @param status   0，1，2
      * @param postType post or page
      * @param pageable 分页信息
-     *
      * @return Page
      */
     @Override
@@ -173,7 +177,6 @@ public class PostServiceImpl implements PostService {
      * 根据文章状态查询 分页，首页分页
      *
      * @param pageable pageable
-     *
      * @return Page
      */
     @Override
@@ -187,7 +190,6 @@ public class PostServiceImpl implements PostService {
      *
      * @param status   0，1，2
      * @param postType post or page
-     *
      * @return List
      */
     @Override
@@ -200,7 +202,6 @@ public class PostServiceImpl implements PostService {
      * 根据编号查询文章
      *
      * @param postId postId
-     *
      * @return Optional
      */
     @Override
@@ -212,7 +213,6 @@ public class PostServiceImpl implements PostService {
      * 根据编号和类型查询文章
      *
      * @param postId postId
-     *
      * @return Post
      */
     @Override
@@ -225,7 +225,6 @@ public class PostServiceImpl implements PostService {
      *
      * @param postUrl  路径
      * @param postType post or page
-     *
      * @return Post
      */
     @Override
@@ -249,7 +248,6 @@ public class PostServiceImpl implements PostService {
      * 获取下一篇文章 较新
      *
      * @param postDate postDate
-     *
      * @return Post
      */
     @Override
@@ -261,7 +259,6 @@ public class PostServiceImpl implements PostService {
      * 获取下一篇文章 较老
      *
      * @param postDate postDate
-     *
      * @return Post
      */
     @Override
@@ -314,7 +311,6 @@ public class PostServiceImpl implements PostService {
 
     /**
      * @return List
-     *
      * @Author Aquan
      * @Description 查询归档信息 返回所有文章
      * @Date 2019.1.4 11:16
@@ -341,7 +337,6 @@ public class PostServiceImpl implements PostService {
      *
      * @param year  year
      * @param month month
-     *
      * @return List
      */
     @Override
@@ -354,7 +349,6 @@ public class PostServiceImpl implements PostService {
      * 根据年份查询文章
      *
      * @param year year
-     *
      * @return List
      */
     @Override
@@ -369,7 +363,6 @@ public class PostServiceImpl implements PostService {
      * @param year     year year
      * @param month    month month
      * @param pageable pageable pageable
-     *
      * @return Page
      */
     @Override
@@ -383,7 +376,6 @@ public class PostServiceImpl implements PostService {
      * @param category category
      * @param status   status
      * @param pageable pageable
-     *
      * @return Page
      */
     @Override
@@ -398,26 +390,12 @@ public class PostServiceImpl implements PostService {
      * @param tag      tag
      * @param status   status
      * @param pageable pageable
-     *
      * @return Page
      */
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_tag_'+#tag.tagId+'_'+#pageable.pageNumber")
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
         return postRepository.findPostsByTagsAndPostStatus(tag, PostStatusEnum.PUBLISHED.getCode(), pageable);
-    }
-
-    /**
-     * 搜索文章
-     *
-     * @param keyword  关键词
-     * @param pageable 分页信息
-     *
-     * @return Page
-     */
-    @Override
-    public Page<Post> searchByKeywords(String keyword, Pageable pageable) {
-        return postRepository.findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(keyword, pageable);
     }
 
     /**
@@ -435,7 +413,6 @@ public class PostServiceImpl implements PostService {
      * 当前文章的相似文章
      *
      * @param post post
-     *
      * @return List
      */
     @Override
@@ -473,7 +450,6 @@ public class PostServiceImpl implements PostService {
      * 根据文章状态查询数量
      *
      * @param status 文章状态
-     *
      * @return 文章数量
      */
     @Override
@@ -485,7 +461,6 @@ public class PostServiceImpl implements PostService {
      * 生成rss
      *
      * @param posts posts
-     *
      * @return String
      */
     @Override
@@ -503,7 +478,6 @@ public class PostServiceImpl implements PostService {
      * 生成sitemap
      *
      * @param posts posts
-     *
      * @return String
      */
     @Override
@@ -531,7 +505,6 @@ public class PostServiceImpl implements PostService {
      * @param post     post
      * @param cateList cateList
      * @param tagList  tagList
-     *
      * @return Post Post
      */
     @Override
@@ -549,7 +522,6 @@ public class PostServiceImpl implements PostService {
      * 获取最近的文章
      *
      * @param limit 条数
-     *
      * @return List
      */
     @Override
