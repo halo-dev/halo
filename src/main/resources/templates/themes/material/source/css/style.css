@@ -366,20 +366,20 @@ a {
     margin: 13px auto 0;
     text-align: right;
 }
-#post-content code,
-#post-content tt {
-    margin: 0 2px;
-    padding: 0px 5px;
-    background-color: rgba(0, 0, 0, 0.04);
-    border-radius: 3px;
-}
-#post-content pre>code {
-    margin: 0;
-    padding: 0;
-    white-space: pre;
-    border: none;
-    background: transparent;
-}
+/*#post-content code,*/
+/*#post-content tt {*/
+    /*margin: 0 2px;*/
+    /*padding: 0px 5px;*/
+    /*background-color: rgba(0, 0, 0, 0.04);*/
+    /*border-radius: 3px;*/
+/*}*/
+/*#post-content pre>code {*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*white-space: pre;*/
+    /*border: none;*/
+    /*background: transparent;*/
+/*}*/
 #post-content pre {
     background-color: #f7f7f7;
     font-size: 13px;
@@ -413,13 +413,13 @@ a {
     margin: 0;
     display: block;
 }
-#post-content pre code,
-#post-content pre tt {
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-    border: none;
-}
+/*#post-content pre code,*/
+/*#post-content pre tt {*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*background-color: transparent;*/
+    /*border: none;*/
+/*}*/
 
 .post-toc-wrap::-webkit-scrollbar{
     width: 7px;

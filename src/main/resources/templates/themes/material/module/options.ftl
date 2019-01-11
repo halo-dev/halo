@@ -204,6 +204,20 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="materialCodePretty" class="col-sm-4 control-label">代码高亮：</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" id="materialCodePretty" name="material_code_pretty">
+                                            <option value="Default" ${((options.material_code_pretty!'Default')=='Default')?string('selected','')}>Default</option>
+                                            <option value="Coy" ${((options.material_code_pretty!)=='Coy')?string('selected','')}>Coy</option>
+                                            <option value="Dark" ${((options.material_code_pretty!)=='Dark')?string('selected','')}>Dark</option>
+                                            <option value="Okaidia" ${((options.material_code_pretty!)=='Okaidia')?string('selected','')}>Okaidia</option>
+                                            <option value="Solarized Light" ${((options.material_code_pretty!)=='Solarized Light')?string('selected','')}>Solarized Light</option>
+                                            <option value="Tomorrow Night" ${((options.material_code_pretty!)=='Tomorrow Night')?string('selected','')}>Tomorrow Night</option>
+                                            <option value="Twilight" ${((options.material_code_pretty!)=='Twilight')?string('selected','')}>Twilight</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="box-footer">
                                 <button type="button" class="btn btn-primary btn-sm pull-right" onclick="saveThemeOptions('materialStyleOptions')">保存设置</button>
@@ -449,6 +463,17 @@
                                         </label>
                                         <label class="radio-inline">
                                             <input type="radio" name="theme_material_other_sidebar_postcount" id="materialOtherSidebarPostCount" value="false" ${((options.theme_material_other_sidebar_postcount!'true')=='false')?string('checked','')}> 隐藏
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="materialOtherMathJax" class="col-sm-4 control-label">MathJax：</label>
+                                    <div class="col-sm-8">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_mathjax" id="materialOtherMathJax" value="true" ${((options.theme_material_other_mathjax!'true')=='true')?string('checked','')}> 显示
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="theme_material_other_mathjax" id="materialOtherMathJax" value="false" ${((options.theme_material_other_mathjax!)=='false')?string('checked','')}> 隐藏
                                         </label>
                                     </div>
                                 </div>
