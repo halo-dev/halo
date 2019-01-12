@@ -90,6 +90,7 @@ In addition to the built-in [Anatole](https://github.com/hi-caicai/farbox-theme-
 - [Story](https://github.com/ruibaby/story-halo) - From Typecho,Author [Trii Hsia](https://yumoe.com/).
 - [NexT](https://github.com/ruibaby/next-halo) - From Hexo,Author [iissnan](https://notes.iissnan.com/).
 - [Casper](https://github.com/ruibaby/casper-halo) - From Ghost,Author [Ghost](https://github.com/TryGhost).
+- [Pinghsu](https://github.com/ruibaby/pinghsu-halo) - From Typecho,Author [Chakhsu.Lau](https://github.com/chakhsu).
 
 > Disclaimer: Do not accept any comments or suggestions on the functionality of the **Porting Theme**.
 
