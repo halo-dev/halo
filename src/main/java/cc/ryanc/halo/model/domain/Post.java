@@ -1,7 +1,6 @@
 package cc.ryanc.halo.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -129,6 +128,11 @@ public class Post implements Serializable {
      * 是否允许评论
      */
     private Integer allowComment = 0;
+
+    /**
+     * 文章访问密码
+     */
+    private String postPassword;
 
     /**
      * 指定渲染模板
