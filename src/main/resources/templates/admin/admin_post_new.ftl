@@ -65,6 +65,10 @@
                                 <option value="0"><@spring.message code='common.select.no' /></option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="postPassword" class="control-label">文章密码：</label>
+                            <input type="password" class="form-control" id="postPassword" name="postPassword">
+                        </div>
                     </div>
                     <div class="box-footer">
                         <button onclick="push(1)" class="btn btn-default btn-sm "><@spring.message code='admin.editor.save-draft' /></button>
@@ -273,7 +277,8 @@
             'postThumbnail': $('#selectImg').attr('src'),
             'cateList' : cateList.toString(),
             'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
-            'allowComment' : $('#allowComment').val()
+            'allowComment' : $('#allowComment').val(),
+            'postPassword' : $("#postPassword").val()
         },function (data) {
             if(data.code === 1){
                 //清除自动保存的内容

@@ -149,7 +149,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable) {
-        return postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
+        Page<Post> posts = postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
                 postType,
                 postStatus,
                 "%" + keyword + "%",
@@ -158,6 +158,12 @@ public class PostServiceImpl implements PostService {
                 "%" + keyword + "%",
                 pageable
         );
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -170,7 +176,13 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable) {
-        return postRepository.findPostsByPostStatusAndPostType(status, postType, pageable);
+        Page<Post> posts = postRepository.findPostsByPostStatusAndPostType(status, postType, pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -182,7 +194,13 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_page_'+#pageable.pageNumber")
     public Page<Post> findPostByStatus(Pageable pageable) {
-        return postRepository.findPostsByPostStatusAndPostType(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        Page<Post> posts = postRepository.findPostsByPostStatusAndPostType(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -367,7 +385,13 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable) {
-        return postRepository.findPostByYearAndMonth(year, month, null);
+        Page<Post> posts = postRepository.findPostByYearAndMonth(year, month, null);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -381,7 +405,13 @@ public class PostServiceImpl implements PostService {
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_category_'+#category.cateId+'_'+#pageable.pageNumber")
     public Page<Post> findPostByCategories(Category category, Pageable pageable) {
-        return postRepository.findPostByCategoriesAndPostStatus(category, PostStatusEnum.PUBLISHED.getCode(), pageable);
+        Page<Post> posts = postRepository.findPostByCategoriesAndPostStatus(category, PostStatusEnum.PUBLISHED.getCode(), pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -395,7 +425,13 @@ public class PostServiceImpl implements PostService {
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_tag_'+#tag.tagId+'_'+#pageable.pageNumber")
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
-        return postRepository.findPostsByTagsAndPostStatus(tag, PostStatusEnum.PUBLISHED.getCode(), pageable);
+        Page<Post> posts = postRepository.findPostsByTagsAndPostStatus(tag, PostStatusEnum.PUBLISHED.getCode(), pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**

@@ -48,6 +48,11 @@ public class FrontOthersController {
         final Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
         final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         final List<Post> posts = postsPage.getContent();
+        for (Post post : posts) {
+            if(StrUtil.isNotEmpty(post.getPostPassword())){
+                post.setPostContent("该文章为加密文章");
+            }
+        }
         return postService.buildRss(posts);
     }
 
@@ -64,6 +69,11 @@ public class FrontOthersController {
         final Pageable pageable = PageRequest.of(0, 999, sort);
         final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         final List<Post> posts = postsPage.getContent();
+        for (Post post : posts) {
+            if(StrUtil.isNotEmpty(post.getPostPassword())){
+                post.setPostContent("该文章为加密文章");
+            }
+        }
         return postService.buildSiteMap(posts);
     }
 }

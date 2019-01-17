@@ -13,19 +13,22 @@ import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,9 +46,9 @@ import java.util.List;
 @RequestMapping(value = "/archives")
 public class FrontArchiveController extends BaseController {
 
+    private static final String POSTS_CACHE_NAME = "posts";
     @Autowired
     private PostService postService;
-
     @Autowired
     private CommentService commentService;
 
@@ -53,7 +56,6 @@ public class FrontArchiveController extends BaseController {
      * 文章归档
      *
      * @param model model
-     *
      * @return 模板路径
      */
     @GetMapping
@@ -66,7 +68,6 @@ public class FrontArchiveController extends BaseController {
      *
      * @param model model
      * @param page  page 当前页码
-     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "page/{page}")
@@ -91,7 +92,6 @@ public class FrontArchiveController extends BaseController {
      * @param model model
      * @param year  year 年份
      * @param month month 月份
-     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "{year}/{month}")
@@ -112,12 +112,12 @@ public class FrontArchiveController extends BaseController {
      *
      * @param postUrl 文章路径名
      * @param model   model
-     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl,
                           @RequestParam(value = "cp", defaultValue = "1") Integer cp,
+                          HttpServletRequest request,
                           Model model) {
         final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
         if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
@@ -130,12 +130,12 @@ public class FrontArchiveController extends BaseController {
         if (null != prePost) {
             //兼容老版本主题
             model.addAttribute("beforePost", prePost);
-            model.addAttribute("prePost",prePost);
+            model.addAttribute("prePost", prePost);
         }
         if (null != nextPost) {
             //兼容老版本主题
             model.addAttribute("afterPost", nextPost);
-            model.addAttribute("nextPost",nextPost);
+            model.addAttribute("nextPost", nextPost);
         }
         List<Comment> comments = null;
         if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
@@ -161,12 +161,44 @@ public class FrontArchiveController extends BaseController {
         final ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
         final int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
         model.addAttribute("is_post", true);
-        model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("tagWords", CollUtil.join(tagWords, ","));
         postService.cacheViews(post.getPostId());
+
+        //判断文章是否有加密
+        if (StrUtil.isNotEmpty(post.getPostPassword())) {
+            Cookie cookie = ServletUtil.getCookie(request, "halo-post-password-" + post.getPostId());
+            if (null == cookie) {
+                post.setPostSummary("该文章为加密文章");
+                post.setPostContent("<form id=\"postPasswordForm\" method=\"post\" action=\"/archives/verifyPostPassword\"><p>该文章为加密文章，输入正确的密码即可访问。</p><input type=\"hidden\" id=\"postId\" name=\"postId\" value=\"" + post.getPostId() + "\"> <input type=\"password\" id=\"postPassword\" name=\"postPassword\"> <input type=\"submit\" id=\"passwordSubmit\" value=\"提交\"></form>");
+            }
+        }
+        model.addAttribute("post", post);
         return this.render("post");
+    }
+
+    /**
+     * 验证文章密码
+     *
+     * @param postId       postId
+     * @param postPassword postPassword
+     * @param response     response
+     * @return String
+     */
+    @PostMapping(value = "/verifyPostPassword")
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
+    public String verifyPostPassword(@RequestParam(value = "postId") Long postId,
+                                     @RequestParam(value = "postPassword") String postPassword,
+                                     HttpServletResponse response) {
+        final Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_POST.getDesc());
+        if (null == post) {
+            return this.renderNotFound();
+        }
+        if (SecureUtil.md5(postPassword).equals(post.getPostPassword())) {
+            ServletUtil.addCookie(response, "halo-post-password-" + post.getPostId(), SecureUtil.md5(postPassword));
+        }
+        return "redirect:/archives/" + post.getPostUrl();
     }
 }

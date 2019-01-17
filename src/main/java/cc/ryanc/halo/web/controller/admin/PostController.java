@@ -18,6 +18,7 @@ import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -120,7 +121,7 @@ public class PostController extends BaseController {
             //排序规则
             final Sort sort = new Sort(Sort.Direction.DESC, "postId");
             final Pageable pageable = PageRequest.of(page, size, sort);
-            model.addAttribute("posts", postService.searchPosts(keyword,PostTypeEnum.POST_TYPE_POST.getDesc(),PostStatusEnum.PUBLISHED.getCode(),pageable));
+            model.addAttribute("posts", postService.searchPosts(keyword, PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable));
         } catch (Exception e) {
             log.error("未知错误：{}", e.getMessage());
         }
@@ -186,6 +187,9 @@ public class PostController extends BaseController {
             post.setUser(user);
             post = postService.buildCategoriesAndTags(post, cateList, tagList);
             post.setPostUrl(urlFilter(post.getPostUrl()));
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostPassword(SecureUtil.md5(post.getPostPassword()));
+            }
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
                 post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
@@ -223,6 +227,9 @@ public class PostController extends BaseController {
             post.setPostDate(new Date());
         }
         post = postService.buildCategoriesAndTags(post, cateList, tagList);
+        if (StrUtil.isNotEmpty(post.getPostPassword())) {
+            post.setPostPassword(SecureUtil.md5(post.getPostPassword()));
+        }
         //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
         if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
             post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");

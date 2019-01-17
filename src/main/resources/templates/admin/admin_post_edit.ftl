@@ -68,6 +68,10 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="postPassword" class="control-label">文章密码：</label>
+                            <input type="password" class="form-control" id="postPassword" name="postPassword" value="${post.postPassword!}">
+                        </div>
+                        <div class="form-group">
                             <label for="postDate" class="control-label">发布时间：</label>
                             <input type="text" class="form-control" id="postDate" name="postDate" value="${post.postDate!?string('yyyy-MM-dd HH:mm')}">
                         </div>
@@ -297,7 +301,8 @@
             'cateList' : cateList.toString(),
             'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
             'allowComment' : $('#allowComment').val(),
-            'postDate' : $("#postDate").val()
+            'postDate' : $("#postDate").val(),
+            'postPassword' : $("#postPassword").val()
         },function (data) {
             if(data.code === 1){
                 //清除自动保存的内容
