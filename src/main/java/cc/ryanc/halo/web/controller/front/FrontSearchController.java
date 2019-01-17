@@ -9,6 +9,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,7 @@ public class FrontSearchController extends BaseController {
     @GetMapping
     public String search(Model model,
                          @RequestParam(value = "keyword") String keyword) {
-        return this.search(model, keyword, 1);
+        return this.search(model, HtmlUtil.escape(keyword), 1);
     }
 
     /**
@@ -69,7 +70,7 @@ public class FrontSearchController extends BaseController {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<Post> posts = postService.searchPosts(keyword,PostTypeEnum.POST_TYPE_POST.getDesc(),PostStatusEnum.PUBLISHED.getCode(),pageable);
+        final Page<Post> posts = postService.searchPosts(HtmlUtil.escape(keyword),PostTypeEnum.POST_TYPE_POST.getDesc(),PostStatusEnum.PUBLISHED.getCode(),pageable);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", keyword);
