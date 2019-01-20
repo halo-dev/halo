@@ -631,7 +631,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="apiToken" class="col-lg-2 col-sm-4 control-label">Api Token</label>
+                                        <label for="apiToken" class="col-lg-2 col-sm-4 control-label">Api Token：</label>
                                         <div class="col-lg-4 col-sm-8">
                                             <div class="input-group">
                                                 <input type="text" class="form-control" id="apiToken" name="api_token" value="${options.api_token!}">

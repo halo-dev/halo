@@ -142,7 +142,7 @@ public class FrontCommentController {
                 comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
             }
             if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
-                comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));
+                comment.setCommentAuthorUrl(URLUtil.normalize(comment.getCommentAuthorUrl()));
             }
             commentService.save(comment);
             if (comment.getCommentParent() > 0) {

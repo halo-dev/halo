@@ -78,7 +78,6 @@ public class AdminController extends BaseController {
      *
      * @param model   model
      * @param session session
-     *
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
@@ -118,7 +117,6 @@ public class AdminController extends BaseController {
      * 处理跳转到登录页的请求
      *
      * @param session session
-     *
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
@@ -137,7 +135,6 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
-     *
      * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
@@ -189,7 +186,6 @@ public class AdminController extends BaseController {
      * 退出登录 销毁session
      *
      * @param session session
-     *
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
@@ -207,7 +203,6 @@ public class AdminController extends BaseController {
      * @param model model model
      * @param page  page 当前页码
      * @param size  size 每页条数
-     *
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
@@ -284,7 +279,6 @@ public class AdminController extends BaseController {
      *
      * @param file    file
      * @param request request
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/tools/markdownImport")
