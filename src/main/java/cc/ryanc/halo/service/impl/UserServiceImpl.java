@@ -93,6 +93,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserLoginEnable(String enable) {
         final User user = this.findUser();
+        user.setLoginError(0);
         user.setLoginEnable(enable);
         userRepository.save(user);
     }

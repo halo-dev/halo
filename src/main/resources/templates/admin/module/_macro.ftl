@@ -61,7 +61,6 @@
 <script src="/static/halo-backend/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/static/halo-backend/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 <script src="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
-<script src="/static/halo-backend/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
 <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script src="/static/halo-common/OwO/OwO.min.js"></script>
 <script src="/static/halo-backend/js/halo.min.js"></script>

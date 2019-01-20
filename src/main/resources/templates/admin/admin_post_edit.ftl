@@ -150,6 +150,9 @@
                             <img src="${post.postThumbnail!'/static/halo-frontend/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                         </div>
                     </div>
+                    <div class="box-footer">
+                        <button onclick="removeThumbnail()" class="btn btn-default btn-sm ">移除</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -204,6 +207,7 @@
      */
     $(function () {
         inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+            progressText: "![上传中...]()",
             uploadUrl: "/admin/attachments/upload"
         });
     });
@@ -239,8 +243,7 @@
         var titleVal = $("#postTitle");
         var postUrl = $("#postUrl");
         if(titleVal.val()!=="" && titleVal.val() !== null && postUrl.html()===''){
-            var result = titleVal.toPinyin().toLowerCase();
-            postUrl.html(result.substring(0,result.length-1));
+            postUrl.html(new Date().getTime());
         }
     }
 
@@ -312,6 +315,10 @@
                 halo.showMsg(data.msg,'error',2000);
             }
         },'JSON')
+    }
+
+    function removeThumbnail(){
+        $("#selectImg").attr("src","/static/halo-frontend/images/thumbnail/thumbnail.png");
     }
 </script>
 </@footer>
