@@ -644,8 +644,8 @@
                                     <div class="form-group">
                                         <label for="statisticsCode" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.statistics-code' />
                                             <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.statistics-code-tips' />" style="cursor: pointer">
-                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                </span>
+                                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                            </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
                                             <textarea class="form-control" rows="6" id="statisticsCode" name="statistics_code" style="resize: none">${options.statistics_code!}</textarea>

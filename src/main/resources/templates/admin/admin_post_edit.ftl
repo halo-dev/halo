@@ -28,7 +28,7 @@
             <div class="col-md-9">
                 <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
                 <div style="margin-bottom: 10px;">
-                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" value="${post.postTitle!}">
+                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" value="${post.postTitle!}" autocomplete="off">
                 </div>
                 <div style="display: block;margin-bottom: 10px;">
                     <span>
@@ -69,7 +69,7 @@
                         </div>
                         <div class="form-group">
                             <label for="postPassword" class="control-label">文章密码：</label>
-                            <input type="password" class="form-control" id="postPassword" name="postPassword" value="${post.postPassword!}">
+                            <input type="password" class="form-control" id="postPassword" name="postPassword" value="${post.postPassword!}" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label for="postDate" class="control-label">发布时间：</label>

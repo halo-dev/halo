@@ -26,7 +26,7 @@
         <div class="row">
             <div class="col-md-9">
                 <div style="margin-bottom: 10px;">
-                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();">
+                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" autocomplete="off">
                 </div>
                 <div style="display: block;margin-bottom: 10px;">
                     <span>
@@ -67,7 +67,7 @@
                         </div>
                         <div class="form-group">
                             <label for="postPassword" class="control-label">文章密码：</label>
-                            <input type="password" class="form-control" id="postPassword" name="postPassword">
+                            <input type="password" class="form-control" id="postPassword" name="postPassword" autocomplete="off">
                         </div>
                     </div>
                     <div class="box-footer">
