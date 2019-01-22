@@ -47,8 +47,10 @@ import java.util.List;
 public class FrontArchiveController extends BaseController {
 
     private static final String POSTS_CACHE_NAME = "posts";
+
     @Autowired
     private PostService postService;
+
     @Autowired
     private CommentService commentService;
 

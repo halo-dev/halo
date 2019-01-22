@@ -57,14 +57,19 @@ public class PageController {
 
     @Autowired
     LocaleMessageUtil localeMessageUtil;
+
     @Autowired
     private LinkService linkService;
+
     @Autowired
     private GalleryService galleryService;
+
     @Autowired
     private PostService postService;
+
     @Autowired
     private LogsService logsService;
+
     @Autowired
     private HttpServletRequest request;
 

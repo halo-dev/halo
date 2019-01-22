@@ -62,41 +62,6 @@ public class FrontCommentController {
     private MailService mailService;
 
     /**
-     * 获取文章的评论
-     *
-     * @param postId postId 文章编号
-     *
-     * @return List
-     */
-    @GetMapping(value = "/getComment/{postId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Comment> getComment(@PathVariable Long postId) {
-        final Optional<Post> post = postService.findByPostId(postId);
-        final Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        final Pageable pageable = PageRequest.of(0, 999, sort);
-        final List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.orElse(new Post()), pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
-        return CommentUtil.getComments(comments);
-    }
-
-    /**
-     * 加载评论
-     *
-     * @param page 页码
-     * @param post 当前文章
-     *
-     * @return List
-     */
-    @GetMapping(value = "/loadComment")
-    @ResponseBody
-    public List<Comment> loadComment(@RequestParam(value = "page") Integer page,
-                                     @RequestParam(value = "post") Post post) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        final Pageable pageable = PageRequest.of(page - 1, 10, sort);
-        final List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
-        return comments;
-    }
-
-    /**
      * 提交新评论
      *
      * @param comment comment实体
