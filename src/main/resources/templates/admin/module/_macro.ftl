@@ -56,7 +56,7 @@
 <#if (options.blog_locale!'zh_CN') == 'zh_CN'>
 <script src="/static/halo-backend/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
+<script src="/static/halo-backend/plugins/easymde/easymde.min.js"></script>
 <script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
 <script src="/static/halo-backend/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/static/halo-backend/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>

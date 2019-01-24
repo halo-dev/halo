@@ -1,7 +1,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.themes.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/easymde/easymde.min.css">
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
         <ol class="breadcrumb">
@@ -94,7 +94,7 @@
     /**
      * 加载编辑器
      */
-    var simplemde = new SimpleMDE({
+    var easyMDE = new EasyMDE({
         element: document.getElementById("tplContent"),
         autoDownloadFontAwesome: false,
         autofocus: true,
@@ -111,11 +111,11 @@
         var tplNameTitle = $('#tplNameTitle');
         if (tplName && tplName !== '') {
             $.get('/admin/themes/getTpl',{'tplName': tplName},function (data) {
-                simplemde.value(data);
+                easyMDE.value(data);
                 tplNameTitle.html(tplName);
             })
         } else {
-            simplemde.value('');
+            easyMDE.value('');
             tplNameTitle.html('');
         }
     }
@@ -123,7 +123,7 @@
     function saveTpl() {
         $.post('/admin/themes/editor/save',{
             'tplName': $('#tplNameTitle').html(),
-            'tplContent': simplemde.value()
+            'tplContent': easyMDE.value()
         },function (data) {
             if(data.code === 1){
                 halo.showMsg(data.msg,'success',1000);

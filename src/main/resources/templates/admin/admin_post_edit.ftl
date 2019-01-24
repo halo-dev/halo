@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.posts.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/easymde/easymde.min.css">
     <link rel="stylesheet" href="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.css">
     <link rel="stylesheet" href="/static/halo-backend/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
@@ -170,7 +170,13 @@
     });
 
     MathJax.Hub.Config({
-        tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+        showProcessingMessages: false,
+        messageStyle: "none",
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre','code','a']
+        }
     });
 
     var QUEUE = MathJax.Hub.queue;
@@ -178,7 +184,7 @@
     /**
      * 加载编辑器
      */
-    var simplemde = new SimpleMDE({
+    var easyMDE = new EasyMDE({
         element: document.getElementById("editorarea"),
         autoDownloadFontAwesome: false,
         autofocus: true,
@@ -206,7 +212,7 @@
      * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
      */
     $(function () {
-        inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+        inlineAttachment.editors.codemirror4.attach(easyMDE.codemirror, {
             progressText: "![上传中...]()",
             uploadUrl: "/admin/attachments/upload"
         });
@@ -299,7 +305,7 @@
             'postStatus': status,
             'postTitle': postTitle.val(),
             'postUrl' : postUrl.html().toString(),
-            'postContentMd': simplemde.value(),
+            'postContentMd': easyMDE.value(),
             'postThumbnail': $('#selectImg').attr('src'),
             'cateList' : cateList.toString(),
             'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
@@ -309,7 +315,7 @@
         },function (data) {
             if(data.code === 1){
                 //清除自动保存的内容
-                simplemde.clearAutosavedValue();
+                easyMDE.clearAutosavedValue();
                 halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts',"${options.admin_pjax!'true'}");
             }else{
                 halo.showMsg(data.msg,'error',2000);
