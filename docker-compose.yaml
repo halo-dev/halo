@@ -9,9 +9,9 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - /etc/nginx/conf.d
-      - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
+      - /etc/nginx/conf.d:/etc/nginx/conf.d
+      - /etc/nginx/vhost.d:/etc/nginx/vhost.d
+      - /usr/share/nginx/html:/usr/share/nginx/html
       - /etc/nginx/certs:/etc/nginx/certs:ro
 
   halo:
