@@ -33,28 +33,30 @@ Deploy with shell script：
 
 ```bash
 # install Halo
-yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
+$ yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
 
 # upgrade Halo
-bash halo-cli.sh -u
+$ bash halo-cli.sh -u
 ```
 
 Deploy with Docker：
 ```bash
 # pull docker images
-docker pull ruibaby/halo
+$ docker pull ruibaby/halo
 
 # create docker container and run it
-docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+$ docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+
+# Tips：DB_USER and DB_PASSWORD must be repaired and recorded
 ```
 
 Deploy with Docker compose：
 ```bash
 # Download the nginx config file template
-curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
+$ curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
 
 # Get the docker-compose.yaml
-yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
+$ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
 # Modify docker-compose.yaml
 # 1. modify VIRTUAL_HOST, LETSENCRYPT_HOST for your own domain name.
@@ -63,7 +65,7 @@ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 # 4. modify DB_PASSWORD .
 
 # run
-docker-compose up -d
+$ docker-compose up -d
 ```
 
 > Tips: If you use Idea, Eclipse and other IDEs to run, you need to install the Lombok plugin, In addition, JDK10 is not supported at the moment, and there are problems with themes scanning and uploading.
