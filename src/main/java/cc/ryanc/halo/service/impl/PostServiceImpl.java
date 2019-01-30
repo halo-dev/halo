@@ -4,11 +4,16 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
+import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.repository.PostRepository;
+import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +47,12 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private TagService tagService;
+
     /**
      * 保存文章
      *
@@ -50,7 +61,18 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post saveByPost(Post post) {
+    public Post save(Post post) {
+        int postSummary = 50;
+        if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
+            postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
+        }
+        final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
+        if (summaryText.length() > postSummary) {
+            final String summary = summaryText.substring(0, postSummary);
+            post.setPostSummary(summary);
+        } else {
+            post.setPostSummary(summaryText);
+        }
         return postRepository.save(post);
     }
 
@@ -62,8 +84,8 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post removeByPostId(Long postId) {
-        Optional<Post> post = this.findByPostId(postId);
+    public Post remove(Long postId) {
+        final Optional<Post> post = this.findByPostId(postId);
         postRepository.delete(post.get());
         return post.get();
     }
@@ -78,20 +100,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Post updatePostStatus(Long postId, Integer status) {
-        Optional<Post> post = this.findByPostId(postId);
+        final Optional<Post> post = this.findByPostId(postId);
         post.get().setPostStatus(status);
         return postRepository.save(post.get());
-    }
-
-    /**
-     * 修改文章阅读量
-     *
-     * @param post post
-     */
-    @Override
-    public void updatePostView(Post post) {
-        post.setPostViews(post.getPostViews() + 1);
-        postRepository.save(post);
     }
 
     /**
@@ -102,9 +113,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void updateAllSummary(Integer postSummary) {
-        List<Post> posts = this.findAllPosts(PostTypeEnum.POST_TYPE_POST.getDesc());
+        final List<Post> posts = this.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
         for (Post post : posts) {
-            String text = StrUtil.trim(HtmlUtil.cleanHtmlTag(post.getPostContent()));
+            String text = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
             if (text.length() > postSummary) {
                 post.setPostSummary(text.substring(0, postSummary));
             } else {
@@ -115,18 +126,6 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 获取文章列表 分页
-     *
-     * @param postType post or page
-     * @param pageable 分页信息
-     * @return Page
-     */
-    @Override
-    public Page<Post> findAllPosts(String postType, Pageable pageable) {
-        return postRepository.findPostsByPostType(postType, pageable);
-    }
-
-    /**
      * 获取文章列表 不分页
      *
      * @param postType post or page
@@ -134,20 +133,36 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_type_'+#postType")
-    public List<Post> findAllPosts(String postType) {
+    public List<Post> findAll(String postType) {
         return postRepository.findPostsByPostType(postType);
     }
 
     /**
      * 模糊查询文章
      *
-     * @param keyWord  keyword
-     * @param pageable pageable
-     * @return List
+     * @param keyword    关键词
+     * @param postType   文章类型
+     * @param postStatus 文章状态
+     * @param pageable   分页信息
+     * @return Page
      */
     @Override
-    public List<Post> searchPosts(String keyWord, Pageable pageable) {
-        return postRepository.findByPostTitleLike(keyWord, pageable);
+    public Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable) {
+        Page<Post> posts = postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
+                postType,
+                postStatus,
+                "%" + keyword + "%",
+                postType,
+                postStatus,
+                "%" + keyword + "%",
+                pageable
+        );
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -160,7 +175,13 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable) {
-        return postRepository.findPostsByPostStatusAndPostType(status, postType, pageable);
+        Page<Post> posts = postRepository.findPostsByPostStatusAndPostType(status, postType, pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -172,7 +193,13 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_page_'+#pageable.pageNumber")
     public Page<Post> findPostByStatus(Pageable pageable) {
-        return postRepository.findPostsByPostStatusAndPostType(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        Page<Post> posts = postRepository.findPostsByPostStatusAndPostType(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -235,27 +262,26 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 查询之后的文章
+     * 获取下一篇文章 较新
      *
-     * @param postDate 发布时间
-     * @return List
+     * @param postDate postDate
+     * @return Post
      */
     @Override
-    public List<Post> findByPostDateAfter(Date postDate) {
-        return postRepository.findByPostDateAfterAndPostStatusAndPostTypeOrderByPostDateDesc(postDate, PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc());
+    public Post getNextPost(Date postDate) {
+        return postRepository.queryNextPost(postDate);
     }
 
     /**
-     * 查询Id之前的文章
+     * 获取下一篇文章 较老
      *
-     * @param postDate 发布时间
-     * @return List
+     * @param postDate postDate
+     * @return Post
      */
     @Override
-    public List<Post> findByPostDateBefore(Date postDate) {
-        return postRepository.findByPostDateBeforeAndPostStatusAndPostTypeOrderByPostDateAsc(postDate, PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc());
+    public Post getPrePost(Date postDate) {
+        return postRepository.queryPrePost(postDate);
     }
-
 
     /**
      * 查询归档信息 根据年份和月份
@@ -265,8 +291,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_year_month'")
     public List<Archive> findPostGroupByYearAndMonth() {
-        List<Object[]> objects = postRepository.findPostGroupByYearAndMonth();
-        List<Archive> archives = new ArrayList<>();
+        final List<Object[]> objects = postRepository.findPostGroupByYearAndMonth();
+        final List<Archive> archives = new ArrayList<>();
         Archive archive = null;
         for (Object[] obj : objects) {
             archive = new Archive();
@@ -287,8 +313,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_year'")
     public List<Archive> findPostGroupByYear() {
-        List<Object[]> objects = postRepository.findPostGroupByYear();
-        List<Archive> archives = new ArrayList<>();
+        final List<Object[]> objects = postRepository.findPostGroupByYear();
+        final List<Archive> archives = new ArrayList<>();
         Archive archive = null;
         for (Object[] obj : objects) {
             archive = new Archive();
@@ -299,6 +325,29 @@ public class PostServiceImpl implements PostService {
         }
         return archives;
     }
+
+    /**
+     * @return List
+     * @Author Aquan
+     * @Description 查询归档信息 返回所有文章
+     * @Date 2019.1.4 11:16
+     * @Param
+     **/
+    @Override
+    @Cacheable(value = POSTS_CACHE_NAME, key = "'archives_all'")
+    public List<Archive> findAllPost() {
+        final List<Post> posts = postRepository.findAllPost();
+        final Integer count = postRepository.totalAllPostCount();
+        final List<Archive> archives = new ArrayList<>();
+        Archive archive = null;
+        archive = new Archive();
+        archive.setCount(String.valueOf(count));
+        archive.setPosts(posts);
+        archives.add(archive);
+
+        return archives;
+    }
+
 
     /**
      * 根据年份和月份查询文章
@@ -335,7 +384,13 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable) {
-        return postRepository.findPostByYearAndMonth(year, month, null);
+        Page<Post> posts = postRepository.findPostByYearAndMonth(year, month, null);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -349,7 +404,13 @@ public class PostServiceImpl implements PostService {
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_category_'+#category.cateId+'_'+#pageable.pageNumber")
     public Page<Post> findPostByCategories(Category category, Pageable pageable) {
-        return postRepository.findPostByCategoriesAndPostStatus(category, PostStatusEnum.PUBLISHED.getCode(), pageable);
+        Page<Post> posts = postRepository.findPostByCategoriesAndPostStatus(category, PostStatusEnum.PUBLISHED.getCode(), pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -363,19 +424,13 @@ public class PostServiceImpl implements PostService {
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_tag_'+#tag.tagId+'_'+#pageable.pageNumber")
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
-        return postRepository.findPostsByTagsAndPostStatus(tag, PostStatusEnum.PUBLISHED.getCode(), pageable);
-    }
-
-    /**
-     * 搜索文章
-     *
-     * @param keyword  关键词
-     * @param pageable 分页信息
-     * @return Page
-     */
-    @Override
-    public Page<Post> searchByKeywords(String keyword, Pageable pageable) {
-        return postRepository.findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(keyword, pageable);
+        Page<Post> posts = postRepository.findPostsByTagsAndPostStatus(tag, PostStatusEnum.PUBLISHED.getCode(), pageable);
+        for (Post post : posts.getContent()) {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostSummary("该文章为加密文章");
+            }
+        }
+        return posts;
     }
 
     /**
@@ -399,15 +454,15 @@ public class PostServiceImpl implements PostService {
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_related_'+#post.getPostId()")
     public List<Post> relatedPosts(Post post) {
         //获取当前文章的所有标签
-        List<Tag> tags = post.getTags();
-        List<Post> tempPosts = new ArrayList<>();
+        final List<Tag> tags = post.getTags();
+        final List<Post> tempPosts = new ArrayList<>();
         for (Tag tag : tags) {
             tempPosts.addAll(postRepository.findPostsByTags(tag));
         }
         //去掉当前的文章
         tempPosts.remove(post);
         //去掉重复的文章
-        List<Post> allPosts = new ArrayList<>();
+        final List<Post> allPosts = new ArrayList<>();
         for (int i = 0; i < tempPosts.size(); i++) {
             if (!allPosts.contains(tempPosts.get(i))) {
                 allPosts.add(tempPosts.get(i));
@@ -463,5 +518,49 @@ public class PostServiceImpl implements PostService {
     @Override
     public String buildSiteMap(List<Post> posts) {
         return HaloUtils.getSiteMap(posts);
+    }
+
+    /**
+     * 缓存阅读数
+     *
+     * @param postId postId
+     */
+    @Override
+    public void cacheViews(Long postId) {
+        if (null != HaloConst.POSTS_VIEWS.get(postId)) {
+            HaloConst.POSTS_VIEWS.put(postId, HaloConst.POSTS_VIEWS.get(postId) + 1);
+        } else {
+            HaloConst.POSTS_VIEWS.put(postId, 1L);
+        }
+    }
+
+    /**
+     * 组装分类目录和标签
+     *
+     * @param post     post
+     * @param cateList cateList
+     * @param tagList  tagList
+     * @return Post Post
+     */
+    @Override
+    public Post buildCategoriesAndTags(Post post, List<String> cateList, String tagList) {
+        final List<Category> categories = categoryService.strListToCateList(cateList);
+        post.setCategories(categories);
+        if (StrUtil.isNotEmpty(tagList)) {
+            final List<Tag> tags = tagService.strListToTagList(StrUtil.trim(tagList));
+            post.setTags(tags);
+        }
+        return post;
+    }
+
+    /**
+     * 获取最近的文章
+     *
+     * @param limit 条数
+     * @return List
+     */
+    @Override
+    public List<Post> getRecentPosts(int limit) {
+        return postRepository.getPostsByLimit(limit);
     }
 }

@@ -3,15 +3,12 @@
 <@head>${options.blog_title!} | <@spring.message code='admin.pages.galleries.title' /></@head>
 <div class="content-wrapper">
     <style type="text/css" rel="stylesheet">
-        .form-horizontal .control-label{
-            text-align: left;
-        }
         .div-thumbnail{transition:all .5s ease-in-out;padding:10px}
         .thumbnail{margin-bottom:0}
     </style>
-    <section class="content-header">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.pages.galleries.title' /><small></small></h1>
-        <a class="btn-header" id="btnNewPicture" href="#">
+        <a class="btn-header" id="btnNewPicture" href="javascript:void(0)">
             <@spring.message code='admin.pages.galleries.text.add-gallery' />
         </a>
         <ol class="breadcrumb">
@@ -22,7 +19,7 @@
             <li class="active"><@spring.message code='admin.pages.galleries.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-lg-12 col-xs-12" id="newPicturePanel" style="display: none">
                 <div class="box box-primary">
@@ -61,7 +58,7 @@
                                     <div class="input-group">
                                         <input type="text" class="form-control" id="galleryUrl" name="galleryUrl">
                                         <span class="input-group-btn">
-                                            <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=galleryUrl','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
+                                            <button class="btn btn-default btn-flat" type="button" onclick="halo.layerModal('/admin/attachments/select?id=galleryUrl','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                         </span>
                                     </div>
                                 </div>
@@ -83,8 +80,8 @@
         <div class="row">
             <#list galleries.content as gallery>
                 <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/page/gallery?galleryId=${gallery.galleryId?c}','<@spring.message code="admin.pages.galleries.modal.title" />')">
-                    <a href="#" class="thumbnail">
-                        <img src="${gallery.galleryThumbnailUrl?if_exists}" class="img-responsive">
+                    <a href="javascript:void(0)" class="thumbnail">
+                        <img src="${gallery.galleryThumbnailUrl!}" class="img-responsive">
                     </a>
                 </div>
             </#list>
@@ -109,11 +106,12 @@
             </div>
         </div>
     </section>
-    <script type="application/javascript">
-        $('#btnNewPicture').click(function () {
-            $('#newPicturePanel').slideToggle(400);
-        });
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $('#btnNewPicture').click(function () {
+        $('#newPicturePanel').slideToggle(400);
+    });
+</script>
+</@footer>
 </#compress>

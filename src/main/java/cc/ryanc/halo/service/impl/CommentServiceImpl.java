@@ -40,7 +40,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public void saveByComment(Comment comment) {
+    public void save(Comment comment) {
         commentRepository.save(comment);
     }
 
@@ -52,9 +52,9 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Optional<Comment> removeByCommentId(Long commentId) {
-        Optional<Comment> comment = this.findCommentById(commentId);
-        commentRepository.delete(comment.get());
+    public Optional<Comment> remove(Long commentId) {
+        final Optional<Comment> comment = this.findCommentById(commentId);
+        commentRepository.delete(comment.orElse(null));
         return comment;
     }
 
@@ -65,7 +65,7 @@ public class CommentServiceImpl implements CommentService {
      * @return Page
      */
     @Override
-    public Page<Comment> findAllComments(Integer status, Pageable pageable) {
+    public Page<Comment> findAll(Integer status, Pageable pageable) {
         return commentRepository.findCommentsByCommentStatus(status, pageable);
     }
 
@@ -77,7 +77,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @CachePut(value = COMMENTS_CACHE_NAME, key = "'comments_status_'+#status")
-    public List<Comment> findAllComments(Integer status) {
+    public List<Comment> findAll(Integer status) {
         return commentRepository.findCommentsByCommentStatus(status);
     }
 
@@ -88,7 +88,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @Cacheable(value = COMMENTS_CACHE_NAME, key = "'comment'")
-    public List<Comment> findAllComments() {
+    public List<Comment> findAll() {
         return commentRepository.findAll();
     }
 
@@ -102,7 +102,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @CacheEvict(value = COMMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Comment updateCommentStatus(Long commentId, Integer status) {
-        Optional<Comment> comment = findCommentById(commentId);
+        final Optional<Comment> comment = findCommentById(commentId);
         comment.get().setCommentStatus(status);
         return commentRepository.save(comment.get());
     }
@@ -187,5 +187,26 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Integer getCountByStatus(Integer status) {
         return commentRepository.countAllByCommentStatus(status);
+    }
+
+    /**
+     * 查询评论总数
+     *
+     * @return Long
+     */
+    @Override
+    public Long getCount() {
+        return commentRepository.count();
+    }
+
+    /**
+     * 获取最近的评论
+     *
+     * @param limit limit
+     * @return List
+     */
+    @Override
+    public List<Comment> getRecentComments(int limit) {
+        return commentRepository.getCommentsByLimit(limit);
     }
 }

@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/fileinput/fileinput.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/AdminLTE.min.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -26,7 +26,7 @@
                     <div class="row">
                         <#list attachments.content as attachment>
                             <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 div-thumbnail">
-                                <a href="#" class="thumbnail" onclick="doTransport('${attachment.attachPath}')">
+                                <a href="javascript:void(0)" class="thumbnail" onclick="doTransport('<#if !attachment.attachLocation?? || attachment.attachLocation! == 'server'>${options.blog_url!}</#if>${attachment.attachPath}')">
                                     <img src="${attachment.attachSmallPath}" class="img-responsive">
                                 </a>
                             </div>
@@ -36,16 +36,16 @@
                                 <@spring.message code='admin.pageinfo.text.no' />${attachments.number+1}/${attachments.totalPages}<@spring.message code='admin.pageinfo.text.page' />
                             </div>
                             <div class="btn-group pull-right btn-group-sm" role="group">
-                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select" >
+                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?id=${id}" >
                                     <@spring.message code='admin.pageinfo.btn.first' />
                                 </a>
-                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}" >
+                                <a class="btn btn-default <#if !attachments.hasPrevious()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number-1}&id=${id}" >
                                     <@spring.message code='admin.pageinfo.btn.pre' />
                                 </a>
-                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}">
+                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.number+1}&id=${id}">
                                     <@spring.message code='admin.pageinfo.btn.next' />
                                 </a>
-                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}">
+                                <a class="btn btn-default <#if !attachments.hasNext()>disabled</#if>" href="/admin/attachments/select?page=${attachments.totalPages-1}&id=${id}">
                                     <@spring.message code='admin.pageinfo.btn.last' />
                                 </a>
                             </div>
@@ -68,14 +68,14 @@
     </section>
 </div>
 </body>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/plugins/fileinput/fileinput.min.js"></script>
-<#if options.blog_locale?default('zh_CN')=='zh_CN'>
-<script src="/static/plugins/fileinput/zh.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-backend/plugins/fileinput/fileinput.min.js"></script>
+<#if (options.blog_locale!'zh_CN')=='zh_CN'>
+<script src="/static/halo-backend/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/js/halo.min.js"></script>
+<script src="/static/halo-backend/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/halo-backend/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
     $('#uploadImg').fileinput({
@@ -86,12 +86,9 @@
         maxFileCount: 10,
         enctype : 'multipart/form-data',
         showClose: false
-    }).on("fileuploaded",function (event,data,previewId,index) {
-        var data = data.jqXHR.responseJSON;
-        if(data.success=="1"){
-            $("#uploadForm").hide(400);
-            halo.showMsgAndReload(data.message,'success',1000);
-        }
+    }).on("filebatchuploadcomplete",function (event, files, extra) {
+        $("#uploadForm").hide(400);
+        halo.showMsgAndReload('上传成功！','success',1000);
     });
     function doTransport(url) {
         parent.$('#${id}').val(url);

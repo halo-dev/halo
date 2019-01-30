@@ -21,7 +21,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Object obj = request.getSession().getAttribute(HaloConst.USER_SESSION_KEY);
+        final Object obj = request.getSession().getAttribute(HaloConst.USER_SESSION_KEY);
         //如果user不为空则放行
         if (null != obj) {
             return true;

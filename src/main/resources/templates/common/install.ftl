@@ -6,10 +6,10 @@
         <meta name="renderer" content="webkit">
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <title>Halo-<@spring.message code='install.page.title'/></title>
-        <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
-        <link rel="stylesheet" href="/static/plugins/animate/animate.min.css">
-        <link rel="stylesheet" href="/static/plugins/bootstrapvalidator/css/bootstrapValidator.min.css">
+        <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/halo-backend/css/AdminLTE.min.css">
+        <link rel="stylesheet" href="/static/halo-backend/plugins/animate/animate.min.css">
+        <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrapvalidator/css/bootstrapValidator.min.css">
         <!--[if lt IE 9]>
         <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
         <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -217,10 +217,10 @@
             </div>
         </div>
     </body>
-    <script src="/static/plugins/jquery/jquery.min.js"></script>
-    <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/static/plugins/bootstrapvalidator/js/bootstrapValidator.min.js"></script>
-    <script src="/static/plugins/bootstrapvalidator/js/language/zh_CN.js"></script>
+    <script src="/static/halo-common/jquery/jquery.min.js"></script>
+    <script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/static/halo-backend/plugins/bootstrapvalidator/js/bootstrapValidator.min.js"></script>
+    <script src="/static/halo-backend/plugins/bootstrapvalidator/js/language/zh_CN.js"></script>
     <#if isInstall==false>
     <script>
         var domain = window.location.host;
@@ -301,15 +301,15 @@
                     e.preventDefault();
                     var $form = $(e.target);
                     var bv = $form.data('bootstrapValidator');
-                    $.post($form.attr('action'),$form.serialize(),function (result) {
-                        if(result==true){
+                    $.post($form.attr('action'),$form.serialize(),function (data) {
+                        if(data.code === 1){
                             $('#installFirst').hide();
                             $('#installSuccess').show();
                         }else{
                             $('#installFirst').hide();
                             $('#installError').show();
                         }
-                    },'json');
+                    },'JSON');
                 });
         });
         $('#blogLocale').on('change',function(){

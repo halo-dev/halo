@@ -20,4 +20,12 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * @return Category
      */
     Category findCategoryByCateUrl(String cateUrl);
+
+    /**
+     * 根据分类名称查询
+     *
+     * @param cateName 分类名称
+     * @return Category
+     */
+    Category findCategoryByCateName(String cateName);
 }

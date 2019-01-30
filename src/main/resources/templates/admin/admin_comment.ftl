@@ -2,10 +2,11 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.comments.title' /></@head>
 <div class="content-wrapper">
+    <link rel="stylesheet" href="/static/halo-common/OwO/OwO.min.css">
     <style type="text/css" rel="stylesheet">
         .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}s
     </style>
-    <section class="content-header">
+    <section class="content-header" id="animated-header">
         <h1><@spring.message code='admin.comments.title' /><small></small></h1>
         <ol class="breadcrumb">
             <li>
@@ -14,7 +15,7 @@
             <li class="active"><@spring.message code='admin.comments.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <ul style="list-style: none;padding-left: 0">
             <li class="publish">
                 <a data-pjax="true" href="/admin/comments" <#if status==0>style="color: #000" </#if>><@spring.message code='common.status.published' /><span class="count">(${publicCount})</span></a>&nbsp;|&nbsp;
@@ -30,22 +31,20 @@
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.comment-author' /></th>
-                                <th width="50%"><@spring.message code='common.th.content' /></th>
-                                <th><@spring.message code='common.th.comment-page' /></th>
-                                <th><@spring.message code='common.th.date' /></th>
-                                <th><@spring.message code='common.th.control' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover">
                             <tbody>
+                                <tr>
+                                    <th><@spring.message code='common.th.comment-author' /></th>
+                                    <th width="50%"><@spring.message code='common.th.content' /></th>
+                                    <th><@spring.message code='common.th.comment-page' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
+                                </tr>
                                 <#if comments.content?size gt 0>
                                     <#list comments.content as comment>
                                         <tr>
                                             <td><a href="${comment.commentAuthorUrl}" target="_blank">${comment.commentAuthor}</a></td>
-                                            <td>${comment.commentContent}</td>
+                                            <td><p>${comment.commentContent}</p></td>
                                             <td>
                                                 <#if comment.post.postType == "post">
                                                     <a target="_blank" href="/archives/${comment.post.postUrl}#comment-id-${comment.commentId?c}">${comment.post.postTitle}</a>
@@ -131,7 +130,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                     <h4 class="modal-title"><@spring.message code="common.btn.reply" /></h4>
                 </div>
-                <form method="post" action="/admin/comments/reply">
+                <form>
                     <input type="hidden" id="commentId" name="commentId" value=""/>
                     <input type="hidden" id="userAgent" name="userAgent" value=""/>
                     <input type="hidden" id="postId" name="postId" value="" />
@@ -147,57 +146,56 @@
             </div>
         </div>
     </div>
-    <script>
-        var s = new OwO({
-            container: document.getElementsByClassName('OwO')[0],
-            target: document.getElementsByClassName('comment-input-content')[0],
-            position: 'down',
-            width: '100%',
-            maxHeight: '210px',
-            api:"/static/plugins/OwO/OwO.min.json"
-        });
-        function modelShow(url,message) {
-            $('#url').val(url);
-            $('#message').html(message);
-            $('#removeCommentModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-
-        /**
-         * 显示回复模态框
-         *
-         * @param commentId commentId
-         * @param postId postId
-         */
-        function replyShow(commentId,postId) {
-            $('#userAgent').val(navigator.userAgent);
-            $('#commentId').val(commentId);
-            $('#postId').val(postId);
-            $('#commentReplyModal').modal();
-        }
-
-        function reply() {
-            $.ajax({
-                type: 'POST',
-                url: '/admin/comments/reply',
-                async: false,
-                data: {
-                    'commentId': $("#commentId").val(),
-                    'userAgent': $("#userAgent").val(),
-                    'postId': $("#postId").val(),
-                    'commentContent': halo.formatContent($("#commentContent").val())
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        window.location.reload();
-                    }
-                }
-            });
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    var s = new OwO({
+        container: document.getElementsByClassName('OwO')[0],
+        target: document.getElementsByClassName('comment-input-content')[0],
+        position: 'down',
+        width: '100%',
+        maxHeight: '210px',
+        api:"/static/halo-common/OwO/OwO.min.json"
+    });
+    function modelShow(url,message) {
+        $('#url').val(url);
+        $('#message').html(message);
+        $('#removeCommentModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+
+    /**
+     * 显示回复模态框
+     *
+     * @param commentId commentId
+     * @param postId postId
+     */
+    function replyShow(commentId,postId) {
+        $('#userAgent').val(navigator.userAgent);
+        $('#commentId').val(commentId);
+        $('#postId').val(postId);
+        $('#commentReplyModal').modal();
+    }
+
+    function reply() {
+        $.post('/admin/comments/reply',{
+            'commentId': $("#commentId").val(),
+            'userAgent': $("#userAgent").val(),
+            'postId': $("#postId").val(),
+            'commentContent': halo.formatContent($("#commentContent").val())
+        },function(data) {
+            if(data.code === 1){
+                window.location.reload();
+            }
+        },'JSON');
+    }
+</script>
+</@footer>
 </#compress>

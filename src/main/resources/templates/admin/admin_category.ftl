@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.categories.title' /></@head>
 <div class="content-wrapper">
-    <section class="content-header">
+    <section class="content-header" id="animated-header">
         <h1>
             <@spring.message code='admin.categories.title' />
             <small></small>
@@ -12,11 +12,11 @@
                 <a data-pjax="true" href="/admin">
                     <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.categories.bread.posts' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.categories.bread.posts' /></a></li>
             <li class="active"><@spring.message code='admin.categories.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-md-5">
                 <div class="box box-primary">
@@ -24,27 +24,27 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.categories.text.edit-category' /> <#if updateCategory??>[${updateCategory.cateName}]</#if></h3>
                         </div>
-                        <form action="/admin/category/save" method="post" role="form" id="cateAddForm">
+                        <form role="form" id="cateSaveForm">
                             <input type="hidden" name="cateId" value="${updateCategory.cateId?c}">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="cateName"><@spring.message code='admin.categories.form.cate-name' /></label>
-                                    <input type="text" class="form-control" id="cateName" name="cateName" value="${updateCategory.cateName}">
+                                    <input type="text" class="form-control" id="cateName" name="cateName" value="${updateCategory.cateName!}">
                                     <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="cateUrl"><@spring.message code='admin.categories.form.cate-url' /></label>
-                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl" value="${updateCategory.cateUrl}">
+                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl" value="${updateCategory.cateUrl!}">
                                     <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="cateDesc" class="control-label"><@spring.message code='admin.categories.form.cate-desc' /></label>
-                                    <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none">${updateCategory.cateDesc}</textarea>
+                                    <textarea class="form-control" rows="3" id="cateDesc" name="cateDesc" style="resize: none">${updateCategory.cateDesc!}</textarea>
                                     <small><@spring.message code='admin.categories.form.cate-desc-tips' /></small>
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-edit' /></button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-edit' /></button>
                                 <a data-pjax="true" href="/admin/category" class="btn btn-info btn-sm "><@spring.message code='common.btn.back-to-add' /></a>
                             </div>
                         </form>
@@ -52,16 +52,16 @@
                         <div class="box-header with-border">
                             <h3 class="box-title"><@spring.message code='admin.categories.text.add-category' /></h3>
                         </div>
-                        <form action="/admin/category/save" method="post" role="form" id="cateAddForm" onsubmit="return checkCate()">
+                        <form role="form" id="cateSaveForm">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="cateName"><@spring.message code='admin.categories.form.cate-name' /></label>
-                                    <input type="text" class="form-control" id="cateName" name="cateName" placeholder="">
+                                    <input type="text" class="form-control" id="cateName" name="cateName">
                                     <small><@spring.message code='admin.categories.form.cate-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
                                     <label for="cateUrl"><@spring.message code='admin.categories.form.cate-url' /></label>
-                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl" placeholder="">
+                                    <input type="text" class="form-control" id="cateUrl" name="cateUrl">
                                     <small><@spring.message code='admin.categories.form.cate-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                             <div class="box-footer">
-                                <button type="submit" class="btn btn-primary btn-sm "><@spring.message code='common.btn.define-add' /></button>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="save()"><@spring.message code='common.btn.define-add' /></button>
                             </div>
                         </form>
                     </#if>
@@ -83,39 +83,37 @@
                         <h3 class="box-title"><@spring.message code='admin.categories.text.all-categories' /></h3>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.name' /></th>
-                                <th><@spring.message code='common.th.url' /></th>
-                                <th><@spring.message code='common.th.desc' /></th>
-                                <th><@spring.message code='common.th.posts-count' /></th>
-                                <th><@spring.message code='common.th.control' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover">
                             <tbody>
-                            <@commonTag method="categories">
-                                <#if categories?? && categories?size gt 0>
-                                    <#list categories as cate>
-                                        <tr>
-                                            <td>${cate.cateName}</td>
-                                            <td>${cate.cateUrl}</td>
-                                            <td>${(cate.cateDesc)!}</td>
-                                            <td>
-                                                <span class="label" style="background-color: #d6cdcd;">${cate.posts?size}</span>
-                                            </td>
-                                            <td>
-                                                <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
-                                                    <a href="#" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
-                                                <#else >
-                                                    <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
-                                                </#if>
-                                                <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId?c}')"><@spring.message code='common.btn.delete' /></button>
-                                            </td>
-                                        </tr>
-                                    </#list>
-                                </#if>
-                            </@commonTag>
+                                <tr>
+                                    <th><@spring.message code='common.th.name' /></th>
+                                    <th><@spring.message code='common.th.url' /></th>
+                                    <th><@spring.message code='common.th.desc' /></th>
+                                    <th><@spring.message code='common.th.posts-count' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
+                                </tr>
+                                <@commonTag method="categories">
+                                    <#if categories?? && categories?size gt 0>
+                                        <#list categories as cate>
+                                            <tr>
+                                                <td>${cate.cateName!}</td>
+                                                <td>${cate.cateUrl!}</td>
+                                                <td>${cate.cateDesc!}</td>
+                                                <td>
+                                                    <span class="label" style="background-color: #d6cdcd;">${cate.posts?size}</span>
+                                                </td>
+                                                <td>
+                                                    <#if updateCategory?? && updateCategory.cateId?c==cate.cateId?c>
+                                                        <a href="javascript:void(0)" class="btn btn-primary btn-xs " disabled><@spring.message code='common.btn.editing' /></a>
+                                                    <#else >
+                                                        <a data-pjax="true" href="/admin/category/edit?cateId=${cate.cateId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
+                                                    </#if>
+                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/category/remove?cateId=${cate.cateId?c}')"><@spring.message code='common.btn.delete' /></button>
+                                                </td>
+                                            </tr>
+                                        </#list>
+                                    </#if>
+                                </@commonTag>
                             </tbody>
                         </table>
                     </div>
@@ -142,41 +140,31 @@
             </div>
         </div>
     </div>
-    <script>
-        function modelShow(url) {
-            $('#url').val(url);
-            $('#removeCateModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-        function checkCate() {
-            var name = $('#cateName').val();
-            var url = $('#cateUrl').val();
-            var desc = $('#cateDesc').val();
-            var result = true;
-            if(name==""||url==""||desc==""){
-                halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
-                result = false;
-            }
-            $.ajax({
-                type: 'GET',
-                url: '/admin/category/checkUrl',
-                async: false,
-                data: {
-                    'cateUrl' : url
-                },
-                success: function (data) {
-                    if(data.code==0){
-                        halo.showMsg(data.msg,'error',2000);
-                        result = false;
-                    }
-                }
-            });
-            return result;
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url) {
+        $('#url').val(url);
+        $('#removeCateModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+    function save() {
+        var param = $("#cateSaveForm").serialize();
+        $.post('/admin/category/save',param,function (data) {
+            if (data.code === 1) {
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/category',"${options.admin_pjax!'true'}");
+            } else {
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+</script>
+</@footer>
 </#compress>

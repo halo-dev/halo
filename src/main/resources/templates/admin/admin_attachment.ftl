@@ -2,13 +2,14 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.attachments.title' /></@head>
 <div class="content-wrapper">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/fileinput/fileinput.min.css">
     <style type="text/css" rel="stylesheet">
         .div-thumbnail{transition:all .5s ease-in-out;padding:10px}
         .thumbnail{margin-bottom:0}
     </style>
-    <section class="content-header">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.attachments.title' /></h1>
-        <a class="btn-header" id="showForm" href="#">
+        <a class="btn-header" id="showForm" href="javascript:void(0)">
             <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.attachments.btn.upload' />
         </a>
         <ol class="breadcrumb">
@@ -16,7 +17,7 @@
             <li class="active"><@spring.message code='admin.attachments.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <div class="row" id="uploadForm" style="display: none;">
             <div class="col-md-12">
                 <div class="form-group">
@@ -28,9 +29,9 @@
         </div>
         <div class="row">
             <#list attachments.content as attachment>
-                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/attachments/attachment?attachId=${attachment.attachId?c}','<@spring.message code="admin.attachments.js.modal.detail-title" />')">
-                    <a href="#" class="thumbnail">
-                        <img src="${attachment.attachSmallPath?if_exists}" class="img-responsive">
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 div-thumbnail" onclick="halo.layerModal('/admin/attachments/attachment?attachId=${attachment.attachId?c}','<@spring.message code="admin.attachments.modal.detail-title" />')">
+                    <a href="javascript:void(0)" class="thumbnail">
+                        <img src="${attachment.attachSmallPath!}" class="img-responsive">
                     </a>
                 </div>
             </#list>
@@ -55,36 +56,24 @@
             </div>
         </div>
     </section>
-    <script type="application/javascript">
-        function loadFileInput() {
-            $('#uploadImg').fileinput({
-                language: 'zh',
-                uploadUrl: '/admin/attachments/upload',
-                uploadAsync: true,
-                allowedFileExtensions: ['jpg','gif','png','jpeg','svg','psd'],
-                maxFileCount: 100,
-                enctype : 'multipart/form-data',
-                showClose: false
-            }).on("fileuploaded",function (event,data,previewId,index) {
-                var data = data.jqXHR.responseJSON;
-                if(data.success=="1"){
-                    $("#uploadForm").hide(400);
-                    halo.showMsgAndReload(data.message,'success',1000);
-                }
-            });
-        }
-        $(document).ready(function () {
-            loadFileInput();
-        });
-        <#if options.admin_pjax?default("true") == "true">
-        $(document).on('pjax:complete',function () {
-            loadFileInput();
-        });
-        </#if>
-        $("#showForm").click(function(){
-            $("#uploadForm").slideToggle(400);
-        });
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $('#uploadImg').fileinput({
+        language: 'zh',
+        uploadUrl: '/admin/attachments/upload',
+        uploadAsync: true,
+        allowedFileExtensions: ['jpg','gif','png','jpeg','svg','psd'],
+        maxFileCount: 100,
+        enctype : 'multipart/form-data',
+        showClose: false
+    }).on("filebatchuploadcomplete",function (event, files, extra) {
+        $("#uploadForm").hide(400);
+        halo.showMsgAndRedirect('上传成功！','success',1000,'/admin/attachments',"${options.admin_pjax!'true'}");
+    });
+    $("#showForm").click(function(){
+        $("#uploadForm").slideToggle(400);
+    });
+</script>
+</@footer>
 </#compress>

@@ -13,19 +13,22 @@ import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,6 +45,8 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/archives")
 public class FrontArchiveController extends BaseController {
+
+    private static final String POSTS_CACHE_NAME = "posts";
 
     @Autowired
     private PostService postService;
@@ -72,13 +77,13 @@ public class FrontArchiveController extends BaseController {
                            @PathVariable(value = "page") Integer page) {
 
         //所有文章数据，分页，material主题适用
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Pageable pageable = PageRequest.of(page - 1, 5, sort);
-        Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Pageable pageable = PageRequest.of(page - 1, 5, sort);
+        final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
             return this.renderNotFound();
         }
-        model.addAttribute("is_archives",true);
+        model.addAttribute("is_archives", true);
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -95,11 +100,11 @@ public class FrontArchiveController extends BaseController {
     public String archives(Model model,
                            @PathVariable(value = "year") String year,
                            @PathVariable(value = "month") String month) {
-        Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
+        final Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
         if (null == posts) {
             return this.renderNotFound();
         }
-        model.addAttribute("is_archives",true);
+        model.addAttribute("is_archives", true);
         model.addAttribute("posts", posts);
         return this.render("archives");
     }
@@ -113,24 +118,26 @@ public class FrontArchiveController extends BaseController {
      */
     @GetMapping(value = "{postUrl}")
     public String getPost(@PathVariable String postUrl,
-                          @RequestParam(value = "cp",defaultValue = "1") Integer cp,
+                          @RequestParam(value = "cp", defaultValue = "1") Integer cp,
+                          HttpServletRequest request,
                           Model model) {
-        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
+        final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
         if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
             return this.renderNotFound();
         }
         //获得当前文章的发布日期
-        Date postDate = post.getPostDate();
-        //查询当前文章日期之前的所有文章
-        List<Post> beforePosts = postService.findByPostDateBefore(postDate);
-        //查询当前文章日期之后的所有文章
-        List<Post> afterPosts = postService.findByPostDateAfter(postDate);
-
-        if (null != beforePosts && beforePosts.size() > 0) {
-            model.addAttribute("beforePost", beforePosts.get(beforePosts.size() - 1));
+        final Date postDate = post.getPostDate();
+        final Post prePost = postService.getPrePost(postDate);
+        final Post nextPost = postService.getNextPost(postDate);
+        if (null != prePost) {
+            //兼容老版本主题
+            model.addAttribute("beforePost", prePost);
+            model.addAttribute("prePost", prePost);
         }
-        if (null != afterPosts && afterPosts.size() > 0) {
-            model.addAttribute("afterPost", afterPosts.get(afterPosts.size() - 1));
+        if (null != nextPost) {
+            //兼容老版本主题
+            model.addAttribute("afterPost", nextPost);
+            model.addAttribute("nextPost", nextPost);
         }
         List<Comment> comments = null;
         if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
@@ -139,29 +146,61 @@ public class FrontArchiveController extends BaseController {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
         //获取文章的标签用作keywords
-        List<Tag> tags = post.getTags();
-        List<String> tagWords = new ArrayList<>();
+        final List<Tag> tags = post.getTags();
+        final List<String> tagWords = new ArrayList<>();
         if (tags != null) {
             for (Tag tag : tags) {
                 tagWords.add(tag.getTagName());
             }
         }
         //默认显示10条
-        Integer size = 10;
+        int size = 10;
         //获取每页评论条数
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
-        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
-        int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
-        model.addAttribute("is_post",true);
-        model.addAttribute("post", post);
+        final ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
+        final int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
+        model.addAttribute("is_post", true);
         model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("tagWords", CollUtil.join(tagWords, ","));
-        postService.updatePostView(post);
+        postService.cacheViews(post.getPostId());
+
+        //判断文章是否有加密
+        if (StrUtil.isNotEmpty(post.getPostPassword())) {
+            Cookie cookie = ServletUtil.getCookie(request, "halo-post-password-" + post.getPostId());
+            if (null == cookie) {
+                post.setPostSummary("该文章为加密文章");
+                post.setPostContent("<form id=\"postPasswordForm\" method=\"post\" action=\"/archives/verifyPostPassword\"><p>该文章为加密文章，输入正确的密码即可访问。</p><input type=\"hidden\" id=\"postId\" name=\"postId\" value=\"" + post.getPostId() + "\"> <input type=\"password\" id=\"postPassword\" name=\"postPassword\"> <input type=\"submit\" id=\"passwordSubmit\" value=\"提交\"></form>");
+            }
+        }
+        model.addAttribute("post", post);
         return this.render("post");
+    }
+
+    /**
+     * 验证文章密码
+     *
+     * @param postId       postId
+     * @param postPassword postPassword
+     * @param response     response
+     * @return String
+     */
+    @PostMapping(value = "/verifyPostPassword")
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
+    public String verifyPostPassword(@RequestParam(value = "postId") Long postId,
+                                     @RequestParam(value = "postPassword") String postPassword,
+                                     HttpServletResponse response) {
+        final Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_POST.getDesc());
+        if (null == post) {
+            return this.renderNotFound();
+        }
+        if (SecureUtil.md5(postPassword).equals(post.getPostPassword())) {
+            ServletUtil.addCookie(response, "halo-post-password-" + post.getPostId(), SecureUtil.md5(postPassword));
+        }
+        return "redirect:/archives/" + post.getPostUrl();
     }
 }

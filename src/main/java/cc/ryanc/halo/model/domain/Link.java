@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 /**
@@ -33,11 +34,13 @@ public class Link implements Serializable {
     /**
      * 友情链接名称
      */
+    @NotEmpty(message = "友情链接名称不能为空！")
     private String linkName;
 
     /**
      * 友情链接地址
      */
+    @NotEmpty(message = "友情链接地址不能为空！")
     private String linkUrl;
 
     /**

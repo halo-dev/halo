@@ -1,26 +1,21 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.Comment;
-import cc.ryanc.halo.model.domain.Logs;
-import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.CommonParamsEnum;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
-import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
+import cc.ryanc.halo.utils.MarkdownUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +26,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * <pre>
@@ -70,6 +65,12 @@ public class AdminController extends BaseController {
     private AttachmentService attachmentService;
 
     @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
     private LocaleMessageUtil localeMessageUtil;
 
     /**
@@ -83,27 +84,32 @@ public class AdminController extends BaseController {
     public String index(Model model) {
 
         //查询评论的条数
-        Integer commentCount = commentService.findAllComments().size();
+        final Long commentCount = commentService.getCount();
         model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
-        List<Post> postsLatest = postService.findPostLatest();
+        final List<Post> postsLatest = postService.findPostLatest();
         model.addAttribute("postTopFive", postsLatest);
 
         //查询最新的日志
-        List<Logs> logsLatest = logsService.findLogsLatest();
+        final List<Logs> logsLatest = logsService.findLogsLatest();
         model.addAttribute("logs", logsLatest);
 
         //查询最新的评论
-        List<Comment> comments = commentService.findCommentsLatest();
+        final List<Comment> comments = commentService.findCommentsLatest();
         model.addAttribute("comments", comments);
 
         //附件数量
-        model.addAttribute("mediaCount", attachmentService.findAllAttachments().size());
+        model.addAttribute("mediaCount", attachmentService.getCount());
 
         //文章阅读总数
-        Long postViewsSum = postService.getPostViews();
+        final Long postViewsSum = postService.getPostViews();
         model.addAttribute("postViewsSum", postViewsSum);
+
+        //成立天数
+        final Date blogStart = DateUtil.parse(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
+        final long hadDays = DateUtil.between(blogStart, DateUtil.date(), DateUnit.DAY);
+        model.addAttribute("hadDays", hadDays);
         return "admin/admin_index";
     }
 
@@ -115,7 +121,7 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/login")
     public String login(HttpSession session) {
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
         if (null != user) {
             return "redirect:/admin";
@@ -137,13 +143,13 @@ public class AdminController extends BaseController {
                                @ModelAttribute("loginPwd") String loginPwd,
                                HttpSession session) {
         //已注册账号，单用户，只有一个
-        User aUser = userService.findUser();
+        final User aUser = userService.findUser();
         //首先判断是否已经被禁用已经是否已经过了10分钟
         Date loginLast = DateUtil.date();
         if (null != aUser.getLoginLast()) {
             loginLast = aUser.getLoginLast();
         }
-        Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
+        final Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
         if (StrUtil.equals(aUser.getLoginEnable(), TrueFalseEnum.FALSE.getDesc()) && (between < CommonParamsEnum.TEN.getValue())) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.disabled"));
         }
@@ -160,25 +166,18 @@ public class AdminController extends BaseController {
             session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
             //重置用户的登录状态为正常
             userService.updateUserNormal();
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, ServletUtil.getClientIP(request), DateUtil.date()));
+            logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, request);
             log.info("User {} login succeeded.", aUser.getUserDisplayName());
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
         } else {
             //更新失败次数
-            Integer errorCount = userService.updateUserLoginError();
+            final Integer errorCount = userService.updateUserLoginError();
             //超过五次禁用账户
             if (errorCount >= CommonParamsEnum.FIVE.getValue()) {
                 userService.updateUserLoginEnable(TrueFalseEnum.FALSE.getDesc());
             }
-            logsService.saveByLogs(
-                    new Logs(
-                            LogsRecord.LOGIN,
-                            LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]",
-                            ServletUtil.getClientIP(request),
-                            DateUtil.date()
-                    )
-            );
-            Object[] args = {(5 - errorCount)};
+            logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]", request);
+            final Object[] args = {(5 - errorCount)};
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.failed", args));
         }
     }
@@ -191,9 +190,9 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         session.removeAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), ServletUtil.getClientIP(request), DateUtil.date()));
+        logsService.save(LogsRecord.LOGOUT, user.getUserName(), request);
         log.info("User {} has logged out", user.getUserName());
         return "redirect:/admin/login";
     }
@@ -210,9 +209,9 @@ public class AdminController extends BaseController {
     public String logs(Model model,
                        @RequestParam(value = "page", defaultValue = "0") Integer page,
                        @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        Sort sort = new Sort(Sort.Direction.DESC, "logId");
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Logs> logs = logsService.findAllLogs(pageable);
+        final Sort sort = new Sort(Sort.Direction.DESC, "logId");
+        final Pageable pageable = PageRequest.of(page, size, sort);
+        final Page<Logs> logs = logsService.findAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
@@ -225,7 +224,7 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logs/clear")
     public String logsClear() {
         try {
-            logsService.removeAllLogs();
+            logsService.removeAll();
         } catch (Exception e) {
             log.error("Clear log failed:{}" + e.getMessage());
         }
@@ -233,7 +232,7 @@ public class AdminController extends BaseController {
     }
 
     /**
-     * 不可描述的页面
+     * Halo关于页面
      *
      * @return 模板路径admin/admin_halo
      */
@@ -250,7 +249,105 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/getToken")
     @ResponseBody
     public JsonResult getToken() {
-        String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
+        final String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
+    }
+
+
+    /**
+     * 小工具
+     *
+     * @return String
+     */
+    @GetMapping(value = "/tools")
+    public String tools() {
+        return "admin/admin_tools";
+    }
+
+    /**
+     * Markdown 导入页面
+     *
+     * @return String
+     */
+    @GetMapping(value = "/tools/markdownImport")
+    public String markdownImport() {
+        return "admin/widget/_markdown_import";
+    }
+
+    /**
+     * Markdown 导入
+     *
+     * @param file    file
+     * @param request request
+     * @return JsonResult
+     */
+    @PostMapping(value = "/tools/markdownImport")
+    @ResponseBody
+    public JsonResult markdownImport(@RequestParam("file") MultipartFile file,
+                                     HttpServletRequest request,
+                                     HttpSession session) throws IOException {
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final String markdown = IoUtil.read(file.getInputStream(), "UTF-8");
+        final String content = MarkdownUtils.renderMarkdown(markdown);
+        final Map<String, List<String>> frontMatters = MarkdownUtils.getFrontMatter(markdown);
+        final Post post = new Post();
+        List<String> elementValue = null;
+        final List<Tag> tags = new ArrayList<>();
+        final List<Category> categories = new ArrayList<>();
+        Tag tag = null;
+        Category category = null;
+        if (frontMatters.size() > 0) {
+            for (String key : frontMatters.keySet()) {
+                elementValue = frontMatters.get(key);
+                for (String ele : elementValue) {
+                    if ("title".equals(key)) {
+                        post.setPostTitle(ele);
+                    } else if ("date".equals(key)) {
+                        post.setPostDate(DateUtil.parse(ele));
+                    } else if ("updated".equals(key)) {
+                        post.setPostUpdate(DateUtil.parse(ele));
+                    } else if ("tags".equals(key)) {
+                        tag = tagService.findTagByTagName(ele);
+                        if (null == tag) {
+                            tag = new Tag();
+                            tag.setTagName(ele);
+                            tag.setTagUrl(ele);
+                            tag = tagService.save(tag);
+                        }
+                        tags.add(tag);
+                    } else if ("categories".equals(key)) {
+                        category = categoryService.findByCateName(ele);
+                        if (null == category) {
+                            category = new Category();
+                            category.setCateName(ele);
+                            category.setCateUrl(ele);
+                            category.setCateDesc(ele);
+                            category = categoryService.save(category);
+                        }
+                        categories.add(category);
+                    }
+                }
+            }
+        } else {
+            post.setPostDate(new Date());
+            post.setPostUpdate(new Date());
+            post.setPostTitle(file.getOriginalFilename());
+        }
+        post.setPostContentMd(markdown);
+        post.setPostContent(content);
+        post.setPostType(PostTypeEnum.POST_TYPE_POST.getDesc());
+        post.setAllowComment(AllowCommentEnum.ALLOW.getCode());
+        post.setUser(user);
+        post.setTags(tags);
+        post.setCategories(categories);
+        post.setPostUrl(StrUtil.removeSuffix(file.getOriginalFilename(), ".md"));
+        if (null == post.getPostDate()) {
+            post.setPostDate(new Date());
+        }
+        if (null == post.getPostUpdate()) {
+            post.setPostUpdate(new Date());
+        }
+        postService.save(post);
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
     }
 }

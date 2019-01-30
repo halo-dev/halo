@@ -1,13 +1,12 @@
 package cc.ryanc.halo.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import cc.ryanc.halo.model.domain.Comment;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import cc.ryanc.halo.model.domain.Comment;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * <pre>
@@ -30,7 +29,7 @@ public class CommentUtil {
             return Collections.emptyList();
         }
 
-        List<Comment> commentsResult = new ArrayList<>();
+        final List<Comment> commentsResult = new ArrayList<>();
 
         for (Comment comment : commentsRoot) {
             if (comment.getCommentParent() == 0) {
@@ -60,7 +59,7 @@ public class CommentUtil {
             return null;
         }
 
-        List<Comment> commentsChild = new ArrayList<>();
+        final List<Comment> commentsChild = new ArrayList<>();
         for (Comment comment : commentsRoot) {
             if (comment.getCommentParent() != 0) {
                 if (comment.getCommentParent().equals(id)) {

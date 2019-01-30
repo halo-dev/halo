@@ -25,10 +25,12 @@ import java.util.Map;
 @Component
 public class ApiInterceptor implements HandlerInterceptor {
 
+    private static final String TOKEN = "token";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.API_STATUS.getProp()))) {
-            if (StrUtil.equals(request.getHeader("token"), HaloConst.OPTIONS.get(BlogPropertiesEnum.API_TOKEN.getProp()))) {
+            if (StrUtil.equals(request.getHeader(TOKEN), HaloConst.OPTIONS.get(BlogPropertiesEnum.API_TOKEN.getProp()))) {
                 return true;
             } else {
                 response.setCharacterEncoding("UTF-8");

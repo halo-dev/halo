@@ -30,7 +30,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = ERROR_PATH)
     public String handleError(HttpServletRequest request) {
-        Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+        final Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         if (statusCode.equals(CommonParamsEnum.NOT_FOUND.getValue())) {
             return "redirect:/404";
         } else {

@@ -138,7 +138,7 @@ public enum BlogPropertiesEnum {
     /**
      * 默认缩略图地址
      */
-    DEFAULT_THUMBNAIL("/static/images/thumbnail/thumbnail.png"),
+    DEFAULT_THUMBNAIL("/static/halo-frontend/images/thumbnail/thumbnail.png"),
 
     /**
      * 自动备份
@@ -148,7 +148,12 @@ public enum BlogPropertiesEnum {
     /**
      * API Token
      */
-    API_TOKEN("api_token");
+    API_TOKEN("api_token"),
+
+    /**
+     * 附件存储位置
+     */
+    ATTACH_LOC("attach_loc");
 
     private String prop;
 

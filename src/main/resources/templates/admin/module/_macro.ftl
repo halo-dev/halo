@@ -6,40 +6,31 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title><#nested ></title>
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/plugins/pace/pace.min.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
-    <link rel="stylesheet" href="/static/css/skins/_all-skins.min.css">
-    <link rel="stylesheet" href="/static/css/style.min.css">
-    <link rel="stylesheet" href="/static/css/loader.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
-    <link rel="stylesheet" href="/static/plugins/OwO/OwO.min.css">
-    <link rel="stylesheet" href="/static/plugins/pretty-checkbox/pretty-checkbox.min.css">
+    <title><#nested /></title>
+    <#-- CSS -->
+    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/pace/pace.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/style.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/pretty-checkbox/pretty-checkbox.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/animate/animate.min.css">
+    <link rel="stylesheet" href="//fonts.loli.net/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    <script src="/static/plugins/jquery/jquery.min.js"></script>
-    <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/static/plugins/OwO/OwO.min.js"></script>
+    <#if options.admin_layout_boxed_background??>
+    <style>
+        .layout-boxed {
+            background: url(${options.admin_layout_boxed_background!}) repeat fixed!important;
+        }
+    </style>
+    </#if>
 </head>
-<body class="hold-transition sidebar-mini ${options.admin_theme?default('skin-blue')} ${options.admin_layout?default('')} ${options.sidebar_style?default('')}">
-<#if options.admin_loading?default("false") == "true">
-<#-- 页面加载动画 -->
-<div id="loading">
-    <div id="loading-center">
-        <div id="loading-center-absolute">
-            <div class="object" id="object_one"></div>
-            <div class="object" id="object_two"></div>
-            <div class="object" id="object_three"></div>
-            <div class="object" id="object_four"></div>
-        </div>
-    </div>
-</div>
-</#if>
+<body class="hold-transition sidebar-mini ${options.admin_theme!'skin-blue'} ${options.admin_layout!''} ${options.sidebar_style!''}">
 <div class="wrapper">
 <#-- 顶部栏模块 -->
 <#include "_header.ftl">
@@ -50,39 +41,43 @@
 <#macro footer>
 <#include "_footer.ftl">
 </div>
-<#if options.admin_pjax?default("true") == "true">
-    <script src="/static/plugins/pjax/jquery.pjax.js"></script>
+
+<#-- JS -->
+<#if (options.admin_pjax!'true') == 'true'>
+<script src="/static/halo-backend/plugins/pjax/pjax.min.js"></script>
 </#if>
-<script src="/static/plugins/pace/pace.min.js"></script>
-<script src="/static/js/adminlte.min.js"></script>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/plugins/fileinput/fileinput.min.js"></script>
-<#if options.blog_locale?default('zh_CN')=='zh_CN'>
-    <script src="/static/plugins/fileinput/zh.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-backend/plugins/pace/pace.min.js"></script>
+<script src="/static/halo-backend/js/adminlte.min.js"></script>
+<script src="/static/halo-backend/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/halo-backend/plugins/layer/layer.js"></script>
+<script src="/static/halo-backend/plugins/fileinput/fileinput.min.js"></script>
+<#if (options.blog_locale!'zh_CN') == 'zh_CN'>
+<script src="/static/halo-backend/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/js/halo.min.js"></script>
-<@compress single_line=true>
+<script src="/static/halo-backend/plugins/easymde/easymde.min.js"></script>
+<script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
+<script src="/static/halo-backend/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/halo-backend/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
+<script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script src="/static/halo-common/OwO/OwO.min.js"></script>
+<script src="/static/halo-backend/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
-    Pace.options = {
-        restartOnRequestAfter: false
-    };
     $(document).ajaxStart(function() {Pace.restart();});
-    <#if options.admin_pjax?default("true") == "true">
-        $(document).pjax('a[data-pjax=true]', '.content-wrapper', {fragment: '.content-wrapper',timeout: 8000});
-    </#if>
-    <#if options.admin_loading?default("false") == "true">
-        $(window).on('load', function(){
-            $('body').addClass('loaded');
-            setTimeout(function () {
-                $('#loading').remove();
-            },500);
+    <#if (options.admin_pjax!'true') == 'true'>
+        var pjax = new Pjax({
+            elements: 'a[data-pjax=true]',
+            cacheBust: false,
+            debug: false,
+            selectors: ['title', '.content-wrapper', '#footer_script']
         });
     </#if>
     var heading = "<@spring.message code='common.text.tips' />";
 </script>
-</@compress>
+<#nested />
 </body>
 </html>
 </#macro>

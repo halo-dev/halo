@@ -2,6 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.themes.title' /></@head>
 <div class="content-wrapper">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/fileinput/fileinput.min.css">
     <style type="text/css" rel="stylesheet">
         .theme-thumbnail{
             width:100%;
@@ -33,33 +34,33 @@
             color: red;
         }
     </style>
-    <section class="content-header">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.title' /></h1>
-        <a class="btn-header" id="showForm" href="#" onclick="halo.layerModal('/admin/themes/install','<@spring.message code="admin.themes.js.install-theme" />')">
+        <a class="btn-header" id="showForm" href="javascript:void(0)" onclick="halo.layerModal('/admin/themes/install','<@spring.message code="admin.themes.js.install-theme" />')">
             <i class="fa fa-cloud-upload" aria-hidden="true"></i><@spring.message code='admin.themes.btn.install' />
         </a>
         <ol class="breadcrumb">
             <li><a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a></li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.themes.bread.appearance' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.themes.bread.appearance' /></a></li>
             <li class="active"><@spring.message code='admin.themes.title' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <#if themes?? && (themes?size>0)>
                 <#list themes as theme>
                     <div class="col-md-6 col-lg-3 col theme-body">
                         <div class="box box-solid">
-                            <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName?if_exists}/screenshot.png)">
+                            <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName!}/screenshot.png)">
                                 <div class="pull-right btn-delete" style="display: none" onclick="modelShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
                             </div>
                             <div class="box-footer">
-                                <span class="theme-title">${theme.themeName?if_exists?cap_first}</span>
+                                <span class="theme-title">${theme.themeName!?cap_first}</span>
                                 <#if theme.hasOptions>
-                                    <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="halo.layerModal('/admin/themes/options?theme=${theme.themeName?if_exists}&hasUpdate=<#if theme.hasUpdate>true<#else>false</#if>','${theme.themeName?if_exists} <@spring.message code="admin.themes.js.theme-setting" />')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
+                                    <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="halo.layerModal('/admin/themes/options?theme=${theme.themeName!}&hasUpdate=<#if theme.hasUpdate>true<#else>false</#if>','${theme.themeName!} <@spring.message code="admin.themes.js.theme-setting" />')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
                                 </#if>
                                 <#if activeTheme != "${theme.themeName}">
-                                    <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName?if_exists}')" style="display: none;margin-right: 3px"><@spring.message code='admin.themes.btn.enable' /></button>
+                                    <button class="btn btn-default btn-sm pull-right btn-theme-enable" onclick="setTheme('${theme.themeName!}')" style="display: none;margin-right: 3px"><@spring.message code='admin.themes.btn.enable' /></button>
                                     <#else>
                                     <button class="btn btn-default btn-sm pull-right btn-theme-enable" style="display: none;margin-right: 3px" disabled><@spring.message code='admin.themes.btn.activated' /></button>
                                 </#if>
@@ -93,51 +94,53 @@
             </div>
         </div>
     </div>
-    <script type="application/javascript">
-
-        /**
-         * 设置主题
-         * @param site_theme 主题名
-         */
-        function setTheme(site_theme) {
-            $.ajax({
-                type: 'get',
-                url: '/admin/themes/set',
-                data: {
-                    'siteTheme': site_theme
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
-                }
-            });
-        }
-        $('.theme-thumbnail').mouseover(function () {
-            $(this).children('.btn-delete').show();
-        });
-        $('.theme-thumbnail').mouseleave(function () {
-            $(this).children('.btn-delete').hide();
-        });
-        $('.theme-body').mouseover(function () {
-            $(this).find(".theme-thumbnail").css("opacity","0.8");
-            $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").show();
-        });
-        $('.theme-body').mouseleave(function () {
-            $(this).find(".theme-thumbnail").css("opacity","1");
-            $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").hide();
-        });
-        function modelShow(url) {
-            $('#url').val(url);
-            $('#removeThemeModal').modal();
-        }
-        function removeIt(){
-            var url=$.trim($("#url").val());
-            window.location.href=url;
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+
+    /**
+     * 设置主题
+     * @param site_theme 主题名
+     */
+    function setTheme(site_theme) {
+        $.get('/admin/themes/set',{'siteTheme': site_theme},function(data) {
+            if(data.code === 1){
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/themes',"${options.admin_pjax!'true'}");
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+
+    var themeThumbnail = $('.theme-thumbnail');
+    var themeBody = $('.theme-body');
+
+    themeThumbnail.mouseover(function () {
+        $(this).children('.btn-delete').show();
+    });
+    themeThumbnail.mouseleave(function () {
+        $(this).children('.btn-delete').hide();
+    });
+    themeBody.mouseover(function () {
+        $(this).find(".theme-thumbnail").css("opacity","0.8");
+        $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").show();
+    });
+    themeBody.mouseleave(function () {
+        $(this).find(".theme-thumbnail").css("opacity","1");
+        $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").hide();
+    });
+    function modelShow(url) {
+        $('#url').val(url);
+        $('#removeThemeModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+</script>
+</@footer>
 </#compress>

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +34,13 @@ public class Tag implements Serializable {
     /**
      * 标签名称
      */
+    @NotEmpty(message = "标签名称不能为空！")
     private String tagName;
 
     /**
      * 标签路径
      */
+    @NotEmpty(message = "标签路径不能为空！")
     private String tagUrl;
 
     @ManyToMany(mappedBy = "tags")

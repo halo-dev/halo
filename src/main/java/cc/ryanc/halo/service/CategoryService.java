@@ -21,7 +21,7 @@ public interface CategoryService {
      * @param category 分类目录
      * @return 如果插入成功，返回分类目录对象
      */
-    Category saveByCategory(Category category);
+    Category save(Category category);
 
     /**
      * 根据编号删除分类目录
@@ -29,14 +29,14 @@ public interface CategoryService {
      * @param cateId 分类目录编号
      * @return category
      */
-    Category removeByCateId(Long cateId);
+    Category remove(Long cateId);
 
     /**
      * 获取所有分类目录
      *
      * @return 返回List集合
      */
-    List<Category> findAllCategories();
+    List<Category> findAll();
 
     /**
      * 根据编号查询单个分类
@@ -53,6 +53,14 @@ public interface CategoryService {
      * @return category
      */
     Category findByCateUrl(String cateUrl);
+
+    /**
+     * 根据分类名称查询
+     *
+     * @param cateName 分类名称
+     * @return Category
+     */
+    Category findByCateName(String cateName);
 
     /**
      * 将分类字符串集合转化为Category泛型集合

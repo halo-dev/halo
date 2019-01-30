@@ -53,6 +53,7 @@ public class FrontTagController extends BaseController {
      *
      * @param tagUrl 标签路径
      * @param model  model
+     *
      * @return String
      */
     @GetMapping(value = "{tagUrl}")
@@ -67,25 +68,26 @@ public class FrontTagController extends BaseController {
      * @param model  model
      * @param tagUrl 标签路径
      * @param page   页码
+     *
      * @return String
      */
     @GetMapping(value = "{tagUrl}/page/{page}")
     public String tags(Model model,
                        @PathVariable("tagUrl") String tagUrl,
                        @PathVariable("page") Integer page) {
-        Tag tag = tagService.findByTagUrl(tagUrl);
-        if(null==tag){
+        final Tag tag = tagService.findByTagUrl(tagUrl);
+        if (null == tag) {
             return this.renderNotFound();
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        Integer size = 10;
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Post> posts = postService.findPostsByTags(tag, pageable);
-        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-        model.addAttribute("is_tags",true);
+        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Page<Post> posts = postService.findPostsByTags(tag, pageable);
+        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+        model.addAttribute("is_tags", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("tag", tag);

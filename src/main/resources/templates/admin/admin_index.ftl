@@ -2,17 +2,9 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.index.title' /></@head>
 <div class="content-wrapper">
-    <style type="text/css" rel="stylesheet">
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-        .control-radio{
-            padding-top: 7px;
-        }
-    </style>
-    <section class="content-header">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.index.title' /></h1>
-        <a class="btn-header" id="btnWidgetsOption" href="#">
+        <a class="btn-header" id="btnWidgetsOption" href="javascript:void(0)">
             <@spring.message code='admin.index.btn.widgets' />
         </a>
         <ol class="breadcrumb">
@@ -22,7 +14,7 @@
             <li class="active"><@spring.message code='admin.index.bread.active' /></li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-lg-12 col-xs-12" id="widgetOptionsPanel" style="display: none">
                 <div class="box box-primary">
@@ -36,13 +28,13 @@
                                     <label for="widgetPostCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.post-count' />：</label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_postcount" id="widgetPostCount" value="true" ${((options.widget_postcount?default('true'))=='true')?string('checked','')}>
+                                            <input type="radio" name="widget_postcount" id="widgetPostCount" value="true" ${((options.widget_postcount!'true')=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.display' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_postcount" id="widgetPostCount" value="false" ${((options.widget_postcount?default('true'))=='false')?string('checked','')}>
+                                            <input type="radio" name="widget_postcount" id="widgetPostCount" value="false" ${((options.widget_postcount!'true')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.hide' /></label>
                                             </div>
@@ -53,13 +45,13 @@
                                     <label for="widgetCommentCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.comment-count' />：</label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="true" ${((options.widget_commentcount?default('true'))=='true')?string('checked','')}>
+                                            <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="true" ${((options.widget_commentcount!'true')=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.display' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="false" ${((options.widget_commentcount?default('true'))=='false')?string('checked','')}>
+                                            <input type="radio" name="widget_commentcount" id="widgetCommentCount" value="false" ${((options.widget_commentcount!'true')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.hide' /></label>
                                             </div>
@@ -70,13 +62,13 @@
                                     <label for="widgetAttachmentCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.attachment-count' />：</label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="true" ${((options.widget_attachmentcount?default('true'))=='true')?string('checked','')}>
+                                            <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="true" ${((options.widget_attachmentcount!'true')=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.display' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="false" ${((options.widget_attachmentcount?default('true'))=='false')?string('checked','')}>
+                                            <input type="radio" name="widget_attachmentcount" id="widgetAttachmentCount" value="false" ${((options.widget_attachmentcount!'true')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.hide' /></label>
                                             </div>
@@ -87,13 +79,13 @@
                                     <label for="widgetDayCount" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.day-count' />：</label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_daycount" id="widgetDayCount" value="true" ${((options.widget_daycount?default('true'))=='true')?string('checked','')}>
+                                            <input type="radio" name="widget_daycount" id="widgetDayCount" value="true" ${((options.widget_daycount!'true')=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.display' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_daycount" id="widgetDayCount" value="false" ${((options.widget_daycount?default('true'))=='false')?string('checked','')}>
+                                            <input type="radio" name="widget_daycount" id="widgetDayCount" value="false" ${((options.widget_daycount!'true')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.hide' /></label>
                                             </div>
@@ -106,13 +98,13 @@
                                     <label for="widgetPostLastest" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.post-lastest' />：</label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="true" ${((options.widget_postlastest?default('true'))=='true')?string('checked','')}>
+                                            <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="true" ${((options.widget_postlastest!'true')=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.display' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="false" ${((options.widget_postlastest?default('true'))=='false')?string('checked','')}>
+                                            <input type="radio" name="widget_postlastest" id="widgetPostLastest" value="false" ${((options.widget_postlastest!'true')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.hide' /></label>
                                             </div>
@@ -123,13 +115,13 @@
                                     <label for="widgetCommentLastest" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.comment-lastest' />：</label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="true" ${((options.widget_commentlastest?default('true'))=='true')?string('checked','')}>
+                                            <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="true" ${((options.widget_commentlastest!'true')=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.display' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="false" ${((options.widget_commentlastest?default('true'))=='false')?string('checked','')}>
+                                            <input type="radio" name="widget_commentlastest" id="widgetCommentLastest" value="false" ${((options.widget_commentlastest!'true')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.hide' /></label>
                                             </div>
@@ -140,13 +132,13 @@
                                     <label for="widgetLogsLastest" class="col-sm-4 control-label"><@spring.message code='admin.index.widgets.logs-lastest' />：</label>
                                     <div class="col-sm-8 control-radio">
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="true" ${((options.widget_logslastest?default('true'))=='true')?string('checked','')}>
+                                            <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="true" ${((options.widget_logslastest!'true')=='true')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.display' /></label>
                                             </div>
                                         </div>
                                         <div class="pretty p-default p-round">
-                                            <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="false" ${((options.widget_logslastest?default('true'))=='false')?string('checked','')}>
+                                            <input type="radio" name="widget_logslastest" id="widgetLogsLastest" value="false" ${((options.widget_logslastest!'true')=='false')?string('checked','')}>
                                             <div class="state p-primary">
                                                 <label><@spring.message code='common.radio.hide' /></label>
                                             </div>
@@ -161,46 +153,46 @@
                     </form>
                 </div>
             </div>
-            <#if options.widget_postcount?default("true")=="true">
+            <#if (options.widget_postcount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetPostCountBody">
                 <div class="small-box bg-aqua">
-                    <div class="inner"><h3><@articleTag method="postsCount">${postsCount?default(0)}</@articleTag></h3><p><@spring.message code='admin.index.widgets.posts' /></p></div>
+                    <div class="inner"><h3><@articleTag method="postsCount">${postsCount!0}</@articleTag></h3><p><@spring.message code='admin.index.widgets.posts' /></p></div>
                     <div class="icon"><i class="ion ion-bag"></i></div>
                     <a data-pjax="true" href="/admin/posts" class="small-box-footer"><@spring.message code='common.btn.view-all' /> <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
             </#if>
-            <#if options.widget_commentcount?default("true")=="true">
+            <#if (options.widget_commentcount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetCommentCountBody">
                 <div class="small-box bg-green">
-                    <div class="inner"><h3>${commentCount?default(0)}</h3><p><@spring.message code='admin.index.widgets.comments' /></p></div>
+                    <div class="inner"><h3>${commentCount!0}</h3><p><@spring.message code='admin.index.widgets.comments' /></p></div>
                     <div class="icon"><i class="ion ion-stats-bars"></i></div>
                     <a data-pjax="true" href="/admin/comments" class="small-box-footer"><@spring.message code='common.btn.view-all' /> <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
             </#if>
-            <#if options.widget_attachmentcount?default("true")=="true">
+            <#if (options.widget_attachmentcount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetAttachmentCountBody">
                 <div class="small-box bg-yellow">
-                    <div class="inner"><h3>${mediaCount?default(0)}</h3><p><@spring.message code='admin.index.widgets.attachments' /></p></div>
+                    <div class="inner"><h3>${mediaCount!0}</h3><p><@spring.message code='admin.index.widgets.attachments' /></p></div>
                     <div class="icon"><i class="ion ion-person-add"></i></div>
                     <a data-pjax="true" href="/admin/attachments" class="small-box-footer"><@spring.message code='common.btn.upload-image' /> <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
             </div>
             </#if>
-            <#if options.widget_daycount?default("true")=="true">
+            <#if (options.widget_daycount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetDayCountBody">
                 <div class="small-box bg-red">
-                    <div class="inner"><h3 id="blogStart"></h3><p><@spring.message code='admin.index.widgets.day-count' /></p></div>
+                    <div class="inner"><h3 id="blogStart">${hadDays!}</h3><p><@spring.message code='admin.index.widgets.day-count' /></p></div>
                     <div class="icon"><i class="ion ion-pie-graph"></i></div>
-                    <a href="#" class="small-box-footer" data-toggle="modal" data-target="#blogInfo">${options.blog_start?default('0000-00-00')} <i class="fa fa-star"></i></a>
+                    <a href="javascript:void(0)" class="small-box-footer" data-toggle="modal" data-target="#blogInfo">${options.blog_start!'0000-00-00'} <i class="fa fa-star"></i></a>
                 </div>
             </div>
             </#if>
         </div>
 
         <div class="row">
-            <#if options.widget_postlastest?default("true")=="true">
+            <#if (options.widget_postlastest!'true')=='true'>
             <div class="col-lg-6 col-xs-12" id="widgetPostLastestBody">
                 <div class="box box-primary">
                     <div class="box-header with-border">
@@ -212,15 +204,13 @@
                         </div>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover text-center">
-                            <thead>
+                        <table class="table table-hover text-center">
+                            <tbody>
                                 <tr>
                                     <th width="50%"><@spring.message code='common.th.title' /></th>
                                     <th><@spring.message code='common.th.status' /></th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                            </thead>
-                            <tbody>
                                 <#if postTopFive??>
                                     <#list postTopFive as post>
                                         <tr>
@@ -238,7 +228,7 @@
                                                     <span class="label bg-red"><@spring.message code='common.status.recycle-bin' /></span>
                                                 </#if>
                                             </td>
-                                            <td><@common.timeline datetime="${post.postDate?if_exists}"?datetime /></td>
+                                            <td><@common.timeline datetime="${post.postDate!}"?datetime /></td>
                                         </tr>
                                     </#list>
                                 <#else>
@@ -250,7 +240,7 @@
                 </div>
             </div>
             </#if>
-            <#if options.widget_commentlastest?default("true")=="true">
+            <#if (options.widget_commentlastest!'true')=='true'>
             <div class="col-lg-6 col-xs-12" id="widgetCommentLastestBody">
                 <div class="box box-primary">
                     <div class="box-header with-border">
@@ -262,17 +252,15 @@
                         </div>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover text-center">
-                            <thead>
-                            <tr>
-                                <th><@spring.message code='common.th.comment-author' /></th>
-                                <th><@spring.message code='common.th.comment-page' /></th>
-                                <th width="30%"><@spring.message code='common.th.content' /></th>
-                                <th><@spring.message code='common.th.status' /></th>
-                                <th><@spring.message code='common.th.date' /></th>
-                            </tr>
-                            </thead>
+                        <table class="table table-hover text-center">
                             <tbody>
+                                <tr>
+                                    <th><@spring.message code='common.th.comment-author' /></th>
+                                    <th width="20%"><@spring.message code='common.th.comment-page' /></th>
+                                    <th width="30%"><@spring.message code='common.th.content' /></th>
+                                    <th><@spring.message code='common.th.status' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                </tr>
                                 <#if comments??>
                                 <#list comments as comment>
                                     <tr>
@@ -322,7 +310,7 @@
                 </div>
             </div>
             </#if>
-            <#if options.widget_logslastest?default("true")=="true">
+            <#if (options.widget_logslastest!'true')=='true'>
             <div class="col-lg-6 col-xs-12" id="widgetLogsLastestBody">
                 <div class="box box-primary">
                     <div class="box-header with-border">
@@ -332,7 +320,7 @@
                                 <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-bars"></i></button>
                                 <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#" onclick="halo.layerModal('/admin/logs','<@spring.message code="admin.index.widgets.text.all-logs" />')"><@spring.message code='common.btn.view-all' /></a></li>
+                                    <li><a href="javascript:void(0)" onclick="halo.layerModal('/admin/logs','<@spring.message code="admin.index.widgets.text.all-logs" />')"><@spring.message code='common.btn.view-all' /></a></li>
                                     <li><a href="/admin/logs/clear"><@spring.message code='admin.index.widgets.btn.clear-logs' /></a></li>
                                 </ul>
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
@@ -342,16 +330,14 @@
                         </div>
                     </div>
                     <div class="box-body table-responsive no-padding">
-                        <table class="table table-bordered table-hover text-center">
-                            <thead>
+                        <table class="table table-hover text-center">
+                            <tbody>
                                 <tr>
                                     <th><@spring.message code='common.th.action' /></th>
                                     <th><@spring.message code='common.th.result' /></th>
                                     <th>IP</th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                            </thead>
-                            <tbody>
                                 <#if logs??>
                                 <#list logs as log>
                                     <tr>
@@ -380,13 +366,13 @@
                     <h4 class="modal-title" id="blog-data"><@spring.message code='admin.index.blog-data.title' /></h4>
                 </div>
                 <div class="modal-body">
-                    <p>「${options.blog_title?if_exists}」<@spring.message code='admin.index.blog-data.days-count-before' /><span id="blogStartDay"></span><@spring.message code='admin.index.blog-data.days-count-after' /></p>
+                    <p>「${options.blog_title!}」<@spring.message code='admin.index.blog-data.days-count-before' /><span id="blogStartDay">${hadDays!}</span><@spring.message code='admin.index.blog-data.days-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.during' /></p>
-                    <p><@spring.message code='admin.index.blog-data.posts-count-before' />&nbsp;<@articleTag method="postsCount">${postsCount?default(0)}</@articleTag>&nbsp;<@spring.message code='admin.index.blog-data.posts-count-after' /></p>
+                    <p><@spring.message code='admin.index.blog-data.posts-count-before' />&nbsp;<@articleTag method="postsCount">${postsCount!0}</@articleTag>&nbsp;<@spring.message code='admin.index.blog-data.posts-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.tags-count-before' />&nbsp;<@commonTag method="tags">${tags?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.tags-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.comments-count-before' />&nbsp;${commentCount}&nbsp;<@spring.message code='admin.index.blog-data.comments-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.links-count-before' />&nbsp;<@commonTag method="links">${links?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.links-count-after' /></p>
-                    <p><@spring.message code='admin.index.blog-data.views-count-before' />&nbsp;${postViewsSum?default(0L)}&nbsp;<@spring.message code='admin.index.blog-data.views-count-after' /></p>
+                    <p><@spring.message code='admin.index.blog-data.views-count-before' />&nbsp;${postViewsSum!0}&nbsp;<@spring.message code='admin.index.blog-data.views-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.motto' /></p>
                 </div>
                 <div class="modal-footer">
@@ -395,19 +381,12 @@
             </div>
         </div>
     </div>
-    <script type="application/javascript">
-        $(document).ready(function () {
-            var dateBegin = new Date("${options.blog_start?default('0000-00-00')}");
-            var dateEnd = new Date();
-            var parseDate = dateEnd.getTime() - dateBegin.getTime();
-            var days = Math.floor(parseDate/(24*3600*1000));
-            $('#blogStart').html(days+1);
-            $('#blogStartDay').html(days+1);
-        });
-        $('#btnWidgetsOption').click(function () {
-            $('#widgetOptionsPanel').slideToggle(400);
-        });
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $('#btnWidgetsOption').click(function () {
+        $('#widgetOptionsPanel').slideToggle(400);
+    });
+</script>
+</@footer>
 </#compress>

@@ -23,7 +23,7 @@ public interface CommentService {
      *
      * @param comment comment
      */
-    void saveByComment(Comment comment);
+    void save(Comment comment);
 
     /**
      * 删除评论
@@ -31,7 +31,7 @@ public interface CommentService {
      * @param commentId commentId
      * @return Optional
      */
-    Optional<Comment> removeByCommentId(Long commentId);
+    Optional<Comment> remove(Long commentId);
 
     /**
      * 查询所有的评论，用于后台管理
@@ -40,7 +40,7 @@ public interface CommentService {
      * @param pageable pageable
      * @return Page
      */
-    Page<Comment> findAllComments(Integer status, Pageable pageable);
+    Page<Comment> findAll(Integer status, Pageable pageable);
 
     /**
      * 根据评论状态查询评论
@@ -48,14 +48,14 @@ public interface CommentService {
      * @param status 评论状态
      * @return List
      */
-    List<Comment> findAllComments(Integer status);
+    List<Comment> findAll(Integer status);
 
     /**
      * 查询所有评论，不分页
      *
      * @return List
      */
-    List<Comment> findAllComments();
+    List<Comment> findAll();
 
     /**
      * 更改评论的状态
@@ -125,4 +125,19 @@ public interface CommentService {
      * @return 评论数量
      */
     Integer getCountByStatus(Integer status);
+
+    /**
+     * 查询评论总数
+     *
+     * @return Long
+     */
+    Long getCount();
+
+    /**
+     * 获取最近的评论
+     *
+     * @param limit limit
+     * @return List
+     */
+    List<Comment> getRecentComments(int limit);
 }
