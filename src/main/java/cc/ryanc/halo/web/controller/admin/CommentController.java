@@ -182,7 +182,6 @@ public class CommentController extends BaseController {
             comment.setCommentAuthorUrl(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5(user.getUserEmail()));
-            comment.setCommentDate(DateUtil.date());
 
             final StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
             buildContent.append(lastComment.getCommentId());

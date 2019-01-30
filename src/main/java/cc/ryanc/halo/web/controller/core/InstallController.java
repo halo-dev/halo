@@ -137,7 +137,6 @@ public class InstallController {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             post.setPostSummary("欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
             post.setPostStatus(0);
-            post.setPostDate(DateUtil.date());
             post.setPostUrl("hello-halo");
             post.setUser(user);
             post.setCategories(categories);
@@ -152,7 +151,6 @@ public class InstallController {
             comment.setCommentAuthorUrl("https://ryanc.cc");
             comment.setCommentAuthorIp("127.0.0.1");
             comment.setCommentAuthorAvatarMd5(SecureUtil.md5("i@ryanc.cc"));
-            comment.setCommentDate(DateUtil.date());
             comment.setCommentContent("欢迎，欢迎！");
             comment.setCommentStatus(0);
             comment.setCommentAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");

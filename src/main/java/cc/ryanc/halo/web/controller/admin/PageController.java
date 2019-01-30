@@ -261,10 +261,7 @@ public class PageController {
                 }
                 post.setPostViews(oldPost.getPostViews());
                 msg = localeMessageUtil.getMessage("code.admin.common.update-success");
-            } else {
-                post.setPostDate(DateUtil.date());
             }
-            post.setPostUpdate(DateUtil.date());
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {

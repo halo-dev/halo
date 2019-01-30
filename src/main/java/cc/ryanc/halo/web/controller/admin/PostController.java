@@ -183,7 +183,6 @@ public class PostController extends BaseController {
         final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
         try {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
-            post.setPostDate(DateUtil.date());
             post.setUser(user);
             post = postService.buildCategoriesAndTags(post, cateList, tagList);
             post.setPostUrl(urlFilter(post.getPostUrl()));
