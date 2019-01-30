@@ -8,7 +8,7 @@
                     var fd = new Date();
                     document.write(fd.getFullYear());
                 </script>
-                &nbsp;${options.blog_title?if_exists}
+                &nbsp;${options.blog_title!}
             </div>
             <!--
             I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright.
@@ -27,12 +27,12 @@
         <!-- Header Title -->
         <span class="header-title header-item">
             <a href="/" title="<%= config.title %>">
-                ${options.blog_title?if_exists}
+                ${options.blog_title!}
             </a>
         </span>
 
         <p class="header-slogan header-item">
-            ${options.theme_material_uiux_slogan?default("Hi,nice to meet you")}
+            ${options.theme_material_uiux_slogan!'Hi,nice to meet you'}
         </p>
 
         <!-- Header Nav -->

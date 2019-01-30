@@ -1,4 +1,3 @@
-
 <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable" method="post" action="">
     <label id="search-label" class="mdl-button mdl-js-ripple-effect mdl-js-button mdl-button--fab mdl-color--accent mdl-shadow--4dp" for="search">
         <i class="material-icons mdl-color-text--white" role="presentation">search</i>

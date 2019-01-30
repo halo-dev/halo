@@ -5,6 +5,7 @@ import cc.ryanc.halo.repository.OptionsRepository;
 import cc.ryanc.halo.service.OptionsService;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -25,12 +26,15 @@ public class OptionsServiceImpl implements OptionsService {
     @Autowired
     private OptionsRepository optionsRepository;
 
+    private static final String POSTS_CACHE_NAME = "posts";
+
     /**
      * 批量保存设置
      *
      * @param options options
      */
     @Override
+    @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void saveOptions(Map<String, String> options) {
         if (null != options && !options.isEmpty()) {
             options.forEach((k, v) -> saveOption(k, v));
@@ -84,8 +88,8 @@ public class OptionsServiceImpl implements OptionsService {
      */
     @Override
     public Map<String, String> findAllOptions() {
-        Map<String, String> options = new HashMap<>();
-        List<Options> optionsList = optionsRepository.findAll();
+        final Map<String, String> options = new HashMap<>();
+        final List<Options> optionsList = optionsRepository.findAll();
         if (null != optionsList) {
             optionsList.forEach(option -> options.put(option.getOptionName(), option.getOptionValue()));
         }
@@ -100,7 +104,7 @@ public class OptionsServiceImpl implements OptionsService {
      */
     @Override
     public String findOneOption(String key) {
-        Options options = optionsRepository.findOptionsByOptionName(key);
+        final Options options = optionsRepository.findOptionsByOptionName(key);
         if (null != options) {
             return options.getOptionValue();
         }

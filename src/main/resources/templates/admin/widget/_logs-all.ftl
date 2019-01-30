@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -12,8 +12,8 @@
         <div class="col-lg-12 attachDesc" style="padding-top: 15px;">
             <div class="box box-solid">
                 <div class="box-body table-responsive no-padding">
-                    <table class="table table-bordered table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <tbody>
                             <tr>
                                 <th><@spring.message code='admin.logs.th.log-id' /></th>
                                 <th><@spring.message code='admin.logs.th.log-action' /></th>
@@ -21,8 +21,6 @@
                                 <th>IP</th>
                                 <th><@spring.message code='admin.logs.th.log-datetime' /></th>
                             </tr>
-                        </thead>
-                        <tbody>
                             <#list logs.content as log>
                                 <tr>
                                     <td>${log.logId}</td>
@@ -59,6 +57,6 @@
     </div>
 </div>
 </body>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
 </html>

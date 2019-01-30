@@ -3,7 +3,7 @@
     <li class="dropdown">
         <ul id="settings-dropdown" class="dropdown-menu">
             <li>
-                <a href="mailto:${user.userEmail?default("")}" target="_blank" title="Email Me">
+                <a href="mailto:${user.userEmail!}" target="_blank" title="Email Me">
                     <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
                     Email Me
                 </a>
@@ -19,7 +19,7 @@
     </li>
     <li class="divider"></li>
 
-    <#if options.theme_material_other_sidebar_archives?default('true') == 'true'>
+    <#if (options.theme_material_other_sidebar_archives!'true') == 'true'>
     <!-- Archives  -->
     <li class="dropdown">
         <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
@@ -41,7 +41,7 @@
     </li>
     </#if>
 
-    <#if options.theme_material_other_sidebar_cates?default('true') == 'true'>
+    <#if (options.theme_material_other_sidebar_cates!'true') == 'true'>
     <!-- Categories  -->
     <li class="dropdown">
         <a href="#" class="ripple-effect dropdown-toggle" data-toggle="dropdown">
@@ -75,7 +75,7 @@
         </#list>
     </@commonTag>
 
-    <#if options.theme_material_other_sidebar_postcount?default('true') == 'true'>
+    <#if (options.theme_material_other_sidebar_postcount!'true') == 'true'>
     <!-- Article Number  -->
     <li>
         <a href="/archives">

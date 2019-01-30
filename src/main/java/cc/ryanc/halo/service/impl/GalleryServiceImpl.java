@@ -37,7 +37,7 @@ public class GalleryServiceImpl implements GalleryService {
      */
     @Override
     @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Gallery saveByGallery(Gallery gallery) {
+    public Gallery save(Gallery gallery) {
         return galleryRepository.save(gallery);
     }
 
@@ -49,22 +49,10 @@ public class GalleryServiceImpl implements GalleryService {
      */
     @Override
     @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Gallery removeByGalleryId(Long galleryId) {
-        Optional<Gallery> gallery = this.findByGalleryId(galleryId);
+    public Gallery remove(Long galleryId) {
+        final Optional<Gallery> gallery = this.findByGalleryId(galleryId);
         galleryRepository.delete(gallery.get());
         return gallery.get();
-    }
-
-    /**
-     * 修改图片信息
-     *
-     * @param gallery gallery
-     * @return Gallery
-     */
-    @Override
-    @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Gallery updateByGallery(Gallery gallery) {
-        return galleryRepository.save(gallery);
     }
 
     /**
@@ -74,7 +62,7 @@ public class GalleryServiceImpl implements GalleryService {
      * @return Page
      */
     @Override
-    public Page<Gallery> findAllGalleries(Pageable pageable) {
+    public Page<Gallery> findAll(Pageable pageable) {
         return galleryRepository.findAll(pageable);
     }
 
@@ -85,7 +73,7 @@ public class GalleryServiceImpl implements GalleryService {
      */
     @Override
     @Cacheable(value = GALLERIES_CACHE_NAME, key = "'gallery'")
-    public List<Gallery> findAllGalleries() {
+    public List<Gallery> findAll() {
         return galleryRepository.findAll();
     }
 

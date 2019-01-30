@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/AdminLTE.min.css">
     <style>
         .attachDesc,.attachImg{padding-top:15px;padding-bottom:15px}
         .form-horizontal .control-label{text-align:left}
@@ -16,7 +16,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-6 attachImg">
-            <img src="${gallery.galleryUrl?if_exists}" style="width: 100%;">
+            <img src="${gallery.galleryUrl!}" style="width: 100%;">
         </div>
         <div class="col-lg-6 attachDesc">
             <div class="box box-solid">
@@ -35,19 +35,19 @@
                         <div class="form-group">
                             <label for="galleryDesc" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-desc' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="galleryDesc" name="galleryDesc" value="${gallery.galleryDesc?if_exists}" >
+                                <input type="text" class="form-control" id="galleryDesc" name="galleryDesc" value="${gallery.galleryDesc!}" >
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="galleryDate" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-date' /></label>
                             <div class="col-sm-10">
-                                <input type="date" class="form-control" id="galleryDate" name="galleryDate" value="${gallery.galleryDate?if_exists}">
+                                <input type="date" class="form-control" id="galleryDate" name="galleryDate" value="${gallery.galleryDate!}">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="galleryLocation" class="col-sm-2 control-label"><@spring.message code='admin.pages.galleries.form.gallery-location' /></label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="galleryLocation" name="galleryLocation" value="${gallery.galleryLocation?if_exists}" >
+                                <input type="text" class="form-control" id="galleryLocation" name="galleryLocation" value="${gallery.galleryLocation!}" >
                             </div>
                         </div>
                         <div class="form-group">
@@ -73,12 +73,12 @@
     </div>
 </div>
 </body>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/js/adminlte.min.js"></script>
-<script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/js/halo.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-backend/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/halo-backend/js/adminlte.min.js"></script>
+<script src="/static/halo-backend/plugins/layer/layer.js"></script>
+<script src="/static/halo-backend/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
     function btn_delete() {
@@ -87,21 +87,13 @@
             ,btn: ['<@spring.message code="common.btn.delete" />', '<@spring.message code="common.btn.cancel" />']
             ,yes: function(index){
                 layer.close(index);
-                $.ajax({
-                    type: 'GET',
-                    url: '/admin/page/gallery/remove',
-                    async: false,
-                    data:{
-                        galleryId : ${gallery.galleryId?c}
-                    },
-                    success: function (data) {
-                        if(data.code==1){
-                            halo.showMsgAndReload(data.msg,'success',1000);
-                        }else{
-                            halo.showMsg(data.msg,'error',2000);
-                        }
+                $.get('/admin/page/gallery/remove',{'galleryId' : ${gallery.galleryId?c}},function (data) {
+                    if(data.code === 1){
+                        halo.showMsgAndReload(data.msg,'success',1000);
+                    }else{
+                        halo.showMsg(data.msg,'error',2000);
                     }
-                });
+                },'JSON');
             }
         });
     }

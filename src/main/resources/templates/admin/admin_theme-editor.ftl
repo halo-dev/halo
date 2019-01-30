@@ -1,23 +1,18 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.themes.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/plugins/simplemde/simplemde.min.css">
-    <style type="text/css">
-        .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
-        .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
-        .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
-    </style>
-    <section class="content-header">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/easymde/easymde.min.css">
+    <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
         <ol class="breadcrumb">
             <li>
                 <a data-pjax="true" href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#">外观</a></li>
+            <li><a data-pjax="true" href="javascript:void(0)">外观</a></li>
             <li class="active">主题编辑</li>
         </ol>
     </section>
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-md-9">
                 <div class="box box-primary">
@@ -37,7 +32,7 @@
             <div class="col-md-3">
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title">${options.theme?default('halo')}主题</h3>
+                        <h3 class="box-title">${options.theme!'halo'}主题</h3>
                     </div>
                     <div class="box-body table-responsive no-padding">
                         <div class="table-responsive mailbox-messages">
@@ -45,7 +40,7 @@
                                 <tbody>
                                     <#list tpls as tpl>
                                         <tr style="cursor: pointer">
-                                            <td class="mailbox-name" onclick="loadContent('${tpl}')"><a href="#">${tpl}</a></td>
+                                            <td class="mailbox-name" onclick="loadContent('${tpl}')"><a href="javascript:void(0)">${tpl}</a></td>
                                             <td class="mailbox-subject">
                                                 <#switch tpl>
                                                     <#case "index.ftl">
@@ -93,62 +88,49 @@
             </div>
         </div>
     </section>
-    <script src="/static/plugins/simplemde/simplemde.min.js"></script>
-    <script>
-        /**
-         * 加载编辑器
-         */
-        var simplemde = new SimpleMDE({
-            element: document.getElementById("tplContent"),
-            autoDownloadFontAwesome: false,
-            autofocus: true,
-            renderingConfig: {
-                codeSyntaxHighlighting: true
-            },
-            showIcons: ["code", "table"],
-            status: false,
-            tabSize: 4,
-            toolbar: false,
-            toolbarTips: false
-        });
-        function loadContent(tplName) {
-            if (tplName && tplName != '') {
-                $.ajax({
-                    type: 'GET',
-                    url: '/admin/themes/getTpl',
-                    async: false,
-                    data: {
-                        tplName: tplName
-                    },
-                    success: function (data) {
-                        simplemde.value(data);
-                        $('#tplNameTitle').html(tplName);
-                    }
-                });
-            } else {
-                simplemde.value('');
-                $('#tplNameTitle').html('');
-            }
-        }
-
-        function saveTpl() {
-            $.ajax({
-                type: 'POST',
-                url: '/admin/themes/editor/save',
-                async: false,
-                data:{
-                    'tplName': $('#tplNameTitle').html(),
-                    'tplContent': simplemde.value()
-                },
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsg(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
-                }
-            });
-        }
-    </script>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    /**
+     * 加载编辑器
+     */
+    var easyMDE = new EasyMDE({
+        element: document.getElementById("tplContent"),
+        autoDownloadFontAwesome: false,
+        autofocus: true,
+        renderingConfig: {
+            codeSyntaxHighlighting: true
+        },
+        showIcons: ["code", "table"],
+        status: false,
+        tabSize: 4,
+        toolbar: false,
+        toolbarTips: false
+    });
+    function loadContent(tplName) {
+        var tplNameTitle = $('#tplNameTitle');
+        if (tplName && tplName !== '') {
+            $.get('/admin/themes/getTpl',{'tplName': tplName},function (data) {
+                easyMDE.value(data);
+                tplNameTitle.html(tplName);
+            })
+        } else {
+            easyMDE.value('');
+            tplNameTitle.html('');
+        }
+    }
+
+    function saveTpl() {
+        $.post('/admin/themes/editor/save',{
+            'tplName': $('#tplNameTitle').html(),
+            'tplContent': easyMDE.value()
+        },function (data) {
+            if(data.code === 1){
+                halo.showMsg(data.msg,'success',1000);
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+</script>
+</@footer>

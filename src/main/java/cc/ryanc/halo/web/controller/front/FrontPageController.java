@@ -5,10 +5,7 @@ import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.ListPage;
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
-import cc.ryanc.halo.model.enums.CommentStatusEnum;
-import cc.ryanc.halo.model.enums.PostTypeEnum;
-import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.PostService;
@@ -52,7 +49,7 @@ public class FrontPageController extends BaseController {
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model) {
-        List<Gallery> galleries = galleryService.findAllGalleries();
+        final List<Gallery> galleries = galleryService.findAll();
         model.addAttribute("galleries", galleries);
         return this.render("gallery");
     }
@@ -72,14 +69,15 @@ public class FrontPageController extends BaseController {
      *
      * @param postUrl 页面路径
      * @param model   model
+     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "/p/{postUrl}")
     public String getPage(@PathVariable(value = "postUrl") String postUrl,
-                          @RequestParam(value = "cp",defaultValue = "1") Integer cp,
+                          @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
-        Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
-        if (null == post) {
+        final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        if (null == post || !post.getPostStatus().equals(PostStatusEnum.PUBLISHED.getCode())) {
             return this.renderNotFound();
         }
         List<Comment> comments = null;
@@ -89,23 +87,22 @@ public class FrontPageController extends BaseController {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
         }
         //默认显示10条
-        Integer size = 10;
-        //获取每页评论条数
+        int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
-        ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments),cp, size);
-        int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
-        model.addAttribute("is_page",true);
+        final ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
+        final int[] rainbow = PageUtil.rainbow(cp, commentsPage.getTotalPage(), 3);
+        model.addAttribute("is_page", true);
         model.addAttribute("post", post);
         model.addAttribute("comments", commentsPage);
         model.addAttribute("commentsCount", comments.size());
         model.addAttribute("rainbow", rainbow);
-        postService.updatePostView(post);
+        postService.cacheViews(post.getPostId());
 
         //如果设置了自定义模板，则渲染自定义模板
-        if(StrUtil.isNotEmpty(post.getCustomTpl())){
+        if (StrUtil.isNotEmpty(post.getCustomTpl())) {
             return this.render(post.getCustomTpl());
         }
         return this.render("page");

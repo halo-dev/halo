@@ -13,6 +13,7 @@ import cc.ryanc.halo.utils.CommentUtil;
 import cc.ryanc.halo.utils.OwoUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -61,44 +62,12 @@ public class FrontCommentController {
     private MailService mailService;
 
     /**
-     * 获取文章的评论
-     *
-     * @param postId postId 文章编号
-     * @return List
-     */
-    @GetMapping(value = "/getComment/{postId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Comment> getComment(@PathVariable Long postId) {
-        Optional<Post> post = postService.findByPostId(postId);
-        Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        Pageable pageable = PageRequest.of(0, 999, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post.get(), pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
-        return CommentUtil.getComments(comments);
-    }
-
-    /**
-     * 加载评论
-     *
-     * @param page 页码
-     * @param post 当前文章
-     * @return List
-     */
-    @GetMapping(value = "/loadComment")
-    @ResponseBody
-    public List<Comment> loadComment(@RequestParam(value = "page") Integer page,
-                                     @RequestParam(value = "post") Post post) {
-        Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        Pageable pageable = PageRequest.of(page - 1, 10, sort);
-        List<Comment> comments = commentService.findCommentsByPostAndCommentStatus(post, pageable, CommentStatusEnum.PUBLISHED.getCode()).getContent();
-        return comments;
-    }
-
-    /**
      * 提交新评论
      *
      * @param comment comment实体
      * @param post    post实体
      * @param request request
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/newComment")
@@ -114,10 +83,9 @@ public class FrontCommentController {
         }
         try {
             Comment lastComment = null;
-            post = postService.findByPostId(post.getPostId()).get();
+            post = postService.findByPostId(post.getPostId()).orElse(new Post());
             comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
-            comment.setCommentDate(DateUtil.date());
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setIsAdmin(0);
             comment.setCommentAuthor(HtmlUtil.escape(comment.getCommentAuthor()));
@@ -125,17 +93,22 @@ public class FrontCommentController {
                 comment.setCommentAuthorAvatarMd5(SecureUtil.md5(comment.getCommentAuthorEmail()));
             }
             if (comment.getCommentParent() > 0) {
-                lastComment = commentService.findCommentById(comment.getCommentParent()).get();
-                String lastContent = "<a href='#comment-id-" + lastComment.getCommentId() + "'>@" + lastComment.getCommentAuthor() + "</a> ";
-                comment.setCommentContent(lastContent + OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
+                lastComment = commentService.findCommentById(comment.getCommentParent()).orElse(new Comment());
+                final StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
+                buildContent.append(lastComment.getCommentId());
+                buildContent.append("'>@");
+                buildContent.append(lastComment.getCommentAuthor());
+                buildContent.append("</a> ");
+                buildContent.append(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
+                comment.setCommentContent(buildContent.toString());
             } else {
                 //将评论内容的字符专为安全字符
                 comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
             }
             if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
-                comment.setCommentAuthorUrl(URLUtil.formatUrl(comment.getCommentAuthorUrl()));
+                comment.setCommentAuthorUrl(URLUtil.normalize(comment.getCommentAuthorUrl()));
             }
-            commentService.saveByComment(comment);
+            commentService.save(comment);
             if (comment.getCommentParent() > 0) {
                 new EmailToParent(comment, lastComment, post).start();
                 new EmailToAdmin(comment, post).start();
@@ -169,14 +142,19 @@ public class FrontCommentController {
             if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.TRUE.getDesc()) && StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp()), TrueFalseEnum.TRUE.getDesc())) {
                 try {
                     //发送邮件到博主
-                    Map<String, Object> map = new HashMap<>(5);
+                    final Map<String, Object> map = new HashMap<>(5);
+                    final StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
+                        pageUrl.append("/archives/");
+                    } else {
+                        pageUrl.append("/p/");
+                    }
+                    pageUrl.append(post.getPostUrl());
+                    pageUrl.append("#comment-id-");
+                    pageUrl.append(comment.getCommentId());
+                    map.put("pageUrl", pageUrl.toString());
                     map.put("author", userService.findUser().getUserDisplayName());
                     map.put("pageName", post.getPostTitle());
-                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    }
                     map.put("visitor", comment.getCommentAuthor());
                     map.put("commentContent", comment.getCommentContent());
                     mailService.sendTemplateMail(userService.findUser().getUserEmail(), "有新的评论", map, "common/mail_template/mail_admin.ftl");
@@ -206,15 +184,21 @@ public class FrontCommentController {
             //发送通知给对方
             if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.TRUE.getDesc()) && StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp()), TrueFalseEnum.TRUE.getDesc())) {
                 if (Validator.isEmail(lastComment.getCommentAuthorEmail())) {
-                    Map<String, Object> map = new HashMap<>(8);
+                    final Map<String, Object> map = new HashMap<>(8);
+                    final StrBuilder pageUrl = new StrBuilder(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
+                        pageUrl.append("/archives/");
+
+                    } else {
+                        pageUrl.append("/p/");
+                    }
+                    pageUrl.append(post.getPostUrl());
+                    pageUrl.append("#comment-id-");
+                    pageUrl.append(comment.getCommentId());
+                    map.put("pageUrl", pageUrl.toString());
                     map.put("blogTitle", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()));
                     map.put("commentAuthor", lastComment.getCommentAuthor());
                     map.put("pageName", lastComment.getPost().getPostTitle());
-                    if (StrUtil.equals(post.getPostType(), PostTypeEnum.POST_TYPE_POST.getDesc())) {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    } else {
-                        map.put("pageUrl", HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/p/" + post.getPostUrl() + "#comment-id-" + comment.getCommentId());
-                    }
                     map.put("commentContent", lastComment.getCommentContent());
                     map.put("replyAuthor", comment.getCommentAuthor());
                     map.put("replyContent", comment.getCommentContent());

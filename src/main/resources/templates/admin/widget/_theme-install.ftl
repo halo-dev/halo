@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/plugins/fileinput/fileinput.min.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/fileinput/fileinput.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/AdminLTE.min.css">
     <style type="text/css" rel="stylesheet">
         .form-horizontal .control-label{
             text-align: left;
@@ -73,15 +73,15 @@
     </section>
 </div>
 </body>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/plugins/fileinput/fileinput.min.js"></script>
-<#if options.blog_locale?default('zh_CN')=='zh_CN'>
-<script src="/static/plugins/fileinput/zh.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-backend/plugins/fileinput/fileinput.min.js"></script>
+<#if (options.blog_locale!'zh_CN')=='zh_CN'>
+<script src="/static/halo-backend/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/js/halo.min.js"></script>
+<script src="/static/halo-backend/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/halo-backend/plugins/layer/layer.js"></script>
+<script src="/static/halo-backend/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
     $(document).ready(function () {
@@ -102,9 +102,9 @@
             showClose: false
         }).on("fileuploaded",function (event,data,previewId,index) {
             var data = data.jqXHR.responseJSON;
-            if(data.code==1){
+            if(data.code === 1){
                 $("#uploadForm").hide(400);
-                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/themes');
+                halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/themes');
             }else{
                 halo.showMsg(data.msg,'error',2000);
             }
@@ -117,27 +117,23 @@
     function pullAction() {
         var remoteAddr = $("#remoteAddr").val();
         var themeName = $("#themeName").val();
-        if(remoteAddr==null || themeName==null){
+        var btnInstall = $('#btnInstall');
+        if(remoteAddr===null || themeName===null){
             halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
             return;
         }
-        $('#btnInstall').button('loading');
-        $.ajax({
-            type: 'post',
-            url: '/admin/themes/clone',
-            data: {
-                remoteAddr : remoteAddr,
-                themeName: themeName
-            },
-            success: function (data) {
-                if(data.code==1){
-                    halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/themes');
-                }else {
-                    halo.showMsg(data.msg,'error',2000);
-                    $('#btnInstall').button('reset');
-                }
+        btnInstall.button('loading');
+        $.post('/admin/themes/clone',{
+            'remoteAddr' : remoteAddr,
+            'themeName': themeName
+        },function (data) {
+            if(data.code === 1){
+                halo.showMsgAndParentRedirect(data.msg,'success',1000,'/admin/themes');
+            }else {
+                halo.showMsg(data.msg,'error',2000);
+                btnInstall.button('reset');
             }
-        });
+        },'JSON');
     }
 </script>
 </html>

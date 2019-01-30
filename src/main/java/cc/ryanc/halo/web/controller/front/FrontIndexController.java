@@ -15,9 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * <pre>
@@ -44,7 +44,6 @@ public class FrontIndexController extends BaseController {
      */
     @GetMapping
     public String index(Model model) {
-        //调用方法渲染首页
         return this.index(model, 1);
     }
 
@@ -59,60 +58,22 @@ public class FrontIndexController extends BaseController {
     @GetMapping(value = "page/{page}")
     public String index(Model model,
                         @PathVariable(value = "page") Integer page) {
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         //默认显示10条
-        Integer size = 10;
-        //尝试加载设置选项，用于设置显示条数
+        int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         //所有文章数据，分页
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Post> posts = postService.findPostByStatus(pageable);
+        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Page<Post> posts = postService.findPostByStatus(pageable);
         if (null == posts) {
             return this.renderNotFound();
         }
-        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-        model.addAttribute("is_index",true);
+        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+        model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
-        return this.render("index");
-    }
-
-    /**
-     * ajax分页
-     *
-     * @param page page 当前页码
-     * @return List
-     */
-    @GetMapping(value = "next")
-    @ResponseBody
-    public List<Post> ajaxIndex(@RequestParam(value = "page") Integer page) {
-        Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        //默认显示10条
-        Integer size = 10;
-        //尝试加载设置选项，用于设置显示条数
-        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
-        }
-
-        //文章数据，只获取文章，没有分页
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        List<Post> posts = postService.findPostByStatus(pageable).getContent();
-        return posts;
-    }
-
-    /**
-     * 搜索文章
-     *
-     * @param keyword keyword
-     * @param model   model
-     * @return 模板路径/themes/{theme}/index
-     */
-    @GetMapping(value = "search")
-    public String search(@RequestParam("keyword") String keyword, Model model) {
-        Page<Post> posts = postService.searchByKeywords(keyword, null);
-        model.addAttribute("posts", posts);
         return this.render("index");
     }
 }

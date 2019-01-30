@@ -9,8 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 /**
@@ -46,45 +49,45 @@ public class CategoryController {
      * 新增/修改分类目录
      *
      * @param category category对象
-     * @return 重定向到/admin/category
-     */
-    @PostMapping(value = "/save")
-    public String saveCategory(@ModelAttribute Category category) {
-
-        try {
-            categoryService.saveByCategory(category);
-        } catch (Exception e) {
-            log.error("Modify category failed: {}", e.getMessage());
-        }
-        return "redirect:/admin/category";
-    }
-
-    /**
-     * 验证分类目录路径是否已经存在
      *
-     * @param cateUrl 分类路径
      * @return JsonResult
      */
-    @GetMapping(value = "/checkUrl")
+    @PostMapping(value = "/save")
     @ResponseBody
-    public JsonResult checkCateUrlExists(@RequestParam("cateUrl") String cateUrl) {
-        Category category = categoryService.findByCateUrl(cateUrl);
-        if (null != category) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+    public JsonResult saveCategory(@Valid Category category, BindingResult result) {
+        if (result.hasErrors()) {
+            for (ObjectError error : result.getAllErrors()) {
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+            }
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
+        final Category tempCategory = categoryService.findByCateUrl(category.getCateUrl());
+        if (null != category.getCateId()) {
+            if (null != tempCategory && !category.getCateId().equals(tempCategory.getCateId())) {
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+            }
+        } else {
+            if (null != tempCategory) {
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+            }
+        }
+        category = categoryService.save(category);
+        if (null == category) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+        }
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
     }
 
     /**
      * 处理删除分类目录的请求
      *
      * @param cateId cateId
+     *
      * @return 重定向到/admin/category
      */
     @GetMapping(value = "/remove")
     public String removeCategory(@RequestParam("cateId") Long cateId) {
         try {
-            categoryService.removeByCateId(cateId);
+            categoryService.remove(cateId);
         } catch (Exception e) {
             log.error("Delete category failed: {}", e.getMessage());
         }
@@ -96,12 +99,13 @@ public class CategoryController {
      *
      * @param cateId cateId
      * @param model  model
+     *
      * @return 模板路径admin/admin_category
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model, @RequestParam("cateId") Long cateId) {
-        Optional<Category> category = categoryService.findByCateId(cateId);
-        model.addAttribute("updateCategory", category.get());
+        final Optional<Category> category = categoryService.findByCateId(cateId);
+        model.addAttribute("updateCategory", category.orElse(new Category()));
         return "admin/admin_category";
     }
 }

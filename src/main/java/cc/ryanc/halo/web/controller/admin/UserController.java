@@ -66,7 +66,7 @@ public class UserController {
                     return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
                 }
             }
-            userService.saveByUser(user);
+            userService.save(user);
             configuration.setSharedVariable("user", userService.findUser());
             session.removeAttribute(HaloConst.USER_SESSION_KEY);
         } catch (Exception e) {
@@ -92,10 +92,10 @@ public class UserController {
                                  @ModelAttribute("userId") Long userId,
                                  HttpSession session) {
         try {
-            User user = userService.findByUserIdAndUserPass(userId, SecureUtil.md5(beforePass));
+            final User user = userService.findByUserIdAndUserPass(userId, SecureUtil.md5(beforePass));
             if (null != user) {
                 user.setUserPass(SecureUtil.md5(newPass));
-                userService.saveByUser(user);
+                userService.save(user);
                 session.removeAttribute(HaloConst.USER_SESSION_KEY);
             } else {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.old-password-error"));

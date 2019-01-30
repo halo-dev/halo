@@ -6,6 +6,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -33,16 +35,19 @@ public class Menu implements Serializable {
     /**
      * 菜单名称
      */
+    @NotEmpty(message = "菜单名称不能为空！")
     private String menuName;
 
     /**
      * 菜单路径
      */
+    @NotEmpty(message = "菜单路径不能为空！")
     private String menuUrl;
 
     /**
      * 排序编号
      */
+    @NotNull(message = "排序编号不能为空！")
     private Integer menuSort;
 
     /**

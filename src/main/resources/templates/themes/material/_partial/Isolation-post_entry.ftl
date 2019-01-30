@@ -1,10 +1,10 @@
 <#list posts.content as post>
-<div class="post_entry-module mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp mdl-cell mdl-cell--12-col fade out">
+<div class="post_entry-module mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation!'2'}dp mdl-cell mdl-cell--12-col fade out">
     <!-- Post_entry Header -->
     <!-- Post Header Info -->
     <div class="post_entry-header_info without-thumbnail">
         <!-- Author Avatar & Name -->
-        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName?default('halo')}'s avatar">
+        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName!'Halo'}'s avatar">
         <span class="name-span">RYAN0UP</span>
     </div>
     <!-- Null Thumbnail -->
@@ -18,7 +18,7 @@
         </p>
         <!-- Post Excerpt -->
         <p class="post_entry-excerpt">
-            ${post.postSummary?if_exists}...
+            ${post.postSummary!}...
             &nbsp;&nbsp;&nbsp;
             <span>
                 <a href="/archives/${post.postUrl}" target="_self">阅读全文</a>

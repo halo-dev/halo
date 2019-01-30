@@ -1,4 +1,4 @@
-<div class="sidebar-header header-cover" style="background-image: url(${options.theme_material_sidebar_header?default('/material/source/img/sidebar_header.png')});">
+<div class="sidebar-header header-cover" style="background-image: url(${options.theme_material_sidebar_header!'/material/source/img/sidebar_header.png'});">
     <!-- Top bar -->
     <div class="top-bar"></div>
 
@@ -13,12 +13,12 @@
 
     <!-- Sidebar Avatar -->
     <div class="sidebar-image">
-        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" alt="${user.userDisplayName?default("")}'s avatar">
+        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" alt="${user.userDisplayName!'Halo'}'s avatar">
     </div>
 
     <!-- Sidebar Email -->
     <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
-        ${user.userEmail?default(" ")}
+        ${user.userEmail!'i@example.com'}
         <b class="caret"></b>
     </a>
 </div>

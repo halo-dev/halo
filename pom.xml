@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.6.RELEASE</version>
+		<version>2.1.2.RELEASE</version>
 		<relativePath/>
 	</parent>
 
@@ -31,15 +31,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<oh-my-email.version>0.0.3</oh-my-email.version>
-		<lombok.version>1.18.2</lombok.version>
-		<ehcache.version>3.6.0</ehcache.version>
+		<oh-my-email.version>0.0.4</oh-my-email.version>
+		<lombok.version>1.18.4</lombok.version>
+		<ehcache.version>3.6.3</ehcache.version>
 		<rome.version>1.0</rome.version>
-		<hutool-all.version>4.1.19</hutool-all.version>
+		<hutool-all.version>4.4.2</hutool-all.version>
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
-		<qiniu-java-sdk.version>7.2.14</qiniu-java-sdk.version>
+		<qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
-		<jaxb-api.version>2.3.0</jaxb-api.version>
+		<commonmark.version>0.12.1</commonmark.version>
 	</properties>
 
 	<dependencies>
@@ -53,12 +53,6 @@
 					<artifactId>spring-boot-starter-tomcat</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -152,6 +146,12 @@
 			<groupId>com.qiniu</groupId>
 			<artifactId>qiniu-java-sdk</artifactId>
 			<version>${qiniu-java-sdk.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>okhttp</artifactId>
+					<groupId>com.squareup.okhttp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- 图片操作 -->
@@ -161,11 +161,21 @@
 			<version>${thumbnailator.version}</version>
 		</dependency>
 
-		<!-- jaxb-api-->
+		<!-- Markdown渲染 -->
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>${jaxb-api.version}</version>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark-ext-gfm-tables</artifactId>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark-ext-yaml-front-matter</artifactId>
+			<version>${commonmark.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -198,7 +208,6 @@
 					</resource>
 				</resources>
 				<plugins>
-					<!-- 跳过单元测试，不然打包的时候会因为加载不了application.yaml报错 -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
@@ -235,8 +244,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
-					<!-- 打包成jar文件，并指定lib文件夹以及resources资源文件夹 -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
@@ -273,7 +280,6 @@
                     </resource>
                 </resources>
                 <plugins>
-                    <!-- 跳过单元测试，不然打包的时候会因为加载不了application.yaml报错 -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -310,8 +316,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <!-- 打包成jar文件，并指定lib文件夹以及resources资源文件夹 -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
@@ -345,6 +349,11 @@
                             <fork>true</fork>
                         </configuration>
                     </plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.0.0</version>
+					</plugin>
                 </plugins>
 			</build>
 		</profile>

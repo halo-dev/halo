@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/css/AdminLTE.min.css">
     <style>
         .themeSetting, .themeImg {
             padding-top: 15px;
@@ -24,11 +24,11 @@
 
 <#macro import_js>
 </body>
-<script src="/static/plugins/jquery/jquery.min.js"></script>
-<script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/plugins/layer/layer.js"></script>
-<script src="/static/js/halo.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-backend/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/halo-backend/plugins/layer/layer.js"></script>
+<script src="/static/halo-backend/js/halo.min.js"></script>
 <#nested />
 <script>
     var halo = new $.halo();
@@ -39,18 +39,13 @@
      */
     function saveThemeOptions(option) {
         var param = $('#'+option).serialize();
-        $.ajax({
-            type: 'post',
-            url: '/admin/option/save',
-            data: param,
-            success: function (data) {
-                if(data.code==1){
-                    halo.showMsg(data.msg, "success", 1000);
-                }else{
-                    halo.showMsg(data.msg, "error", 1000);
-                }
+        $.post('/admin/option/save',param,function (data) {
+            if(data.code === 1){
+                halo.showMsg(data.msg, "success", 1000);
+            }else{
+                halo.showMsg(data.msg, "error", 1000);
             }
-        });
+        },'JSON');
     }
 
     /**
@@ -74,21 +69,14 @@
      */
     function updateTheme(theme, e) {
         $(e).button('loading');
-        $.ajax({
-            type: 'get',
-            url: '/admin/themes/pull',
-            data: {
-                'themeName': theme
-            },
-            success: function (data) {
-                if (data.code == 1) {
-                    halo.showMsgAndParentRedirect(data.msg, 'success', 1000, '/admin/themes');
-                } else {
-                    halo.showMsg(data.msg, 'error', 2000);
-                    $(e).button('reset');
-                }
+        $.get('/admin/themes/pull',{'themeName': theme},function (data) {
+            if (data.code === 1) {
+                halo.showMsgAndParentRedirect(data.msg, 'success', 1000, '/admin/themes');
+            } else {
+                halo.showMsg(data.msg, 'error', 2000);
+                $(e).button('reset');
             }
-        });
+        },'JSON');
     }
 </script>
 </html>

@@ -2,12 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.user.profile.title' /></@head>
 <div class="content-wrapper">
-    <style>
-        .form-horizontal .control-label{
-            text-align: left;
-        }
-    </style>
-    <section class="content-header">
+    <section class="content-header" id="animated-header">
         <h1>
             <@spring.message code='admin.user.profile.title' />
             <small></small>
@@ -17,12 +12,12 @@
                 <a data-pjax="true" href="/admin">
                     <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
-            <li><a data-pjax="true" href="#"><@spring.message code='admin.user.profile.bread.user' /></a></li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.user.profile.bread.user' /></a></li>
             <li class="active"><@spring.message code='admin.user.profile.title' /></li>
         </ol>
     </section>
     <!-- tab选项卡 -->
-    <section class="content container-fluid">
+    <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-md-12">
                 <div class="nav-tabs-custom">
@@ -37,8 +32,8 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="general">
                             <form method="post" class="form-horizontal" id="profileForm">
-                                <input type="hidden" name="userId" value="${user.userId?if_exists}">
-                                <input type="hidden" id="userPass" name="userPass" value="${user.userPass?if_exists}">
+                                <input type="hidden" name="userId" value="${user.userId!}">
+                                <input type="hidden" id="userPass" name="userPass" value="${user.userPass!}">
                                 <div class="box-body">
                                     <div class="form-group">
                                         <label for="userName" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.username' />
@@ -47,7 +42,7 @@
                                             </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <input type="text" class="form-control" id="userName" name="userName" value="${user.userName?if_exists}">
+                                            <input type="text" class="form-control" id="userName" name="userName" value="${user.userName!}">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -57,22 +52,22 @@
                                             </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <input type="text" class="form-control" id="userDisplayName" name="userDisplayName" value="${user.userDisplayName?if_exists}">
+                                            <input type="text" class="form-control" id="userDisplayName" name="userDisplayName" value="${user.userDisplayName!}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="userEmail" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.email' /></label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <input type="email" class="form-control" id="userEmail" name="userEmail" value="${user.userEmail?if_exists}">
+                                            <input type="email" class="form-control" id="userEmail" name="userEmail" value="${user.userEmail!}">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="userAvatar" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.user.profile.form.avatar' /></label>
                                         <div class="col-lg-4 col-sm-8">
                                             <div class="input-group">
-                                                <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar?if_exists}">
+                                                <input type="text" class="form-control" id="userAvatar" name="userAvatar" value="${user.userAvatar!}">
                                                 <span class="input-group-btn">
-                                                    <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=userAvatar','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
+                                                    <button class="btn btn-default btn-flat" type="button" onclick="halo.layerModal('/admin/attachments/select?id=userAvatar','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                 </span>
                                             </div>
                                         </div>
@@ -84,7 +79,7 @@
                                             </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
-                                            <textarea class="form-control" rows="3" id="userDesc" name="userDesc" style="resize: none">${user.userDesc?if_exists}</textarea>
+                                            <textarea class="form-control" rows="3" id="userDesc" name="userDesc" style="resize: none">${user.userDesc!}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -100,19 +95,19 @@
                                     <div class="form-group">
                                         <label for="beforePass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.old-password' /></label>
                                         <div class="col-sm-4">
-                                            <input type="password" class="form-control" id="beforePass" name="beforePass">
+                                            <input type="password" class="form-control" id="beforePass" name="beforePass" autocomplete="current-password">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="newPass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.new-password' /></label>
                                         <div class="col-sm-4">
-                                            <input type="password" class="form-control" id="newPass" name="newPass">
+                                            <input type="password" class="form-control" id="newPass" name="newPass" autocomplete="new-password">
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="reNewPass" class="col-sm-2 control-label"><@spring.message code='admin.user.profile.form.confirm-password' /></label>
                                         <div class="col-sm-4">
-                                            <input type="password" class="form-control" id="reNewPass" name="reNewPass">
+                                            <input type="password" class="form-control" id="reNewPass" name="reNewPass" autocomplete="new-password">
                                         </div>
                                     </div>
                                 </div>
@@ -126,54 +121,43 @@
             </div>
         </div>
     </section>
-    <@compress single_line=true>
-    <script>
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        });
-        function saveUser(option) {
-            var param = $('#'+option).serialize();
-            $.ajax({
-                type: 'post',
-                url: '/admin/profile/save',
-                data: param,
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
-                }
-            });
-        }
-        function changPass() {
-            var beforePass = $('#beforePass').val();
-            var newPass = $('#newPass').val();
-            var reNewPass = $('#reNewPass').val();
-            if(beforePass==""||newPass==""||reNewPass==""){
-                halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
-                return;
-            }
-            if(newPass!=reNewPass){
-                halo.showMsg("<@spring.message code='admin.user.profile.form.password.no-same' />",'error',2000);
-                return;
-            }
-            var param = $('#passForm').serialize();
-            $.ajax({
-                type: 'post',
-                url: '/admin/profile/changePass',
-                data: param,
-                success: function (data) {
-                    if(data.code==1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
-                    }else{
-                        halo.showMsg(data.msg,'error',2000);
-                    }
-                }
-            });
-        }
-    </script>
-    </@compress>
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    });
+    function saveUser(option) {
+        var param = $('#'+option).serialize();
+        $.post('/admin/profile/save',param,function (data) {
+            if(data.code === 1){
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/profile',"${options.admin_pjax!'true'}");
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+    function changPass() {
+        var beforePass = $('#beforePass').val();
+        var newPass = $('#newPass').val();
+        var reNewPass = $('#reNewPass').val();
+        if(beforePass===""||newPass===""||reNewPass===""){
+            halo.showMsg("<@spring.message code='common.js.info-no-complete' />",'info',2000);
+            return;
+        }
+        if(newPass!==reNewPass){
+            halo.showMsg("<@spring.message code='admin.user.profile.form.password.no-same' />",'error',2000);
+            return;
+        }
+        var param = $('#passForm').serialize();
+        $.post('/admin/profile/changePass',param,function (data) {
+            if(data.code === 1){
+                halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/profile',"${options.admin_pjax!'true'}");
+            }else{
+                halo.showMsg(data.msg,'error',2000);
+            }
+        },'JSON');
+    }
+</script>
+</@footer>
 </#compress>

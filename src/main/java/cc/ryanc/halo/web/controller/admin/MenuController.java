@@ -1,12 +1,18 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Menu;
+import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.MenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * <pre>
@@ -28,6 +34,7 @@ public class MenuController {
      * 渲染菜单设置页面
      *
      * @param model model
+     *
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping
@@ -39,16 +46,23 @@ public class MenuController {
      * 新增/修改菜单
      *
      * @param menu menu
+     *
      * @return 重定向到/admin/menus
      */
     @PostMapping(value = "/save")
-    public String saveMenu(@ModelAttribute Menu menu) {
-        try {
-            menuService.saveByMenu(menu);
-        } catch (Exception e) {
-            log.error("Saving menu failed: {}" + e.getMessage());
+    @ResponseBody
+    public JsonResult saveMenu(@Valid Menu menu, BindingResult result) {
+        if (result.hasErrors()) {
+            for (ObjectError error : result.getAllErrors()) {
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+            }
         }
-        return "redirect:/admin/menus";
+        menu = menuService.save(menu);
+        if (null != menu) {
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "菜单保存成功！");
+        } else {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "菜单保存成功！");
+        }
     }
 
     /**
@@ -56,11 +70,12 @@ public class MenuController {
      *
      * @param menuId 菜单编号
      * @param model  model
+     *
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping(value = "/edit")
     public String updateMenu(@RequestParam("menuId") Long menuId, Model model) {
-        Menu menu = menuService.findByMenuId(menuId).get();
+        final Menu menu = menuService.findByMenuId(menuId).orElse(new Menu());
         model.addAttribute("updateMenu", menu);
         return "/admin/admin_menu";
     }
@@ -69,12 +84,13 @@ public class MenuController {
      * 删除菜单
      *
      * @param menuId 菜单编号
+     *
      * @return 重定向到/admin/menus
      */
     @GetMapping(value = "/remove")
     public String removeMenu(@RequestParam("menuId") Long menuId) {
         try {
-            menuService.removeByMenuId(menuId);
+            menuService.remove(menuId);
         } catch (Exception e) {
             log.error("Deleting menu failed: {}", e.getMessage());
         }
