@@ -13,7 +13,6 @@ import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +21,14 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import javax.persistence.criteria.Predicate;
+import java.util.*;
 
 /**
  * <pre>
@@ -163,6 +164,17 @@ public class PostServiceImpl implements PostService {
             }
         }
         return posts;
+    }
+
+    @Override
+    public Page<Post> searchPostsBy(String keyword, String postType, Integer postStatus, Pageable pageable) {
+        return postRepository.findAll(buildSearchSepcification(keyword, postType, postStatus), pageable)
+                .map(post -> {
+                    if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                        post.setPostSummary("该文章为加密文章");
+                    }
+                    return post;
+                });
     }
 
     /**
@@ -397,7 +409,6 @@ public class PostServiceImpl implements PostService {
      * 根据分类目录查询文章
      *
      * @param category category
-     * @param status   status
      * @param pageable pageable
      * @return Page
      */
@@ -417,7 +428,6 @@ public class PostServiceImpl implements PostService {
      * 根据标签查询文章，分页
      *
      * @param tag      tag
-     * @param status   status
      * @param pageable pageable
      * @return Page
      */
@@ -563,4 +573,28 @@ public class PostServiceImpl implements PostService {
     public List<Post> getRecentPosts(int limit) {
         return postRepository.getPostsByLimit(limit);
     }
+
+    @NonNull
+    private Specification<Post> buildSearchSepcification(@Nullable String keyword, @Nullable String postType, @Nullable Integer postStatus) {
+        return (Specification<Post>) (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (StringUtils.hasText(keyword)) {
+                predicates.add(criteriaBuilder.like(root.get("postContent"), keyword));
+            }
+
+            if (StringUtils.hasText(postType)) {
+                predicates.add(criteriaBuilder.equal(root.get("postType"), postType));
+                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("postType"), postType)));
+            }
+
+            if (postStatus != null) {
+                predicates.add(criteriaBuilder.equal(root.get("postStatus"), postStatus));
+                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("postStatus"), postType)));
+            }
+
+            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
+    }
+
 }

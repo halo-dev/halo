@@ -209,7 +209,6 @@ public class PostController extends BaseController {
      * @param post     post
      * @param cateList 分类目录
      * @param tagList  标签
-     * @param session  session
      * @return JsonResult
      */
     @PostMapping(value = "/update")
