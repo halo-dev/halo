@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -55,15 +56,11 @@ public class AttachmentController {
      * 复印件列表
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_attachment
      */
     @GetMapping
     public String attachments(Model model,
-                              @RequestParam(value = "page", defaultValue = "0") Integer page,
-                              @RequestParam(value = "size", defaultValue = "18") Integer size) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        final Pageable pageable = PageRequest.of(page, size, sort);
+                              @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable) {
         final Page<Attachment> attachments = attachmentService.findAll(pageable);
         model.addAttribute("attachments", attachments);
         return "admin/admin_attachment";
@@ -73,17 +70,13 @@ public class AttachmentController {
      * 跳转选择附件页面
      *
      * @param model model
-     * @param page  page 当前页码
-     *
      * @return 模板路径admin/widget/_attachment-select
      */
     @GetMapping(value = "/select")
     public String selectAttachment(Model model,
-                                   @RequestParam(value = "page", defaultValue = "0") Integer page,
+                                   @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable,
                                    @RequestParam(value = "id", defaultValue = "none") String id,
                                    @RequestParam(value = "type", defaultValue = "normal") String type) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        final Pageable pageable = PageRequest.of(page, 18, sort);
         final Page<Attachment> attachments = attachmentService.findAll(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
@@ -109,7 +102,6 @@ public class AttachmentController {
      *
      * @param file    file
      * @param request request
-     *
      * @return Map
      */
     @PostMapping(value = "/upload", produces = {"application/json;charset=UTF-8"})
@@ -159,7 +151,6 @@ public class AttachmentController {
      *
      * @param model    model
      * @param attachId 附件编号
-     *
      * @return 模板路径admin/widget/_attachment-detail
      */
     @GetMapping(value = "/attachment")
@@ -174,7 +165,6 @@ public class AttachmentController {
      *
      * @param attachId 附件编号
      * @param request  request
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/remove")

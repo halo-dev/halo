@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -60,18 +61,12 @@ public class CommentController extends BaseController {
      *
      * @param model  model
      * @param status status 评论状态
-     * @param page   page 当前页码
-     * @param size   size 每页显示条数
-     *
      * @return 模板路径admin/admin_comment
      */
     @GetMapping
     public String comments(Model model,
-                           @RequestParam(value = "status", defaultValue = "0") Integer status,
-                           @RequestParam(value = "page", defaultValue = "0") Integer page,
-                           @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "commentDate");
-        final Pageable pageable = PageRequest.of(page, size, sort);
+                           @PageableDefault(sort = "commentDate", direction = Sort.Direction.DESC) Pageable pageable,
+                           @RequestParam(value = "status", defaultValue = "0") Integer status) {
         final Page<Comment> comments = commentService.findAll(status, pageable);
         model.addAttribute("comments", comments);
         model.addAttribute("publicCount", commentService.getCountByStatus(CommentStatusEnum.PUBLISHED.getCode()));
@@ -86,19 +81,18 @@ public class CommentController extends BaseController {
      *
      * @param commentId 评论编号
      * @param status    评论状态
-     *
      * @return 重定向到/admin/comments
      */
     @GetMapping(value = "/throw")
     public String moveToTrash(@RequestParam("commentId") Long commentId,
                               @RequestParam("status") String status,
-                              @RequestParam(value = "page", defaultValue = "0") Integer page) {
+                              @PageableDefault Pageable pageable) {
         try {
             commentService.updateCommentStatus(commentId, CommentStatusEnum.RECYCLE.getCode());
         } catch (Exception e) {
             log.error("Delete comment failed: {}", e.getMessage());
         }
-        return "redirect:/admin/comments?status=" + status + "&page=" + page;
+        return "redirect:/admin/comments?status=" + status + "&page=" + pageable.getPageNumber();
     }
 
     /**
@@ -107,7 +101,6 @@ public class CommentController extends BaseController {
      * @param commentId 评论编号
      * @param status    评论状态
      * @param session   session
-     *
      * @return 重定向到/admin/comments
      */
     @GetMapping(value = "/revert")
@@ -128,20 +121,18 @@ public class CommentController extends BaseController {
      *
      * @param commentId commentId 评论编号
      * @param status    status 评论状态
-     * @param page      当前页码
-     *
      * @return string 重定向到/admin/comments
      */
     @GetMapping(value = "/remove")
     public String moveToAway(@RequestParam("commentId") Long commentId,
                              @RequestParam("status") Integer status,
-                             @RequestParam(value = "page", defaultValue = "0") Integer page) {
+                             @PageableDefault Pageable pageable) {
         try {
             commentService.remove(commentId);
         } catch (Exception e) {
             log.error("Delete comment failed: {}", e.getMessage());
         }
-        return "redirect:/admin/comments?status=" + status + "&page=" + page;
+        return "redirect:/admin/comments?status=" + status + "&page=" + pageable.getPageNumber();
     }
 
 
@@ -150,7 +141,6 @@ public class CommentController extends BaseController {
      *
      * @param commentId      被回复的评论
      * @param commentContent 回复的内容
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/reply")

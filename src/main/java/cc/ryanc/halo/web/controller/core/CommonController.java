@@ -41,7 +41,6 @@ public class CommonController implements ErrorController {
     /**
      * 渲染404页面
      *
-     * @param model model
      * @return String
      */
     @GetMapping(value = "/404")
@@ -52,7 +51,6 @@ public class CommonController implements ErrorController {
     /**
      * 渲染500页面
      *
-     * @param model model
      * @return String
      */
     @GetMapping(value = "/500")

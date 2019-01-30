@@ -14,7 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -95,12 +99,10 @@ public class ApiPostController {
      * </p>
      *
      * @param page 页码
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/page/{page}")
-    public JsonResult posts(@PathVariable(value = "page") Integer page) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+    public JsonResult posts(@PathVariable(value = "page") Integer page, @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
@@ -147,7 +149,6 @@ public class ApiPostController {
      * </p>
      *
      * @param postId 文章编号
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/{postId}")
