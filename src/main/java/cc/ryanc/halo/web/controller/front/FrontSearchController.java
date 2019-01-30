@@ -16,12 +16,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -49,7 +52,7 @@ public class FrontSearchController extends BaseController {
     @GetMapping
     public String search(Model model,
                          @RequestParam(value = "keyword") String keyword) {
-        return this.search(model, HtmlUtil.escape(keyword), 1);
+        return this.search(model, HtmlUtil.escape(keyword), 1, Sort.by(DESC, "postDate"));
     }
 
     /**
@@ -63,14 +66,14 @@ public class FrontSearchController extends BaseController {
     @GetMapping(value = "page/{page}")
     public String search(Model model,
                          @RequestParam(value = "keyword") String keyword,
-                         @PathVariable(value = "page") Integer page) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+                         @PathVariable(value = "page") Integer page,
+                         @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<Post> posts = postService.searchPosts(HtmlUtil.escape(keyword),PostTypeEnum.POST_TYPE_POST.getDesc(),PostStatusEnum.PUBLISHED.getCode(),pageable);
+        final Page<Post> posts = postService.searchPosts(HtmlUtil.escape(keyword), PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", keyword);

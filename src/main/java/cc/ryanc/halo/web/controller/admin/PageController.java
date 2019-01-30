@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -77,7 +78,6 @@ public class PageController {
      * 页面管理页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_page
      */
     @GetMapping
@@ -102,7 +102,6 @@ public class PageController {
      *
      * @param model  model
      * @param linkId linkId 友情链接编号
-     *
      * @return String 模板路径admin/admin_page_link
      */
     @GetMapping(value = "/links/edit")
@@ -116,7 +115,6 @@ public class PageController {
      * 处理添加/修改友链的请求并渲染页面
      *
      * @param link Link实体
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/links/save")
@@ -138,7 +136,6 @@ public class PageController {
      * 处理删除友情链接的请求并重定向
      *
      * @param linkId 友情链接编号
-     *
      * @return 重定向到/admin/page/links
      */
     @GetMapping(value = "/links/remove")
@@ -155,17 +152,11 @@ public class PageController {
      * 图库管理
      *
      * @param model model
-     * @param page  当前页码
-     * @param size  每页显示的条数
-     *
      * @return 模板路径admin/admin_page_gallery
      */
     @GetMapping(value = "/galleries")
     public String gallery(Model model,
-                          @RequestParam(value = "page", defaultValue = "0") Integer page,
-                          @RequestParam(value = "size", defaultValue = "18") Integer size) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "galleryId");
-        final Pageable pageable = PageRequest.of(page, size, sort);
+                          @PageableDefault(size = 18, sort = "galleryId", direction = Sort.Direction.DESC) Pageable pageable) {
         final Page<Gallery> galleries = galleryService.findAll(pageable);
         model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
@@ -175,7 +166,6 @@ public class PageController {
      * 保存图片
      *
      * @param gallery gallery
-     *
      * @return 重定向到/admin/page/gallery
      */
     @PostMapping(value = "/gallery/save")
@@ -196,7 +186,6 @@ public class PageController {
      *
      * @param model     model
      * @param galleryId 图片编号
-     *
      * @return 模板路径admin/widget/_gallery-detail
      */
     @GetMapping(value = "/gallery")
@@ -210,7 +199,6 @@ public class PageController {
      * 删除图库中的图片
      *
      * @param galleryId 图片编号
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/gallery/remove")
@@ -229,7 +217,6 @@ public class PageController {
      * 跳转到新建页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_page_md_editor
      */
     @GetMapping(value = "/new")
@@ -281,7 +268,6 @@ public class PageController {
      *
      * @param pageId 页面编号
      * @param model  model
-     *
      * @return admin/admin_page_md_editor
      */
     @GetMapping(value = "/edit")
@@ -297,7 +283,6 @@ public class PageController {
      * 检查该路径是否已经存在
      *
      * @param postUrl postUrl
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/checkUrl")

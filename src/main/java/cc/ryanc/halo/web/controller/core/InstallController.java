@@ -85,8 +85,6 @@ public class InstallController {
      * 执行安装
      *
      * @param blogLocale      系统语言
-     * @param siteTitle       博客标题
-     * @param siteUrl         博客网址
      * @param userName        用户名
      * @param userDisplayName 用户名显示名
      * @param userEmail       用户邮箱

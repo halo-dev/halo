@@ -15,7 +15,6 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -23,9 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
@@ -37,6 +35,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -83,17 +83,12 @@ public class PostController extends BaseController {
      * 处理后台获取文章列表的请求
      *
      * @param model model
-     * @param page  当前页码
-     * @param size  每页显示的条数
      * @return 模板路径admin/admin_post
      */
     @GetMapping
     public String posts(Model model,
                         @RequestParam(value = "status", defaultValue = "0") Integer status,
-                        @RequestParam(value = "page", defaultValue = "0") Integer page,
-                        @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        final Pageable pageable = PageRequest.of(page, size, sort);
+                        @PageableDefault(sort = "postDate", direction = DESC) Pageable pageable) {
         final Page<Post> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         model.addAttribute("posts", posts);
         model.addAttribute("publishCount", postService.getCountByStatus(PostStatusEnum.PUBLISHED.getCode()));
@@ -108,19 +103,13 @@ public class PostController extends BaseController {
      *
      * @param model   Model
      * @param keyword keyword 关键字
-     * @param page    page 当前页码
-     * @param size    size 每页显示条数
      * @return 模板路径admin/admin_post
      */
     @PostMapping(value = "/search")
     public String searchPost(Model model,
                              @RequestParam(value = "keyword") String keyword,
-                             @RequestParam(value = "page", defaultValue = "0") Integer page,
-                             @RequestParam(value = "size", defaultValue = "10") Integer size) {
+                             @PageableDefault(sort = "postId", direction = DESC) Pageable pageable) {
         try {
-            //排序规则
-            final Sort sort = new Sort(Sort.Direction.DESC, "postId");
-            final Pageable pageable = PageRequest.of(page, size, sort);
             model.addAttribute("posts", postService.searchPosts(keyword, PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable));
         } catch (Exception e) {
             log.error("未知错误：{}", e.getMessage());

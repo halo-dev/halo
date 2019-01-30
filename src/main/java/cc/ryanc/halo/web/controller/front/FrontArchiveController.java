@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -62,7 +65,7 @@ public class FrontArchiveController extends BaseController {
      */
     @GetMapping
     public String archives(Model model) {
-        return this.archives(model, 1);
+        return this.archives(model, 1, Sort.by(DESC, "postDate"));
     }
 
     /**
@@ -74,10 +77,9 @@ public class FrontArchiveController extends BaseController {
      */
     @GetMapping(value = "page/{page}")
     public String archives(Model model,
-                           @PathVariable(value = "page") Integer page) {
-
+                           @PathVariable(value = "page") Integer page,
+                           @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         //所有文章数据，分页，material主题适用
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         final Pageable pageable = PageRequest.of(page - 1, 5, sort);
         final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -44,7 +47,6 @@ public class FrontCategoryController extends BaseController {
      * 分类列表页面
      *
      * @param model model
-     *
      * @return String
      */
     @GetMapping
@@ -59,13 +61,12 @@ public class FrontCategoryController extends BaseController {
      *
      * @param model   model
      * @param cateUrl cateUrl
-     *
      * @return string
      */
     @GetMapping(value = "{cateUrl}")
     public String categories(Model model,
                              @PathVariable("cateUrl") String cateUrl) {
-        return this.categories(model, cateUrl, 1);
+        return this.categories(model, cateUrl, 1, Sort.by(DESC, "postDate"));
     }
 
     /**
@@ -74,18 +75,17 @@ public class FrontCategoryController extends BaseController {
      * @param model   model
      * @param cateUrl 分类目录路径
      * @param page    页码
-     *
      * @return String
      */
     @GetMapping("{cateUrl}/page/{page}")
     public String categories(Model model,
                              @PathVariable("cateUrl") String cateUrl,
-                             @PathVariable("page") Integer page) {
+                             @PathVariable("page") Integer page,
+                             @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         final Category category = categoryService.findByCateUrl(cateUrl);
         if (null == category) {
             return this.renderNotFound();
         }
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         int size = 10;
         if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
             size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));

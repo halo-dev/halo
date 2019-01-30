@@ -20,9 +20,9 @@ import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -77,7 +77,6 @@ public class AdminController extends BaseController {
      * 请求后台页面
      *
      * @param model   model
-     * @param session session
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
@@ -201,16 +200,11 @@ public class AdminController extends BaseController {
      * 查看所有日志
      *
      * @param model model model
-     * @param page  page 当前页码
-     * @param size  size 每页条数
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
-    public String logs(Model model,
-                       @RequestParam(value = "page", defaultValue = "0") Integer page,
-                       @RequestParam(value = "size", defaultValue = "10") Integer size) {
+    public String logs(Model model, @PageableDefault Pageable pageable) {
         final Sort sort = new Sort(Sort.Direction.DESC, "logId");
-        final Pageable pageable = PageRequest.of(page, size, sort);
         final Page<Logs> logs = logsService.findAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
