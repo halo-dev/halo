@@ -133,7 +133,6 @@ public class AttachmentController {
                 attachment.setAttachSmallPath(resultMap.get("smallPath"));
                 attachment.setAttachType(file.getContentType());
                 attachment.setAttachSuffix(resultMap.get("suffix"));
-                attachment.setAttachCreated(DateUtil.date());
                 attachment.setAttachSize(resultMap.get("size"));
                 attachment.setAttachWh(resultMap.get("wh"));
                 attachment.setAttachLocation(resultMap.get("location"));

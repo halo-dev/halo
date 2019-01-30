@@ -86,7 +86,6 @@ public class FrontCommentController {
             post = postService.findByPostId(post.getPostId()).orElse(new Post());
             comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
-            comment.setCommentDate(DateUtil.date());
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
             comment.setIsAdmin(0);
             comment.setCommentAuthor(HtmlUtil.escape(comment.getCommentAuthor()));

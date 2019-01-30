@@ -2,6 +2,9 @@ package cc.ryanc.halo.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -20,6 +23,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "halo_post")
+@EntityListeners(AuditingEntityListener.class)
 public class Post implements Serializable {
 
     private static final long serialVersionUID = -6019684584665869629L;
@@ -105,11 +109,13 @@ public class Post implements Serializable {
     /**
      * 发表日期
      */
+    @CreatedDate
     private Date postDate;
 
     /**
      * 最后一次更新时间
      */
+    @LastModifiedDate
     private Date postUpdate;
 
     /**

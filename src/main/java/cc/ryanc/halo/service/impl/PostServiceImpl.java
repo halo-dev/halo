@@ -73,7 +73,6 @@ public class PostServiceImpl implements PostService {
         } else {
             post.setPostSummary(summaryText);
         }
-        post.setPostUpdate(DateUtil.date());
         return postRepository.save(post);
     }
 
