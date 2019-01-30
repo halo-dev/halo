@@ -33,28 +33,30 @@
 
 ```bash
 # 安装 Halo
-yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
+$ yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
 
 # 更新 Halo
-bash halo-cli.sh -u
+$ bash halo-cli.sh -u
 ```
 
 Docker 部署：
 ```bash
 # 拉取镜像
-docker pull ruibaby/halo
+$ docker pull ruibaby/halo
 
 # 运行
-docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+$ docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo -e DB_USER=root -e DB_PASSWORD=123456 ruibaby/halo
+
+# 注意：DB_USER 和 DB_PASSWORD 务必修改并记下
 ```
 
 Docker Compose 部署：
 ```bash
 # 下载 Nginx 配置文件模板
-curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
+$ curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
 
 # 获取 docker-compose.yaml 文件
-yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
+$ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
 # 修改 docker-compose.yaml
 # 1. 修改 VIRTUAL_HOST,LETSENCRYPT_HOST 为自己的域名。
@@ -63,7 +65,7 @@ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 # 4. 修改 DB_PASSWORD 数据库密码。
 
 # 运行
-docker-compose up -d
+$ docker-compose up -d
 ```
 
 > 注意：如使用 Idea，Eclipse 等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题管理和主题上传会有问题。
