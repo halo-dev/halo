@@ -291,7 +291,8 @@
         },function (data) {
             if(data.code === 1){
                 //清除自动保存的内容
-                easyMDE.clearAutosavedValue();
+                easyMDE.toTextArea();
+                easyMDE = null;
                 halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts',"${options.admin_pjax!'true'}");
             }else{
                 halo.showMsg(data.msg,'error',2000);
