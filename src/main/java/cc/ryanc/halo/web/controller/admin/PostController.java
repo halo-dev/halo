@@ -110,7 +110,8 @@ public class PostController extends BaseController {
                              @RequestParam(value = "keyword") String keyword,
                              @PageableDefault(sort = "postId", direction = DESC) Pageable pageable) {
         try {
-            model.addAttribute("posts", postService.searchPosts(keyword, PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable));
+            Page<Post> posts = postService.searchPostsBy(keyword, PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
+            model.addAttribute("posts", posts);
         } catch (Exception e) {
             log.error("未知错误：{}", e.getMessage());
         }
