@@ -1,7 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.QiNiuPutSet;
 import cc.ryanc.halo.model.enums.AttachLocationEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
@@ -42,6 +41,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+
 /**
  * <pre>
  *     附件业务逻辑实现类
@@ -62,6 +63,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 新增附件信息
      *
      * @param attachment attachment
+     *
      * @return Attachment
      */
     @Override
@@ -85,6 +87,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 获取所有附件信息 分页
      *
      * @param pageable pageable
+     *
      * @return Page
      */
     @Override
@@ -96,6 +99,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 根据附件id查询附件
      *
      * @param attachId attachId
+     *
      * @return Optional
      */
     @Override
@@ -107,6 +111,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 根据编号移除附件
      *
      * @param attachId attachId
+     *
      * @return Attachment
      */
     @Override
@@ -122,12 +127,13 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
+     *
      * @return Map
      */
     @Override
     public Map<String, String> upload(MultipartFile file, HttpServletRequest request) {
         Map<String, String> resultMap;
-        String attachLoc = HaloConst.OPTIONS.get(BlogPropertiesEnum.ATTACH_LOC.getProp());
+        String attachLoc = OPTIONS.get(BlogPropertiesEnum.ATTACH_LOC.getProp());
         if (StrUtil.isEmpty(attachLoc)) {
             attachLoc = "server";
         }
@@ -153,6 +159,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
+     *
      * @return Map
      */
     @Override
@@ -244,6 +251,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
+     *
      * @return Map
      */
     @Override
@@ -252,11 +260,11 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             final Configuration cfg = new Configuration(Zone.zone0());
             final String key = Md5Util.getMD5Checksum(file);
-            final String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
-            final String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
-            final String domain = HaloConst.OPTIONS.get("qiniu_domain");
-            final String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
-            final String smallUrl = HaloConst.OPTIONS.get("qiniu_small_url");
+            final String accessKey = OPTIONS.get("qiniu_access_key");
+            final String secretKey = OPTIONS.get("qiniu_secret_key");
+            final String domain = OPTIONS.get("qiniu_domain");
+            final String bucket = OPTIONS.get("qiniu_bucket");
+            final String smallUrl = OPTIONS.get("qiniu_small_url");
             if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket)) {
                 return resultMap;
             }
@@ -304,6 +312,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
+     *
      * @return Map
      */
     @Override
@@ -311,12 +320,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         final Map<String, String> resultMap = new HashMap<>(6);
         try {
             final String key = Md5Util.getMD5Checksum(file);
-            final String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
-            final String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
-            final String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
-            final String domain = HaloConst.OPTIONS.get("upyun_oss_domain");
-            final String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
-            final String smallUrl = HaloConst.OPTIONS.get("upyun_oss_small");
+            final String ossSrc = OPTIONS.get("upyun_oss_src");
+            final String ossPwd = OPTIONS.get("upyun_oss_pwd");
+            final String bucket = OPTIONS.get("upyun_oss_bucket");
+            final String domain = OPTIONS.get("upyun_oss_domain");
+            final String operator = OPTIONS.get("upyun_oss_operator");
+            final String smallUrl = OPTIONS.get("upyun_oss_small");
             if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
                 return resultMap;
             }
@@ -353,15 +362,16 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 七牛云删除附件
      *
      * @param key key
+     *
      * @return boolean
      */
     @Override
     public boolean deleteQiNiuAttachment(String key) {
         boolean flag = true;
         final Configuration cfg = new Configuration(Zone.zone0());
-        final String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
-        final String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
-        final String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
+        final String accessKey = OPTIONS.get("qiniu_access_key");
+        final String secretKey = OPTIONS.get("qiniu_secret_key");
+        final String bucket = OPTIONS.get("qiniu_bucket");
         if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(bucket)) {
             return false;
         }
@@ -381,15 +391,16 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 又拍云删除附件
      *
      * @param fileName fileName
+     *
      * @return boolean
      */
     @Override
     public boolean deleteUpYunAttachment(String fileName) {
         boolean flag = true;
-        final String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
-        final String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
-        final String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
-        final String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
+        final String ossSrc = OPTIONS.get("upyun_oss_src");
+        final String ossPwd = OPTIONS.get("upyun_oss_pwd");
+        final String bucket = OPTIONS.get("upyun_oss_bucket");
+        final String operator = OPTIONS.get("upyun_oss_operator");
         if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
             return false;
         }

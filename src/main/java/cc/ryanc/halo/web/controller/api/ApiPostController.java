@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
@@ -15,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -102,8 +103,8 @@ public class ApiPostController {
     public JsonResult posts(@PathVariable(value = "page") Integer page) {
         final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         int size = 10;
-        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
         final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);

@@ -4,7 +4,6 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -13,7 +12,6 @@ import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.HaloUtils;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.POSTS_VIEWS;
 
 /**
  * <pre>
@@ -57,14 +58,15 @@ public class PostServiceImpl implements PostService {
      * 保存文章
      *
      * @param post Post
+     *
      * @return Post
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Post save(Post post) {
         int postSummary = 50;
-        if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
-            postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
+        if (StrUtil.isNotEmpty(OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
+            postSummary = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
         }
         final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
         if (summaryText.length() > postSummary) {
@@ -80,6 +82,7 @@ public class PostServiceImpl implements PostService {
      * 根据编号移除文章
      *
      * @param postId postId
+     *
      * @return Post
      */
     @Override
@@ -95,6 +98,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param postId postId
      * @param status status
+     *
      * @return Post
      */
     @Override
@@ -129,6 +133,7 @@ public class PostServiceImpl implements PostService {
      * 获取文章列表 不分页
      *
      * @param postType post or page
+     *
      * @return List
      */
     @Override
@@ -144,11 +149,12 @@ public class PostServiceImpl implements PostService {
      * @param postType   文章类型
      * @param postStatus 文章状态
      * @param pageable   分页信息
+     *
      * @return Page
      */
     @Override
     public Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable) {
-        Page<Post> posts = postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
+        return postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
                 postType,
                 postStatus,
                 "%" + keyword + "%",
@@ -156,13 +162,12 @@ public class PostServiceImpl implements PostService {
                 postStatus,
                 "%" + keyword + "%",
                 pageable
-        );
-        for (Post post : posts.getContent()) {
+        ).map(post -> {
             if (StrUtil.isNotEmpty(post.getPostPassword())) {
                 post.setPostSummary("该文章为加密文章");
             }
-        }
-        return posts;
+            return post;
+        });
     }
 
     /**
@@ -171,35 +176,35 @@ public class PostServiceImpl implements PostService {
      * @param status   0，1，2
      * @param postType post or page
      * @param pageable 分页信息
+     *
      * @return Page
      */
     @Override
     public Page<Post> findPostByStatus(Integer status, String postType, Pageable pageable) {
-        Page<Post> posts = postRepository.findPostsByPostStatusAndPostType(status, postType, pageable);
-        for (Post post : posts.getContent()) {
+        return postRepository.findPostsByPostStatusAndPostType(status, postType, pageable).map(post -> {
             if (StrUtil.isNotEmpty(post.getPostPassword())) {
                 post.setPostSummary("该文章为加密文章");
             }
-        }
-        return posts;
+            return post;
+        });
     }
 
     /**
      * 根据文章状态查询 分页，首页分页
      *
      * @param pageable pageable
+     *
      * @return Page
      */
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_page_'+#pageable.pageNumber")
     public Page<Post> findPostByStatus(Pageable pageable) {
-        Page<Post> posts = postRepository.findPostsByPostStatusAndPostType(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        for (Post post : posts.getContent()) {
+        return postRepository.findPostsByPostStatusAndPostType(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable).map(post -> {
             if (StrUtil.isNotEmpty(post.getPostPassword())) {
                 post.setPostSummary("该文章为加密文章");
             }
-        }
-        return posts;
+            return post;
+        });
     }
 
     /**
@@ -207,6 +212,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param status   0，1，2
      * @param postType post or page
+     *
      * @return List
      */
     @Override
@@ -219,6 +225,7 @@ public class PostServiceImpl implements PostService {
      * 根据编号查询文章
      *
      * @param postId postId
+     *
      * @return Optional
      */
     @Override
@@ -230,6 +237,7 @@ public class PostServiceImpl implements PostService {
      * 根据编号和类型查询文章
      *
      * @param postId postId
+     *
      * @return Post
      */
     @Override
@@ -242,6 +250,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param postUrl  路径
      * @param postType post or page
+     *
      * @return Post
      */
     @Override
@@ -265,6 +274,7 @@ public class PostServiceImpl implements PostService {
      * 获取下一篇文章 较新
      *
      * @param postDate postDate
+     *
      * @return Post
      */
     @Override
@@ -276,6 +286,7 @@ public class PostServiceImpl implements PostService {
      * 获取下一篇文章 较老
      *
      * @param postDate postDate
+     *
      * @return Post
      */
     @Override
@@ -328,6 +339,7 @@ public class PostServiceImpl implements PostService {
 
     /**
      * @return List
+     *
      * @Author Aquan
      * @Description 查询归档信息 返回所有文章
      * @Date 2019.1.4 11:16
@@ -354,6 +366,7 @@ public class PostServiceImpl implements PostService {
      *
      * @param year  year
      * @param month month
+     *
      * @return List
      */
     @Override
@@ -366,6 +379,7 @@ public class PostServiceImpl implements PostService {
      * 根据年份查询文章
      *
      * @param year year
+     *
      * @return List
      */
     @Override
@@ -380,17 +394,17 @@ public class PostServiceImpl implements PostService {
      * @param year     year year
      * @param month    month month
      * @param pageable pageable pageable
+     *
      * @return Page
      */
     @Override
     public Page<Post> findPostByYearAndMonth(String year, String month, Pageable pageable) {
-        Page<Post> posts = postRepository.findPostByYearAndMonth(year, month, null);
-        for (Post post : posts.getContent()) {
+        return postRepository.findPostByYearAndMonth(year, month, null).map(post -> {
             if (StrUtil.isNotEmpty(post.getPostPassword())) {
                 post.setPostSummary("该文章为加密文章");
             }
-        }
-        return posts;
+            return post;
+        });
     }
 
     /**
@@ -399,18 +413,18 @@ public class PostServiceImpl implements PostService {
      * @param category category
      * @param status   status
      * @param pageable pageable
+     *
      * @return Page
      */
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_category_'+#category.cateId+'_'+#pageable.pageNumber")
     public Page<Post> findPostByCategories(Category category, Pageable pageable) {
-        Page<Post> posts = postRepository.findPostByCategoriesAndPostStatus(category, PostStatusEnum.PUBLISHED.getCode(), pageable);
-        for (Post post : posts.getContent()) {
+        return postRepository.findPostByCategoriesAndPostStatus(category, PostStatusEnum.PUBLISHED.getCode(), pageable).map(post -> {
             if (StrUtil.isNotEmpty(post.getPostPassword())) {
                 post.setPostSummary("该文章为加密文章");
             }
-        }
-        return posts;
+            return post;
+        });
     }
 
     /**
@@ -419,18 +433,18 @@ public class PostServiceImpl implements PostService {
      * @param tag      tag
      * @param status   status
      * @param pageable pageable
+     *
      * @return Page
      */
     @Override
     @CachePut(value = POSTS_CACHE_NAME, key = "'posts_tag_'+#tag.tagId+'_'+#pageable.pageNumber")
     public Page<Post> findPostsByTags(Tag tag, Pageable pageable) {
-        Page<Post> posts = postRepository.findPostsByTagsAndPostStatus(tag, PostStatusEnum.PUBLISHED.getCode(), pageable);
-        for (Post post : posts.getContent()) {
+        return postRepository.findPostsByTagsAndPostStatus(tag, PostStatusEnum.PUBLISHED.getCode(), pageable).map(post -> {
             if (StrUtil.isNotEmpty(post.getPostPassword())) {
                 post.setPostSummary("该文章为加密文章");
             }
-        }
-        return posts;
+            return post;
+        });
     }
 
     /**
@@ -448,6 +462,7 @@ public class PostServiceImpl implements PostService {
      * 当前文章的相似文章
      *
      * @param post post
+     *
      * @return List
      */
     @Override
@@ -485,6 +500,7 @@ public class PostServiceImpl implements PostService {
      * 根据文章状态查询数量
      *
      * @param status 文章状态
+     *
      * @return 文章数量
      */
     @Override
@@ -496,6 +512,7 @@ public class PostServiceImpl implements PostService {
      * 生成rss
      *
      * @param posts posts
+     *
      * @return String
      */
     @Override
@@ -513,6 +530,7 @@ public class PostServiceImpl implements PostService {
      * 生成sitemap
      *
      * @param posts posts
+     *
      * @return String
      */
     @Override
@@ -527,10 +545,10 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public void cacheViews(Long postId) {
-        if (null != HaloConst.POSTS_VIEWS.get(postId)) {
-            HaloConst.POSTS_VIEWS.put(postId, HaloConst.POSTS_VIEWS.get(postId) + 1);
+        if (null != POSTS_VIEWS.get(postId)) {
+            POSTS_VIEWS.put(postId, POSTS_VIEWS.get(postId) + 1);
         } else {
-            HaloConst.POSTS_VIEWS.put(postId, 1L);
+            POSTS_VIEWS.put(postId, 1L);
         }
     }
 
@@ -540,6 +558,7 @@ public class PostServiceImpl implements PostService {
      * @param post     post
      * @param cateList cateList
      * @param tagList  tagList
+     *
      * @return Post Post
      */
     @Override
@@ -557,6 +576,7 @@ public class PostServiceImpl implements PostService {
      * 获取最近的文章
      *
      * @param limit 条数
+     *
      * @return List
      */
     @Override

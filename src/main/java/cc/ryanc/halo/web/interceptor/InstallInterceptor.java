@@ -1,6 +1,5 @@
 package cc.ryanc.halo.web.interceptor;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cn.hutool.core.util.StrUtil;
@@ -10,6 +9,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -24,7 +25,7 @@ public class InstallInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
-        if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
+        if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
             return true;
         }
         response.sendRedirect("/install");
