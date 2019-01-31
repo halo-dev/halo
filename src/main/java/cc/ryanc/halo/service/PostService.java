@@ -6,6 +6,8 @@ import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
@@ -70,8 +72,23 @@ public interface PostService {
      * @param postStatus 文章状态
      * @param pageable   分页信息
      * @return Page
+     * @see PostService#searchPostsBy(java.lang.String, java.lang.String, java.lang.Integer, org.springframework.data.domain.Pageable)
      */
+    @Deprecated
     Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable);
+
+    /**
+     * 模糊查询文章
+     *
+     * @param keyword    关键词
+     * @param postType   文章类型
+     * @param postStatus 文章状态
+     * @param pageable   分页信息
+     * @return a page of posts
+     */
+    @NonNull
+    Page<Post> searchPostsBy(@Nullable String keyword, @Nullable String postType, @Nullable Integer postStatus, @NonNull Pageable pageable);
+
 
     /**
      * 根据文章状态查询 分页，用于后台管理
@@ -247,22 +264,6 @@ public interface PostService {
      * @return 文章数量
      */
     Integer getCountByStatus(Integer status);
-
-    /**
-     * 生成rss
-     *
-     * @param posts posts
-     * @return String
-     */
-    String buildRss(List<Post> posts);
-
-    /**
-     * 生成sitemap
-     *
-     * @param posts posts
-     * @return String
-     */
-    String buildSiteMap(List<Post> posts);
 
     /**
      * 缓存阅读数

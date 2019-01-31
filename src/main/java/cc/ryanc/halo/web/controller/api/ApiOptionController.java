@@ -85,8 +85,8 @@ public class ApiOptionController {
      *
      * @return JsonResult
      */
-    @GetMapping(value = "/{optionName}")
-    public JsonResult option(@PathVariable(value = "optionName") String optionName) {
+    @GetMapping(value = "/one")
+    public JsonResult option(@RequestParam(value = "optionName") String optionName) {
         final String optionValue = optionsService.findOneOption(optionName);
         return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), optionValue);
     }

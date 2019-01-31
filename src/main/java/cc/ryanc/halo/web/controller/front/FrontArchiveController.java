@@ -3,7 +3,6 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.ListPage;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
@@ -22,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -58,11 +61,12 @@ public class FrontArchiveController extends BaseController {
      * 文章归档
      *
      * @param model model
+     *
      * @return 模板路径
      */
     @GetMapping
     public String archives(Model model) {
-        return this.archives(model, 1);
+        return this.archives(model, 1, Sort.by(DESC, "postDate"));
     }
 
     /**
@@ -70,14 +74,14 @@ public class FrontArchiveController extends BaseController {
      *
      * @param model model
      * @param page  page 当前页码
+     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "page/{page}")
     public String archives(Model model,
-                           @PathVariable(value = "page") Integer page) {
-
+                           @PathVariable(value = "page") Integer page,
+                           @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         //所有文章数据，分页，material主题适用
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         final Pageable pageable = PageRequest.of(page - 1, 5, sort);
         final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
@@ -94,6 +98,7 @@ public class FrontArchiveController extends BaseController {
      * @param model model
      * @param year  year 年份
      * @param month month 月份
+     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "{year}/{month}")
@@ -114,6 +119,7 @@ public class FrontArchiveController extends BaseController {
      *
      * @param postUrl 文章路径名
      * @param model   model
+     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "{postUrl}")
@@ -140,7 +146,7 @@ public class FrontArchiveController extends BaseController {
             model.addAttribute("nextPost", nextPost);
         }
         List<Comment> comments = null;
-        if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
+        if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
             comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatusEnum.PUBLISHED.getCode());
         } else {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
@@ -156,8 +162,8 @@ public class FrontArchiveController extends BaseController {
         //默认显示10条
         int size = 10;
         //获取每页评论条数
-        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
+            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
         final ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
@@ -187,6 +193,7 @@ public class FrontArchiveController extends BaseController {
      * @param postId       postId
      * @param postPassword postPassword
      * @param response     response
+     *
      * @return String
      */
     @PostMapping(value = "/verifyPostPassword")

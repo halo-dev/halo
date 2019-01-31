@@ -1,6 +1,5 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
@@ -32,6 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.THEMES;
 
 /**
  * <pre>
@@ -70,8 +72,8 @@ public class ThemeController extends BaseController {
     @GetMapping
     public String themes(Model model) {
         model.addAttribute("activeTheme", BaseController.THEME);
-        if (null != HaloConst.THEMES) {
-            model.addAttribute("themes", HaloConst.THEMES);
+        if (null != THEMES) {
+            model.addAttribute("themes", THEMES);
         }
         return "admin/admin_theme";
     }
@@ -94,10 +96,10 @@ public class ThemeController extends BaseController {
             optionsService.saveOption(BlogPropertiesEnum.THEME.getProp(), siteTheme);
             //设置主题
             BaseController.THEME = siteTheme;
-            HaloConst.OPTIONS.clear();
-            HaloConst.OPTIONS = optionsService.findAllOptions();
+            OPTIONS.clear();
+            OPTIONS = optionsService.findAllOptions();
             configuration.setSharedVariable("themeName", siteTheme);
-            configuration.setSharedVariable("options", HaloConst.OPTIONS);
+            configuration.setSharedVariable("options", OPTIONS);
             log.info("Changed theme to {}", siteTheme);
             logsService.save(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-success", new Object[]{siteTheme}));
@@ -128,8 +130,8 @@ public class ThemeController extends BaseController {
                 logsService.save(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), request);
                 ZipUtil.unzip(themePath, new File(basePath.getAbsolutePath(), "templates/themes/"));
                 FileUtil.del(themePath);
-                HaloConst.THEMES.clear();
-                HaloConst.THEMES = HaloUtils.getThemes();
+                THEMES.clear();
+                THEMES = HaloUtils.getThemes();
             } else {
                 log.error("Upload theme failed, no file selected");
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-no-file"));
@@ -154,8 +156,8 @@ public class ThemeController extends BaseController {
             final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             final File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + themeName);
             FileUtil.del(themePath);
-            HaloConst.THEMES.clear();
-            HaloConst.THEMES = HaloUtils.getThemes();
+            THEMES.clear();
+            THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
             log.error("Delete theme failed: {}", e.getMessage());
         }
@@ -194,8 +196,8 @@ public class ThemeController extends BaseController {
             if (NOT_FOUND_GIT.equals(cmdResult)) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
-            HaloConst.THEMES.clear();
-            HaloConst.THEMES = HaloUtils.getThemes();
+            THEMES.clear();
+            THEMES = HaloUtils.getThemes();
         } catch (FileNotFoundException e) {
             log.error("Cloning theme failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.clone-theme-failed") + e.getMessage());
@@ -220,8 +222,8 @@ public class ThemeController extends BaseController {
             if (NOT_FOUND_GIT.equals(cmdResult)) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
-            HaloConst.THEMES.clear();
-            HaloConst.THEMES = HaloUtils.getThemes();
+            THEMES.clear();
+            THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
             log.error("Update theme failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.update-theme-failed") + e.getMessage());
