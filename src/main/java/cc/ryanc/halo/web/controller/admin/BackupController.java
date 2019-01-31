@@ -5,7 +5,6 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.BackupDto;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.MailService;
@@ -33,6 +32,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>
@@ -170,14 +172,14 @@ public class BackupController {
                 content.append("date: ").append(post.getPostDate()).append("\n");
                 content.append("updated: ").append(post.getPostUpdate()).append("\n");
                 content.append("thumbnail: ").append(post.getPostThumbnail()).append("\n");
-                if(post.getTags().size()>0){
+                if (post.getTags().size() > 0) {
                     content.append("tags:").append("\n");
                     final List<Tag> tags = post.getTags();
                     for (Tag tag : tags) {
                         content.append("  - ").append(tag.getTagName()).append("\n");
                     }
                 }
-                if(post.getCategories().size()>0){
+                if (post.getCategories().size() > 0) {
                     content.append("categories:").append("\n");
                     final List<Category> categories = post.getCategories();
                     for (Category category : categories) {
@@ -236,11 +238,11 @@ public class BackupController {
                                   @RequestParam("type") String type,
                                   HttpSession session) {
         final String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
         if (null == user.getUserEmail() || StrUtil.isEmpty(user.getUserEmail())) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.no-email"));
         }
-        if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
+        if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.no-post"));
         }
         new EmailToAdmin(srcPath, user).start();

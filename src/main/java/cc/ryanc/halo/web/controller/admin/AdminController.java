@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.*;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.*;
@@ -32,6 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>
@@ -78,6 +80,7 @@ public class AdminController extends BaseController {
      *
      * @param model   model
      * @param session session
+     *
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
@@ -107,7 +110,7 @@ public class AdminController extends BaseController {
         model.addAttribute("postViewsSum", postViewsSum);
 
         //成立天数
-        final Date blogStart = DateUtil.parse(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
+        final Date blogStart = DateUtil.parse(OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
         final long hadDays = DateUtil.between(blogStart, DateUtil.date(), DateUnit.DAY);
         model.addAttribute("hadDays", hadDays);
         return "admin/admin_index";
@@ -117,11 +120,12 @@ public class AdminController extends BaseController {
      * 处理跳转到登录页的请求
      *
      * @param session session
+     *
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
     public String login(HttpSession session) {
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
         if (null != user) {
             return "redirect:/admin";
@@ -135,6 +139,7 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
+     *
      * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
@@ -163,7 +168,7 @@ public class AdminController extends BaseController {
         userService.updateUserLoginLast(DateUtil.date());
         //判断User对象是否相等
         if (ObjectUtil.equal(aUser, user)) {
-            session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
+            session.setAttribute(USER_SESSION_KEY, aUser);
             //重置用户的登录状态为正常
             userService.updateUserNormal();
             logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, request);
@@ -186,12 +191,13 @@ public class AdminController extends BaseController {
      * 退出登录 销毁session
      *
      * @param session session
+     *
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        session.removeAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
+        session.removeAttribute(USER_SESSION_KEY);
         logsService.save(LogsRecord.LOGOUT, user.getUserName(), request);
         log.info("User {} has logged out", user.getUserName());
         return "redirect:/admin/login";
@@ -203,6 +209,7 @@ public class AdminController extends BaseController {
      * @param model model model
      * @param page  page 当前页码
      * @param size  size 每页条数
+     *
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
@@ -279,6 +286,7 @@ public class AdminController extends BaseController {
      *
      * @param file    file
      * @param request request
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/tools/markdownImport")
@@ -286,7 +294,7 @@ public class AdminController extends BaseController {
     public JsonResult markdownImport(@RequestParam("file") MultipartFile file,
                                      HttpServletRequest request,
                                      HttpSession session) throws IOException {
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
         final String markdown = IoUtil.read(file.getInputStream(), "UTF-8");
         final String content = MarkdownUtils.renderMarkdown(markdown);
         final Map<String, List<String>> frontMatters = MarkdownUtils.getFrontMatter(markdown);

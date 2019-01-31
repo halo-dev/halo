@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
@@ -15,7 +14,6 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -37,6 +35,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>
@@ -67,6 +68,7 @@ public class PostController extends BaseController {
      * 去除html，htm后缀，以及将空格替换成-
      *
      * @param url url
+     *
      * @return String
      */
     private static String urlFilter(String url) {
@@ -85,6 +87,7 @@ public class PostController extends BaseController {
      * @param model model
      * @param page  当前页码
      * @param size  每页显示的条数
+     *
      * @return 模板路径admin/admin_post
      */
     @GetMapping
@@ -110,6 +113,7 @@ public class PostController extends BaseController {
      * @param keyword keyword 关键字
      * @param page    page 当前页码
      * @param size    size 每页显示条数
+     *
      * @return 模板路径admin/admin_post
      */
     @PostMapping(value = "/search")
@@ -133,6 +137,7 @@ public class PostController extends BaseController {
      *
      * @param postId 文章编号
      * @param model  model
+     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "/view")
@@ -157,6 +162,7 @@ public class PostController extends BaseController {
      *
      * @param postId 文章编号
      * @param model  model
+     *
      * @return 模板路径admin/admin_editor
      */
     @GetMapping(value = "/edit")
@@ -180,7 +186,7 @@ public class PostController extends BaseController {
                            @RequestParam("cateList") List<String> cateList,
                            @RequestParam("tagList") String tagList,
                            HttpSession session) {
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
         try {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             post.setUser(user);
@@ -191,7 +197,7 @@ public class PostController extends BaseController {
             }
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-                post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
+                post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
             }
             postService.save(post);
             logsService.save(LogsRecord.PUSH_POST, post.getPostTitle(), request);
@@ -210,6 +216,7 @@ public class PostController extends BaseController {
      * @param cateList 分类目录
      * @param tagList  标签
      * @param session  session
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/update")
@@ -231,7 +238,7 @@ public class PostController extends BaseController {
         }
         //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
         if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-            post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
+            post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
         }
         post = postService.save(post);
         if (null != post) {
@@ -245,6 +252,7 @@ public class PostController extends BaseController {
      * 处理移至回收站的请求
      *
      * @param postId 文章编号
+     *
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/throw")
@@ -262,6 +270,7 @@ public class PostController extends BaseController {
      * 处理文章为发布的状态
      *
      * @param postId 文章编号
+     *
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/revert")
@@ -280,6 +289,7 @@ public class PostController extends BaseController {
      * 处理删除文章的请求
      *
      * @param postId 文章编号
+     *
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/remove")
@@ -301,6 +311,7 @@ public class PostController extends BaseController {
      * 更新所有摘要
      *
      * @param postSummary 文章摘要字数
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/updateSummary")
@@ -320,6 +331,7 @@ public class PostController extends BaseController {
      * 验证文章路径是否已经存在
      *
      * @param postUrl 文章路径
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/checkUrl")
@@ -337,6 +349,7 @@ public class PostController extends BaseController {
      * 将所有文章推送到百度
      *
      * @param baiduToken baiduToken
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/pushAllToBaidu")
@@ -345,7 +358,7 @@ public class PostController extends BaseController {
         if (StrUtil.isBlank(baiduToken)) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.no-baidu-token"));
         }
-        final String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
+        final String blogUrl = OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
         final List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
         final StringBuilder urls = new StringBuilder();
         for (Post post : posts) {

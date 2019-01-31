@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
+import static cc.ryanc.halo.model.dto.HaloConst.*;
+
 /**
  * <pre>
  *     sitemap，rss页面控制器
@@ -39,20 +41,21 @@ public class FrontOthersController {
     @GetMapping(value = {"feed", "feed.xml", "atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String feed() {
-        String rssPosts = HaloConst.OPTIONS.get(BlogPropertiesEnum.RSS_POSTS.getProp());
+        String rssPosts = OPTIONS.get(BlogPropertiesEnum.RSS_POSTS.getProp());
         if (StrUtil.isBlank(rssPosts)) {
             rssPosts = "20";
         }
         //获取文章列表并根据时间排序
         final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         final Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
-        final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        final List<Post> posts = postsPage.getContent();
-        for (Post post : posts) {
+        final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable).map(post -> {
             if(StrUtil.isNotEmpty(post.getPostPassword())){
                 post.setPostContent("该文章为加密文章");
+                post.setPostSummary("该文章为加密文章");
             }
-        }
+            return post;
+        });
+        final List<Post> posts = postsPage.getContent();
         return postService.buildRss(posts);
     }
 
@@ -67,13 +70,14 @@ public class FrontOthersController {
         //获取文章列表并根据时间排序
         final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         final Pageable pageable = PageRequest.of(0, 999, sort);
-        final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        final List<Post> posts = postsPage.getContent();
-        for (Post post : posts) {
+        final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable).map(post -> {
             if(StrUtil.isNotEmpty(post.getPostPassword())){
                 post.setPostContent("该文章为加密文章");
+                post.setPostSummary("该文章为加密文章");
             }
-        }
+            return post;
+        });
+        final List<Post> posts = postsPage.getContent();
         return postService.buildSiteMap(posts);
     }
 }
