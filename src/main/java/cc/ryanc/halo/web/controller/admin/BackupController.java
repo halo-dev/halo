@@ -62,7 +62,6 @@ public class BackupController {
      * 渲染备份页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_backup
      */
     @GetMapping
@@ -86,7 +85,6 @@ public class BackupController {
      * 执行备份
      *
      * @param type 备份类型
-     *
      * @return JsonResult
      */
     @GetMapping(value = "doBackup")
@@ -208,7 +206,6 @@ public class BackupController {
      *
      * @param fileName 文件名
      * @param type     备份类型
-     *
      * @return JsonResult
      */
     @GetMapping(value = "delBackup")
@@ -229,7 +226,6 @@ public class BackupController {
      *
      * @param fileName 文件名
      * @param type     备份类型
-     *
      * @return JsonResult
      */
     @GetMapping(value = "sendToEmail")

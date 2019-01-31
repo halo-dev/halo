@@ -66,7 +66,6 @@ public class ThemeController extends BaseController {
      * 渲染主题设置页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_theme
      */
     @GetMapping
@@ -83,7 +82,6 @@ public class ThemeController extends BaseController {
      *
      * @param siteTheme 主题名称
      * @param request   request
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/set")
@@ -113,7 +111,6 @@ public class ThemeController extends BaseController {
      * 上传主题
      *
      * @param file 文件
-     *
      * @return JsonResult
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -147,7 +144,6 @@ public class ThemeController extends BaseController {
      * 删除主题
      *
      * @param themeName 主题文件夹名
-     *
      * @return string 重定向到/admin/themes
      */
     @GetMapping(value = "/remove")
@@ -179,7 +175,6 @@ public class ThemeController extends BaseController {
      *
      * @param remoteAddr 远程地址
      * @param themeName  主题名称
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/clone")
@@ -209,7 +204,6 @@ public class ThemeController extends BaseController {
      * 更新主题
      *
      * @param themeName 主题名
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/pull")
@@ -253,7 +247,6 @@ public class ThemeController extends BaseController {
      * 编辑主题
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_theme-editor
      */
     @GetMapping(value = "/editor")
@@ -267,7 +260,6 @@ public class ThemeController extends BaseController {
      * 获取模板文件内容
      *
      * @param tplName 模板文件名
-     *
      * @return 模板内容
      */
     @GetMapping(value = "/getTpl", produces = "text/text;charset=UTF-8")
@@ -296,7 +288,6 @@ public class ThemeController extends BaseController {
      *
      * @param tplName    模板名称
      * @param tplContent 模板内容
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/editor/save")

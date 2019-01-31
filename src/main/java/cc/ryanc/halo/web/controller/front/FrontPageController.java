@@ -70,7 +70,6 @@ public class FrontPageController extends BaseController {
      *
      * @param postUrl 页面路径
      * @param model   model
-     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "/p/{postUrl}")

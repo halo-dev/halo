@@ -29,8 +29,8 @@ public class ApiTagController {
      * 获取所有标签
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -61,8 +61,8 @@ public class ApiTagController {
      * 获取单个标签的信息
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",

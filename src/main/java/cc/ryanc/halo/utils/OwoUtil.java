@@ -19,7 +19,6 @@ public class OwoUtil {
      * 将表情标志转化为图片地址
      *
      * @param mark 表情标志
-     *
      * @return 表情图片地址
      */
     public static String markToImg(String mark) {

@@ -68,7 +68,6 @@ public class PostController extends BaseController {
      * 去除html，htm后缀，以及将空格替换成-
      *
      * @param url url
-     *
      * @return String
      */
     private static String urlFilter(String url) {
@@ -125,7 +124,6 @@ public class PostController extends BaseController {
      *
      * @param postId 文章编号
      * @param model  model
-     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "/view")
@@ -150,7 +148,6 @@ public class PostController extends BaseController {
      *
      * @param postId 文章编号
      * @param model  model
-     *
      * @return 模板路径admin/admin_editor
      */
     @GetMapping(value = "/edit")
@@ -238,7 +235,6 @@ public class PostController extends BaseController {
      * 处理移至回收站的请求
      *
      * @param postId 文章编号
-     *
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/throw")
@@ -256,7 +252,6 @@ public class PostController extends BaseController {
      * 处理文章为发布的状态
      *
      * @param postId 文章编号
-     *
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/revert")
@@ -275,7 +270,6 @@ public class PostController extends BaseController {
      * 处理删除文章的请求
      *
      * @param postId 文章编号
-     *
      * @return 重定向到/admin/posts
      */
     @GetMapping(value = "/remove")
@@ -297,7 +291,6 @@ public class PostController extends BaseController {
      * 更新所有摘要
      *
      * @param postSummary 文章摘要字数
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/updateSummary")
@@ -317,7 +310,6 @@ public class PostController extends BaseController {
      * 验证文章路径是否已经存在
      *
      * @param postUrl 文章路径
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/checkUrl")
@@ -335,7 +327,6 @@ public class PostController extends BaseController {
      * 将所有文章推送到百度
      *
      * @param baiduToken baiduToken
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/pushAllToBaidu")

@@ -20,9 +20,7 @@ public class Md5Util {
      * 计算文件MD5编码
      *
      * @param file file
-     *
      * @return byte
-     *
      * @throws Exception Exception
      */
     private static byte[] createChecksum(MultipartFile file) throws Exception {
@@ -47,9 +45,7 @@ public class Md5Util {
      * 生成文件hash值
      *
      * @param file file
-     *
      * @return String
-     *
      * @throws Exception Exception
      */
     public static String getMD5Checksum(MultipartFile file) throws Exception {

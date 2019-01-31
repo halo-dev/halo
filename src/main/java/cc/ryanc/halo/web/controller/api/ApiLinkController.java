@@ -32,8 +32,8 @@ public class ApiLinkController {
      * 获取所有友情链接
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",

@@ -65,7 +65,6 @@ public class FrontCommentController {
      * @param comment comment实体
      * @param post    post实体
      * @param request request
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/newComment")

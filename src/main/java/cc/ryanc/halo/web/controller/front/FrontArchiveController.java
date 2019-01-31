@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
 import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -61,7 +61,6 @@ public class FrontArchiveController extends BaseController {
      * 文章归档
      *
      * @param model model
-     *
      * @return 模板路径
      */
     @GetMapping
@@ -74,7 +73,6 @@ public class FrontArchiveController extends BaseController {
      *
      * @param model model
      * @param page  page 当前页码
-     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "page/{page}")
@@ -98,7 +96,6 @@ public class FrontArchiveController extends BaseController {
      * @param model model
      * @param year  year 年份
      * @param month month 月份
-     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "{year}/{month}")
@@ -119,7 +116,6 @@ public class FrontArchiveController extends BaseController {
      *
      * @param postUrl 文章路径名
      * @param model   model
-     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "{postUrl}")
@@ -193,7 +189,6 @@ public class FrontArchiveController extends BaseController {
      * @param postId       postId
      * @param postPassword postPassword
      * @param response     response
-     *
      * @return String
      */
     @PostMapping(value = "/verifyPostPassword")

@@ -49,7 +49,6 @@ public class CategoryController {
      * 新增/修改分类目录
      *
      * @param category category对象
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/save")
@@ -81,7 +80,6 @@ public class CategoryController {
      * 处理删除分类目录的请求
      *
      * @param cateId cateId
-     *
      * @return 重定向到/admin/category
      */
     @GetMapping(value = "/remove")
@@ -99,7 +97,6 @@ public class CategoryController {
      *
      * @param cateId cateId
      * @param model  model
-     *
      * @return 模板路径admin/admin_category
      */
     @GetMapping(value = "/edit")

@@ -32,8 +32,8 @@ public class ApiArchivesController {
      * 根据年份归档
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -86,8 +86,8 @@ public class ApiArchivesController {
      * 根据月份归档
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -137,11 +137,11 @@ public class ApiArchivesController {
     }
 
     /**
+     * @return JsonResult
      * @Author Aquan
      * @Description 返回所有文章
      * @Date 2019.1.4 11:06
      * @Param
-     * @return JsonResult
      **/
     @GetMapping(value = "/all")
     public JsonResult archivesAllPost() {

@@ -29,8 +29,8 @@ public class ApiCategoryController {
      * 获取所有分类
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -62,8 +62,8 @@ public class ApiCategoryController {
      * 获取单个分类的信息
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",

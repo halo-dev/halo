@@ -39,7 +39,6 @@ public class HaloUtils {
      * 获取备份文件信息
      *
      * @param dir dir
-     *
      * @return List
      */
     public static List<BackupDto> getBackUps(String dir) {
@@ -74,7 +73,6 @@ public class HaloUtils {
      * 转换文件大小
      *
      * @param size size
-     *
      * @return String
      */
     public static String parseSize(long size) {
@@ -101,7 +99,6 @@ public class HaloUtils {
      * 获取文件创建时间
      *
      * @param srcPath 文件绝对路径
-     *
      * @return 时间
      */
     public static Date getCreateTime(String srcPath) {
@@ -124,7 +121,6 @@ public class HaloUtils {
      * 获取文件长和宽
      *
      * @param file file
-     *
      * @return String
      */
     public static String getImageWh(File file) {
@@ -186,7 +182,6 @@ public class HaloUtils {
      * 获取主题下的模板文件名
      *
      * @param theme theme
-     *
      * @return List
      */
     public static List<String> getTplName(String theme) {
@@ -294,7 +289,6 @@ public class HaloUtils {
      * @param blogUrl 博客地址
      * @param token   百度推送token
      * @param urls    文章路径
-     *
      * @return String
      */
     public static String baiduPost(String blogUrl, String token, String urls) {

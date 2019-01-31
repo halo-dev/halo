@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
 import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -47,7 +47,6 @@ public class FrontSearchController extends BaseController {
      *
      * @param model   model
      * @param keyword 关键词
-     *
      * @return 模板路径/themes/{theme}/search
      */
     @GetMapping
@@ -62,7 +61,6 @@ public class FrontSearchController extends BaseController {
      * @param model   model
      * @param keyword 关键词
      * @param page    当前页码
-     *
      * @return 模板路径/themes/{theme}/search
      */
     @GetMapping(value = "page/{page}")

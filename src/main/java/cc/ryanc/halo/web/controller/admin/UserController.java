@@ -56,7 +56,6 @@ public class UserController {
      *
      * @param user    user
      * @param session session
-     *
      * @return JsonResult
      */
     @PostMapping(value = "save")
@@ -85,7 +84,6 @@ public class UserController {
      * @param newPass    新密码
      * @param userId     用户编号
      * @param session    session
-     *
      * @return JsonResult
      */
     @PostMapping(value = "changePass")
