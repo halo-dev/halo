@@ -509,36 +509,6 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * 生成rss
-     *
-     * @param posts posts
-     *
-     * @return String
-     */
-    @Override
-    public String buildRss(List<Post> posts) {
-        String rss = "";
-        try {
-            rss = HaloUtils.getRss(posts);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return rss;
-    }
-
-    /**
-     * 生成sitemap
-     *
-     * @param posts posts
-     *
-     * @return String
-     */
-    @Override
-    public String buildSiteMap(List<Post> posts) {
-        return HaloUtils.getSiteMap(posts);
-    }
-
-    /**
      * 缓存阅读数
      *
      * @param postId postId
