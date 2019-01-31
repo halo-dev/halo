@@ -3,7 +3,6 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.ListPage;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
@@ -35,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -61,6 +61,7 @@ public class FrontArchiveController extends BaseController {
      * 文章归档
      *
      * @param model model
+     *
      * @return 模板路径
      */
     @GetMapping
@@ -73,6 +74,7 @@ public class FrontArchiveController extends BaseController {
      *
      * @param model model
      * @param page  page 当前页码
+     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "page/{page}")
@@ -96,6 +98,7 @@ public class FrontArchiveController extends BaseController {
      * @param model model
      * @param year  year 年份
      * @param month month 月份
+     *
      * @return 模板路径/themes/{theme}/archives
      */
     @GetMapping(value = "{year}/{month}")
@@ -116,6 +119,7 @@ public class FrontArchiveController extends BaseController {
      *
      * @param postUrl 文章路径名
      * @param model   model
+     *
      * @return 模板路径/themes/{theme}/post
      */
     @GetMapping(value = "{postUrl}")
@@ -142,7 +146,7 @@ public class FrontArchiveController extends BaseController {
             model.addAttribute("nextPost", nextPost);
         }
         List<Comment> comments = null;
-        if (StrUtil.equals(HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || HaloConst.OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
+        if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
             comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatusEnum.PUBLISHED.getCode());
         } else {
             comments = commentService.findCommentsByPostAndCommentStatusNot(post, CommentStatusEnum.RECYCLE.getCode());
@@ -158,8 +162,8 @@ public class FrontArchiveController extends BaseController {
         //默认显示10条
         int size = 10;
         //获取每页评论条数
-        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()))) {
+            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_COMMENTS.getProp()));
         }
         //评论分页
         final ListPage<Comment> commentsPage = new ListPage<Comment>(CommentUtil.getComments(comments), cp, size);
@@ -189,6 +193,7 @@ public class FrontArchiveController extends BaseController {
      * @param postId       postId
      * @param postPassword postPassword
      * @param response     response
+     *
      * @return String
      */
     @PostMapping(value = "/verifyPostPassword")

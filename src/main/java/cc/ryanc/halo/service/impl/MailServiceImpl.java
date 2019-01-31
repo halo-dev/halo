@@ -1,6 +1,5 @@
 package cc.ryanc.halo.service.impl;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -14,6 +13,8 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.File;
 import java.util.Map;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -40,12 +41,12 @@ public class MailServiceImpl implements MailService {
     public void sendMail(String to, String subject, String content) {
         //配置邮件服务器
         HaloUtils.configMail(
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         try {
             OhMyEmail.subject(subject)
-                    .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
+                    .from(OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
                     .text(content)
                     .send();
@@ -66,15 +67,15 @@ public class MailServiceImpl implements MailService {
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         //配置邮件服务器
         HaloUtils.configMail(
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         StrBuilder text = new StrBuilder();
         try {
             final Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, content));
             OhMyEmail.subject(subject)
-                    .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
+                    .from(OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
                     .html(text.toString())
                     .send();
@@ -96,16 +97,16 @@ public class MailServiceImpl implements MailService {
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachSrc) {
         //配置邮件服务器
         HaloUtils.configMail(
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
-                HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp()),
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp()),
+                OPTIONS.get(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp()));
         File file = new File(attachSrc);
         StrBuilder text = new StrBuilder();
         try {
             final Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, content));
             OhMyEmail.subject(subject)
-                    .from(HaloConst.OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
+                    .from(OPTIONS.get(BlogPropertiesEnum.MAIL_FROM_NAME.getProp()))
                     .to(to)
                     .html(text.toString())
                     .attach(file, file.getName())

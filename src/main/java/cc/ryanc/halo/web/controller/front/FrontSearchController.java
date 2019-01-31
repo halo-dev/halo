@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -47,6 +47,7 @@ public class FrontSearchController extends BaseController {
      *
      * @param model   model
      * @param keyword 关键词
+     *
      * @return 模板路径/themes/{theme}/search
      */
     @GetMapping
@@ -61,6 +62,7 @@ public class FrontSearchController extends BaseController {
      * @param model   model
      * @param keyword 关键词
      * @param page    当前页码
+     *
      * @return 模板路径/themes/{theme}/search
      */
     @GetMapping(value = "page/{page}")
@@ -69,14 +71,11 @@ public class FrontSearchController extends BaseController {
                          @PathVariable(value = "page") Integer page,
                          @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         int size = 10;
-        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
         final Page<Post> posts = postService.searchPostsBy(HtmlUtil.escape(keyword), PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
-
-        log.debug("Search posts result: [{}]", posts);
-
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", keyword);

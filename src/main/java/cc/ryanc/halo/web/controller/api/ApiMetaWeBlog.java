@@ -3,7 +3,6 @@ package cc.ryanc.halo.web.controller.api;
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
@@ -26,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+
 /**
  * @author : RYAN0UP
  * @date : 2018/12/11
@@ -47,6 +48,7 @@ public class ApiMetaWeBlog {
 
     /**
      * @param request request
+     *
      * @return String
      */
     @PostMapping
@@ -124,7 +126,9 @@ public class ApiMetaWeBlog {
 
     /**
      * @param methodCall
+     *
      * @return
+     *
      * @throws Exception
      */
     private Post parsetPost(final JSONObject methodCall) throws Exception {
@@ -136,20 +140,20 @@ public class ApiMetaWeBlog {
         for (int i = 0; i < members.length(); i++) {
             final JSONObject member = members.getJSONObject(i);
             final String name = member.getString("name");
-            if("dateCreated".equals(name)){
+            if ("dateCreated".equals(name)) {
                 final String dateString = member.getJSONObject("value").getString("dateTime.iso8601");
                 Date date = DateUtil.parseDate(dateString);
                 ret.setPostDate(date);
-            }else if ("title".equals(name)){
+            } else if ("title".equals(name)) {
                 ret.setPostTitle(member.getJSONObject("value").getString("string"));
-            }else if("description".equals(name)){
+            } else if ("description".equals(name)) {
                 final String content = member.getJSONObject("value").optString("string");
                 ret.setPostContent(content);
                 ret.setPostContentMd(content);
-            }else if("categories".equals(name)){
+            } else if ("categories".equals(name)) {
                 final StrBuilder cateBuilder = new StrBuilder();
                 final JSONObject data = member.getJSONObject("value").getJSONObject("array").getJSONObject("data");
-                if(0==data.length()){
+                if (0 == data.length()) {
                     throw new Exception("At least one category");
                 }
             }
@@ -161,6 +165,7 @@ public class ApiMetaWeBlog {
      * 根据文章编号获取文章信息
      *
      * @param postId 文章编号
+     *
      * @return 文章信息xml格式
      */
     private String getPost(Long postId) {
@@ -175,6 +180,7 @@ public class ApiMetaWeBlog {
      * 根据文章编号构建文章信息
      *
      * @param postId 文章编号
+     *
      * @return 文章信息xml格式
      */
     private String buildPost(final Long postId) {
@@ -224,13 +230,13 @@ public class ApiMetaWeBlog {
      * @return 博客信息xml节点
      */
     private String buildBlogInfo() {
-        final String blogId = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
-        final String blogTitle = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp());
+        final String blogId = OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
+        final String blogTitle = OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp());
         final StrBuilder strBuilder = new StrBuilder("<member><name>blogid</name><value>");
         strBuilder.append(blogId);
         strBuilder.append("</value></member>");
         strBuilder.append("<member><name>url</name><value>");
-        strBuilder.append(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+        strBuilder.append(OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
         strBuilder.append("</value></member>");
         strBuilder.append("<member><name>blogName</name><value>");
         strBuilder.append(blogTitle);
@@ -242,6 +248,7 @@ public class ApiMetaWeBlog {
      * 组装分类信息
      *
      * @return 分类信息xml格式
+     *
      * @throws Exception Exception
      */
     private String getCategories() throws Exception {
@@ -258,6 +265,7 @@ public class ApiMetaWeBlog {
      * 构建分类信息
      *
      * @return 分类信息xml节点
+     *
      * @throws Exception Exception
      */
     private String buildCategories() throws Exception {
@@ -271,7 +279,7 @@ public class ApiMetaWeBlog {
             strBuilder.append("<member><name>description</name>").append("<value>").append(cateName).append("</value></member>");
             strBuilder.append("<member><name>title</name>").append("<value>").append(cateName).append("</value></member>");
             strBuilder.append("<member><name>categoryid</name>").append("<value>").append(cateId).append("</value></member>");
-            strBuilder.append("<member><name>htmlUrl</name>").append("<value>").append(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp())).append("/categories/").append(cateName).append("</value></member>");
+            strBuilder.append("<member><name>htmlUrl</name>").append("<value>").append(OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp())).append("/categories/").append(cateName).append("</value></member>");
             strBuilder.append("</struct></value>");
         }
         return strBuilder.toString();

@@ -323,6 +323,23 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label class="col-lg-2 col-sm-4 control-label">API 评论开关：</label>
+                                        <div class="col-lg-4 col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="comment_api_switch" value="true" ${((options.comment_api_switch!)=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.enable' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="comment_api_switch" value="false" ${((options.comment_api_switch!'false')=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.disable' /></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="indexComments" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.index-comments' />
                                             <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.index-comments-tips' />" style="cursor: pointer">
                                                 <i class="fa fa-question-circle" aria-hidden="true"></i>

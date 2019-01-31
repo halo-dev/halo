@@ -1,13 +1,13 @@
 package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.model.domain.*;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import freemarker.template.Configuration;
@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static cc.ryanc.halo.model.dto.HaloConst.*;
 
 /**
  * <pre>
@@ -70,7 +72,7 @@ public class InstallController {
     @GetMapping
     public String install(Model model) {
         try {
-            if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
+            if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
                 model.addAttribute("isInstall", true);
             } else {
                 model.addAttribute("isInstall", false);
@@ -104,7 +106,7 @@ public class InstallController {
                                 @RequestParam("userPwd") String userPwd,
                                 HttpServletRequest request) {
         try {
-            if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), HaloConst.OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
+            if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), "该博客已初始化，不能再次安装！");
             }
             //创建新的用户
@@ -139,6 +141,7 @@ public class InstallController {
             post.setUser(user);
             post.setCategories(categories);
             post.setAllowComment(AllowCommentEnum.ALLOW.getCode());
+            post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
             postService.save(post);
 
             //第一个评论
@@ -186,9 +189,9 @@ public class InstallController {
             menuArchive.setMenuIcon(" ");
             menuService.save(menuArchive);
 
-            HaloConst.OPTIONS.clear();
-            HaloConst.OPTIONS = optionsService.findAllOptions();
-            configuration.setSharedVariable("options", HaloConst.OPTIONS);
+            OPTIONS.clear();
+            OPTIONS = optionsService.findAllOptions();
+            configuration.setSharedVariable("options", OPTIONS);
             configuration.setSharedVariable("user", userService.findUser());
         } catch (Exception e) {
             log.error(e.getMessage());
