@@ -34,7 +34,6 @@
 		<oh-my-email.version>0.0.4</oh-my-email.version>
 		<lombok.version>1.18.4</lombok.version>
 		<ehcache.version>3.6.3</ehcache.version>
-		<rome.version>1.0</rome.version>
 		<hutool-all.version>4.4.2</hutool-all.version>
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
 		<qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
@@ -118,13 +117,6 @@
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
 			<version>${ehcache.version}</version>
-		</dependency>
-
-		<!-- rss -->
-		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome</artifactId>
-			<version>${rome.version}</version>
 		</dependency>
 
 		<!-- hutool工具包 -->
