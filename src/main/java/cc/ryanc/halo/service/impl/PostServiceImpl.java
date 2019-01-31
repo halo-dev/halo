@@ -22,13 +22,20 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.*;
+
+import static org.springframework.data.jpa.domain.Specification.where;
 
 /**
  * <pre>
@@ -575,26 +582,49 @@ public class PostServiceImpl implements PostService {
     }
 
     @NonNull
-    private Specification<Post> buildSearchSepcification(@Nullable String keyword, @Nullable String postType, @Nullable Integer postStatus) {
-        return (Specification<Post>) (root, criteriaQuery, criteriaBuilder) -> {
-            List<Predicate> predicates = new LinkedList<>();
-
-            if (StringUtils.hasText(keyword)) {
-                predicates.add(criteriaBuilder.like(root.get("postContent"), keyword));
-            }
-
-            if (StringUtils.hasText(postType)) {
-                predicates.add(criteriaBuilder.equal(root.get("postType"), postType));
-                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("postType"), postType)));
-            }
-
-            if (postStatus != null) {
-                predicates.add(criteriaBuilder.equal(root.get("postStatus"), postStatus));
-                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("postStatus"), postType)));
-            }
-
-            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
-        };
+    private Specification<Post> buildSearchSepcification(@NonNull String keyword,
+                                                         @NonNull String postType,
+                                                         @NonNull Integer postStatus) {
+        return Specification.where(postTitleLike(keyword)).or(postContentLike(keyword)).and(postTypeEqual(postType)).and(postStatusEqual(postStatus));
+//        return (root, criteriaQuery, criteriaBuilder) -> {
+//            List<Predicate> predicates = new LinkedList<>();
+//
+//            if (StringUtils.hasText(keyword)) {
+//                predicates.add(criteriaBuilder.like(root.get("postContent"), keyword));
+//                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("postTitle"), keyword)));
+//            }
+//
+//            if (StringUtils.hasText(postType)) {
+//                predicates.add(criteriaBuilder.equal(root.get("postType"), postType));
+//            }
+//
+//            if (postStatus != null) {
+//                predicates.add(criteriaBuilder.equal(root.get("postStatus"), postStatus));
+//            }
+//
+//            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
+//        };
     }
 
+    private Specification<Post> postContentLike(@NonNull String keyword) {
+        Assert.hasText(keyword, "Keyword must not be blank");
+
+        return (root, criteriaQuery, criteriaBuilder) ->
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("postContent")), "%" + keyword.toLowerCase() + "%");
+    }
+
+    private Specification<Post> postTitleLike(@NonNull String keyword) {
+        Assert.hasText(keyword, "Keyword must not be blank");
+
+        return (root, criteriaQuery, criteriaBuilder) ->
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("postTitle")), "%" + keyword.toLowerCase() + "%");
+    }
+
+    private Specification<Post> postTypeEqual(@NonNull String postType) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("postType"), postType);
+    }
+
+    private Specification<Post> postStatusEqual(@NonNull Integer postStatus) {
+        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("postStatus"), postStatus);
+    }
 }

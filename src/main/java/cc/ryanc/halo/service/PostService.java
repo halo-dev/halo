@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.dto.Archive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
@@ -86,7 +87,7 @@ public interface PostService {
      * @return a page of posts
      */
     @NonNull
-    Page<Post> searchPostsBy(String keyword, String postType, Integer postStatus, @NonNull Pageable pageable);
+    Page<Post> searchPostsBy(@Nullable String keyword, @Nullable String postType, @Nullable Integer postStatus, @NonNull Pageable pageable);
 
 
     /**
