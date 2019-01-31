@@ -1,6 +1,5 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.OptionsService;
@@ -14,6 +13,8 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -61,8 +62,8 @@ public class OptionController {
             optionsService.saveOptions(options);
             //刷新options
             configuration.setSharedVariable("options", optionsService.findAllOptions());
-            HaloConst.OPTIONS.clear();
-            HaloConst.OPTIONS = optionsService.findAllOptions();
+            OPTIONS.clear();
+            OPTIONS = optionsService.findAllOptions();
             session.removeAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME);
             log.info("List of saved options: " + options);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));

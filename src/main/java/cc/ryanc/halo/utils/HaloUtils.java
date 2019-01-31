@@ -1,20 +1,11 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.BackupDto;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Content;
-import com.sun.syndication.feed.rss.Item;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -282,84 +273,6 @@ public class HaloUtils {
                 fileWriter.close();
             }
         }
-    }
-
-    /**
-     * 生成rss
-     *
-     * @param posts posts
-     *
-     * @return String
-     *
-     * @throws FeedException FeedException
-     */
-    public static String getRss(List<Post> posts) throws FeedException {
-        Assert.notEmpty(posts, "posts must not be empty");
-
-        final Channel channel = new Channel("rss_2.0");
-        if (null == HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp())) {
-            channel.setTitle("");
-        } else {
-            channel.setTitle(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_TITLE.getProp()));
-        }
-        if (null == HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp())) {
-            channel.setLink("");
-        } else {
-            channel.setLink(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
-        }
-        if (null == HaloConst.OPTIONS.get(BlogPropertiesEnum.SEO_DESC.getProp())) {
-            channel.setDescription("");
-        } else {
-            channel.setDescription(HaloConst.OPTIONS.get(BlogPropertiesEnum.SEO_DESC.getProp()));
-        }
-        channel.setLanguage("zh-CN");
-        final List<Item> items = new ArrayList<>();
-        for (Post post : posts) {
-            final Item item = new Item();
-            item.setTitle(post.getPostTitle());
-            final Content content = new Content();
-            String value = post.getPostContent();
-            final char[] xmlChar = value.toCharArray();
-            for (int i = 0; i < xmlChar.length; ++i) {
-                if (xmlChar[i] > 0xFFFD) {
-                    xmlChar[i] = ' ';
-                } else if (xmlChar[i] < 0x20 && xmlChar[i] != 't' & xmlChar[i] != 'n' & xmlChar[i] != 'r') {
-                    xmlChar[i] = ' ';
-                }
-            }
-            value = new String(xmlChar);
-            content.setValue(value);
-            item.setContent(content);
-            item.setLink(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/" + post.getPostUrl());
-            item.setPubDate(post.getPostDate());
-            items.add(item);
-        }
-        channel.setItems(items);
-        final WireFeedOutput out = new WireFeedOutput();
-        return out.outputString(channel);
-    }
-
-    /**
-     * 获取sitemap
-     *
-     * @param posts posts
-     *
-     * @return String
-     */
-    public static String getSiteMap(List<Post> posts) {
-        Assert.notEmpty(posts, "post mut not be empty");
-        final StrBuilder head = new StrBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">");
-        final StrBuilder urlBody = new StrBuilder();
-        final String urlPath = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/archives/";
-        for (Post post : posts) {
-            urlBody.append("<url><loc>");
-            urlBody.append(urlPath);
-            urlBody.append(post.getPostUrl());
-            urlBody.append("</loc><lastmod>");
-            urlBody.append(DateUtil.format(post.getPostDate(), "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
-            urlBody.append("</lastmod></url>");
-        }
-        return head.append(urlBody).append("</urlset>").toString();
     }
 
     /**

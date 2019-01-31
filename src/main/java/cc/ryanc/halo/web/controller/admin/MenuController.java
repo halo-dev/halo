@@ -33,8 +33,6 @@ public class MenuController {
     /**
      * 渲染菜单设置页面
      *
-     * @param model model
-     *
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping
@@ -46,7 +44,6 @@ public class MenuController {
      * 新增/修改菜单
      *
      * @param menu menu
-     *
      * @return 重定向到/admin/menus
      */
     @PostMapping(value = "/save")
@@ -70,7 +67,6 @@ public class MenuController {
      *
      * @param menuId 菜单编号
      * @param model  model
-     *
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping(value = "/edit")
@@ -84,7 +80,6 @@ public class MenuController {
      * 删除菜单
      *
      * @param menuId 菜单编号
-     *
      * @return 重定向到/admin/menus
      */
     @GetMapping(value = "/remove")

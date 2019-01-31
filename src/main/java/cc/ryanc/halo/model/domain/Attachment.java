@@ -1,11 +1,10 @@
 package cc.ryanc.halo.model.domain;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -20,6 +19,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "halo_attachment")
+@EntityListeners(AuditingEntityListener.class)
 public class Attachment implements Serializable {
 
     private static final long serialVersionUID = 3060117944880138064L;
@@ -59,6 +59,7 @@ public class Attachment implements Serializable {
     /**
      * 上传时间
      */
+    @CreatedDate
     private Date attachCreated;
 
     /**

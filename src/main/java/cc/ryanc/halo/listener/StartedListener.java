@@ -1,6 +1,5 @@
 package cc.ryanc.halo.listener;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.OptionsService;
@@ -18,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static cc.ryanc.halo.model.dto.HaloConst.*;
 
 /**
  * <pre>
@@ -72,7 +73,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     private void loadOptions() {
         final Map<String, String> options = optionsService.findAllOptions();
         if (options != null && !options.isEmpty()) {
-            HaloConst.OPTIONS = options;
+            OPTIONS = options;
         }
     }
 
@@ -80,10 +81,10 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * 加载所有主题
      */
     private void loadThemes() {
-        HaloConst.THEMES.clear();
+        THEMES.clear();
         final List<Theme> themes = HaloUtils.getThemes();
         if (null != themes) {
-            HaloConst.THEMES = themes;
+            THEMES = themes;
         }
     }
 
@@ -227,6 +228,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         map.put("@(高兴)", "<img src='/static/halo-common/OwO/alu/高兴.png' alt='高兴.png' style='vertical-align: middle;'>");
         map.put("@(黑线)", "<img src='/static/halo-common/OwO/alu/黑线.png' alt='黑线.png' style='vertical-align: middle;'>");
         map.put("@(鼓掌)", "<img src='/static/halo-common/OwO/alu/鼓掌.png' alt='鼓掌.png' style='vertical-align: middle;'>");
-        HaloConst.OWO = map;
+        OWO = map;
     }
 }

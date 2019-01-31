@@ -39,7 +39,6 @@ public class LogsServiceImpl implements LogsService {
         final Logs logs = new Logs();
         logs.setLogTitle(logTitle);
         logs.setLogContent(logContent);
-        logs.setLogCreated(new Date());
         logs.setLogIp(ServletUtil.getClientIP(request));
         logsRepository.save(logs);
     }
