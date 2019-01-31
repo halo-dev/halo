@@ -12,7 +12,11 @@
                 <item>
                     <title>${post.postTitle!}</title>
                     <link>${options.blog_url}/archives/${post.postUrl!}</link>
-                    <content:encoded>${post.postContent!}</content:encoded>
+                    <content:encoded>
+                        <![CDATA[
+                            ${post.postContent!}
+                        ]]>
+                    </content:encoded>
                     <pubDate>${post.postDate}</pubDate>
                 </item>
             </#list>
