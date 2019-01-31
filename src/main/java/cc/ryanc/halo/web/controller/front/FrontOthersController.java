@@ -45,9 +45,7 @@ public class FrontOthersController {
      * 获取文章rss
      *
      * @param model model
-     *
      * @return String
-     *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
@@ -77,9 +75,7 @@ public class FrontOthersController {
      * 获取 XML 格式的站点地图
      *
      * @param model model
-     *
      * @return String
-     *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
@@ -103,7 +99,6 @@ public class FrontOthersController {
      * 获取 HTML 格式的站点地图
      *
      * @param model model
-     *
      * @return String
      */
     @GetMapping(value = "sitemap.html", produces = {"text/html"})
@@ -124,9 +119,7 @@ public class FrontOthersController {
      * robots
      *
      * @param model model
-     *
      * @return String
-     *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */

@@ -51,7 +51,6 @@ public class ApiCommentController {
      * @param result  result
      * @param postId  postId
      * @param request request
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/save")

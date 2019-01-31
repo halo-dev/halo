@@ -48,7 +48,6 @@ public class ApiMetaWeBlog {
 
     /**
      * @param request request
-     *
      * @return String
      */
     @PostMapping
@@ -126,9 +125,7 @@ public class ApiMetaWeBlog {
 
     /**
      * @param methodCall
-     *
      * @return
-     *
      * @throws Exception
      */
     private Post parsetPost(final JSONObject methodCall) throws Exception {
@@ -165,7 +162,6 @@ public class ApiMetaWeBlog {
      * 根据文章编号获取文章信息
      *
      * @param postId 文章编号
-     *
      * @return 文章信息xml格式
      */
     private String getPost(Long postId) {
@@ -180,7 +176,6 @@ public class ApiMetaWeBlog {
      * 根据文章编号构建文章信息
      *
      * @param postId 文章编号
-     *
      * @return 文章信息xml格式
      */
     private String buildPost(final Long postId) {
@@ -248,7 +243,6 @@ public class ApiMetaWeBlog {
      * 组装分类信息
      *
      * @return 分类信息xml格式
-     *
      * @throws Exception Exception
      */
     private String getCategories() throws Exception {
@@ -265,7 +259,6 @@ public class ApiMetaWeBlog {
      * 构建分类信息
      *
      * @return 分类信息xml节点
-     *
      * @throws Exception Exception
      */
     private String buildCategories() throws Exception {

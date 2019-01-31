@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.dto.HaloConst.*;
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -66,7 +66,6 @@ public class InstallController {
      * 渲染安装页面
      *
      * @param model model
-     *
      * @return 模板路径
      */
     @GetMapping
@@ -92,7 +91,6 @@ public class InstallController {
      * @param userEmail       用户邮箱
      * @param userPwd         用户密码
      * @param request         request
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/do")

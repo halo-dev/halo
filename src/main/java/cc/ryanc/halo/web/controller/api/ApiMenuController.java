@@ -32,8 +32,8 @@ public class ApiMenuController {
      * 获取所有菜单
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",

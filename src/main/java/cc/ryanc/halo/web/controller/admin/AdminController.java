@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -78,7 +77,7 @@ public class AdminController extends BaseController {
     /**
      * 请求后台页面
      *
-     * @param model   model
+     * @param model model
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
@@ -118,7 +117,6 @@ public class AdminController extends BaseController {
      * 处理跳转到登录页的请求
      *
      * @param session session
-     *
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
@@ -137,7 +135,6 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
-     *
      * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
@@ -189,7 +186,6 @@ public class AdminController extends BaseController {
      * 退出登录 销毁session
      *
      * @param session session
-     *
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
@@ -209,7 +205,6 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/logs")
     public String logs(Model model, @PageableDefault Pageable pageable) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "logId");
         final Page<Logs> logs = logsService.findAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
@@ -278,7 +273,6 @@ public class AdminController extends BaseController {
      *
      * @param file    file
      * @param request request
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/tools/markdownImport")

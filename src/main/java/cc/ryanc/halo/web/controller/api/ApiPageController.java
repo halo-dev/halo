@@ -58,7 +58,6 @@ public class ApiPageController {
      * </p>
      *
      * @param postId postId
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/{postId}")

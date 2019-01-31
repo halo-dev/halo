@@ -63,7 +63,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 新增附件信息
      *
      * @param attachment attachment
-     *
      * @return Attachment
      */
     @Override
@@ -87,7 +86,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 获取所有附件信息 分页
      *
      * @param pageable pageable
-     *
      * @return Page
      */
     @Override
@@ -99,7 +97,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 根据附件id查询附件
      *
      * @param attachId attachId
-     *
      * @return Optional
      */
     @Override
@@ -111,7 +108,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 根据编号移除附件
      *
      * @param attachId attachId
-     *
      * @return Attachment
      */
     @Override
@@ -127,7 +123,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
-     *
      * @return Map
      */
     @Override
@@ -159,7 +154,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
-     *
      * @return Map
      */
     @Override
@@ -251,7 +245,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
-     *
      * @return Map
      */
     @Override
@@ -312,7 +305,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      *
      * @param file    file
      * @param request request
-     *
      * @return Map
      */
     @Override
@@ -362,7 +354,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 七牛云删除附件
      *
      * @param key key
-     *
      * @return boolean
      */
     @Override
@@ -391,7 +382,6 @@ public class AttachmentServiceImpl implements AttachmentService {
      * 又拍云删除附件
      *
      * @param fileName fileName
-     *
      * @return boolean
      */
     @Override

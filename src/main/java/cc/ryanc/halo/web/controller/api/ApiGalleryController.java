@@ -30,8 +30,8 @@ public class ApiGalleryController {
      * 获取所有图片
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -66,8 +66,8 @@ public class ApiGalleryController {
      * 获取单张图片的信息
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",

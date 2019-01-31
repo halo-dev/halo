@@ -48,7 +48,6 @@ public class TagController {
      * 新增/修改标签
      *
      * @param tag tag
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/save")
@@ -80,7 +79,6 @@ public class TagController {
      * 处理删除标签的请求
      *
      * @param tagId 标签编号
-     *
      * @return 重定向到/admin/tag
      */
     @GetMapping(value = "/remove")
@@ -98,7 +96,6 @@ public class TagController {
      *
      * @param model model
      * @param tagId 标签编号
-     *
      * @return 模板路径admin/admin_tag
      */
     @GetMapping(value = "/edit")

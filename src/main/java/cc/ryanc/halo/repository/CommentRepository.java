@@ -96,6 +96,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @param limit 条数
      * @return List
      */
-    @Query(value = "SELECT * FROM halo_comment WHERE comment_status = 0 ORDER BY comment_date DESC LIMIT :limit",nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_comment WHERE comment_status = 0 ORDER BY comment_date DESC LIMIT :limit", nativeQuery = true)
     List<Comment> getCommentsByLimit(@Param(value = "limit") int limit);
 }

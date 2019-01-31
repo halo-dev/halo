@@ -23,10 +23,9 @@ import java.util.Map;
 @Service
 public class OptionsServiceImpl implements OptionsService {
 
+    private static final String POSTS_CACHE_NAME = "posts";
     @Autowired
     private OptionsRepository optionsRepository;
-
-    private static final String POSTS_CACHE_NAME = "posts";
 
     /**
      * 批量保存设置
