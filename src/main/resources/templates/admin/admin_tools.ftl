@@ -1,16 +1,16 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head>${options.blog_title!} | 小工具</@head>
+<@head>${options.blog_title!} | <@spring.message code='admin.tools.title' /></@head>
 <div class="content-wrapper">
     <section class="content-header" id="animated-header">
-        <h1 style="display: inline-block;">小工具</h1>
+        <h1 style="display: inline-block;"><@spring.message code='admin.tools.title' /></h1>
         <ol class="breadcrumb">
             <li>
                 <a data-pjax="true" href="/admin">
                     <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
             <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.setting.bread.setting' /></a></li>
-            <li class="active">小工具</li>
+            <li class="active"><@spring.message code='admin.tools.title' /></li>
         </ol>
     </section>
     <section class="content container-fluid" id="animated-content">
@@ -19,18 +19,18 @@
                 <div class="box box-solid">
                     <div class="box-body">
                         <h4 style="background-color:#f7f7f7; font-size: 18px; text-align: center; padding: 7px 10px; margin-top: 0;">
-                            Markdown 导入
+                            <@spring.message code='admin.tools.markdown.name' />
                         </h4>
                         <div class="media">
                             <div class="media-body">
                                 <div class="clearfix">
                                     <p class="pull-right">
-                                        <a href="#" class="btn btn-success btn-sm ad-click-event"  onclick="halo.layerModal('/admin/tools/markdownImport','Markdown 导入')">
-                                            导入
+                                        <a href="#" class="btn btn-success btn-sm ad-click-event"  onclick="halo.layerModal('/admin/tools/markdownImport','<@spring.message code="admin.tools.markdown.name" />')">
+                                            <@spring.message code='admin.tools.btn.import' />
                                         </a>
                                     </p>
-                                    <h4 style="margin-top: 0">Markdown 文档导入</h4>
-                                    <p>支持 Hexo/Jekyll 导入并解析元数据</p>
+                                    <h4 style="margin-top: 0"><@spring.message code='admin.tools.markdown.full.name' /></h4>
+                                    <p><@spring.message code='admin.tools.markdown.desc' /></p>
                                 </div>
                             </div>
                         </div>
@@ -41,18 +41,18 @@
                 <div class="box box-solid">
                     <div class="box-body">
                         <h4 style="background-color:#f7f7f7; font-size: 18px; text-align: center; padding: 7px 10px; margin-top: 0;">
-                            WordPress 导入
+                            <@spring.message code='admin.tools.wordpress.name' />
                         </h4>
                         <div class="media">
                             <div class="media-body">
                                 <div class="clearfix">
                                     <p class="pull-right">
                                         <a href="javascript:void(0)" class="btn btn-success btn-sm ad-click-event">
-                                            导入
+                                            <@spring.message code='admin.tools.btn.import' />
                                         </a>
                                     </p>
-                                    <h4 style="margin-top: 0">WordPress 数据导入</h4>
-                                    <p>尽请期待</p>
+                                    <h4 style="margin-top: 0"><@spring.message code='admin.tools.wordpress.full.name' /></h4>
+                                    <p><@spring.message code='admin.tools.wordpress.desc' /></p>
                                 </div>
                             </div>
                         </div>

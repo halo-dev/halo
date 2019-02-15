@@ -45,11 +45,13 @@ public class FrontOthersController {
      * 获取文章rss
      *
      * @param model model
+     *
      * @return String
+     *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
-    @GetMapping(value = {"feed", "feed.xml", "atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
+    @GetMapping(value = {"feed", "feed.xml", "rss", "rss.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String feed(Model model) throws IOException, TemplateException {
         String rssPosts = OPTIONS.get(BlogPropertiesEnum.RSS_POSTS.getProp());
@@ -72,10 +74,44 @@ public class FrontOthersController {
     }
 
     /**
+     * 获取 atom.xml
+     *
+     * @param model model
+     *
+     * @return String
+     *
+     * @throws IOException       IOException
+     * @throws TemplateException TemplateException
+     */
+    @GetMapping(value = {"atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
+    @ResponseBody
+    public String atom(Model model) throws IOException, TemplateException {
+        String rssPosts = OPTIONS.get(BlogPropertiesEnum.RSS_POSTS.getProp());
+        if (StrUtil.isBlank(rssPosts)) {
+            rssPosts = "20";
+        }
+        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+        final Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
+        final Page<Post> postsPage = postService.findPostByStatus(0, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable).map(post -> {
+            if (StrUtil.isNotEmpty(post.getPostPassword())) {
+                post.setPostContent("该文章为加密文章");
+                post.setPostSummary("该文章为加密文章");
+            }
+            return post;
+        });
+        final List<Post> posts = postsPage.getContent();
+        model.addAttribute("posts", posts);
+        final Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
+        return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+    }
+
+    /**
      * 获取 XML 格式的站点地图
      *
      * @param model model
+     *
      * @return String
+     *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
@@ -99,6 +135,7 @@ public class FrontOthersController {
      * 获取 HTML 格式的站点地图
      *
      * @param model model
+     *
      * @return String
      */
     @GetMapping(value = "sitemap.html", produces = {"text/html"})
@@ -119,7 +156,9 @@ public class FrontOthersController {
      * robots
      *
      * @param model model
+     *
      * @return String
+     *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
