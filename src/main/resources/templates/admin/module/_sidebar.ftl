@@ -92,7 +92,7 @@
                 <ul class="treeview-menu">
                     <li><a data-pjax="true" href="/admin/option"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.blog-settings' /></a></li>
                     <li><a data-pjax="true" href="/admin/backup"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.blog-backup' /></a></li>
-                    <li><a data-pjax="true" href="/admin/tools"><i class="fa fa-circle-o"></i>小工具</a></li>
+                    <li><a data-pjax="true" href="/admin/tools"><i class="fa fa-circle-o"></i><@spring.message code='admin.menu.tools' /></a></li>
                 </ul>
             </li>
         </ul>

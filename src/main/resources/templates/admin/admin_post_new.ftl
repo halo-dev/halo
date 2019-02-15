@@ -66,7 +66,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="postPassword" class="control-label">文章密码：</label>
+                            <label for="postPassword" class="control-label"><@spring.message code='admin.editor.post.password' /></label>
                             <input type="password" class="form-control" id="postPassword" name="postPassword" autocomplete="off">
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                         </div>
                     </div>
                     <div class="box-footer">
-                        <button onclick="removeThumbnail()" class="btn btn-default btn-sm ">移除</button>
+                        <button onclick="removeThumbnail()" class="btn btn-default btn-sm "><@spring.message code='common.btn.remove' /></button>
                     </div>
                 </div>
             </div>
