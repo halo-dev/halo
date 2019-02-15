@@ -52,7 +52,7 @@
                                 <i class="fa fa-sun-o"></i>
                                 <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="/archives/${post.postUrl}#comment_widget">Comments</a>
+                                <a href="${options.blog_url!}/archives/${post.postUrl}#comment_widget">Comments</a>
                             </div>
                         </div>
                     </div>

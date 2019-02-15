@@ -12,17 +12,17 @@
                         <#if posts.hasPrevious()>
                             <#if posts.number == 1>
                                 <li class="pre pagbuttons">
-                                    <a class="btn" role="navigation" href="/tags/${tag.tagUrl}">上一页</a>
+                                    <a class="btn" role="navigation" href="${options.blog_url!}/tags/${tag.tagUrl}">上一页</a>
                                 </li>
                             <#else >
                                 <li class="pre pagbuttons">
-                                    <a class="btn" role="navigation" href="/tags/${tag.tagUrl}/page/${posts.number}">上一页</a>
+                                    <a class="btn" role="navigation" href="${options.blog_url!}/tags/${tag.tagUrl}/page/${posts.number}">上一页</a>
                                 </li>
                             </#if>
                         </#if>
                         <#if posts.hasNext()>
                         <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="/tags/${tag.tagUrl}/page/${posts.number+2}">下一页</a>
+                            <a class="btn" role="navigation" href="${options.blog_url!}/tags/${tag.tagUrl}/page/${posts.number+2}">下一页</a>
                         </li>
                         </#if>
                     </ul>

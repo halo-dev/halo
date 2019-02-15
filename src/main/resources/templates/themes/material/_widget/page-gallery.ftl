@@ -6,7 +6,7 @@
     <!-- Header -->
     <header id="header">
         <h1>
-            <a href="/"><strong>${options.blog_title!}</strong></a> - 图库
+            <a href="${options.blog_url!}/"><strong>${options.blog_title!}</strong></a> - 图库
         </h1>
         <nav>
             <ul>

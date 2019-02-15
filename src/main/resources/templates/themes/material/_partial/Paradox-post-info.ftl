@@ -35,7 +35,7 @@
         <#if post.tags??>
             <#list post.tags as tag>
                 <li class="mdl-menu__item">
-                    <a class="post_tag-link" href="/tags/${tag.tagUrl}/">${tag.tagName}</a>
+                    <a class="post_tag-link" href="${options.blog_url!}/tags/${tag.tagUrl}/">${tag.tagName}</a>
                 </li>
             </#list>
         </#if>

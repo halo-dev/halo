@@ -22,13 +22,13 @@
             <nav class="material-nav mdl-cell mdl-cell--12-col">
                 <#if posts.hasPrevious()>
                     <#if posts.number == 1>
-                        <a class="extend prev" rel="prev" href="/search?keyword=${keyword}">
+                        <a class="extend prev" rel="prev" href="${options.blog_url!}/search?keyword=${keyword}">
                             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
                                 <i class="material-icons" role="presentation">arrow_back</i>
                             </button>
                         </a>
                     <#else >
-                        <a class="extend prev" rel="prev" href="/search/page/${posts.number}?keyword=${keyword}">
+                        <a class="extend prev" rel="prev" href="${options.blog_url!}/search/page/${posts.number}?keyword=${keyword}">
                             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
                                 <i class="material-icons" role="presentation">arrow_back</i>
                             </button>
@@ -37,7 +37,7 @@
                 </#if>
                 <span class="page-number current">${posts.number+1}</span>
                 <#if posts.hasNext()>
-                    <a class="extend next" rel="next" href="/search/page/${posts.number+2}?keyword=${keyword}">
+                    <a class="extend next" rel="next" href="${options.blog_url!}/search/page/${posts.number+2}?keyword=${keyword}">
                         <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
                             <i class="material-icons" role="presentation">arrow_forward</i>
                         </button>
