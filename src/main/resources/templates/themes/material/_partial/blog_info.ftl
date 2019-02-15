@@ -25,7 +25,7 @@
             <span class="visuallyhidden">Pages</span>
         </button>
         <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="show-pages-button">
-            <a class="index_share-link" href="/tags" title="标签">
+            <a class="index_share-link" href="${options.blog_url!}/tags" title="标签">
                 <li class="mdl-menu__item mdl-js-ripple-effect">
                     标签
                 </li>

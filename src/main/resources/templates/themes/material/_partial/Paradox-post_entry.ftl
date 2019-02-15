@@ -9,14 +9,14 @@
     <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50 lazy" data-original="${post.postThumbnail!}">
     </#if>
         <!-- Post Title -->
-        <p class="article-headline-p"><a href="/archives/${post.postUrl}">${post.postTitle!}</a></p>
+        <p class="article-headline-p"><a href="${options.blog_url!}/archives/${post.postUrl}">${post.postTitle!}</a></p>
     </div>
     <!-- Post Excerpt -->
     <div class="mdl-color-text--grey-600 mdl-card__supporting-text post_entry-content">
         ${post.postSummary!}
         &nbsp;&nbsp;&nbsp;
         <span>
-            <a href="/archives/${post.postUrl}" target="_self">阅读全文</a>
+            <a href="${options.blog_url!}/archives/${post.postUrl}" target="_self">阅读全文</a>
         </span>
     </div>
     <!-- Post_entry Info-->
@@ -37,7 +37,7 @@
             <#if post.categories??>
             <#list post.categories as cate>
                 <span class="post_entry-category">
-                  <a class="post_category-link" href="/categories/${cate.cateUrl}/">${cate.cateName}</a>
+                  <a class="post_category-link" href="${options.blog_url!}/categories/${cate.cateUrl}/">${cate.cateName}</a>
                 </span>
             </#list>
             </#if>

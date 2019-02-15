@@ -14,7 +14,7 @@
             <#include "_partial/Isolation-post_entry.ftl">
         </#if>
         <#include "_partial/index-nav.ftl">
-        <@nav url="/categories/${category.cateUrl}/"></@nav>
+        <@nav url="${options.blog_url!}/categories/${category.cateUrl}/"></@nav>
         <#if (options.theme_material_scheme!'Paradox') == "Paradox">
             <#include "_partial/Paradox-post_entry-thumbnail.ftl">
         </#if>
