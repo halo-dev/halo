@@ -158,7 +158,7 @@ public class PageController {
     @GetMapping(value = "/galleries")
     public String gallery(Model model,
                           @PageableDefault(size = 18, sort = "galleryId", direction = Sort.Direction.DESC) Pageable pageable) {
-        final Page<Gallery> galleries = galleryService.findAll(pageable);
+        final Page<Gallery> galleries = galleryService.listAll(pageable);
         model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
     }
@@ -175,7 +175,7 @@ public class PageController {
             if (StrUtil.isEmpty(gallery.getGalleryThumbnailUrl())) {
                 gallery.setGalleryThumbnailUrl(gallery.getGalleryUrl());
             }
-            galleryService.save(gallery);
+            galleryService.create(gallery);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -191,7 +191,7 @@ public class PageController {
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model, @RequestParam("galleryId") Long galleryId) {
-        final Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
+        final Optional<Gallery> gallery = galleryService.fetchById(galleryId);
         model.addAttribute("gallery", gallery.orElse(new Gallery()));
         return "admin/widget/_gallery-detail";
     }
@@ -206,7 +206,7 @@ public class PageController {
     @ResponseBody
     public JsonResult removeGallery(@RequestParam("galleryId") Long galleryId) {
         try {
-            galleryService.remove(galleryId);
+            galleryService.removeById(galleryId);
         } catch (Exception e) {
             log.error("Failed to delete image: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
