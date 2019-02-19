@@ -1,6 +1,7 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -11,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author : RYAN0UP
  * @date : 2018/1/12
  */
-public interface TagRepository extends JpaRepository<Tag, Long> {
+public interface TagRepository extends BaseRepository<Tag, Long> {
 
     /**
      * 根据标签路径查询，用于验证是否已经存在该路径

@@ -3,6 +3,7 @@ package cc.ryanc.halo.repository;
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,7 +22,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificationExecutor<Post> {
+public interface PostRepository extends BaseRepository<Post, Long>, JpaSpecificationExecutor<Post> {
 
     /**
      * 查询前五条文章
