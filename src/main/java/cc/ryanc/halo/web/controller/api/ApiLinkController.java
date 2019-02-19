@@ -54,7 +54,7 @@ public class ApiLinkController {
      */
     @GetMapping
     public JsonResult links() {
-        final List<Link> links = linkService.findAll();
+        final List<Link> links = linkService.listAll();
         if (null != links && links.size() > 0) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), links);
         } else {
