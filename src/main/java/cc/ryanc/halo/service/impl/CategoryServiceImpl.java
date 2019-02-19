@@ -3,7 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.repository.CategoryRepository;
 import cc.ryanc.halo.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +20,16 @@ import java.util.Optional;
  * @date : 2017/11/30
  */
 @Service
-public class CategoryServiceImpl implements CategoryService {
+public class CategoryServiceImpl extends AbstractCrudService<Category, Long> implements CategoryService {
 
     private static final String POSTS_CACHE_NAME = "posts";
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+        super(categoryRepository);
+        this.categoryRepository = categoryRepository;
+    }
 
     /**
      * 保存/修改分类目录
@@ -35,8 +39,8 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Category save(Category category) {
-        return categoryRepository.save(category);
+    public Category create(Category category) {
+        return super.create(category);
     }
 
     /**
@@ -47,31 +51,8 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Category remove(Long cateId) {
-        final Optional<Category> category = this.findByCateId(cateId);
-        categoryRepository.delete(category.orElse(null));
-        return category.orElse(null);
-    }
-
-    /**
-     * 查询所有分类目录
-     *
-     * @return List
-     */
-    @Override
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
-    }
-
-    /**
-     * 根据编号查询分类目录
-     *
-     * @param cateId 分类编号
-     * @return Category
-     */
-    @Override
-    public Optional<Category> findByCateId(Long cateId) {
-        return categoryRepository.findById(cateId);
+    public Category removeById(Long cateId) {
+        return super.removeById(cateId);
     }
 
     /**
@@ -108,10 +89,9 @@ public class CategoryServiceImpl implements CategoryService {
             return null;
         }
         final List<Category> categories = new ArrayList<>();
-        Optional<Category> category = null;
         for (String str : strings) {
-            category = findByCateId(Long.parseLong(str));
-            categories.add(category.get());
+            // TODO There maybe cause NoSuchElementException
+            categories.add(fetchById(Long.parseLong(str)).get());
         }
         return categories;
     }

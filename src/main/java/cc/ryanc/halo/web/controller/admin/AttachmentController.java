@@ -60,7 +60,7 @@ public class AttachmentController {
     @GetMapping
     public String attachments(Model model,
                               @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable) {
-        final Page<Attachment> attachments = attachmentService.findAll(pageable);
+        final Page<Attachment> attachments = attachmentService.listAll(pageable);
         model.addAttribute("attachments", attachments);
         return "admin/admin_attachment";
     }
@@ -76,7 +76,7 @@ public class AttachmentController {
                                    @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable,
                                    @RequestParam(value = "id", defaultValue = "none") String id,
                                    @RequestParam(value = "type", defaultValue = "normal") String type) {
-        final Page<Attachment> attachments = attachmentService.findAll(pageable);
+        final Page<Attachment> attachments = attachmentService.listAll(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
         if (StrUtil.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
@@ -127,7 +127,7 @@ public class AttachmentController {
                 attachment.setAttachSize(resultMap.get("size"));
                 attachment.setAttachWh(resultMap.get("wh"));
                 attachment.setAttachLocation(resultMap.get("location"));
-                attachmentService.save(attachment);
+                attachmentService.create(attachment);
                 log.info("Upload file {} to {} successfully", resultMap.get("fileName"), resultMap.get("filePath"));
                 result.put("success", ResultCodeEnum.SUCCESS.getCode());
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
@@ -154,7 +154,7 @@ public class AttachmentController {
      */
     @GetMapping(value = "/attachment")
     public String attachmentDetail(Model model, @RequestParam("attachId") Long attachId) {
-        final Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
+        final Optional<Attachment> attachment = attachmentService.fetchById(attachId);
         model.addAttribute("attachment", attachment.orElse(new Attachment()));
         return "admin/widget/_attachment-detail";
     }
@@ -170,7 +170,7 @@ public class AttachmentController {
     @ResponseBody
     public JsonResult removeAttachment(@RequestParam("attachId") Long attachId,
                                        HttpServletRequest request) {
-        final Attachment attachment = attachmentService.findByAttachId(attachId).orElse(new Attachment());
+        final Attachment attachment = attachmentService.fetchById(attachId).orElse(new Attachment());
         final String attachLocation = attachment.getAttachLocation();
         final String attachName = attachment.getAttachName();
         final String attachPath = attachment.getAttachPath();
@@ -200,7 +200,7 @@ public class AttachmentController {
                 }
             }
             if (flag) {
-                attachmentService.remove(attachId);
+                attachmentService.removeById(attachId);
                 log.info("Delete file {} successfully!", attachName);
                 logsService.save(LogsRecord.REMOVE_FILE, attachName, request);
             } else {

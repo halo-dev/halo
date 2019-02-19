@@ -123,7 +123,7 @@ public class InstallController {
             category.setCateName("未分类");
             category.setCateUrl("default");
             category.setCateDesc("未分类");
-            categoryService.save(category);
+            categoryService.create(category);
 
             //第一篇文章
             final Post post = new Post();
