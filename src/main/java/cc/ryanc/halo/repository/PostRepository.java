@@ -40,29 +40,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     List<Post> findPostsByPostType(String postType);
 
     /**
-     * 模糊查询
-     *
-     * @param postType0   postType0
-     * @param postStatus0 postStatus0
-     * @param postTitle   postTitle
-     * @param postType1   postType1
-     * @param postStatus1 postStatus1
-     * @param postContent postContent
-     * @param pageable    pageable
-     * @return Page
-     */
-    @Deprecated
-    Page<Post> findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
-            String postType0,
-            Integer postStatus0,
-            String postTitle,
-            String postType1,
-            Integer postStatus1,
-            String postContent,
-            Pageable pageable
-    );
-
-    /**
      * 根据文章的状态查询 分页
      *
      * @param status   0，1，2

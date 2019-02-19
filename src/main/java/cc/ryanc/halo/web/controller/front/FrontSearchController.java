@@ -73,7 +73,7 @@ public class FrontSearchController extends BaseController {
             size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<Post> posts = postService.searchPostsBy(HtmlUtil.escape(keyword), PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
+        final Page<Post> posts = postService.searchPosts(HtmlUtil.escape(keyword), PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", keyword);

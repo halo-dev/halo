@@ -71,23 +71,10 @@ public interface PostService {
      * @param postType   文章类型
      * @param postStatus 文章状态
      * @param pageable   分页信息
-     * @return Page
-     * @see PostService#searchPostsBy(java.lang.String, java.lang.String, java.lang.Integer, org.springframework.data.domain.Pageable)
-     */
-    @Deprecated
-    Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable);
-
-    /**
-     * 模糊查询文章
-     *
-     * @param keyword    关键词
-     * @param postType   文章类型
-     * @param postStatus 文章状态
-     * @param pageable   分页信息
      * @return a page of posts
      */
     @NonNull
-    Page<Post> searchPostsBy(@Nullable String keyword, @Nullable String postType, @Nullable Integer postStatus, @NonNull Pageable pageable);
+    Page<Post> searchPosts(@Nullable String keyword, @Nullable String postType, @Nullable Integer postStatus, @NonNull Pageable pageable);
 
 
     /**

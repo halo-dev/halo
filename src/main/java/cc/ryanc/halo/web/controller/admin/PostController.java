@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.PostMeta;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
@@ -100,40 +102,6 @@ public class PostController extends BaseController {
     }
 
     /**
-     * 模糊查询文章
-     *
-     * @param model   Model
-     * @param keyword keyword 关键字
-     * @return 模板路径admin/admin_post
-     */
-    @PostMapping(value = "/search")
-    public String searchPost(Model model,
-                             @RequestParam(value = "keyword") String keyword,
-                             @PageableDefault(sort = "postId", direction = DESC) Pageable pageable) {
-        try {
-            Page<Post> posts = postService.searchPostsBy(keyword, PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
-            model.addAttribute("posts", posts);
-        } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
-        }
-        return "admin/admin_post";
-    }
-
-    /**
-     * 处理预览文章的请求
-     *
-     * @param postId 文章编号
-     * @param model  model
-     * @return 模板路径/themes/{theme}/post
-     */
-    @GetMapping(value = "/view")
-    public String viewPost(@RequestParam("postId") Long postId, Model model) {
-        final Optional<Post> post = postService.findByPostId(postId);
-        model.addAttribute("post", post.orElse(new Post()));
-        return this.render("post");
-    }
-
-    /**
      * 处理跳转到新建文章页面
      *
      * @return 模板路径admin/admin_editor
@@ -170,7 +138,9 @@ public class PostController extends BaseController {
     public JsonResult save(@ModelAttribute Post post,
                            @RequestParam("cateList") List<String> cateList,
                            @RequestParam("tagList") String tagList,
+                           @RequestParam("metas") List<PostMeta> metas,
                            HttpSession session) {
+        post.setPostMetas(metas);
         final User user = (User) session.getAttribute(USER_SESSION_KEY);
         try {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
