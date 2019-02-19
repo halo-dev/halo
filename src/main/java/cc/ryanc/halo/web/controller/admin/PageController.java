@@ -107,7 +107,7 @@ public class PageController {
      */
     @GetMapping(value = "/links/edit")
     public String toEditLink(Model model, @RequestParam("linkId") Long linkId) {
-        final Optional<Link> link = linkService.findByLinkId(linkId);
+        final Optional<Link> link = linkService.fetchById(linkId);
         model.addAttribute("updateLink", link.orElse(new Link()));
         return "admin/admin_page_link";
     }
@@ -126,7 +126,7 @@ public class PageController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
             }
         }
-        link = linkService.save(link);
+        link = linkService.create(link);
         if (null == link) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
@@ -142,7 +142,7 @@ public class PageController {
     @GetMapping(value = "/links/remove")
     public String removeLink(@RequestParam("linkId") Long linkId) {
         try {
-            linkService.remove(linkId);
+            linkService.removeById(linkId);
         } catch (Exception e) {
             log.error("Deleting a friendship link failed: {}", e.getMessage());
         }
