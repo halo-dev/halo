@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.enums.AttachLocationEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.Md5Util;
 import cn.hutool.core.date.DateUtil;
@@ -25,7 +26,6 @@ import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
 import com.upyun.UpException;
 import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -52,12 +52,16 @@ import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
  * @date : 2018/1/10
  */
 @Service
-public class AttachmentServiceImpl implements AttachmentService {
+public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long> implements AttachmentService {
 
     private static final String ATTACHMENTS_CACHE_NAME = "attachments";
 
-    @Autowired
-    private AttachmentRepository attachmentRepository;
+    private final AttachmentRepository attachmentRepository;
+
+    public AttachmentServiceImpl(AttachmentRepository attachmentRepository) {
+        super(attachmentRepository);
+        this.attachmentRepository = attachmentRepository;
+    }
 
     /**
      * 新增附件信息
@@ -67,8 +71,8 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Attachment save(Attachment attachment) {
-        return attachmentRepository.save(attachment);
+    public Attachment create(Attachment attachment) {
+        return super.create(attachment);
     }
 
     /**
@@ -78,8 +82,8 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @Cacheable(value = ATTACHMENTS_CACHE_NAME, key = "'attachment'")
-    public List<Attachment> findAll() {
-        return attachmentRepository.findAll();
+    public List<Attachment> listAll() {
+        return super.listAll();
     }
 
     /**
@@ -89,7 +93,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return Page
      */
     @Override
-    public Page<Attachment> findAll(Pageable pageable) {
+    public Page<Attachment> listAll(Pageable pageable) {
         return attachmentRepository.findAll(pageable);
     }
 
@@ -100,7 +104,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return Optional
      */
     @Override
-    public Optional<Attachment> findByAttachId(Long attachId) {
+    public Optional<Attachment> fetchById(Long attachId) {
         return attachmentRepository.findById(attachId);
     }
 
@@ -112,10 +116,8 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Attachment remove(Long attachId) {
-        Optional<Attachment> attachment = this.findByAttachId(attachId);
-        attachmentRepository.delete(attachment.orElse(null));
-        return attachment.orElse(null);
+    public Attachment removeById(Long attachId) {
+        return super.removeById(attachId);
     }
 
     /**
@@ -406,13 +408,4 @@ public class AttachmentServiceImpl implements AttachmentService {
         return flag;
     }
 
-    /**
-     * 获取附件总数
-     *
-     * @return Long
-     */
-    @Override
-    public Long getCount() {
-        return attachmentRepository.count();
-    }
 }

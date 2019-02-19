@@ -113,6 +113,11 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
     }
 
     @Override
+    public long count() {
+        return repository.count();
+    }
+
+    @Override
     public DOMAIN create(DOMAIN domain) {
         Assert.notNull(domain, domainName + " data must not be null");
 

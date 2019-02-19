@@ -100,7 +100,7 @@ public class AdminController extends BaseController {
         model.addAttribute("comments", comments);
 
         //附件数量
-        model.addAttribute("mediaCount", attachmentService.getCount());
+        model.addAttribute("mediaCount", attachmentService.count());
 
         //文章阅读总数
         final Long postViewsSum = postService.getPostViews();
@@ -316,7 +316,7 @@ public class AdminController extends BaseController {
                             category.setCateName(ele);
                             category.setCateUrl(ele);
                             category.setCateDesc(ele);
-                            category = categoryService.save(category);
+                            category = categoryService.create(category);
                         }
                         categories.add(category);
                     }

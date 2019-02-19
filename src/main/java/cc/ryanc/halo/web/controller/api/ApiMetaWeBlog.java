@@ -263,7 +263,7 @@ public class ApiMetaWeBlog {
      */
     private String buildCategories() throws Exception {
         final StrBuilder strBuilder = new StrBuilder();
-        final List<Category> categories = categoryService.findAll();
+        final List<Category> categories = categoryService.listAll();
         for (Category category : categories) {
             final String cateName = category.getCateName();
             final Long cateId = category.getCateId();
