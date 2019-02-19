@@ -2,6 +2,7 @@ package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +19,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2018/1/22
  */
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public interface CommentRepository extends BaseRepository<Comment, Long> {
 
     /**
      * 根据评论状态查询所有评论 分页

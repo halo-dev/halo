@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * CrudService interface contained public methods.
+ * CrudService interface contains some common methods.
  *
- * @param <ID>     id type
  * @param <DOMAIN> domain type
+ * @param <ID>     id type
  * @author johnniang
  */
-public interface CrudService<ID, DOMAIN> {
+public interface CrudService<DOMAIN, ID> {
 
     // **************** Select
 
