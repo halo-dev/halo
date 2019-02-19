@@ -140,36 +140,9 @@ public class PostServiceImpl implements PostService {
         return postRepository.findPostsByPostType(postType);
     }
 
-    /**
-     * 模糊查询文章
-     *
-     * @param keyword    关键词
-     * @param postType   文章类型
-     * @param postStatus 文章状态
-     * @param pageable   分页信息
-     * @return Page
-     */
     @Override
     public Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable) {
-        return postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
-                postType,
-                postStatus,
-                "%" + keyword + "%",
-                postType,
-                postStatus,
-                "%" + keyword + "%",
-                pageable
-        ).map(post -> {
-            if (StrUtil.isNotEmpty(post.getPostPassword())) {
-                post.setPostSummary("该文章为加密文章");
-            }
-            return post;
-        });
-    }
-
-    @Override
-    public Page<Post> searchPostsBy(String keyword, String postType, Integer postStatus, Pageable pageable) {
-        return postRepository.findAll(buildSearchSepcification(keyword, postType, postStatus), pageable)
+        return postRepository.findAll(buildSearchSpecification(keyword, postType, postStatus), pageable)
                 .map(post -> {
                     if (StrUtil.isNotEmpty(post.getPostPassword())) {
                         post.setPostSummary("该文章为加密文章");
@@ -542,50 +515,68 @@ public class PostServiceImpl implements PostService {
         return postRepository.getPostsByLimit(limit);
     }
 
+    /**
+     * build Specification for post
+     *
+     * @param keyword    keyword
+     * @param postType   postType
+     * @param postStatus postStatus
+     * @return Specification
+     */
     @NonNull
-    private Specification<Post> buildSearchSepcification(@NonNull String keyword,
+    private Specification<Post> buildSearchSpecification(@NonNull String keyword,
                                                          @NonNull String postType,
                                                          @NonNull Integer postStatus) {
-        return Specification.where(postTitleLike(keyword)).or(postContentLike(keyword)).and(postTypeEqual(postType)).and(postStatusEqual(postStatus));
-//        return (root, criteriaQuery, criteriaBuilder) -> {
-//            List<Predicate> predicates = new LinkedList<>();
-//
-//            if (StringUtils.hasText(keyword)) {
-//                predicates.add(criteriaBuilder.like(root.get("postContent"), keyword));
-//                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("postTitle"), keyword)));
-//            }
-//
-//            if (StringUtils.hasText(postType)) {
-//                predicates.add(criteriaBuilder.equal(root.get("postType"), postType));
-//            }
-//
-//            if (postStatus != null) {
-//                predicates.add(criteriaBuilder.equal(root.get("postStatus"), postStatus));
-//            }
-//
-//            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
-//        };
+        return Specification
+                .where(postTitleLike(keyword))
+                .or(postContentLike(keyword))
+                .and(postTypeEqual(postType))
+                .and(postStatusEqual(postStatus));
     }
 
+    /**
+     * build with postContent
+     *
+     * @param keyword keyword
+     * @return Specification
+     */
     private Specification<Post> postContentLike(@NonNull String keyword) {
         Assert.hasText(keyword, "Keyword must not be blank");
-
         return (root, criteriaQuery, criteriaBuilder) ->
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("postContent")), "%" + keyword.toLowerCase() + "%");
     }
 
+    /**
+     * build with postTitle
+     *
+     * @param keyword keyword
+     * @return Specification
+     */
     private Specification<Post> postTitleLike(@NonNull String keyword) {
         Assert.hasText(keyword, "Keyword must not be blank");
-
         return (root, criteriaQuery, criteriaBuilder) ->
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("postTitle")), "%" + keyword.toLowerCase() + "%");
     }
 
+    /**
+     * build with postType
+     *
+     * @param postType postType
+     * @return Specification
+     */
     private Specification<Post> postTypeEqual(@NonNull String postType) {
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("postType"), postType);
+        return (root, criteriaQuery, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("postType"), postType);
     }
 
+    /**
+     * build with postStatus
+     *
+     * @param postStatus postStatus
+     * @return Specification
+     */
     private Specification<Post> postStatusEqual(@NonNull Integer postStatus) {
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("postStatus"), postStatus);
+        return (root, criteriaQuery, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("postStatus"), postStatus);
     }
 }
