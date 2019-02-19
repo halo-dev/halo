@@ -76,7 +76,7 @@ public class ApiCommentController {
                 comment.setCommentAuthorAvatarMd5(SecureUtil.md5(comment.getCommentAuthorEmail()));
             }
             if (comment.getCommentParent() > 0) {
-                lastComment = commentService.findCommentById(comment.getCommentParent()).orElse(new Comment());
+                lastComment = commentService.fetchById(comment.getCommentParent()).orElse(new Comment());
                 final StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
                 buildContent.append(lastComment.getCommentId());
                 buildContent.append("'>@");
@@ -91,7 +91,7 @@ public class ApiCommentController {
             if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
                 comment.setCommentAuthorUrl(URLUtil.normalize(comment.getCommentAuthorUrl()));
             }
-            commentService.save(comment);
+            commentService.create(comment);
             if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
                 return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), "你的评论已经提交，待博主审核之后可显示。");
             } else {

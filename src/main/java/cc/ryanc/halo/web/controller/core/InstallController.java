@@ -154,7 +154,7 @@ public class InstallController {
             comment.setCommentStatus(0);
             comment.setCommentAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
             comment.setIsAdmin(0);
-            commentService.save(comment);
+            commentService.create(comment);
 
             final Map<String, String> options = new HashMap<>();
             options.put(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());

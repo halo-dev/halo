@@ -84,7 +84,7 @@ public class AdminController extends BaseController {
     public String index(Model model) {
 
         //查询评论的条数
-        final Long commentCount = commentService.getCount();
+        final Long commentCount = commentService.count();
         model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
