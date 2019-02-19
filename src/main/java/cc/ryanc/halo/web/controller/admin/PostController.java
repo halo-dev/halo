@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.PostMeta;
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
@@ -34,7 +33,6 @@ import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
@@ -138,9 +136,9 @@ public class PostController extends BaseController {
     public JsonResult save(@ModelAttribute Post post,
                            @RequestParam("cateList") List<String> cateList,
                            @RequestParam("tagList") String tagList,
-                           @RequestParam("metas") List<PostMeta> metas,
+//                           @RequestParam("metas") List<PostMeta> metas,
                            HttpSession session) {
-        post.setPostMetas(metas);
+//        post.setPostMetas(metas);
         final User user = (User) session.getAttribute(USER_SESSION_KEY);
         try {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
