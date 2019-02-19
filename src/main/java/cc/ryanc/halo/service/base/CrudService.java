@@ -3,7 +3,10 @@ package cc.ryanc.halo.service.base;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,58 +22,59 @@ public interface CrudService<DOMAIN, ID> {
 
     // **************** Select
 
+    @NonNull
     List<DOMAIN> listAll();
 
-    List<DOMAIN> listAll(Sort sort);
+    @NonNull
+    List<DOMAIN> listAll(@NonNull Sort sort);
 
-    Page<DOMAIN> listAll(Pageable pageable);
+    @NonNull
+    Page<DOMAIN> listAll(@NonNull Pageable pageable);
 
-//    <P> List<P> listAll(Class<P> projectionType);
-//
-//    <P> List<P> listAll(Class<P> projectionType, Sort sort);
-//
-//    <P> Page<P> listAll(Class<P> projectionType, Pageable pageable);
+    @NonNull
+    List<DOMAIN> listAllByIds(@NonNull Collection<ID> ids);
 
-    List<DOMAIN> listAllByIds(Iterable<ID> ids);
+    @NonNull
+    List<DOMAIN> listAllByIds(@NonNull Collection<ID> ids, @NonNull Sort sort);
 
-    List<DOMAIN> listAllByIds(Iterable<ID> ids, Sort sort);
+    @NonNull
+    Optional<DOMAIN> fetchById(@NonNull ID id);
 
-    Map<ID, DOMAIN> listAllByIdsAsMap(Iterable<ID> ids);
+    @NonNull
+    DOMAIN getById(@NonNull ID id);
 
-    Map<ID, DOMAIN> listAllByIdsAsMap(Iterable<ID> ids, Sort sort);
+    @Nullable
+    DOMAIN getNullableById(@NonNull ID id);
 
-    Optional<DOMAIN> fetchById(ID id);
+    boolean existsById(@NonNull ID id);
 
-    DOMAIN getById(ID id);
-
-    DOMAIN getNullableById(ID id);
-
-    boolean existsById(ID id);
-
-    void mustExistById(ID id);
+    void mustExistById(@NonNull ID id);
 
 
     // **************** Create
-    DOMAIN create(DOMAIN domain);
+    @NonNull
+    DOMAIN create(@NonNull DOMAIN domain);
 
-    List<DOMAIN> createInBatch(Iterable<DOMAIN> domains);
+    @NonNull
+    List<DOMAIN> createInBatch(@NonNull Collection<DOMAIN> domains);
 
 
     // **************** Update
+    @NonNull
+    DOMAIN update(@NonNull DOMAIN domain);
 
-    DOMAIN update(DOMAIN domain);
-
-    List<DOMAIN> updateInBatch(Iterable<DOMAIN> domains);
+    @NonNull
+    List<DOMAIN> updateInBatch(@NonNull Collection<DOMAIN> domains);
 
 
     // **************** Delete
+    @NonNull
+    DOMAIN removeById(@NonNull ID id);
 
-    void removeById(ID id);
+    void remove(@NonNull DOMAIN domain);
 
-    void remove(DOMAIN domain);
+    void removeInBatch(@NonNull Collection<ID> ids);
 
-    void removeInBatch(Iterable<ID> ids);
-
-    void removeAll(Iterable<DOMAIN> domains);
+    void removeAll(@NonNull Collection<DOMAIN> domains);
 
 }
