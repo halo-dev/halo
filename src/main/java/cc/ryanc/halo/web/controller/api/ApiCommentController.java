@@ -66,7 +66,7 @@ public class ApiCommentController {
         }
         try {
             Comment lastComment = null;
-            final Post post = postService.findByPostId(postId).orElse(new Post());
+            final Post post = postService.fetchById(postId).orElse(new Post());
             comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));

@@ -152,7 +152,7 @@ public class CommentController extends BaseController {
                                    HttpServletRequest request,
                                    HttpSession session) {
         try {
-            final Post post = postService.findByPostId(postId).orElse(new Post());
+            final Post post = postService.fetchById(postId).orElse(new Post());
 
             //博主信息
             final User user = (User) session.getAttribute(USER_SESSION_KEY);

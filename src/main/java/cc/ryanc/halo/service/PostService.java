@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
+import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -22,23 +23,7 @@ import java.util.Optional;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface PostService {
-
-    /**
-     * 新增文章
-     *
-     * @param post Post
-     * @return Post
-     */
-    Post save(Post post);
-
-    /**
-     * 根据编号删除文章
-     *
-     * @param postId postId
-     * @return Post
-     */
-    Post remove(Long postId);
+public interface PostService extends CrudService<Post, Long> {
 
     /**
      * 修改文章状态
@@ -104,13 +89,6 @@ public interface PostService {
      */
     List<Post> findPostByStatus(Integer status, String postType);
 
-    /**
-     * 根据编号查询文章
-     *
-     * @param postId postId
-     * @return Post
-     */
-    Optional<Post> findByPostId(Long postId);
 
     /**
      * 根据编号和类型查询文章
