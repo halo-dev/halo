@@ -52,13 +52,8 @@ public class ApiGalleryController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult galleries() {
-        final List<Gallery> galleries = galleryService.listAll();
-        if (null != galleries && galleries.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), galleries);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
+    public List<Gallery> galleries() {
+        return galleryService.listAll();
     }
 
     /**
@@ -89,12 +84,7 @@ public class ApiGalleryController {
      * @return JsonResult
      */
     @GetMapping(value = "/{id}")
-    public JsonResult galleries(@PathVariable("id") Long id) {
-        final Optional<Gallery> gallery = galleryService.fetchById(id);
-        if (gallery.isPresent()) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), gallery.get());
-        } else {
-            return new JsonResult(ResponseStatusEnum.NOTFOUND.getCode(), ResponseStatusEnum.NOTFOUND.getMsg());
-        }
+    public Gallery galleries(@PathVariable("id") Long id) {
+        return galleryService.getById(id);
     }
 }
