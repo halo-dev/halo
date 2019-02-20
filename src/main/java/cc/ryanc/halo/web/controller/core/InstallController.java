@@ -178,14 +178,14 @@ public class InstallController {
             menuIndex.setMenuUrl("/");
             menuIndex.setMenuSort(1);
             menuIndex.setMenuIcon(" ");
-            menuService.save(menuIndex);
+            menuService.create(menuIndex);
 
             final Menu menuArchive = new Menu();
             menuArchive.setMenuName("归档");
             menuArchive.setMenuUrl("/archives");
             menuArchive.setMenuSort(2);
             menuArchive.setMenuIcon(" ");
-            menuService.save(menuArchive);
+            menuService.create(menuArchive);
 
             OPTIONS.clear();
             OPTIONS = optionsService.findAllOptions();
