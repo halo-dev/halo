@@ -18,7 +18,6 @@ import java.util.List;
  * @date : 2018/6/6
  */
 @CrossOrigin
-@RestController
 @RequestMapping(value = "/api/tags")
 public class ApiTagController {
 

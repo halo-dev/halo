@@ -17,7 +17,6 @@ import java.util.Map;
  * @author : RYAN0UP
  * @date : 2018/7/19
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/options")
 public class ApiOptionController {
