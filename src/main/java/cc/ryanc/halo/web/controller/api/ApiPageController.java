@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.api;
 
+import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -60,13 +61,15 @@ public class ApiPageController {
      * @return JsonResult
      */
     @GetMapping(value = "/{postId}")
-    public JsonResult pages(@PathVariable(value = "postId") Long postId) {
+    public Post pages(@PathVariable(value = "postId") Long postId) {
         final Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_PAGE.getDesc());
-        if (null != post) {
-            postService.cacheViews(post.getPostId());
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), post);
-        } else {
-            return new JsonResult(ResponseStatusEnum.NOTFOUND.getCode(), ResponseStatusEnum.NOTFOUND.getMsg());
+        if (post == null) {
+            throw new NotFoundException("Post with id: " + postId + " was not found").setErrorData(postId);
         }
+
+        // Cache views
+        postService.cacheViews(postId);
+
+        return post;
     }
 }
