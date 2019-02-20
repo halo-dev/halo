@@ -21,6 +21,8 @@ import java.util.Optional;
  *
  * @param <DOMAIN> domain type
  * @param <ID>     id type
+ *
+ * @author johnniang
  */
 public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOMAIN, ID> {
 

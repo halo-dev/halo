@@ -58,12 +58,6 @@ public class ApiOptionController {
     @GetMapping
     public JsonResult options() {
         final Map<String, String> options = optionsService.findAllOptions();
-        //去掉隐私元素
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_FROM_NAME.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp());
         return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), options);
     }
 
