@@ -116,7 +116,7 @@ public class InstallController {
             user.setUserDisplayName(userDisplayName);
             user.setUserEmail(userEmail);
             user.setUserPass(SecureUtil.md5(userPwd));
-            userService.save(user);
+            userService.create(user);
 
             //默认分类
             final Category category = new Category();

@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.service.base.CrudService;
 
 import java.util.Date;
 
@@ -12,14 +13,7 @@ import java.util.Date;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface UserService {
-
-    /**
-     * 保存个人资料
-     *
-     * @param user user
-     */
-    void save(User user);
+public interface UserService extends CrudService<User, Long> {
 
     /**
      * 根据用户名和密码查询，用于登录
