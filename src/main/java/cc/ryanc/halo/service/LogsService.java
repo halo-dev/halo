@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.domain.Logs;
+import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2018/1/19
  */
-public interface LogsService {
+public interface LogsService extends CrudService<Logs, Long> {
 
     /**
      * 保存日志
@@ -25,19 +26,6 @@ public interface LogsService {
      * @param request    request
      */
     void save(String logTitle, String logContent, HttpServletRequest request);
-
-    /**
-     * 移除所有日志
-     */
-    void removeAll();
-
-    /**
-     * 查询所有日志并分页
-     *
-     * @param pageable pageable
-     * @return Page
-     */
-    Page<Logs> findAll(Pageable pageable);
 
     /**
      * 查询最新的五条日志
