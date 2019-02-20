@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.base;
 
+import cc.ryanc.halo.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,7 +16,6 @@ import java.util.Optional;
  *
  * @param <DOMAIN> domain type
  * @param <ID>     id type
- *
  * @author johnniang
  */
 public interface CrudService<DOMAIN, ID> {
@@ -33,7 +33,6 @@ public interface CrudService<DOMAIN, ID> {
      * List all by sort
      *
      * @param sort sort
-     *
      * @return List
      */
     @NonNull
@@ -43,7 +42,6 @@ public interface CrudService<DOMAIN, ID> {
      * List all by pageable
      *
      * @param pageable pageable
-     *
      * @return Page
      */
     @NonNull
@@ -53,7 +51,6 @@ public interface CrudService<DOMAIN, ID> {
      * List all by ids
      *
      * @param ids ids
-     *
      * @return List
      */
     @NonNull
@@ -64,7 +61,6 @@ public interface CrudService<DOMAIN, ID> {
      *
      * @param ids  ids
      * @param sort sort
-     *
      * @return List
      */
     @NonNull
@@ -74,7 +70,6 @@ public interface CrudService<DOMAIN, ID> {
      * Fetch by id
      *
      * @param id id
-     *
      * @return Optional
      */
     @NonNull
@@ -84,33 +79,34 @@ public interface CrudService<DOMAIN, ID> {
      * Get by id
      *
      * @param id id
-     *
      * @return DOMAIN
+     * @throws NotFoundException If the specified id does not exist
      */
     @NonNull
     DOMAIN getById(@NonNull ID id);
 
     /**
-     * Get nullable by id
+     * Gets domain of nullable by id.
      *
      * @param id id
-     *
      * @return DOMAIN
      */
     @Nullable
-    DOMAIN getNullableById(@NonNull ID id);
+    DOMAIN getByIdOfNullable(@NonNull ID id);
 
     /**
-     * @param id id
+     * Exists by id.
      *
+     * @param id id
      * @return boolean
      */
     boolean existsById(@NonNull ID id);
 
     /**
-     * exist by id
+     * Must exist by id, or throw NotFoundException.
      *
      * @param id id
+     * @throws NotFoundException If the specified id does not exist
      */
     void mustExistById(@NonNull ID id);
 
@@ -125,7 +121,6 @@ public interface CrudService<DOMAIN, ID> {
      * save by domain
      *
      * @param domain domain
-     *
      * @return DOMAIN
      */
     @NonNull
@@ -135,47 +130,43 @@ public interface CrudService<DOMAIN, ID> {
      * save by domains
      *
      * @param domains domains
-     *
      * @return List
      */
     @NonNull
     List<DOMAIN> createInBatch(@NonNull Collection<DOMAIN> domains);
 
     /**
-     * Update by domain
+     * Updates by domain
      *
      * @param domain domain
-     *
      * @return DOMAIN
      */
     @NonNull
     DOMAIN update(@NonNull DOMAIN domain);
 
     /**
-     * Update by domains
+     * Updates by domains
      *
      * @param domains domains
-     *
      * @return List
      */
     @NonNull
     List<DOMAIN> updateInBatch(@NonNull Collection<DOMAIN> domains);
 
     /**
-     * Remove by id
+     * Removes by id
      *
      * @param id id
-     *
      * @return DOMAIN
+     * @throws NotFoundException If the specified id does not exist
      */
     @NonNull
     DOMAIN removeById(@NonNull ID id);
 
     /**
-     * Remove by id
+     * Removes by id if present.
      *
      * @param id id
-     *
      * @return DOMAIN
      */
     @Nullable

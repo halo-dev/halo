@@ -21,7 +21,7 @@ public class PostSyncTask {
         final PostService postService = SpringUtil.getBean(PostService.class);
         int count = 0;
         for (Long key : POSTS_VIEWS.keySet()) {
-            Post post = postService.getNullableById(key);
+            Post post = postService.getByIdOfNullable(key);
             if (null != post) {
                 post.setPostViews(post.getPostViews() + POSTS_VIEWS.get(key));
                 postService.create(post);
