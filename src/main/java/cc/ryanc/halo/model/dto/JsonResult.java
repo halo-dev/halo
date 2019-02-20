@@ -14,7 +14,7 @@ import lombok.Data;
 public class JsonResult {
 
     /**
-     * 返回的状态码，0：失败，1：成功
+     * 返回的状态码 (Same as HttpStatus.value()).
      */
     private Integer code;
 

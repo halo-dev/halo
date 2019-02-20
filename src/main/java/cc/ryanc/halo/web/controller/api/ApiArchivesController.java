@@ -5,7 +5,7 @@ import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -74,7 +74,7 @@ public class ApiArchivesController {
     @GetMapping(value = "/year")
     public JsonResult archivesYear() {
         final List<Archive> archives = postService.findPostGroupByYear();
-        if (null != archives && archives.size() > 0) {
+        if (!CollectionUtils.isEmpty(archives)) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archives);
         } else {
             return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
@@ -126,13 +126,8 @@ public class ApiArchivesController {
      * @return JsonResult
      */
     @GetMapping(value = "/year/month")
-    public JsonResult archivesYearAndMonth() {
-        final List<Archive> archives = postService.findPostGroupByYearAndMonth();
-        if (null != archives && archives.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archives);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
+    public List<Archive> archivesYearAndMonth() {
+        return postService.findPostGroupByYearAndMonth();
     }
 
     /**
@@ -143,13 +138,8 @@ public class ApiArchivesController {
      * @Param
      **/
     @GetMapping(value = "/all")
-    public JsonResult archivesAllPost() {
-        final List<Archive> archive = postService.findAllPost();
-        if (null != archive && archive.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archive);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
+    public List<Archive> archivesAllPost() {
+        return postService.findAllPost();
     }
 
 
