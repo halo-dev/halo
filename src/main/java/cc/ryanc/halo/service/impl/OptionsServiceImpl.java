@@ -117,7 +117,7 @@ public class OptionsServiceImpl extends AbstractCrudService<Options, String> imp
      */
     @Override
     public String findOneOption(String key) {
-//        final Options options = getNullableById(key);
+//        final Options options = getByIdOfNullable(key);
 //        if (null != options) {
 //            return options.getOptionValue();
 //        }

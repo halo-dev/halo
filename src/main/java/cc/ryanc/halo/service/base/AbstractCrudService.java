@@ -96,7 +96,7 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
     }
 
     @Override
-    public DOMAIN getNullableById(ID id) {
+    public DOMAIN getByIdOfNullable(ID id) {
         return fetchById(id).orElse(null);
     }
 
