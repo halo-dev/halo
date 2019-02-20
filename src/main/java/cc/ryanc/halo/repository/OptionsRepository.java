@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface OptionsRepository extends BaseRepository<Options, Long> {
+public interface OptionsRepository extends BaseRepository<Options, String> {
 
     /**
      * 根据key查询单个option

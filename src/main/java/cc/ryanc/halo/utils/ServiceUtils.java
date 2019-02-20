@@ -83,4 +83,29 @@ public class ServiceUtils {
 
         return resultMap;
     }
+
+    /**
+     * Converts to map (key from the list data)
+     *
+     * @param list          data list
+     * @param keyFunction   key mapping function
+     * @param valueFunction value mapping function
+     * @param <ID>          id type
+     * @param <D>           data type
+     * @param <V>           value type
+     * @return a map which key from list data and value is data
+     */
+    public static <ID, D, V> Map<ID, V> convertToMap(Collection<D> list, Function<D, ID> keyFunction, Function<D, V> valueFunction) {
+        Assert.notNull(keyFunction, "mapping function must not be null");
+
+        if (CollectionUtils.isEmpty(list)) {
+            return Collections.emptyMap();
+        }
+
+        Map<ID, V> resultMap = new HashMap<>();
+
+        list.forEach(data -> resultMap.putIfAbsent(keyFunction.apply(data), valueFunction.apply(data)));
+
+        return resultMap;
+    }
 }

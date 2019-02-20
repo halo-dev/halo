@@ -71,6 +71,9 @@ public interface CrudService<DOMAIN, ID> {
     @NonNull
     DOMAIN removeById(@NonNull ID id);
 
+    @Nullable
+    DOMAIN removeByIdOfNullable(@NonNull ID id);
+
     void remove(@NonNull DOMAIN domain);
 
     void removeInBatch(@NonNull Collection<ID> ids);
