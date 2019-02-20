@@ -4,7 +4,7 @@ import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.repository.UserRepository;
 import cc.ryanc.halo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -19,19 +19,13 @@ import java.util.List;
  * @date : 2017/11/14
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends AbstractCrudService<User, Long> implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    /**
-     * 保存个人资料
-     *
-     * @param user user
-     */
-    @Override
-    public void save(User user) {
-        userRepository.save(user);
+    public UserServiceImpl(UserRepository userRepository) {
+        super(userRepository);
+        this.userRepository = userRepository;
     }
 
     /**
@@ -95,7 +89,9 @@ public class UserServiceImpl implements UserService {
         final User user = this.findUser();
         user.setLoginError(0);
         user.setLoginEnable(enable);
-        userRepository.save(user);
+
+        // Update user
+        update(user);
     }
 
     /**
@@ -108,8 +104,9 @@ public class UserServiceImpl implements UserService {
     public User updateUserLoginLast(Date lastDate) {
         final User user = this.findUser();
         user.setLoginLast(lastDate);
-        userRepository.save(user);
-        return user;
+
+        // Update user
+        return update(user);
     }
 
     /**
@@ -121,7 +118,11 @@ public class UserServiceImpl implements UserService {
     public Integer updateUserLoginError() {
         final User user = this.findUser();
         user.setLoginError((user.getLoginError() == null ? 0 : user.getLoginError()) + 1);
-        userRepository.save(user);
+
+        // Update user
+        update(user);
+
+        // Return login error times
         return user.getLoginError();
     }
 
@@ -136,7 +137,7 @@ public class UserServiceImpl implements UserService {
         user.setLoginEnable(TrueFalseEnum.TRUE.getDesc());
         user.setLoginError(0);
         user.setLoginLast(new Date());
-        userRepository.save(user);
-        return user;
+
+        return update(user);
     }
 }
