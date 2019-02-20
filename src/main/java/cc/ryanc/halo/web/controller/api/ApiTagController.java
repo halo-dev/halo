@@ -49,7 +49,7 @@ public class ApiTagController {
      */
     @GetMapping
     public JsonResult tags() {
-        final List<Tag> tags = tagService.findAll();
+        final List<Tag> tags = tagService.listAll();
         if (null != tags && tags.size() > 0) {
             return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), tags);
         } else {

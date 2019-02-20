@@ -306,7 +306,7 @@ public class AdminController extends BaseController {
                             tag = new Tag();
                             tag.setTagName(ele);
                             tag.setTagUrl(ele);
-                            tag = tagService.save(tag);
+                            tag = tagService.create(tag);
                         }
                         tags.add(tag);
                     } else if ("categories".equals(key)) {
