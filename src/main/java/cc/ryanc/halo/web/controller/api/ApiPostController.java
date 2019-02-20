@@ -27,7 +27,6 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/posts")
 public class ApiPostController {

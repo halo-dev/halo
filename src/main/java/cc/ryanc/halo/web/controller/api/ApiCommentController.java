@@ -33,7 +33,6 @@ import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/comments")
 public class ApiCommentController {
