@@ -67,7 +67,7 @@ public class OptionController {
             log.info("List of saved options: " + options);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
-            log.error("Save settings option failed: {}", e.getMessage());
+            log.error("Save settings option failed: " + e.getMessage(), e);
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }

@@ -154,6 +154,14 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
     }
 
     @Override
+    public DOMAIN removeByIdOfNullable(ID id) {
+        return fetchById(id).map(domain -> {
+            remove(domain);
+            return domain;
+        }).orElse(null);
+    }
+
+    @Override
     public void remove(DOMAIN domain) {
         Assert.notNull(domain, domainName + " data must not be null");
 
