@@ -140,7 +140,7 @@ public class InstallController {
             post.setCategories(categories);
             post.setAllowComment(AllowCommentEnum.ALLOW.getCode());
             post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
-            postService.save(post);
+            postService.create(post);
 
             //第一个评论
             final Comment comment = new Comment();

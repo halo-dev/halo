@@ -80,7 +80,7 @@ public class FrontCommentController {
         }
         try {
             Comment lastComment = null;
-            post = postService.findByPostId(post.getPostId()).orElse(new Post());
+            post = postService.fetchById(post.getPostId()).orElse(new Post());
             comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));

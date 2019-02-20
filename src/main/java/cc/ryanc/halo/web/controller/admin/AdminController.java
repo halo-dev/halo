@@ -341,7 +341,7 @@ public class AdminController extends BaseController {
         if (null == post.getPostUpdate()) {
             post.setPostUpdate(new Date());
         }
-        postService.save(post);
+        postService.create(post);
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
     }
 }

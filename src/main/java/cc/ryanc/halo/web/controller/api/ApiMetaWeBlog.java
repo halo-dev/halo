@@ -87,7 +87,7 @@ public class ApiMetaWeBlog {
             } else if ("metaWeblog.newPost".equals(methodName)) {
                 Post post = parsetPost(methodCall);
                 post.setUser(user);
-                post = postService.save(post);
+                post = postService.create(post);
                 final StrBuilder strBuilder = new StrBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><methodResponse>");
                 strBuilder.append("<params><param><value><string>");
                 strBuilder.append(post.getPostId());
@@ -101,7 +101,7 @@ public class ApiMetaWeBlog {
                 final Long postId = Long.parseLong(params.getJSONObject(0).getJSONObject("value").optString("string"));
                 post.setPostId(postId);
                 post.setUser(user);
-                postService.save(post);
+                postService.create(post);
                 final StrBuilder strBuilder = new StrBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><methodResponse>");
                 strBuilder.append("<params><param><value><string>");
                 strBuilder.append(postId);
@@ -109,7 +109,7 @@ public class ApiMetaWeBlog {
                 responseContent = strBuilder.toString();
             } else if ("blogger.deletePost".equals(methodName)) {
                 final Long postId = Long.parseLong(params.getJSONObject(0).getJSONObject("value").optString("string"));
-                postService.remove(postId);
+                postService.removeById(postId);
                 final StrBuilder strBuilder = new StrBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?><methodResponse>");
                 strBuilder.append("<params><param><value><boolean>");
                 strBuilder.append(true);
@@ -180,7 +180,7 @@ public class ApiMetaWeBlog {
      */
     private String buildPost(final Long postId) {
         final StrBuilder strBuilder = new StrBuilder();
-        final Post post = postService.findByPostId(postId).orElse(new Post());
+        final Post post = postService.fetchById(postId).orElse(new Post());
         strBuilder.append("<struct>");
         strBuilder.append("<member><name>dateCreated</name>");
         strBuilder.append("<value><dateTime.iso8601>");

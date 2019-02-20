@@ -11,9 +11,9 @@ import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -41,20 +41,27 @@ import static cc.ryanc.halo.model.dto.HaloConst.POSTS_VIEWS;
  * @date : 2017/11/14
  */
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl extends AbstractCrudService<Post, Long> implements PostService {
 
     private static final String POSTS_CACHE_NAME = "posts";
 
     private static final String COMMENTS_CACHE_NAME = "comments";
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
-    private TagService tagService;
+    private final TagService tagService;
+
+    public PostServiceImpl(PostRepository postRepository,
+                           CategoryService categoryService,
+                           TagService tagService) {
+        super(postRepository);
+        this.postRepository = postRepository;
+        this.categoryService = categoryService;
+        this.tagService = tagService;
+    }
+
 
     /**
      * 保存文章
@@ -64,7 +71,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post save(Post post) {
+    public Post create(Post post) {
         int postSummary = 50;
         if (StrUtil.isNotEmpty(OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
             postSummary = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
@@ -76,7 +83,7 @@ public class PostServiceImpl implements PostService {
         } else {
             post.setPostSummary(summaryText);
         }
-        return postRepository.save(post);
+        return super.create(post);
     }
 
     /**
@@ -87,8 +94,8 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post remove(Long postId) {
-        final Optional<Post> post = this.findByPostId(postId);
+    public Post removeById(Long postId) {
+        final Optional<Post> post = fetchById(postId);
         postRepository.delete(post.get());
         return post.get();
     }
@@ -103,7 +110,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Post updatePostStatus(Long postId, Integer status) {
-        final Optional<Post> post = this.findByPostId(postId);
+        final Optional<Post> post = fetchById(postId);
         post.get().setPostStatus(status);
         return postRepository.save(post.get());
     }
@@ -197,17 +204,6 @@ public class PostServiceImpl implements PostService {
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_status_type_'+#status+'_'+#postType")
     public List<Post> findPostByStatus(Integer status, String postType) {
         return postRepository.findPostsByPostStatusAndPostType(status, postType);
-    }
-
-    /**
-     * 根据编号查询文章
-     *
-     * @param postId postId
-     * @return Optional
-     */
-    @Override
-    public Optional<Post> findByPostId(Long postId) {
-        return postRepository.findById(postId);
     }
 
     /**

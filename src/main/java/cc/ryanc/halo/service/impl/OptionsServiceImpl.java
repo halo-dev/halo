@@ -8,6 +8,7 @@ import cc.ryanc.halo.utils.ServiceUtils;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ public class OptionsServiceImpl extends AbstractCrudService<Options, String> imp
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public void saveOptions(Map<String, String> options) {
-        if (null != options && !options.isEmpty()) {
+        if (!CollectionUtils.isEmpty(options)) {
             options.forEach(this::saveOption);
         }
     }

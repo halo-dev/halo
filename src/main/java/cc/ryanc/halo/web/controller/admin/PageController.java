@@ -243,7 +243,7 @@ public class PageController {
             post.setUser(user);
             post.setPostType(PostTypeEnum.POST_TYPE_PAGE.getDesc());
             if (null != post.getPostId()) {
-                final Post oldPost = postService.findByPostId(post.getPostId()).get();
+                final Post oldPost = postService.fetchById(post.getPostId()).get();
                 if (null == post.getPostDate()) {
                     post.setPostDate(DateUtil.date());
                 }
@@ -255,7 +255,7 @@ public class PageController {
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
                 post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
             }
-            postService.save(post);
+            postService.create(post);
             logsService.save(LogsRecord.PUSH_PAGE, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
@@ -273,7 +273,7 @@ public class PageController {
      */
     @GetMapping(value = "/edit")
     public String editPage(@RequestParam("pageId") Long pageId, Model model) {
-        final Optional<Post> post = postService.findByPostId(pageId);
+        final Optional<Post> post = postService.fetchById(pageId);
         final List<String> customTpls = HaloUtils.getCustomTpl(OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("post", post.orElse(new Post()));
         model.addAttribute("customTpls", customTpls);
