@@ -3,13 +3,12 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.repository.TagRepository;
 import cc.ryanc.halo.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <pre>
@@ -20,12 +19,16 @@ import java.util.Optional;
  * @date : 2018/1/12
  */
 @Service
-public class TagServiceImpl implements TagService {
+public class TagServiceImpl extends AbstractCrudService<Tag, Long> implements TagService {
 
     private static final String POSTS_CACHE_NAME = "posts";
 
-    @Autowired
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
+
+    public TagServiceImpl(TagRepository tagRepository) {
+        super(tagRepository);
+        this.tagRepository = tagRepository;
+    }
 
     /**
      * 新增/修改标签
@@ -35,8 +38,8 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Tag save(Tag tag) {
-        return tagRepository.save(tag);
+    public Tag create(Tag tag) {
+        return super.create(tag);
     }
 
     /**
@@ -47,31 +50,8 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Tag remove(Long tagId) {
-        final Optional<Tag> tag = findByTagId(tagId);
-        tagRepository.delete(tag.get());
-        return tag.get();
-    }
-
-    /**
-     * 获取所有标签
-     *
-     * @return List
-     */
-    @Override
-    public List<Tag> findAll() {
-        return tagRepository.findAll();
-    }
-
-    /**
-     * 根据编号查询标签
-     *
-     * @param tagId tagId
-     * @return Optional
-     */
-    @Override
-    public Optional<Tag> findByTagId(Long tagId) {
-        return tagRepository.findById(tagId);
+    public Tag removeById(Long tagId) {
+        return super.removeById(tagId);
     }
 
     /**
@@ -115,7 +95,7 @@ public class TagServiceImpl implements TagService {
                 nt = new Tag();
                 nt.setTagName(tag);
                 nt.setTagUrl(tag);
-                tagsList.add(save(nt));
+                tagsList.add(create(nt));
             }
         }
         return tagsList;
