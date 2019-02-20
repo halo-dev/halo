@@ -52,12 +52,7 @@ public class ApiLinkController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult links() {
-        final List<Link> links = linkService.listAll();
-        if (null != links && links.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), links);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
+    public List<Link> links() {
+        return linkService.listAll();
     }
 }
