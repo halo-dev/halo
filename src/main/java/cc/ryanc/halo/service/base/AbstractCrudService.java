@@ -179,5 +179,8 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
         repository.deleteInBatch(domains);
     }
 
-
+    @Override
+    public void removeAll() {
+        repository.deleteAll();
+    }
 }

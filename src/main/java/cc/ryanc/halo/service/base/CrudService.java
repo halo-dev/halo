@@ -77,4 +77,5 @@ public interface CrudService<DOMAIN, ID> {
 
     void removeAll(@NonNull Collection<DOMAIN> domains);
 
+    void removeAll();
 }

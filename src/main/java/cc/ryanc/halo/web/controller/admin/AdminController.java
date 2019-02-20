@@ -205,7 +205,7 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/logs")
     public String logs(Model model, @PageableDefault Pageable pageable) {
-        final Page<Logs> logs = logsService.findAll(pageable);
+        final Page<Logs> logs = logsService.listAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
