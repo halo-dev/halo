@@ -21,6 +21,8 @@ import java.util.Map;
 
 /**
  * Exception handler of controller.
+ *
+ * @author johnniang
  */
 @RestControllerAdvice
 public class ControllerExceptionHandler {
