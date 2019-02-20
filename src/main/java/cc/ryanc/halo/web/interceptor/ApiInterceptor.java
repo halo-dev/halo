@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -28,6 +29,12 @@ public class ApiInterceptor implements HandlerInterceptor {
 
     private static final String TOKEN = "token";
 
+    private final ObjectMapper objectMapper;
+
+    public ApiInterceptor(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), OPTIONS.get(BlogPropertiesEnum.API_STATUS.getProp()))) {
@@ -37,10 +44,9 @@ public class ApiInterceptor implements HandlerInterceptor {
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("application/json;charset=utf-8");
                 Map<String, Object> map = new HashMap<>(2);
-                ObjectMapper mapper = new ObjectMapper();
-                map.put("code", 400);
+                map.put("code", HttpStatus.BAD_REQUEST.value());
                 map.put("msg", "Invalid Token");
-                response.getWriter().write(mapper.writeValueAsString(map));
+                response.getWriter().write(objectMapper.writeValueAsString(map));
                 return false;
             }
         }
