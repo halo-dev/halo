@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.api;
 
+import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.ResponseStatusEnum;
@@ -78,12 +79,13 @@ public class ApiTagController {
      * @return JsonResult
      */
     @GetMapping(value = "/{tagUrl}")
-    public JsonResult tags(@PathVariable("tagUrl") String tagUrl) {
+    public Tag tags(@PathVariable("tagUrl") String tagUrl) {
         final Tag tag = tagService.findByTagUrl(tagUrl);
-        if (null != tag) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), tag);
-        } else {
-            return new JsonResult(ResponseStatusEnum.NOTFOUND.getCode(), ResponseStatusEnum.NOTFOUND.getMsg());
+
+        if (tag == null) {
+            throw new NotFoundException("Tag with url: " + tagUrl + " was not found");
         }
+
+        return tag;
     }
 }
