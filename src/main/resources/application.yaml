@@ -10,6 +10,9 @@ server:
     session:
       timeout: 86400s
 spring:
+  output:
+    ansi:
+      enabled: always
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
