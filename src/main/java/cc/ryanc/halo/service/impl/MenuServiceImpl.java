@@ -3,7 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Menu;
 import cc.ryanc.halo.repository.MenuRepository;
 import cc.ryanc.halo.service.MenuService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,14 +20,18 @@ import java.util.Optional;
  * @date : 2018/1/24
  */
 @Service
-public class MenuServiceImpl implements MenuService {
+public class MenuServiceImpl extends AbstractCrudService<Menu, Long> implements MenuService {
 
     private static final String MENUS_CACHE_KEY = "'menu'";
 
     private static final String MENUS_CACHE_NAME = "menus";
 
-    @Autowired
-    private MenuRepository menuRepository;
+    private final MenuRepository menuRepository;
+
+    public MenuServiceImpl(MenuRepository menuRepository) {
+        super(menuRepository);
+        this.menuRepository = menuRepository;
+    }
 
     /**
      * 查询所有菜单
@@ -36,8 +40,8 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     @Cacheable(value = MENUS_CACHE_NAME, key = MENUS_CACHE_KEY)
-    public List<Menu> findAll() {
-        return menuRepository.findAll();
+    public List<Menu> listAll() {
+        return super.listAll();
     }
 
     /**
@@ -48,8 +52,8 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     @CacheEvict(value = MENUS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Menu save(Menu menu) {
-        return menuRepository.save(menu);
+    public Menu create(Menu menu) {
+        return super.create(menu);
     }
 
     /**
@@ -60,20 +64,8 @@ public class MenuServiceImpl implements MenuService {
      */
     @Override
     @CacheEvict(value = MENUS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Menu remove(Long menuId) {
-        final Optional<Menu> menu = this.findByMenuId(menuId);
-        menuRepository.delete(menu.orElse(null));
-        return menu.orElse(null);
+    public Menu removeById(Long menuId) {
+        return super.removeById(menuId);
     }
 
-    /**
-     * 根据编号查询菜单
-     *
-     * @param menuId menuId
-     * @return Menu
-     */
-    @Override
-    public Optional<Menu> findByMenuId(Long menuId) {
-        return menuRepository.findById(menuId);
-    }
 }

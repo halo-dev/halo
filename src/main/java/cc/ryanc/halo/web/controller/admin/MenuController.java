@@ -54,7 +54,7 @@ public class MenuController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
             }
         }
-        menu = menuService.save(menu);
+        menu = menuService.create(menu);
         if (null != menu) {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "菜单保存成功！");
         } else {
@@ -71,7 +71,7 @@ public class MenuController {
      */
     @GetMapping(value = "/edit")
     public String updateMenu(@RequestParam("menuId") Long menuId, Model model) {
-        final Menu menu = menuService.findByMenuId(menuId).orElse(new Menu());
+        final Menu menu = menuService.fetchById(menuId).orElse(new Menu());
         model.addAttribute("updateMenu", menu);
         return "/admin/admin_menu";
     }
@@ -85,7 +85,7 @@ public class MenuController {
     @GetMapping(value = "/remove")
     public String removeMenu(@RequestParam("menuId") Long menuId) {
         try {
-            menuService.remove(menuId);
+            menuService.removeById(menuId);
         } catch (Exception e) {
             log.error("Deleting menu failed: {}", e.getMessage());
         }
