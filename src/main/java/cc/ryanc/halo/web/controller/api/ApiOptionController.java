@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.OptionsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -55,9 +56,8 @@ public class ApiOptionController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult options() {
-        final Map<String, String> options = optionsService.findAllOptions();
-        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), options);
+    public Map<String, String> options() {
+        return optionsService.findAllOptions();
     }
 
     /**
@@ -79,7 +79,6 @@ public class ApiOptionController {
      */
     @GetMapping(value = "/one")
     public JsonResult option(@RequestParam(value = "optionName") String optionName) {
-        final String optionValue = optionsService.findOneOption(optionName);
-        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), optionValue);
+        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), optionsService.findOneOption(optionName));
     }
 }
