@@ -81,6 +81,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
             this.entityInformation = entityInformation;
         }
 
+        @Override
         public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
             Path<?> path = root.get(this.entityInformation.getIdAttribute());
             this.parameter = cb.parameter(Iterable.class);

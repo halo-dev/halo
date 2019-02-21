@@ -3,10 +3,13 @@ package cc.ryanc.halo.web.controller.api;
 import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -51,9 +54,9 @@ public class ApiTagController {
     public JsonResult tags() {
         final List<Tag> tags = tagService.listAll();
         if (null != tags && tags.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), tags);
+            return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), tags);
         } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
+            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
         }
     }
 
@@ -76,6 +79,7 @@ public class ApiTagController {
      * </p>
      *
      * @param tagUrl tagUrl
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/{tagUrl}")

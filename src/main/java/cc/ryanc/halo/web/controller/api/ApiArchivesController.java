@@ -2,9 +2,9 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.dto.Archive;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,9 +75,9 @@ public class ApiArchivesController {
     public JsonResult archivesYear() {
         final List<Archive> archives = postService.findPostGroupByYear();
         if (!CollectionUtils.isEmpty(archives)) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), archives);
+            return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), archives);
         } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
+            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
         }
     }
 
@@ -132,6 +132,7 @@ public class ApiArchivesController {
 
     /**
      * @return JsonResult
+     *
      * @Author Aquan
      * @Description 返回所有文章
      * @Date 2019.1.4 11:06
