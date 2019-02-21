@@ -20,6 +20,7 @@ import java.util.List;
  *
  * @param <DOMAIN> domain type
  * @param <ID>     id type
+ * @author johnniang
  */
 public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, ID> implements BaseRepository<DOMAIN, ID> {
 
