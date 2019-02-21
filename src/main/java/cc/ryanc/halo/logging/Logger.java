@@ -341,9 +341,7 @@ public final class Logger implements org.slf4j.Logger {
     }
 
     @Override
-    public void warn(Marker marker, String
-
-format, Object... arguments) {
+    public void warn(Marker marker, String format, Object... arguments) {
         if (isWarnEnabled(marker)) {
             proxy.warn(marker, format, arguments);
         }

@@ -3,7 +3,10 @@ package cc.ryanc.halo.web.controller.api;
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -70,6 +73,7 @@ public class ApiCategoryController {
      * </p>
      *
      * @param cateUrl 分类路径
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/{cateUrl}")
