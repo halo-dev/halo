@@ -34,7 +34,7 @@
 		<oh-my-email.version>0.0.4</oh-my-email.version>
 		<lombok.version>1.18.4</lombok.version>
 		<ehcache.version>3.6.3</ehcache.version>
-		<hutool-all.version>4.4.2</hutool-all.version>
+		<hutool.version>4.4.2</hutool.version>
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
 		<qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
@@ -122,8 +122,28 @@
 		<!-- hutool工具包 -->
 		<dependency>
 			<groupId>cn.hutool</groupId>
-			<artifactId>hutool-all</artifactId>
-			<version>${hutool-all.version}</version>
+			<artifactId>hutool-core</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-http</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-crypto</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-extra</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-cron</artifactId>
+			<version>${hutool.version}</version>
 		</dependency>
 
         <!-- 又拍云SDK -->
