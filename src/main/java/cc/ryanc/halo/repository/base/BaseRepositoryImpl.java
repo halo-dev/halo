@@ -36,6 +36,13 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         this.entityManager = entityManager;
     }
 
+    /**
+     * Finds all domain by id list and the specified sort.
+     *
+     * @param ids  id list of domain must not be null
+     * @param sort the specified sort must not be null
+     * @return a list of domains
+     */
     @Override
     public List<DOMAIN> findAllByIdIn(Iterable<ID> ids, Sort sort) {
         Assert.notNull(ids, "The given Iterable of Id's must not be null!");
@@ -58,6 +65,12 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         }
     }
 
+    /**
+     * Deletes by id list.
+     *
+     * @param ids id list of domain must not be null
+     * @return number of rows affected
+     */
     @Override
     public long deleteByIdIn(Iterable<ID> ids) {
 
