@@ -1,5 +1,6 @@
 package cc.ryanc.halo.utils;
 
+import cc.ryanc.halo.model.dto.HaloConst;
 import org.commonmark.Extension;
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor;
@@ -20,34 +21,40 @@ import java.util.Set;
 public class MarkdownUtils {
 
     /**
-     * Front-matter插件
+     * Front-matter 插件
      */
     private static final Set<Extension> EXTENSIONS_YAML = Collections.singleton(YamlFrontMatterExtension.create());
 
     /**
-     * Table插件
+     * Table 插件
      */
     private static final Set<Extension> EXTENSIONS_TABLE = Collections.singleton(TablesExtension.create());
 
     /**
-     * 解析Markdown文档
+     * 解析 Markdown 文档
      */
     private static final Parser PARSER = Parser.builder().extensions(EXTENSIONS_YAML).extensions(EXTENSIONS_TABLE).build();
 
     /**
-     * 渲染HTML文档
+     * 渲染 HTML 文档
      */
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder().extensions(EXTENSIONS_YAML).extensions(EXTENSIONS_TABLE).build();
 
     /**
-     * 渲染Markdown
+     * 渲染 Markdown
      *
+     * @see https://github.com/otale/tale/blob/master/src/main/java/com/tale/utils/TaleUtils.java
      * @param content content
      * @return String
      */
     public static String renderMarkdown(String content) {
         final Node document = PARSER.parse(content);
-        return RENDERER.render(document);
+        String renderContent = RENDERER.render(document);
+        // render netease music short url
+        if (content.contains(HaloConst.NETEASE_MUSIC_PREFIX)) {
+            renderContent = content.replaceAll(HaloConst.NETEASE_MUSIC_REG_PATTERN, HaloConst.NETEASE_MUSIC_IFRAME);
+        }
+        return renderContent;
     }
 
     /**
