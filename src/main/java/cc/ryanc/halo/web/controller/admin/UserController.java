@@ -67,7 +67,7 @@ public class UserController {
                     return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
                 }
             }
-            userService.save(user);
+            userService.create(user);
             configuration.setSharedVariable("user", userService.findUser());
             session.removeAttribute(USER_SESSION_KEY);
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public class UserController {
             final User user = userService.findByUserIdAndUserPass(userId, SecureUtil.md5(beforePass));
             if (null != user) {
                 user.setUserPass(SecureUtil.md5(newPass));
-                userService.save(user);
+                userService.update(user);
                 session.removeAttribute(USER_SESSION_KEY);
             } else {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.old-password-error"));

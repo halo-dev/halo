@@ -1,14 +1,14 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Gallery;
-import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.GalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <pre>
@@ -18,7 +18,6 @@ import java.util.Optional;
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/galleries")
 public class ApiGalleryController {
@@ -53,13 +52,8 @@ public class ApiGalleryController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult galleries() {
-        final List<Gallery> galleries = galleryService.findAll();
-        if (null != galleries && galleries.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), galleries);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
+    public List<Gallery> galleries() {
+        return galleryService.listAll();
     }
 
     /**
@@ -87,15 +81,11 @@ public class ApiGalleryController {
      * </p>
      *
      * @param id id
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/{id}")
-    public JsonResult galleries(@PathVariable("id") Long id) {
-        final Optional<Gallery> gallery = galleryService.findByGalleryId(id);
-        if (gallery.isPresent()) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), gallery.get());
-        } else {
-            return new JsonResult(ResponseStatusEnum.NOTFOUND.getCode(), ResponseStatusEnum.NOTFOUND.getMsg());
-        }
+    public Gallery galleries(@PathVariable("id") Long id) {
+        return galleryService.getById(id);
     }
 }

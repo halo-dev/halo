@@ -80,7 +80,7 @@ public class FrontCommentController {
         }
         try {
             Comment lastComment = null;
-            post = postService.findByPostId(post.getPostId()).orElse(new Post());
+            post = postService.fetchById(post.getPostId()).orElse(new Post());
             comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
             comment.setPost(post);
             comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
@@ -90,7 +90,7 @@ public class FrontCommentController {
                 comment.setCommentAuthorAvatarMd5(SecureUtil.md5(comment.getCommentAuthorEmail()));
             }
             if (comment.getCommentParent() > 0) {
-                lastComment = commentService.findCommentById(comment.getCommentParent()).orElse(new Comment());
+                lastComment = commentService.fetchById(comment.getCommentParent()).orElse(new Comment());
                 final StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
                 buildContent.append(lastComment.getCommentId());
                 buildContent.append("'>@");
@@ -105,7 +105,7 @@ public class FrontCommentController {
             if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
                 comment.setCommentAuthorUrl(URLUtil.normalize(comment.getCommentAuthorUrl()));
             }
-            commentService.save(comment);
+            commentService.create(comment);
             if (comment.getCommentParent() > 0) {
                 new EmailToParent(comment, lastComment, post).start();
                 new EmailToAdmin(comment, post).start();

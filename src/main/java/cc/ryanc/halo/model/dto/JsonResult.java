@@ -14,7 +14,7 @@ import lombok.Data;
 public class JsonResult {
 
     /**
-     * 返回的状态码，0：失败，1：成功
+     * 返回的状态码 (Same as HttpStatus.value()).
      */
     private Integer code;
 
@@ -24,9 +24,17 @@ public class JsonResult {
     private String msg;
 
     /**
+     * Dev message.(only setting in dev environment)
+     */
+    private String devMsg;
+
+    /**
      * 返回的数据
      */
     private Object result;
+
+    public JsonResult() {
+    }
 
     /**
      * 只返回状态码
@@ -69,6 +77,13 @@ public class JsonResult {
      */
     public JsonResult(Integer code, Object result) {
         this.code = code;
+        this.result = result;
+    }
+
+    public JsonResult(Integer code, String msg, String devMsg, Object result) {
+        this.code = code;
+        this.msg = msg;
+        this.devMsg = devMsg;
         this.result = result;
     }
 }

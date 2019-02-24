@@ -51,7 +51,7 @@ public class FrontCategoryController extends BaseController {
      */
     @GetMapping
     public String categories(Model model) {
-        final List<Category> categories = categoryService.findAll();
+        final List<Category> categories = categoryService.listAll();
         model.addAttribute("categories", categories);
         return this.render("categories");
     }

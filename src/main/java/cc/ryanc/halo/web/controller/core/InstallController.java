@@ -116,14 +116,14 @@ public class InstallController {
             user.setUserDisplayName(userDisplayName);
             user.setUserEmail(userEmail);
             user.setUserPass(SecureUtil.md5(userPwd));
-            userService.save(user);
+            userService.create(user);
 
             //默认分类
             final Category category = new Category();
             category.setCateName("未分类");
             category.setCateUrl("default");
             category.setCateDesc("未分类");
-            categoryService.save(category);
+            categoryService.create(category);
 
             //第一篇文章
             final Post post = new Post();
@@ -140,7 +140,7 @@ public class InstallController {
             post.setCategories(categories);
             post.setAllowComment(AllowCommentEnum.ALLOW.getCode());
             post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
-            postService.save(post);
+            postService.create(post);
 
             //第一个评论
             final Comment comment = new Comment();
@@ -154,7 +154,7 @@ public class InstallController {
             comment.setCommentStatus(0);
             comment.setCommentAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36");
             comment.setIsAdmin(0);
-            commentService.save(comment);
+            commentService.create(comment);
 
             final Map<String, String> options = new HashMap<>();
             options.put(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
@@ -178,14 +178,14 @@ public class InstallController {
             menuIndex.setMenuUrl("/");
             menuIndex.setMenuSort(1);
             menuIndex.setMenuIcon(" ");
-            menuService.save(menuIndex);
+            menuService.create(menuIndex);
 
             final Menu menuArchive = new Menu();
             menuArchive.setMenuName("归档");
             menuArchive.setMenuUrl("/archives");
             menuArchive.setMenuSort(2);
             menuArchive.setMenuIcon(" ");
-            menuService.save(menuArchive);
+            menuService.create(menuArchive);
 
             OPTIONS.clear();
             OPTIONS = optionsService.findAllOptions();

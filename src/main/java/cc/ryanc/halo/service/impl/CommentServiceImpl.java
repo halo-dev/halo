@@ -4,7 +4,7 @@ import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.repository.CommentRepository;
 import cc.ryanc.halo.service.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,14 +24,18 @@ import java.util.Optional;
  * @date : 2018/1/22
  */
 @Service
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl extends AbstractCrudService<Comment, Long> implements CommentService {
 
     private static final String COMMENTS_CACHE_NAME = "comments";
 
     private static final String POSTS_CACHE_NAME = "posts";
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
+
+    public CommentServiceImpl(CommentRepository commentRepository) {
+        super(commentRepository);
+        this.commentRepository = commentRepository;
+    }
 
     /**
      * 新增评论
@@ -40,8 +44,8 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public void save(Comment comment) {
-        commentRepository.save(comment);
+    public Comment create(Comment comment) {
+        return super.create(comment);
     }
 
     /**
@@ -53,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
     public Optional<Comment> remove(Long commentId) {
-        final Optional<Comment> comment = this.findCommentById(commentId);
+        final Optional<Comment> comment = this.fetchById(commentId);
         commentRepository.delete(comment.orElse(null));
         return comment;
     }
@@ -88,7 +92,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @Cacheable(value = COMMENTS_CACHE_NAME, key = "'comment'")
-    public List<Comment> findAll() {
+    public List<Comment> listAll() {
         return commentRepository.findAll();
     }
 
@@ -102,20 +106,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @CacheEvict(value = COMMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Comment updateCommentStatus(Long commentId, Integer status) {
-        final Optional<Comment> comment = findCommentById(commentId);
+        final Optional<Comment> comment = fetchById(commentId);
         comment.get().setCommentStatus(status);
         return commentRepository.save(comment.get());
-    }
-
-    /**
-     * 根据评论编号查询评论
-     *
-     * @param commentId commentId
-     * @return Optional
-     */
-    @Override
-    public Optional<Comment> findCommentById(Long commentId) {
-        return commentRepository.findById(commentId);
     }
 
     /**
@@ -187,16 +180,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Integer getCountByStatus(Integer status) {
         return commentRepository.countAllByCommentStatus(status);
-    }
-
-    /**
-     * 查询评论总数
-     *
-     * @return Long
-     */
-    @Override
-    public Long getCount() {
-        return commentRepository.count();
     }
 
     /**
