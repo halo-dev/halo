@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -78,13 +79,14 @@ public class AdminController extends BaseController {
      * 请求后台页面
      *
      * @param model model
+     *
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
     public String index(Model model) {
 
         //查询评论的条数
-        final Long commentCount = commentService.getCount();
+        final Long commentCount = commentService.count();
         model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
@@ -100,7 +102,7 @@ public class AdminController extends BaseController {
         model.addAttribute("comments", comments);
 
         //附件数量
-        model.addAttribute("mediaCount", attachmentService.getCount());
+        model.addAttribute("mediaCount", attachmentService.count());
 
         //文章阅读总数
         final Long postViewsSum = postService.getPostViews();
@@ -117,6 +119,7 @@ public class AdminController extends BaseController {
      * 处理跳转到登录页的请求
      *
      * @param session session
+     *
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
@@ -135,6 +138,7 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
+     *
      * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
@@ -186,6 +190,7 @@ public class AdminController extends BaseController {
      * 退出登录 销毁session
      *
      * @param session session
+     *
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
@@ -201,11 +206,12 @@ public class AdminController extends BaseController {
      * 查看所有日志
      *
      * @param model model model
+     *
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
     public String logs(Model model, @PageableDefault Pageable pageable) {
-        final Page<Logs> logs = logsService.findAll(pageable);
+        final Page<Logs> logs = logsService.listAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
@@ -244,9 +250,8 @@ public class AdminController extends BaseController {
     @ResponseBody
     public JsonResult getToken() {
         final String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), HttpStatus.OK.getReasonPhrase(), SecureUtil.md5(token));
     }
-
 
     /**
      * 小工具
@@ -273,6 +278,7 @@ public class AdminController extends BaseController {
      *
      * @param file    file
      * @param request request
+     *
      * @return JsonResult
      */
     @PostMapping(value = "/tools/markdownImport")
@@ -306,7 +312,7 @@ public class AdminController extends BaseController {
                             tag = new Tag();
                             tag.setTagName(ele);
                             tag.setTagUrl(ele);
-                            tag = tagService.save(tag);
+                            tag = tagService.create(tag);
                         }
                         tags.add(tag);
                     } else if ("categories".equals(key)) {
@@ -316,7 +322,7 @@ public class AdminController extends BaseController {
                             category.setCateName(ele);
                             category.setCateUrl(ele);
                             category.setCateDesc(ele);
-                            category = categoryService.save(category);
+                            category = categoryService.create(category);
                         }
                         categories.add(category);
                     }
@@ -341,7 +347,7 @@ public class AdminController extends BaseController {
         if (null == post.getPostUpdate()) {
             post.setPostUpdate(new Date());
         }
-        postService.save(post);
+        postService.create(post);
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
     }
 }

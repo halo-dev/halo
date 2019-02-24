@@ -69,7 +69,7 @@ public class CategoryController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         }
-        category = categoryService.save(category);
+        category = categoryService.create(category);
         if (null == category) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
@@ -85,7 +85,7 @@ public class CategoryController {
     @GetMapping(value = "/remove")
     public String removeCategory(@RequestParam("cateId") Long cateId) {
         try {
-            categoryService.remove(cateId);
+            categoryService.removeById(cateId);
         } catch (Exception e) {
             log.error("Delete category failed: {}", e.getMessage());
         }
@@ -101,7 +101,7 @@ public class CategoryController {
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model, @RequestParam("cateId") Long cateId) {
-        final Optional<Category> category = categoryService.findByCateId(cateId);
+        final Optional<Category> category = categoryService.fetchById(cateId);
         model.addAttribute("updateCategory", category.orElse(new Category()));
         return "admin/admin_category";
     }

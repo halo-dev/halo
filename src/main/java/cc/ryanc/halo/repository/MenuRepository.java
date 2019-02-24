@@ -1,6 +1,7 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Menu;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -11,5 +12,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author : RYAN0UP
  * @date : 2018/1/24
  */
-public interface MenuRepository extends JpaRepository<Menu, Long> {
+public interface MenuRepository extends BaseRepository<Menu, Long> {
 }

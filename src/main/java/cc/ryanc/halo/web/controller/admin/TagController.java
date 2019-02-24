@@ -68,7 +68,7 @@ public class TagController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         }
-        tag = tagService.save(tag);
+        tag = tagService.create(tag);
         if (null == tag) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
@@ -84,7 +84,7 @@ public class TagController {
     @GetMapping(value = "/remove")
     public String removeTag(@RequestParam("tagId") Long tagId) {
         try {
-            tagService.remove(tagId);
+            tagService.removeById(tagId);
         } catch (Exception e) {
             log.error("Failed to delete tag: {}", e.getMessage());
         }
@@ -100,7 +100,7 @@ public class TagController {
      */
     @GetMapping(value = "/edit")
     public String toEditTag(Model model, @RequestParam("tagId") Long tagId) {
-        final Tag tag = tagService.findByTagId(tagId).orElse(new Tag());
+        final Tag tag = tagService.fetchById(tagId).orElse(new Tag());
         model.addAttribute("updateTag", tag);
         return "admin/admin_tag";
     }

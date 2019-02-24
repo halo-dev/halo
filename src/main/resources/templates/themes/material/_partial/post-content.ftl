@@ -6,7 +6,7 @@
             <p>
                 <strong>${options.theme_material_other_post_license!}</strong>
                 <br>
-                <strong>本文链接：</strong><a href="${options.blog_url!}/article/${post.postUrl}">${options.blog_url!}/article/${post.postUrl}</a>
+                <strong>本文链接：</strong><a href="${options.blog_url!}/archives/${post.postUrl}">${options.blog_url!}/archives/${post.postUrl}</a>
             </p>
         </blockquote>
         </#if>
@@ -23,7 +23,7 @@
                 <p>
                     <strong>${options.theme_material_other_post_license!}</strong>
                     <br>
-                    <strong>本文链接：</strong><a href="${options.blog_url!}/article/${post.postUrl}">${options.blog_url!}/article/${post.postUrl}</a>
+                    <strong>本文链接：</strong><a href="${options.blog_url!}/archives/${post.postUrl}">${options.blog_url!}/archives/${post.postUrl}</a>
                 </p>
             </blockquote>
             </#if>

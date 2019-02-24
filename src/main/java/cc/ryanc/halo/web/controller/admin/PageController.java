@@ -107,7 +107,7 @@ public class PageController {
      */
     @GetMapping(value = "/links/edit")
     public String toEditLink(Model model, @RequestParam("linkId") Long linkId) {
-        final Optional<Link> link = linkService.findByLinkId(linkId);
+        final Optional<Link> link = linkService.fetchById(linkId);
         model.addAttribute("updateLink", link.orElse(new Link()));
         return "admin/admin_page_link";
     }
@@ -126,7 +126,7 @@ public class PageController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
             }
         }
-        link = linkService.save(link);
+        link = linkService.create(link);
         if (null == link) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
@@ -142,7 +142,7 @@ public class PageController {
     @GetMapping(value = "/links/remove")
     public String removeLink(@RequestParam("linkId") Long linkId) {
         try {
-            linkService.remove(linkId);
+            linkService.removeById(linkId);
         } catch (Exception e) {
             log.error("Deleting a friendship link failed: {}", e.getMessage());
         }
@@ -158,7 +158,7 @@ public class PageController {
     @GetMapping(value = "/galleries")
     public String gallery(Model model,
                           @PageableDefault(size = 18, sort = "galleryId", direction = Sort.Direction.DESC) Pageable pageable) {
-        final Page<Gallery> galleries = galleryService.findAll(pageable);
+        final Page<Gallery> galleries = galleryService.listAll(pageable);
         model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
     }
@@ -175,7 +175,7 @@ public class PageController {
             if (StrUtil.isEmpty(gallery.getGalleryThumbnailUrl())) {
                 gallery.setGalleryThumbnailUrl(gallery.getGalleryUrl());
             }
-            galleryService.save(gallery);
+            galleryService.create(gallery);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -191,7 +191,7 @@ public class PageController {
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model, @RequestParam("galleryId") Long galleryId) {
-        final Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
+        final Optional<Gallery> gallery = galleryService.fetchById(galleryId);
         model.addAttribute("gallery", gallery.orElse(new Gallery()));
         return "admin/widget/_gallery-detail";
     }
@@ -206,7 +206,7 @@ public class PageController {
     @ResponseBody
     public JsonResult removeGallery(@RequestParam("galleryId") Long galleryId) {
         try {
-            galleryService.remove(galleryId);
+            galleryService.removeById(galleryId);
         } catch (Exception e) {
             log.error("Failed to delete image: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
@@ -243,7 +243,7 @@ public class PageController {
             post.setUser(user);
             post.setPostType(PostTypeEnum.POST_TYPE_PAGE.getDesc());
             if (null != post.getPostId()) {
-                final Post oldPost = postService.findByPostId(post.getPostId()).get();
+                final Post oldPost = postService.fetchById(post.getPostId()).get();
                 if (null == post.getPostDate()) {
                     post.setPostDate(DateUtil.date());
                 }
@@ -253,9 +253,9 @@ public class PageController {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-                post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
+                post.setPostThumbnail(OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
             }
-            postService.save(post);
+            postService.create(post);
             logsService.save(LogsRecord.PUSH_PAGE, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
@@ -273,7 +273,7 @@ public class PageController {
      */
     @GetMapping(value = "/edit")
     public String editPage(@RequestParam("pageId") Long pageId, Model model) {
-        final Optional<Post> post = postService.findByPostId(pageId);
+        final Optional<Post> post = postService.fetchById(pageId);
         final List<String> customTpls = HaloUtils.getCustomTpl(OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("post", post.orElse(new Post()));
         model.addAttribute("customTpls", customTpls);

@@ -100,40 +100,6 @@ public class PostController extends BaseController {
     }
 
     /**
-     * 模糊查询文章
-     *
-     * @param model   Model
-     * @param keyword keyword 关键字
-     * @return 模板路径admin/admin_post
-     */
-    @PostMapping(value = "/search")
-    public String searchPost(Model model,
-                             @RequestParam(value = "keyword") String keyword,
-                             @PageableDefault(sort = "postId", direction = DESC) Pageable pageable) {
-        try {
-            Page<Post> posts = postService.searchPostsBy(keyword, PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
-            model.addAttribute("posts", posts);
-        } catch (Exception e) {
-            log.error("未知错误：{}", e.getMessage());
-        }
-        return "admin/admin_post";
-    }
-
-    /**
-     * 处理预览文章的请求
-     *
-     * @param postId 文章编号
-     * @param model  model
-     * @return 模板路径/themes/{theme}/post
-     */
-    @GetMapping(value = "/view")
-    public String viewPost(@RequestParam("postId") Long postId, Model model) {
-        final Optional<Post> post = postService.findByPostId(postId);
-        model.addAttribute("post", post.orElse(new Post()));
-        return this.render("post");
-    }
-
-    /**
      * 处理跳转到新建文章页面
      *
      * @return 模板路径admin/admin_editor
@@ -152,7 +118,7 @@ public class PostController extends BaseController {
      */
     @GetMapping(value = "/edit")
     public String editPost(@RequestParam("postId") Long postId, Model model) {
-        final Optional<Post> post = postService.findByPostId(postId);
+        final Optional<Post> post = postService.fetchById(postId);
         model.addAttribute("post", post.orElse(new Post()));
         return "admin/admin_post_edit";
     }
@@ -170,7 +136,9 @@ public class PostController extends BaseController {
     public JsonResult save(@ModelAttribute Post post,
                            @RequestParam("cateList") List<String> cateList,
                            @RequestParam("tagList") String tagList,
+//                           @RequestParam("metas") List<PostMeta> metas,
                            HttpSession session) {
+//        post.setPostMetas(metas);
         final User user = (User) session.getAttribute(USER_SESSION_KEY);
         try {
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
@@ -182,9 +150,9 @@ public class PostController extends BaseController {
             }
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-                post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
+                post.setPostThumbnail(OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
             }
-            postService.save(post);
+            postService.create(post);
             logsService.save(LogsRecord.PUSH_POST, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
@@ -208,7 +176,7 @@ public class PostController extends BaseController {
                              @RequestParam("cateList") List<String> cateList,
                              @RequestParam("tagList") String tagList) {
         //old data
-        final Post oldPost = postService.findByPostId(post.getPostId()).orElse(new Post());
+        final Post oldPost = postService.fetchById(post.getPostId()).orElse(new Post());
         post.setPostViews(oldPost.getPostViews());
         post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
         post.setUser(oldPost.getUser());
@@ -221,9 +189,9 @@ public class PostController extends BaseController {
         }
         //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
         if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-            post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
+            post.setPostThumbnail(OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
         }
-        post = postService.save(post);
+        post = postService.create(post);
         if (null != post) {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
         } else {
@@ -275,8 +243,8 @@ public class PostController extends BaseController {
     @GetMapping(value = "/remove")
     public String removePost(@RequestParam("postId") Long postId, @RequestParam("postType") String postType) {
         try {
-            final Optional<Post> post = postService.findByPostId(postId);
-            postService.remove(postId);
+            final Optional<Post> post = postService.fetchById(postId);
+            postService.removeById(postId);
             logsService.save(LogsRecord.REMOVE_POST, post.get().getPostTitle(), request);
         } catch (Exception e) {
             log.error("Delete article failed: {}", e.getMessage());

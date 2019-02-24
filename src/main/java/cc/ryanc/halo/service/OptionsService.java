@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.domain.Options;
+import cc.ryanc.halo.service.base.CrudService;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface OptionsService {
+public interface OptionsService extends CrudService<Options, String> {
 
     /**
      * 保存单个设置选项
@@ -28,13 +29,6 @@ public interface OptionsService {
      * @param options options
      */
     void saveOptions(Map<String, String> options);
-
-    /**
-     * 移除设置选项
-     *
-     * @param options options
-     */
-    void removeOption(Options options);
 
     /**
      * 获取所有设置选项

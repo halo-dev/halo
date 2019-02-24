@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -111,4 +112,9 @@ public class Comment implements Serializable {
      */
     @Transient
     private List<Comment> childComments;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getCommentDate() {
+        return commentDate;
+    }
 }

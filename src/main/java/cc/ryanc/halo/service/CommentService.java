@@ -2,6 +2,7 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,14 +17,7 @@ import java.util.Optional;
  * @author : RYAN0UP
  * @date : 2018/1/22
  */
-public interface CommentService {
-
-    /**
-     * 新增评论
-     *
-     * @param comment comment
-     */
-    void save(Comment comment);
+public interface CommentService extends CrudService<Comment, Long> {
 
     /**
      * 删除评论
@@ -31,6 +25,7 @@ public interface CommentService {
      * @param commentId commentId
      * @return Optional
      */
+    @Deprecated
     Optional<Comment> remove(Long commentId);
 
     /**
@@ -51,13 +46,6 @@ public interface CommentService {
     List<Comment> findAll(Integer status);
 
     /**
-     * 查询所有评论，不分页
-     *
-     * @return List
-     */
-    List<Comment> findAll();
-
-    /**
      * 更改评论的状态
      *
      * @param commentId commentId
@@ -65,14 +53,6 @@ public interface CommentService {
      * @return Comment
      */
     Comment updateCommentStatus(Long commentId, Integer status);
-
-    /**
-     * 根据评论编号查询评论
-     *
-     * @param commentId commentId
-     * @return Optional
-     */
-    Optional<Comment> findCommentById(Long commentId);
 
     /**
      * 根据文章查询评论
@@ -125,13 +105,6 @@ public interface CommentService {
      * @return 评论数量
      */
     Integer getCountByStatus(Integer status);
-
-    /**
-     * 查询评论总数
-     *
-     * @return Long
-     */
-    Long getCount();
 
     /**
      * 获取最近的评论

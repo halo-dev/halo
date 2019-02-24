@@ -152,17 +152,17 @@ public class CommentController extends BaseController {
                                    HttpServletRequest request,
                                    HttpSession session) {
         try {
-            final Post post = postService.findByPostId(postId).orElse(new Post());
+            final Post post = postService.fetchById(postId).orElse(new Post());
 
             //博主信息
             final User user = (User) session.getAttribute(USER_SESSION_KEY);
 
             //被回复的评论
-            final Comment lastComment = commentService.findCommentById(commentId).orElse(new Comment());
+            final Comment lastComment = commentService.fetchById(commentId).orElse(new Comment());
 
             //修改被回复的评论的状态
             lastComment.setCommentStatus(CommentStatusEnum.PUBLISHED.getCode());
-            commentService.save(lastComment);
+            commentService.create(lastComment);
 
             //保存评论
             final Comment comment = new Comment();
@@ -185,7 +185,7 @@ public class CommentController extends BaseController {
             comment.setCommentParent(commentId);
             comment.setCommentStatus(CommentStatusEnum.PUBLISHED.getCode());
             comment.setIsAdmin(1);
-            commentService.save(comment);
+            commentService.create(comment);
 
             //邮件通知
             new EmailToAuthor(comment, lastComment, post, user, commentContent).start();

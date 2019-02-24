@@ -19,13 +19,12 @@ public class PostSyncTask {
      */
     public void postSync() {
         final PostService postService = SpringUtil.getBean(PostService.class);
-        Post post = null;
         int count = 0;
         for (Long key : POSTS_VIEWS.keySet()) {
-            post = postService.findByPostId(key).orElse(null);
+            Post post = postService.getByIdOfNullable(key);
             if (null != post) {
                 post.setPostViews(post.getPostViews() + POSTS_VIEWS.get(key));
-                postService.save(post);
+                postService.create(post);
                 count++;
             }
         }

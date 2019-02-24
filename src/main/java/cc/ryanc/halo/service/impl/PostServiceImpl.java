@@ -11,9 +11,9 @@ import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -41,20 +41,27 @@ import static cc.ryanc.halo.model.dto.HaloConst.POSTS_VIEWS;
  * @date : 2017/11/14
  */
 @Service
-public class PostServiceImpl implements PostService {
+public class PostServiceImpl extends AbstractCrudService<Post, Long> implements PostService {
 
     private static final String POSTS_CACHE_NAME = "posts";
 
     private static final String COMMENTS_CACHE_NAME = "comments";
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired
-    private TagService tagService;
+    private final TagService tagService;
+
+    public PostServiceImpl(PostRepository postRepository,
+                           CategoryService categoryService,
+                           TagService tagService) {
+        super(postRepository);
+        this.postRepository = postRepository;
+        this.categoryService = categoryService;
+        this.tagService = tagService;
+    }
+
 
     /**
      * 保存文章
@@ -64,7 +71,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post save(Post post) {
+    public Post create(Post post) {
         int postSummary = 50;
         if (StrUtil.isNotEmpty(OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
             postSummary = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
@@ -76,7 +83,7 @@ public class PostServiceImpl implements PostService {
         } else {
             post.setPostSummary(summaryText);
         }
-        return postRepository.save(post);
+        return super.create(post);
     }
 
     /**
@@ -87,8 +94,8 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @CacheEvict(value = {POSTS_CACHE_NAME, COMMENTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Post remove(Long postId) {
-        final Optional<Post> post = this.findByPostId(postId);
+    public Post removeById(Long postId) {
+        final Optional<Post> post = fetchById(postId);
         postRepository.delete(post.get());
         return post.get();
     }
@@ -103,7 +110,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = POSTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
     public Post updatePostStatus(Long postId, Integer status) {
-        final Optional<Post> post = this.findByPostId(postId);
+        final Optional<Post> post = fetchById(postId);
         post.get().setPostStatus(status);
         return postRepository.save(post.get());
     }
@@ -140,36 +147,9 @@ public class PostServiceImpl implements PostService {
         return postRepository.findPostsByPostType(postType);
     }
 
-    /**
-     * 模糊查询文章
-     *
-     * @param keyword    关键词
-     * @param postType   文章类型
-     * @param postStatus 文章状态
-     * @param pageable   分页信息
-     * @return Page
-     */
     @Override
     public Page<Post> searchPosts(String keyword, String postType, Integer postStatus, Pageable pageable) {
-        return postRepository.findByPostTypeAndPostStatusAndPostTitleLikeOrPostTypeAndPostStatusAndPostContentLike(
-                postType,
-                postStatus,
-                "%" + keyword + "%",
-                postType,
-                postStatus,
-                "%" + keyword + "%",
-                pageable
-        ).map(post -> {
-            if (StrUtil.isNotEmpty(post.getPostPassword())) {
-                post.setPostSummary("该文章为加密文章");
-            }
-            return post;
-        });
-    }
-
-    @Override
-    public Page<Post> searchPostsBy(String keyword, String postType, Integer postStatus, Pageable pageable) {
-        return postRepository.findAll(buildSearchSepcification(keyword, postType, postStatus), pageable)
+        return postRepository.findAll(buildSearchSpecification(keyword, postType, postStatus), pageable)
                 .map(post -> {
                     if (StrUtil.isNotEmpty(post.getPostPassword())) {
                         post.setPostSummary("该文章为加密文章");
@@ -224,17 +204,6 @@ public class PostServiceImpl implements PostService {
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_status_type_'+#status+'_'+#postType")
     public List<Post> findPostByStatus(Integer status, String postType) {
         return postRepository.findPostsByPostStatusAndPostType(status, postType);
-    }
-
-    /**
-     * 根据编号查询文章
-     *
-     * @param postId postId
-     * @return Optional
-     */
-    @Override
-    public Optional<Post> findByPostId(Long postId) {
-        return postRepository.findById(postId);
     }
 
     /**
@@ -542,50 +511,68 @@ public class PostServiceImpl implements PostService {
         return postRepository.getPostsByLimit(limit);
     }
 
+    /**
+     * build Specification for post
+     *
+     * @param keyword    keyword
+     * @param postType   postType
+     * @param postStatus postStatus
+     * @return Specification
+     */
     @NonNull
-    private Specification<Post> buildSearchSepcification(@NonNull String keyword,
+    private Specification<Post> buildSearchSpecification(@NonNull String keyword,
                                                          @NonNull String postType,
                                                          @NonNull Integer postStatus) {
-        return Specification.where(postTitleLike(keyword)).or(postContentLike(keyword)).and(postTypeEqual(postType)).and(postStatusEqual(postStatus));
-//        return (root, criteriaQuery, criteriaBuilder) -> {
-//            List<Predicate> predicates = new LinkedList<>();
-//
-//            if (StringUtils.hasText(keyword)) {
-//                predicates.add(criteriaBuilder.like(root.get("postContent"), keyword));
-//                predicates.add(criteriaBuilder.or(criteriaBuilder.like(root.get("postTitle"), keyword)));
-//            }
-//
-//            if (StringUtils.hasText(postType)) {
-//                predicates.add(criteriaBuilder.equal(root.get("postType"), postType));
-//            }
-//
-//            if (postStatus != null) {
-//                predicates.add(criteriaBuilder.equal(root.get("postStatus"), postStatus));
-//            }
-//
-//            return criteriaQuery.where(predicates.toArray(new Predicate[0])).getRestriction();
-//        };
+        return Specification
+                .where(postTitleLike(keyword))
+                .or(postContentLike(keyword))
+                .and(postTypeEqual(postType))
+                .and(postStatusEqual(postStatus));
     }
 
+    /**
+     * build with postContent
+     *
+     * @param keyword keyword
+     * @return Specification
+     */
     private Specification<Post> postContentLike(@NonNull String keyword) {
         Assert.hasText(keyword, "Keyword must not be blank");
-
         return (root, criteriaQuery, criteriaBuilder) ->
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("postContent")), "%" + keyword.toLowerCase() + "%");
     }
 
+    /**
+     * build with postTitle
+     *
+     * @param keyword keyword
+     * @return Specification
+     */
     private Specification<Post> postTitleLike(@NonNull String keyword) {
         Assert.hasText(keyword, "Keyword must not be blank");
-
         return (root, criteriaQuery, criteriaBuilder) ->
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("postTitle")), "%" + keyword.toLowerCase() + "%");
     }
 
+    /**
+     * build with postType
+     *
+     * @param postType postType
+     * @return Specification
+     */
     private Specification<Post> postTypeEqual(@NonNull String postType) {
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("postType"), postType);
+        return (root, criteriaQuery, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("postType"), postType);
     }
 
+    /**
+     * build with postStatus
+     *
+     * @param postStatus postStatus
+     * @return Specification
+     */
     private Specification<Post> postStatusEqual(@NonNull Integer postStatus) {
-        return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get("postStatus"), postStatus);
+        return (root, criteriaQuery, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("postStatus"), postStatus);
     }
 }

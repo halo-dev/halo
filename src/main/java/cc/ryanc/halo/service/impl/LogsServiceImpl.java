@@ -3,8 +3,8 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.repository.LogsRepository;
 import cc.ryanc.halo.service.LogsService;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import cn.hutool.extra.servlet.ServletUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,10 +21,15 @@ import java.util.List;
  * @date : 2018/1/19
  */
 @Service
-public class LogsServiceImpl implements LogsService {
+public class LogsServiceImpl extends AbstractCrudService<Logs, Long> implements LogsService {
 
-    @Autowired
-    private LogsRepository logsRepository;
+    private final LogsRepository logsRepository;
+
+    public LogsServiceImpl(LogsRepository logsRepository) {
+        super(logsRepository);
+        this.logsRepository = logsRepository;
+    }
+
 
     /**
      * 保存日志
@@ -40,25 +45,6 @@ public class LogsServiceImpl implements LogsService {
         logs.setLogContent(logContent);
         logs.setLogIp(ServletUtil.getClientIP(request));
         logsRepository.save(logs);
-    }
-
-    /**
-     * 移除所有日志
-     */
-    @Override
-    public void removeAll() {
-        logsRepository.deleteAll();
-    }
-
-    /**
-     * 查询所有日志并分页
-     *
-     * @param pageable pageable
-     * @return Page
-     */
-    @Override
-    public Page<Logs> findAll(Pageable pageable) {
-        return logsRepository.findAll(pageable);
     }
 
     /**

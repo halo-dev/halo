@@ -1,6 +1,7 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -11,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends BaseRepository<User, Long> {
 
     /**
      * 根据用户名和密码查询
