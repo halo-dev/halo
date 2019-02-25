@@ -128,7 +128,7 @@ public class CommentController extends BaseController {
                              @RequestParam("status") Integer status,
                              @PageableDefault Pageable pageable) {
         try {
-            commentService.remove(commentId);
+            commentService.removeById(commentId);
         } catch (Exception e) {
             log.error("Delete comment failed: {}", e.getMessage());
         }
