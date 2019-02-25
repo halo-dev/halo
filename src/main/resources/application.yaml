@@ -59,4 +59,7 @@ spring:
   messages:
     basename: i18n/messages
 logging:
+  level:
+    cc.ryanc.halo: DEBUG
+    org.hibernate: ERROR
   file: ./logs/log.log

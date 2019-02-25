@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJacksonResponseBodyAdvice;
 
 /**
- * Controller adivce for comment result.
+ * Controller advice for comment result.
  *
  * @author johnniang
  */
 @ControllerAdvice("cc.ryanc.halo.web.controller.api")
 public class CommonResultControllerAdvice extends AbstractMappingJacksonResponseBodyAdvice {
-
 
     @Override
     protected void beforeBodyWriteInternal(MappingJacksonValue bodyContainer,
