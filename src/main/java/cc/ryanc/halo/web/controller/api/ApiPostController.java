@@ -112,9 +112,6 @@ public class ApiPostController {
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
         final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        if (null == posts) {
-            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
-        }
         return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), posts);
     }
 
