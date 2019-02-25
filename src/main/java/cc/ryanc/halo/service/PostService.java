@@ -4,8 +4,11 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.Archive;
+import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
@@ -20,23 +23,7 @@ import java.util.Optional;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface PostService {
-
-    /**
-     * 新增文章
-     *
-     * @param post Post
-     * @return Post
-     */
-    Post save(Post post);
-
-    /**
-     * 根据编号删除文章
-     *
-     * @param postId postId
-     * @return Post
-     */
-    Post remove(Long postId);
+public interface PostService extends CrudService<Post, Long> {
 
     /**
      * 修改文章状态
@@ -65,11 +52,15 @@ public interface PostService {
     /**
      * 模糊查询文章
      *
-     * @param keyWord  keyword
-     * @param pageable pageable
-     * @return List
+     * @param keyword    关键词
+     * @param postType   文章类型
+     * @param postStatus 文章状态
+     * @param pageable   分页信息
+     * @return a page of posts
      */
-    List<Post> searchPosts(String keyWord, Pageable pageable);
+    @NonNull
+    Page<Post> searchPosts(@Nullable String keyword, @Nullable String postType, @Nullable Integer postStatus, @NonNull Pageable pageable);
+
 
     /**
      * 根据文章状态查询 分页，用于后台管理
@@ -98,13 +89,6 @@ public interface PostService {
      */
     List<Post> findPostByStatus(Integer status, String postType);
 
-    /**
-     * 根据编号查询文章
-     *
-     * @param postId postId
-     * @return Post
-     */
-    Optional<Post> findByPostId(Long postId);
 
     /**
      * 根据编号和类型查询文章
@@ -132,20 +116,20 @@ public interface PostService {
     List<Post> findPostLatest();
 
     /**
-     * 查询Id之后的文章
+     * 获取下一篇文章 较新
      *
      * @param postDate postDate
-     * @return List
+     * @return Post
      */
-    List<Post> findByPostDateAfter(Date postDate);
+    Post getNextPost(Date postDate);
 
     /**
-     * 查询Id之前的文章
+     * 获取下一篇文章 较老
      *
      * @param postDate postDate
-     * @return List
+     * @return Post
      */
-    List<Post> findByPostDateBefore(Date postDate);
+    Post getPrePost(Date postDate);
 
     /**
      * 查询归档信息 根据年份和月份
@@ -162,11 +146,11 @@ public interface PostService {
     List<Archive> findPostGroupByYear();
 
     /**
+     * @return List
      * @Author Aquan
      * @Description 查询归档信息 查看所有文章
      * @Date 2019.1.4 11:14
      * @Param
-     * @return List
      **/
     List<Archive> findAllPost();
 
@@ -217,15 +201,6 @@ public interface PostService {
     Page<Post> findPostsByTags(Tag tag, Pageable pageable);
 
     /**
-     * 搜索文章
-     *
-     * @param keyword  关键词
-     * @param pageable 分页信息
-     * @return Page
-     */
-    Page<Post> searchByKeywords(String keyword, Pageable pageable);
-
-    /**
      * 热门文章
      *
      * @return List
@@ -254,22 +229,6 @@ public interface PostService {
      * @return 文章数量
      */
     Integer getCountByStatus(Integer status);
-
-    /**
-     * 生成rss
-     *
-     * @param posts posts
-     * @return String
-     */
-    String buildRss(List<Post> posts);
-
-    /**
-     * 生成sitemap
-     *
-     * @param posts posts
-     * @return String
-     */
-    String buildSiteMap(List<Post> posts);
 
     /**
      * 缓存阅读数

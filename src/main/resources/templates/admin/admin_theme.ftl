@@ -27,9 +27,6 @@
             font-size: 18px;
             line-height: 30px;
         }
-        #uploadForm{
-            display: none;
-        }
         .btn-delete:hover{
             color: red;
         }

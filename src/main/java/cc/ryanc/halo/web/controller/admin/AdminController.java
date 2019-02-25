@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.*;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.*;
@@ -20,9 +19,9 @@ import cn.hutool.http.HtmlUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +31,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>
@@ -76,8 +78,7 @@ public class AdminController extends BaseController {
     /**
      * 请求后台页面
      *
-     * @param model   model
-     * @param session session
+     * @param model model
      *
      * @return 模板路径admin/admin_index
      */
@@ -85,7 +86,7 @@ public class AdminController extends BaseController {
     public String index(Model model) {
 
         //查询评论的条数
-        final Long commentCount = commentService.getCount();
+        final Long commentCount = commentService.count();
         model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
@@ -101,14 +102,14 @@ public class AdminController extends BaseController {
         model.addAttribute("comments", comments);
 
         //附件数量
-        model.addAttribute("mediaCount", attachmentService.getCount());
+        model.addAttribute("mediaCount", attachmentService.count());
 
         //文章阅读总数
         final Long postViewsSum = postService.getPostViews();
         model.addAttribute("postViewsSum", postViewsSum);
 
         //成立天数
-        final Date blogStart = DateUtil.parse(HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
+        final Date blogStart = DateUtil.parse(OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
         final long hadDays = DateUtil.between(blogStart, DateUtil.date(), DateUnit.DAY);
         model.addAttribute("hadDays", hadDays);
         return "admin/admin_index";
@@ -123,7 +124,7 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/login")
     public String login(HttpSession session) {
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
         if (null != user) {
             return "redirect:/admin";
@@ -166,7 +167,7 @@ public class AdminController extends BaseController {
         userService.updateUserLoginLast(DateUtil.date());
         //判断User对象是否相等
         if (ObjectUtil.equal(aUser, user)) {
-            session.setAttribute(HaloConst.USER_SESSION_KEY, aUser);
+            session.setAttribute(USER_SESSION_KEY, aUser);
             //重置用户的登录状态为正常
             userService.updateUserNormal();
             logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, request);
@@ -194,8 +195,8 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        session.removeAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
+        session.removeAttribute(USER_SESSION_KEY);
         logsService.save(LogsRecord.LOGOUT, user.getUserName(), request);
         log.info("User {} has logged out", user.getUserName());
         return "redirect:/admin/login";
@@ -205,18 +206,12 @@ public class AdminController extends BaseController {
      * 查看所有日志
      *
      * @param model model model
-     * @param page  page 当前页码
-     * @param size  size 每页条数
      *
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
-    public String logs(Model model,
-                       @RequestParam(value = "page", defaultValue = "0") Integer page,
-                       @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "logId");
-        final Pageable pageable = PageRequest.of(page, size, sort);
-        final Page<Logs> logs = logsService.findAll(pageable);
+    public String logs(Model model, @PageableDefault Pageable pageable) {
+        final Page<Logs> logs = logsService.listAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
@@ -255,9 +250,8 @@ public class AdminController extends BaseController {
     @ResponseBody
     public JsonResult getToken() {
         final String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), SecureUtil.md5(token));
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), HttpStatus.OK.getReasonPhrase(), SecureUtil.md5(token));
     }
-
 
     /**
      * 小工具
@@ -292,7 +286,7 @@ public class AdminController extends BaseController {
     public JsonResult markdownImport(@RequestParam("file") MultipartFile file,
                                      HttpServletRequest request,
                                      HttpSession session) throws IOException {
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
         final String markdown = IoUtil.read(file.getInputStream(), "UTF-8");
         final String content = MarkdownUtils.renderMarkdown(markdown);
         final Map<String, List<String>> frontMatters = MarkdownUtils.getFrontMatter(markdown);
@@ -318,7 +312,7 @@ public class AdminController extends BaseController {
                             tag = new Tag();
                             tag.setTagName(ele);
                             tag.setTagUrl(ele);
-                            tag = tagService.save(tag);
+                            tag = tagService.create(tag);
                         }
                         tags.add(tag);
                     } else if ("categories".equals(key)) {
@@ -328,7 +322,7 @@ public class AdminController extends BaseController {
                             category.setCateName(ele);
                             category.setCateUrl(ele);
                             category.setCateDesc(ele);
-                            category = categoryService.save(category);
+                            category = categoryService.create(category);
                         }
                         categories.add(category);
                     }
@@ -347,24 +341,13 @@ public class AdminController extends BaseController {
         post.setTags(tags);
         post.setCategories(categories);
         post.setPostUrl(StrUtil.removeSuffix(file.getOriginalFilename(), ".md"));
-        int postSummary = 50;
-        if (StrUtil.isNotEmpty(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()))) {
-            postSummary = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.POST_SUMMARY.getProp()));
-        }
-        final String summaryText = StrUtil.cleanBlank(HtmlUtil.cleanHtmlTag(post.getPostContent()));
-        if (summaryText.length() > postSummary) {
-            final String summary = summaryText.substring(0, postSummary);
-            post.setPostSummary(summary);
-        } else {
-            post.setPostSummary(summaryText);
-        }
         if (null == post.getPostDate()) {
             post.setPostDate(new Date());
         }
         if (null == post.getPostUpdate()) {
             post.setPostUpdate(new Date());
         }
-        postService.save(post);
+        postService.create(post);
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
     }
 }

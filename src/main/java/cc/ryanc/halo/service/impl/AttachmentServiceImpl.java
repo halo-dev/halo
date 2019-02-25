@@ -1,12 +1,12 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.QiNiuPutSet;
 import cc.ryanc.halo.model.enums.AttachLocationEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.Md5Util;
 import cn.hutool.core.date.DateUtil;
@@ -26,7 +26,6 @@ import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
 import com.upyun.UpException;
 import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -42,6 +41,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+
 /**
  * <pre>
  *     附件业务逻辑实现类
@@ -51,12 +52,16 @@ import java.util.*;
  * @date : 2018/1/10
  */
 @Service
-public class AttachmentServiceImpl implements AttachmentService {
+public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long> implements AttachmentService {
 
     private static final String ATTACHMENTS_CACHE_NAME = "attachments";
 
-    @Autowired
-    private AttachmentRepository attachmentRepository;
+    private final AttachmentRepository attachmentRepository;
+
+    public AttachmentServiceImpl(AttachmentRepository attachmentRepository) {
+        super(attachmentRepository);
+        this.attachmentRepository = attachmentRepository;
+    }
 
     /**
      * 新增附件信息
@@ -66,8 +71,8 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Attachment save(Attachment attachment) {
-        return attachmentRepository.save(attachment);
+    public Attachment create(Attachment attachment) {
+        return super.create(attachment);
     }
 
     /**
@@ -77,8 +82,8 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @Cacheable(value = ATTACHMENTS_CACHE_NAME, key = "'attachment'")
-    public List<Attachment> findAll() {
-        return attachmentRepository.findAll();
+    public List<Attachment> listAll() {
+        return super.listAll();
     }
 
     /**
@@ -88,7 +93,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return Page
      */
     @Override
-    public Page<Attachment> findAll(Pageable pageable) {
+    public Page<Attachment> listAll(Pageable pageable) {
         return attachmentRepository.findAll(pageable);
     }
 
@@ -99,7 +104,7 @@ public class AttachmentServiceImpl implements AttachmentService {
      * @return Optional
      */
     @Override
-    public Optional<Attachment> findByAttachId(Long attachId) {
+    public Optional<Attachment> fetchById(Long attachId) {
         return attachmentRepository.findById(attachId);
     }
 
@@ -111,10 +116,8 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     @Override
     @CacheEvict(value = ATTACHMENTS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Attachment remove(Long attachId) {
-        Optional<Attachment> attachment = this.findByAttachId(attachId);
-        attachmentRepository.delete(attachment.get());
-        return attachment.get();
+    public Attachment removeById(Long attachId) {
+        return super.removeById(attachId);
     }
 
     /**
@@ -127,7 +130,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Map<String, String> upload(MultipartFile file, HttpServletRequest request) {
         Map<String, String> resultMap;
-        String attachLoc = HaloConst.OPTIONS.get(BlogPropertiesEnum.ATTACH_LOC.getProp());
+        String attachLoc = OPTIONS.get(BlogPropertiesEnum.ATTACH_LOC.getProp());
         if (StrUtil.isEmpty(attachLoc)) {
             attachLoc = "server";
         }
@@ -252,11 +255,11 @@ public class AttachmentServiceImpl implements AttachmentService {
         try {
             final Configuration cfg = new Configuration(Zone.zone0());
             final String key = Md5Util.getMD5Checksum(file);
-            final String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
-            final String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
-            final String domain = HaloConst.OPTIONS.get("qiniu_domain");
-            final String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
-            final String smallUrl = HaloConst.OPTIONS.get("qiniu_small_url");
+            final String accessKey = OPTIONS.get("qiniu_access_key");
+            final String secretKey = OPTIONS.get("qiniu_secret_key");
+            final String domain = OPTIONS.get("qiniu_domain");
+            final String bucket = OPTIONS.get("qiniu_bucket");
+            final String smallUrl = OPTIONS.get("qiniu_small_url");
             if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket)) {
                 return resultMap;
             }
@@ -311,12 +314,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         final Map<String, String> resultMap = new HashMap<>(6);
         try {
             final String key = Md5Util.getMD5Checksum(file);
-            final String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
-            final String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
-            final String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
-            final String domain = HaloConst.OPTIONS.get("upyun_oss_domain");
-            final String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
-            final String smallUrl = HaloConst.OPTIONS.get("upyun_oss_small");
+            final String ossSrc = OPTIONS.get("upyun_oss_src");
+            final String ossPwd = OPTIONS.get("upyun_oss_pwd");
+            final String bucket = OPTIONS.get("upyun_oss_bucket");
+            final String domain = OPTIONS.get("upyun_oss_domain");
+            final String operator = OPTIONS.get("upyun_oss_operator");
+            final String smallUrl = OPTIONS.get("upyun_oss_small");
             if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(domain) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
                 return resultMap;
             }
@@ -359,9 +362,9 @@ public class AttachmentServiceImpl implements AttachmentService {
     public boolean deleteQiNiuAttachment(String key) {
         boolean flag = true;
         final Configuration cfg = new Configuration(Zone.zone0());
-        final String accessKey = HaloConst.OPTIONS.get("qiniu_access_key");
-        final String secretKey = HaloConst.OPTIONS.get("qiniu_secret_key");
-        final String bucket = HaloConst.OPTIONS.get("qiniu_bucket");
+        final String accessKey = OPTIONS.get("qiniu_access_key");
+        final String secretKey = OPTIONS.get("qiniu_secret_key");
+        final String bucket = OPTIONS.get("qiniu_bucket");
         if (StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(secretKey) || StrUtil.isEmpty(bucket)) {
             return false;
         }
@@ -386,10 +389,10 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public boolean deleteUpYunAttachment(String fileName) {
         boolean flag = true;
-        final String ossSrc = HaloConst.OPTIONS.get("upyun_oss_src");
-        final String ossPwd = HaloConst.OPTIONS.get("upyun_oss_pwd");
-        final String bucket = HaloConst.OPTIONS.get("upyun_oss_bucket");
-        final String operator = HaloConst.OPTIONS.get("upyun_oss_operator");
+        final String ossSrc = OPTIONS.get("upyun_oss_src");
+        final String ossPwd = OPTIONS.get("upyun_oss_pwd");
+        final String bucket = OPTIONS.get("upyun_oss_bucket");
+        final String operator = OPTIONS.get("upyun_oss_operator");
         if (StrUtil.isEmpty(ossSrc) || StrUtil.isEmpty(ossPwd) || StrUtil.isEmpty(bucket) || StrUtil.isEmpty(operator)) {
             return false;
         }
@@ -405,13 +408,4 @@ public class AttachmentServiceImpl implements AttachmentService {
         return flag;
     }
 
-    /**
-     * 获取附件总数
-     *
-     * @return Long
-     */
-    @Override
-    public Long getCount() {
-        return attachmentRepository.count();
-    }
 }

@@ -52,11 +52,11 @@
                                 <i class="fa fa-sun-o"></i>
                                 <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="/archives/${post.postUrl}#comment_widget">Comments</a>
+                                <a href="${options.blog_url!}/archives/${post.postUrl}#comment_widget">Comments</a>
                                 <#if post.tags?size gt 0>
                                     <i class="fa fa-tag"></i>
                                     <#list post.tags as tag>
-                                        <a href="/tags/${tag.tagUrl}" class="tag">&nbsp;${tag.tagName}</a>
+                                        <a href="${options.blog_url!}/tags/${tag.tagUrl}" class="tag">&nbsp;${tag.tagName}</a>
                                     </#list>
                                 </#if>
                             </div>
@@ -79,14 +79,14 @@
                 </div>
                 <div class="pagination">
                     <ul class="clearfix">
-                        <#if afterPost??>
+                        <#if nextPost??>
                         <li class="pre pagbuttons">
-                            <a class="btn" role="navigation" href="/archives/${afterPost.postUrl}" title="${afterPost.postTitle}">上一篇</a>
+                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${nextPost.postUrl}" title="${nextPost.postTitle}">上一篇</a>
                         </li>
                         </#if>
-                        <#if beforePost??>
+                        <#if prePost??>
                         <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="/archives/${beforePost.postUrl}" title="${beforePost.postTitle}">下一篇</a>
+                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${prePost.postUrl}" title="${prePost.postTitle}">下一篇</a>
                         </li>
                         </#if>
                     </ul>

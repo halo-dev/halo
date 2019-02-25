@@ -38,5 +38,5 @@ public class HaloConst {
     /**
      * 文章阅读数缓存
      */
-    public static Map<Long,Long> POSTS_VIEWS = new HashMap<>();
+    public static Map<Long, Long> POSTS_VIEWS = new HashMap<>();
 }

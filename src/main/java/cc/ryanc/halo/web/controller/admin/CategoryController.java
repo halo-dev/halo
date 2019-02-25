@@ -49,7 +49,6 @@ public class CategoryController {
      * 新增/修改分类目录
      *
      * @param category category对象
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/save")
@@ -70,7 +69,7 @@ public class CategoryController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         }
-        category = categoryService.save(category);
+        category = categoryService.create(category);
         if (null == category) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
@@ -81,13 +80,12 @@ public class CategoryController {
      * 处理删除分类目录的请求
      *
      * @param cateId cateId
-     *
      * @return 重定向到/admin/category
      */
     @GetMapping(value = "/remove")
     public String removeCategory(@RequestParam("cateId") Long cateId) {
         try {
-            categoryService.remove(cateId);
+            categoryService.removeById(cateId);
         } catch (Exception e) {
             log.error("Delete category failed: {}", e.getMessage());
         }
@@ -99,12 +97,11 @@ public class CategoryController {
      *
      * @param cateId cateId
      * @param model  model
-     *
      * @return 模板路径admin/admin_category
      */
     @GetMapping(value = "/edit")
     public String toEditCategory(Model model, @RequestParam("cateId") Long cateId) {
-        final Optional<Category> category = categoryService.findByCateId(cateId);
+        final Optional<Category> category = categoryService.fetchById(cateId);
         model.addAttribute("updateCategory", category.orElse(new Category()));
         return "admin/admin_category";
     }

@@ -83,7 +83,7 @@
                                             <div class="input-group">
                                                 <input type="text" class="form-control selectData" id="blogLogo" name="blog_logo" value="${options.blog_logo!}">
                                                 <span class="input-group-btn">
-                                                    <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogLogo','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
+                                                    <button class="btn btn-default btn-flat" type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogLogo','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                 </span>
                                             </div>
                                         </div>
@@ -94,7 +94,7 @@
                                             <div class="input-group">
                                                 <input type="text" class="form-control selectData" id="blogFavicon" name="blog_favicon" value="${options.blog_favicon!}">
                                                 <span class="input-group-btn">
-                                                    <button class="btn btn-default " type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogFavicon','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
+                                                    <button class="btn btn-default btn-flat" type="button" onclick="halo.layerModal('/admin/attachments/select?id=blogFavicon','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
                                                 </span>
                                             </div>
                                         </div>
@@ -145,7 +145,7 @@
                                             <div class="input-group">
                                                 <input type="text" class="form-control" id="baiduToken" name="seo_baidu_token" value="${options.seo_baidu_token!}">
                                                 <span class="input-group-btn">
-                                                    <button class="btn btn-default " id="btn_push_baidu" onclick="pushAllToBaidu()" type="button"><@spring.message code='admin.setting.form.baidu-token-btn-push' /></button>
+                                                    <button class="btn btn-default btn-flat" id="btn_push_baidu" onclick="pushAllToBaidu()" type="button"><@spring.message code='admin.setting.form.baidu-token-btn-push' /></button>
                                                 </span>
                                             </div>
                                         </div>
@@ -207,7 +207,7 @@
                                             <div class="input-group">
                                                 <input type="number" class="form-control" id="postSummary" name="post_summary" value="${options.post_summary!'50'}">
                                                 <span class="input-group-btn">
-                                                    <button class="btn btn-default " id="btn_update_summary" onclick="updateAllSummary()" type="button"><@spring.message code='admin.setting.form.post-summary-btn-update' /></button>
+                                                    <button class="btn btn-default btn-flat" id="btn_update_summary" onclick="updateAllSummary()" type="button"><@spring.message code='admin.setting.form.post-summary-btn-update' /></button>
                                                 </span>
                                             </div>
                                         </div>
@@ -316,6 +316,23 @@
                                             </div>
                                             <div class="pretty p-default p-round">
                                                 <input type="radio" name="comment_reply_notice" value="false" ${((options.comment_reply_notice!)=='false')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.disable' /></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-lg-2 col-sm-4 control-label">API 评论开关：</label>
+                                        <div class="col-lg-4 col-sm-8 control-radio">
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="comment_api_switch" value="true" ${((options.comment_api_switch!)=='true')?string('checked','')}>
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='common.radio.enable' /></label>
+                                                </div>
+                                            </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="comment_api_switch" value="false" ${((options.comment_api_switch!'false')=='false')?string('checked','')}>
                                                 <div class="state p-primary">
                                                     <label><@spring.message code='common.radio.disable' /></label>
                                                 </div>
@@ -505,6 +522,17 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <label for="adminLayoutBoxedBackground" class="col-lg-2 col-sm-4 control-label">盒子布局背景：</label>
+                                        <div class="col-lg-4 col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control selectData" id="adminLayoutBoxedBackground" name="admin_layout_boxed_background" value="${options.admin_layout_boxed_background!}">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default btn-flat" type="button" onclick="halo.layerModal('/admin/attachments/select?id=adminLayoutBoxedBackground','<@spring.message code="common.js.all-attachment" />')"><@spring.message code='common.btn.choose' /></button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="adminTheme" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.admin-theme' /></label>
                                         <div class="col-lg-4 col-sm-8">
                                             <select class="form-control" id="adminTheme" name="admin_theme">
@@ -620,12 +648,12 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="apiToken" class="col-lg-2 col-sm-4 control-label">Api Token</label>
+                                        <label for="apiToken" class="col-lg-2 col-sm-4 control-label">Api Token：</label>
                                         <div class="col-lg-4 col-sm-8">
                                             <div class="input-group">
                                                 <input type="text" class="form-control" id="apiToken" name="api_token" value="${options.api_token!}">
                                                 <span class="input-group-btn">
-                                                    <button class="btn btn-default " id="btnUpdateToken" onclick="updateToken()" type="button"><@spring.message code='admin.setting.form.btn-update-token' /></button>
+                                                    <button class="btn btn-default btn-flat" id="btnUpdateToken" onclick="updateToken()" type="button"><@spring.message code='admin.setting.form.btn-update-token' /></button>
                                                 </span>
                                             </div>
                                         </div>
@@ -633,8 +661,8 @@
                                     <div class="form-group">
                                         <label for="statisticsCode" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.statistics-code' />
                                             <span data-toggle="tooltip" data-placement="top" title="<@spring.message code='admin.setting.form.statistics-code-tips' />" style="cursor: pointer">
-                                                    <i class="fa fa-question-circle" aria-hidden="true"></i>
-                                                </span>
+                                                <i class="fa fa-question-circle" aria-hidden="true"></i>
+                                            </span>
                                         </label>
                                         <div class="col-lg-4 col-sm-8">
                                             <textarea class="form-control" rows="6" id="statisticsCode" name="statistics_code" style="resize: none">${options.statistics_code!}</textarea>

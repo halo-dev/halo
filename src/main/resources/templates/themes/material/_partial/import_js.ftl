@@ -16,12 +16,11 @@
     }
 </script>
 
-<!-- Import prettify js  -->
+<#if post??>
+<script type="text/javascript" src="/material/source/prism/js/prism.js"></script>
+</#if>
 
-<script>
-    lsloader.load("prettify_js", "/material/source/js/prettify.min.js?WN07fivHQSMKWy7BmHBB6w==", !0)
-</script>
-<!--
+<#--
 <% if (theme.hanabi.enable) { %>
     <% if(theme.vendors.materialcdn) { %>
         <%- jsLsload({path:(theme.vendors.materialcdn + '/js/hanabi-browser-bundle.js'),key:'hanabi'}) %>
@@ -31,20 +30,11 @@
 <% } %>
 -->
 <!-- Window Load -->
-<!-- add class for prettify -->
-<script type="text/ls-javascript" id="window-load">
-    $(window).on('load', function() {
-        // Post_Toc parent position fixed
-        $('.post-toc-wrap').parent('.mdl-menu__container').css('position', 'fixed');
-    });
-</script>
 
 <!-- MathJax Load-->
-<!--
-<% if (page.mathjax) { %>
-    <%- partial('_widget/mathjax') %>
-<% } %>
--->
+<#if (options.theme_material_other_mathjax!'true') == 'true'>
+<#include "../_widget/mathjax.ftl">
+</#if>
 
 <!-- Bing Background -->
 <#if (options.theme_material_background_bing!'false')=="true">
@@ -72,7 +62,7 @@
 </script>
 
 <!-- Custom Footer -->
-<!--
+<#--
 <% if (site.data.footer) { %>
     <% for (var i in site.data.footer) { %>
         <%- site.data.footer[i] %>
@@ -87,6 +77,6 @@
             var item = scriptList[i];
             lsloader.runInlineScript(item.id,item.id);
         }
-    })()
+    })();
     console.log('\n %c © Material Theme | Version: 1.5.2 | https://github.com/viosey/hexo-theme-material %c \n', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-left-radius:5px;border-bottom-left-radius:5px;', 'color:#455a64;background:#e0e0e0;padding:5px 0;border-top-right-radius:5px;border-bottom-right-radius:5px;');
 </script>

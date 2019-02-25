@@ -1,15 +1,18 @@
 package cc.ryanc.halo.config;
 
+import cc.ryanc.halo.filter.CorsFilter;
 import cc.ryanc.halo.web.interceptor.ApiInterceptor;
 import cc.ryanc.halo.web.interceptor.InstallInterceptor;
 import cc.ryanc.halo.web.interceptor.LocaleInterceptor;
 import cc.ryanc.halo.web.interceptor.LoginInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.Ordered;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
@@ -83,8 +86,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/templates/themes/")
-                .addResourceLocations("classpath:/robots.txt");
+                .addResourceLocations("classpath:/templates/themes/");
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/upload/");
         registry.addResourceHandler("/favicon.ico")
@@ -93,24 +95,40 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                 .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/backup/");
     }
 
+//    /**
+//     * 跨域
+//     *
+//     * @param registry registry
+//     */
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/api/**")
+//                .allowedHeaders("*")
+//                .allowedOrigins("*")
+//                .allowedMethods("GET", "POST")
+//                .exposedHeaders("access-control-allow-headers",
+//                        "access-control-allow-methods",
+//                        "access-control-allow-origin",
+//                        "access-control-max-age",
+//                        "X-Frame-Options",
+//                        "token")
+//                .allowCredentials(false).maxAge(3600);
+//    }
+
     /**
-     * 跨域
+     * Creates a CorsFilter.
      *
-     * @param registry registry
+     * @return Cors filter registration bean
      */
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedHeaders("*")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST")
-                .exposedHeaders("access-control-allow-headers",
-                        "access-control-allow-methods",
-                        "access-control-allow-origin",
-                        "access-control-max-age",
-                        "X-Frame-Options",
-                        "token")
-                .allowCredentials(false).maxAge(3600);
+    @Bean
+    FilterRegistrationBean<CorsFilter> corsFilter() {
+        FilterRegistrationBean<CorsFilter> corsFilter = new FilterRegistrationBean<>();
+
+        corsFilter.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        corsFilter.setFilter(new CorsFilter());
+        corsFilter.addUrlPatterns("/api/*");
+
+        return corsFilter;
     }
 
     /**

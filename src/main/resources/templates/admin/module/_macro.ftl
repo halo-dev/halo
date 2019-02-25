@@ -22,6 +22,13 @@
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <#if options.admin_layout_boxed_background??>
+    <style>
+        .layout-boxed {
+            background: url(${options.admin_layout_boxed_background!}) repeat fixed!important;
+        }
+    </style>
+    </#if>
 </head>
 <body class="hold-transition sidebar-mini ${options.admin_theme!'skin-blue'} ${options.admin_layout!''} ${options.sidebar_style!''}">
 <div class="wrapper">
@@ -49,12 +56,11 @@
 <#if (options.blog_locale!'zh_CN') == 'zh_CN'>
 <script src="/static/halo-backend/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/halo-backend/plugins/simplemde/simplemde.min.js"></script>
+<script src="/static/halo-backend/plugins/easymde/easymde.min.js"></script>
 <script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
 <script src="/static/halo-backend/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/static/halo-backend/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 <script src="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
-<script src="/static/halo-backend/plugins/hz2py/jQuery.Hz2Py-min.js"></script>
 <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script src="/static/halo-common/OwO/OwO.min.js"></script>
 <script src="/static/halo-backend/js/halo.min.js"></script>

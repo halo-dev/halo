@@ -11,7 +11,7 @@
 </p>
 
 ------------------------------
-🇨🇳简体中文 | 🇺🇸[English](./docs/README-en-US.md)
+🇨🇳简体中文 | 🇺🇸[English](README-en_US.md)
 
 ## 简介
 
@@ -19,7 +19,7 @@
 
 轻快，简洁，功能强大，使用 Java 开发的博客系统。
 
-> QQ 交流群: 162747721 | Telegram 交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog) | [WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
+> QQ 交流群: 162747721 | Telegram 交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog) | Telegram 频道：[https://t.me/halo_dev](https://t.me/halo_dev) | [WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
 
 ## 演示站点
 
@@ -33,28 +33,30 @@
 
 ```bash
 # 安装 Halo
-yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
+$ yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
 
 # 更新 Halo
-bash halo-cli.sh -u
+$ bash halo-cli.sh -u
 ```
 
 Docker 部署：
 ```bash
 # 拉取镜像
-docker pull ruibaby/halo
+$ docker pull ruibaby/halo
 
 # 运行
-docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+$ docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo -e DB_USER=root -e DB_PASSWORD=123456 ruibaby/halo
+
+# 注意：DB_USER 和 DB_PASSWORD 务必修改并记下
 ```
 
 Docker Compose 部署：
 ```bash
 # 下载 Nginx 配置文件模板
-curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
+$ curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
 
 # 获取 docker-compose.yaml 文件
-yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
+$ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
 # 修改 docker-compose.yaml
 # 1. 修改 VIRTUAL_HOST,LETSENCRYPT_HOST 为自己的域名。
@@ -63,7 +65,7 @@ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 # 4. 修改 DB_PASSWORD 数据库密码。
 
 # 运行
-docker-compose up -d
+$ docker-compose up -d
 ```
 
 > 注意：如使用 Idea，Eclipse 等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题管理和主题上传会有问题。
@@ -85,11 +87,12 @@ docker-compose up -d
 
 除了内置的 [Anatole](https://github.com/hi-caicai/farbox-theme-Anatole) 和 [Material](https://github.com/viosey/hexo-theme-material) ，还有下列主题没有集成在项目里，如有需要，请自行下载之后通过后台上传上去使用。
 
-- [Vno](https://github.com/ruibaby/vno-halo) - 来自Jekyll的一款主题，作者 [Wei Wang](https://onevcat.com/)。
-- [Hux](https://github.com/ruibaby/hux-halo) - 来自Jekyll的一款主题，作者 [Xuan Huang](https://huangxuan.me/)。
-- [Story](https://github.com/ruibaby/story-halo) - 来自Typecho的一款主题，作者 [Trii Hsia](https://yumoe.com/)。
-- [NexT](https://github.com/ruibaby/next-halo) - 来自Hexo的一款主题，作者 [iissnan](https://notes.iissnan.com/)。
-- [Casper](https://github.com/ruibaby/casper-halo) - 来自Ghost的一款主题，作者 [Ghost](https://github.com/TryGhost)。
+- [Vno](https://github.com/ruibaby/vno-halo) - 来自 Jekyll 的一款主题，作者 [Wei Wang](https://onevcat.com/)。
+- [Hux](https://github.com/ruibaby/hux-halo) - 来自 Jekyll 的一款主题，作者 [Xuan Huang](https://huangxuan.me/)。
+- [Story](https://github.com/ruibaby/story-halo) - 来自 Typecho 的一款主题，作者 [Trii Hsia](https://yumoe.com/)。
+- [NexT](https://github.com/ruibaby/next-halo) - 来自 Hexo 的一款主题，作者 [iissnan](https://notes.iissnan.com/)。
+- [Casper](https://github.com/ruibaby/casper-halo) - 来自 Ghost 的一款主题，作者 [Ghost](https://github.com/TryGhost)。
+- [Pinghsu](https://github.com/ruibaby/pinghsu-halo) - 来自 Typecho 的一款主题，作者 [Chakhsu.Lau](https://github.com/chakhsu)。
 
 > 声明：不接受任何对**移植主题**功能上的意见和建议。
 

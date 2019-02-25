@@ -1,12 +1,11 @@
 package cc.ryanc.halo.web.controller.api;
 
+import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.PostService;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.data.web.SortDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * <pre>
@@ -24,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/posts")
 public class ApiPostController {
@@ -99,18 +105,17 @@ public class ApiPostController {
      * @return JsonResult
      */
     @GetMapping(value = "/page/{page}")
-    public JsonResult posts(@PathVariable(value = "page") Integer page) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
+    public JsonResult posts(@PathVariable(value = "page") Integer page, @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         int size = 10;
-        if (StrUtil.isNotBlank(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(HaloConst.OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
         final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         if (null == posts) {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
+            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
         }
-        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), posts);
+        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), posts);
     }
 
     /**
@@ -151,13 +156,16 @@ public class ApiPostController {
      * @return JsonResult
      */
     @GetMapping(value = "/{postId}")
-    public JsonResult posts(@PathVariable(value = "postId") Long postId) {
+    public Post posts(@PathVariable(value = "postId") Long postId) {
         final Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_POST.getDesc());
-        if (null != post) {
-            postService.cacheViews(post.getPostId());
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), post);
-        } else {
-            return new JsonResult(ResponseStatusEnum.NOTFOUND.getCode(), ResponseStatusEnum.NOTFOUND.getMsg());
+
+        if (post == null) {
+            throw new NotFoundException("Post with id: " + postId + " was not found").setErrorData(postId);
         }
+
+        // Cache views
+        postService.cacheViews(post.getPostId());
+
+        return post;
     }
 }

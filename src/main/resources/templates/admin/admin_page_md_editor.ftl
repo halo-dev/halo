@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.pages.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/easymde/easymde.min.css">
     <link rel="stylesheet" href="/static/halo-backend/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
         #postTitle{font-weight: 400;}
@@ -78,22 +78,22 @@
                         </div>
                         <#if post??>
                             <div class="form-group">
-                                <label for="postDate" class="control-label">发布时间：</label>
+                                <label for="postDate" class="control-label"><@spring.message code='admin.editor.post.date' /></label>
                                 <input type="text" class="form-control" id="postDate" name="postDate" value="${post.postDate!?string('yyyy-MM-dd HH:mm')}">
                             </div>
                         <#else>
                             <input type="hidden" class="form-control" id="postDate" name="postDate">
                         </#if>
                         <div class="form-group">
-                            <label for="customTpl" class="control-label">自定义模板：</label>
+                            <label for="customTpl" class="control-label"><@spring.message code='admin.editor.page.custom.tpl' /></label>
                             <select class="form-control" id="customTpl" name="customTpl">
                                 <#if customTpls?? && customTpls?size gt 0>
-                                    <option value="">选择模板</option>
+                                    <option value=""><@spring.message code='admin.editor.page.choose.tpl' /></option>
                                     <#list customTpls as tpl>
                                     <option value="${tpl}" <#if post?? && (post.customTpl!) == '${tpl}'>selected</#if>>${tpl}</option>
                                     </#list>
                                 <#else>
-                                    <option value="">无自定义模板</option>
+                                    <option value=""><@spring.message code='admin.editor.page.no.tpl' /></option>
                                 </#if>
                             </select>
                         </div>
@@ -120,12 +120,11 @@
                     </div>
                     <div class="box-body">
                         <div>
-                            <#if post??>
-                                <img src="${post.postThumbnail!'/static/halo-frontend/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
-                            <#else >
-                                <img src="/static/halo-frontend/images/thumbnail/thumbnail.png" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
-                            </#if>
+                            <img src="<#if post??>${post.postThumbnail!'/static/halo-frontend/images/thumbnail/thumbnail.png'}<#else>/static/halo-frontend/images/thumbnail/thumbnail.png</#if>" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                         </div>
+                    </div>
+                    <div class="box-footer">
+                        <button onclick="removeThumbnail()" class="btn btn-default btn-sm "><@spring.message code='common.btn.remove' /></button>
                     </div>
                 </div>
             </div>
@@ -145,7 +144,13 @@
     </#if>
 
     MathJax.Hub.Config({
-        tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+        showProcessingMessages: false,
+        messageStyle: "none",
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre','code','a']
+        }
     });
 
     var QUEUE = MathJax.Hub.queue;
@@ -153,7 +158,7 @@
     /**
      * 加载编辑器
      */
-    var simplemde = new SimpleMDE({
+    var easyMDE = new EasyMDE({
         element: document.getElementById("editorarea"),
         autoDownloadFontAwesome: false,
         autofocus: true,
@@ -181,7 +186,7 @@
      * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
      */
     $(function () {
-        inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+        inlineAttachment.editors.codemirror4.attach(easyMDE.codemirror, {
             uploadUrl: "/admin/attachments/upload"
         });
     });
@@ -235,7 +240,7 @@
             'postStatus': status,
             'postTitle': postTitle.val(),
             'postUrl' : postUrl.html().toString(),
-            'postContentMd': simplemde.value(),
+            'postContentMd': easyMDE.value(),
             'postThumbnail': $('#selectImg').attr('src'),
             'allowComment' : $('#allowComment').val(),
             'customTpl' : $("#customTpl").val(),
@@ -243,12 +248,17 @@
         },function (data) {
             if(data.code===1){
                 //清除自动保存的内容
-                simplemde.clearAutosavedValue();
+                easyMDE.toTextArea();
+                easyMDE = null;
                 halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/page',"${options.admin_pjax!'true'}");
             }else{
                 halo.showMsg(data.msg,'error',2000);
             }
         },'JSON');
+    }
+
+    function removeThumbnail(){
+        $("#selectImg").attr("src","/static/halo-frontend/images/thumbnail/thumbnail.png");
     }
 </script>
 </@footer>

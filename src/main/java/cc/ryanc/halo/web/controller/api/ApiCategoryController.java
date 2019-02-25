@@ -1,11 +1,12 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Category;
-import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,7 +18,6 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2018/6/6
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/categories")
 public class ApiCategoryController {
@@ -29,8 +29,8 @@ public class ApiCategoryController {
      * 获取所有分类
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -49,21 +49,16 @@ public class ApiCategoryController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult categories() {
-        List<Category> categories = categoryService.findAll();
-        if (null != categories && categories.size() > 0) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), categories);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
+    public List<Category> categories() {
+        return categoryService.listAll();
     }
 
     /**
      * 获取单个分类的信息
      *
      * <p>
-     *     result json:
-     *     <pre>
+     * result json:
+     * <pre>
      * {
      *     "code": 200,
      *     "msg": "OK",
@@ -78,15 +73,11 @@ public class ApiCategoryController {
      * </p>
      *
      * @param cateUrl 分类路径
+     *
      * @return JsonResult
      */
     @GetMapping(value = "/{cateUrl}")
-    public JsonResult categories(@PathVariable("cateUrl") String cateUrl) {
-        final Category category = categoryService.findByCateUrl(cateUrl);
-        if (null != category) {
-            return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), category);
-        } else {
-            return new JsonResult(ResponseStatusEnum.EMPTY.getCode(), ResponseStatusEnum.EMPTY.getMsg());
-        }
+    public Category categories(@PathVariable("cateUrl") String cateUrl) {
+        return categoryService.findByCateUrl(cateUrl);
     }
 }

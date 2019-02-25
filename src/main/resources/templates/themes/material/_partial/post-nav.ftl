@@ -1,8 +1,8 @@
 <nav class="material-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
 
     <!-- Prev Nav -->
-    <#if afterPost??>
-    <a href="/archives/${afterPost.postUrl!}" id="post_nav-newer" class="prev-content">
+    <#if nextPost??>
+    <a href="${options.blog_url!}/archives/${nextPost.postUrl!}" id="post_nav-newer" class="prev-content">
         <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
             <i class="material-icons">arrow_back</i>
         </button>
@@ -14,8 +14,8 @@
     <div class="section-spacer"></div>
 
     <!-- Next Nav -->
-    <#if beforePost??>
-    <a href="/archives/${beforePost.postUrl!}" id="post_nav-older" class="next-content">
+    <#if prePost??>
+    <a href="${options.blog_url!}/archives/${prePost.postUrl!}" id="post_nav-older" class="next-content">
         旧篇
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">

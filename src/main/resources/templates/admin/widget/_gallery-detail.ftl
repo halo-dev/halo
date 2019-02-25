@@ -64,8 +64,8 @@
                         </div>
                     </div>
                     <div class="box-footer">
-                        <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btn_delete()"><@spring.message code='common.btn.delete' /></button>
-                        <button type="button" class="btn btn-info btn-sm pull-right" onclick="btn_save()"><@spring.message code='common.btn.save' /></button>
+                        <button type="button" class="btn btn-danger btn-sm pull-left" onclick="btnDelete()"><@spring.message code='common.btn.delete' /></button>
+                        <button type="button" class="btn btn-info btn-sm pull-right" onclick="btnSave()"><@spring.message code='common.btn.save' /></button>
                     </div>
                 </form>
             </div>
@@ -81,7 +81,7 @@
 <script src="/static/halo-backend/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
-    function btn_delete() {
+    function btnDelete() {
         layer.msg('<@spring.message code="common.text.define-delete" />', {
             time: 0
             ,btn: ['<@spring.message code="common.btn.delete" />', '<@spring.message code="common.btn.cancel" />']
@@ -89,7 +89,7 @@
                 layer.close(index);
                 $.get('/admin/page/gallery/remove',{'galleryId' : ${gallery.galleryId?c}},function (data) {
                     if(data.code === 1){
-                        halo.showMsgAndReload(data.msg,'success',1000);
+                        halo.showMsgAndParentRedirect(data.msg,'success',1000,"/admin/page/galleries");
                     }else{
                         halo.showMsg(data.msg,'error',2000);
                     }
@@ -97,7 +97,7 @@
             }
         });
     }
-    function btn_save() {
+    function btnSave() {
         $('#galleryForm').submit();
         parent.location.reload();
     }

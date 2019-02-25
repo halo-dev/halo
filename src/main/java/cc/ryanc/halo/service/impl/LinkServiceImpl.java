@@ -3,7 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Link;
 import cc.ryanc.halo.repository.LinkRepository;
 import cc.ryanc.halo.service.LinkService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,14 +20,18 @@ import java.util.Optional;
  * @date : 2017/11/14
  */
 @Service
-public class LinkServiceImpl implements LinkService {
+public class LinkServiceImpl extends AbstractCrudService<Link, Long> implements LinkService {
 
     private static final String LINKS_CACHE_KEY = "'link'";
 
     private static final String LINKS_CACHE_NAME = "links";
 
-    @Autowired
-    private LinkRepository linkRepository;
+    private final LinkRepository linkRepository;
+
+    public LinkServiceImpl(LinkRepository linkRepository) {
+        super(linkRepository);
+        this.linkRepository = linkRepository;
+    }
 
     /**
      * 新增/修改友情链接
@@ -37,8 +41,8 @@ public class LinkServiceImpl implements LinkService {
      */
     @Override
     @CacheEvict(value = LINKS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Link save(Link link) {
-        return linkRepository.save(link);
+    public Link create(Link link) {
+        return super.create(link);
     }
 
     /**
@@ -49,10 +53,8 @@ public class LinkServiceImpl implements LinkService {
      */
     @Override
     @CacheEvict(value = LINKS_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Link remove(Long linkId) {
-        final Optional<Link> link = this.findByLinkId(linkId);
-        linkRepository.delete(link.get());
-        return link.get();
+    public Link removeById(Long linkId) {
+        return super.removeById(linkId);
     }
 
     /**
@@ -62,18 +64,8 @@ public class LinkServiceImpl implements LinkService {
      */
     @Override
     @Cacheable(value = LINKS_CACHE_NAME, key = LINKS_CACHE_KEY)
-    public List<Link> findAll() {
-        return linkRepository.findAll();
+    public List<Link> listAll() {
+        return super.listAll();
     }
 
-    /**
-     * 根据编号查询友情链接
-     *
-     * @param linkId linkId
-     * @return Optional
-     */
-    @Override
-    public Optional<Link> findByLinkId(Long linkId) {
-        return linkRepository.findById(linkId);
-    }
 }

@@ -1,6 +1,7 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Category;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -11,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author : RYAN0UP
  * @date : 2017/11/30
  */
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends BaseRepository<Category, Long> {
 
     /**
      * 根据分类目录路径查询，用于验证是否已经存在该路径

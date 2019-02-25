@@ -3,9 +3,11 @@ package cc.ryanc.halo.repository;
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,7 +22,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2017/11/14
  */
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends BaseRepository<Post, Long>, JpaSpecificationExecutor<Post> {
 
     /**
      * 查询前五条文章
@@ -37,24 +39,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @return List
      */
     List<Post> findPostsByPostType(String postType);
-
-    /**
-     * 分页查询文章
-     *
-     * @param postType post or page
-     * @param pageable 分页信息
-     * @return Page
-     */
-    Page<Post> findPostsByPostType(String postType, Pageable pageable);
-
-    /**
-     * 模糊查询
-     *
-     * @param keyWord  keyword
-     * @param pageable pageable
-     * @return List
-     */
-    List<Post> findByPostTitleLike(String keyWord, Pageable pageable);
 
     /**
      * 根据文章的状态查询 分页
@@ -94,25 +78,22 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Post findPostByPostIdAndPostType(Long postId, String postType);
 
     /**
-     * 查询之后文章
+     * 查询指定日期之前的文章
      *
-     * @param postDate   发布时间
-     * @param postStatus 0，1，2
-     * @param postType   post or page
-     * @return List
+     * @param postDate 日期
+     * @return Post
      */
-    List<Post> findByPostDateAfterAndPostStatusAndPostTypeOrderByPostDateDesc(Date postDate, Integer postStatus, String postType);
-
+    @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type='post' AND post_date < :postDate ORDER BY post_date DESC LIMIT 1", nativeQuery = true)
+    Post queryPrePost(@Param("postDate") Date postDate);
 
     /**
-     * 查询之前的文章
+     * 查询指定日期之后的文章
      *
-     * @param postDate   发布时间
-     * @param postStatus 0，1，2
-     * @param postType   post or page
-     * @return List
+     * @param postDate 日期
+     * @return Post
      */
-    List<Post> findByPostDateBeforeAndPostStatusAndPostTypeOrderByPostDateAsc(Date postDate, Integer postStatus, String postType);
+    @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type='post' AND post_date > :postDate ORDER BY post_date ASC LIMIT 1", nativeQuery = true)
+    Post queryNextPost(@Param("postDate") Date postDate);
 
     /**
      * 查询文章归档信息 根据年份和月份
@@ -132,25 +113,24 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 
     /**
+     * @return List
      * @Author Aquan
      * @Description 查询文章归档信息 查询所有文章
      * @Date 2019.1.4 11:19
      * @Param
-     * @return List
      **/
     @Query(value = "SELECT *,YEAR(post_date) AS YEAR FROM halo_post WHERE post_status=0 AND post_type='post' ORDER BY post_date DESC", nativeQuery = true)
     List<Post> findAllPost();
 
     /**
+     * @return Integer
      * @Author Aquan
      * @Description 查询文章总数
      * @Date 2019.1.4 15:03
      * @Param
-     * @return Integer
      **/
     @Query(value = "SELECT count(1) AS COUNT FROM halo_post WHERE post_status=0 AND post_type='post'", nativeQuery = true)
     Integer totalAllPostCount();
-
 
 
     /**
@@ -212,16 +192,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findPostsByTags(Tag tag);
 
     /**
-     * 模糊查询文章
-     *
-     * @param keyword  关键词
-     * @param pageable 分页信息
-     * @return Page
-     */
-    @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type='post' AND post_title LIKE '%=:keyword%' OR post_content LIKE '%=:keyword%'", nativeQuery = true)
-    Page<Post> findPostByPostTitleLikeOrPostContentLikeAndPostTypeAndPostStatus(String keyword, Pageable pageable);
-
-    /**
      * 按热度从大到小排序
      *
      * @param postStatus 文章状态
@@ -234,7 +204,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      *
      * @return Long
      */
-    @Query(value = "SELECT SUM(POST_VIEWS) FROM HALO_POST", nativeQuery = true)
+    @Query(value = "SELECT SUM(post_views) FROM halo_post", nativeQuery = true)
     Long getPostViewsSum();
 
     /**
@@ -252,6 +222,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * @param limit 条数
      * @return List
      */
-    @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type = 'post' ORDER BY post_date DESC LIMIT :limit",nativeQuery = true)
+    @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type = 'post' ORDER BY post_date DESC LIMIT :limit", nativeQuery = true)
     List<Post> getPostsByLimit(@Param(value = "limit") int limit);
 }

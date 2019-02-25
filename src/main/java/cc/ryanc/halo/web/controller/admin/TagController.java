@@ -48,7 +48,6 @@ public class TagController {
      * 新增/修改标签
      *
      * @param tag tag
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/save")
@@ -69,7 +68,7 @@ public class TagController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         }
-        tag = tagService.save(tag);
+        tag = tagService.create(tag);
         if (null == tag) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
@@ -80,13 +79,12 @@ public class TagController {
      * 处理删除标签的请求
      *
      * @param tagId 标签编号
-     *
      * @return 重定向到/admin/tag
      */
     @GetMapping(value = "/remove")
     public String removeTag(@RequestParam("tagId") Long tagId) {
         try {
-            tagService.remove(tagId);
+            tagService.removeById(tagId);
         } catch (Exception e) {
             log.error("Failed to delete tag: {}", e.getMessage());
         }
@@ -98,12 +96,11 @@ public class TagController {
      *
      * @param model model
      * @param tagId 标签编号
-     *
      * @return 模板路径admin/admin_tag
      */
     @GetMapping(value = "/edit")
     public String toEditTag(Model model, @RequestParam("tagId") Long tagId) {
-        final Tag tag = tagService.findByTagId(tagId).orElse(new Tag());
+        final Tag tag = tagService.fetchById(tagId).orElse(new Tag());
         model.addAttribute("updateTag", tag);
         return "admin/admin_tag";
     }

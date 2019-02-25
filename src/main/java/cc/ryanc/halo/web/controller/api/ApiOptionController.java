@@ -1,11 +1,13 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
-import cc.ryanc.halo.model.enums.ResponseStatusEnum;
 import cc.ryanc.halo.service.OptionsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -17,7 +19,6 @@ import java.util.Map;
  * @author : RYAN0UP
  * @date : 2018/7/19
  */
-@CrossOrigin
 @RestController
 @RequestMapping(value = "/api/options")
 public class ApiOptionController {
@@ -56,15 +57,8 @@ public class ApiOptionController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult options() {
-        final Map<String, String> options = optionsService.findAllOptions();
-        //去掉隐私元素
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_HOST.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_FROM_NAME.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_PASSWORD.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp());
-        options.remove(BlogPropertiesEnum.MAIL_SMTP_USERNAME.getProp());
-        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), options);
+    public Map<String, String> options() {
+        return optionsService.findAllOptions();
     }
 
     /**
@@ -85,9 +79,8 @@ public class ApiOptionController {
      *
      * @return JsonResult
      */
-    @GetMapping(value = "/{optionName}")
-    public JsonResult option(@PathVariable(value = "optionName") String optionName) {
-        final String optionValue = optionsService.findOneOption(optionName);
-        return new JsonResult(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getMsg(), optionValue);
+    @GetMapping(value = "/one")
+    public JsonResult option(@RequestParam(value = "optionName") String optionName) {
+        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), optionsService.findOneOption(optionName));
     }
 }

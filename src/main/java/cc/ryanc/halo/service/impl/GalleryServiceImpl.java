@@ -3,15 +3,12 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.repository.GalleryRepository;
 import cc.ryanc.halo.service.GalleryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * <pre>
@@ -22,12 +19,16 @@ import java.util.Optional;
  * @date : 2018/2/26
  */
 @Service
-public class GalleryServiceImpl implements GalleryService {
+public class GalleryServiceImpl extends AbstractCrudService<Gallery, Long> implements GalleryService {
 
     private static final String GALLERIES_CACHE_NAME = "galleries";
 
-    @Autowired
-    private GalleryRepository galleryRepository;
+    private final GalleryRepository galleryRepository;
+
+    public GalleryServiceImpl(GalleryRepository galleryRepository) {
+        super(galleryRepository);
+        this.galleryRepository = galleryRepository;
+    }
 
     /**
      * 保存图片
@@ -37,8 +38,8 @@ public class GalleryServiceImpl implements GalleryService {
      */
     @Override
     @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Gallery save(Gallery gallery) {
-        return galleryRepository.save(gallery);
+    public Gallery create(Gallery gallery) {
+        return super.create(gallery);
     }
 
     /**
@@ -49,21 +50,8 @@ public class GalleryServiceImpl implements GalleryService {
      */
     @Override
     @CacheEvict(value = GALLERIES_CACHE_NAME, allEntries = true, beforeInvocation = true)
-    public Gallery remove(Long galleryId) {
-        final Optional<Gallery> gallery = this.findByGalleryId(galleryId);
-        galleryRepository.delete(gallery.get());
-        return gallery.get();
-    }
-
-    /**
-     * 查询所有图片 分页
-     *
-     * @param pageable pageable
-     * @return Page
-     */
-    @Override
-    public Page<Gallery> findAll(Pageable pageable) {
-        return galleryRepository.findAll(pageable);
+    public Gallery removeById(Long galleryId) {
+        return super.removeById(galleryId);
     }
 
     /**
@@ -73,18 +61,8 @@ public class GalleryServiceImpl implements GalleryService {
      */
     @Override
     @Cacheable(value = GALLERIES_CACHE_NAME, key = "'gallery'")
-    public List<Gallery> findAll() {
-        return galleryRepository.findAll();
+    public List<Gallery> listAll() {
+        return super.listAll();
     }
 
-    /**
-     * 根据编号查询图片信息
-     *
-     * @param galleryId galleryId
-     * @return Optional
-     */
-    @Override
-    public Optional<Gallery> findByGalleryId(Long galleryId) {
-        return galleryRepository.findById(galleryId);
-    }
 }

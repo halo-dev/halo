@@ -1,6 +1,5 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
@@ -33,6 +32,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.THEMES;
+
 /**
  * <pre>
  *     后台主题管理控制器
@@ -64,14 +66,13 @@ public class ThemeController extends BaseController {
      * 渲染主题设置页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_theme
      */
     @GetMapping
     public String themes(Model model) {
         model.addAttribute("activeTheme", BaseController.THEME);
-        if (null != HaloConst.THEMES) {
-            model.addAttribute("themes", HaloConst.THEMES);
+        if (null != THEMES) {
+            model.addAttribute("themes", THEMES);
         }
         return "admin/admin_theme";
     }
@@ -81,7 +82,6 @@ public class ThemeController extends BaseController {
      *
      * @param siteTheme 主题名称
      * @param request   request
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/set")
@@ -94,10 +94,10 @@ public class ThemeController extends BaseController {
             optionsService.saveOption(BlogPropertiesEnum.THEME.getProp(), siteTheme);
             //设置主题
             BaseController.THEME = siteTheme;
-            HaloConst.OPTIONS.clear();
-            HaloConst.OPTIONS = optionsService.findAllOptions();
+            OPTIONS.clear();
+            OPTIONS = optionsService.findAllOptions();
             configuration.setSharedVariable("themeName", siteTheme);
-            configuration.setSharedVariable("options", HaloConst.OPTIONS);
+            configuration.setSharedVariable("options", OPTIONS);
             log.info("Changed theme to {}", siteTheme);
             logsService.save(LogsRecord.CHANGE_THEME, "更换为" + siteTheme, request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-success", new Object[]{siteTheme}));
@@ -111,7 +111,6 @@ public class ThemeController extends BaseController {
      * 上传主题
      *
      * @param file 文件
-     *
      * @return JsonResult
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -128,8 +127,8 @@ public class ThemeController extends BaseController {
                 logsService.save(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), request);
                 ZipUtil.unzip(themePath, new File(basePath.getAbsolutePath(), "templates/themes/"));
                 FileUtil.del(themePath);
-                HaloConst.THEMES.clear();
-                HaloConst.THEMES = HaloUtils.getThemes();
+                THEMES.clear();
+                THEMES = HaloUtils.getThemes();
             } else {
                 log.error("Upload theme failed, no file selected");
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-no-file"));
@@ -145,7 +144,6 @@ public class ThemeController extends BaseController {
      * 删除主题
      *
      * @param themeName 主题文件夹名
-     *
      * @return string 重定向到/admin/themes
      */
     @GetMapping(value = "/remove")
@@ -154,8 +152,8 @@ public class ThemeController extends BaseController {
             final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             final File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + themeName);
             FileUtil.del(themePath);
-            HaloConst.THEMES.clear();
-            HaloConst.THEMES = HaloUtils.getThemes();
+            THEMES.clear();
+            THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
             log.error("Delete theme failed: {}", e.getMessage());
         }
@@ -177,7 +175,6 @@ public class ThemeController extends BaseController {
      *
      * @param remoteAddr 远程地址
      * @param themeName  主题名称
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/clone")
@@ -194,8 +191,8 @@ public class ThemeController extends BaseController {
             if (NOT_FOUND_GIT.equals(cmdResult)) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
-            HaloConst.THEMES.clear();
-            HaloConst.THEMES = HaloUtils.getThemes();
+            THEMES.clear();
+            THEMES = HaloUtils.getThemes();
         } catch (FileNotFoundException e) {
             log.error("Cloning theme failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.clone-theme-failed") + e.getMessage());
@@ -207,7 +204,6 @@ public class ThemeController extends BaseController {
      * 更新主题
      *
      * @param themeName 主题名
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/pull")
@@ -220,8 +216,8 @@ public class ThemeController extends BaseController {
             if (NOT_FOUND_GIT.equals(cmdResult)) {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
             }
-            HaloConst.THEMES.clear();
-            HaloConst.THEMES = HaloUtils.getThemes();
+            THEMES.clear();
+            THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
             log.error("Update theme failed: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.update-theme-failed") + e.getMessage());
@@ -251,7 +247,6 @@ public class ThemeController extends BaseController {
      * 编辑主题
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_theme-editor
      */
     @GetMapping(value = "/editor")
@@ -265,7 +260,6 @@ public class ThemeController extends BaseController {
      * 获取模板文件内容
      *
      * @param tplName 模板文件名
-     *
      * @return 模板内容
      */
     @GetMapping(value = "/getTpl", produces = "text/text;charset=UTF-8")
@@ -294,7 +288,6 @@ public class ThemeController extends BaseController {
      *
      * @param tplName    模板名称
      * @param tplContent 模板内容
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/editor/save")

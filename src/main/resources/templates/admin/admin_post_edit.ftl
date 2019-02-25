@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.posts.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/static/halo-backend/plugins/easymde/easymde.min.css">
     <link rel="stylesheet" href="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.css">
     <link rel="stylesheet" href="/static/halo-backend/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
@@ -28,7 +28,7 @@
             <div class="col-md-9">
                 <input type="hidden" id="postId" name="postId" value="${post.postId?c}">
                 <div style="margin-bottom: 10px;">
-                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" value="${post.postTitle!}">
+                    <input type="text" class="form-control input-lg" id="postTitle" name="postTitle" placeholder="<@spring.message code='admin.posts.edit.form.title.placeholder' />" onblur="autoComplateUrl();" value="${post.postTitle!}" autocomplete="off">
                 </div>
                 <div style="display: block;margin-bottom: 10px;">
                     <span>
@@ -68,7 +68,11 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="postDate" class="control-label">发布时间：</label>
+                            <label for="postPassword" class="control-label"><@spring.message code='admin.editor.post.password' /></label>
+                            <input type="password" class="form-control" id="postPassword" name="postPassword" value="${post.postPassword!}" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="postDate" class="control-label"><@spring.message code='admin.editor.post.date' /></label>
                             <input type="text" class="form-control" id="postDate" name="postDate" value="${post.postDate!?string('yyyy-MM-dd HH:mm')}">
                         </div>
                     </div>
@@ -146,6 +150,9 @@
                             <img src="${post.postThumbnail!'/static/halo-frontend/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                         </div>
                     </div>
+                    <div class="box-footer">
+                        <button onclick="removeThumbnail()" class="btn btn-default btn-sm "><@spring.message code='common.btn.remove' /></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,7 +170,13 @@
     });
 
     MathJax.Hub.Config({
-        tex2jax: {inlineMath: [["$","$"],["\\(","\\)"]]}
+        showProcessingMessages: false,
+        messageStyle: "none",
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre','code','a']
+        }
     });
 
     var QUEUE = MathJax.Hub.queue;
@@ -171,7 +184,7 @@
     /**
      * 加载编辑器
      */
-    var simplemde = new SimpleMDE({
+    var easyMDE = new EasyMDE({
         element: document.getElementById("editorarea"),
         autoDownloadFontAwesome: false,
         autofocus: true,
@@ -199,7 +212,8 @@
      * 方法来自https://gitee.com/supperzh/zb-blog/blob/master/src/main/resources/templates/article/publish.html#L255
      */
     $(function () {
-        inlineAttachment.editors.codemirror4.attach(simplemde.codemirror, {
+        inlineAttachment.editors.codemirror4.attach(easyMDE.codemirror, {
+            progressText: "![上传中...]()",
             uploadUrl: "/admin/attachments/upload"
         });
     });
@@ -235,8 +249,7 @@
         var titleVal = $("#postTitle");
         var postUrl = $("#postUrl");
         if(titleVal.val()!=="" && titleVal.val() !== null && postUrl.html()===''){
-            var result = titleVal.toPinyin().toLowerCase();
-            postUrl.html(result.substring(0,result.length-1));
+            postUrl.html(new Date().getTime());
         }
     }
 
@@ -292,21 +305,27 @@
             'postStatus': status,
             'postTitle': postTitle.val(),
             'postUrl' : postUrl.html().toString(),
-            'postContentMd': simplemde.value(),
+            'postContentMd': easyMDE.value(),
             'postThumbnail': $('#selectImg').attr('src'),
             'cateList' : cateList.toString(),
             'tagList' : $('#tagList').tagEditor('getTags')[0].tags.toString(),
             'allowComment' : $('#allowComment').val(),
-            'postDate' : $("#postDate").val()
+            'postDate' : $("#postDate").val(),
+            'postPassword' : $("#postPassword").val()
         },function (data) {
             if(data.code === 1){
                 //清除自动保存的内容
-                simplemde.clearAutosavedValue();
+                easyMDE.toTextArea();
+                easyMDE = null;
                 halo.showMsgAndRedirect(data.msg,'success',1000,'/admin/posts',"${options.admin_pjax!'true'}");
             }else{
                 halo.showMsg(data.msg,'error',2000);
             }
         },'JSON')
+    }
+
+    function removeThumbnail(){
+        $("#selectImg").attr("src","/static/halo-frontend/images/thumbnail/thumbnail.png");
     }
 </script>
 </@footer>

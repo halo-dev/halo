@@ -14,14 +14,14 @@
     <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
         <!-- Post Title -->
         <p class="post_entry-title">
-            <a href="/archives/${post.postUrl}">${post.postTitle}</a>
+            <a href="${options.blog_url!}/archives/${post.postUrl}">${post.postTitle}</a>
         </p>
         <!-- Post Excerpt -->
         <p class="post_entry-excerpt">
             ${post.postSummary!}...
             &nbsp;&nbsp;&nbsp;
             <span>
-                <a href="/archives/${post.postUrl}" target="_self">阅读全文</a>
+                <a href="${options.blog_url!}/archives/${post.postUrl}" target="_self">阅读全文</a>
             </span>
         </p>
         <!-- Post Tags -->
@@ -29,7 +29,7 @@
             <#if post.tags??>
                 <#list post.tags as tag>
                     <li class="post_entry-tags-list-item">
-                        <a class="post_entry-tags-list-link" href="/tags/${tag.tagUrl}/">${tag.tagName}</a>
+                        <a class="post_entry-tags-list-link" href="${options.blog_url!}/tags/${tag.tagUrl}/">${tag.tagName}</a>
                     </li>
                 </#list>
             </#if>

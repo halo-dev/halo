@@ -33,8 +33,6 @@ public class MenuController {
     /**
      * 渲染菜单设置页面
      *
-     * @param model model
-     *
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping
@@ -46,7 +44,6 @@ public class MenuController {
      * 新增/修改菜单
      *
      * @param menu menu
-     *
      * @return 重定向到/admin/menus
      */
     @PostMapping(value = "/save")
@@ -57,7 +54,7 @@ public class MenuController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
             }
         }
-        menu = menuService.save(menu);
+        menu = menuService.create(menu);
         if (null != menu) {
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "菜单保存成功！");
         } else {
@@ -70,12 +67,11 @@ public class MenuController {
      *
      * @param menuId 菜单编号
      * @param model  model
-     *
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping(value = "/edit")
     public String updateMenu(@RequestParam("menuId") Long menuId, Model model) {
-        final Menu menu = menuService.findByMenuId(menuId).orElse(new Menu());
+        final Menu menu = menuService.fetchById(menuId).orElse(new Menu());
         model.addAttribute("updateMenu", menu);
         return "/admin/admin_menu";
     }
@@ -84,13 +80,12 @@ public class MenuController {
      * 删除菜单
      *
      * @param menuId 菜单编号
-     *
      * @return 重定向到/admin/menus
      */
     @GetMapping(value = "/remove")
     public String removeMenu(@RequestParam("menuId") Long menuId) {
         try {
-            menuService.remove(menuId);
+            menuService.removeById(menuId);
         } catch (Exception e) {
             log.error("Deleting menu failed: {}", e.getMessage());
         }

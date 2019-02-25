@@ -1,7 +1,10 @@
 package cc.ryanc.halo.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -21,6 +24,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "halo_comment")
+@EntityListeners(AuditingEntityListener.class)
 public class Comment implements Serializable {
 
     private static final long serialVersionUID = -6639021627094260505L;
@@ -72,6 +76,7 @@ public class Comment implements Serializable {
     /**
      * 评论时间
      */
+    @CreatedDate
     private Date commentDate;
 
     /**
@@ -107,4 +112,9 @@ public class Comment implements Serializable {
      */
     @Transient
     private List<Comment> childComments;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getCommentDate() {
+        return commentDate;
+    }
 }

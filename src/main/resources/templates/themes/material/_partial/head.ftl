@@ -56,24 +56,11 @@
     <!-- Import CSS -->
     <style id="material_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("material_css","/material/source/css/material.min.css?Z7a72R1E4SxzBKR/WGctOA==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
     <style id="style_css"></style><script>if(typeof window.lsLoadCSSMaxNums === "undefined")window.lsLoadCSSMaxNums = 0;window.lsLoadCSSMaxNums++;lsloader.load("style_css","/material/source/css/style.min.css?MKetZV3cUTfDxvMffaOezg==",function(){if(typeof window.lsLoadCSSNums === "undefined")window.lsLoadCSSNums = 0;window.lsLoadCSSNums++;if(window.lsLoadCSSNums == window.lsLoadCSSMaxNums)document.documentElement.style.display="";}, false)</script>
-    <style id="prettify_css"></style>
-    <script>
-        void 0 === window.lsLoadCSSMaxNums && (window.lsLoadCSSMaxNums = 0), window.lsLoadCSSMaxNums++, lsloader.load(
-                "prettify_css", "/material/source/css/prettify.min.css?zp8STOU9v89XWFEnN+6YmQ==",
-                function () {
-                    void 0 === window.lsLoadCSSNums && (window.lsLoadCSSNums = 0), ++window.lsLoadCSSNums == window.lsLoadCSSMaxNums &&
-                    (document.documentElement.style.display = "")
-                }, !1)
-    </script>
-    <style id="prettify_theme"></style>
-    <script>
-        void 0 === window.lsLoadCSSMaxNums && (window.lsLoadCSSMaxNums = 0), window.lsLoadCSSMaxNums++, lsloader.load(
-                "prettify_theme", "/material/source/css/prettify/github-v2.min.css?AfzKxt++K+/lhZBlSjnxwg==",
-                function () {
-                    void 0 === window.lsLoadCSSNums && (window.lsLoadCSSNums = 0), ++window.lsLoadCSSNums == window.lsLoadCSSMaxNums &&
-                    (document.documentElement.style.display = "")
-                }, !1)
-    </script>
+
+    <#if post??>
+        <link rel="stylesheet" type="text/css" href="/material/source/prism/css/prism-${options.material_code_pretty!'Default'}.css" />
+    </#if>
+
     <#if (options.theme_material_scheme!'Paradox') == "Isolation">
         <link rel="stylesheet" href="/material/source/css/fontawesome.min.css">
     </#if>
@@ -111,34 +98,26 @@
     <meta name="twitter:card" content="summary_large_image">
 
     <!-- Add canonical link for SEO -->
-    <!--
+    <#--
     <% if( (page.current === 1) && (is_home()) ) { %>
     <link rel="canonical" href="<%- config.url %>" />
     <% } else { %>
     <link rel="canonical" href="<%- config.url + url_for(path) %>" />
     <% } %>
+    -->
 
     <!-- Structured-data for SEO -->
-    <!--
+    <#--
     <% if(theme.head.structured_data === true) { %>
     <%- partial('_partial/structured-data') %>
     <% } %>
     -->
 
     <!-- Analytics -->
-    <!--
-    <% if(theme.analytics.google_site_id) { %>
-    <%- partial('_widget/analytics/google-analytics') %>
-    <% } %>
-    <% if(theme.analytics.baidu_site_id) { %>
-    <%- partial('_widget/analytics/baidu-analytics') %>
-    <% } %>
-    <% if(theme.analytics.cnzz_site_id) { %>
-    <%- partial('_widget/analytics/cnzz-analytics') %>
-    <% } %>
-    -->
+    <@common.statistics />
+
     <!-- Custom Head -->
-    <!--
+    <#--
     <% if (site.data.head) { %>
     <% for (var i in site.data.head) { %>
     <%- site.data.head[i] %>

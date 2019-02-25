@@ -4,7 +4,6 @@ import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Link;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.HaloConst;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
@@ -24,9 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -41,6 +40,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>
@@ -57,14 +59,19 @@ public class PageController {
 
     @Autowired
     LocaleMessageUtil localeMessageUtil;
+
     @Autowired
     private LinkService linkService;
+
     @Autowired
     private GalleryService galleryService;
+
     @Autowired
     private PostService postService;
+
     @Autowired
     private LogsService logsService;
+
     @Autowired
     private HttpServletRequest request;
 
@@ -72,7 +79,6 @@ public class PageController {
      * 页面管理页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_page
      */
     @GetMapping
@@ -97,12 +103,11 @@ public class PageController {
      *
      * @param model  model
      * @param linkId linkId 友情链接编号
-     *
      * @return String 模板路径admin/admin_page_link
      */
     @GetMapping(value = "/links/edit")
     public String toEditLink(Model model, @RequestParam("linkId") Long linkId) {
-        final Optional<Link> link = linkService.findByLinkId(linkId);
+        final Optional<Link> link = linkService.fetchById(linkId);
         model.addAttribute("updateLink", link.orElse(new Link()));
         return "admin/admin_page_link";
     }
@@ -111,7 +116,6 @@ public class PageController {
      * 处理添加/修改友链的请求并渲染页面
      *
      * @param link Link实体
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/links/save")
@@ -122,7 +126,7 @@ public class PageController {
                 return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
             }
         }
-        link = linkService.save(link);
+        link = linkService.create(link);
         if (null == link) {
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
@@ -133,13 +137,12 @@ public class PageController {
      * 处理删除友情链接的请求并重定向
      *
      * @param linkId 友情链接编号
-     *
      * @return 重定向到/admin/page/links
      */
     @GetMapping(value = "/links/remove")
     public String removeLink(@RequestParam("linkId") Long linkId) {
         try {
-            linkService.remove(linkId);
+            linkService.removeById(linkId);
         } catch (Exception e) {
             log.error("Deleting a friendship link failed: {}", e.getMessage());
         }
@@ -150,18 +153,12 @@ public class PageController {
      * 图库管理
      *
      * @param model model
-     * @param page  当前页码
-     * @param size  每页显示的条数
-     *
      * @return 模板路径admin/admin_page_gallery
      */
     @GetMapping(value = "/galleries")
     public String gallery(Model model,
-                          @RequestParam(value = "page", defaultValue = "0") Integer page,
-                          @RequestParam(value = "size", defaultValue = "18") Integer size) {
-        final Sort sort = new Sort(Sort.Direction.DESC, "galleryId");
-        final Pageable pageable = PageRequest.of(page, size, sort);
-        final Page<Gallery> galleries = galleryService.findAll(pageable);
+                          @PageableDefault(size = 18, sort = "galleryId", direction = Sort.Direction.DESC) Pageable pageable) {
+        final Page<Gallery> galleries = galleryService.listAll(pageable);
         model.addAttribute("galleries", galleries);
         return "admin/admin_page_gallery";
     }
@@ -170,7 +167,6 @@ public class PageController {
      * 保存图片
      *
      * @param gallery gallery
-     *
      * @return 重定向到/admin/page/gallery
      */
     @PostMapping(value = "/gallery/save")
@@ -179,7 +175,7 @@ public class PageController {
             if (StrUtil.isEmpty(gallery.getGalleryThumbnailUrl())) {
                 gallery.setGalleryThumbnailUrl(gallery.getGalleryUrl());
             }
-            galleryService.save(gallery);
+            galleryService.create(gallery);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -191,12 +187,11 @@ public class PageController {
      *
      * @param model     model
      * @param galleryId 图片编号
-     *
      * @return 模板路径admin/widget/_gallery-detail
      */
     @GetMapping(value = "/gallery")
     public String gallery(Model model, @RequestParam("galleryId") Long galleryId) {
-        final Optional<Gallery> gallery = galleryService.findByGalleryId(galleryId);
+        final Optional<Gallery> gallery = galleryService.fetchById(galleryId);
         model.addAttribute("gallery", gallery.orElse(new Gallery()));
         return "admin/widget/_gallery-detail";
     }
@@ -205,14 +200,13 @@ public class PageController {
      * 删除图库中的图片
      *
      * @param galleryId 图片编号
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/gallery/remove")
     @ResponseBody
     public JsonResult removeGallery(@RequestParam("galleryId") Long galleryId) {
         try {
-            galleryService.remove(galleryId);
+            galleryService.removeById(galleryId);
         } catch (Exception e) {
             log.error("Failed to delete image: {}", e.getMessage());
             return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
@@ -224,12 +218,11 @@ public class PageController {
      * 跳转到新建页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_page_md_editor
      */
     @GetMapping(value = "/new")
     public String newPage(Model model) {
-        final List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
+        final List<String> customTpls = HaloUtils.getCustomTpl(OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("customTpls", customTpls);
         return "admin/admin_page_md_editor";
     }
@@ -246,26 +239,23 @@ public class PageController {
         String msg = localeMessageUtil.getMessage("code.admin.common.save-success");
         try {
             //发表用户
-            final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+            final User user = (User) session.getAttribute(USER_SESSION_KEY);
             post.setUser(user);
             post.setPostType(PostTypeEnum.POST_TYPE_PAGE.getDesc());
             if (null != post.getPostId()) {
-                final Post oldPost = postService.findByPostId(post.getPostId()).get();
+                final Post oldPost = postService.fetchById(post.getPostId()).get();
                 if (null == post.getPostDate()) {
                     post.setPostDate(DateUtil.date());
                 }
                 post.setPostViews(oldPost.getPostViews());
                 msg = localeMessageUtil.getMessage("code.admin.common.update-success");
-            } else {
-                post.setPostDate(DateUtil.date());
             }
-            post.setPostUpdate(DateUtil.date());
             post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
             //当没有选择文章缩略图的时候，自动分配一张内置的缩略图
             if (StrUtil.equals(post.getPostThumbnail(), BlogPropertiesEnum.DEFAULT_THUMBNAIL.getProp())) {
-                post.setPostThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 10) + ".jpg");
+                post.setPostThumbnail(OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()) + "/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
             }
-            postService.save(post);
+            postService.create(post);
             logsService.save(LogsRecord.PUSH_PAGE, post.getPostTitle(), request);
             return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
         } catch (Exception e) {
@@ -279,13 +269,12 @@ public class PageController {
      *
      * @param pageId 页面编号
      * @param model  model
-     *
      * @return admin/admin_page_md_editor
      */
     @GetMapping(value = "/edit")
     public String editPage(@RequestParam("pageId") Long pageId, Model model) {
-        final Optional<Post> post = postService.findByPostId(pageId);
-        final List<String> customTpls = HaloUtils.getCustomTpl(HaloConst.OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
+        final Optional<Post> post = postService.fetchById(pageId);
+        final List<String> customTpls = HaloUtils.getCustomTpl(OPTIONS.get(BlogPropertiesEnum.THEME.getProp()));
         model.addAttribute("post", post.orElse(new Post()));
         model.addAttribute("customTpls", customTpls);
         return "admin/admin_page_md_editor";
@@ -295,7 +284,6 @@ public class PageController {
      * 检查该路径是否已经存在
      *
      * @param postUrl postUrl
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/checkUrl")

@@ -1,7 +1,8 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.dto.HaloConst;
 import lombok.extern.slf4j.Slf4j;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OWO;
 
 /**
  * <pre>
@@ -21,8 +22,8 @@ public class OwoUtil {
      * @return 表情图片地址
      */
     public static String markToImg(String mark) {
-        for (String key : HaloConst.OWO.keySet()) {
-            mark = mark.replace(key, HaloConst.OWO.get(key));
+        for (String key : OWO.keySet()) {
+            mark = mark.replace(key, OWO.get(key));
         }
         return mark;
     }
