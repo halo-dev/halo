@@ -2,10 +2,8 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,13 +49,8 @@ public class ApiTagController {
      * @return JsonResult
      */
     @GetMapping
-    public JsonResult tags() {
-        final List<Tag> tags = tagService.listAll();
-        if (null != tags && tags.size() > 0) {
-            return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), tags);
-        } else {
-            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
-        }
+    public List<Tag> tags() {
+        return tagService.listAll();
     }
 
     /**
@@ -87,7 +80,7 @@ public class ApiTagController {
         final Tag tag = tagService.findByTagUrl(tagUrl);
 
         if (tag == null) {
-            throw new NotFoundException("Tag with url: " + tagUrl + " was not found");
+            throw new NotFoundException("Tag with url: " + tagUrl + " was not found").setErrorData(tagUrl);
         }
 
         return tag;

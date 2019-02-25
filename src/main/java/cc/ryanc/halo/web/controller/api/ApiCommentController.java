@@ -1,6 +1,5 @@
 package cc.ryanc.halo.web.controller.api;
 
-import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
@@ -16,8 +15,9 @@ import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,13 +37,19 @@ import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 @RequestMapping(value = "/api/comments")
 public class ApiCommentController {
 
-    private final Logger log = Logger.getLogger(getClass());
+    /**
+     * Comment format [formatter 1: commentId, formatter 2: commentAuthor, formatter 3: commentContent]
+     */
+    private final static String COMMENT_FORMAT = "<a href='#comment-id-%s'>@%s</a> %s";
 
-    @Autowired
-    private CommentService commentService;
+    private final CommentService commentService;
 
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
+
+    public ApiCommentController(CommentService commentService, PostService postService) {
+        this.commentService = commentService;
+        this.postService = postService;
+    }
 
     /**
      * 新增评论
@@ -51,49 +57,54 @@ public class ApiCommentController {
      * @param comment comment
      * @param postId  postId
      * @param request request
-     *
      * @return JsonResult
      */
-    @PostMapping(value = "/save")
-    @ResponseBody
+    @PostMapping("save")
     public JsonResult save(@Valid Comment comment,
                            @RequestParam(value = "postId") Long postId,
                            HttpServletRequest request) {
-        try {
-            Comment lastComment = null;
-            final Post post = postService.fetchById(postId).orElse(new Post());
-            comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
-            comment.setPost(post);
-            comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
-            comment.setIsAdmin(0);
-            comment.setCommentAuthor(HtmlUtil.escape(comment.getCommentAuthor()));
-            if (StrUtil.isNotBlank(comment.getCommentAuthorEmail())) {
-                comment.setCommentAuthorAvatarMd5(SecureUtil.md5(comment.getCommentAuthorEmail()));
-            }
-            if (comment.getCommentParent() > 0) {
-                lastComment = commentService.fetchById(comment.getCommentParent()).orElse(new Comment());
-                final StrBuilder buildContent = new StrBuilder("<a href='#comment-id-");
-                buildContent.append(lastComment.getCommentId());
-                buildContent.append("'>@");
-                buildContent.append(lastComment.getCommentAuthor());
-                buildContent.append("</a> ");
-                buildContent.append(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
-                comment.setCommentContent(buildContent.toString());
-            } else {
-                //将评论内容的字符专为安全字符
-                comment.setCommentContent(OwoUtil.markToImg(HtmlUtil.escape(comment.getCommentContent()).replace("&lt;br/&gt;", "<br/>")));
-            }
-            if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
-                comment.setCommentAuthorUrl(URLUtil.normalize(comment.getCommentAuthorUrl()));
-            }
-            commentService.create(comment);
-            if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
-                return new JsonResult(HttpStatus.OK.value(), "你的评论已经提交，待博主审核之后可显示。");
-            } else {
-                return new JsonResult(HttpStatus.OK.value(), "你的评论已经提交，刷新后即可显示。");
-            }
-        } catch (Exception e) {
-            throw new BadRequestException("评论失败！", e);
+        comment.setCommentAuthorEmail(HtmlUtil.escape(comment.getCommentAuthorEmail()).toLowerCase());
+        comment.setPost(postService.fetchById(postId).orElse(new Post()));
+        comment.setCommentAuthorIp(ServletUtil.getClientIP(request));
+        comment.setIsAdmin(0);
+        comment.setCommentAuthor(HtmlUtil.escape(comment.getCommentAuthor()));
+
+        if (StrUtil.isNotBlank(comment.getCommentAuthorEmail())) {
+            comment.setCommentAuthorAvatarMd5(SecureUtil.md5(comment.getCommentAuthorEmail()));
         }
+        if (comment.getCommentParent() > 0) {
+            // Get last comment
+            Comment lastComment = commentService.fetchById(comment.getCommentParent()).orElse(new Comment());
+            // Format and set comment content
+            comment.setCommentContent(String.format(COMMENT_FORMAT, lastComment.getCommentId(), lastComment.getCommentAuthor(), convertToSecureString(comment.getCommentContent())));
+        } else {
+            //将评论内容的字符专为安全字符
+            comment.setCommentContent(convertToSecureString(comment.getCommentContent()));
+        }
+        if (StrUtil.isNotEmpty(comment.getCommentAuthorUrl())) {
+            comment.setCommentAuthorUrl(URLUtil.normalize(comment.getCommentAuthorUrl()));
+        }
+
+        // Create the comment
+        commentService.create(comment);
+
+        if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
+            return JsonResult.ok("你的评论已经提交，待博主审核之后可显示。");
+        } else {
+            return JsonResult.ok("你的评论已经提交，刷新后即可显示。");
+        }
+    }
+
+    /**
+     * Converts content to secure content.
+     *
+     * @param originalContent original content must not be null
+     * @return secure content
+     */
+    @NonNull
+    private String convertToSecureString(@NonNull String originalContent) {
+        Assert.hasText(originalContent, "Original content must not be blank");
+
+        return OwoUtil.markToImg(HtmlUtil.escape(originalContent).replace("&lt;br/&gt;", "<br/>"));
     }
 }

@@ -1,6 +1,9 @@
 package cc.ryanc.halo.model.dto;
 
 import lombok.Data;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * <pre>
@@ -24,7 +27,7 @@ public class JsonResult {
     private String msg;
 
     /**
-     * Dev message.(only setting in dev environment)
+     * Development message.(Development environment only)
      */
     private String devMsg;
 
@@ -85,5 +88,28 @@ public class JsonResult {
         this.msg = msg;
         this.devMsg = devMsg;
         this.result = result;
+    }
+
+    /**
+     * Create an ok result with message and data.
+     *
+     * @param data    result data
+     * @param message result message
+     * @return ok result with message and data
+     */
+    @NonNull
+    public static JsonResult ok(@Nullable String message, @Nullable Object data) {
+        return new JsonResult(HttpStatus.OK.value(), message, data);
+    }
+
+    /**
+     * Creates an ok result with message only.
+     *
+     * @param message result message
+     * @return ok result with message only
+     */
+    @NonNull
+    public static JsonResult ok(@Nullable String message) {
+        return ok(message, null);
     }
 }
