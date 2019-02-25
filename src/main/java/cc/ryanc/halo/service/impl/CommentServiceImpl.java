@@ -49,20 +49,6 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     /**
-     * 删除评论
-     *
-     * @param commentId commentId
-     * @return Optional
-     */
-    @Override
-    @CacheEvict(value = {COMMENTS_CACHE_NAME, POSTS_CACHE_NAME}, allEntries = true, beforeInvocation = true)
-    public Optional<Comment> remove(Long commentId) {
-        final Optional<Comment> comment = this.fetchById(commentId);
-        commentRepository.delete(comment.orElse(null));
-        return comment;
-    }
-
-    /**
      * 查询所有的评论，用于后台管理
      *
      * @param pageable pageable

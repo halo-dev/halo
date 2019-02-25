@@ -20,15 +20,6 @@ import java.util.Optional;
 public interface CommentService extends CrudService<Comment, Long> {
 
     /**
-     * 删除评论
-     *
-     * @param commentId commentId
-     * @return Optional
-     */
-    @Deprecated
-    Optional<Comment> remove(Long commentId);
-
-    /**
      * 查询所有的评论，用于后台管理
      *
      * @param status   status
