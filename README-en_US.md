@@ -29,16 +29,6 @@ Fast, concise, and powerful blogging system developed in Java.
 
 ## Quick start
 
-Deploy with shell script：
-
-```bash
-# install Halo
-$ yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
-
-# upgrade Halo
-$ bash halo-cli.sh -u
-```
-
 Deploy with Docker：
 ```bash
 # pull docker images
@@ -66,6 +56,16 @@ $ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
 # run
 $ docker-compose up -d
+```
+
+Deploy with shell script：
+
+```bash
+# install Halo
+$ yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
+
+# upgrade Halo
+$ bash halo-cli.sh -u
 ```
 
 > Tips: If you use Idea, Eclipse and other IDEs to run, you need to install the Lombok plugin, In addition, JDK10 is not supported at the moment, and there are problems with themes scanning and uploading.
