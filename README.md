@@ -29,16 +29,6 @@
 
 ## 快速开始
 
-服务器快速部署：
-
-```bash
-# 安装 Halo
-$ yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
-
-# 更新 Halo
-$ bash halo-cli.sh -u
-```
-
 Docker 部署：
 ```bash
 # 拉取镜像
@@ -66,6 +56,16 @@ $ yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
 
 # 运行
 $ docker-compose up -d
+```
+
+脚本部署（不推荐）：
+
+```bash
+# 安装 Halo
+$ yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
+
+# 更新 Halo
+$ bash halo-cli.sh -u
 ```
 
 > 注意：如使用 Idea，Eclipse 等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题管理和主题上传会有问题。
