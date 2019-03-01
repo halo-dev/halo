@@ -175,11 +175,20 @@ public class AdminController extends BaseController {
         } else {
             //更新失败次数
             final Integer errorCount = userService.updateUserLoginError();
+
+            Integer limitCount = CommonParamsEnum.FIVE.getValue();
+
+            log.error("Login failure count: [{}], but limit count: [{}]", errorCount, limitCount);
+
             //超过五次禁用账户
-            if (errorCount >= CommonParamsEnum.FIVE.getValue()) {
+            if (errorCount >= limitCount) {
+                log.error("Exceeded login limit. You have been locked permanently");
                 userService.updateUserLoginEnable(TrueFalseEnum.FALSE.getDesc());
             }
+
+            // Log login error detail
             logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]", request);
+
             return JsonResult.fail(localeMessageUtil.getMessage("code.admin.login.failed", new Integer[]{5 - errorCount}));
         }
     }
@@ -292,29 +301,37 @@ public class AdminController extends BaseController {
         if (!CollectionUtils.isEmpty(frontMatters)) {
             // Iterate the map and inner list
             frontMatters.forEach((key, elementValue) -> elementValue.forEach(ele -> {
-                if ("title".equals(key)) {
-                    post.setPostTitle(ele);
-                } else if ("date".equals(key)) {
-                    post.setPostDate(DateUtil.parse(ele));
-                } else if ("updated".equals(key)) {
-                    post.setPostUpdate(DateUtil.parse(ele));
-                } else if ("tags".equals(key)) {
-                    Tag tag = Optional.ofNullable(tagService.findTagByTagName(ele)).orElseGet(() -> {
-                        Tag aTag = new Tag();
-                        aTag.setTagName(ele);
-                        aTag.setTagUrl(ele);
-                        return tagService.create(aTag);
-                    });
-                    tags.add(tag);
-                } else if ("categories".equals(key)) {
-                    Category category = Optional.ofNullable(categoryService.findByCateName(ele)).orElseGet(() -> {
-                        Category catg = new Category();
-                        catg.setCateName(ele);
-                        catg.setCateUrl(ele);
-                        catg.setCateDesc(ele);
-                        return categoryService.create(catg);
-                    });
-                    categories.add(category);
+                switch (key) {
+                    case "title":
+                        post.setPostTitle(ele);
+                        break;
+                    case "date":
+                        post.setPostDate(DateUtil.parse(ele));
+                        break;
+                    case "updated":
+                        post.setPostUpdate(DateUtil.parse(ele));
+                        break;
+                    case "tags":
+                        Tag tag = Optional.ofNullable(tagService.findTagByTagName(ele)).orElseGet(() -> {
+                            Tag aTag = new Tag();
+                            aTag.setTagName(ele);
+                            aTag.setTagUrl(ele);
+                            return tagService.create(aTag);
+                        });
+                        tags.add(tag);
+                        break;
+                    case "categories":
+                        Category category = Optional.ofNullable(categoryService.findByCateName(ele)).orElseGet(() -> {
+                            Category catg = new Category();
+                            catg.setCateName(ele);
+                            catg.setCateUrl(ele);
+                            catg.setCateDesc(ele);
+                            return categoryService.create(catg);
+                        });
+                        categories.add(category);
+                        break;
+                    default:
+                        break;
                 }
             }));
         }
@@ -322,7 +339,6 @@ public class AdminController extends BaseController {
         if (StrUtil.isBlank(post.getPostTitle())) {
             post.setPostTitle(file.getOriginalFilename());
         }
-
 
         post.setPostContentMd(markdown);
         post.setPostContent(content);
@@ -332,6 +348,9 @@ public class AdminController extends BaseController {
         post.setTags(tags);
         post.setCategories(categories);
         post.setPostUrl(StrUtil.removeSuffix(file.getOriginalFilename(), ".md"));
+
+        log.debug("Post you imported just now: [{}]", post);
+
         postService.create(post);
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
     }

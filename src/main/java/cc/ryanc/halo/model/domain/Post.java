@@ -3,8 +3,8 @@ package cc.ryanc.halo.model.domain;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.undertow.util.DateUtils;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,6 +24,7 @@ import java.util.List;
  * @date : 2017/11/14
  */
 @Data
+@ToString
 @Entity
 @Table(name = "halo_post")
 @EntityListeners(AuditingEntityListener.class)
@@ -161,8 +162,13 @@ public class Post implements Serializable {
     @PrePersist
     public void prePersist() {
         DateTime now = DateUtil.date();
-        postDate = now;
-        postUpdate = now;
+        if (postDate == null) {
+            postDate = now;
+        }
+
+        if (postUpdate == null) {
+            postUpdate = now;
+        }
         postId = null;
     }
 
