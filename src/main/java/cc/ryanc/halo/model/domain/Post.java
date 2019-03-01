@@ -1,6 +1,9 @@
 package cc.ryanc.halo.model.domain;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.undertow.util.DateUtils;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -153,5 +156,18 @@ public class Post implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date getPostUpdate() {
         return postUpdate;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        DateTime now = DateUtil.date();
+        postDate = now;
+        postUpdate = now;
+        postId = null;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        postUpdate = DateUtil.date();
     }
 }
