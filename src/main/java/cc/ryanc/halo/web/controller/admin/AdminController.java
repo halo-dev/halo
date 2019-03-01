@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
+import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
@@ -12,11 +13,10 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HtmlUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +24,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,10 +44,11 @@ import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
  * @author : RYAN0UP
  * @date : 2017/12/5
  */
-@Slf4j
 @Controller
 @RequestMapping(value = "/admin")
 public class AdminController extends BaseController {
+
+    private final Logger log = Logger.getLogger(getClass());
 
     @Autowired
     private PostService postService;
@@ -79,7 +81,6 @@ public class AdminController extends BaseController {
      * 请求后台页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
@@ -119,17 +120,13 @@ public class AdminController extends BaseController {
      * 处理跳转到登录页的请求
      *
      * @param session session
-     *
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
     public String login(HttpSession session) {
         final User user = (User) session.getAttribute(USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
-        if (null != user) {
-            return "redirect:/admin";
-        }
-        return "admin/admin_login";
+        return user != null ? "redirect:/admin" : "admin/admin_login";
     }
 
     /**
@@ -138,7 +135,6 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
-     *
      * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
@@ -148,6 +144,7 @@ public class AdminController extends BaseController {
                                HttpSession session) {
         //已注册账号，单用户，只有一个
         final User aUser = userService.findUser();
+
         //首先判断是否已经被禁用已经是否已经过了10分钟
         Date loginLast = DateUtil.date();
         if (null != aUser.getLoginLast()) {
@@ -155,24 +152,26 @@ public class AdminController extends BaseController {
         }
         final Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
         if (StrUtil.equals(aUser.getLoginEnable(), TrueFalseEnum.FALSE.getDesc()) && (between < CommonParamsEnum.TEN.getValue())) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.disabled"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.login.disabled"));
         }
+
         //验证用户名和密码
-        User user = null;
+        User user;
         if (Validator.isEmail(loginName)) {
             user = userService.userLoginByEmail(loginName, SecureUtil.md5(loginPwd));
         } else {
             user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd));
         }
         userService.updateUserLoginLast(DateUtil.date());
+
         //判断User对象是否相等
-        if (ObjectUtil.equal(aUser, user)) {
+        if (Objects.equals(aUser, user)) {
             session.setAttribute(USER_SESSION_KEY, aUser);
             //重置用户的登录状态为正常
             userService.updateUserNormal();
             logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, request);
             log.info("User {} login succeeded.", aUser.getUserDisplayName());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
+            return JsonResult.success(localeMessageUtil.getMessage("code.admin.login.success"));
         } else {
             //更新失败次数
             final Integer errorCount = userService.updateUserLoginError();
@@ -181,8 +180,7 @@ public class AdminController extends BaseController {
                 userService.updateUserLoginEnable(TrueFalseEnum.FALSE.getDesc());
             }
             logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]", request);
-            final Object[] args = {(5 - errorCount)};
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.failed", args));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.login.failed", new Integer[]{5 - errorCount}));
         }
     }
 
@@ -190,7 +188,6 @@ public class AdminController extends BaseController {
      * 退出登录 销毁session
      *
      * @param session session
-     *
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
@@ -206,7 +203,6 @@ public class AdminController extends BaseController {
      * 查看所有日志
      *
      * @param model model model
-     *
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
@@ -226,7 +222,7 @@ public class AdminController extends BaseController {
         try {
             logsService.removeAll();
         } catch (Exception e) {
-            log.error("Clear log failed:{}" + e.getMessage());
+            log.error("Clear log failed", e);
         }
         return "redirect:/admin";
     }
@@ -249,8 +245,8 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/getToken")
     @ResponseBody
     public JsonResult getToken() {
-        final String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), HttpStatus.OK.getReasonPhrase(), SecureUtil.md5(token));
+        final String token = String.valueOf(System.currentTimeMillis() + RandomUtil.randomInt(Integer.MAX_VALUE));
+        return JsonResult.success(HttpStatus.OK.getReasonPhrase(), SecureUtil.md5(token));
     }
 
     /**
@@ -278,7 +274,6 @@ public class AdminController extends BaseController {
      *
      * @param file    file
      * @param request request
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/tools/markdownImport")
@@ -291,48 +286,44 @@ public class AdminController extends BaseController {
         final String content = MarkdownUtils.renderMarkdown(markdown);
         final Map<String, List<String>> frontMatters = MarkdownUtils.getFrontMatter(markdown);
         final Post post = new Post();
-        List<String> elementValue = null;
-        final List<Tag> tags = new ArrayList<>();
-        final List<Category> categories = new ArrayList<>();
-        Tag tag = null;
-        Category category = null;
-        if (frontMatters.size() > 0) {
-            for (String key : frontMatters.keySet()) {
-                elementValue = frontMatters.get(key);
-                for (String ele : elementValue) {
-                    if ("title".equals(key)) {
-                        post.setPostTitle(ele);
-                    } else if ("date".equals(key)) {
-                        post.setPostDate(DateUtil.parse(ele));
-                    } else if ("updated".equals(key)) {
-                        post.setPostUpdate(DateUtil.parse(ele));
-                    } else if ("tags".equals(key)) {
-                        tag = tagService.findTagByTagName(ele);
-                        if (null == tag) {
-                            tag = new Tag();
-                            tag.setTagName(ele);
-                            tag.setTagUrl(ele);
-                            tag = tagService.create(tag);
-                        }
-                        tags.add(tag);
-                    } else if ("categories".equals(key)) {
-                        category = categoryService.findByCateName(ele);
-                        if (null == category) {
-                            category = new Category();
-                            category.setCateName(ele);
-                            category.setCateUrl(ele);
-                            category.setCateDesc(ele);
-                            category = categoryService.create(category);
-                        }
-                        categories.add(category);
-                    }
+        final List<Tag> tags = new LinkedList<>();
+        final List<Category> categories = new LinkedList<>();
+
+        if (!CollectionUtils.isEmpty(frontMatters)) {
+            // Iterate the map and inner list
+            frontMatters.forEach((key, elementValue) -> elementValue.forEach(ele -> {
+                if ("title".equals(key)) {
+                    post.setPostTitle(ele);
+                } else if ("date".equals(key)) {
+                    post.setPostDate(DateUtil.parse(ele));
+                } else if ("updated".equals(key)) {
+                    post.setPostUpdate(DateUtil.parse(ele));
+                } else if ("tags".equals(key)) {
+                    Tag tag = Optional.ofNullable(tagService.findTagByTagName(ele)).orElseGet(() -> {
+                        Tag aTag = new Tag();
+                        aTag.setTagName(ele);
+                        aTag.setTagUrl(ele);
+                        return tagService.create(aTag);
+                    });
+                    tags.add(tag);
+                } else if ("categories".equals(key)) {
+                    Category category = Optional.ofNullable(categoryService.findByCateName(ele)).orElseGet(() -> {
+                        Category catg = new Category();
+                        catg.setCateName(ele);
+                        catg.setCateUrl(ele);
+                        catg.setCateDesc(ele);
+                        return categoryService.create(catg);
+                    });
+                    categories.add(category);
                 }
-            }
-        } else {
-            post.setPostDate(new Date());
-            post.setPostUpdate(new Date());
+            }));
+        }
+
+        if (StrUtil.isBlank(post.getPostTitle())) {
             post.setPostTitle(file.getOriginalFilename());
         }
+
+
         post.setPostContentMd(markdown);
         post.setPostContent(content);
         post.setPostType(PostTypeEnum.POST_TYPE_POST.getDesc());
@@ -341,12 +332,6 @@ public class AdminController extends BaseController {
         post.setTags(tags);
         post.setCategories(categories);
         post.setPostUrl(StrUtil.removeSuffix(file.getOriginalFilename(), ".md"));
-        if (null == post.getPostDate()) {
-            post.setPostDate(new Date());
-        }
-        if (null == post.getPostUpdate()) {
-            post.setPostUpdate(new Date());
-        }
         postService.create(post);
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
     }

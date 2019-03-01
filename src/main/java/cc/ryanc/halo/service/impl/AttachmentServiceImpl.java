@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.model.dto.QiNiuPutSet;
 import cc.ryanc.halo.model.enums.AttachLocationEnum;
@@ -31,6 +32,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -53,6 +55,8 @@ import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
  */
 @Service
 public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long> implements AttachmentService {
+
+    private final Logger log = Logger.getLogger(getClass());
 
     private static final String ATTACHMENTS_CACHE_NAME = "attachments";
 
@@ -160,6 +164,9 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
      */
     @Override
     public Map<String, String> attachUpload(MultipartFile file, HttpServletRequest request) {
+        Assert.notNull(file, "MultipartFile must not be null");
+        Assert.notNull(request, "Http servlet request must not be null");
+
         final Map<String, String> resultMap = new HashMap<>(6);
         final String dateString = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
         try {
@@ -277,17 +284,11 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
                 putSet = new Gson().fromJson(response.bodyString(), QiNiuPutSet.class);
             } catch (QiniuException e) {
                 final Response r = e.response;
-                System.err.println(r.toString());
-                try {
-                    System.err.println(r.bodyString());
-                } catch (QiniuException ex2) {
-                    //ignore
-                }
-            } catch (JsonSyntaxException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Qiniu error response: [{}]", r);
+            } catch (JsonSyntaxException | IOException e) {
+                log.error("Failed to attach QiNiu resource", e);
             }
+
             final String filePath = domain.trim() + "/" + key;
             resultMap.put("fileName", file.getOriginalFilename());
             resultMap.put("filePath", filePath.trim());
@@ -297,7 +298,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
             resultMap.put("wh", putSet.getW() + "x" + putSet.getH());
             resultMap.put("location", AttachLocationEnum.QINIU.getDesc());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Failed to generate md5 check sum", e);
         }
         return resultMap;
     }
@@ -347,7 +348,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
             resultMap.put("location", AttachLocationEnum.UPYUN.getDesc());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to attach UpYun resource", e);
         }
         return resultMap;
     }
@@ -400,10 +401,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
         upYun.setApiDomain(UpYun.ED_AUTO);
         try {
             flag = upYun.deleteFile(ossSrc + fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UpException e) {
-            e.printStackTrace();
+        } catch (IOException | UpException e) {
+            log.error("Failed to delete UpYun attachment", e);
         }
         return flag;
     }

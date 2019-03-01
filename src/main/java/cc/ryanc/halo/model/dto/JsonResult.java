@@ -1,9 +1,11 @@
 package cc.ryanc.halo.model.dto;
 
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 /**
  * <pre>
@@ -111,5 +113,57 @@ public class JsonResult {
     @NonNull
     public static JsonResult ok(@Nullable String message) {
         return ok(message, null);
+    }
+
+    /**
+     * Creates an fail result with message only.
+     *
+     * @param message message of result must not be blank
+     * @return fail result with message only
+     */
+    public static JsonResult fail(@NonNull String message) {
+        Assert.hasText(message, "Message of result must not be blank");
+
+        return new JsonResult(ResultCodeEnum.FAIL.getCode(), message);
+    }
+
+    /**
+     * Creates an fail result.
+     *
+     * @param message message of result must not be blank
+     * @return fail result
+     */
+    public static JsonResult fail(@NonNull String message, @NonNull Object data) {
+        Assert.notNull(data, "Data of result must not be null");
+
+        JsonResult failResult = fail(message);
+        failResult.setResult(data);
+        return failResult;
+    }
+
+    /**
+     * Creates an success result with message only.
+     *
+     * @param message message of result must not be blank
+     * @return success result with message only
+     */
+    public static JsonResult success(@NonNull String message) {
+        Assert.hasText(message, "Message of result must not be blank");
+
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), message);
+    }
+
+    /**
+     * Creates an success result.
+     *
+     * @param message message of result must not be blank
+     * @return success result
+     */
+    public static JsonResult success(@NonNull String message, @NonNull Object data) {
+        Assert.notNull(data, "Data of result must not be null");
+
+        JsonResult successResult = success(message);
+        successResult.setResult(data);
+        return successResult;
     }
 }
