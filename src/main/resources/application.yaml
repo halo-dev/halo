@@ -38,7 +38,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
-    open-in-view: false
   freemarker:
     allow-request-override: false
     cache: false
