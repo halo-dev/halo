@@ -104,7 +104,7 @@ public class AttachmentController {
      * @param request request
      * @return Map
      */
-    @PostMapping(value = "/upload", produces = {"application/json;charset=UTF-8"})
+    @PostMapping("/upload")
     @ResponseBody
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
@@ -206,14 +206,14 @@ public class AttachmentController {
             }
             if (flag) {
                 attachmentService.removeById(attachId);
-                log.info("Delete file {} successfully!", attachName);
+                log.info("Deleted attachment [{}] successfully", attachName);
                 logsService.save(LogsRecord.REMOVE_FILE, attachName, request);
             } else {
-                log.error("Deleting attachment {} failed!", attachName);
+                log.error("Failed to delete attachment: [{}]", attachName);
                 return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.delete-failed"));
             }
         } catch (Exception e) {
-            log.error("Deleting attachment " + attachName + " failed.", e);
+            log.error("Failed to deleted " + attachName, e);
 
             return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
