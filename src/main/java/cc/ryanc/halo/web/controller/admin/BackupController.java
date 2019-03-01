@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class BackupController {
      */
     @GetMapping
     public String backup(@RequestParam(value = "type", defaultValue = "resources") String type, Model model) {
-        List<BackupDto> backups = null;
+        List<BackupDto> backups;
         if (StrUtil.equals(type, BackupTypeEnum.RESOURCES.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.RESOURCES.getDesc());
         } else if (StrUtil.equals(type, BackupTypeEnum.DATABASES.getDesc())) {
@@ -74,7 +74,7 @@ public class BackupController {
         } else if (StrUtil.equals(type, BackupTypeEnum.POSTS.getDesc())) {
             backups = HaloUtils.getBackUps(BackupTypeEnum.POSTS.getDesc());
         } else {
-            backups = new ArrayList<>();
+            backups = Collections.emptyList();
         }
         model.addAttribute("backups", backups);
         model.addAttribute("type", type);
@@ -92,13 +92,17 @@ public class BackupController {
     public JsonResult doBackup(@RequestParam("type") String type) {
         if (StrUtil.equals(BackupTypeEnum.RESOURCES.getDesc(), type)) {
             return this.backupResources();
-        } else if (StrUtil.equals(BackupTypeEnum.DATABASES.getDesc(), type)) {
-            return this.backupDatabase();
-        } else if (StrUtil.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
-            return this.backupPosts();
-        } else {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
+
+        if (StrUtil.equals(BackupTypeEnum.DATABASES.getDesc(), type)) {
+            return this.backupDatabase();
+        }
+
+        if (StrUtil.equals(BackupTypeEnum.POSTS.getDesc(), type)) {
+            return this.backupPosts();
+        }
+
+        return JsonResult.fail(localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
     }
 
     /**
@@ -116,10 +120,10 @@ public class BackupController {
             //压缩文件
             ZipUtil.zip(srcPath + "halo.mv.db", System.getProperties().getProperty("user.home") + "/halo/backup/databases/" + distName + ".zip");
             log.info("Current time: {}, database backup was performed.", DateUtil.now());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
+            return JsonResult.success(localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
-            log.error("Backup database failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
+            log.error("Failed to backup database", e);
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
 
@@ -139,10 +143,10 @@ public class BackupController {
             //执行打包
             ZipUtil.zip(srcPath, System.getProperties().getProperty("user.home") + "/halo/backup/resources/" + distName + ".zip");
             log.info("Current time: {}, the resource file backup was performed.", DateUtil.now());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
+            return JsonResult.success(localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
-            log.error("Backup resource file failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
+            log.error("Failed to backup resource file", e);
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
 
@@ -194,10 +198,10 @@ public class BackupController {
             ZipUtil.zip(srcPath.toString(), srcPath.toString() + ".zip");
             FileUtil.del(srcPath.toString());
             log.info("Current time: {}, performed an article backup.", DateUtil.now());
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-success"));
+            return JsonResult.success(localeMessageUtil.getMessage("code.admin.backup.backup-success"));
         } catch (Exception e) {
-            log.error("Backup article failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
+            log.error("Failed to backup article", e);
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.backup.backup-failed"));
         }
     }
 
@@ -215,9 +219,12 @@ public class BackupController {
         final String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         try {
             FileUtil.del(srcPath);
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
+
+            return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.delete-success"));
         } catch (Exception e) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
+            log.error("Failed to delete backup file: " + fileName + ", type: " + type, e);
+
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
     }
 
@@ -236,13 +243,14 @@ public class BackupController {
         final String srcPath = System.getProperties().getProperty("user.home") + "/halo/backup/" + type + "/" + fileName;
         final User user = (User) session.getAttribute(USER_SESSION_KEY);
         if (null == user.getUserEmail() || StrUtil.isEmpty(user.getUserEmail())) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.backup.no-email"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.backup.no-email"));
         }
         if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp()), TrueFalseEnum.FALSE.getDesc())) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.no-post"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.no-post"));
         }
         new EmailToAdmin(srcPath, user).start();
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.backup.email-success"));
+
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.backup.email-success"));
     }
 
     /**
@@ -267,7 +275,7 @@ public class BackupController {
                 content.put("size", HaloUtils.parseSize(file.length()));
                 mailService.sendAttachMail(user.getUserEmail(), localeMessageUtil.getMessage("code.admin.backup.have-new-backup"), content, "common/mail_template/mail_attach.ftl", srcPath);
             } catch (Exception e) {
-                log.error("Mail server not configured: {}", e.getMessage());
+                log.error("Mail server was not configured", e);
             }
         }
     }
