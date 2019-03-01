@@ -43,9 +43,9 @@ public class MarkdownUtils {
     /**
      * 渲染 Markdown
      *
-     * @see https://github.com/otale/tale/blob/master/src/main/java/com/tale/utils/TaleUtils.java
      * @param content content
      * @return String
+     * @see <a href="https://github.com/otale/tale/blob/master/src/main/java/com/tale/utils/TaleUtils.java">TaleUtils.java</a>
      */
     public static String renderMarkdown(String content) {
         final Node document = PARSER.parse(content);
