@@ -82,6 +82,7 @@ public class AttachmentController {
         if (StrUtil.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
             return "admin/widget/_attachment-select-post";
         }
+
         return "admin/widget/_attachment-select";
     }
 
@@ -107,7 +108,7 @@ public class AttachmentController {
     @ResponseBody
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
-        final Map<String, Object> result = new HashMap<>(3);
+        final Map<String, Object> result = new HashMap<>(4);
         if (!file.isEmpty()) {
             try {
                 final Map<String, String> resultMap = attachmentService.upload(file, request);
@@ -135,12 +136,16 @@ public class AttachmentController {
                 result.put("filename", resultMap.get("filePath"));
                 logsService.save(LogsRecord.UPLOAD_FILE, resultMap.get("fileName"), request);
             } catch (Exception e) {
-                log.error("Upload file failed:{}", e.getMessage());
+                log.error("Upload file failed", e);
                 result.put("success", ResultCodeEnum.FAIL.getCode());
                 result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
             }
         } else {
-            log.error("File cannot be empty!");
+            log.error("File cannot be empty! File name: [{}]", file.getOriginalFilename());
+
+            // Return error message
+            result.put("success", ResultCodeEnum.FAIL.getCode());
+            result.put("message", "File cannot be empty");
         }
         return result;
     }
@@ -205,13 +210,14 @@ public class AttachmentController {
                 logsService.save(LogsRecord.REMOVE_FILE, attachName, request);
             } else {
                 log.error("Deleting attachment {} failed!", attachName);
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
+                return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.delete-failed"));
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("Deleting attachment {} failed: {}", attachName, e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
+            log.error("Deleting attachment " + attachName + " failed.", e);
+
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
+
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.delete-success"));
     }
 }
