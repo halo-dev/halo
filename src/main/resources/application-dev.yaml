@@ -31,13 +31,13 @@ spring:
   h2:
     console:
       settings:
-        web-allow-others: false
+        web-allow-others: true
       path: /h2-console
-      enabled: false
+      enabled: true
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
   freemarker:
     allow-request-override: false
     cache: false
@@ -60,5 +60,6 @@ spring:
     basename: i18n/messages
 logging:
   level:
-    cc.ryanc.halo: INFO
+    cc.ryanc.halo: DEBUG
+    org.hibernate: ERROR
   file: ./logs/log.log
