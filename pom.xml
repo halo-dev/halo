@@ -147,11 +147,6 @@
 			<artifactId>hutool-extra</artifactId>
 			<version>${hutool.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>cn.hutool</groupId>
-			<artifactId>hutool-cron</artifactId>
-			<version>${hutool.version}</version>
-		</dependency>
 
         <!-- 又拍云SDK -->
 		<dependency>

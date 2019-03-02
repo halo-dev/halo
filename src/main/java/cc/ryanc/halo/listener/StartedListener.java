@@ -6,7 +6,6 @@ import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.cron.CronUtil;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,15 +47,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         this.loadOptions();
         this.loadThemes();
         this.loadOwo();
-        //启动定时任务
-//        CronUtil.start();
-//        log.info("The scheduled task starts successfully!");
-    }
-
-    @PreDestroy
-    public void onDestroy() {
-        log.info("Destroyed the cron scheduler");
-        CronUtil.stop();
     }
 
     /**
