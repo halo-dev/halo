@@ -2,6 +2,7 @@ package cc.ryanc.halo.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -18,6 +19,7 @@ import java.util.List;
  * @date : 2018/1/12
  */
 @Data
+@ToString
 @Entity
 @Table(name = "halo_tag")
 public class Tag implements Serializable {

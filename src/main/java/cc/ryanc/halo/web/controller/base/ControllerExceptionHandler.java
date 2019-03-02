@@ -53,7 +53,7 @@ public class ControllerExceptionHandler {
     public JsonResult handleConstraintViolationException(ConstraintViolationException e) {
         JsonResult jsonResult = handleBaseException(e);
         jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
-        jsonResult.setMsg("Filed validation error");
+        jsonResult.setMsg("Field validation error");
         jsonResult.setResult(e.getConstraintViolations());
         return jsonResult;
     }
@@ -63,7 +63,7 @@ public class ControllerExceptionHandler {
     public JsonResult handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         JsonResult jsonResult = handleBaseException(e);
         jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
-        jsonResult.setMsg("Filed validation error");
+        jsonResult.setMsg("Field validation error");
         Map<String, String> errMap = ValidationUtils.mapWithFieldError(e.getBindingResult().getFieldErrors());
         jsonResult.setResult(errMap);
         return jsonResult;
