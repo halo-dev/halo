@@ -113,7 +113,6 @@ public class Post implements Serializable {
     /**
      * 发表日期
      */
-    @CreatedDate
     private Date postDate;
 
     /**
@@ -170,10 +169,5 @@ public class Post implements Serializable {
             postUpdate = now;
         }
         postId = null;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        postUpdate = DateUtil.date();
     }
 }
