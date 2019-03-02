@@ -95,26 +95,6 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                 .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/backup/");
     }
 
-//    /**
-//     * 跨域
-//     *
-//     * @param registry registry
-//     */
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/api/**")
-//                .allowedHeaders("*")
-//                .allowedOrigins("*")
-//                .allowedMethods("GET", "POST")
-//                .exposedHeaders("access-control-allow-headers",
-//                        "access-control-allow-methods",
-//                        "access-control-allow-origin",
-//                        "access-control-max-age",
-//                        "X-Frame-Options",
-//                        "token")
-//                .allowCredentials(false).maxAge(3600);
-//    }
-
     /**
      * Creates a CorsFilter.
      *
