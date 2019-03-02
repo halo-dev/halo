@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.front;
 
+import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
@@ -34,10 +35,11 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @author : RYAN0UP
  * @date : 2019/1/11
  */
-@Slf4j
 @Controller
 @RequestMapping(value = "/search")
 public class FrontSearchController extends BaseController {
+
+    private final Logger log = Logger.getLogger(getClass());
 
     @Autowired
     private PostService postService;

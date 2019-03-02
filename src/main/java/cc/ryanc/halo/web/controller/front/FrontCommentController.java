@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.front;
 
+import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.JsonResult;
@@ -43,9 +44,10 @@ import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
  * @author : RYAN0UP
  * @date : 2018/4/26
  */
-@Slf4j
 @Controller
 public class FrontCommentController {
+
+    private final Logger log = Logger.getLogger(getClass());
 
     @Autowired
     private CommentService commentService;
