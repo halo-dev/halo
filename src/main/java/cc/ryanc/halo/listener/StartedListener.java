@@ -14,6 +14,7 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,12 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         //启动定时任务
         CronUtil.start();
         log.info("The scheduled task starts successfully!");
+    }
+
+    @PreDestroy
+    public void onDestroy() {
+        log.info("Destroyed the cron scheduler");
+        CronUtil.stop();
     }
 
     /**

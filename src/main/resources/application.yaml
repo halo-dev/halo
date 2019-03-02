@@ -10,6 +10,8 @@ server:
     session:
       timeout: 86400s
 spring:
+  devtools:
+    add-properties: false
   output:
     ansi:
       enabled: always
