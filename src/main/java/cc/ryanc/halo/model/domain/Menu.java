@@ -1,6 +1,7 @@
 package cc.ryanc.halo.model.domain;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +20,7 @@ import java.io.Serializable;
  * @date : 2018/1/24
  */
 @Data
+@ToString
 @Entity
 @Table(name = "halo_menu")
 public class Menu implements Serializable {

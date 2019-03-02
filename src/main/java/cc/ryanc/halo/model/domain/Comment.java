@@ -3,6 +3,7 @@ package cc.ryanc.halo.model.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -22,6 +23,7 @@ import java.util.List;
  * @date : 2018/1/22
  */
 @Data
+@ToString
 @Entity
 @Table(name = "halo_comment")
 @EntityListeners(AuditingEntityListener.class)

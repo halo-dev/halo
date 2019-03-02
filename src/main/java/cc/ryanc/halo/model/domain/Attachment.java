@@ -1,6 +1,7 @@
 package cc.ryanc.halo.model.domain;
 
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -17,6 +18,7 @@ import java.util.Date;
  * @date : 2018/1/10
  */
 @Data
+@ToString
 @Entity
 @Table(name = "halo_attachment")
 @EntityListeners(AuditingEntityListener.class)
