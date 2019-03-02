@@ -50,8 +50,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         this.loadThemes();
         this.loadOwo();
         //启动定时任务
-        CronUtil.start();
-        log.info("The scheduled task starts successfully!");
+//        CronUtil.start();
+//        log.info("The scheduled task starts successfully!");
     }
 
     @PreDestroy

@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * <pre>
@@ -21,6 +22,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableCaching
 @EnableJpaAuditing
+@EnableScheduling
 @EnableJpaRepositories(basePackages = "cc.ryanc.halo.repository", repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {
     public static void main(String[] args) {
