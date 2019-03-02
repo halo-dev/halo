@@ -38,7 +38,6 @@
                 </div>
 </#compress>
                 <div class="box box-primary">
-                    <!-- Editor.md编辑器 -->
                     <div class="box-body pad">
                         <div id="markdown-editor">
                             <textarea id="editorarea" style="display:none;"></textarea>
