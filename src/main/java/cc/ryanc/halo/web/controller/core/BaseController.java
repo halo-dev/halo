@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.core;
 
+import cc.ryanc.halo.logging.Logger;
 import cn.hutool.core.text.StrBuilder;
 
 /**
@@ -11,6 +12,8 @@ import cn.hutool.core.text.StrBuilder;
  * @date : 2017/12/15
  */
 public abstract class BaseController {
+
+    protected Logger log = Logger.getLogger(getClass());
 
     /**
      * 定义默认主题

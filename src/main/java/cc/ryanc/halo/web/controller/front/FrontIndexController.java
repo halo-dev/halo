@@ -30,7 +30,6 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @author : RYAN0UP
  * @date : 2018/4/26
  */
-@Slf4j
 @Controller
 @RequestMapping(value = {"/", "index"})
 public class FrontIndexController extends BaseController {
@@ -47,7 +46,7 @@ public class FrontIndexController extends BaseController {
      */
     @GetMapping
     public String index(Model model) {
-        return this.index(model, 1, Sort.by(DESC, "postDate"));
+        return this.index(model, 1, Sort.by(DESC, "priority").and(Sort.by(DESC, "postDate")));
     }
 
     /**
@@ -60,7 +59,12 @@ public class FrontIndexController extends BaseController {
     @GetMapping(value = "page/{page}")
     public String index(Model model,
                         @PathVariable(value = "page") Integer page,
-                        @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
+                        @SortDefault.SortDefaults({
+                                @SortDefault(sort = "priority", direction = DESC),
+                                @SortDefault(sort = "postDate", direction = DESC)
+                        }) Sort sort) {
+        log.debug("Requested index page, sort info: [{}]", sort);
+
         //默认显示10条
         int size = 10;
         if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
