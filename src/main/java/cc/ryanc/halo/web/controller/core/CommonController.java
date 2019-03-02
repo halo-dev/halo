@@ -40,6 +40,7 @@ public class CommonController implements ErrorController {
         Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
 
         if (throwable != null && StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
+            log.error("Captured an exception", throwable);
             // TODO May cause unreasoned problem
             // if Ftl was not found then redirect to /404
             return "redirect:/404";

@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -148,6 +148,12 @@ public class Post implements Serializable {
      */
     private String customTpl;
 
+    /**
+     * Post priority (default is 0)
+     */
+    @ColumnDefault("0")
+    private Integer priority;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date getPostDate() {
         return postDate;
@@ -161,6 +167,7 @@ public class Post implements Serializable {
     @PrePersist
     public void prePersist() {
         DateTime now = DateUtil.date();
+
         if (postDate == null) {
             postDate = now;
         }
@@ -168,6 +175,11 @@ public class Post implements Serializable {
         if (postUpdate == null) {
             postUpdate = now;
         }
+
+        if (priority == null) {
+            priority = 0;
+        }
+
         postId = null;
     }
 }

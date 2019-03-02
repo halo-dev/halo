@@ -62,5 +62,4 @@ logging:
   level:
     cc.ryanc.halo: DEBUG
     org.hibernate: ERROR
-    web: DEBUG
   file: ./logs/log.log
