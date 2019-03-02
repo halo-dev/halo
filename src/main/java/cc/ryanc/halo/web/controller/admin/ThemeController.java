@@ -48,8 +48,6 @@ import static cc.ryanc.halo.model.dto.HaloConst.THEMES;
 @RequestMapping(value = "/admin/themes")
 public class ThemeController extends BaseController {
 
-    private static final String NOT_FOUND_GIT = "-bash: git: command not found";
-
     @Autowired
     private OptionsService optionsService;
 
@@ -121,7 +119,7 @@ public class ThemeController extends BaseController {
             if (!file.isEmpty()) {
                 //获取项目根路径
                 final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-                final File themePath = new File(basePath.getAbsolutePath(), new StringBuffer("templates/themes/").append(file.getOriginalFilename()).toString());
+                final File themePath = new File(basePath.getAbsolutePath(), new StrBuilder("templates/themes/").append(file.getOriginalFilename()).toString());
                 file.transferTo(themePath);
                 log.info("Upload topic success, path is " + themePath.getAbsolutePath());
                 logsService.save(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), request);
@@ -187,10 +185,7 @@ public class ThemeController extends BaseController {
         try {
             final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             final File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
-            final String cmdResult = RuntimeUtil.execForStr("git clone " + remoteAddr + " " + themePath.getAbsolutePath() + "/" + themeName);
-            if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
-            }
+            RuntimeUtil.execForStr("git clone " + remoteAddr + " " + themePath.getAbsolutePath() + "/" + themeName);
             THEMES.clear();
             THEMES = HaloUtils.getThemes();
         } catch (FileNotFoundException e) {
@@ -212,10 +207,7 @@ public class ThemeController extends BaseController {
         try {
             final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
             final File themePath = new File(basePath.getAbsolutePath(), "templates/themes");
-            final String cmdResult = RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName + " && git pull");
-            if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
-            }
+            RuntimeUtil.execForStr("cd " + themePath.getAbsolutePath() + "/" + themeName,"git pull");
             THEMES.clear();
             THEMES = HaloUtils.getThemes();
         } catch (Exception e) {
