@@ -154,11 +154,11 @@ public class PostController extends BaseController {
             }
             postService.create(post);
             logsService.save(LogsRecord.PUSH_POST, post.getPostTitle(), request);
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
+            return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
             log.error("Save article failed: {}", e.getMessage());
             e.printStackTrace();
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
 
@@ -193,9 +193,9 @@ public class PostController extends BaseController {
         }
         post = postService.create(post);
         if (null != post) {
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
+            return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.update-success"));
         } else {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.update-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.update-failed"));
         }
     }
 
@@ -269,9 +269,9 @@ public class PostController extends BaseController {
         } catch (Exception e) {
             log.error("Update summary failed: {}", e.getMessage());
             e.printStackTrace();
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.update-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.update-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.update-success"));
     }
 
     /**
@@ -286,7 +286,7 @@ public class PostController extends BaseController {
         postUrl = urlFilter(postUrl);
         final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_POST.getDesc());
         if (null != post) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
     }
@@ -301,7 +301,7 @@ public class PostController extends BaseController {
     @ResponseBody
     public JsonResult pushAllToBaidu(@RequestParam("baiduToken") String baiduToken) {
         if (StrUtil.isBlank(baiduToken)) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.no-baidu-token"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.post.no-baidu-token"));
         }
         final String blogUrl = OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
         final List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
@@ -314,9 +314,9 @@ public class PostController extends BaseController {
         }
         final String result = HaloUtils.baiduPost(blogUrl, baiduToken, urls.toString());
         if (StrUtil.isEmpty(result)) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.post.push-to-baidu-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.post.push-to-baidu-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.post.push-to-baidu-success"));
     }
 
     @InitBinder

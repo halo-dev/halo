@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Menu;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.MenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +50,14 @@ public class MenuController {
     public JsonResult saveMenu(@Valid Menu menu, BindingResult result) {
         if (result.hasErrors()) {
             for (ObjectError error : result.getAllErrors()) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+                return JsonResult.fail(error.getDefaultMessage());
             }
         }
         menu = menuService.create(menu);
         if (null != menu) {
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "菜单保存成功！");
+            return JsonResult.success("菜单保存成功！");
         } else {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "菜单保存成功！");
+            return JsonResult.fail("菜单保存失败！");
         }
     }
 

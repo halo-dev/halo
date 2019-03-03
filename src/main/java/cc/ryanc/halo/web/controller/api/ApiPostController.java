@@ -101,7 +101,6 @@ public class ApiPostController {
      * </p>
      *
      * @param page 页码
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/page/{page}")
@@ -112,7 +111,7 @@ public class ApiPostController {
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
         final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), posts);
+        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), posts);
     }
 
     /**
@@ -149,7 +148,6 @@ public class ApiPostController {
      * </p>
      *
      * @param postId 文章编号
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/{postId}")

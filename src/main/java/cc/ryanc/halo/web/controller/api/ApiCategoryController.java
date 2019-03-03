@@ -73,7 +73,6 @@ public class ApiCategoryController {
      * </p>
      *
      * @param cateUrl 分类路径
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/{cateUrl}")

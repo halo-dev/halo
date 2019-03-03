@@ -3,7 +3,10 @@ package cc.ryanc.halo.web.controller.core;
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.model.enums.*;
+import cc.ryanc.halo.model.enums.AllowCommentEnum;
+import cc.ryanc.halo.model.enums.AttachLocationEnum;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import cn.hutool.core.date.DateUtil;
@@ -105,7 +108,7 @@ public class InstallController {
                                 HttpServletRequest request) {
         try {
             if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), OPTIONS.get(BlogPropertiesEnum.IS_INSTALL.getProp()))) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), "该博客已初始化，不能再次安装！");
+                return JsonResult.fail("该博客已初始化，不能再次安装！");
             }
             //创建新的用户
             final User user = new User();
@@ -193,8 +196,8 @@ public class InstallController {
             configuration.setSharedVariable("user", userService.findUser());
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), e.getMessage());
+            return JsonResult.fail(e.getMessage());
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "安装成功！");
+        return JsonResult.success("安装成功！");
     }
 }

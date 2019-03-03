@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.User;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -64,7 +63,7 @@ public class UserController {
         try {
             if (result.hasErrors()) {
                 for (ObjectError error : result.getAllErrors()) {
-                    return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+                    return JsonResult.fail(error.getDefaultMessage());
                 }
             }
             userService.create(user);
@@ -72,9 +71,9 @@ public class UserController {
             session.removeAttribute(USER_SESSION_KEY);
         } catch (Exception e) {
             log.error("Failed to modify user profile: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.edit-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.edit-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.edit-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.edit-success"));
     }
 
     /**
@@ -99,12 +98,12 @@ public class UserController {
                 userService.update(user);
                 session.removeAttribute(USER_SESSION_KEY);
             } else {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.old-password-error"));
+                return JsonResult.fail(localeMessageUtil.getMessage("code.admin.user.old-password-error"));
             }
         } catch (Exception e) {
             log.error("Password change failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.user.update-password-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.user.update-password-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.user.update-password-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.user.update-password-success"));
     }
 }
