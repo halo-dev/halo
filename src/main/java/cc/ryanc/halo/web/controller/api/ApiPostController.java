@@ -1,12 +1,16 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.exception.NotFoundException;
+import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.TagService;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,6 +41,12 @@ public class ApiPostController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private TagService tagService;
 
     /**
      * 获取文章列表 分页
@@ -162,5 +172,54 @@ public class ApiPostController {
         postService.cacheViews(post.getPostId());
 
         return post;
+    }
+
+    /**
+     * 根据分类目录查询所有文章 分页
+     *
+     * @param cateUrl 分类目录路径
+     * @param page    页码
+     * @return String
+     */
+    @GetMapping(value = "/categories/{cateUrl}/{page}")
+    public JsonResult categories(@PathVariable("cateUrl") String cateUrl,
+                                 @PathVariable("page") Integer page,
+                                 @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
+        final Category category = categoryService.findByCateUrl(cateUrl);
+        int size = 10;
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+        }
+        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Page<Post> posts = postService.findPostByCategories(category, pageable);
+        if (null == posts) {
+            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
+        }
+        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), posts);
+    }
+
+
+    /**
+     * 根据标签路径查询所有文章 分页
+     *
+     * @param tagUrl 标签路径
+     * @param page   页码
+     * @return String
+     */
+    @GetMapping(value = "/tags/{tagUrl}/{page}")
+    public JsonResult tags(@PathVariable("tagUrl") String tagUrl,
+                           @PathVariable("page") Integer page,
+                           @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
+        final Tag tag = tagService.findByTagUrl(tagUrl);
+        int size = 10;
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+        }
+        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Page<Post> posts = postService.findPostsByTags(tag, pageable);
+        if (null == posts) {
+            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
+        }
+        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), posts);
     }
 }
