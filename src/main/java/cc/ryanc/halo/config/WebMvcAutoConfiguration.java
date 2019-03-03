@@ -60,6 +60,10 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/backup/**")
                 .excludePathPatterns("/admin/login")
                 .excludePathPatterns("/admin/getLogin")
+                .excludePathPatterns("/admin/findPassword")
+                .excludePathPatterns("/admin/sendResetPasswordEmail")
+                .excludePathPatterns("/admin/toResetPassword")
+                .excludePathPatterns("/admin/resetPassword")
                 .excludePathPatterns("/static/**");
         registry.addInterceptor(installInterceptor)
                 .addPathPatterns("/**")
