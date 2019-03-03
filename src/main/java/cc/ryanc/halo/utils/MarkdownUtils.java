@@ -54,6 +54,14 @@ public class MarkdownUtils {
         if (content.contains(HaloConst.NETEASE_MUSIC_PREFIX)) {
             renderContent = content.replaceAll(HaloConst.NETEASE_MUSIC_REG_PATTERN, HaloConst.NETEASE_MUSIC_IFRAME);
         }
+        // render bilibili video short url
+        if (content.contains(HaloConst.BILIBILI_VIDEO_PREFIX)) {
+            renderContent = content.replaceAll(HaloConst.BILIBILI_VIDEO_REG_PATTERN, HaloConst.BILIBILI_VIDEO_IFRAME);
+        }
+        // render youtube video short url
+        if (content.contains(HaloConst.YOUTUBE_VIDEO_PREFIX)) {
+            renderContent = content.replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
+        }
         return renderContent;
     }
 
@@ -68,5 +76,9 @@ public class MarkdownUtils {
         final Node document = PARSER.parse(content);
         document.accept(visitor);
         return visitor.getData();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("[bilibili:44971847]".replaceAll(HaloConst.BILIBILI_VIDEO_REG_PATTERN, HaloConst.BILIBILI_VIDEO_IFRAME));
     }
 }
