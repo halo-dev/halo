@@ -5,7 +5,6 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.service.CategoryService;
@@ -19,12 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.utils.HaloUtils.getDefaultPageSize;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
@@ -114,14 +110,27 @@ public class ApiPostController {
      * @return JsonResult
      */
     @GetMapping(value = "/page/{page}")
-    public JsonResult posts(@PathVariable(value = "page") Integer page, @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
-        int size = 10;
-        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+    public JsonResult posts(@PathVariable(value = "page") Integer page,
+                            @SortDefault(sort = "postDate", direction = DESC) Sort sort,
+                            @RequestParam(value = "cateUrl", required = false) String cateUrl,
+                            @RequestParam(value = "tagUrl", required = false) String tagUrl) {
+        // Build page info
+        Pageable pageable = PageRequest.of(page - 1, getDefaultPageSize(), sort);
+
+        Page<Post> postPage;
+
+        if (StrUtil.isNotBlank(cateUrl)) {
+            // Query by category url
+            postPage = postService.findPostByCategories(categoryService.findByCateUrl(cateUrl), pageable);
+        } else if (StrUtil.isNotBlank(tagUrl)) {
+            // Query by tag url
+            postPage = postService.findPostsByTags(tagService.findByTagUrl(tagUrl), pageable);
+        } else {
+            // Query default
+            postPage = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
         }
-        final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), posts);
+
+        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), postPage);
     }
 
     /**
@@ -182,20 +191,15 @@ public class ApiPostController {
      * @return String
      */
     @GetMapping(value = "/categories/{cateUrl}/{page}")
+    @Deprecated
     public JsonResult categories(@PathVariable("cateUrl") String cateUrl,
                                  @PathVariable("page") Integer page,
                                  @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         final Category category = categoryService.findByCateUrl(cateUrl);
-        int size = 10;
-        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
-        }
-        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Pageable pageable = PageRequest.of(page - 1, getDefaultPageSize(), sort);
         final Page<Post> posts = postService.findPostByCategories(category, pageable);
-        if (null == posts) {
-            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
-        }
-        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), posts);
+
+        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), posts);
     }
 
 
@@ -207,19 +211,15 @@ public class ApiPostController {
      * @return String
      */
     @GetMapping(value = "/tags/{tagUrl}/{page}")
+    @Deprecated
     public JsonResult tags(@PathVariable("tagUrl") String tagUrl,
                            @PathVariable("page") Integer page,
                            @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         final Tag tag = tagService.findByTagUrl(tagUrl);
-        int size = 10;
-        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
-        }
-        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Pageable pageable = PageRequest.of(page - 1, getDefaultPageSize(), sort);
         final Page<Post> posts = postService.findPostsByTags(tag, pageable);
-        if (null == posts) {
-            return new JsonResult(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.getReasonPhrase());
-        }
-        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), posts);
+
+        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), posts);
     }
+
 }

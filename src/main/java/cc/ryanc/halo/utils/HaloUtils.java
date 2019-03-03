@@ -2,6 +2,7 @@ package cc.ryanc.halo.utils;
 
 import cc.ryanc.halo.model.dto.BackupDto;
 import cc.ryanc.halo.model.dto.Theme;
+import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.StrBuilder;
@@ -24,6 +25,8 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+
 /**
  * <pre>
  * 常用工具
@@ -34,6 +37,21 @@ import java.util.*;
  */
 @Slf4j
 public class HaloUtils {
+
+    private final static int DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * Gets default page size.
+     *
+     * @return default page size
+     */
+    public static int getDefaultPageSize() {
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+            return Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+        }
+
+        return DEFAULT_PAGE_SIZE;
+    }
 
     /**
      * 获取备份文件信息
@@ -48,7 +66,7 @@ public class HaloUtils {
         final File srcPath = new File(srcPathStr.toString());
         final File[] files = srcPath.listFiles();
         final List<BackupDto> backupDtos = new ArrayList<>();
-        BackupDto backupDto = null;
+        BackupDto backupDto;
         // 遍历文件
         if (null != files) {
             for (File file : files) {
@@ -107,8 +125,7 @@ public class HaloUtils {
         BasicFileAttributes attr;
         try {
             attr = basicview.readAttributes();
-            final Date createDate = new Date(attr.creationTime().toMillis());
-            return createDate;
+            return new Date(attr.creationTime().toMillis());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,7 +164,7 @@ public class HaloUtils {
             final File themesPath = new File(basePath.getAbsolutePath(), "templates/themes");
             final File[] files = themesPath.listFiles();
             if (null != files) {
-                Theme theme = null;
+                Theme theme;
                 for (File file : files) {
                     if (file.isDirectory()) {
                         if (StrUtil.equals("__MACOSX", file.getName())) {
