@@ -46,7 +46,7 @@ public class FrontIndexController extends BaseController {
      */
     @GetMapping
     public String index(Model model) {
-        return this.index(model, 1, Sort.by(DESC, "priority").and(Sort.by(DESC, "postDate")));
+        return this.index(model, 1, Sort.by(DESC, "postPriority").and(Sort.by(DESC, "postDate")));
     }
 
     /**
@@ -60,7 +60,7 @@ public class FrontIndexController extends BaseController {
     public String index(Model model,
                         @PathVariable(value = "page") Integer page,
                         @SortDefault.SortDefaults({
-                                @SortDefault(sort = "priority", direction = DESC),
+                                @SortDefault(sort = "postPriority", direction = DESC),
                                 @SortDefault(sort = "postDate", direction = DESC)
                         }) Sort sort) {
         log.debug("Requested index page, sort info: [{}]", sort);
