@@ -13,6 +13,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -76,6 +77,9 @@ public class AdminController extends BaseController {
 
     @Autowired
     private LocaleMessageUtil localeMessageUtil;
+
+    @Autowired
+    private MailService mailService;
 
     /**
      * 请求后台页面
@@ -191,6 +195,107 @@ public class AdminController extends BaseController {
 
             return JsonResult.fail(localeMessageUtil.getMessage("code.admin.login.failed", new Integer[]{5 - errorCount}));
         }
+    }
+
+    /**
+     * 重置密码
+     *
+     * @return String
+     */
+    @GetMapping(value = "/findPassword")
+    public String findPassword() {
+        return "admin/admin_findpassword";
+    }
+
+    /**
+     * 发送重置密码邮件
+     *
+     * @param userName 用户名
+     * @param email    邮箱
+     * @return JsonResult
+     */
+    @PostMapping(value = "/sendResetPasswordEmail")
+    @ResponseBody
+    public JsonResult sendResetPasswordEmail(@RequestParam(value = "userName") String userName,
+                                             @RequestParam(value = "email") String email,
+                                             HttpSession session) {
+        final User user = userService.findUser();
+        if (StrUtil.isEmpty(userName) || StrUtil.isEmpty(email)) {
+            return JsonResult.fail("请输入完整信息！");
+        }
+        if (!user.getUserEmail().equals(email) || !user.getUserName().equals(userName)) {
+            return JsonResult.fail("用户名或电子邮箱错误，请确定你的身份！");
+        }
+        try {
+            long time = System.currentTimeMillis();
+            String randomString = RandomUtil.randomString(10);
+            String code = SecureUtil.md5(time + randomString);
+            StrBuilder url = new StrBuilder(OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp()));
+            url.append("/admin/toResetPassword?code=");
+            url.append(code);
+            mailService.sendMail(user.getUserEmail(), "请根据该链接重置你的博客密码", "请点击该链接重置你的密码：" + url);
+            session.setAttribute("resetPasswordCode", code);
+            return JsonResult.success("邮件发送成功，请登录您的邮箱进行下一步操作");
+        } catch (Exception e) {
+            return JsonResult.fail("邮件发送失败，请确定已经配置好了发信服务器信息");
+        }
+    }
+
+    /**
+     * 重置密码页面
+     *
+     * @param code code
+     * @return String
+     */
+    @GetMapping(value = "/toResetPassword")
+    public String toResetPassword(@RequestParam(value = "code", defaultValue = "") String code,
+                                  Model model,
+                                  HttpSession session) {
+        final String sessionCode = (String) session.getAttribute("resetPasswordCode");
+        if (StrUtil.isEmpty(code)) {
+            this.renderNotFound();
+        }
+        if (!sessionCode.equals(code)) {
+            model.addAttribute("isRight", false);
+        } else {
+            model.addAttribute("isRight", true);
+        }
+        model.addAttribute("code", code);
+        return "admin/admin_resetpassword";
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param password       password
+     * @param definePassword definePassword
+     * @return String
+     */
+    @PostMapping(value = "/resetPassword")
+    @ResponseBody
+    public JsonResult resetPassword(@RequestParam(value = "password") String password,
+                                    @RequestParam(value = "definePassword") String definePassword,
+                                    @RequestParam(value = "code") String code,
+                                    HttpSession session) {
+        final String sessionCode = (String) session.getAttribute("resetPasswordCode");
+        if (null == sessionCode) {
+            return JsonResult.fail("不允许该操作！");
+        }
+        if (!StrUtil.equals(code, sessionCode)) {
+            return JsonResult.fail("不允许该操作！");
+        }
+        if (StrUtil.isEmpty(password) || StrUtil.isEmpty(definePassword)) {
+            return JsonResult.fail("请输入完整信息！");
+        }
+        if (!StrUtil.equals(password, definePassword)) {
+            return JsonResult.fail("两次密码不一样！");
+        }
+        final User user = userService.findUser();
+        user.setUserPass(SecureUtil.md5(password));
+        userService.update(user);
+        userService.updateUserNormal();
+        session.removeAttribute("resetPasswordCode");
+        return JsonResult.success("重置密码成功！");
     }
 
     /**
