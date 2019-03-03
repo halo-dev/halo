@@ -3,6 +3,7 @@ package cc.ryanc.halo.model.domain;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
@@ -68,6 +69,7 @@ public class Post implements Serializable {
      * 文章内容 html格式
      */
     @Lob
+    @JsonIgnore
     private String postContent;
 
     /**
