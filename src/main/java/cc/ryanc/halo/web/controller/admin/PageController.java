@@ -123,14 +123,14 @@ public class PageController {
     public JsonResult saveLink(@Valid Link link, BindingResult result) {
         if (result.hasErrors()) {
             for (ObjectError error : result.getAllErrors()) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+                return JsonResult.fail(error.getDefaultMessage());
             }
         }
         link = linkService.create(link);
         if (null == link) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.save-success"));
     }
 
     /**
@@ -209,9 +209,9 @@ public class PageController {
             galleryService.removeById(galleryId);
         } catch (Exception e) {
             log.error("Failed to delete image: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.delete-success"));
     }
 
     /**
@@ -257,10 +257,10 @@ public class PageController {
             }
             postService.create(post);
             logsService.save(LogsRecord.PUSH_PAGE, post.getPostTitle(), request);
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), msg);
+            return JsonResult.success(msg);
         } catch (Exception e) {
             log.error("Save page failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
 
@@ -291,7 +291,7 @@ public class PageController {
     public JsonResult checkUrlExists(@RequestParam("postUrl") String postUrl) {
         final Post post = postService.findByPostUrl(postUrl, PostTypeEnum.POST_TYPE_PAGE.getDesc());
         if (null != post) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
         }
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "");
     }

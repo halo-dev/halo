@@ -13,12 +13,11 @@ import cn.hutool.core.text.StrBuilder;
  */
 public abstract class BaseController {
 
-    protected Logger log = Logger.getLogger(getClass());
-
     /**
      * 定义默认主题
      */
     public static String THEME = "anatole";
+    protected Logger log = Logger.getLogger(getClass());
 
     /**
      * 根据主题名称渲染页面

@@ -81,7 +81,6 @@ public class ApiGalleryController {
      * </p>
      *
      * @param id id
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/{id}")

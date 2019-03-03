@@ -6,7 +6,6 @@ import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
@@ -20,7 +19,6 @@ import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HtmlUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -77,7 +75,7 @@ public class FrontCommentController {
                                  HttpServletRequest request) {
         if (result.hasErrors()) {
             for (ObjectError error : result.getAllErrors()) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+                return JsonResult.fail(error.getDefaultMessage());
             }
         }
         try {
@@ -115,12 +113,12 @@ public class FrontCommentController {
                 new EmailToAdmin(comment, post).start();
             }
             if (StrUtil.equals(OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()), TrueFalseEnum.TRUE.getDesc()) || OPTIONS.get(BlogPropertiesEnum.NEW_COMMENT_NEED_CHECK.getProp()) == null) {
-                return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "你的评论已经提交，待博主审核之后可显示。");
+                return JsonResult.success("你的评论已经提交，待博主审核之后可显示。");
             } else {
-                return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), "你的评论已经提交，刷新后即可显示。");
+                return JsonResult.success("你的评论已经提交，刷新后即可显示。");
             }
         } catch (Exception e) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), "评论失败！");
+            return JsonResult.fail("评论失败！");
         }
     }
 

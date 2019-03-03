@@ -76,11 +76,10 @@ public class ApiOptionController {
      * </p>
      *
      * @param optionName 设置选项名称
-     *
      * @return JsonResult
      */
     @GetMapping(value = "/one")
     public JsonResult option(@RequestParam(value = "optionName") String optionName) {
-        return new JsonResult(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), optionsService.findOneOption(optionName));
+        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), optionsService.findOneOption(optionName));
     }
 }

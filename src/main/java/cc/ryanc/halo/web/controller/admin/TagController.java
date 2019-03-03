@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -55,24 +54,24 @@ public class TagController {
     public JsonResult saveTag(@Valid Tag tag, BindingResult result) {
         if (result.hasErrors()) {
             for (ObjectError error : result.getAllErrors()) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+                return JsonResult.fail(error.getDefaultMessage());
             }
         }
         final Tag tempTag = tagService.findByTagUrl(tag.getTagUrl());
         if (null != tag.getTagId()) {
             if (null != tempTag && !tag.getTagId().equals(tempTag.getTagId())) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+                return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         } else {
             if (null != tempTag) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+                return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         }
         tag = tagService.create(tag);
         if (null == tag) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.save-success"));
     }
 
     /**

@@ -2,7 +2,6 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -56,24 +55,24 @@ public class CategoryController {
     public JsonResult saveCategory(@Valid Category category, BindingResult result) {
         if (result.hasErrors()) {
             for (ObjectError error : result.getAllErrors()) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), error.getDefaultMessage());
+                return JsonResult.fail(error.getDefaultMessage());
             }
         }
         final Category tempCategory = categoryService.findByCateUrl(category.getCateUrl());
         if (null != category.getCateId()) {
             if (null != tempCategory && !category.getCateId().equals(tempCategory.getCateId())) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+                return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         } else {
             if (null != tempCategory) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
+                return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.url-is-exists"));
             }
         }
         category = categoryService.create(category);
         if (null == category) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+            return JsonResult.fail(localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
+        return JsonResult.success(localeMessageUtil.getMessage("code.admin.common.save-success"));
     }
 
     /**

@@ -6,7 +6,6 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -20,9 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class CommonController implements ErrorController {
 
-    private final Logger log = Logger.getLogger(getClass());
-
     private static final String ERROR_PATH = "/error";
+    private final Logger log = Logger.getLogger(getClass());
 
     /**
      * 渲染404，500
