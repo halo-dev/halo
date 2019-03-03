@@ -152,7 +152,7 @@ public class Post implements Serializable {
      * Post priority (default is 0)
      */
     @ColumnDefault("0")
-    private Integer priority;
+    private Integer postPriority;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date getPostDate() {
@@ -176,8 +176,8 @@ public class Post implements Serializable {
             postUpdate = now;
         }
 
-        if (priority == null) {
-            priority = 0;
+        if (postPriority == null) {
+            postPriority = 0;
         }
 
         postId = null;
