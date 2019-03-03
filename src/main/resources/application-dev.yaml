@@ -10,6 +10,8 @@ server:
     session:
       timeout: 86400s
 spring:
+  cache:
+    type: none
   output:
     ansi:
       enabled: always
