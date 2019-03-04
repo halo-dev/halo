@@ -77,8 +77,4 @@ public class MarkdownUtils {
         document.accept(visitor);
         return visitor.getData();
     }
-
-    public static void main(String[] args) {
-        System.out.println("[bilibili:44971847]".replaceAll(HaloConst.BILIBILI_VIDEO_REG_PATTERN, HaloConst.BILIBILI_VIDEO_IFRAME));
-    }
 }
