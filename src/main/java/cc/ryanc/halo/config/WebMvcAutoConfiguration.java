@@ -1,6 +1,7 @@
 package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.filter.CorsFilter;
+import cc.ryanc.halo.filter.LogFilter;
 import cc.ryanc.halo.web.interceptor.ApiInterceptor;
 import cc.ryanc.halo.web.interceptor.InstallInterceptor;
 import cc.ryanc.halo.web.interceptor.LocaleInterceptor;
@@ -14,7 +15,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
@@ -108,11 +112,27 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     FilterRegistrationBean<CorsFilter> corsFilter() {
         FilterRegistrationBean<CorsFilter> corsFilter = new FilterRegistrationBean<>();
 
-        corsFilter.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        corsFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 10);
         corsFilter.setFilter(new CorsFilter());
         corsFilter.addUrlPatterns("/api/*");
 
         return corsFilter;
+    }
+
+    /**
+     * Creates a LogFilter.
+     *
+     * @return Log filter registration bean
+     */
+    @Bean
+    FilterRegistrationBean<LogFilter> logFilter() {
+        FilterRegistrationBean<LogFilter> logFilter = new FilterRegistrationBean<>();
+
+        logFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 9);
+        logFilter.setFilter(new LogFilter());
+        logFilter.addUrlPatterns("/api/*", "/admin/*");
+
+        return logFilter;
     }
 
     /**
