@@ -2,8 +2,8 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.*;
-import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
@@ -34,8 +34,8 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
-import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>

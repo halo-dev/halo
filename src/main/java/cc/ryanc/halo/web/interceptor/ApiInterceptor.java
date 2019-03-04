@@ -1,6 +1,6 @@
 package cc.ryanc.halo.web.interceptor;
 
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cn.hutool.core.util.StrUtil;
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>

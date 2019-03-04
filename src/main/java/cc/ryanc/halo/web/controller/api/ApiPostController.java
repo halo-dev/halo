@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.service.CategoryService;

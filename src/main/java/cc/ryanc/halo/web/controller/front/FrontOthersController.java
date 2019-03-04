@@ -22,7 +22,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import java.io.IOException;
 import java.util.List;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>

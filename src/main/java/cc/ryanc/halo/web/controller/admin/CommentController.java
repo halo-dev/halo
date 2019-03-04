@@ -3,7 +3,7 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.MailService;
@@ -31,8 +31,8 @@ import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
-import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>

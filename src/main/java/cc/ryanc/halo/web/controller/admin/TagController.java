@@ -1,7 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import lombok.extern.slf4j.Slf4j;

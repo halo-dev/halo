@@ -1,7 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
+import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>

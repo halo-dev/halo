@@ -1,6 +1,6 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import freemarker.template.Configuration;
@@ -13,7 +13,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>

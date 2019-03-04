@@ -1,6 +1,6 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.support.HaloConst;
 import org.commonmark.Extension;
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor;

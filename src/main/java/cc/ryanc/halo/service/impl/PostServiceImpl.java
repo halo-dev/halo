@@ -3,7 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.dto.Archive;
+import cc.ryanc.halo.model.support.Archive;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -29,8 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
-import static cc.ryanc.halo.model.dto.HaloConst.POSTS_VIEWS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.POSTS_VIEWS;
 
 /**
  * <pre>

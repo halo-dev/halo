@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.dto;
+package cc.ryanc.halo.model.support;
 
 /**
  * <pre>

@@ -7,7 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
+import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>

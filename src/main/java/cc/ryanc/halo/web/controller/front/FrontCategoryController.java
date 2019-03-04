@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**

@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.dto;
+package cc.ryanc.halo.model.support;
 
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import lombok.Data;

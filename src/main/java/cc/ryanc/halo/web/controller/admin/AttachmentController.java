@@ -1,8 +1,8 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.AttachmentService;

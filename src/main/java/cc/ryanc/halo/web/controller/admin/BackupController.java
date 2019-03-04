@@ -4,8 +4,8 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.BackupDto;
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.BackupDto;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.PostService;
@@ -33,8 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
-import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
 
 /**
  * <pre>

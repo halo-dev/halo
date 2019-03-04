@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.dto;
+package cc.ryanc.halo.model.support;
 
 import java.util.Collections;
 import java.util.List;
