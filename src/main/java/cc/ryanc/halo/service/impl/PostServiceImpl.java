@@ -3,10 +3,10 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.support.Archive;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.model.support.Archive;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.PostService;
@@ -18,7 +18,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -238,7 +240,11 @@ public class PostServiceImpl extends AbstractCrudService<Post, Long> implements 
     @Override
     @Cacheable(value = POSTS_CACHE_NAME, key = "'posts_latest'")
     public List<Post> findPostLatest() {
-        return postRepository.findTopFive();
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "postDate"));
+
+        Page<Post> postPage = postRepository.findAll(pageable);
+
+        return postPage.getContent();
     }
 
     /**
