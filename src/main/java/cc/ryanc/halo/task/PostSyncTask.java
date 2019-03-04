@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import static cc.ryanc.halo.model.dto.HaloConst.POSTS_VIEWS;
+import static cc.ryanc.halo.model.support.HaloConst.POSTS_VIEWS;
 
 /**
  * @author : RYAN0UP

@@ -1,6 +1,6 @@
 package cc.ryanc.halo.listener;
 
-import cc.ryanc.halo.model.dto.Theme;
+import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.dto.HaloConst.*;
+import static cc.ryanc.halo.model.support.HaloConst.*;
 
 /**
  * <pre>

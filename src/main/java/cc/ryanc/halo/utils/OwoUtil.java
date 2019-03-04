@@ -2,7 +2,7 @@ package cc.ryanc.halo.utils;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OWO;
+import static cc.ryanc.halo.model.support.HaloConst.OWO;
 
 /**
  * <pre>

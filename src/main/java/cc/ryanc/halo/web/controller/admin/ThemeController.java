@@ -1,7 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.service.LogsService;
@@ -31,8 +31,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
-import static cc.ryanc.halo.model.dto.HaloConst.THEMES;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.THEMES;
 
 /**
  * <pre>

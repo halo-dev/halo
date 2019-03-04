@@ -1,8 +1,8 @@
 package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.model.domain.*;
-import cc.ryanc.halo.model.dto.JsonResult;
-import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.AllowCommentEnum;
 import cc.ryanc.halo.model.enums.AttachLocationEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>

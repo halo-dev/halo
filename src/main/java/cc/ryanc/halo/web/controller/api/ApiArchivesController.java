@@ -1,6 +1,6 @@
 package cc.ryanc.halo.web.controller.api;
 
-import cc.ryanc.halo.model.dto.Archive;
+import cc.ryanc.halo.model.support.Archive;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

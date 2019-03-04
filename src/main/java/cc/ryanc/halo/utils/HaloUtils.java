@@ -1,7 +1,7 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.dto.BackupDto;
-import cc.ryanc.halo.model.dto.Theme;
+import cc.ryanc.halo.model.support.BackupDto;
+import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
 import cn.hutool.core.io.FileUtil;
@@ -25,7 +25,7 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>

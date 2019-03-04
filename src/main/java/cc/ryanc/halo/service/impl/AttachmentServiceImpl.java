@@ -2,7 +2,7 @@ package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.dto.QiNiuPutSet;
+import cc.ryanc.halo.model.support.QiNiuPutSet;
 import cc.ryanc.halo.model.enums.AttachLocationEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.repository.AttachmentRepository;
@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>

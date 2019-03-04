@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.base;
 
 import cc.ryanc.halo.exception.HaloException;
 import cc.ryanc.halo.logging.Logger;
-import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.utils.ExceptionUtils;
 import cc.ryanc.halo.utils.ValidationUtils;
 import org.springframework.dao.DataIntegrityViolationException;
