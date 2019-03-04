@@ -2,9 +2,9 @@ package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.support.QiNiuPutSet;
 import cc.ryanc.halo.model.enums.AttachLocationEnum;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.support.QiNiuPutSet;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
@@ -260,8 +260,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
     public Map<String, String> attachQiNiuUpload(MultipartFile file, HttpServletRequest request) {
         final Map<String, String> resultMap = new HashMap<>(7);
         try {
-            // TODO Dynamically set this zone of qiniuyun (七牛云上传附件失败 #110)
-            final Configuration cfg = new Configuration(Zone.zone0());
+            // TODO Wait for testing (七牛云上传附件失败 #110)
+            final Configuration cfg = new Configuration(HaloUtils.getDefaultQiniuZone());
             final String key = Md5Util.getMD5Checksum(file);
             final String accessKey = OPTIONS.get("qiniu_access_key");
             final String secretKey = OPTIONS.get("qiniu_secret_key");
