@@ -30,6 +30,9 @@ public class BeanUtilsTest {
         assertEquals(a.getB(), b.getB());
         assertNull(b.getC());
 
+        TestD d = new TestD(a);
+        TestE e = BeanUtils.transformFrom(d, TestE.class);
+        assertEquals(d.getA().getA(), e.getA().getA());
     }
 
     @Test
@@ -95,4 +98,17 @@ public class BeanUtilsTest {
         private Integer b;
     }
 
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class TestD {
+        private TestA a;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class TestE {
+        private TestA a;
+    }
 }
