@@ -56,6 +56,7 @@ public class Post implements Serializable {
      * 文章类型
      * post  文章
      * page  页面
+     * journal 日志
      */
     private String postType = "post";
 
@@ -155,6 +156,12 @@ public class Post implements Serializable {
      */
     @ColumnDefault("0")
     private Integer postPriority;
+
+    /**
+     * 发布来源
+     */
+    @ColumnDefault("admin")
+    private String postSource;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     public Date getPostDate() {

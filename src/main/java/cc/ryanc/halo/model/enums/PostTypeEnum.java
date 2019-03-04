@@ -18,7 +18,12 @@ public enum PostTypeEnum {
     /**
      * 页面
      */
-    POST_TYPE_PAGE("page");
+    POST_TYPE_PAGE("page"),
+
+    /**
+     * 日志
+     */
+    POST_TYPE_JOURNAL("journal");
 
     private String desc;
 
