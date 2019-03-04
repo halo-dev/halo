@@ -8,7 +8,9 @@ import cc.ryanc.halo.utils.ValidationUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.Assert;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -66,6 +68,23 @@ public class ControllerExceptionHandler {
         jsonResult.setMsg("Field validation error");
         Map<String, String> errMap = ValidationUtils.mapWithFieldError(e.getBindingResult().getFieldErrors());
         jsonResult.setResult(errMap);
+        return jsonResult;
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public JsonResult handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        JsonResult jsonResult = handleBaseException(e);
+        jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
+        return jsonResult;
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public JsonResult handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        JsonResult jsonResult = handleBaseException(e);
+        jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
+        jsonResult.setMsg("Required request body is missing");
         return jsonResult;
     }
 

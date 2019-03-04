@@ -2,6 +2,7 @@ package cc.ryanc.halo.model.params;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.dto.base.AbstractInputConverter;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import lombok.Data;
 
@@ -31,9 +32,12 @@ public class JournalParam extends AbstractInputConverter<Post> {
 
     @Override
     public Post convertTo() {
-        Post post = super.convertTo();
+        Post post = new Post();
+        post.setPostTitle(title);
         post.setPostContentMd(content);
         post.setPostContent(MarkdownUtils.renderMarkdown(content));
+        post.setPostSource(source);
+        post.setPostType(PostTypeEnum.POST_TYPE_JOURNAL.getDesc());
         return post;
     }
 }

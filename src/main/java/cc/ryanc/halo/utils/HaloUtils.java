@@ -295,6 +295,10 @@ public class HaloUtils {
      * @param password password
      */
     public static void configMail(String smtpHost, String userName, String password) {
+        Assert.hasText(smtpHost, "SMTP host config must not be blank");
+        Assert.hasText(userName, "Email username must not be blank");
+        Assert.hasText(password, "Email password must not be blank");
+        
         final Properties properties = OhMyEmail.defaultConfig(false);
         properties.setProperty("mail.smtp.host", smtpHost);
         OhMyEmail.config(properties, userName, password);

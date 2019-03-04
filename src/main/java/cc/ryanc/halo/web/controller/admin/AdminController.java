@@ -240,6 +240,7 @@ public class AdminController extends BaseController {
             session.setAttribute(RESET_PASSWORD_SESSION_KEY, code);
             return JsonResult.success("邮件发送成功，请登录您的邮箱进行下一步操作");
         } catch (Exception e) {
+            log.error("Failed to send password email", e);
             return JsonResult.fail("邮件发送失败，请确定已经配置好了发信服务器信息");
         }
     }
