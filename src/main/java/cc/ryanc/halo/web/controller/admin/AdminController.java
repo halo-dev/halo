@@ -2,9 +2,9 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.*;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.support.LogsRecord;
-import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.MarkdownUtils;
@@ -48,6 +48,8 @@ import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
 @Controller
 @RequestMapping(value = "/admin")
 public class AdminController extends BaseController {
+
+    private final static String RESET_PASSWORD_SESSION_KEY = "resetPasswordCode";
 
     private final Logger log = Logger.getLogger(getClass());
 
@@ -234,7 +236,7 @@ public class AdminController extends BaseController {
             url.append("/admin/toResetPassword?code=");
             url.append(code);
             mailService.sendMail(user.getUserEmail(), "请根据该链接重置你的博客密码", "请点击该链接重置你的密码：" + url);
-            session.setAttribute("resetPasswordCode", code);
+            session.setAttribute(RESET_PASSWORD_SESSION_KEY, code);
             return JsonResult.success("邮件发送成功，请登录您的邮箱进行下一步操作");
         } catch (Exception e) {
             return JsonResult.fail("邮件发送失败，请确定已经配置好了发信服务器信息");
@@ -251,15 +253,10 @@ public class AdminController extends BaseController {
     public String toResetPassword(@RequestParam(value = "code", defaultValue = "") String code,
                                   Model model,
                                   HttpSession session) {
-        final String sessionCode = (String) session.getAttribute("resetPasswordCode");
-        if (StrUtil.isEmpty(code)) {
-            this.renderNotFound();
-        }
-        if (!sessionCode.equals(code)) {
-            model.addAttribute("isRight", false);
-        } else {
-            model.addAttribute("isRight", true);
-        }
+        String sessionCode = (String) session.getAttribute(RESET_PASSWORD_SESSION_KEY);
+
+        model.addAttribute("isRight", StrUtil.equals(sessionCode, code));
+
         model.addAttribute("code", code);
         return "admin/admin_resetpassword";
     }
@@ -277,14 +274,11 @@ public class AdminController extends BaseController {
                                     @RequestParam(value = "definePassword") String definePassword,
                                     @RequestParam(value = "code") String code,
                                     HttpSession session) {
-        final String sessionCode = (String) session.getAttribute("resetPasswordCode");
-        if (null == sessionCode) {
+        final String sessionCode = (String) session.getAttribute(RESET_PASSWORD_SESSION_KEY);
+        if (null == sessionCode || !StrUtil.equals(sessionCode, code)) {
             return JsonResult.fail("不允许该操作！");
         }
-        if (!StrUtil.equals(code, sessionCode)) {
-            return JsonResult.fail("不允许该操作！");
-        }
-        if (StrUtil.isEmpty(password) || StrUtil.isEmpty(definePassword)) {
+        if (StrUtil.isBlank(password) || StrUtil.isBlank(definePassword)) {
             return JsonResult.fail("请输入完整信息！");
         }
         if (!StrUtil.equals(password, definePassword)) {
@@ -294,7 +288,7 @@ public class AdminController extends BaseController {
         user.setUserPass(SecureUtil.md5(password));
         userService.update(user);
         userService.updateUserNormal();
-        session.removeAttribute("resetPasswordCode");
+        session.removeAttribute(RESET_PASSWORD_SESSION_KEY);
         return JsonResult.success("重置密码成功！");
     }
 
