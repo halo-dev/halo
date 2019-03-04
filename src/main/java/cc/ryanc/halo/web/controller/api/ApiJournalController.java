@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.PostDetailOutputDTO;
 import cc.ryanc.halo.model.params.JournalParam;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.http.HttpStatus;
@@ -32,11 +33,11 @@ public class ApiJournalController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Post save(@RequestBody JournalParam journalParam) {
+    public PostDetailOutputDTO save(@RequestBody JournalParam journalParam) {
         // TODO need to validate token
 
         Post post = journalParam.convertTo();
 
-        return postService.create(post);
+        return new PostDetailOutputDTO().convertFrom(postService.create(post));
     }
 }
