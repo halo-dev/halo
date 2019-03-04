@@ -1,9 +1,7 @@
 package cc.ryanc.halo.web.controller.api;
 
 import cc.ryanc.halo.exception.NotFoundException;
-import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -19,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 import static cc.ryanc.halo.utils.HaloUtils.getDefaultPageSize;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -171,55 +171,14 @@ public class ApiPostController {
      */
     @GetMapping(value = "/{postId}")
     public Post posts(@PathVariable(value = "postId") Long postId) {
-        final Post post = postService.findByPostId(postId, PostTypeEnum.POST_TYPE_POST.getDesc());
-
-        if (post == null) {
-            throw new NotFoundException("Post with id: " + postId + " was not found").setErrorData(postId);
-        }
+        // Find post by post id
+        Post post = Optional.ofNullable(postService.findByPostId(postId, PostTypeEnum.POST_TYPE_POST.getDesc()))
+                .orElseThrow(() -> new NotFoundException("Post with id: " + postId + " was not found").setErrorData(postId));
 
         // Cache views
         postService.cacheViews(post.getPostId());
 
         return post;
-    }
-
-    /**
-     * 根据分类目录查询所有文章 分页
-     *
-     * @param cateUrl 分类目录路径
-     * @param page    页码
-     * @return String
-     */
-    @GetMapping(value = "/categories/{cateUrl}/{page}")
-    @Deprecated
-    public JsonResult categories(@PathVariable("cateUrl") String cateUrl,
-                                 @PathVariable("page") Integer page,
-                                 @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
-        final Category category = categoryService.findByCateUrl(cateUrl);
-        final Pageable pageable = PageRequest.of(page - 1, getDefaultPageSize(), sort);
-        final Page<Post> posts = postService.findPostByCategories(category, pageable);
-
-        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), posts);
-    }
-
-
-    /**
-     * 根据标签路径查询所有文章 分页
-     *
-     * @param tagUrl 标签路径
-     * @param page   页码
-     * @return String
-     */
-    @GetMapping(value = "/tags/{tagUrl}/{page}")
-    @Deprecated
-    public JsonResult tags(@PathVariable("tagUrl") String tagUrl,
-                           @PathVariable("page") Integer page,
-                           @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
-        final Tag tag = tagService.findByTagUrl(tagUrl);
-        final Pageable pageable = PageRequest.of(page - 1, getDefaultPageSize(), sort);
-        final Page<Post> posts = postService.findPostsByTags(tag, pageable);
-
-        return JsonResult.ok(HttpStatus.OK.getReasonPhrase(), posts);
     }
 
 }
