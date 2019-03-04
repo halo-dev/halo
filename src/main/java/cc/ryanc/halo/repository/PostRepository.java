@@ -6,10 +6,10 @@ import cc.ryanc.halo.model.domain.Tag;
 import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import java.util.Date;
 import java.util.List;
@@ -216,4 +216,14 @@ public interface PostRepository extends BaseRepository<Post, Long>, JpaSpecifica
      */
     @Query(value = "SELECT * FROM halo_post WHERE post_status = 0 AND post_type = 'post' ORDER BY post_date DESC LIMIT :limit", nativeQuery = true)
     List<Post> getPostsByLimit(@Param(value = "limit") int limit);
+
+    /**
+     * Finds all posts by post type.
+     *
+     * @param postType post type must not be blank
+     * @param pageable page info must not be null
+     * @return a page of posts
+     */
+    @NonNull
+    Page<Post> findAllByPostType(@NonNull String postType, @NonNull Pageable pageable);
 }

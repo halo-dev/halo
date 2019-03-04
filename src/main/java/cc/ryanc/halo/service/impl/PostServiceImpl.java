@@ -242,7 +242,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Long> implements 
     public List<Post> findPostLatest() {
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "postDate"));
 
-        Page<Post> postPage = postRepository.findAll(pageable);
+        Page<Post> postPage = postRepository.findAllByPostType("post", pageable);
 
         return postPage.getContent();
     }
