@@ -1,14 +1,16 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.support.BackupDto;
-import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.CommonParamsEnum;
+import cc.ryanc.halo.model.support.BackupDto;
+import cc.ryanc.halo.model.support.Theme;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
+import com.qiniu.common.Zone;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 
@@ -51,6 +53,40 @@ public class HaloUtils {
         }
 
         return DEFAULT_PAGE_SIZE;
+    }
+
+    /**
+     * Gets default qiniuyun zone.
+     *
+     * @return qiniuyun zone
+     */
+    @NonNull
+    public static Zone getDefaultQiniuZone() {
+        Zone zone;
+        // Get zone from setting
+        String qiniuZone = OPTIONS.get("qiniu_zone");
+        switch (qiniuZone) {
+            case "z0":
+                zone = Zone.zone0();
+                break;
+            case "z1":
+                zone = Zone.zone1();
+                break;
+            case "z2":
+                zone = Zone.zone2();
+                break;
+            case "na0":
+                zone = Zone.zoneNa0();
+                break;
+            case "as0":
+                zone = Zone.zoneAs0();
+                break;
+            default:
+                // Default is detecting zone automatically
+                zone = Zone.autoZone();
+        }
+
+        return zone;
     }
 
     /**
@@ -298,7 +334,7 @@ public class HaloUtils {
         Assert.hasText(smtpHost, "SMTP host config must not be blank");
         Assert.hasText(userName, "Email username must not be blank");
         Assert.hasText(password, "Email password must not be blank");
-        
+
         final Properties properties = OhMyEmail.defaultConfig(false);
         properties.setProperty("mail.smtp.host", smtpHost);
         OhMyEmail.config(properties, userName, password);
