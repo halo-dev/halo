@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.*;
 import cc.ryanc.halo.model.enums.*;
+import cc.ryanc.halo.model.params.PasswordResetParam;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.service.*;
@@ -264,28 +265,23 @@ public class AdminController extends BaseController {
     /**
      * 重置密码
      *
-     * @param password       password
-     * @param definePassword definePassword
+     * @param resetParam password reset param
      * @return String
      */
     @PostMapping(value = "/resetPassword")
     @ResponseBody
-    public JsonResult resetPassword(@RequestParam(value = "password") String password,
-                                    @RequestParam(value = "definePassword") String definePassword,
-                                    @RequestParam(value = "code") String code,
+    public JsonResult resetPassword(@RequestBody PasswordResetParam resetParam,
                                     HttpSession session) {
         final String sessionCode = (String) session.getAttribute(RESET_PASSWORD_SESSION_KEY);
-        if (null == sessionCode || !StrUtil.equals(sessionCode, code)) {
+        if (null == sessionCode || !StrUtil.equals(sessionCode, resetParam.getCode())) {
             return JsonResult.fail("不允许该操作！");
         }
-        if (StrUtil.isBlank(password) || StrUtil.isBlank(definePassword)) {
-            return JsonResult.fail("请输入完整信息！");
-        }
-        if (!StrUtil.equals(password, definePassword)) {
+
+        if (!StrUtil.equals(resetParam.getPassword(), resetParam.getDefinePassword())) {
             return JsonResult.fail("两次密码不一样！");
         }
         final User user = userService.findUser();
-        user.setUserPass(SecureUtil.md5(password));
+        user.setUserPass(SecureUtil.md5(resetParam.getPassword()));
         userService.update(user);
         userService.updateUserNormal();
         session.removeAttribute(RESET_PASSWORD_SESSION_KEY);
