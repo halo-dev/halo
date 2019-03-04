@@ -258,8 +258,9 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
      */
     @Override
     public Map<String, String> attachQiNiuUpload(MultipartFile file, HttpServletRequest request) {
-        final Map<String, String> resultMap = new HashMap<>(6);
+        final Map<String, String> resultMap = new HashMap<>(7);
         try {
+            // TODO Dynamically set this zone of qiniuyun (七牛云上传附件失败 #110)
             final Configuration cfg = new Configuration(Zone.zone0());
             final String key = Md5Util.getMD5Checksum(file);
             final String accessKey = OPTIONS.get("qiniu_access_key");
