@@ -59,7 +59,7 @@ public class ApiCommentController {
      * @param request request
      * @return JsonResult
      */
-    @PostMapping("save")
+    @PostMapping(value = "/save")
     public JsonResult save(@Valid Comment comment,
                            @RequestParam(value = "postId") Long postId,
                            HttpServletRequest request) {

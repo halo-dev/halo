@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * <pre>
- *     图库API
+ *     图库 API
  * </pre>
  *
  * @author : RYAN0UP
