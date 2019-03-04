@@ -63,7 +63,7 @@
             }
 
             .form-group {
-                margin-bottom: 24px;
+                margin-bottom: 32px;
             }
 
             #password,#definePassword {
@@ -107,17 +107,28 @@
             if (password.val() === "" || definePassword.val() === "") {
                 halo.showMsg("请输入完整信息！", 'info', 2000);
             } else {
-                $.post('/admin/resetPassword',{
-                    'password': password.val(),
-                    'definePassword': definePassword.val(),
-                    'code': '${code}'
-                },function (data) {
-                    if (data.code === 1) {
-                        halo.showMsgAndRedirect(data.msg,'success',1000,"/admin/login")
-                    } else {
-                        halo.showMsg(data.msg,'error',2000);
+                $.ajax({
+                    url: '/admin/resetPassword',
+                    dataType: 'JSON',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        "password": password.val(),
+                        "definePassword": definePassword.val(),
+                        'code': '${code}'
+                    }),
+                    processData: false,
+                    success: function( data, textStatus, jQxhr ){
+                        if (data.code === 1) {
+                            halo.showMsgAndRedirect(data.msg,'success',1000,"/admin/login")
+                        } else {
+                            halo.showMsg(data.msg,'error',2000);
+                        }
+                    },
+                    error: function( jqXhr, textStatus, errorThrown ){
+                        console.log( errorThrown );
                     }
-                },'JSON');
+                });
             }
         }
     </script>

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
     <link rel="stylesheet" href="/static/halo-backend/css/style.min.css">
     <style>
-        body{background-color:#f5f5f5}*{outline:0}label{color:#4b1c0f}.loginForm{max-width:380px;margin-top:10%}.loginLogo{font-size:56px;text-align:center;margin-bottom:25px;font-weight:500;color:#444;text-shadow:#b2baba .1em .1em .2em}.loginBody{padding:20px;background-color:#fff;-o-box-shadow:-4px 7px 46px 2px rgba(0,0,0,.1);box-shadow:-4px 7px 46px 2px rgba(0,0,0,.1)}.login-button{background-color:#fff;border-radius:0;border:1px solid #000;transition:all .5s ease-in-out}.login-button:hover{border:1px solid #fff;background-color:#000;color:#fff}.form-group{margin-bottom: 24px;}#loginName,#loginPwd{border-radius:0}.control{padding-bottom:5px}
+        body{background-color:#f5f5f5}*{outline:0}label{color:#4b1c0f}.loginForm{max-width:380px;margin-top:10%}.loginLogo{font-size:56px;text-align:center;margin-bottom:25px;font-weight:500;color:#444;text-shadow:#b2baba .1em .1em .2em}.loginBody{padding:20px;background-color:#fff;-o-box-shadow:-4px 7px 46px 2px rgba(0,0,0,.1);box-shadow:-4px 7px 46px 2px rgba(0,0,0,.1)}.login-button{background-color:#fff;border-radius:0;border:1px solid #000;transition:all .5s ease-in-out}.login-button:hover{border:1px solid #fff;background-color:#000;color:#fff}.form-group{margin-bottom: 32px;}#loginName,#loginPwd{border-radius:0}.control{padding-bottom:5px}
     </style>
 </head>
 <body>
