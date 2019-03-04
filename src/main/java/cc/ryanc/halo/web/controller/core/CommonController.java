@@ -38,11 +38,14 @@ public class CommonController implements ErrorController {
         // Get the exception
         Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
 
-        if (throwable != null && StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
+        if (throwable != null) {
             log.error("Captured an exception", throwable);
-            // TODO May cause unreasoned problem
-            // if Ftl was not found then redirect to /404
-            return "redirect:/404";
+
+            if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
+                // TODO May cause unreasoned problem
+                // if Ftl was not found then redirect to /404
+                return "redirect:/404";
+            }
         }
 
         if (statusCode.equals(CommonParamsEnum.NOT_FOUND.getValue())) {
