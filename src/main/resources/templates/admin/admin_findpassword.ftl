@@ -63,7 +63,7 @@
             }
 
             .form-group {
-                margin-bottom: 24px;
+                margin-bottom: 32px;
             }
 
             #userName,#email {
