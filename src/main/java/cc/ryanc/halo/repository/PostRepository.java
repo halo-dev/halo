@@ -25,14 +25,6 @@ import java.util.List;
 public interface PostRepository extends BaseRepository<Post, Long>, JpaSpecificationExecutor<Post> {
 
     /**
-     * 查询前五条文章
-     *
-     * @return List
-     */
-    @Query(value = "SELECT * FROM halo_post WHERE post_type='post' ORDER BY post_date DESC LIMIT 5", nativeQuery = true)
-    List<Post> findTopFive();
-
-    /**
      * 查询所有文章 根据文章类型
      *
      * @param postType post or page

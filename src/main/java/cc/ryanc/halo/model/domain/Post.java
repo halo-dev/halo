@@ -154,13 +154,11 @@ public class Post implements Serializable {
     /**
      * Post priority (default is 0)
      */
-    @ColumnDefault("0")
     private Integer postPriority;
 
     /**
-     * 发布来源
+     * 发布来源 (default is admin)
      */
-    @ColumnDefault("admin")
     private String postSource;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -187,6 +185,10 @@ public class Post implements Serializable {
 
         if (postPriority == null) {
             postPriority = 0;
+        }
+
+        if (postSource == null) {
+            postSource = "admin";
         }
 
         postId = null;
