@@ -40,7 +40,7 @@ import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 @Slf4j
 public class HaloUtils {
 
-    private final static int DEFAULT_PAGE_SIZE = 10;
+    public final static int DEFAULT_PAGE_SIZE = 10;
 
     /**
      * Gets default page size.
