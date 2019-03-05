@@ -2,9 +2,6 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.backup.title' /></@head>
 <div class="content-wrapper">
-    <style type="text/css" rel="stylesheet">
-        .resourceType,.databaseType,.postType{list-style:none;float:left;margin:0;padding-bottom:10px}
-    </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.backup.title' /></h1>
         <ol class="breadcrumb">
@@ -18,18 +15,26 @@
     <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-xs-12">
-                <ul style="list-style: none;padding-left: 0">
-                    <li class="resourceType">
-                        <a data-pjax="true" href="/admin/backup?type=resources" <#if type=='resources'>style="color: #000" </#if>><@spring.message code='admin.backup.item.resources' /></a>&nbsp;|&nbsp;
+                <ul class="subbutton">
+                    <li class="resources">
+                        <a data-pjax="true" href="/admin/backup?type=resources" <#if type=='resources'>class="current"</#if>>
+                            <@spring.message code='admin.backup.item.resources' />
+                        </a> |
                     </li>
-                    <li class="databaseType">
-                        <a data-pjax="true" href="/admin/backup?type=databases" <#if type=='databases'>style="color: #000" </#if>><@spring.message code='admin.backup.item.database' /></a>&nbsp;|&nbsp;
+                    <li class="databases">
+                        <a data-pjax="true" href="/admin/backup?type=databases" <#if type=='databases'>class="current"</#if>>
+                            <@spring.message code='admin.backup.item.database' />
+                        </a> |
                     </li>
-                    <li class="postType">
-                        <a data-pjax="true" href="/admin/backup?type=posts" <#if type=='posts'>style="color: #000" </#if>><@spring.message code='admin.backup.item.posts' /></a>
+                    <li class="posts">
+                        <a data-pjax="true" href="/admin/backup?type=posts" <#if type=='posts'>class="current"</#if>>
+                            <@spring.message code='admin.backup.item.posts' />
+                        </a>
                     </li>
                 </ul>
             </div>
+        </div>
+        <div class="row">
             <div class="col-xs-12">
                 <div class="box box-primary">
                     <div class="box-body table-responsive no-padding">

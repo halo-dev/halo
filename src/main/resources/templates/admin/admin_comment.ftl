@@ -3,9 +3,6 @@
 <@head>${options.blog_title!} | <@spring.message code='admin.comments.title' /></@head>
 <div class="content-wrapper">
     <link rel="stylesheet" href="/static/halo-common/OwO/OwO.min.css">
-    <style type="text/css" rel="stylesheet">
-        .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}s
-    </style>
     <section class="content-header" id="animated-header">
         <h1><@spring.message code='admin.comments.title' /><small></small></h1>
         <ol class="breadcrumb">
@@ -16,17 +13,27 @@
         </ol>
     </section>
     <section class="content container-fluid" id="animated-content">
-        <ul style="list-style: none;padding-left: 0">
-            <li class="publish">
-                <a data-pjax="true" href="/admin/comments" <#if status==0>style="color: #000" </#if>><@spring.message code='common.status.published' /><span class="count">(${publicCount})</span></a>&nbsp;|&nbsp;
-            </li>
-            <li class="draft">
-                <a data-pjax="true" href="/admin/comments?status=1" <#if status==1>style="color: #000" </#if>><@spring.message code='common.status.checking' /><span class="count">(${checkCount})</span></a>&nbsp;|&nbsp;
-            </li>
-            <li class="trash">
-                <a data-pjax="true" href="/admin/comments?status=2" <#if status==2>style="color: #000" </#if>><@spring.message code='common.status.recycle-bin' /><span class="count">(${trashCount})</span></a>
-            </li>
-        </ul>
+        <div class="row">
+            <div class="col-xs-12">
+                <ul class="subbutton">
+                    <li class="public">
+                        <a data-pjax="true" href="/admin/comments" <#if status==0>class="current"</#if>>
+                            <@spring.message code='common.status.published' /><span class="count">(${publicCount})</span>
+                        </a> |
+                    </li>
+                    <li class="checking">
+                        <a data-pjax="true" href="/admin/comments?status=1" <#if status==1>class="current"</#if>>
+                            <@spring.message code='common.status.checking' /><span class="count">(${checkCount})</span>
+                        </a> |
+                    </li>
+                    <li class="trash">
+                        <a data-pjax="true" href="/admin/comments?status=2" <#if status==2>class="current"</#if>>
+                            <@spring.message code='common.status.recycle-bin' /><span class="count">(${trashCount})</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
         <div class="row">
             <div class="col-xs-12">
                 <div class="box box-primary">
