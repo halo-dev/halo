@@ -2,10 +2,6 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.posts.title' /></@head>
 <div class="content-wrapper">
-    <style type="text/css" rel="stylesheet">
-        .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}
-        .pretty{margin: 0;}
-    </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
         <a data-pjax="true" class="btn-header" id="btnNewPost" href="/admin/posts/write">
@@ -24,15 +20,21 @@
     <section class="content container-fluid" id="animated-content">
         <div class="row">
             <div class="col-xs-12">
-                <ul style="list-style: none;padding-left: 0">
+                <ul class="subbutton">
                     <li class="publish">
-                        <a data-pjax="true" href="/admin/posts" <#if status==0>style="color: #000" </#if>><@spring.message code='common.status.published' /><span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
+                        <a data-pjax="true" href="/admin/posts" <#if status==0>class="current"</#if>>
+                            <@spring.message code='common.status.published' /><span class="count">(${publishCount})</span>
+                        </a> |
                     </li>
                     <li class="draft">
-                        <a data-pjax="true" href="/admin/posts?status=1" <#if status==1>style="color: #000" </#if>><@spring.message code='common.status.draft' /><span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
+                        <a data-pjax="true" href="/admin/posts?status=1" <#if status==1>class="current"</#if>>
+                            <@spring.message code='common.status.draft' /><span class="count">(${draftCount})</span>
+                        </a> |
                     </li>
                     <li class="trash">
-                        <a data-pjax="true" href="/admin/posts?status=2" <#if status==2>style="color: #000" </#if>><@spring.message code='common.status.recycle-bin' /><span class="count">(${trashCount})</span></a>
+                        <a data-pjax="true" href="/admin/posts?status=2" <#if status==2>class="current"</#if>>
+                            <@spring.message code='common.status.recycle-bin' /><span class="count">(${trashCount})</span>
+                        </a>
                     </li>
                 </ul>
             </div>
