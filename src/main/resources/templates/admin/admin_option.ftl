@@ -447,6 +447,19 @@
                                     <!-- 七牛云 -->
                                     <div class="qiniu-options" style="display: none">
                                         <div class="form-group">
+                                            <label for="qiniuZone" class="col-lg-2 col-sm-4 control-label">区域：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <select class="form-control" id="qiniuZone" name="qiniu_zone">
+                                                    <option ${((options.qiniu_zone!'')=='')?string('selected','')}>自动选择</option>
+                                                    <option value="z0" ${((options.qiniu_zone!)=='z0')?string('selected','')}>华东</option>
+                                                    <option value="z1" ${((options.qiniu_zone!)=='z1')?string('selected','')}>华北</option>
+                                                    <option value="z2" ${((options.qiniu_zone!)=='z2')?string('selected','')}>华南</option>
+                                                    <option value="na0" ${((options.qiniu_zone!)=='na0')?string('selected','')}>北美</option>
+                                                    <option value="as0" ${((options.qiniu_zone!)=='as0')?string('selected','')}>东南亚</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="qiniuDomain" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.qiniu-domain' /></label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <input type="text" class="form-control" id="qiniuDomain" name="qiniu_domain" value="${options.qiniu_domain!}">

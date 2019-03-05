@@ -34,7 +34,6 @@ public class ApiJournalController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PostDetailOutputDTO save(@RequestBody JournalParam journalParam) {
-        // TODO need to validate token
 
         Post post = journalParam.convertTo();
 
