@@ -62,9 +62,15 @@ public class HaloUtils {
      */
     @NonNull
     public static Zone getDefaultQiniuZone() {
-        Zone zone;
         // Get zone from setting
         String qiniuZone = OPTIONS.get("qiniu_zone");
+
+        if (StrUtil.isBlank(qiniuZone)) {
+            return Zone.autoZone();
+        }
+
+        Zone zone;
+
         switch (qiniuZone) {
             case "z0":
                 zone = Zone.zone0();
