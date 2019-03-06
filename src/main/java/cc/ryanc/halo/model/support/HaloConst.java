@@ -16,6 +16,11 @@ import java.util.Map;
 public class HaloConst {
 
     /**
+     * version constant
+     */
+    public static final String HALO_VERSION = "0.4.2";
+
+    /**
      * 所有设置选项（key,value）
      */
     public static Map<String, String> OPTIONS = new HashMap<>();
