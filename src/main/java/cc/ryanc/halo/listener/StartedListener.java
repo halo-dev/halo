@@ -1,7 +1,7 @@
 package cc.ryanc.halo.listener;
 
-import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -39,6 +39,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
+        // save halo version to database
+        optionsService.saveOption("version", HALO_VERSION);
         try {
             this.loadActiveTheme();
         } catch (TemplateModelException e) {
