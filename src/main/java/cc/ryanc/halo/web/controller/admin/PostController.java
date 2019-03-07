@@ -178,6 +178,8 @@ public class PostController extends BaseController {
         //old data
         final Post oldPost = postService.fetchById(post.getPostId()).orElse(new Post());
         post.setPostViews(oldPost.getPostViews());
+        post.setPostPriority(oldPost.getPostPriority());
+        post.setPostSource(oldPost.getPostSource());
         post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
         post.setUser(oldPost.getUser());
         if (null == post.getPostDate()) {
