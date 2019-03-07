@@ -10,6 +10,7 @@ import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.BeanUtils;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.MarkdownUtils;
@@ -177,11 +178,8 @@ public class PostController extends BaseController {
                              @RequestParam("tagList") String tagList) {
         //old data
         final Post oldPost = postService.fetchById(post.getPostId()).orElse(new Post());
-        post.setPostViews(oldPost.getPostViews());
-        post.setPostPriority(oldPost.getPostPriority());
-        post.setPostSource(oldPost.getPostSource());
+        BeanUtils.updateProperties(oldPost,post);
         post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
-        post.setUser(oldPost.getUser());
         if (null == post.getPostDate()) {
             post.setPostDate(new Date());
         }
