@@ -60,6 +60,11 @@ spring:
   # 多语言资源文件路径
   messages:
     basename: i18n/messages
+
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
 logging:
   level:
     cc.ryanc.halo: INFO
