@@ -33,7 +33,6 @@
 		<java.version>1.8</java.version>
 		<oh-my-email.version>0.0.4</oh-my-email.version>
 		<lombok.version>1.18.4</lombok.version>
-		<ehcache.version>3.6.3</ehcache.version>
 		<hutool.version>4.5.0</hutool.version>
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
 		<qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
@@ -121,9 +120,8 @@
 
 		<!-- EhCache -->
 		<dependency>
-			<groupId>org.ehcache</groupId>
+			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>${ehcache.version}</version>
 		</dependency>
 
 		<!-- hutool工具包 -->

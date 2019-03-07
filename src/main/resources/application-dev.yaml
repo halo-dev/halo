@@ -10,8 +10,6 @@ server:
     session:
       timeout: 86400s
 spring:
-  cache:
-    type: none
   output:
     ansi:
       enabled: always
@@ -60,6 +58,11 @@ spring:
   # 多语言资源文件路径
   messages:
     basename: i18n/messages
+
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
 logging:
   level:
     cc.ryanc.halo: DEBUG
