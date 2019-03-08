@@ -66,18 +66,33 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // Get server port
         String serverPort = applicationContext.getEnvironment().getProperty("server.port");
 
-        String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
-        if (StrUtil.isNotBlank(blogUrl)) {
-            blogUrl = StrUtil.removeSuffix(blogUrl, "/");
-        } else {
-            blogUrl = "http://localhost:" + serverPort;
-        }
+        String blogUrl = getBlogUrl();
 
         log.info("Halo started at    {}", blogUrl);
         log.info("Halo admin is at   {}/admin", blogUrl);
         if (!haloProperties.getDocDisabled()) {
             log.debug("Halo doc enable at {}/swagger-ui.html", blogUrl);
         }
+    }
+
+    /**
+     * Gets blog url.
+     *
+     * @return blog url (If blog url isn't present, current machine IP address will be default)
+     */
+    private String getBlogUrl() {
+        // Get server port
+        String serverPort = applicationContext.getEnvironment().getProperty("server.port");
+
+        String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
+
+        if (StrUtil.isNotBlank(blogUrl)) {
+            blogUrl = StrUtil.removeSuffix(blogUrl, "/");
+        } else {
+            blogUrl = String.format("http://%s:%s", HaloUtils.getMachineIP(), serverPort);
+        }
+
+        return blogUrl;
     }
 
     /**
