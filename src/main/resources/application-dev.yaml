@@ -58,11 +58,14 @@ spring:
   # 多语言资源文件路径
   messages:
     basename: i18n/messages
+  cache:
+    type: none
 
 logging:
   level:
     cc.ryanc.halo: DEBUG
     org.hibernate: ERROR
   file: ./logs/log.log
+
 halo:
   doc-disabled: false
