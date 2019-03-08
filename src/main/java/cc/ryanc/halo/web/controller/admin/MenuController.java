@@ -1,8 +1,11 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Menu;
+import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.MenuService;
+import cc.ryanc.halo.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +15,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * <pre>
@@ -29,13 +33,19 @@ public class MenuController {
     @Autowired
     private MenuService menuService;
 
+    @Autowired
+    private PostService postService;
+
     /**
      * 渲染菜单设置页面
      *
+     * @param model model
      * @return 模板路径/admin/admin_menu
      */
     @GetMapping
-    public String menus() {
+    public String menus(Model model) {
+        List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        model.addAttribute("posts",posts);
         return "/admin/admin_menu";
     }
 

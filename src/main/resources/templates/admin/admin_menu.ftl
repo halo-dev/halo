@@ -67,8 +67,60 @@
                                     <small><@spring.message code='admin.menus.form.menu-name-tips' /></small>
                                 </div>
                                 <div class="form-group">
-                                    <label for="menuUrl"><@spring.message code='admin.menus.form.menu-url' /></label>
-                                    <input type="text" class="form-control" id="menuUrl" name="menuUrl">
+                                    <label for="menuUrlType">路径类型：</label>
+                                    <select class="form-control" id="menuUrlType" name="menuUrlType" onchange="urlTypeChoice()">
+                                        <option value="0">自定义</option>
+                                        <option value="1">预设</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="customUrlGroup">
+                                    <label for="menuCustomUrl"><@spring.message code='admin.menus.form.menu-url' /></label>
+                                    <input type="text" class="form-control" id="menuCustomUrl" name="menuUrl">
+                                    <small><@spring.message code='admin.menus.form.menu-url-tips' /></small>
+                                </div>
+                                <div class="form-group" id="internalUrlGroup" style="display: none">
+                                    <label for="menuInternalUrl"><@spring.message code='admin.menus.form.menu-url' /></label>
+                                    <select class="form-control" id="menuInternalUrl" name="menuUrl" disabled="disabled">
+                                        <optgroup label="内置页面">
+                                            <option value="/">首页 ( / )</option>
+                                            <option value="/archives">归档 ( /archives )</option>
+                                            <option value="/links">友情链接 ( /links )</option>
+                                            <option value="/gallery">图库 ( /gallery )</option>
+                                            <option value="/categories">分类目录 ( /categories )</option>
+                                            <option value="/tags">标签 ( /tags )</option>
+                                        </optgroup>
+                                        <#if posts?? && posts?size gt 0>
+                                            <optgroup label="自定义页面">
+                                                <#list posts as post>
+                                                    <option value="/p/${post.postUrl!}">${post.postTitle!} ( /p/${post.postUrl!} )</option>
+                                                </#list>
+                                            </optgroup>
+                                        </#if>
+                                        <@commonTag method = "categories">
+                                            <#if categories?? && categories?size gt 0>
+                                                <optgroup label="分类目录">
+                                                    <#list categories as cate>
+                                                        <option value="/categories/${cate.cateUrl!}">${cate.cateName!} ( /categories/${cate.cateUrl!} )</option>
+                                                    </#list>
+                                                </optgroup>
+                                            </#if>
+                                        </@commonTag>
+                                        <@commonTag method = "tags">
+                                            <#if tags?? && tags?size gt 0>
+                                                <optgroup label="标签">
+                                                    <#list tags as tag>
+                                                        <option value="/tags/${tag.tagName!}">${tag.tagName!} ( /tags/${tag.tagName!} )</option>
+                                                    </#list>
+                                                </optgroup>
+                                            </#if>
+                                        </@commonTag>
+                                        <optgroup label="其他">
+                                            <option value="/sitemap.xml">站点地图 ( /sitemap.xml )</option>
+                                            <option value="/sitemap.html">站点地图 ( /sitemap.html )</option>
+                                            <option value="/atom.xml">Atom 订阅 ( /atom.xml )</option>
+                                            <option value="/rss.xml">Rss 订阅 ( /rss.xml )</option>
+                                        </optgroup>
+                                    </select>
                                     <small><@spring.message code='admin.menus.form.menu-url-tips' /></small>
                                 </div>
                                 <div class="form-group">
@@ -168,6 +220,24 @@
         <#else>
             window.location.href = url;
         </#if>
+    }
+
+    function urlTypeChoice() {
+        var customUrl = $("#menuCustomUrl");
+        var internalUrl = $("#menuInternalUrl");
+        var customUrlGroup = $("#customUrlGroup");
+        var internalUrlGroup = $("#internalUrlGroup");
+        if($("#menuUrlType").val() === "0"){
+            customUrlGroup.show();
+            customUrl.removeAttr("disabled");
+            internalUrlGroup.hide();
+            internalUrl.attr("disabled","disabled");
+        }else{
+            internalUrlGroup.show();
+            internalUrl.removeAttr("disabled");
+            customUrlGroup.hide();
+            customUrl.attr("disabled","disabled");
+        }
     }
 
     /**
