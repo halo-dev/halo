@@ -20,7 +20,7 @@ public abstract class BaseController {
     protected Logger log = Logger.getLogger(getClass());
 
     /**
-     * 根据主题名称渲染页面
+     * 根据模板名称渲染页面
      *
      * @param pageName pageName
      * @return 返回拼接好的模板路径
@@ -29,7 +29,23 @@ public abstract class BaseController {
         final StrBuilder themeStr = new StrBuilder("themes/");
         themeStr.append(THEME);
         themeStr.append("/");
-        return themeStr.append(pageName).toString();
+        themeStr.append(pageName);
+        return themeStr.toString();
+    }
+
+    /**
+     * 根据主题以及模板名渲染页面
+     *
+     * @param theme    主题
+     * @param pageName 模板名
+     * @return String
+     */
+    public String render(String theme, String pageName) {
+        final StrBuilder themeStr = new StrBuilder("themes/");
+        themeStr.append(theme);
+        themeStr.append("/");
+        themeStr.append(pageName);
+        return themeStr.toString();
     }
 
     /**
