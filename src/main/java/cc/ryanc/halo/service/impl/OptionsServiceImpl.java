@@ -55,26 +55,11 @@ public class OptionsServiceImpl extends AbstractCrudService<Options, String> imp
      */
     @Override
     public void saveOption(String key, String value) {
-        if (StrUtil.equals(value, "")) {
-//            options = new Options();
-//            options.setOptionName(key);
-//            this.remove(options);
-
+        if (StrUtil.isBlank(value)) {
+            // If value is empty
             removeByIdOfNullable(key);
         } else if (StrUtil.isNotEmpty(key)) {
             //如果查询到有该设置选项则做更新操作，反之保存新的设置选项
-
-//                if (null == optionsRepository.findOptionsByOptionName(key)) {
-//                    options = new Options();
-//                    options.setOptionName(key);
-//                    options.setOptionValue(value);
-//                    optionsRepository.save(options);
-//                } else {
-//                    options = optionsRepository.findOptionsByOptionName(key);
-//                    options.setOptionValue(value);
-//                    optionsRepository.save(options);
-//                }
-
             Options options = fetchById(key).map(option -> {
                 // Exist
                 option.setOptionValue(value);
@@ -99,13 +84,6 @@ public class OptionsServiceImpl extends AbstractCrudService<Options, String> imp
      */
     @Override
     public Map<String, String> findAllOptions() {
-//        final Map<String, String> options = new HashMap<>();
-//        final List<Options> optionsList = optionsRepository.findAll();
-//        if (null != optionsList) {
-//            optionsList.forEach(option -> options.put(option.getOptionName(), option.getOptionValue()));
-//        }
-//        return options;
-
         return ServiceUtils.convertToMap(listAll(), Options::getOptionName, Options::getOptionValue);
     }
 
@@ -117,12 +95,6 @@ public class OptionsServiceImpl extends AbstractCrudService<Options, String> imp
      */
     @Override
     public String findOneOption(String key) {
-//        final Options options = getByIdOfNullable(key);
-//        if (null != options) {
-//            return options.getOptionValue();
-//        }
-//        return null;
-
         return fetchById(key).map(Options::getOptionValue).orElse(null);
     }
 }

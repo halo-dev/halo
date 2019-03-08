@@ -1,6 +1,8 @@
 package cc.ryanc.halo.listener;
 
+import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionsService;
 import cc.ryanc.halo.utils.HaloUtils;
@@ -10,6 +12,7 @@ import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,6 +40,12 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Autowired
     private freemarker.template.Configuration configuration;
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    private HaloProperties haloProperties;
+
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
@@ -49,6 +58,26 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         this.loadOptions();
         this.loadThemes();
         this.loadOwo();
+
+        this.printStartInfo();
+    }
+
+    private void printStartInfo() {
+        // Get server port
+        String serverPort = applicationContext.getEnvironment().getProperty("server.port");
+
+        String blogUrl = HaloConst.OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
+        if (StrUtil.isNotBlank(blogUrl)) {
+            blogUrl = StrUtil.removeSuffix(blogUrl, "/");
+        } else {
+            blogUrl = "http://localhost:" + serverPort;
+        }
+
+        log.info("Halo started at    {}", blogUrl);
+        log.info("Halo admin is at   {}/admin", blogUrl);
+        if (!haloProperties.getDocDisabled()) {
+            log.debug("Halo doc enable at {}/swagger-ui.html", blogUrl);
+        }
     }
 
     /**
