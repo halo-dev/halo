@@ -64,3 +64,5 @@ logging:
     cc.ryanc.halo: DEBUG
     org.hibernate: ERROR
   file: ./logs/log.log
+halo:
+  doc-disabled: false
