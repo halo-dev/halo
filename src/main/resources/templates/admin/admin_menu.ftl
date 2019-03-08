@@ -109,7 +109,7 @@
                                             <#if tags?? && tags?size gt 0>
                                                 <optgroup label="标签">
                                                     <#list tags as tag>
-                                                        <option value="/tags/${tag.tagName!}">${tag.tagName!} ( /tags/${tag.tagName!} )</option>
+                                                        <option value="/tags/${tag.tagUrl!}">${tag.tagName!} ( /tags/${tag.tagUrl!} )</option>
                                                     </#list>
                                                 </optgroup>
                                             </#if>
