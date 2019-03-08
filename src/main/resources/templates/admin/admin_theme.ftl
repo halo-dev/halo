@@ -27,6 +27,9 @@
             font-size: 18px;
             line-height: 30px;
         }
+        .theme-title a{
+            color: #000;
+        }
         .btn-delete:hover{
             color: red;
         }
@@ -52,7 +55,9 @@
                                 <div class="pull-right btn-delete" style="display: none" onclick="modelShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
                             </div>
                             <div class="box-footer">
-                                <span class="theme-title">${theme.themeName!?cap_first}</span>
+                                <span class="theme-title">
+                                    <a href="${options.blog_url!}?theme=${theme.themeName!}" target="_blank" title="点击预览该主题">${theme.themeName!?cap_first}</a>
+                                </span>
                                 <#if theme.hasOptions>
                                     <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="halo.layerModal('/admin/themes/options?theme=${theme.themeName!}&hasUpdate=<#if theme.hasUpdate>true<#else>false</#if>','${theme.themeName!} <@spring.message code="admin.themes.js.theme-setting" />')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
                                 </#if>
