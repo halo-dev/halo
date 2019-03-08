@@ -21,6 +21,11 @@ public class HaloConst {
     public static final String HALO_VERSION = "0.4.2";
 
     /**
+     * Token key
+     */
+    public static final String TOKEN_HEADER = "token";
+
+    /**
      * 所有设置选项（key,value）
      */
     public static Map<String, String> OPTIONS = new HashMap<>();

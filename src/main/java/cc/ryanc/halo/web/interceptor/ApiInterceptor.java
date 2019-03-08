@@ -1,8 +1,8 @@
 package cc.ryanc.halo.web.interceptor;
 
-import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.TrueFalseEnum;
+import cc.ryanc.halo.model.support.JsonResult;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.support.HaloConst.TOKEN_HEADER;
 
 /**
  * <pre>
@@ -28,8 +29,6 @@ import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 @Component
 public class ApiInterceptor implements HandlerInterceptor {
 
-    private static final String TOKEN = "token";
-
     private final ObjectMapper objectMapper;
 
     public ApiInterceptor(ObjectMapper objectMapper) {
@@ -38,19 +37,20 @@ public class ApiInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), OPTIONS.get(BlogPropertiesEnum.API_STATUS.getProp()))) {
-            if (StrUtil.equals(request.getHeader(TOKEN), OPTIONS.get(BlogPropertiesEnum.API_TOKEN.getProp()))) {
-                return true;
-            } else {
-                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-                response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-                JsonResult result = new JsonResult(HttpStatus.BAD_REQUEST.value(), "Invalid Token");
-                response.getWriter().write(objectMapper.writeValueAsString(result));
-                return false;
-            }
+        if (!StrUtil.equals(TrueFalseEnum.TRUE.getDesc(), OPTIONS.get(BlogPropertiesEnum.API_STATUS.getProp()))) {
+            response.sendRedirect("/404");
+            return false;
         }
-        response.sendRedirect("/404");
-        return false;
+
+        if (!StrUtil.equals(request.getHeader(TOKEN_HEADER), OPTIONS.get(BlogPropertiesEnum.API_TOKEN.getProp()))) {
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+            JsonResult result = new JsonResult(HttpStatus.BAD_REQUEST.value(), "Invalid Token");
+            response.getWriter().write(objectMapper.writeValueAsString(result));
+            return false;
+        }
+
+        return true;
     }
 
     @Override
