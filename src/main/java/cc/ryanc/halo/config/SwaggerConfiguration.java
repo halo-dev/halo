@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static cc.ryanc.halo.model.support.HaloConst.HALO_VERSION;
+import static cc.ryanc.halo.model.support.HaloConst.TOKEN_HEADER;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 /**
@@ -101,7 +103,7 @@ public class SwaggerConfiguration {
     }
 
     private ApiKey apiKeys() {
-        return new ApiKey("TOKEN ACCESS", HttpHeaders.AUTHORIZATION, In.HEADER.name());
+        return new ApiKey("TOKEN ACCESS", TOKEN_HEADER, In.HEADER.name());
     }
 
     private SecurityContext securityContext() {
@@ -121,7 +123,7 @@ public class SwaggerConfiguration {
         return new ApiInfoBuilder()
                 .title("Halo API Documentation")
                 .description("Documentation for Halo API")
-                .version("v0.4.2")
+                .version(HALO_VERSION)
                 .termsOfServiceUrl("https://ryanc.cc/")
                 .contact(new Contact("RYAN0UP", "https://ryanc.cc/", "i#ryanc.cc"))
                 .build();
