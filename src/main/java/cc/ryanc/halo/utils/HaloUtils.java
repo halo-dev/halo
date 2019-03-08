@@ -17,8 +17,10 @@ import org.springframework.util.ResourceUtils;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -41,6 +43,21 @@ import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 public class HaloUtils {
 
     public final static int DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * Gets machine IP address.
+     *
+     * @return current machine IP address.
+     */
+    public static String getMachineIP() {
+        InetAddress machineAddress;
+        try {
+            machineAddress = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            machineAddress = InetAddress.getLoopbackAddress();
+        }
+        return machineAddress.getHostAddress();
+    }
 
     /**
      * Gets default page size.
@@ -187,9 +204,9 @@ public class HaloUtils {
             final BufferedImage image = ImageIO.read(new FileInputStream(file));
             return image.getWidth() + "x" + image.getHeight();
         } catch (Exception e) {
-            e.printStackTrace();
-            return "";
+            log.error("Failed to get read image file", e);
         }
+        return "";
     }
 
     /**
@@ -232,7 +249,7 @@ public class HaloUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("Themes scan failed：{}", e.getMessage());
+            log.error("Themes scan failed", e);
         }
         return themes;
     }
@@ -268,7 +285,7 @@ public class HaloUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("Failed to get theme template: {}", e.getMessage());
+            log.error("Failed to get theme template", e);
         }
         return tpls;
     }
@@ -294,7 +311,7 @@ public class HaloUtils {
                 }
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error("File not found", e);
         }
         return tpls;
     }
@@ -318,7 +335,7 @@ public class HaloUtils {
             bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(data);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to export file", e);
         } finally {
             if (null != bufferedWriter) {
                 bufferedWriter.close();
@@ -392,7 +409,7 @@ public class HaloUtils {
                 result.append(line);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to create baidu post", e);
         } finally {
             try {
                 if (null != out) {
@@ -402,7 +419,7 @@ public class HaloUtils {
                     in.close();
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
+                // Ignore this exception
             }
         }
         return result.toString();
