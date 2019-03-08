@@ -59,10 +59,6 @@ spring:
   messages:
     basename: i18n/messages
 
-  cache:
-    type: ehcache
-    ehcache:
-      config: classpath:ehcache.xml
 logging:
   level:
     cc.ryanc.halo: DEBUG
