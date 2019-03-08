@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -44,8 +45,9 @@ public class FrontIndexController extends BaseController {
      * @return 模板路径
      */
     @GetMapping
-    public String index(Model model) {
-        return this.index(model, 1, Sort.by(DESC, "postPriority").and(Sort.by(DESC, "postDate")));
+    public String index(@RequestParam(value = "theme", defaultValue = "") String theme,
+                        Model model) {
+        return this.index(model, theme, 1, Sort.by(DESC, "postPriority").and(Sort.by(DESC, "postDate")));
     }
 
     /**
@@ -57,6 +59,7 @@ public class FrontIndexController extends BaseController {
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,
+                        @RequestParam(value = "theme", defaultValue = "") String theme,
                         @PathVariable(value = "page") Integer page,
                         @SortDefault.SortDefaults({
                                 @SortDefault(sort = "postPriority", direction = DESC),
@@ -79,6 +82,9 @@ public class FrontIndexController extends BaseController {
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
+        if (StrUtil.isNotEmpty(theme)) {
+            return this.render(theme, "index");
+        }
         return this.render("index");
     }
 }
