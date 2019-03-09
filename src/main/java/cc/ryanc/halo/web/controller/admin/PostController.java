@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.dto.PostViewOutputDTO;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
@@ -35,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
@@ -304,9 +306,12 @@ public class PostController extends BaseController {
             return JsonResult.fail(localeMessageUtil.getMessage("code.admin.post.no-baidu-token"));
         }
         final String blogUrl = OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
-        final List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc());
+        final List<PostViewOutputDTO> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc())
+                .stream()
+                .map(post -> new PostViewOutputDTO().convertFrom(post))
+                .collect(Collectors.toList());
         final StringBuilder urls = new StringBuilder();
-        for (Post post : posts) {
+        for (PostViewOutputDTO post : posts) {
             urls.append(blogUrl);
             urls.append("/archives/");
             urls.append(post.getPostUrl());

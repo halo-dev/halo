@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Menu;
 import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.PostViewOutputDTO;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.MenuService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <pre>
@@ -44,9 +46,12 @@ public class MenuController {
      */
     @GetMapping
     public String menus(Model model) {
-        List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        List<PostViewOutputDTO> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc())
+                .stream()
+                .map(post -> new PostViewOutputDTO().convertFrom(post))
+                .collect(Collectors.toList());
         model.addAttribute("posts",posts);
-        return "/admin/admin_menu";
+        return "admin/admin_menu";
     }
 
     /**
@@ -82,7 +87,7 @@ public class MenuController {
     public String updateMenu(@RequestParam("menuId") Long menuId, Model model) {
         final Menu menu = menuService.fetchById(menuId).orElse(new Menu());
         model.addAttribute("updateMenu", menu);
-        return "/admin/admin_menu";
+        return "admin/admin_menu";
     }
 
     /**

@@ -2,6 +2,8 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.domain.*;
+import cc.ryanc.halo.model.dto.CommentViewOutputDTO;
+import cc.ryanc.halo.model.dto.PostViewOutputDTO;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.model.params.PasswordResetParam;
 import cc.ryanc.halo.model.support.JsonResult;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
@@ -97,24 +100,30 @@ public class AdminController extends BaseController {
         final Long commentCount = commentService.count();
         model.addAttribute("commentCount", commentCount);
 
-        //查询最新的文章
-        final List<Post> postsLatest = postService.findPostLatest();
-        model.addAttribute("postTopFive", postsLatest);
-
-        //查询最新的日志
-        final List<Logs> logsLatest = logsService.findLogsLatest();
-        model.addAttribute("logs", logsLatest);
-
-        //查询最新的评论
-        final List<Comment> comments = commentService.findCommentsLatest();
-        model.addAttribute("comments", comments);
-
         //附件数量
         model.addAttribute("mediaCount", attachmentService.count());
 
         //文章阅读总数
         final Long postViewsSum = postService.getPostViews();
         model.addAttribute("postViewsSum", postViewsSum);
+
+        //查询最新的文章
+        final List<PostViewOutputDTO> postsLatest = postService.findPostLatest()
+                .stream()
+                .map(post -> new PostViewOutputDTO().convertFrom(post))
+                .collect(Collectors.toList());
+        model.addAttribute("postsLatest", postsLatest);
+
+        //查询最新的日志
+        final List<Logs> logsLatest = logsService.findLogsLatest();
+        model.addAttribute("logsLatest", logsLatest);
+
+        //查询最新的评论
+        final List<CommentViewOutputDTO> commentsLatest = commentService.findCommentsLatest()
+                .stream()
+                .map(comment -> new CommentViewOutputDTO().convertFrom(comment))
+                .collect(Collectors.toList());
+        model.addAttribute("commentsLatest", commentsLatest);
 
         //成立天数
         final Date blogStart = DateUtil.parse(OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));

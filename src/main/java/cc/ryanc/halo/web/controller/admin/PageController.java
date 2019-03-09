@@ -4,11 +4,12 @@ import cc.ryanc.halo.model.domain.Gallery;
 import cc.ryanc.halo.model.domain.Link;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.support.JsonResult;
-import cc.ryanc.halo.model.support.LogsRecord;
+import cc.ryanc.halo.model.dto.PageAdminOutputDTO;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.service.GalleryService;
 import cc.ryanc.halo.service.LinkService;
 import cc.ryanc.halo.service.LogsService;
@@ -40,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static cc.ryanc.halo.model.support.HaloConst.USER_SESSION_KEY;
@@ -83,7 +85,10 @@ public class PageController {
      */
     @GetMapping
     public String pages(Model model) {
-        final List<Post> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc());
+        final List<PageAdminOutputDTO> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc())
+                .stream()
+                .map(post -> new PageAdminOutputDTO().convertFrom(post))
+                .collect(Collectors.toList());
         model.addAttribute("pages", posts);
         return "admin/admin_page";
     }
