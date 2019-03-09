@@ -211,8 +211,8 @@
                                     <th><@spring.message code='common.th.status' /></th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                                <#if postTopFive??>
-                                    <#list postTopFive as post>
+                                <#if postsLatest??>
+                                    <#list postsLatest as post>
                                         <tr>
                                             <#if post.postStatus == 0>
                                                 <td><a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a></td>
@@ -261,8 +261,8 @@
                                     <th><@spring.message code='common.th.status' /></th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                                <#if comments??>
-                                <#list comments as comment>
+                                <#if commentsLatest??>
+                                <#list commentsLatest as comment>
                                     <tr>
                                         <td>${comment.commentAuthor}</td>
                                         <td>
@@ -338,8 +338,8 @@
                                     <th>IP</th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                                <#if logs??>
-                                <#list logs as log>
+                                <#if logsLatest??>
+                                <#list logsLatest as log>
                                     <tr>
                                         <td>${log.logTitle}</td>
                                         <td>${log.logContent}</td>

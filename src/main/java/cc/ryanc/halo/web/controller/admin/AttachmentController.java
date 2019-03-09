@@ -1,10 +1,10 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.support.JsonResult;
-import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
@@ -52,7 +52,7 @@ public class AttachmentController {
     private LocaleMessageUtil localeMessageUtil;
 
     /**
-     * 复印件列表
+     * 附件列表
      *
      * @param model model
      * @return 模板路径admin/admin_attachment
