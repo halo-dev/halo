@@ -34,21 +34,6 @@ public abstract class BaseController {
     }
 
     /**
-     * 根据主题以及模板名渲染页面
-     *
-     * @param theme    主题
-     * @param pageName 模板名
-     * @return String
-     */
-    public String render(String theme, String pageName) {
-        final StrBuilder themeStr = new StrBuilder("themes/");
-        themeStr.append(theme);
-        themeStr.append("/");
-        themeStr.append(pageName);
-        return themeStr.toString();
-    }
-
-    /**
      * 渲染404页面
      *
      * @return redirect:/404
