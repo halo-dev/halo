@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.dto.CommentAdminOutputDTO;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.service.CommentService;
@@ -67,7 +68,8 @@ public class CommentController extends BaseController {
     public String comments(Model model,
                            @PageableDefault(sort = "commentDate", direction = Sort.Direction.DESC) Pageable pageable,
                            @RequestParam(value = "status", defaultValue = "0") Integer status) {
-        final Page<Comment> comments = commentService.findAll(status, pageable);
+        final Page<CommentAdminOutputDTO> comments = commentService.findAll(status, pageable)
+                .map(comment -> new CommentAdminOutputDTO().convertFrom(comment));
         model.addAttribute("comments", comments);
         model.addAttribute("publicCount", commentService.getCountByStatus(CommentStatusEnum.PUBLISHED.getCode()));
         model.addAttribute("checkCount", commentService.getCountByStatus(CommentStatusEnum.CHECKING.getCode()));

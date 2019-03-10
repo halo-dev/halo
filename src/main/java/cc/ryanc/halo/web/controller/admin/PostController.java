@@ -2,13 +2,14 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.dto.PostAdminOutputDTO;
 import cc.ryanc.halo.model.dto.PostViewOutputDTO;
-import cc.ryanc.halo.model.support.JsonResult;
-import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.BeanUtils;
@@ -93,7 +94,8 @@ public class PostController extends BaseController {
     public String posts(Model model,
                         @RequestParam(value = "status", defaultValue = "0") Integer status,
                         @PageableDefault(sort = "postDate", direction = DESC) Pageable pageable) {
-        final Page<Post> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        final Page<PostAdminOutputDTO> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable)
+                .map(post -> new PostAdminOutputDTO().convertFrom(post));
         model.addAttribute("posts", posts);
         model.addAttribute("publishCount", postService.getCountByStatus(PostStatusEnum.PUBLISHED.getCode()));
         model.addAttribute("draftCount", postService.getCountByStatus(PostStatusEnum.DRAFT.getCode()));
@@ -180,7 +182,7 @@ public class PostController extends BaseController {
                              @RequestParam("tagList") String tagList) {
         //old data
         final Post oldPost = postService.fetchById(post.getPostId()).orElse(new Post());
-        BeanUtils.updateProperties(oldPost,post);
+        BeanUtils.updateProperties(oldPost, post);
         post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
         if (null == post.getPostDate()) {
             post.setPostDate(new Date());

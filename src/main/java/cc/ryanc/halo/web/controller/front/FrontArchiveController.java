@@ -3,8 +3,9 @@ package cc.ryanc.halo.web.controller.front;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.support.ListPage;
+import cc.ryanc.halo.model.dto.PostListOutputDTO;
 import cc.ryanc.halo.model.enums.*;
+import cc.ryanc.halo.model.support.ListPage;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.CommentUtil;
@@ -79,7 +80,8 @@ public class FrontArchiveController extends BaseController {
                            @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
         //所有文章数据，分页，material主题适用
         final Pageable pageable = PageRequest.of(page - 1, 5, sort);
-        final Page<Post> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+        final Page<PostListOutputDTO> posts = postService.findPostByStatus(PostStatusEnum.PUBLISHED.getCode(), PostTypeEnum.POST_TYPE_POST.getDesc(), pageable)
+                .map(post -> new PostListOutputDTO().convertFrom(post));
         if (null == posts) {
             return this.renderNotFound();
         }
@@ -100,7 +102,8 @@ public class FrontArchiveController extends BaseController {
     public String archives(Model model,
                            @PathVariable(value = "year") String year,
                            @PathVariable(value = "month") String month) {
-        final Page<Post> posts = postService.findPostByYearAndMonth(year, month, null);
+        final Page<PostListOutputDTO> posts = postService.findPostByYearAndMonth(year, month, null)
+                .map(post -> new PostListOutputDTO().convertFrom(post));
         if (null == posts) {
             return this.renderNotFound();
         }

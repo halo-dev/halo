@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.model.dto.PostListOutputDTO;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
@@ -86,7 +87,8 @@ public class FrontTagController extends BaseController {
             size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<Post> posts = postService.findPostsByTags(tag, pageable);
+        final Page<PostListOutputDTO> posts = postService.findPostsByTags(tag, pageable)
+                .map(post -> new PostListOutputDTO().convertFrom(post));
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_tags", true);
         model.addAttribute("posts", posts);

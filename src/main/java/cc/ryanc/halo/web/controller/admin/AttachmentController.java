@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Attachment;
+import cc.ryanc.halo.model.dto.AttachmentAdminOutputDTO;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.model.support.JsonResult;
@@ -60,7 +61,8 @@ public class AttachmentController {
     @GetMapping
     public String attachments(Model model,
                               @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable) {
-        final Page<Attachment> attachments = attachmentService.listAll(pageable);
+        final Page<AttachmentAdminOutputDTO> attachments = attachmentService.listAll(pageable)
+                .map(attachment -> new AttachmentAdminOutputDTO().convertFrom(attachment));
         model.addAttribute("attachments", attachments);
         return "admin/admin_attachment";
     }
@@ -76,7 +78,8 @@ public class AttachmentController {
                                    @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable,
                                    @RequestParam(value = "id", defaultValue = "none") String id,
                                    @RequestParam(value = "type", defaultValue = "normal") String type) {
-        final Page<Attachment> attachments = attachmentService.listAll(pageable);
+        final Page<AttachmentAdminOutputDTO> attachments = attachmentService.listAll(pageable)
+                .map(attachment -> new AttachmentAdminOutputDTO().convertFrom(attachment));
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
         if (StrUtil.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
