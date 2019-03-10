@@ -27,9 +27,6 @@
             font-size: 18px;
             line-height: 30px;
         }
-        .theme-title a{
-            color: #000;
-        }
         .btn-delete:hover{
             color: red;
         }
@@ -56,7 +53,7 @@
                             </div>
                             <div class="box-footer">
                                 <span class="theme-title">
-                                    <a href="${options.blog_url!}?theme=${theme.themeName!}" target="_blank" title="点击预览该主题">${theme.themeName!?cap_first}</a>
+                                    ${theme.themeName!?cap_first}
                                 </span>
                                 <#if theme.hasOptions>
                                     <button class="btn btn-primary btn-sm pull-right btn-theme-setting" onclick="halo.layerModal('/admin/themes/options?theme=${theme.themeName!}&hasUpdate=<#if theme.hasUpdate>true<#else>false</#if>','${theme.themeName!} <@spring.message code="admin.themes.js.theme-setting" />')" style="display: none"><@spring.message code='admin.themes.btn.setting' /></button>
