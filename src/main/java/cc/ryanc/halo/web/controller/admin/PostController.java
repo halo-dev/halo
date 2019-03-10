@@ -24,8 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
@@ -85,6 +87,7 @@ public class PostController extends BaseController {
     }
 
     /**
+     * ¬
      * 处理后台获取文章列表的请求
      *
      * @param model model
@@ -93,7 +96,12 @@ public class PostController extends BaseController {
     @GetMapping
     public String posts(Model model,
                         @RequestParam(value = "status", defaultValue = "0") Integer status,
-                        @PageableDefault(sort = "postDate", direction = DESC) Pageable pageable) {
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @SortDefault.SortDefaults({
+                                @SortDefault(sort = "postPriority", direction = DESC),
+                                @SortDefault(sort = "postDate", direction = DESC)
+                        }) Sort sort) {
+        final Pageable pageable = PageRequest.of(page, 10, sort);
         final Page<PostAdminOutputDTO> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable)
                 .map(post -> new PostAdminOutputDTO().convertFrom(post));
         model.addAttribute("posts", posts);
@@ -257,6 +265,22 @@ public class PostController extends BaseController {
             return "redirect:/admin/posts?status=2";
         }
         return "redirect:/admin/page";
+    }
+
+    /**
+     * 置顶/取消置顶文章
+     *
+     * @param postId   postId
+     * @param priority priority
+     * @return JsonResult
+     */
+    @GetMapping(value = "/topPost")
+    public String topPost(@RequestParam("postId") Long postId,
+                          @RequestParam("priority") Integer priority) {
+        Post post = postService.getById(postId);
+        post.setPostPriority(priority);
+        postService.update(post);
+        return "redirect:/admin/posts";
     }
 
     /**

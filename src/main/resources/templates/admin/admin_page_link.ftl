@@ -102,7 +102,7 @@
                                                     <#else >
                                                     <a data-pjax="true" class="btn btn-primary btn-xs" href="/admin/page/links/edit?linkId=${link.linkId?c}"><@spring.message code='common.btn.modify' /></a>
                                                     </#if>
-                                                    <button class="btn btn-danger btn-xs" onclick="modelShow('/admin/page/links/remove?linkId=${link.linkId?c}')"><@spring.message code='common.btn.delete' /></>
+                                                    <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/page/links/remove?linkId=${link.linkId?c}')"><@spring.message code='common.btn.delete' /></>
                                                 </td>
                                             </tr>
                                         </#list>
@@ -135,7 +135,7 @@
 </div>
 <@footer>
 <script type="application/javascript" id="footer_script">
-    function modelShow(url) {
+    function modalShow(url) {
         $('#url').val(url);
         $('#removeLinkModal').modal();
     }

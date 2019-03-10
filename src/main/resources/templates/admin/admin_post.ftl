@@ -92,18 +92,23 @@
                                             <td>
                                                 <#switch post.postStatus>
                                                     <#case 0>
-                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs "><@spring.message code='common.btn.edit' /></a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
+                                                        <#if post.postPriority == 0>
+                                                            <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/topPost?postId=${post.postId?c}&priority=1','是否置顶该文章？')">置顶</button>
+                                                        <#else>
+                                                            <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/topPost?postId=${post.postId?c}&priority=0','是否取消置顶该文章？')">取消置顶</button>
+                                                        </#if>
+                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs"><@spring.message code='common.btn.edit' /></a>
+                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/throw?postId=${post.postId?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                         <#break >
                                                     <#case 1>
                                                         <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}"
-                                                           class="btn btn-info btn-xs "><@spring.message code="common.btn.edit" /></a>
-                                                        <button class="btn btn-primary btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-release-post" />')"><@spring.message code='common.btn.release' /></button>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
+                                                           class="btn btn-info btn-xs"><@spring.message code="common.btn.edit" /></a>
+                                                        <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/revert?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-release-post" />')"><@spring.message code='common.btn.release' /></button>
+                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/throw?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                         <#break >
                                                     <#case 2>
                                                         <a data-pjax="true" href="/admin/posts/revert?postId=${post.postId?c}&status=2" class="btn btn-primary btn-xs "><@spring.message code='common.btn.reduction' /></a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId?c}&postType=${post.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
+                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/remove?postId=${post.postId?c}&postType=${post.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
                                                         <#break >
                                                 </#switch>
                                             </td>
@@ -154,7 +159,7 @@
                 <div class="modal-footer">
                     <input type="hidden" id="url"/>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code='common.btn.cancel' /></button>
-                    <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal"><@spring.message code='common.btn.define' /></a>
+                    <a onclick="modalAction()" class="btn btn-danger" data-dismiss="modal"><@spring.message code='common.btn.define' /></a>
                 </div>
             </div>
         </div>
@@ -162,12 +167,12 @@
 </div>
 <@footer>
 <script type="application/javascript" id="footer_script">
-    function modelShow(url,message) {
+    function modalShow(url,message) {
         $('#url').val(url);
         $('#message').html(message);
         $('#removePostModal').modal();
     }
-    function removeIt(){
+    function modalAction(){
         var url=$.trim($("#url").val());
         <#if (options.admin_pjax!'true') == 'true'>
             pjax.loadUrl(url);

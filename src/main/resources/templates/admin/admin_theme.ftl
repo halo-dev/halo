@@ -49,7 +49,7 @@
                     <div class="col-md-6 col-lg-3 col theme-body">
                         <div class="box box-solid">
                             <div class="box-body theme-thumbnail" style="background-image: url(/${theme.themeName!}/screenshot.png)">
-                                <div class="pull-right btn-delete" style="display: none" onclick="modelShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
+                                <div class="pull-right btn-delete" style="display: none" onclick="modalShow('/admin/themes/remove?themeName=${theme.themeName}')"><i class="fa fa-times fa-lg" aria-hidden="true"></i></div>
                             </div>
                             <div class="box-footer">
                                 <span class="theme-title">
@@ -128,7 +128,7 @@
         $(this).find(".theme-thumbnail").css("opacity","1");
         $(this).find(".btn-theme-setting,.btn-theme-enable,.btn-theme-update").hide();
     });
-    function modelShow(url) {
+    function modalShow(url) {
         $('#url').val(url);
         $('#removeThemeModal').modal();
     }
