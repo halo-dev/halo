@@ -4,7 +4,7 @@ import cc.ryanc.halo.model.domain.Category;
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.Tag;
-import cc.ryanc.halo.model.dto.base.AbstractOutputConverter;
+import cc.ryanc.halo.model.dto.base.OutputConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * @author johnniang
  */
 @Data
-public class PostAdminOutputDTO extends AbstractOutputConverter<PostAdminOutputDTO, Post> {
+public class PostAdminOutputDTO implements OutputConverter<PostAdminOutputDTO, Post> {
 
     private Long postId;
 
