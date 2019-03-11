@@ -64,16 +64,16 @@
                                                 <#switch comment.commentStatus>
                                                     <#case 0>
                                                     <button class="btn btn-primary btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')" <#if comment.isAdmin==1>disabled</#if>><@spring.message code="common.btn.reply" /></button>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=0&page=${comments.number}','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code="common.btn.recycling" /></button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modalShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=0&page=${comments.number}','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code="common.btn.recycling" /></button>
                                                     <#break >
                                                     <#case 1>
                                                     <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=1"><@spring.message code="common.btn.pass" /></a>
                                                     <button class="btn btn-info btn-xs " onclick="replyShow('${comment.commentId?c}','${comment.post.postId?c}')"><@spring.message code="common.btn.pass-reply" /></button>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=1&page=${comments.number}','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code="common.btn.recycling" /></button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modalShow('/admin/comments/throw?commentId=${comment.commentId?c}&status=1&page=${comments.number}','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code="common.btn.recycling" /></button>
                                                     <#break >
                                                     <#case 2>
                                                     <a data-pjax="true" class="btn btn-primary btn-xs " href="/admin/comments/revert?commentId=${comment.commentId?c}&status=2"><@spring.message code="common.btn.reduction" /></a>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/comments/remove?commentId=${comment.commentId?c}&status=2&page=${comments.number}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code="common.btn.delete" /></button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modalShow('/admin/comments/remove?commentId=${comment.commentId?c}&status=2&page=${comments.number}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code="common.btn.delete" /></button>
                                                     <#break >
                                                 </#switch>
                                             </td>
@@ -164,7 +164,7 @@
         maxHeight: '210px',
         api:"/static/halo-common/OwO/OwO.min.json"
     });
-    function modelShow(url,message) {
+    function modalShow(url,message) {
         $('#url').val(url);
         $('#message').html(message);
         $('#removeCommentModal').modal();

@@ -95,7 +95,7 @@
                                                     <td>${page.postDate?string("yyyy-MM-dd HH:mm")}</td>
                                                     <td>
                                                         <a data-pjax="true" href="/admin/page/edit?pageId=${page.postId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.edit' /></a>
-                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modalShow('/admin/posts/remove?postId=${page.postId?c}&postType=${page.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
                                                     </td>
                                                 </tr>
                                             </#list>
@@ -135,7 +135,7 @@
 </div>
 <@footer>
 <script type="application/javascript" id="footer_script">
-    function modelShow(url,message) {
+    function modalShow(url,message) {
         $('#url').val(url);
         $('#message').html(message);
         $('#removePostModal').modal();

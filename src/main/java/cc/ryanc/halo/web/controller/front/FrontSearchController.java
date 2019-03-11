@@ -1,7 +1,7 @@
 package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.logging.Logger;
-import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.PostListOutputDTO;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
@@ -74,7 +74,8 @@ public class FrontSearchController extends BaseController {
             size = Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
         }
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<Post> posts = postService.searchPosts(HtmlUtil.escape(keyword), PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable);
+        final Page<PostListOutputDTO> posts = postService.searchPosts(HtmlUtil.escape(keyword), PostTypeEnum.POST_TYPE_POST.getDesc(), PostStatusEnum.PUBLISHED.getCode(), pageable)
+                .map(post -> new PostListOutputDTO().convertFrom(post));
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", keyword);

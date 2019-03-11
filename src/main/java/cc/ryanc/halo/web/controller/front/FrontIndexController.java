@@ -1,6 +1,6 @@
 package cc.ryanc.halo.web.controller.front;
 
-import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.dto.PostListOutputDTO;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
@@ -71,7 +71,8 @@ public class FrontIndexController extends BaseController {
         }
         //所有文章数据，分页
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<Post> posts = postService.findPostByStatus(pageable);
+        final Page<PostListOutputDTO> posts = postService.findPostByStatus(pageable)
+                .map(post -> new PostListOutputDTO().convertFrom(post));
         if (null == posts) {
             return this.renderNotFound();
         }
