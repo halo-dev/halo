@@ -1,7 +1,7 @@
 package cc.ryanc.halo.model.dto;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.dto.base.AbstractOutputConverter;
+import cc.ryanc.halo.model.dto.base.OutputConverter;
 import lombok.Data;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Data;
  * @date : 2019-03-10
  */
 @Data
-public class AttachmentAdminOutputDTO extends AbstractOutputConverter<AttachmentAdminOutputDTO, Attachment> {
+public class AttachmentAdminOutputDTO implements OutputConverter<AttachmentAdminOutputDTO, Attachment> {
 
     private Long attachId;
 
