@@ -176,7 +176,7 @@
                                                     <#else>
                                                         <a data-pjax="true" href="/admin/menus/edit?menuId=${menu.menuId?c}" class="btn btn-primary btn-xs "><@spring.message code='common.btn.modify' /></a>
                                                     </#if>
-                                                    <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/menus/remove?menuId=${menu.menuId?c}')"><@spring.message code='common.btn.delete' /></button>
+                                                    <button class="btn btn-danger btn-xs " onclick="modalShow('/admin/menus/remove?menuId=${menu.menuId?c}')"><@spring.message code='common.btn.delete' /></button>
                                                 </td>
                                             </tr>
                                         </#list>
@@ -209,7 +209,7 @@
 </div>
 <@footer>
 <script type="application/javascript" id="footer_script">
-    function modelShow(url) {
+    function modalShow(url) {
         $('#url').val(url);
         $('#removeMenuModal').modal();
     }

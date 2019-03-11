@@ -120,18 +120,6 @@
 </div>
 <@footer>
 <script type="application/javascript" id="footer_script">
-    function modelShow(url) {
-        $('#url').val(url);
-        $('#removeCateModal').modal();
-    }
-    function removeIt(){
-        var url=$.trim($("#url").val());
-        <#if (options.admin_pjax!'true') == 'true'>
-            pjax.loadUrl(url);
-        <#else>
-            window.location.href = url;
-        </#if>
-    }
     function save() {
         var param = $("#tagSaveForm").serialize();
         $.post("/admin/tag/save",param,function (data) {

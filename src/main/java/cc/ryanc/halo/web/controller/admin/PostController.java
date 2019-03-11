@@ -2,13 +2,14 @@ package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.dto.PostAdminOutputDTO;
 import cc.ryanc.halo.model.dto.PostViewOutputDTO;
-import cc.ryanc.halo.model.support.JsonResult;
-import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
 import cc.ryanc.halo.model.enums.PostStatusEnum;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.model.enums.ResultCodeEnum;
+import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.LogsRecord;
 import cc.ryanc.halo.service.LogsService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.BeanUtils;
@@ -22,9 +23,10 @@ import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.ServletRequestDataBinder;
@@ -92,11 +94,14 @@ public class PostController extends BaseController {
     @GetMapping
     public String posts(Model model,
                         @RequestParam(value = "status", defaultValue = "0") Integer status,
-                        @PageableDefault(sort = "postDate", direction = DESC) Pageable pageable) {
-        final Page<Post> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
-
-        Page<PostViewOutputDTO> postViewOutputDTOS = posts.map(post -> new PostViewOutputDTO().convertFrom(post));
-
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @SortDefault.SortDefaults({
+                                @SortDefault(sort = "postPriority", direction = DESC),
+                                @SortDefault(sort = "postDate", direction = DESC)
+                        }) Sort sort) {
+        final Pageable pageable = PageRequest.of(page, 10, sort);
+        final Page<PostAdminOutputDTO> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable)
+                .map(post -> new PostAdminOutputDTO().convertFrom(post));
         model.addAttribute("posts", posts);
         model.addAttribute("publishCount", postService.getCountByStatus(PostStatusEnum.PUBLISHED.getCode()));
         model.addAttribute("draftCount", postService.getCountByStatus(PostStatusEnum.DRAFT.getCode()));
@@ -258,6 +263,22 @@ public class PostController extends BaseController {
             return "redirect:/admin/posts?status=2";
         }
         return "redirect:/admin/page";
+    }
+
+    /**
+     * 置顶/取消置顶文章
+     *
+     * @param postId   postId
+     * @param priority priority
+     * @return JsonResult
+     */
+    @GetMapping(value = "/topPost")
+    public String topPost(@RequestParam("postId") Long postId,
+                          @RequestParam("priority") Integer priority) {
+        Post post = postService.getById(postId);
+        post.setPostPriority(priority);
+        postService.update(post);
+        return "redirect:/admin/posts";
     }
 
     /**
