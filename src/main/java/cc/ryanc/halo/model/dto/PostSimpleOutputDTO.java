@@ -1,7 +1,9 @@
 package cc.ryanc.halo.model.dto;
 
-import cc.ryanc.halo.model.domain.*;
-import cc.ryanc.halo.model.dto.base.AbstractOutputConverter;
+import cc.ryanc.halo.model.domain.Category;
+import cc.ryanc.halo.model.domain.Post;
+import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.model.dto.base.OutputConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -14,7 +16,7 @@ import java.util.List;
  * @author johnniang
  */
 @Data
-public class PostSimpleOutputDTO extends AbstractOutputConverter<PostSimpleOutputDTO, Post> {
+public class PostSimpleOutputDTO implements OutputConverter<PostSimpleOutputDTO, Post> {
 
     private Long postId;
 

@@ -12,7 +12,8 @@ import static cc.ryanc.halo.utils.BeanUtils.updateProperties;
  *
  * @author johnniang
  */
-public abstract class AbstractOutputConverter<DTO, DOMAIN> implements OutputConverter<DTO, DOMAIN> {
+@Deprecated
+public abstract class AbstractOutputConverter<DTO extends OutputConverter<DTO, DOMAIN>, DOMAIN> implements OutputConverter<DTO, DOMAIN> {
 
     @SuppressWarnings("unchecked")
     private final Class<DTO> dtoType = (Class<DTO>) fetchType(0);
@@ -23,9 +24,9 @@ public abstract class AbstractOutputConverter<DTO, DOMAIN> implements OutputConv
 
     @Override
     @SuppressWarnings("unchecked")
-    public DTO convertFrom(DOMAIN domain) {
+    public <T extends DTO> T convertFrom(DOMAIN domain) {
         updateProperties(domain, this);
-        return (DTO) this;
+        return (T) this;
     }
 
     /**

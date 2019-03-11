@@ -87,8 +87,10 @@ public class PageController {
     public String pages(Model model) {
         final List<PageAdminOutputDTO> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc())
                 .stream()
-                .map(post -> new PageAdminOutputDTO().convertFrom(post))
+                .map(post -> (PageAdminOutputDTO) new PageAdminOutputDTO().convertFrom(post))
                 .collect(Collectors.toList());
+
+
         model.addAttribute("pages", posts);
         return "admin/admin_page";
     }

@@ -11,6 +11,7 @@ import static cc.ryanc.halo.utils.BeanUtils.updateProperties;
  *
  * @author johnniang
  */
+@Deprecated
 public abstract class AbstractInputConverter<DOMAIN> implements InputConverter<DOMAIN> {
 
     @SuppressWarnings("unchecked")

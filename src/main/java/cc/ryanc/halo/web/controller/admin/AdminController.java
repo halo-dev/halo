@@ -110,7 +110,7 @@ public class AdminController extends BaseController {
         //查询最新的文章
         final List<PostViewOutputDTO> postsLatest = postService.findPostLatest()
                 .stream()
-                .map(post -> new PostViewOutputDTO().convertFrom(post))
+                .map(post -> (PostViewOutputDTO) new PostViewOutputDTO().convertFrom(post))
                 .collect(Collectors.toList());
         model.addAttribute("postsLatest", postsLatest);
 
@@ -121,7 +121,7 @@ public class AdminController extends BaseController {
         //查询最新的评论
         final List<CommentViewOutputDTO> commentsLatest = commentService.findCommentsLatest()
                 .stream()
-                .map(comment -> new CommentViewOutputDTO().convertFrom(comment))
+                .map(comment -> (CommentViewOutputDTO) new CommentViewOutputDTO().convertFrom(comment))
                 .collect(Collectors.toList());
         model.addAttribute("commentsLatest", commentsLatest);
 

@@ -2,7 +2,7 @@ package cc.ryanc.halo.model.dto;
 
 import cc.ryanc.halo.model.domain.Comment;
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.base.AbstractOutputConverter;
+import cc.ryanc.halo.model.dto.base.OutputConverter;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,7 +12,7 @@ import java.util.Date;
  * @date : 2019-03-09
  */
 @Data
-public class CommentViewOutputDTO extends AbstractOutputConverter<CommentViewOutputDTO, Comment> {
+public class CommentViewOutputDTO implements OutputConverter<CommentViewOutputDTO, Comment> {
 
     private Long commentId;
 

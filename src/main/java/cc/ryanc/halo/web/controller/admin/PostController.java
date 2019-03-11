@@ -94,6 +94,9 @@ public class PostController extends BaseController {
                         @RequestParam(value = "status", defaultValue = "0") Integer status,
                         @PageableDefault(sort = "postDate", direction = DESC) Pageable pageable) {
         final Page<Post> posts = postService.findPostByStatus(status, PostTypeEnum.POST_TYPE_POST.getDesc(), pageable);
+
+        Page<PostViewOutputDTO> postViewOutputDTOS = posts.map(post -> new PostViewOutputDTO().convertFrom(post));
+
         model.addAttribute("posts", posts);
         model.addAttribute("publishCount", postService.getCountByStatus(PostStatusEnum.PUBLISHED.getCode()));
         model.addAttribute("draftCount", postService.getCountByStatus(PostStatusEnum.DRAFT.getCode()));
@@ -180,7 +183,7 @@ public class PostController extends BaseController {
                              @RequestParam("tagList") String tagList) {
         //old data
         final Post oldPost = postService.fetchById(post.getPostId()).orElse(new Post());
-        BeanUtils.updateProperties(oldPost,post);
+        BeanUtils.updateProperties(oldPost, post);
         post.setPostContent(MarkdownUtils.renderMarkdown(post.getPostContentMd()));
         if (null == post.getPostDate()) {
             post.setPostDate(new Date());
@@ -308,7 +311,7 @@ public class PostController extends BaseController {
         final String blogUrl = OPTIONS.get(BlogPropertiesEnum.BLOG_URL.getProp());
         final List<PostViewOutputDTO> posts = postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc())
                 .stream()
-                .map(post -> new PostViewOutputDTO().convertFrom(post))
+                .map(post -> (PostViewOutputDTO) new PostViewOutputDTO().convertFrom(post))
                 .collect(Collectors.toList());
         final StringBuilder urls = new StringBuilder();
         for (PostViewOutputDTO post : posts) {
