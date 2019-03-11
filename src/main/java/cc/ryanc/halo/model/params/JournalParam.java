@@ -1,7 +1,7 @@
 package cc.ryanc.halo.model.params;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.base.AbstractInputConverter;
+import cc.ryanc.halo.model.dto.base.InputConverter;
 import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import lombok.Data;
@@ -13,7 +13,7 @@ import lombok.Data;
  * @date : 2019/03/04
  */
 @Data
-public class JournalParam extends AbstractInputConverter<Post> {
+public class JournalParam implements InputConverter<Post> {
 
     /**
      * 标题

@@ -48,9 +48,9 @@ public class MenuController {
     public String menus(Model model) {
         List<PostViewOutputDTO> posts = postService.findAll(PostTypeEnum.POST_TYPE_PAGE.getDesc())
                 .stream()
-                .map(post -> new PostViewOutputDTO().convertFrom(post))
+                .map(post -> (PostViewOutputDTO) new PostViewOutputDTO().convertFrom(post))
                 .collect(Collectors.toList());
-        model.addAttribute("posts",posts);
+        model.addAttribute("posts", posts);
         return "admin/admin_menu";
     }
 

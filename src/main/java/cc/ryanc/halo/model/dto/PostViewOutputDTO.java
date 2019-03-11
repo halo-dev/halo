@@ -1,7 +1,7 @@
 package cc.ryanc.halo.model.dto;
 
 import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.dto.base.AbstractOutputConverter;
+import cc.ryanc.halo.model.dto.base.OutputConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -12,7 +12,7 @@ import java.util.Date;
  * @date : 2019-03-09
  */
 @Data
-public class PostViewOutputDTO extends AbstractOutputConverter<PostViewOutputDTO, Post> {
+public class PostViewOutputDTO implements OutputConverter<PostViewOutputDTO, Post> {
 
     private Long postId;
 

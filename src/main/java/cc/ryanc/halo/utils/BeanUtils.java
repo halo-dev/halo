@@ -52,7 +52,7 @@ public class BeanUtils {
             // Return the target instance
             return targetInstance;
         } catch (Exception e) {
-            throw new BeanUtilsException("Failed to new " + targetClass.getName() + "instance or copy properties", e);
+            throw new BeanUtilsException("Failed to new " + targetClass.getName() + " instance or copy properties", e);
         }
     }
 
