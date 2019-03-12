@@ -13,13 +13,6 @@ import java.util.stream.Stream;
 public interface ValueEnum<T> {
 
     /**
-     * Get enum value.
-     *
-     * @return enum value
-     */
-    T getValue();
-
-    /**
      * Convert value to corresponding enum.
      *
      * @param enumType enum type
@@ -38,4 +31,11 @@ public interface ValueEnum<T> {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("unknown database value: " + value));
     }
+
+    /**
+     * Get enum value.
+     *
+     * @return enum value
+     */
+    T getValue();
 }
