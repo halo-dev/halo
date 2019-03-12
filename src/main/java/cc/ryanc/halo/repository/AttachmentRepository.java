@@ -2,7 +2,6 @@ package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Attachment;
 import cc.ryanc.halo.repository.base.BaseRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * <pre>
