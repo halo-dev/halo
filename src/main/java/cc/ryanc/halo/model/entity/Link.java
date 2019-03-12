@@ -24,31 +24,31 @@ public class Link {
     /**
      * 友链名称
      */
-    @Column(name = "name",columnDefinition = "varchar(255) not null")
+    @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
      * 友链地址
      */
-    @Column(name = "url",columnDefinition = "varchar(255) not null")
+    @Column(name = "url", columnDefinition = "varchar(255) not null")
     private String url;
 
     /**
      * 友链 Logo
      */
-    @Column(name = "logo",columnDefinition = "varchar(255) default ''")
+    @Column(name = "logo", columnDefinition = "varchar(255) default ''")
     private String logo;
 
     /**
      * 描述
      */
-    @Column(name = "description",columnDefinition = "varchar(255) default ''")
+    @Column(name = "description", columnDefinition = "varchar(255) default ''")
     private String description;
 
     /**
      * 分组
      */
-    @Column(name = "group",columnDefinition = "varchar(255) default ''")
+    @Column(name = "group", columnDefinition = "varchar(255) default ''")
     private String group;
 
     /**

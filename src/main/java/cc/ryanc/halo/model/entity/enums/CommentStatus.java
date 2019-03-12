@@ -7,8 +7,19 @@ package cc.ryanc.halo.model.entity.enums;
  */
 public enum CommentStatus implements ValueEnum<Integer> {
 
+    /**
+     * 已发布
+     */
     PUBLISHED(0),
+
+    /**
+     * 草稿
+     */
     AUDITING(1),
+
+    /**
+     * 回收站
+     */
     RECYCLE(2);
 
     private final Integer value;

@@ -24,49 +24,49 @@ public class Attachment {
     /**
      * 附件名称
      */
-    @Column(name = "name",columnDefinition = "varchar(255) not null")
+    @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
      * 附件路径
      */
-    @Column(name = "path",columnDefinition = "varchar(1023) default ''")
+    @Column(name = "path", columnDefinition = "varchar(1023) default ''")
     private String path;
 
     /**
      * 缩略图路径
      */
-    @Column(name = "thumb_path",columnDefinition = "varchar(1023) default ''")
+    @Column(name = "thumb_path", columnDefinition = "varchar(1023) default ''")
     private String thumbPath;
 
     /**
      * 附件类型
      */
-    @Column(name = "media_type",columnDefinition = "varchar(50) default ''")
+    @Column(name = "media_type", columnDefinition = "varchar(50) default ''")
     private String mediaType;
 
     /**
      * 附件后缀
      */
-    @Column(name = "suffix",columnDefinition = "varchar(50) default ''")
+    @Column(name = "suffix", columnDefinition = "varchar(50) default ''")
     private String suffix;
 
     /**
      * 附件尺寸
      */
-    @Column(name = "dimension",columnDefinition = "varchar(50) default ''")
+    @Column(name = "dimension", columnDefinition = "varchar(50) default ''")
     private String dimension;
 
     /**
      * 附件大小
      */
-    @Column(name = "size",columnDefinition = "varchar(50) default ''")
+    @Column(name = "size", columnDefinition = "varchar(50) default ''")
     private String size;
 
     /**
      * 附件上传类型
      */
-    @Column(name = "type",columnDefinition = "int default 0")
+    @Column(name = "type", columnDefinition = "int default 0")
     private Integer type;
 
     /**

@@ -24,37 +24,37 @@ public class User {
     /**
      * 用户名
      */
-    @Column(name = "username",columnDefinition = "varchar(50) not null")
+    @Column(name = "username", columnDefinition = "varchar(50) not null")
     private String username;
 
     /**
      * 昵称
      */
-    @Column(name = "nickname",columnDefinition = "varchar(255) not null")
+    @Column(name = "nickname", columnDefinition = "varchar(255) not null")
     private String nickname;
 
     /**
      * 密码
      */
-    @Column(name = "password",columnDefinition = "varchar(255) not null")
+    @Column(name = "password", columnDefinition = "varchar(255) not null")
     private String password;
 
     /**
      * 邮箱
      */
-    @Column(name = "email",columnDefinition = "varchar(127) default ''")
+    @Column(name = "email", columnDefinition = "varchar(127) default ''")
     private String email;
 
     /**
      * 头像
      */
-    @Column(name = "avatar",columnDefinition = "varchar(1023) default ''")
+    @Column(name = "avatar", columnDefinition = "varchar(1023) default ''")
     private String avatar;
 
     /**
      * 描述
      */
-    @Column(name = "description",columnDefinition = "varchar(1023) default ''")
+    @Column(name = "description", columnDefinition = "varchar(1023) default ''")
     private String description;
 
     /**

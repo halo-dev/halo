@@ -27,27 +27,47 @@ public class Category {
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    @Column(name = "deleted", columnDefinition = "tinyint default 0")
-    private Boolean deleted;
-
+    /**
+     * 分类名称
+     */
     @Column(name = "name", columnDefinition = "varchar(50) not null")
     private String name;
 
+    /**
+     * 缩略名
+     */
     @Column(name = "snake_name", columnDefinition = "varchar(50) not null")
     private String snakeName;
 
+    /**
+     * 描述
+     */
     @Column(name = "description", columnDefinition = "varchar(100) default ''")
     private String description;
 
+    /**
+     * 上级目录
+     */
     @Column(name = "parent_id", columnDefinition = "int default 0")
     private Integer parentId;
 
+    /**
+     * 创建时间戳
+     */
+    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createTime;
+
+    /**
+     * 更新时间戳
+     */
+    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updateTime;
+
+    /**
+     * 是否已删除
+     */
+    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
+    private Boolean deleted;
 }
