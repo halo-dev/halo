@@ -21,6 +21,7 @@ import java.util.Date;
 @ToString
 @Entity
 @Table(name = "halo_logs")
+@Deprecated
 @EntityListeners(AuditingEntityListener.class)
 public class Logs implements Serializable {
 

@@ -22,6 +22,7 @@ import java.util.Date;
 @Entity
 @Table(name = "halo_attachment")
 @EntityListeners(AuditingEntityListener.class)
+@Deprecated
 public class Attachment implements Serializable {
 
     private static final long serialVersionUID = 3060117944880138064L;
