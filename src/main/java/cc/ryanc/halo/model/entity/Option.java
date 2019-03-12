@@ -27,21 +27,35 @@ public class Option {
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
-    private Boolean deleted;
-
+    /**
+     * 设置项 Key
+     */
     @Column(name = "option_key", columnDefinition = "varchar(100) not null")
     private String optionKey;
 
+    /**
+     * 设置项 Value
+     */
     @Column(name = "option_value", columnDefinition = "varchar(1023) not null")
     private String optionValue;
 
+    /**
+     * 创建时间戳
+     */
+    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createTime;
+
+    /**
+     * 更新时间戳
+     */
+    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updateTime;
+
+    /**
+     * 是否已删除
+     */
+    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
+    private Boolean deleted;
 }

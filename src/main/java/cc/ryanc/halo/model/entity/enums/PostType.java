@@ -7,8 +7,19 @@ package cc.ryanc.halo.model.entity.enums;
  */
 public enum PostType implements ValueEnum<Integer> {
 
+    /**
+     * 普通文章
+     */
     POST(0),
+
+    /**
+     * 自定义页面
+     */
     PAGE(1),
+
+    /**
+     * 日志
+     */
     JOURNAL(2);
 
     private final Integer value;

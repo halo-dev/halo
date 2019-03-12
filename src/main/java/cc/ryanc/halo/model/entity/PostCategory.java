@@ -27,20 +27,35 @@ public class PostCategory {
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIME")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    @Column(name = "deleted", columnDefinition = "tinyint default 0")
-    private Boolean deleted;
-
+    /**
+     * 分类目录编号
+     */
     @Column(name = "category_id")
     private Integer categoryId;
 
+    /**
+     * 文章编号
+     */
     @Column(name = "post_id")
     private Integer postId;
+
+    /**
+     * 创建时间戳
+     */
+    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createTime;
+
+    /**
+     * 更新时间戳
+     */
+    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updateTime;
+
+    /**
+     * 是否已删除
+     */
+    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
+    private Boolean deleted;
 }
