@@ -22,6 +22,7 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "halo_tag")
+@Deprecated
 public class Tag implements Serializable {
 
     private static final long serialVersionUID = -7501342327884372194L;

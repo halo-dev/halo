@@ -27,6 +27,7 @@ import java.util.List;
 @Entity
 @Table(name = "halo_comment")
 @EntityListeners(AuditingEntityListener.class)
+@Deprecated
 public class Comment implements Serializable {
 
     private static final long serialVersionUID = -6639021627094260505L;

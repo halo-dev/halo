@@ -22,6 +22,7 @@ import java.io.Serializable;
 @ToString
 @Entity
 @Table(name = "halo_link")
+@Deprecated
 public class Link implements Serializable {
 
     private static final long serialVersionUID = 5441686055841177588L;

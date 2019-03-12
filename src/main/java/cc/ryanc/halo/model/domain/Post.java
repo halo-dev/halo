@@ -28,6 +28,7 @@ import java.util.List;
 @Entity
 @Table(name = "halo_post")
 @EntityListeners(AuditingEntityListener.class)
+@Deprecated
 public class Post implements Serializable {
 
     private static final long serialVersionUID = -6019684584665869629L;
