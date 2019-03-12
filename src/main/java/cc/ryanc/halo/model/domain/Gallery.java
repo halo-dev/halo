@@ -21,6 +21,7 @@ import java.io.Serializable;
 @ToString
 @Entity
 @Table(name = "halo_gallery")
+@Deprecated
 public class Gallery implements Serializable {
 
     private static final long serialVersionUID = 1646093266970933841L;
