@@ -24,31 +24,31 @@ public class Menu {
     /**
      * 菜单名称
      */
-    @Column(name = "name",columnDefinition = "varchar(255) not null")
+    @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
      * 菜单地址
      */
-    @Column(name = "url",columnDefinition = "varchar(255) not null")
+    @Column(name = "url", columnDefinition = "varchar(255) not null")
     private String url;
 
     /**
      * 排序
      */
-    @Column(name = "sort",columnDefinition = "int default 0")
+    @Column(name = "sort", columnDefinition = "int default 0")
     private Integer sort;
 
     /**
      * 窗口打开方式
      */
-    @Column(name = "target",columnDefinition = "varchar(20) default '_self'")
+    @Column(name = "target", columnDefinition = "varchar(20) default '_self'")
     private String target;
 
     /**
      * 菜单图标
      */
-    @Column(name = "icon",columnDefinition = "varchar(50) default ''")
+    @Column(name = "icon", columnDefinition = "varchar(50) default ''")
     private String icon;
 
     /**

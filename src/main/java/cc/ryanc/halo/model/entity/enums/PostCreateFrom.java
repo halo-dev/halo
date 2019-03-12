@@ -7,7 +7,14 @@ package cc.ryanc.halo.model.entity.enums;
  */
 public enum PostCreateFrom implements ValueEnum<Integer> {
 
+    /**
+     * 发布来源：管理后台
+     */
     ADMIN(0),
+
+    /**
+     * 发布来源：微信
+     */
     WECHAT(1);
 
     private final Integer value;
