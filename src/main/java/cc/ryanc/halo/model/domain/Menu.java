@@ -23,6 +23,7 @@ import java.io.Serializable;
 @ToString
 @Entity
 @Table(name = "halo_menu")
+@Deprecated
 public class Menu implements Serializable {
 
     private static final long serialVersionUID = -7726233157376388786L;
