@@ -69,7 +69,7 @@ $ bash halo-cli.sh -u
 ```
 
 > 注意：如使用 Idea，Eclipse 等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题管理和主题上传会有问题。
-> 更多请参考[ Halo 使用文档 ](https://halo-doc.ryanc.cc/installation/)或者[ Wiki](https://github.com/ruibaby/halo/wiki)。
+> 更多请参考[ Halo 使用文档 ](https://halo-doc.ryanc.cc/installation/)或者[ Wiki](https://github.com/halo-dev/halo/wiki)。
 
 ## 博客示例
 
@@ -87,18 +87,18 @@ $ bash halo-cli.sh -u
 
 除了内置的 [Anatole](https://github.com/hi-caicai/farbox-theme-Anatole) 和 [Material](https://github.com/viosey/hexo-theme-material) ，还有下列主题没有集成在项目里，如有需要，请自行下载之后通过后台上传上去使用。
 
-- [Vno](https://github.com/ruibaby/vno-halo) - 来自 Jekyll 的一款主题，作者 [Wei Wang](https://onevcat.com/)。
-- [Hux](https://github.com/ruibaby/hux-halo) - 来自 Jekyll 的一款主题，作者 [Xuan Huang](https://huangxuan.me/)。
-- [Story](https://github.com/ruibaby/story-halo) - 来自 Typecho 的一款主题，作者 [Trii Hsia](https://yumoe.com/)。
-- [NexT](https://github.com/ruibaby/next-halo) - 来自 Hexo 的一款主题，作者 [iissnan](https://notes.iissnan.com/)。
-- [Casper](https://github.com/ruibaby/casper-halo) - 来自 Ghost 的一款主题，作者 [Ghost](https://github.com/TryGhost)。
-- [Pinghsu](https://github.com/ruibaby/pinghsu-halo) - 来自 Typecho 的一款主题，作者 [Chakhsu.Lau](https://github.com/chakhsu)。
+- [Vno](https://github.com/halo-dev/vno-halo) - 来自 Jekyll 的一款主题，作者 [Wei Wang](https://onevcat.com/)。
+- [Hux](https://github.com/halo-dev/hux-halo) - 来自 Jekyll 的一款主题，作者 [Xuan Huang](https://huangxuan.me/)。
+- [Story](https://github.com/halo-dev/story-halo) - 来自 Typecho 的一款主题，作者 [Trii Hsia](https://yumoe.com/)。
+- [NexT](https://github.com/halo-dev/next-halo) - 来自 Hexo 的一款主题，作者 [iissnan](https://notes.iissnan.com/)。
+- [Casper](https://github.com/halo-dev/casper-halo) - 来自 Ghost 的一款主题，作者 [Ghost](https://github.com/TryGhost)。
+- [Pinghsu](https://github.com/halo-dev/pinghsu-halo) - 来自 Typecho 的一款主题，作者 [Chakhsu.Lau](https://github.com/chakhsu)。
 
 > 声明：不接受任何对**移植主题**功能上的意见和建议。
 
 ## 许可证
 
-[![license](https://img.shields.io/github/license/ruibaby/halo.svg?style=flat-square)](https://github.com/ruibaby/halo/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
 > Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议，即便是在中国。
 

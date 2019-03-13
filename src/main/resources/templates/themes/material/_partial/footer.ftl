@@ -23,7 +23,7 @@
 
     <div class="mdl-mini-footer--right-section">
         <div>
-            <div class="footer-develop-div">Powered by <a href="https://github.com/ruibaby/halo" target="_blank" class="footer-develop-a">Halo</a></div>
+            <div class="footer-develop-div">Powered by <a href="https://github.com/halo-dev/halo" target="_blank" class="footer-develop-a">Halo</a></div>
             <div class="footer-develop-div">Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a></div>
         </div>
     </div>

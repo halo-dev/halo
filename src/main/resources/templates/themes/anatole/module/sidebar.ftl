@@ -22,7 +22,7 @@
             <a href="https://www.caicai.me">CaiCai</a>
             <#-- 虽然Halo使用了宽松的GPL协议，但开发不易，希望您可以保留一下版权声明。笔芯~ -->
             <div class="by_halo">
-                <a href="https://github.com/ruibaby/halo" target="_blank">Proudly published with Halo&#65281;</a>
+                <a href="https://github.com/halo-dev/halo" target="_blank">Proudly published with Halo&#65281;</a>
             </div>
             <div class="footer_text">
                 <@footer_info></@footer_info>

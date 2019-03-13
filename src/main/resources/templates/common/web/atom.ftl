@@ -14,7 +14,7 @@
         <language>zh-CN</language>
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>
-        <generator>https://github.com/ruibaby/halo</generator>
+        <generator>https://github.com/halo-dev/halo</generator>
     </channel>
     <#if posts?? && posts?size gt 0>
         <#list posts as post>

@@ -69,7 +69,7 @@ $ bash halo-cli.sh -u
 ```
 
 > Tips: If you use Idea, Eclipse and other IDEs to run, you need to install the Lombok plugin, In addition, JDK10 is not supported at the moment, and there are problems with themes scanning and uploading.
-> See the [Halo documentation](https://halo-doc.ryanc.cc/installation/) or [ Wiki](https://github.com/ruibaby/halo/wiki) for more details.
+> See the [Halo documentation](https://halo-doc.ryanc.cc/installation/) or [ Wiki](https://github.com/halo-dev/halo/wiki) for more details.
 
 ## Blogs with Halo
 
@@ -87,18 +87,18 @@ $ bash halo-cli.sh -u
 
 In addition to the built-in [Anatole](https://github.com/hi-caicai/farbox-theme-Anatole) and [Material](https://github.com/viosey/hexo-theme-material), there are the following The theme is not integrated in the project. If you need it, please download it and upload it through the background.
 
-- [Vno](https://github.com/ruibaby/vno-halo) - From Jekyll,Author [Wei Wang](https://onevcat.com/).
-- [Hux](https://github.com/ruibaby/hux-halo) - From Jekyll,Author [Xuan Huang](https://huangxuan.me/).
-- [Story](https://github.com/ruibaby/story-halo) - From Typecho,Author [Trii Hsia](https://yumoe.com/).
-- [NexT](https://github.com/ruibaby/next-halo) - From Hexo,Author [iissnan](https://notes.iissnan.com/).
-- [Casper](https://github.com/ruibaby/casper-halo) - From Ghost,Author [Ghost](https://github.com/TryGhost).
-- [Pinghsu](https://github.com/ruibaby/pinghsu-halo) - From Typecho,Author [Chakhsu.Lau](https://github.com/chakhsu).
+- [Vno](https://github.com/halo-dev/vno-halo) - From Jekyll,Author [Wei Wang](https://onevcat.com/).
+- [Hux](https://github.com/halo-dev/hux-halo) - From Jekyll,Author [Xuan Huang](https://huangxuan.me/).
+- [Story](https://github.com/halo-dev/story-halo) - From Typecho,Author [Trii Hsia](https://yumoe.com/).
+- [NexT](https://github.com/halo-dev/next-halo) - From Hexo,Author [iissnan](https://notes.iissnan.com/).
+- [Casper](https://github.com/halo-dev/casper-halo) - From Ghost,Author [Ghost](https://github.com/TryGhost).
+- [Pinghsu](https://github.com/halo-dev/pinghsu-halo) - From Typecho,Author [Chakhsu.Lau](https://github.com/chakhsu).
 
 > Disclaimer: Do not accept any comments or suggestions on the functionality of the **Porting Theme**.
 
 ## License
 
-[![license](https://img.shields.io/github/license/ruibaby/halo.svg?style=flat-square)](https://github.com/ruibaby/halo/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
 > Halo uses the GPL-v3.0 protocol to open source.
 
