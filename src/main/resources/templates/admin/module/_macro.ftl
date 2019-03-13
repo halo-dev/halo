@@ -8,15 +8,15 @@
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <title><#nested /></title>
     <#-- CSS -->
-    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/pace/pace.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/css/AdminLTE.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/css/skins/_all-skins.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/css/style.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/toast/css/jquery.toast.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/pretty-checkbox/pretty-checkbox.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/animate/animate.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/pace/pace.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/css/style.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/toast/css/jquery.toast.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/pretty-checkbox/pretty-checkbox.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/animate/animate.min.css">
     <link rel="stylesheet" href="//fonts.loli.net/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -44,26 +44,26 @@
 
 <#-- JS -->
 <#if (options.admin_pjax!'true') == 'true'>
-<script src="/static/halo-backend/plugins/pjax/pjax.min.js"></script>
+<script src="/static/halo-admin/plugins/pjax/pjax.min.js"></script>
 </#if>
 <script src="/static/halo-common/jquery/jquery.min.js"></script>
-<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="/static/halo-backend/plugins/pace/pace.min.js"></script>
-<script src="/static/halo-backend/js/adminlte.min.js"></script>
-<script src="/static/halo-backend/plugins/toast/js/jquery.toast.min.js"></script>
-<script src="/static/halo-backend/plugins/layer/layer.js"></script>
-<script src="/static/halo-backend/plugins/fileinput/fileinput.min.js"></script>
+<script src="/static/halo-admin/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-admin/plugins/pace/pace.min.js"></script>
+<script src="/static/halo-admin/js/adminlte.min.js"></script>
+<script src="/static/halo-admin/plugins/toast/js/jquery.toast.min.js"></script>
+<script src="/static/halo-admin/plugins/layer/layer.js"></script>
+<script src="/static/halo-admin/plugins/fileinput/fileinput.min.js"></script>
 <#if (options.blog_locale!'zh_CN') == 'zh_CN'>
-<script src="/static/halo-backend/plugins/fileinput/zh.min.js"></script>
+<script src="/static/halo-admin/plugins/fileinput/zh.min.js"></script>
 </#if>
-<script src="/static/halo-backend/plugins/easymde/easymde.min.js"></script>
-<script src="/static/halo-backend/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
-<script src="/static/halo-backend/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-<script src="/static/halo-backend/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
-<script src="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
+<script src="/static/halo-admin/plugins/easymde/easymde.min.js"></script>
+<script src="/static/halo-admin/plugins/inline-attachment/codemirror-4.inline-attachment.min.js"></script>
+<script src="/static/halo-admin/plugins/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/static/halo-admin/plugins/datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
+<script src="/static/halo-admin/plugins/jquery-tageditor/jquery.tag-editor.min.js"></script>
 <script src="//cdnjs.loli.net/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script src="/static/halo-common/OwO/OwO.min.js"></script>
-<script src="/static/halo-backend/js/halo.min.js"></script>
+<script src="/static/halo-admin/js/halo.min.js"></script>
 <script>
     var halo = new $.halo();
     $(document).ajaxStart(function() {Pace.restart();});

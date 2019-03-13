@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
 <div class="container-fluid">
@@ -58,5 +58,5 @@
 </div>
 </body>
 <script src="/static/halo-common/jquery/jquery.min.js"></script>
-<script src="/static/halo-backend/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="/static/halo-admin/plugins/bootstrap/js/bootstrap.min.js"></script>
 </html>

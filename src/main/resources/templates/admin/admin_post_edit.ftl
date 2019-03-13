@@ -2,9 +2,9 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.posts.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/easymde/easymde.min.css">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/jquery-tageditor/jquery.tag-editor.css">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/easymde/easymde.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/jquery-tageditor/jquery.tag-editor.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
     <style type="text/css">
         #postTitle{font-weight: 400;}
     </style>
@@ -146,7 +146,7 @@
                     </div>
                     <div class="box-body">
                         <div>
-                            <img src="${post.postThumbnail!'/static/halo-frontend/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
+                            <img src="${post.postThumbnail!'/static/halo-content/images/thumbnail/thumbnail.png'}" class="img-responsive img-thumbnail" id="selectImg" onclick="halo.layerModal('/admin/attachments/select?id=selectImg','<@spring.message code="common.js.all-attachment" />')" style="cursor: pointer;">
                         </div>
                     </div>
                     <div class="box-footer">
@@ -324,7 +324,7 @@
     }
 
     function removeThumbnail(){
-        $("#selectImg").attr("src","/static/halo-frontend/images/thumbnail/thumbnail.png");
+        $("#selectImg").attr("src","/static/halo-content/images/thumbnail/thumbnail.png");
     }
 </script>
 </@footer>
