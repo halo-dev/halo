@@ -1,7 +1,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.themes.edit.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/easymde/easymde.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/easymde/easymde.min.css">
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;"><@spring.message code='admin.themes.edit.title' /></h1>
         <ol class="breadcrumb">

@@ -98,7 +98,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/upload/");
         registry.addResourceHandler("/favicon.ico")
-                .addResourceLocations("classpath:/static/halo-backend/images/favicon.ico");
+                .addResourceLocations("classpath:/static/halo-admin/images/favicon.ico");
         registry.addResourceHandler("/backup/**")
                 .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/backup/");
 

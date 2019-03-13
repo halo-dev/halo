@@ -2,7 +2,7 @@
     <section class="sidebar">
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar!}<#else >/static/halo-backend/images/default.png</#if>" class="img-circle" alt="User Image">
+                <img src="<#if user.userAvatar?if_exists!="">${user.userAvatar!}<#else >/static/halo-admin/images/default.png</#if>" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
                 <p>${user.userDisplayName!}</p><a data-pjax="true" href="/admin/profile"><i class="fa fa-circle text-success"></i><@spring.message code='admin.menu.profile' /></a>

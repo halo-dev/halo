@@ -2,7 +2,7 @@
 <#include "module/_macro.ftl">
 <@head>${options.blog_title!} | <@spring.message code='admin.themes.title' /></@head>
 <div class="content-wrapper">
-    <link rel="stylesheet" href="/static/halo-backend/plugins/fileinput/fileinput.min.css">
+    <link rel="stylesheet" href="/static/halo-admin/plugins/fileinput/fileinput.min.css">
     <style type="text/css" rel="stylesheet">
         .theme-thumbnail{
             width:100%;

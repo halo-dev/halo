@@ -138,7 +138,7 @@ public enum BlogPropertiesEnum {
     /**
      * 默认缩略图地址
      */
-    DEFAULT_THUMBNAIL("/static/halo-frontend/images/thumbnail/thumbnail.png"),
+    DEFAULT_THUMBNAIL("/static/halo-content/images/thumbnail/thumbnail.png"),
 
     /**
      * 自动备份
