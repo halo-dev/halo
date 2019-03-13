@@ -16,6 +16,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.http.HtmlUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,9 +30,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
@@ -73,13 +80,24 @@ public class AdminController extends BaseController {
     private TagService tagService;
 
     @Autowired
+    private OptionsService optionsService;
+
+    @Autowired
+    private GalleryService galleryService;
+
+    @Autowired
+    private LinkService linkService;
+
+    @Autowired
+    private MenuService menuService;
+
+    @Autowired
     private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 请求后台页面
      *
      * @param model model
-     *
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
@@ -119,7 +137,6 @@ public class AdminController extends BaseController {
      * 处理跳转到登录页的请求
      *
      * @param session session
-     *
      * @return 模板路径admin/admin_login
      */
     @GetMapping(value = "/login")
@@ -138,7 +155,6 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
-     *
      * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
@@ -190,7 +206,6 @@ public class AdminController extends BaseController {
      * 退出登录 销毁session
      *
      * @param session session
-     *
      * @return 重定向到/admin/login
      */
     @GetMapping(value = "/logOut")
@@ -206,7 +221,6 @@ public class AdminController extends BaseController {
      * 查看所有日志
      *
      * @param model model model
-     *
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
@@ -278,7 +292,6 @@ public class AdminController extends BaseController {
      *
      * @param file    file
      * @param request request
-     *
      * @return JsonResult
      */
     @PostMapping(value = "/tools/markdownImport")
@@ -349,5 +362,118 @@ public class AdminController extends BaseController {
         }
         postService.create(post);
         return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
+    }
+
+
+    /**
+     * 导出博客数据
+     *
+     * @param response response
+     */
+    @GetMapping(value = "/tools/dataExport")
+    @ResponseBody
+    public void dataExport(HttpServletResponse response) {
+        final Map<String, String> options = optionsService.findAllOptions();
+        final List<Attachment> attachments = attachmentService.listAll();
+        final List<Post> posts = postService.listAll();
+        final List<Gallery> galleries = galleryService.listAll();
+        final List<Link> links = linkService.listAll();
+        final List<Menu> menus = menuService.listAll();
+        JSONObject data = new JSONObject();
+        JSONArray postsJar = new JSONArray();
+        for (Post post : posts) {
+            JSONObject postObj = new JSONObject();
+            postObj.put("postId", post.getPostId());
+            postObj.put("postTitle", post.getPostTitle());
+            postObj.put("postType", post.getPostType());
+            postObj.put("postContentMd", post.getPostContentMd());
+            postObj.put("postContent", post.getPostContent());
+            postObj.put("postUrl", post.getPostUrl());
+            postObj.put("postSummary", post.getPostSummary());
+            postObj.put("postThumbnail", post.getPostThumbnail());
+            postObj.put("postDate", post.getPostDate());
+            postObj.put("postUpdate", post.getPostUpdate());
+            postObj.put("postStatus", post.getPostStatus());
+            postObj.put("postViews", post.getPostViews());
+            postObj.put("allowComment", post.getAllowComment());
+            postObj.put("postPassword", post.getPostPassword());
+            postObj.put("customTpl", post.getCustomTpl());
+            if (null != post.getTags() && post.getTags().size() > 0) {
+                JSONArray tagsJar = new JSONArray();
+                for (Tag tag : post.getTags()) {
+                    JSONObject tagObj = new JSONObject();
+                    tagObj.put("tagId", tag.getTagId());
+                    tagObj.put("tagName", tag.getTagName());
+                    tagObj.put("tagUrl", tag.getTagUrl());
+                    tagsJar.add(tagObj);
+                }
+                postObj.put("tags", tagsJar);
+            }
+
+            if (null != post.getCategories() && post.getCategories().size() > 0) {
+                JSONArray categoriesJar = new JSONArray();
+                for (Category category : post.getCategories()) {
+                    JSONObject categoryObj = new JSONObject();
+                    categoryObj.put("cateId", category.getCateId());
+                    categoryObj.put("cateName", category.getCateName());
+                    categoryObj.put("cateUrl", category.getCateUrl());
+                    categoryObj.put("cateDesc", category.getCateDesc());
+                    categoriesJar.add(categoryObj);
+                }
+                postObj.put("categories", categoriesJar);
+            }
+            if (null != post.getComments() && post.getComments().size() > 0) {
+                JSONArray commentsJar = new JSONArray();
+                for (Comment comment : post.getComments()) {
+                    JSONObject commentObj = new JSONObject();
+                    commentObj.put("commentId", comment.getCommentId());
+                    commentObj.put("commentAuthor", comment.getCommentAuthor());
+                    commentObj.put("commentAuthorEmail", comment.getCommentAuthorEmail());
+                    commentObj.put("commentAuthorUrl", comment.getCommentAuthorUrl());
+                    commentObj.put("commentAuthorIp", comment.getCommentAuthorIp());
+                    commentObj.put("commentAuthorAvatarMd5", comment.getCommentAuthorAvatarMd5());
+                    commentObj.put("commentContent", comment.getCommentContent());
+                    commentObj.put("commentAgent", comment.getCommentAgent());
+                    commentObj.put("commentParent", comment.getCommentParent());
+                    commentObj.put("commentStatus", comment.getCommentStatus());
+                    commentObj.put("isAdmin", comment.getIsAdmin());
+                    commentsJar.add(commentObj);
+                }
+                postObj.put("comments", commentsJar);
+            }
+            postsJar.add(postObj);
+        }
+        data.put("options", JSONUtil.parseFromMap(options));
+        data.put("attachments", JSONUtil.parseArray(attachments));
+        data.put("posts", postsJar);
+        data.put("galleries", JSONUtil.parseArray(galleries));
+        data.put("links", JSONUtil.parseArray(links));
+        data.put("menus", JSONUtil.parseArray(menus));
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-disposition", "attachment;filename=halo_data.json");
+
+        BufferedOutputStream bufferedOutputStream = null;
+        ServletOutputStream servletOutputStream = null;
+        try {
+            servletOutputStream = response.getOutputStream();
+            bufferedOutputStream = new BufferedOutputStream(servletOutputStream);
+            bufferedOutputStream.write(data.toString().getBytes(StandardCharsets.UTF_8));
+            bufferedOutputStream.flush();
+            bufferedOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (null != bufferedOutputStream) {
+                    bufferedOutputStream.close();
+                }
+                if (null != servletOutputStream) {
+                    servletOutputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

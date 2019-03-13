@@ -41,6 +41,28 @@
                 <div class="box box-solid">
                     <div class="box-body">
                         <h4 style="background-color:#f7f7f7; font-size: 18px; text-align: center; padding: 7px 10px; margin-top: 0;">
+                            JSON 数据导出
+                        </h4>
+                        <div class="media">
+                            <div class="media-body">
+                                <div class="clearfix">
+                                    <p class="pull-right">
+                                        <a href="/admin/tools/dataExport" class="btn btn-success btn-sm ad-click-event">
+                                            导出
+                                        </a>
+                                    </p>
+                                    <h4 style="margin-top: 0">导出 JSON 格式数据</h4>
+                                    <p>此工具可以将博客设置，文章，评论等数据导出</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-4">
+                <div class="box box-solid">
+                    <div class="box-body">
+                        <h4 style="background-color:#f7f7f7; font-size: 18px; text-align: center; padding: 7px 10px; margin-top: 0;">
                             <@spring.message code='admin.tools.wordpress.name' />
                         </h4>
                         <div class="media">
