@@ -26,7 +26,7 @@
                 <p><@spring.message code='admin.halo.content.p2' /></p>
             </blockquote>
             <p><@spring.message code='admin.halo.content.p3' /></p>
-            <p>Github issues ：<a href='https://github.com/ruibaby/halo/issues' target="_blank">https://github.com/ruibaby/halo/issues</a></p>
+            <p>Github issues ：<a href='https://github.com/halo-dev/halo/issues' target="_blank">https://github.com/halo-dev/halo/issues</a></p>
             <p>Blog : <a href="https://ryanc.cc" target="_blank">https://ryanc.cc</a> </p>
             <p>Email : <a href='mailto:i@ryanc.cc'>i@ryanc.cc</a></p>
             <p>Telegram : <a href="https://t.me/ruibaby" target="_blank">ruibaby</a></p>

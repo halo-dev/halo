@@ -18,7 +18,7 @@
             它不会影响美观并可以给开发者很大的支持。 :)
             -->
             <div>
-                Powered by <a href="https://github.com/ruibaby/halo.git" target="_blank" class="footer-develop-a">Halo</a>
+                Powered by <a href="https://github.com/halo-dev/halo.git" target="_blank" class="footer-develop-a">Halo</a>
                 <br>
                 Theme - <a href="https://github.com/viosey/hexo-theme-material" target="_blank" class="footer-develop-a">Material</a>
             </div>
