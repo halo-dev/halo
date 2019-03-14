@@ -2,6 +2,7 @@ package cc.ryanc.halo.model.dto;
 
 import cc.ryanc.halo.model.dto.base.OutputConverter;
 import cc.ryanc.halo.model.entity.Comment;
+import cc.ryanc.halo.model.enums.CommentStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -29,6 +30,8 @@ public class CommentOutputDTO implements OutputConverter<CommentOutputDTO, Comme
     private String gavatarMd5;
 
     private String content;
+
+    private CommentStatus status;
 
     private String userAgent;
 
