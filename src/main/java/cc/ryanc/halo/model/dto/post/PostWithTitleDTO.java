@@ -18,9 +18,7 @@ public class PostWithTitleDTO implements OutputConverter<PostWithTitleDTO, Post>
 
     private Integer id;
 
-    /**
-     * 文章标题
-     */
     private String title;
 
+    private String type;
 }
