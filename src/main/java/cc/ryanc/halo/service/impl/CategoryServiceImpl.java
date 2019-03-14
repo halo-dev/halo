@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> implements CategoryService {
 
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
         super(categoryRepository);

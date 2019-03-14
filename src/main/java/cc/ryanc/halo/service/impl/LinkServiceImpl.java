@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implements LinkService {
 
-    private LinkRepository linkRepository;
+    private final LinkRepository linkRepository;
 
     public LinkServiceImpl(LinkRepository linkRepository) {
         super(linkRepository);

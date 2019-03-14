@@ -33,7 +33,7 @@ public class AdminController {
     }
 
     /**
-     * admin dashboard
+     * Admin dashboard.
      *
      * @param model model
      * @return template path: admin/admin_index.ftl

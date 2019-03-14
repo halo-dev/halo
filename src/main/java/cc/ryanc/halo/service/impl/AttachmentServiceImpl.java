@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integer> implements AttachmentService {
 
-    private AttachmentRepository attachmentRepository;
+    private final AttachmentRepository attachmentRepository;
 
     public AttachmentServiceImpl(AttachmentRepository attachmentRepository) {
         super(attachmentRepository);

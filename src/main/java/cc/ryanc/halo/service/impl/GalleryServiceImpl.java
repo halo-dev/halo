@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GalleryServiceImpl extends AbstractCrudService<Gallery, Integer> implements GalleryService {
 
-    private GalleryRepository galleryRepository;
+    private final GalleryRepository galleryRepository;
 
     public GalleryServiceImpl(GalleryRepository galleryRepository) {
         super(galleryRepository);

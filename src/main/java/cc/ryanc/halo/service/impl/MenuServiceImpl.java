@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implements MenuService {
 
-    private MenuRepository menuRepository;
+    private final MenuRepository menuRepository;
 
     public MenuServiceImpl(MenuRepository menuRepository) {
         super(menuRepository);
