@@ -1,6 +1,8 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.dto.PostSimpleOutputDTO;
+import cc.ryanc.halo.model.dto.LogOutputDTO;
+import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
+import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.LogService;
@@ -48,14 +50,20 @@ public class AdminController {
     @GetMapping(value = {"", "/index"})
     public String admin(Model model) {
 
-        Page<PostSimpleOutputDTO> postPage = postService.listLatest(10);
+        Page<PostSimpleOutputDTO> postPage = postService.listLatest(5);
+
+        Page<CommentVO> commentPage = commentService.listLatest(5);
+
+        Page<LogOutputDTO> logPage = logService.listLatest(5);
 
         model.addAttribute("postsCount", postPage.getTotalElements());
-        model.addAttribute("commentsCount", commentService.count());
+        model.addAttribute("commentsCount", commentPage.getTotalElements());
         model.addAttribute("attachmentsCount", attachmentService.count());
 
         model.addAttribute("latestPosts", postPage.getContent());
-        model.addAttribute("latestLogs", logService.listLatest(10).getContent());
+        model.addAttribute("latestLogs", logPage.getContent());
+        model.addAttribute("latestComments", commentPage.getContent());
+
         return "admin/admin_index";
     }
 }

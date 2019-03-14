@@ -70,6 +70,12 @@ public class Comment {
     private Boolean isAdmin;
 
     /**
+     * Post id.
+     */
+    @Column(name = "post_id", columnDefinition = "int not null")
+    private Integer postId;
+
+    /**
      * 上级评论
      */
     @Column(name = "parent_id", columnDefinition = "bigint default 0")

@@ -1,7 +1,5 @@
-package cc.ryanc.halo.model.dto;
+package cc.ryanc.halo.model.dto.post;
 
-import cc.ryanc.halo.model.dto.base.OutputConverter;
-import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostCreateFrom;
 import cc.ryanc.halo.model.enums.PostType;
 import lombok.Data;
@@ -17,15 +15,8 @@ import java.util.Date;
  */
 @Data
 @ToString
-@EqualsAndHashCode
-public class PostSimpleOutputDTO implements OutputConverter<PostSimpleOutputDTO, Post> {
-
-    private Integer id;
-
-    /**
-     * 文章标题
-     */
-    private String title;
+@EqualsAndHashCode(callSuper = true)
+public class PostSimpleOutputDTO extends PostWithTitleDTO {
 
     /**
      * 文章类型

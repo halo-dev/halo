@@ -1,6 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
-import cc.ryanc.halo.model.dto.PostSimpleOutputDTO;
+import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
