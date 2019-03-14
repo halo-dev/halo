@@ -2,6 +2,8 @@ package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
+import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
@@ -49,7 +51,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @return Page<PostSimpleOutputDTO>
      */
     @Override
-    public Page<PostSimpleOutputDTO> listByStatus(int status, Integer type, Pageable pageable) {
+    public Page<PostSimpleOutputDTO> listByStatus(PostStatus status, PostType type, Pageable pageable) {
         Page<Post> posts = postRepository.queryAllByStatusAndType(status, type, pageable);
         return posts.map(post -> new PostSimpleOutputDTO().convertFrom(post));
     }
@@ -63,7 +65,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @return posts count
      */
     @Override
-    public Long countByStatus(int status, Integer type) {
+    public Long countByStatus(PostStatus status, PostType type) {
         return postRepository.countAllByStatusAndType(status,type);
     }
 }
