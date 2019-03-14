@@ -1,4 +1,4 @@
-package cc.ryanc.halo.service.v1;
+package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.entity.Log;
 import cc.ryanc.halo.service.base.CrudService;
