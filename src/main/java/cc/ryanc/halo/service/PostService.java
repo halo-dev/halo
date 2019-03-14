@@ -1,6 +1,6 @@
 package cc.ryanc.halo.service;
 
-import cc.ryanc.halo.model.dto.PostSimpleOutputDTO;
+import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;

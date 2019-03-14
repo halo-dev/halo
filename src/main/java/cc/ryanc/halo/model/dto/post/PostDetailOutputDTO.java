@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.dto;
+package cc.ryanc.halo.model.dto.post;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
