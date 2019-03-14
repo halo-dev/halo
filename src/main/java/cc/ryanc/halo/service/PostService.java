@@ -2,6 +2,8 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
+import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +37,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return Page<PostSimpleOutputDTO>
      */
     @NonNull
-    Page<PostSimpleOutputDTO> listByStatus(int status, Integer type, Pageable pageable);
+    Page<PostSimpleOutputDTO> listByStatus(PostStatus status, PostType type, Pageable pageable);
 
     /**
      * Count posts by status and type
@@ -44,5 +46,5 @@ public interface PostService extends CrudService<Post, Integer> {
      * @param type type
      * @return posts count
      */
-    Long countByStatus(int status,Integer type);
+    Long countByStatus(PostStatus status, PostType type);
 }

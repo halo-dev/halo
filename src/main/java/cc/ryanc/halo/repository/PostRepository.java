@@ -1,6 +1,8 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.entity.Post;
+import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +26,7 @@ public interface PostRepository extends BaseRepository<Post, Integer>, JpaSpecif
      *
      * @return Page<Post>
      */
-    Page<Post> queryAllByStatusAndType(int status, Integer type, Pageable pageable);
+    Page<Post> queryAllByStatusAndType(PostStatus status, PostType type, Pageable pageable);
 
     /**
      * Count posts by status and type
@@ -34,5 +36,5 @@ public interface PostRepository extends BaseRepository<Post, Integer>, JpaSpecif
      *
      * @return posts count
      */
-    Long countAllByStatusAndType(int status, Integer type);
+    Long countAllByStatusAndType(PostStatus status, PostType type);
 }
