@@ -1,20 +1,22 @@
 package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
+import cc.ryanc.halo.security.resolver.AuthenticationArgumentResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -32,53 +34,13 @@ import java.util.Locale;
 @PropertySource(value = "classpath:application.yaml", ignoreResourceNotFound = true, encoding = "UTF-8")
 public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
-//    @Autowired
-//    private LoginInterceptor loginInterceptor;
-//
-//    @Autowired
-//    private InstallInterceptor installInterceptor;
-//
-//    @Autowired
-//    private ApiInterceptor apiInterceptor;
-//
-//    @Autowired
-//    private LocaleInterceptor localeInterceptor;
-//
     @Autowired
     private HaloProperties haloProperties;
-//
-//    /**
-//     * 注册拦截器
-//     *
-//     * @param registry registry
-//     */
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(loginInterceptor)
-//                .addPathPatterns("/admin.*")
-//                .addPathPatterns("/admin/**")
-//                .addPathPatterns("/backup/**")
-//                .excludePathPatterns("/admin/login")
-//                .excludePathPatterns("/admin/getLogin")
-//                .excludePathPatterns("/admin/findPassword")
-//                .excludePathPatterns("/admin/sendResetPasswordEmail")
-//                .excludePathPatterns("/admin/toResetPassword")
-//                .excludePathPatterns("/admin/resetPassword")
-//                .excludePathPatterns("/static/**");
-//        registry.addInterceptor(installInterceptor)
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/install")
-//                .excludePathPatterns("/install/do")
-//                .excludePathPatterns("/static/**");
-//        registry.addInterceptor(apiInterceptor)
-//                .addPathPatterns("/api/**");
-//        registry.addInterceptor(localeInterceptor)
-//                .addPathPatterns("/admin.*")
-//                .addPathPatterns("/admin/**")
-//                .addPathPatterns("/install");
-//        registry.addInterceptor(localeChangeInterceptor())
-//                .addPathPatterns("/install");
-//    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new AuthenticationArgumentResolver());
+    }
 
     /**
      * 配置静态资源路径

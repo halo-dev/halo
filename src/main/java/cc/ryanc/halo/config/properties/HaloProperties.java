@@ -16,4 +16,9 @@ public class HaloProperties {
      * Doc api disabled. (Default is true)
      */
     private Boolean docDisabled = true;
+
+    /**
+     * Production env. (Default is true)
+     */
+    private Boolean productionEnv = true;
 }

@@ -1,0 +1,27 @@
+package cc.ryanc.halo.security.context;
+
+import cc.ryanc.halo.security.authentication.Authentication;
+import org.springframework.lang.Nullable;
+
+/**
+ * Security context interface.
+ *
+ * @author johnniang
+ */
+public interface SecurityContext {
+
+    /**
+     * Gets the currently authenticated principal.
+     *
+     * @return the Authentication or null if authentication information is unavailable
+     */
+    @Nullable
+    Authentication getAuthentication();
+
+    /**
+     * Changes the currently authenticated principal, or removes the authentication information.
+     *
+     * @param authentication the new authentication or null if no further authentication should not be stored
+     */
+    void setAuthentication(@Nullable Authentication authentication);
+}
