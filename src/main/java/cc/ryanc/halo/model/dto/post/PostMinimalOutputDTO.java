@@ -2,6 +2,7 @@ package cc.ryanc.halo.model.dto.post;
 
 import cc.ryanc.halo.model.dto.base.OutputConverter;
 import cc.ryanc.halo.model.entity.Post;
+import cc.ryanc.halo.model.enums.PostStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,8 +15,11 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode
-public class PostWithTitleDTO implements OutputConverter<PostWithTitleDTO, Post> {
+public class PostMinimalOutputDTO implements OutputConverter<PostMinimalOutputDTO, Post> {
 
+    /**
+     * Post id.
+     */
     private Integer id;
 
     /**
@@ -23,4 +27,13 @@ public class PostWithTitleDTO implements OutputConverter<PostWithTitleDTO, Post>
      */
     private String title;
 
+    /**
+     * Post status.
+     */
+    private PostStatus status;
+
+    /**
+     * Post url.
+     */
+    private String url;
 }

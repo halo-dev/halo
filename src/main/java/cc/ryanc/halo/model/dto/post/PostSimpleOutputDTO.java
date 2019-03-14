@@ -16,7 +16,7 @@ import java.util.Date;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class PostSimpleOutputDTO extends PostWithTitleDTO {
+public class PostSimpleOutputDTO extends PostMinimalOutputDTO {
 
     /**
      * 文章类型
