@@ -1,7 +1,7 @@
 package cc.ryanc.halo.model.entity;
 
 
-import cc.ryanc.halo.model.entity.enums.LogType;
+import cc.ryanc.halo.model.enums.LogType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
