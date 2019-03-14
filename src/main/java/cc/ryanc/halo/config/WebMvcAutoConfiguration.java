@@ -2,6 +2,7 @@ package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.security.resolver.AuthenticationArgumentResolver;
+import cc.ryanc.halo.factory.StringToEnumConverterFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -91,5 +93,10 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         final LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
         lci.setParamName("lang");
         return lci;
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverterFactory(new StringToEnumConverterFactory());
     }
 }
