@@ -111,6 +111,13 @@ public class Post {
     private Long likes;
 
     /**
+     * Edit time.
+     */
+    @Column(name = "edit_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date editTime;
+
+    /**
      * 创建时间戳
      */
     @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
