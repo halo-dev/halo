@@ -1,4 +1,4 @@
-package cc.ryanc.halo.repository.v1;
+package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.repository.base.BaseRepository;
