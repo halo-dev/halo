@@ -7,6 +7,7 @@ import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -15,6 +16,7 @@ import org.springframework.util.Assert;
  * Post service implementation.
  *
  * @author johnniang
+ * @author RYAN0UP
  */
 @Service
 public class PostServiceImpl extends AbstractCrudService<Post, Integer> implements PostService {
@@ -35,5 +37,33 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         Page<Post> posts = listAll(latestPageable);
 
         return posts.map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    }
+
+    /**
+     * List by status and type
+     *
+     * @param status   status
+     * @param type     type
+     * @param pageable pageable
+     *
+     * @return Page<PostSimpleOutputDTO>
+     */
+    @Override
+    public Page<PostSimpleOutputDTO> listByStatus(int status, Integer type, Pageable pageable) {
+        Page<Post> posts = postRepository.queryAllByStatusAndType(status, type, pageable);
+        return posts.map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    }
+
+    /**
+     * Count posts by status and type
+     *
+     * @param status status
+     * @param type   type
+     *
+     * @return posts count
+     */
+    @Override
+    public Long countByStatus(int status, Integer type) {
+        return postRepository.countAllByStatusAndType(status,type);
     }
 }
