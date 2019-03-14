@@ -1,7 +1,7 @@
 package cc.ryanc.halo.model.entity;
 
-import cc.ryanc.halo.model.entity.enums.PostCreateFrom;
-import cc.ryanc.halo.model.entity.enums.PostType;
+import cc.ryanc.halo.model.enums.PostCreateFrom;
+import cc.ryanc.halo.model.enums.PostType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

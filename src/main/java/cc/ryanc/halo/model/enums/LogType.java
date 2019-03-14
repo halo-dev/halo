@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.entity.enums;
+package cc.ryanc.halo.model.enums;
 
 /**
  * Log type.
