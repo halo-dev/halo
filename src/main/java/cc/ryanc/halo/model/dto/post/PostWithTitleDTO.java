@@ -19,6 +19,4 @@ public class PostWithTitleDTO implements OutputConverter<PostWithTitleDTO, Post>
     private Integer id;
 
     private String title;
-
-    private String type;
 }
