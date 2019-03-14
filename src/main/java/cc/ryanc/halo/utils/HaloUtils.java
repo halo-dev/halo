@@ -1,7 +1,5 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
-import cc.ryanc.halo.model.enums.CommonParamsEnum;
 import cc.ryanc.halo.model.support.BackupDto;
 import cc.ryanc.halo.model.support.Theme;
 import cn.hutool.core.io.FileUtil;
@@ -59,18 +57,18 @@ public class HaloUtils {
         return machineAddress.getHostAddress();
     }
 
-    /**
-     * Gets default page size.
-     *
-     * @return default page size
-     */
-    public static int getDefaultPageSize() {
-        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-            return Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
-        }
-
-        return DEFAULT_PAGE_SIZE;
-    }
+//    /**
+//     * Gets default page size.
+//     *
+//     * @return default page size
+//     */
+//    public static int getDefaultPageSize() {
+//        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
+//            return Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
+//        }
+//
+//        return DEFAULT_PAGE_SIZE;
+//    }
 
     /**
      * Gets default qiniuyun zone.
@@ -112,65 +110,65 @@ public class HaloUtils {
         return zone;
     }
 
-    /**
-     * 获取备份文件信息
-     *
-     * @param dir dir
-     * @return List
-     */
-    public static List<BackupDto> getBackUps(String dir) {
-        final StrBuilder srcPathStr = new StrBuilder(System.getProperties().getProperty("user.home"));
-        srcPathStr.append("/halo/backup/");
-        srcPathStr.append(dir);
-        final File srcPath = new File(srcPathStr.toString());
-        final File[] files = srcPath.listFiles();
-        final List<BackupDto> backupDtos = new ArrayList<>();
-        BackupDto backupDto;
-        // 遍历文件
-        if (null != files) {
-            for (File file : files) {
-                if (file.isFile()) {
-                    if (StrUtil.equals(file.getName(), ".DS_Store")) {
-                        continue;
-                    }
-                    backupDto = new BackupDto();
-                    backupDto.setFileName(file.getName());
-                    backupDto.setCreateAt(getCreateTime(file.getAbsolutePath()));
-                    backupDto.setFileType(FileUtil.getType(file));
-                    backupDto.setFileSize(parseSize(file.length()));
-                    backupDto.setBackupType(dir);
-                    backupDtos.add(backupDto);
-                }
-            }
-        }
-        return backupDtos;
-    }
+//    /**
+//     * 获取备份文件信息
+//     *
+//     * @param dir dir
+//     * @return List
+//     */
+//    public static List<BackupDto> getBackUps(String dir) {
+//        final StrBuilder srcPathStr = new StrBuilder(System.getProperties().getProperty("user.home"));
+//        srcPathStr.append("/halo/backup/");
+//        srcPathStr.append(dir);
+//        final File srcPath = new File(srcPathStr.toString());
+//        final File[] files = srcPath.listFiles();
+//        final List<BackupDto> backupDtos = new ArrayList<>();
+//        BackupDto backupDto;
+//        // 遍历文件
+//        if (null != files) {
+//            for (File file : files) {
+//                if (file.isFile()) {
+//                    if (StrUtil.equals(file.getName(), ".DS_Store")) {
+//                        continue;
+//                    }
+//                    backupDto = new BackupDto();
+//                    backupDto.setFileName(file.getName());
+//                    backupDto.setCreateAt(getCreateTime(file.getAbsolutePath()));
+//                    backupDto.setFileType(FileUtil.getType(file));
+//                    backupDto.setFileSize(parseSize(file.length()));
+//                    backupDto.setBackupType(dir);
+//                    backupDtos.add(backupDto);
+//                }
+//            }
+//        }
+//        return backupDtos;
+//    }
 
-    /**
-     * 转换文件大小
-     *
-     * @param size size
-     * @return String
-     */
-    public static String parseSize(long size) {
-        if (size < CommonParamsEnum.BYTE.getValue()) {
-            return size + "B";
-        } else {
-            size = size / 1024;
-        }
-        if (size < CommonParamsEnum.BYTE.getValue()) {
-            return size + "KB";
-        } else {
-            size = size / 1024;
-        }
-        if (size < CommonParamsEnum.BYTE.getValue()) {
-            size = size * 100;
-            return size / 100 + "." + size % 100 + "MB";
-        } else {
-            size = size * 100 / 1024;
-            return size / 100 + "." + size % 100 + "GB";
-        }
-    }
+//    /**
+//     * 转换文件大小
+//     *
+//     * @param size size
+//     * @return String
+//     */
+//    public static String parseSize(long size) {
+//        if (size < CommonParamsEnum.BYTE.getValue()) {
+//            return size + "B";
+//        } else {
+//            size = size / 1024;
+//        }
+//        if (size < CommonParamsEnum.BYTE.getValue()) {
+//            return size + "KB";
+//        } else {
+//            size = size / 1024;
+//        }
+//        if (size < CommonParamsEnum.BYTE.getValue()) {
+//            size = size * 100;
+//            return size / 100 + "." + size % 100 + "MB";
+//        } else {
+//            size = size * 100 / 1024;
+//            return size / 100 + "." + size % 100 + "GB";
+//        }
+//    }
 
     /**
      * 获取文件创建时间

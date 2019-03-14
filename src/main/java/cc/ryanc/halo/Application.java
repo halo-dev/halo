@@ -21,7 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @EnableJpaAuditing
 @EnableScheduling
-@EnableJpaRepositories(basePackages = "cc.ryanc.halo.repository", repositoryBaseClass = BaseRepositoryImpl.class)
+@EnableJpaRepositories(basePackages = {"cc.ryanc.halo.repository"}, repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {
 
     private final static Logger LOG = Logger.getLogger(Application.class);
