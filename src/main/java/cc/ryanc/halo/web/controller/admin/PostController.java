@@ -5,10 +5,8 @@ import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.SortDefault;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,28 +34,23 @@ public class PostController {
     /**
      * posts manage
      *
-     * @param model  model
-     * @param status post status
-     * @param page   current page
-     * @param sort   sort
-     *
+     * @param model    model
+     * @param status   post status
+     * @param pageable page info
      * @return template path: admin/admin_post.ftl
      */
     @GetMapping
-    public String posts(Model model,
-                        @RequestParam(value = "status", defaultValue = "published") PostStatus status,
-                        @RequestParam(value = "page", defaultValue = "0") Integer page,
-                        @SortDefault.SortDefaults({
-                                @SortDefault(sort = "topPriority", direction = DESC),
-                                @SortDefault(sort = "createTime", direction = DESC)
-                        }) Sort sort) {
-        final Pageable pageable = PageRequest.of(page, 10, sort);
-        final Page<PostSimpleOutputDTO> posts = postService.listByStatus(status, PostType.POST, pageable);
-        model.addAttribute("posts", posts);
-        model.addAttribute("publishedCount", postService.countByStatus(PostStatus.PUBLISHED, PostType.POST));
-        model.addAttribute("draftCount", postService.countByStatus(PostStatus.DRAFT, PostType.POST));
-        model.addAttribute("recycleCount", postService.countByStatus(PostStatus.RECYCLE, PostType.POST));
+    public String listPosts(Model model,
+                            @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
+                            @RequestParam(value = "status", defaultValue = "published") PostStatus status) {
+        final Page<PostSimpleOutputDTO> postPage = postService.pageByStatusAndType(status, PostType.POST, pageable);
+
+        model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("publishedCount", postService.countByStatusAndType(PostStatus.PUBLISHED, PostType.POST));
+        model.addAttribute("draftCount", postService.countByStatusAndType(PostStatus.DRAFT, PostType.POST));
+        model.addAttribute("recycleCount", postService.countByStatusAndType(PostStatus.RECYCLE, PostType.POST));
         model.addAttribute("status", status);
         return "admin/admin_post";
     }
+
 }

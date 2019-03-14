@@ -51,8 +51,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @return Page<PostSimpleOutputDTO>
      */
     @Override
-    public Page<PostSimpleOutputDTO> listByStatus(PostStatus status, PostType type, Pageable pageable) {
-        Page<Post> posts = postRepository.queryAllByStatusAndType(status, type, pageable);
+    public Page<PostSimpleOutputDTO> pageByStatusAndType(PostStatus status, PostType type, Pageable pageable) {
+        Page<Post> posts = postRepository.findAllByStatusAndType(status, type, pageable);
         return posts.map(post -> new PostSimpleOutputDTO().convertFrom(post));
     }
 
@@ -65,7 +65,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @return posts count
      */
     @Override
-    public Long countByStatus(PostStatus status, PostType type) {
-        return postRepository.countAllByStatusAndType(status,type);
+    public Long countByStatusAndType(PostStatus status, PostType type) {
+        return postRepository.countByStatusAndType(status,type);
     }
 }

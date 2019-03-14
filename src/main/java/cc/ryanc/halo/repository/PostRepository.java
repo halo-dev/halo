@@ -7,6 +7,7 @@ import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.lang.NonNull;
 
 
 /**
@@ -18,23 +19,22 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface PostRepository extends BaseRepository<Post, Integer>, JpaSpecificationExecutor<Post> {
 
     /**
-     * Find posts by status and type
+     * Finds posts by status and type.
      *
      * @param status   status
      * @param type     type
      * @param pageable pageable
-     *
      * @return Page<Post>
      */
-    Page<Post> queryAllByStatusAndType(PostStatus status, PostType type, Pageable pageable);
+    @NonNull
+    Page<Post> findAllByStatusAndType(@NonNull PostStatus status, @NonNull PostType type, @NonNull Pageable pageable);
 
     /**
-     * Count posts by status and type
+     * Counts posts by status and type.
      *
      * @param status status
      * @param type   type
-     *
      * @return posts count
      */
-    Long countAllByStatusAndType(PostStatus status, PostType type);
+    long countByStatusAndType(@NonNull PostStatus status, @NonNull PostType type);
 }
