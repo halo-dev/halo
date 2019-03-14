@@ -27,7 +27,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @RequestMapping(value = "/admin/posts")
 public class PostController {
 
-    private PostService postService;
+    private final PostService postService;
 
     public PostController(PostService postService) {
         this.postService = postService;
@@ -45,18 +45,18 @@ public class PostController {
      */
     @GetMapping
     public String posts(Model model,
-                        @RequestParam(value = "status", defaultValue = "0") PostStatus status,
+                        @RequestParam(value = "status", defaultValue = "published") PostStatus status,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @SortDefault.SortDefaults({
-                                @SortDefault(sort = "postPriority", direction = DESC),
-                                @SortDefault(sort = "postDate", direction = DESC)
+                                @SortDefault(sort = "topPriority", direction = DESC),
+                                @SortDefault(sort = "createTime", direction = DESC)
                         }) Sort sort) {
         final Pageable pageable = PageRequest.of(page, 10, sort);
         final Page<PostSimpleOutputDTO> posts = postService.listByStatus(status, PostType.POST, pageable);
         model.addAttribute("posts", posts);
-        model.addAttribute("publishCount", postService.countByStatus(PostStatus.PUBLISHED, PostType.POST));
+        model.addAttribute("publishedCount", postService.countByStatus(PostStatus.PUBLISHED, PostType.POST));
         model.addAttribute("draftCount", postService.countByStatus(PostStatus.DRAFT, PostType.POST));
-        model.addAttribute("trashCount", postService.countByStatus(PostStatus.RECYCLE, PostType.POST));
+        model.addAttribute("recycleCount", postService.countByStatus(PostStatus.RECYCLE, PostType.POST));
         model.addAttribute("status", status);
         return "admin/admin_post";
     }
