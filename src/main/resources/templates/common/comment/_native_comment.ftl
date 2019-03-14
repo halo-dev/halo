@@ -1,259 +1,132 @@
+<@compress single_line=true>
+<link type="text/css" rel="stylesheet" href="/static/halo-common/OwO/OwO.min.css">
+<link type="text/css" rel="stylesheet" href="/static/halo-frontend/css/comment.min.css">
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    .native-comment {
-        padding: 10px;
-    }
-
-    .native-wrap {
-        border: 1px solid #f0f0f0;
-        padding: 10px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    input, textarea, button {
-        outline: none;
-    }
-
-    .comment-header {
-        width: 100%;
-        line-height: 1.8;
-    }
-
-    .comment-input-who, .comment-input-email, .comment-input-website {
-        width: 33.33%;
-        padding: 10px 0;
-        font-size: .8rem;
-        float: left;
-        border: none;
-        border-bottom: 1px dashed #dedede;
-    }
-
-    .comment-input:focus {
-        border-bottom: 1px dashed red;
-    }
-
-    .comment-input-content {
-        width: 100%;
-        min-height: 120px;
-        resize: vertical;
-        border: none;
-        padding: 10px 0;
-    }
-
-    .comment-footer {
-        text-align: right;
-        vertical-align: middle;
-    }
-
-    .comment-submit {
-        border-radius: 0;
-        vertical-align: middle;
-        padding: 7px 14px;
-        font-size: .9rem;
-        cursor: pointer;
-        border: 1px solid #ededed;
-        background: #ededed;
-        color: #313131;
-    }
-
-    .native-list {
-        width: 100%;
-        list-style: none;
-        margin: 0 auto;
-        padding: 0;
-    }
-
-    .native-list .native-list-one {
-        padding-top: 10px;
-        position: relative;
-        display: block;
-        transition: all .3s ease-in-out;
-    }
-
-    .native-list .native-list-one .native-list-one-img {
-        width: 2.5rem;
-        height: 2.5rem;
-        float: left;
-        border-radius: 50%;
-        margin-right: .7rem;
-    }
-
-    .native-list .native-list-one section {
-        overflow: hidden;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px dashed #f5f5f5;
-    }
-
-    .native-list .native-list-one section .native-list-one-head {
-        line-height: 1.5;
-        margin-bottom: .625rem;
-        margin-top: 0;
-    }
-
-    .native-list-one-head-name {
-        font-size: .875rem;
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: none;
-        color: #555;
-    }
-
-    .native-list-one-head-admin{
-        padding: .1em 0.2em;
-        border-radius: 2px;
-        font-size: 70%;
-        font-weight: 700;
-        background-color: #87ceeb;
-        color: #fff;
-        display: inline;
-    }
-
-    .ua {
-        display: inline-block;
-        padding: .2rem .5rem;
-        background: #ededed;
-        color: #b3b1b1;
-        font-size: .75rem;
-        border-radius: .2rem;
-        margin-right: .3rem;
-    }
-
-    .native-list-one-content p {
-        font-size: 14px;
-        letter-spacing: 0;
-        margin: 0 0 1pc;
-        font-weight: 400;
-    }
-
-    .native-list-one-footer-time {
-        color: #b3b3b3;
-        font-size: .75rem;
-        margin-right: .875rem;
-    }
-
-    .native-list-one-footer-reback {
-        font-size: .8125rem;
-        color: #ef2f11;
-        cursor: pointer;
-    }
-    ${options.native_css?if_exists}
-    @media screen and (max-width: 560px) {
-        .comment-input-who, .comment-input-email, .comment-input-website {
-            width: 100%;
-        }
-    }
+${options.native_css!}
 </style>
-<div class="native-comment">
-    <div class="native-wrap">
+<div class="comment-container">
+    <div class="comment-avatar">
+        <img src="//gravatar.loli.net/avatar/none?s=256&d=${options.native_comment_avatar!'mm'}" class="comment-author-avatar">
+    </div>
+    <div class="comment-wrap">
         <div class="comment-header">
-            <input type="hidden" name="postId" value="${post.postId}">
-            <input type="text" class="comment-input comment-input-who" name="commentAuthor" id="commentAuthor"
-                   placeholder="昵称">
-            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" placeholder="邮箱">
-            <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl"
-                   placeholder="网址(https/http)">
+            <input type="hidden" name="postId" value="${post.postId?c}">
+            <input type="hidden" name="commentParent" id="commentParent" value="0">
+            <input type="text" class="comment-input comment-input-who" name="commentAuthor" id="commentAuthor" placeholder="昵称(必填)">
+            <input type="text" class="comment-input comment-input-email" name="commentAuthorEmail" id="commentAuthorEmail" onblur="loadAvatar()" placeholder="邮箱(选填)">
+            <input type="text" class="comment-input comment-input-website" name="commentAuthorUrl" id="commentAuthorUrl" placeholder="网址(选填)">
         </div>
         <div class="comment-content">
-            <textarea class="comment-input comment-input-content" name="commentContent" id="commentContent"
-                      placeholder="come on"></textarea>
+            <textarea class="comment-input-content" name="commentContent" id="commentContent" placeholder="${options.native_comment_placeholder!'赶快评论一个吧！'}"></textarea>
+            <div class="OwO"></div>
         </div>
         <div class="comment-footer">
-            <button type="button" class="comment-submit" id="btn-push">提交</button>
+            <button type="button" class="comment-cancel-reply" id="comment-cancel-reply" style="display: none;">取消回复</button>
+            <button type="button" class="comment-submit" id="comment-submit">提交</button>
         </div>
     </div>
-    <div class="native-info" style="padding-top: 5px;font-size: 12px;color: #0F192A;">
-        <span id="native-info-total">${comments.getTotalElements()}</span>条评论
+    <div class="comment-message" style="text-align: center;padding: 20px;display: none"></div>
+    <div class="comment-info">
+        <span id="comment-info-total" style="font-weight: 600">${commentsCount!0}</span>评论
     </div>
-    <ul class="native-list">
-        <#list comments.content as comment>
-            <li class="native-list-one" id="comment-id-${comment.commentId}">
-                <img class="native-list-one-img" src="//www.gravatar.com/avatar/${comment.commentAuthorAvatarMd5?if_exists}?s=256&d=${options.native_comment_avatar?default('mm')}">
-                <section>
-                    <div class="native-list-one-head">
-                        <a class="native-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl?if_exists}">${comment.commentAuthor?if_exists}</a>
-                        <#if comment.isAdmin==1>
-                            <label class="native-list-one-head-admin">博主</label>
-                        </#if>
-                        <#--<span class="ua"></span>-->
-                        <#--<span class="ua"></span>-->
-                    </div>
-                    <div class="native-list-one-content">
-                        <p>${comment.commentContent?if_exists}</p>
-                    </div>
-                    <div class="native-list-one-footer">
-                        <span class="native-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
-                        <span rid="" at="@${comment.commentAuthor?if_exists}" class="native-list-one-footer-reback">回复</span>
-                    </div>
-                </section>
-            </li>
-        </#list>
+    <#macro childComments comments>
+        <ul class="comment-list" style="margin-left: 30px; border-left: 1px solid #f1f1f1">
+        <#if comments?? && comments?size gt 0>
+            <#list comments?sort_by("commentDate") as comment>
+                <li class="comment-list-one" id="comment-id-${comment.commentId?c}" style="margin-left: 5px;">
+                    <img class="comment-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5!}?s=256&d=${options.native_comment_avatar!'mm'}">
+                    <section>
+                        <div class="comment-list-one-head">
+                            <a class="comment-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl!}">${comment.commentAuthor!}</a>
+                            <span class="comment-ua-info" style="display: none">${comment.commentAgent!}</span>
+                            <#if comment.isAdmin==1>
+                                <span class="comment-list-one-head-admin">博主</span>
+                            </#if>
+                        </div>
+                        <div class="comment-list-one-content">
+                            <p>${comment.commentContent!}</p>
+                        </div>
+                        <div class="comment-list-one-footer">
+                            <span class="comment-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
+                            <span at="${comment.commentId?c}" class="comment-list-one-footer-reback">回复</span>
+                        </div>
+                    </section>
+                    <#if comment.childComments?? && comment.childComments?size gt 0>
+                        <@childComments comment.childComments></@childComments>
+                    </#if>
+                </li>
+            </#list>
+        </#if>
+        </ul>
+    </#macro>
+    <ul class="comment-list" id="comments-list">
+        <#if comments?? && comments.getPageList()?size gt 0>
+            <#list comments.getPageList()?sort_by("commentDate")?reverse as comment>
+                <li class="comment-list-one" id="comment-id-${comment.commentId?c}">
+                    <img class="comment-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5!}?s=256&d=${options.native_comment_avatar!'mm'}">
+                    <section>
+                        <div class="comment-list-one-head">
+                            <a class="comment-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl!}">${comment.commentAuthor!}</a>
+                            <span class="comment-ua-info" style="display: none">${comment.commentAgent!}</span>
+                            <#if comment.isAdmin==1>
+                                <label class="comment-list-one-head-admin">博主</label>
+                            </#if>
+                        </div>
+                        <div class="comment-list-one-content">
+                            <p>${comment.commentContent!}</p>
+                        </div>
+                        <div class="comment-list-one-footer">
+                            <span class="comment-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
+                            <span at="${comment.commentId?c}" class="comment-list-one-footer-reback">回复</span>
+                        </div>
+                    </section>
+                    <#if comment.childComments?? && comment.childComments?size gt 0>
+                        <@childComments comment.childComments></@childComments>
+                    </#if>
+                </li>
+            </#list>
+        </#if>
     </ul>
+    <div class="native-nav" id="comment-nav">
+        <#if comments.totalPage gt 1>
+            <ol class="page-nav">
+                <#if comments.hasPrevious>
+                <li>
+                    <a href="?cp=${comments.nowPage-1}#comments-list" title="上一页">←</a>
+                </li>
+                </#if>
+                <li>
+                    <#list rainbow as r>
+                        <#if r == comments.nowPage>
+                            <a href="?cp=${comments.nowPage}#comments-list" style="color: red;">${r}</a>
+                        <#else>
+                            <a href="?cp=${r}#comments-list">${r}</a>
+                        </#if>
+                    </#list>
+                </li>
+                <#if comments.hasNext>
+                <li>
+                    <a href="?cp=${comments.nowPage+1}#comments-list" title="下一页">→</a>
+                </li>
+                </#if>
+            </ol>
+        </#if>
+    </div>
 </div>
-<script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-<script src="//cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
-<script src="//cdn.bootcss.com/UAParser.js/0.7.17/ua-parser.min.js"></script>
+<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-frontend/plugins/md5/md5.min.js"></script>
+<script src="/static/halo-frontend/plugins/ua-parser/ua-parser.min.js"></script>
+<script src="/static/halo-common/OwO/OwO.min.js"></script>
+<#if (options.comment_activate_power_mode!'false') == "true">
+<script src="/static/halo-frontend/plugins/activate-power-mode/activate-power-mode.js"></script>
 <script>
-    <#--$(document).ready(function () {-->
-        <#--$.ajax({-->
-            <#--type: "get",-->
-            <#--async: true,-->
-            <#--url: "/getComment/${post.postId}",-->
-            <#--dataType: "json",-->
-            <#--success: function (data) {-->
-                <#--setTimeout(function () {-->
-                    <#--$('.native-loading').hide();-->
-                <#--}, 1000);-->
-                <#--var parser = new UAParser();-->
-                <#--$.each(data, function (i, element) {-->
-                    <#--parser.setUA(element.commentAgent);-->
-                    <#--var result = parser.getResult();-->
-                    <#--var browser = result.browser.name + ' ' + result.browser.version;-->
-                    <#--var os = result.os.name + ' ' + result.os.version;-->
-                    <#--var author = element.commentAuthor;-->
-                    <#--var authorEmail = element.commentAuthorEmail;-->
-                    <#--var authorUrl = element.commentAuthorUrl;-->
-                    <#--var timestamp = element.commentDate;-->
-                    <#--var date = new Date(timestamp).toLocaleDateString();-->
-                    <#--var content = element.commentContent;-->
-                    <#--var authorPic = md5(authorEmail);-->
-                    <#--$('.native-list').append("<li class=\"native-list-one\"><img class=\"native-list-one-img\" src=\"//www.gravatar.com/avatar/" + authorPic + "?s=256&d=${options.native_comment_avatar?default('default')}\"><section><div class=\"native-list-one-head\"><a class=\"native-list-one-head-name\" rel=\"nofollow\" href=\"" + authorUrl + "\" target=\"_blank\">" + author + "</a> <span class=\"ua\">" + browser + "</span> <span class=\"ua\">" + os + "</span></div><div class=\"native-list-one-content\"><p>" + content + "</p></div><div class=\"native-list-one-footer\"><span class=\"native-list-one-footer-time\">" + date + "</span> <span rid=\"\" at=\"@" + author + "\" mail=\"" + authorEmail + "\" class=\"native-list-one-footer-reback\">回复</span></div></section></li>");-->
-                <#--});-->
-            <#--}-->
-        <#--});-->
-    <#--});-->
-    $('#btn-push').click(function () {
-        var author = $("#commentAuthor");
-        if (author.val() == '') {
-            $(author).css("border-bottom", "1px dashed red");
-            return;
-        }
-        var content = $("#commentContent");
-        if (content.val() == '') {
-            $(content).css("border-bottom", "1px dashed red");
-            return;
-        }
-        $.ajax({
-            type: 'POST',
-            url: '/newComment',
-            async: false,
-            data: {
-                'postId': $('input[name=postId]').val(),
-                'commentContent': $('textarea[name=commentContent]').val(),
-                'commentAuthor': $('input[name=commentAuthor]').val(),
-                'commentAuthorEmail': $('input[name=commentAuthorEmail]').val(),
-                'commentAuthorUrl': $('input[name=commentAuthorUrl]').val(),
-                'commentAgent': navigator.userAgent,
-                'commentAuthorAvatarMd5': md5($('input[name=commentAuthorEmail]').val())
-            },
-            success: function (data) {
-                if (data == true) {
-                    window.location.reload();
-                }
-            }
-        });
-    });
+    POWERMODE.colorful = true;
+    POWERMODE.shake = false;
+    document.body.addEventListener('input', POWERMODE);
 </script>
+</#if>
+<script>
+    var avatarType = "${options.native_comment_avatar!'mm'}";
+</script>
+<script src="/static/halo-frontend/js/comment.min.js"></script>
+</@compress>

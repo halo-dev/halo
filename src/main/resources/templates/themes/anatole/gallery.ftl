@@ -1,7 +1,8 @@
+<#include "/common/macro/common_macro.ftl">
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>图库 · ${options.blog_title?if_exists}</title>
+    <title>图库 · ${options.blog_title!}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="anatole/source/plugins/gallery/css/main.css" />
@@ -11,7 +12,7 @@
 <div id="main">
     <header id="header">
         <h1>图库</h1>
-        <p>${user.userDesc?if_exists}</p>
+        <p>${user.userDesc!}</p>
         <ul class="icons">
             <!--
             <li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
@@ -27,20 +28,20 @@
             <article>
                 <a class="thumbnail" href="${gallery.galleryUrl}" data-position="left center"><img src="${gallery.galleryThumbnailUrl}" alt="${gallery.galleryDesc}" /></a>
                 <h2>${gallery.galleryName}</h2>
-                <p>${gallery.galleryDate?if_exists}</p>
+                <p>${gallery.galleryDate!}</p>
             </article>
         </#list>
         </#if>
     </section>
     <footer id="footer">
         <ul class="copyright">
-            <li>&copy; ${options.blog_title?if_exists}.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a>.</li>
+            <li>&copy; ${options.blog_title!}.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a>.</li>
         </ul>
     </footer>
 </div>
 <script src="anatole/source/plugins/gallery/js/jquery.min.js"></script>
 <script src="anatole/source/plugins/gallery/js/skel.min.js"></script>
 <script src="anatole/source/plugins/gallery/js/main.js"></script>
-${options.statistics_code?if_exists}
+<@statistics></@statistics>
 </body>
 </html>

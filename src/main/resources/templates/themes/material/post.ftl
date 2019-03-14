@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@layout title="${post.postTitle?if_exists} | ${options.blog_title?default('Material')}" keywords="${options.seo_keywords?default('Material')}" description="${options.seo_desc?default('Material')}">
+<@layout title="${post.postTitle!} | ${options.blog_title!'Material'}" keywords="${options.seo_keywords!'Material'},${tagWords}" description="${post.postSummary!}">
     <!-- Post Module -->
     <div class="material-post_container">
         <div class="material-post mdl-grid">
@@ -8,7 +8,7 @@
                 <!-- Post Header(Thumbnail & Title) -->
                 <#include "_partial/post-header.ftl">
 
-                <#if options.theme_material_scheme?if_exists == "Paradox">
+                <#if (options.theme_material_scheme!'Paradox') == "Paradox">
                 <!-- Paradox Post Info -->
                 <#include "_partial/Paradox-post-info.ftl">
                 </#if>
@@ -16,7 +16,7 @@
                 <!-- Post Content -->
                 <#include "_partial/post-content.ftl">
 
-                <#if options.theme_material_scheme?if_exists == "Isolation">
+                <#if (options.theme_material_scheme!'Paradox') == "Isolation">
                 <#include "_partial/Isolation-post-info.ftl">
                 </#if>
 

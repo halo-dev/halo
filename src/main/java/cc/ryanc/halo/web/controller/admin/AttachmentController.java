@@ -1,39 +1,41 @@
 package cc.ryanc.halo.web.controller.admin;
 
 import cc.ryanc.halo.model.domain.Attachment;
-import cc.ryanc.halo.model.domain.Logs;
-import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
+import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static cc.ryanc.halo.model.enums.AttachLocationEnum.*;
+
 /**
+ * <pre>
+ *     后台附件控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/19
- * @version : 1.0
- * description: 附件
  */
 @Slf4j
 @Controller
@@ -46,29 +48,20 @@ public class AttachmentController {
     @Autowired
     private LogsService logsService;
 
-    /**
-     * 刷新HaloConst
-     */
-    private void updateConst() {
-        HaloConst.ATTACHMENTS.clear();
-        HaloConst.ATTACHMENTS = attachmentService.findAllAttachments();
-    }
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
-     * 获取upload的所有图片资源并渲染页面
+     * 复印件列表
      *
      * @param model model
      * @return 模板路径admin/admin_attachment
      */
     @GetMapping
     public String attachments(Model model,
-                              @RequestParam(value = "page", defaultValue = "0") Integer page,
-                              @RequestParam(value = "size", defaultValue = "18") Integer size) {
-        Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        Pageable pageable = new PageRequest(page, size, sort);
-        Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
+                              @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable) {
+        final Page<Attachment> attachments = attachmentService.listAll(pageable);
         model.addAttribute("attachments", attachments);
-
         return "admin/admin_attachment";
     }
 
@@ -76,19 +69,31 @@ public class AttachmentController {
      * 跳转选择附件页面
      *
      * @param model model
-     * @param page  page 当前页码
      * @return 模板路径admin/widget/_attachment-select
      */
     @GetMapping(value = "/select")
     public String selectAttachment(Model model,
-                                   @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                   @RequestParam(value = "id") String id) {
-        Sort sort = new Sort(Sort.Direction.DESC, "attachId");
-        Pageable pageable = new PageRequest(page, 18, sort);
-        Page<Attachment> attachments = attachmentService.findAllAttachments(pageable);
+                                   @PageableDefault(size = 18, sort = "attachId", direction = Sort.Direction.DESC) Pageable pageable,
+                                   @RequestParam(value = "id", defaultValue = "none") String id,
+                                   @RequestParam(value = "type", defaultValue = "normal") String type) {
+        final Page<Attachment> attachments = attachmentService.listAll(pageable);
         model.addAttribute("attachments", attachments);
         model.addAttribute("id", id);
+        if (StrUtil.equals(type, PostTypeEnum.POST_TYPE_POST.getDesc())) {
+            return "admin/widget/_attachment-select-post";
+        }
         return "admin/widget/_attachment-select";
+    }
+
+
+    /**
+     * 上传附件窗口
+     *
+     * @return String
+     */
+    @GetMapping(value = "/uploadModal")
+    public String uploadModal() {
+        return "admin/widget/_attachment-upload";
     }
 
     /**
@@ -96,89 +101,46 @@ public class AttachmentController {
      *
      * @param file    file
      * @param request request
-     * @return Map<String   ,   Object></>
+     * @return Map
      */
     @PostMapping(value = "/upload", produces = {"application/json;charset=UTF-8"})
     @ResponseBody
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file,
                                       HttpServletRequest request) {
-        return uploadAttachment(file, request);
-    }
-
-    /**
-     * editor.md上传图片
-     *
-     * @param file    file
-     * @param request request
-     * @return Map<String   ,   Object></>
-     */
-    @PostMapping(value = "/upload/editor", produces = {"application/json;charset=UTF-8"})
-    @ResponseBody
-    public Map<String, Object> editorUpload(@RequestParam("editormd-image-file") MultipartFile file,
-                                            HttpServletRequest request) {
-        return uploadAttachment(file, request);
-    }
-
-
-    /**
-     * 上传图片
-     *
-     * @param file    file
-     * @param request request
-     * @return Map<String   ,   Object></>
-     */
-    public Map<String, Object> uploadAttachment(MultipartFile file, HttpServletRequest request) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        final Map<String, Object> result = new HashMap<>(3);
         if (!file.isEmpty()) {
             try {
-                File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-                StringBuffer sbMedia = new StringBuffer("upload/");
-                sbMedia.append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/");
-                File mediaPath = new File(basePath.getAbsolutePath(), sbMedia.toString());
-                if (!mediaPath.exists()) {
-                    mediaPath.mkdirs();
+                final Map<String, String> resultMap = attachmentService.upload(file, request);
+                if (resultMap == null || resultMap.isEmpty()) {
+                    log.error("File upload failed");
+                    result.put("success", ResultCodeEnum.FAIL.getCode());
+                    result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
+                    return result;
                 }
-                file.transferTo(new File(mediaPath.getAbsoluteFile(), file.getOriginalFilename()));
-                String fileName = file.getOriginalFilename();
-                String nameWithOutSuffix = fileName.substring(0, fileName.lastIndexOf('.'));
-                String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
-
                 //保存在数据库
                 Attachment attachment = new Attachment();
-                attachment.setAttachName(fileName);
-                attachment.setAttachPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(fileName).toString());
-                System.out.println(mediaPath.getAbsolutePath() + "/" + fileName);
-                //判断图片大小，如果长宽都小于500，则保存原始图片路径
-                BufferedImage sourceImg = ImageIO.read(new FileInputStream(mediaPath.getPath() + "/" + fileName));
-                if (sourceImg.getWidth() < 500 && sourceImg.getHeight() < 500) {
-                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(fileName).toString());
-                } else {
-                    attachment.setAttachSmallPath(new StringBuffer("/upload/").append(HaloUtil.YEAR).append("/").append(HaloUtil.MONTH).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString());
-                    //剪裁图片
-                    HaloUtil.cutCenterImage(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(fileName).toString(), new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(nameWithOutSuffix).append("_small.").append(fileSuffix).toString(), 500, 500, fileSuffix);
-                }
-
+                attachment.setAttachName(resultMap.get("fileName"));
+                attachment.setAttachPath(resultMap.get("filePath"));
+                attachment.setAttachSmallPath(resultMap.get("smallPath"));
                 attachment.setAttachType(file.getContentType());
-                attachment.setAttachSuffix(new StringBuffer(".").append(fileSuffix).toString());
-                attachment.setAttachCreated(HaloUtil.getDate());
-                attachmentService.saveByAttachment(attachment);
-
-                updateConst();
-                log.info("上传文件[" + file.getOriginalFilename() + "]到[" + mediaPath.getAbsolutePath() + "]成功");
-                logsService.saveByLogs(
-                        new Logs(LogsRecord.UPLOAD_FILE, file.getOriginalFilename(), HaloUtil.getIpAddr(request), HaloUtil.getDate())
-                );
-
-                result.put("success", 1);
-                result.put("message", "上传成功！");
+                attachment.setAttachSuffix(resultMap.get("suffix"));
+                attachment.setAttachSize(resultMap.get("size"));
+                attachment.setAttachWh(resultMap.get("wh"));
+                attachment.setAttachLocation(resultMap.get("location"));
+                attachmentService.create(attachment);
+                log.info("Upload file {} to {} successfully", resultMap.get("fileName"), resultMap.get("filePath"));
+                result.put("success", ResultCodeEnum.SUCCESS.getCode());
+                result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-success"));
                 result.put("url", attachment.getAttachPath());
+                result.put("filename", resultMap.get("filePath"));
+                logsService.save(LogsRecord.UPLOAD_FILE, resultMap.get("fileName"), request);
             } catch (Exception e) {
-                log.error("未知错误：{0}", e.getMessage());
-                result.put("success", 0);
-                result.put("message", "上传失败！");
+                log.error("Upload file failed:{}", e.getMessage());
+                result.put("success", ResultCodeEnum.FAIL.getCode());
+                result.put("message", localeMessageUtil.getMessage("code.admin.attachment.upload-failed"));
             }
         } else {
-            log.error("文件不能为空");
+            log.error("File cannot be empty!");
         }
         return result;
     }
@@ -191,12 +153,9 @@ public class AttachmentController {
      * @return 模板路径admin/widget/_attachment-detail
      */
     @GetMapping(value = "/attachment")
-    public String attachmentDetail(Model model, @PathParam("attachId") Long attachId) {
-        Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
-        model.addAttribute("attachment", attachment.get());
-
-        //设置选项
-        model.addAttribute("options", HaloConst.OPTIONS);
+    public String attachmentDetail(Model model, @RequestParam("attachId") Long attachId) {
+        final Optional<Attachment> attachment = attachmentService.fetchById(attachId);
+        model.addAttribute("attachment", attachment.orElse(new Attachment()));
         return "admin/widget/_attachment-detail";
     }
 
@@ -205,50 +164,54 @@ public class AttachmentController {
      *
      * @param attachId 附件编号
      * @param request  request
-     * @return true：移除附件成功，false：移除附件失败
+     * @return JsonResult
      */
     @GetMapping(value = "/remove")
     @ResponseBody
-    public boolean removeAttachment(@PathParam("attachId") Long attachId,
-                                    HttpServletRequest request) {
-        Optional<Attachment> attachment = attachmentService.findByAttachId(attachId);
-        String delFileName = attachment.get().getAttachName();
-        String delSmallFileName = delFileName.substring(0, delFileName.lastIndexOf('.')) + "_small" + attachment.get().getAttachSuffix();
+    public JsonResult removeAttachment(@RequestParam("attachId") Long attachId,
+                                       HttpServletRequest request) {
+        final Attachment attachment = attachmentService.fetchById(attachId).orElse(new Attachment());
+        final String attachLocation = attachment.getAttachLocation();
+        final String attachName = attachment.getAttachName();
+        final String attachPath = attachment.getAttachPath();
+        boolean flag = true;
         try {
-            //删除数据库中的内容
-            attachmentService.removeByAttachId(attachId);
-            //刷新HaloConst变量
-            updateConst();
-            //删除文件
-            File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            File mediaPath = new File(basePath.getAbsolutePath(), attachment.get().getAttachPath().substring(0, attachment.get().getAttachPath().lastIndexOf('/')));
-            File delFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delFileName).toString());
-            File delSmallFile = new File(new StringBuffer(mediaPath.getAbsolutePath()).append("/").append(delSmallFileName).toString());
-
-            BufferedImage sourceImg = ImageIO.read(new FileInputStream(delFile));
-            if (sourceImg.getWidth() > 500 && sourceImg.getHeight() > 500) {
-                if (delSmallFile.exists()) {
-                    if (delSmallFile.delete()) {
-                        updateConst();
+            if (attachLocation != null) {
+                if (attachLocation.equals(SERVER.getDesc())) {
+                    StrBuilder userPath = new StrBuilder(System.getProperties().getProperty("user.home"));
+                    userPath.append("/halo");
+                    //图片物理地址
+                    StrBuilder delPath = new StrBuilder(userPath);
+                    delPath.append(attachPath);
+                    //缩略图物理地址
+                    StrBuilder delSmallPath = new StrBuilder(userPath);
+                    delSmallPath.append(attachment.getAttachSmallPath());
+                    File delFile = new File(delPath.toString());
+                    File delSmallFile = new File(delSmallPath.toString());
+                    if (delFile.exists() && delFile.isFile()) {
+                        flag = delFile.delete() && delSmallFile.delete();
                     }
+                } else if (attachLocation.equals(QINIU.getDesc())) {
+                    String key = attachPath.substring(attachPath.lastIndexOf("/") + 1);
+                    flag = attachmentService.deleteQiNiuAttachment(key);
+                } else if (attachLocation.equals(UPYUN.getDesc())) {
+                    String fileName = attachPath.substring(attachPath.lastIndexOf("/") + 1);
+                    flag = attachmentService.deleteUpYunAttachment(fileName);
                 }
             }
-            if (delFile.exists() && delFile.isFile()) {
-                if (delFile.delete()) {
-                    updateConst();
-                    log.info("删除文件[" + delFileName + "]成功！");
-                    logsService.saveByLogs(
-                            new Logs(LogsRecord.REMOVE_FILE, delFileName, HaloUtil.getIpAddr(request), HaloUtil.getDate())
-                    );
-                } else {
-                    log.error("删除附件[" + delFileName + "]失败！");
-                    return false;
-                }
+            if (flag) {
+                attachmentService.removeById(attachId);
+                log.info("Delete file {} successfully!", attachName);
+                logsService.save(LogsRecord.REMOVE_FILE, attachName, request);
+            } else {
+                log.error("Deleting attachment {} failed!", attachName);
+                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
             }
         } catch (Exception e) {
-            log.error("删除附件[" + delFileName + "]失败！:", e.getMessage());
-            return false;
+            e.printStackTrace();
+            log.error("Deleting attachment {} failed: {}", attachName, e.getMessage());
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-failed"));
         }
-        return true;
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.delete-success"));
     }
 }

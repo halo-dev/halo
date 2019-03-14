@@ -1,22 +1,25 @@
 package cc.ryanc.halo.model.domain;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * <pre>
+ *     操作日志
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/19
  */
 @Data
 @Entity
 @Table(name = "halo_logs")
+@EntityListeners(AuditingEntityListener.class)
 public class Logs implements Serializable {
 
     private static final long serialVersionUID = -2571815432301283171L;
@@ -46,6 +49,7 @@ public class Logs implements Serializable {
     /**
      * 产生的时间
      */
+    @CreatedDate
     private Date logCreated;
 
     public Logs() {

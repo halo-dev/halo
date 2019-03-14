@@ -1,53 +1,25 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.domain.Tag;
+import cc.ryanc.halo.service.base.CrudService;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
+ * <pre>
+ *     标签业务逻辑接口
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/12
  */
-public interface TagService {
-
-    /**
-     * 新增/修改标签
-     *
-     * @param tag tag
-     * @return Tag
-     */
-    Tag saveByTag(Tag tag);
-
-    /**
-     * 根据编号移除标签
-     *
-     * @param tagId tagId
-     * @return Tag
-     */
-    Tag removeByTagId(Long tagId);
-
-    /**
-     * 获取所有标签
-     *
-     * @return list
-     */
-    List<Tag> findAllTags();
-
-    /**
-     * 根据编号查询标签
-     *
-     * @param tagId tagId
-     * @return Link
-     */
-    Optional<Tag> findByTagId(Long tagId);
+public interface TagService extends CrudService<Tag, Long> {
 
     /**
      * 根据标签路径查询
      *
      * @param tagUrl tagUrl
-     * @return tag
+     * @return Tag
      */
     Tag findByTagUrl(String tagUrl);
 
@@ -55,7 +27,7 @@ public interface TagService {
      * 根据标签名称查询
      *
      * @param tagName tagName
-     * @return tag
+     * @return Tag
      */
     Tag findTagByTagName(String tagName);
 
@@ -63,7 +35,7 @@ public interface TagService {
      * 转换标签字符串为实体集合
      *
      * @param tagList tagList
-     * @return list
+     * @return List
      */
     List<Tag> strListToTagList(String tagList);
 }

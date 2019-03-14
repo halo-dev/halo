@@ -1,8 +1,11 @@
 package cc.ryanc.halo.model.dto;
 
 /**
+ * <pre>
+ *     日志常量
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/19
  */
 public interface LogsRecord {
@@ -18,6 +21,8 @@ public interface LogsRecord {
     String LOGOUT = "退出登录";
 
     String PUSH_POST = "发表文章";
+
+    String PUSH_PAGE = "发表页面";
 
     String REMOVE_POST = "删除文章";
 

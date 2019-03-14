@@ -1,7 +1,10 @@
 package cc.ryanc.halo.model.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,13 +13,17 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章／页面
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 @Data
 @Entity
 @Table(name = "halo_post")
+@EntityListeners(AuditingEntityListener.class)
 public class Post implements Serializable {
 
     private static final long serialVersionUID = -6019684584665869629L;
@@ -92,7 +99,6 @@ public class Post implements Serializable {
      * 文章的评论
      */
     @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
-    @JsonIgnore
     private List<Comment> comments = new ArrayList<>();
 
     /**
@@ -103,11 +109,13 @@ public class Post implements Serializable {
     /**
      * 发表日期
      */
+    @CreatedDate
     private Date postDate;
 
     /**
      * 最后一次更新时间
      */
+    @LastModifiedDate
     private Date postUpdate;
 
     /**
@@ -116,4 +124,34 @@ public class Post implements Serializable {
      * 2 回收站
      */
     private Integer postStatus = 0;
+
+    /**
+     * 文章访问量
+     */
+    private Long postViews = 0L;
+
+    /**
+     * 是否允许评论
+     */
+    private Integer allowComment = 0;
+
+    /**
+     * 文章访问密码
+     */
+    private String postPassword;
+
+    /**
+     * 指定渲染模板
+     */
+    private String customTpl;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getPostDate() {
+        return postDate;
+    }
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    public Date getPostUpdate() {
+        return postUpdate;
+    }
 }

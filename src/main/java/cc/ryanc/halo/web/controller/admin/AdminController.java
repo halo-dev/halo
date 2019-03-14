@@ -1,40 +1,54 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.domain.Comment;
-import cc.ryanc.halo.model.domain.Logs;
-import cc.ryanc.halo.model.domain.Post;
-import cc.ryanc.halo.model.domain.User;
-import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.domain.*;
+import cc.ryanc.halo.model.dto.JsonResult;
 import cc.ryanc.halo.model.dto.LogsRecord;
-import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.service.LogsService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.UserService;
-import cc.ryanc.halo.util.HaloUtil;
+import cc.ryanc.halo.model.enums.*;
+import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
+import cc.ryanc.halo.utils.MarkdownUtils;
 import cc.ryanc.halo.web.controller.core.BaseController;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.http.HtmlUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+import static cc.ryanc.halo.model.dto.HaloConst.USER_SESSION_KEY;
 
 /**
+ * <pre>
+ *     后台首页控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/5
- * @version : 1.0
- * description: 后台首页控制器
  */
 @Slf4j
 @Controller
@@ -56,36 +70,66 @@ public class AdminController extends BaseController {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private AttachmentService attachmentService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private TagService tagService;
+
+    @Autowired
+    private OptionsService optionsService;
+
+    @Autowired
+    private GalleryService galleryService;
+
+    @Autowired
+    private LinkService linkService;
+
+    @Autowired
+    private MenuService menuService;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
+
     /**
      * 请求后台页面
      *
-     * @param model   model
-     * @param session session
+     * @param model model
      * @return 模板路径admin/admin_index
      */
     @GetMapping(value = {"", "/index"})
-    public String index(Model model, HttpSession session) {
-        //查询文章条数
-        Integer postCount = postService.findAllPosts(HaloConst.POST_TYPE_POST).size();
-        model.addAttribute("postCount", postCount);
+    public String index(Model model) {
 
         //查询评论的条数
-        Integer commentCount = commentService.findAllComments().size();
+        final Long commentCount = commentService.count();
         model.addAttribute("commentCount", commentCount);
 
         //查询最新的文章
-        List<Post> postsLatest = postService.findPostLatest();
+        final List<Post> postsLatest = postService.findPostLatest();
         model.addAttribute("postTopFive", postsLatest);
 
         //查询最新的日志
-        List<Logs> logsLatest = logsService.findLogsLatest();
+        final List<Logs> logsLatest = logsService.findLogsLatest();
         model.addAttribute("logs", logsLatest);
 
         //查询最新的评论
-        List<Comment> comments = commentService.findCommentsLatest();
+        final List<Comment> comments = commentService.findCommentsLatest();
         model.addAttribute("comments", comments);
 
-        model.addAttribute("mediaCount", HaloConst.ATTACHMENTS.size());
+        //附件数量
+        model.addAttribute("mediaCount", attachmentService.count());
+
+        //文章阅读总数
+        final Long postViewsSum = postService.getPostViews();
+        model.addAttribute("postViewsSum", postViewsSum);
+
+        //成立天数
+        final Date blogStart = DateUtil.parse(OPTIONS.get(BlogPropertiesEnum.BLOG_START.getProp()));
+        final long hadDays = DateUtil.between(blogStart, DateUtil.date(), DateUnit.DAY);
+        model.addAttribute("hadDays", hadDays);
         return "admin/admin_index";
     }
 
@@ -97,7 +141,7 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/login")
     public String login(HttpSession session) {
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
         //如果session存在，跳转到后台首页
         if (null != user) {
             return "redirect:/admin";
@@ -111,47 +155,51 @@ public class AdminController extends BaseController {
      * @param loginName 登录名：邮箱／用户名
      * @param loginPwd  loginPwd 密码
      * @param session   session session
-     * @return String 登录状态
+     * @return JsonResult JsonResult
      */
     @PostMapping(value = "/getLogin")
     @ResponseBody
-    public String getLogin(@ModelAttribute("loginName") String loginName,
-                           @ModelAttribute("loginPwd") String loginPwd,
-                           HttpSession session) {
-        String status = "false";
-        try {
-            User aUser = userService.findUser();
-            User user = null;
-            if (StringUtils.equals(aUser.getLoginEnable(), "false")) {
-                status = "disable";
-            } else {
-                //验证是否是邮箱登录
-                Pattern patternEmail = Pattern.compile("\\w[-\\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\\.)+[A-Za-z]{2,14}");
-                Matcher matcher = patternEmail.matcher(loginName);
-                if (matcher.find()) {
-                    user = userService.userLoginByEmail(loginName, HaloUtil.getMD5(loginPwd)).get(0);
-                } else {
-                    user = userService.userLoginByName(loginName, HaloUtil.getMD5(loginPwd)).get(0);
-                }
-                if (aUser == user) {
-                    session.setAttribute(HaloConst.USER_SESSION_KEY, user);
-                    //重置用户的登录状态为正常
-                    userService.updateUserNormal();
-                    userService.updateUserLoginLast(new Date());
-                    logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, HaloUtil.getIpAddr(request), HaloUtil.getDate()));
-                    status = "true";
-                }
-            }
-        } catch (Exception e) {
-            Integer errorCount = userService.updateUserLoginError();
-            if (errorCount >= 5) {
-                userService.updateUserLoginEnable("false");
-            }
-            userService.updateUserLoginLast(new Date());
-            logsService.saveByLogs(new Logs(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + loginName + "," + loginPwd + "]", HaloUtil.getIpAddr(request), new Date()));
-            log.error("登录失败！：{0}", e.getMessage());
+    public JsonResult getLogin(@ModelAttribute("loginName") String loginName,
+                               @ModelAttribute("loginPwd") String loginPwd,
+                               HttpSession session) {
+        //已注册账号，单用户，只有一个
+        final User aUser = userService.findUser();
+        //首先判断是否已经被禁用已经是否已经过了10分钟
+        Date loginLast = DateUtil.date();
+        if (null != aUser.getLoginLast()) {
+            loginLast = aUser.getLoginLast();
         }
-        return status;
+        final Long between = DateUtil.between(loginLast, DateUtil.date(), DateUnit.MINUTE);
+        if (StrUtil.equals(aUser.getLoginEnable(), TrueFalseEnum.FALSE.getDesc()) && (between < CommonParamsEnum.TEN.getValue())) {
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.disabled"));
+        }
+        //验证用户名和密码
+        User user = null;
+        if (Validator.isEmail(loginName)) {
+            user = userService.userLoginByEmail(loginName, SecureUtil.md5(loginPwd));
+        } else {
+            user = userService.userLoginByName(loginName, SecureUtil.md5(loginPwd));
+        }
+        userService.updateUserLoginLast(DateUtil.date());
+        //判断User对象是否相等
+        if (ObjectUtil.equal(aUser, user)) {
+            session.setAttribute(USER_SESSION_KEY, aUser);
+            //重置用户的登录状态为正常
+            userService.updateUserNormal();
+            logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_SUCCESS, request);
+            log.info("User {} login succeeded.", aUser.getUserDisplayName());
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.login.success"));
+        } else {
+            //更新失败次数
+            final Integer errorCount = userService.updateUserLoginError();
+            //超过五次禁用账户
+            if (errorCount >= CommonParamsEnum.FIVE.getValue()) {
+                userService.updateUserLoginEnable(TrueFalseEnum.FALSE.getDesc());
+            }
+            logsService.save(LogsRecord.LOGIN, LogsRecord.LOGIN_ERROR + "[" + HtmlUtil.escape(loginName) + "," + HtmlUtil.escape(loginPwd) + "]", request);
+            final Object[] args = {(5 - errorCount)};
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.login.failed", args));
+        }
     }
 
     /**
@@ -162,10 +210,10 @@ public class AdminController extends BaseController {
      */
     @GetMapping(value = "/logOut")
     public String logOut(HttpSession session) {
-        User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
-        logsService.saveByLogs(new Logs(LogsRecord.LOGOUT, user.getUserName(), HaloUtil.getIpAddr(request), HaloUtil.getDate()));
-        session.invalidate();
-        log.info("用户[" + user.getUserName() + "]退出登录");
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
+        session.removeAttribute(USER_SESSION_KEY);
+        logsService.save(LogsRecord.LOGOUT, user.getUserName(), request);
+        log.info("User {} has logged out", user.getUserName());
         return "redirect:/admin/login";
     }
 
@@ -173,17 +221,11 @@ public class AdminController extends BaseController {
      * 查看所有日志
      *
      * @param model model model
-     * @param page  page 当前页码
-     * @param size  size 每页条数
      * @return 模板路径admin/widget/_logs-all
      */
     @GetMapping(value = "/logs")
-    public String logs(Model model,
-                       @RequestParam(value = "page", defaultValue = "0") Integer page,
-                       @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        Sort sort = new Sort(Sort.Direction.DESC, "logId");
-        Pageable pageable = new PageRequest(page, size, sort);
-        Page<Logs> logs = logsService.findAllLogs(pageable);
+    public String logs(Model model, @PageableDefault Pageable pageable) {
+        final Page<Logs> logs = logsService.listAll(pageable);
         model.addAttribute("logs", logs);
         return "admin/widget/_logs-all";
     }
@@ -196,20 +238,242 @@ public class AdminController extends BaseController {
     @GetMapping(value = "/logs/clear")
     public String logsClear() {
         try {
-            logsService.removeAllLogs();
+            logsService.removeAll();
         } catch (Exception e) {
-            log.error("未知错误：" + e.getMessage());
+            log.error("Clear log failed:{}" + e.getMessage());
         }
         return "redirect:/admin";
     }
 
     /**
-     * 不可描述的页面
+     * Halo关于页面
      *
      * @return 模板路径admin/admin_halo
      */
     @GetMapping(value = "/halo")
     public String halo() {
         return "admin/admin_halo";
+    }
+
+    /**
+     * 获取一个Token
+     *
+     * @return JsonResult
+     */
+    @GetMapping(value = "/getToken")
+    @ResponseBody
+    public JsonResult getToken() {
+        final String token = (System.currentTimeMillis() + new Random().nextInt(999999999)) + "";
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), HttpStatus.OK.getReasonPhrase(), SecureUtil.md5(token));
+    }
+
+    /**
+     * 小工具
+     *
+     * @return String
+     */
+    @GetMapping(value = "/tools")
+    public String tools() {
+        return "admin/admin_tools";
+    }
+
+    /**
+     * Markdown 导入页面
+     *
+     * @return String
+     */
+    @GetMapping(value = "/tools/markdownImport")
+    public String markdownImport() {
+        return "admin/widget/_markdown_import";
+    }
+
+    /**
+     * Markdown 导入
+     *
+     * @param file    file
+     * @param request request
+     * @return JsonResult
+     */
+    @PostMapping(value = "/tools/markdownImport")
+    @ResponseBody
+    public JsonResult markdownImport(@RequestParam("file") MultipartFile file,
+                                     HttpServletRequest request,
+                                     HttpSession session) throws IOException {
+        final User user = (User) session.getAttribute(USER_SESSION_KEY);
+        final String markdown = IoUtil.read(file.getInputStream(), "UTF-8");
+        final String content = MarkdownUtils.renderMarkdown(markdown);
+        final Map<String, List<String>> frontMatters = MarkdownUtils.getFrontMatter(markdown);
+        final Post post = new Post();
+        List<String> elementValue = null;
+        final List<Tag> tags = new ArrayList<>();
+        final List<Category> categories = new ArrayList<>();
+        Tag tag = null;
+        Category category = null;
+        if (frontMatters.size() > 0) {
+            for (String key : frontMatters.keySet()) {
+                elementValue = frontMatters.get(key);
+                for (String ele : elementValue) {
+                    if ("title".equals(key)) {
+                        post.setPostTitle(ele);
+                    } else if ("date".equals(key)) {
+                        post.setPostDate(DateUtil.parse(ele));
+                    } else if ("updated".equals(key)) {
+                        post.setPostUpdate(DateUtil.parse(ele));
+                    } else if ("tags".equals(key)) {
+                        tag = tagService.findTagByTagName(ele);
+                        if (null == tag) {
+                            tag = new Tag();
+                            tag.setTagName(ele);
+                            tag.setTagUrl(ele);
+                            tag = tagService.create(tag);
+                        }
+                        tags.add(tag);
+                    } else if ("categories".equals(key)) {
+                        category = categoryService.findByCateName(ele);
+                        if (null == category) {
+                            category = new Category();
+                            category.setCateName(ele);
+                            category.setCateUrl(ele);
+                            category.setCateDesc(ele);
+                            category = categoryService.create(category);
+                        }
+                        categories.add(category);
+                    }
+                }
+            }
+        } else {
+            post.setPostDate(new Date());
+            post.setPostUpdate(new Date());
+            post.setPostTitle(file.getOriginalFilename());
+        }
+        post.setPostContentMd(markdown);
+        post.setPostContent(content);
+        post.setPostType(PostTypeEnum.POST_TYPE_POST.getDesc());
+        post.setAllowComment(AllowCommentEnum.ALLOW.getCode());
+        post.setUser(user);
+        post.setTags(tags);
+        post.setCategories(categories);
+        post.setPostUrl(StrUtil.removeSuffix(file.getOriginalFilename(), ".md"));
+        if (null == post.getPostDate()) {
+            post.setPostDate(new Date());
+        }
+        if (null == post.getPostUpdate()) {
+            post.setPostUpdate(new Date());
+        }
+        postService.create(post);
+        return new JsonResult(ResultCodeEnum.SUCCESS.getCode());
+    }
+
+
+    /**
+     * 导出博客数据
+     *
+     * @param response response
+     */
+    @GetMapping(value = "/tools/dataExport")
+    @ResponseBody
+    public void dataExport(HttpServletResponse response) {
+        final Map<String, String> options = optionsService.findAllOptions();
+        final List<Attachment> attachments = attachmentService.listAll();
+        final List<Post> posts = postService.listAll();
+        final List<Gallery> galleries = galleryService.listAll();
+        final List<Link> links = linkService.listAll();
+        final List<Menu> menus = menuService.listAll();
+        JSONObject data = new JSONObject();
+        JSONArray postsJar = new JSONArray();
+        for (Post post : posts) {
+            JSONObject postObj = new JSONObject();
+            postObj.put("postId", post.getPostId());
+            postObj.put("postTitle", post.getPostTitle());
+            postObj.put("postType", post.getPostType());
+            postObj.put("postContentMd", post.getPostContentMd());
+            postObj.put("postContent", post.getPostContent());
+            postObj.put("postUrl", post.getPostUrl());
+            postObj.put("postSummary", post.getPostSummary());
+            postObj.put("postThumbnail", post.getPostThumbnail());
+            postObj.put("postDate", post.getPostDate());
+            postObj.put("postUpdate", post.getPostUpdate());
+            postObj.put("postStatus", post.getPostStatus());
+            postObj.put("postViews", post.getPostViews());
+            postObj.put("allowComment", post.getAllowComment());
+            postObj.put("postPassword", post.getPostPassword());
+            postObj.put("customTpl", post.getCustomTpl());
+            if (null != post.getTags() && post.getTags().size() > 0) {
+                JSONArray tagsJar = new JSONArray();
+                for (Tag tag : post.getTags()) {
+                    JSONObject tagObj = new JSONObject();
+                    tagObj.put("tagId", tag.getTagId());
+                    tagObj.put("tagName", tag.getTagName());
+                    tagObj.put("tagUrl", tag.getTagUrl());
+                    tagsJar.add(tagObj);
+                }
+                postObj.put("tags", tagsJar);
+            }
+
+            if (null != post.getCategories() && post.getCategories().size() > 0) {
+                JSONArray categoriesJar = new JSONArray();
+                for (Category category : post.getCategories()) {
+                    JSONObject categoryObj = new JSONObject();
+                    categoryObj.put("cateId", category.getCateId());
+                    categoryObj.put("cateName", category.getCateName());
+                    categoryObj.put("cateUrl", category.getCateUrl());
+                    categoryObj.put("cateDesc", category.getCateDesc());
+                    categoriesJar.add(categoryObj);
+                }
+                postObj.put("categories", categoriesJar);
+            }
+            if (null != post.getComments() && post.getComments().size() > 0) {
+                JSONArray commentsJar = new JSONArray();
+                for (Comment comment : post.getComments()) {
+                    JSONObject commentObj = new JSONObject();
+                    commentObj.put("commentId", comment.getCommentId());
+                    commentObj.put("commentAuthor", comment.getCommentAuthor());
+                    commentObj.put("commentAuthorEmail", comment.getCommentAuthorEmail());
+                    commentObj.put("commentAuthorUrl", comment.getCommentAuthorUrl());
+                    commentObj.put("commentAuthorIp", comment.getCommentAuthorIp());
+                    commentObj.put("commentAuthorAvatarMd5", comment.getCommentAuthorAvatarMd5());
+                    commentObj.put("commentContent", comment.getCommentContent());
+                    commentObj.put("commentAgent", comment.getCommentAgent());
+                    commentObj.put("commentParent", comment.getCommentParent());
+                    commentObj.put("commentStatus", comment.getCommentStatus());
+                    commentObj.put("isAdmin", comment.getIsAdmin());
+                    commentsJar.add(commentObj);
+                }
+                postObj.put("comments", commentsJar);
+            }
+            postsJar.add(postObj);
+        }
+        data.put("options", JSONUtil.parseFromMap(options));
+        data.put("attachments", JSONUtil.parseArray(attachments));
+        data.put("posts", postsJar);
+        data.put("galleries", JSONUtil.parseArray(galleries));
+        data.put("links", JSONUtil.parseArray(links));
+        data.put("menus", JSONUtil.parseArray(menus));
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-disposition", "attachment;filename=halo_data.json");
+
+        BufferedOutputStream bufferedOutputStream = null;
+        ServletOutputStream servletOutputStream = null;
+        try {
+            servletOutputStream = response.getOutputStream();
+            bufferedOutputStream = new BufferedOutputStream(servletOutputStream);
+            bufferedOutputStream.write(data.toString().getBytes(StandardCharsets.UTF_8));
+            bufferedOutputStream.flush();
+            bufferedOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (null != bufferedOutputStream) {
+                    bufferedOutputStream.close();
+                }
+                if (null != servletOutputStream) {
+                    servletOutputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

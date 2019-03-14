@@ -88,15 +88,19 @@
 </style>
 
 <ul class="md-links">
-    <#list links?if_exists as link>
-        <li class="md-links-item">
-            <a href="${link.linkUrl}" title="${link.linkName}" target="_blank">
-                <img src="${link.linkPic}" alt="${link.linkName}" height="72px"/>
-                <span class="md-links-title">${link.linkName}</span><br/>
-                <span>${link.linkDesc?if_exists}</span>
-            </a>
-        </li>
-    </#list>
+    <@commonTag method="links">
+        <#if links?? && links?size gt 0>
+            <#list links! as link>
+                <li class="md-links-item">
+                    <a href="${link.linkUrl}" title="${link.linkName}" target="_blank">
+                        <img src="${link.linkPic}" alt="${link.linkName}" height="72px"/>
+                        <span class="md-links-title">${link.linkName}</span><br/>
+                        <span>${link.linkDesc!}</span>
+                    </a>
+                </li>
+            </#list>
+        </#if>
+    </@commonTag>
 </ul>
 
 <script type="text/ls-javascript" id="page-links-script">

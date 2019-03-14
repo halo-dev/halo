@@ -1,22 +1,25 @@
 package cc.ryanc.halo.model.domain;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * <pre>
+ *     附件
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/10
  */
 @Data
 @Entity
 @Table(name = "halo_attachment")
+@EntityListeners(AuditingEntityListener.class)
 public class Attachment implements Serializable {
 
     private static final long serialVersionUID = 3060117944880138064L;
@@ -56,5 +59,26 @@ public class Attachment implements Serializable {
     /**
      * 上传时间
      */
+    @CreatedDate
     private Date attachCreated;
+
+    /**
+     * 附件大小
+     */
+    private String attachSize;
+
+    /**
+     * 附件长宽
+     */
+    private String attachWh;
+
+    /**
+     * 附件存储地址
+     */
+    private String attachLocation;
+
+    /**
+     * 附件来源，0：上传，1：外部链接
+     */
+    private Integer attachOrigin = 0;
 }

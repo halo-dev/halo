@@ -8,7 +8,7 @@
                     var fd = new Date();
                     document.write(fd.getFullYear());
                 </script>
-                &nbsp;${options.blog_title?if_exists}
+                &nbsp;${options.blog_title!}
             </div>
             <!--
             I'm glad you use this theme, the development is no so easy, I hope you can keep the copyright.
@@ -26,19 +26,19 @@
 
         <!-- Header Title -->
         <span class="header-title header-item">
-            <a href="/" title="<%= config.title %>">
-                ${options.blog_title?if_exists}
+            <a href="${options.blog_url!}/" title="<%= config.title %>">
+                ${options.blog_title!}
             </a>
         </span>
 
         <p class="header-slogan header-item">
-            ${options.theme_material_uiux_slogan?default("Hi,nice to meet you")}
+            ${options.theme_material_uiux_slogan!'Hi,nice to meet you'}
         </p>
 
         <!-- Header Nav -->
         <nav class="header-nav header-item">
             <span class="header-nav-item">
-                <a href="/" title="Home">
+                <a href="${options.blog_url!}/" title="Home">
                     <span>主页</span>
                 </a>
             </span>
@@ -46,25 +46,25 @@
             <!-- Pages  -->
 
             <span class="header-nav-item">
-                    <a href="/tags" title="标签">
+                    <a href="${options.blog_url!}/tags" title="标签">
                         <span>标签</span>
                     </a>
                 </span>
 
             <span class="header-nav-item">
-                    <a href="/gallery" title="图库">
+                    <a href="${options.blog_url!}/gallery" title="图库">
                         <span>图库</span>
                     </a>
                 </span>
 
             <span class="header-nav-item">
-                    <a href="/links" title="友链">
+                    <a href="${options.blog_url!}/links" title="友链">
                         <span>友链</span>
                     </a>
                 </span>
 
             <span class="header-nav-item">
-                    <a href="/about" title="关于">
+                    <a href="${options.blog_url!}/about" title="关于">
                         <span>关于</span>
                     </a>
                 </span>

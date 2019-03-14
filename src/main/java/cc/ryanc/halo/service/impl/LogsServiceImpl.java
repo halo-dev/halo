@@ -3,84 +3,57 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.domain.Logs;
 import cc.ryanc.halo.repository.LogsRepository;
 import cc.ryanc.halo.service.LogsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
+import cn.hutool.extra.servlet.ServletUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 /**
+ * <pre>
+ *     日志业务逻辑实现类
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2018/1/19
  */
 @Service
-public class LogsServiceImpl implements LogsService {
+public class LogsServiceImpl extends AbstractCrudService<Logs, Long> implements LogsService {
 
-    @Autowired
-    private LogsRepository logsRepository;
+    private final LogsRepository logsRepository;
+
+    public LogsServiceImpl(LogsRepository logsRepository) {
+        super(logsRepository);
+        this.logsRepository = logsRepository;
+    }
+
 
     /**
      * 保存日志
      *
-     * @param logs logs
-     * @return logs
+     * @param logTitle   logTitle
+     * @param logContent logContent
+     * @param request    request
      */
     @Override
-    public Logs saveByLogs(Logs logs) {
-        return logsRepository.save(logs);
-    }
-
-    /**
-     * 根据编号移除
-     *
-     * @param logsId logsId
-     */
-    @Override
-    public void removeByLogsId(Long logsId) {
-        Optional<Logs> logs = this.findLogsByLogsId(logsId);
-        logsRepository.delete(logs.get());
-    }
-
-    /**
-     * 移除所有日志
-     */
-    @Override
-    public void removeAllLogs() {
-        logsRepository.deleteAll();
-    }
-
-    /**
-     * 查询所有日志并分页
-     *
-     * @param pageable pageable
-     * @return page
-     */
-    @Override
-    public Page<Logs> findAllLogs(Pageable pageable) {
-        return logsRepository.findAll(pageable);
+    public void save(String logTitle, String logContent, HttpServletRequest request) {
+        final Logs logs = new Logs();
+        logs.setLogTitle(logTitle);
+        logs.setLogContent(logContent);
+        logs.setLogIp(ServletUtil.getClientIP(request));
+        logsRepository.save(logs);
     }
 
     /**
      * 查询最新的五条日志
      *
-     * @return list
+     * @return List
      */
     @Override
     public List<Logs> findLogsLatest() {
         return logsRepository.findTopFive();
-    }
-
-    /**
-     * 根据编号查询
-     *
-     * @param logsId logsId
-     * @return logs
-     */
-    @Override
-    public Optional<Logs> findLogsByLogsId(Long logsId) {
-        return logsRepository.findById(logsId);
     }
 }

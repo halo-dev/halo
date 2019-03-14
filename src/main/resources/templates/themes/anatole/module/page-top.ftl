@@ -3,7 +3,7 @@
         <@commonTag method="menus">
             <#list menus?sort_by('menuSort') as menu>
                 <li>
-                    <a href="${menu.menuUrl}" target="${menu.menuTarget?if_exists}">${menu.menuName} </a>
+                    <a href="${menu.menuUrl}" target="${menu.menuTarget!}">${menu.menuName} </a>
                 </li>
             </#list>
         </@commonTag>
@@ -15,7 +15,7 @@
             </li>
         </div>
         <div class="avatar">
-            <img src="${options.blog_logo?default("/anatole/source/images/logo@2x.png")}" />
+            <img src="${options.anatole_style_right_icon!'/anatole/source/images/logo.png'}" />
         </div>
     </div>
 </div>

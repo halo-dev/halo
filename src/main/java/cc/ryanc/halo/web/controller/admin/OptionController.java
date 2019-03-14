@@ -1,20 +1,28 @@
 package cc.ryanc.halo.web.controller.admin;
 
-import cc.ryanc.halo.model.dto.HaloConst;
+import cc.ryanc.halo.model.dto.JsonResult;
+import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import cc.ryanc.halo.service.OptionsService;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
+import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
+
 /**
+ * <pre>
+ *     后台设置选项控制器
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/12/13
- * @version : 1.0
- * description : 设置选项控制器
  */
 @Slf4j
 @Controller
@@ -26,6 +34,9 @@ public class OptionController {
 
     @Autowired
     private Configuration configuration;
+
+    @Autowired
+    private LocaleMessageUtil localeMessageUtil;
 
     /**
      * 请求跳转到option页面并完成渲染
@@ -41,22 +52,23 @@ public class OptionController {
      * 保存设置选项
      *
      * @param options options
-     * @return true：保存成功，false：保存失败
+     * @return JsonResult
      */
     @PostMapping(value = "/save")
     @ResponseBody
-    public boolean saveOptions(@RequestParam Map<String, String> options) {
+    public JsonResult saveOptions(@RequestParam Map<String, String> options, HttpSession session) {
         try {
             optionsService.saveOptions(options);
             //刷新options
             configuration.setSharedVariable("options", optionsService.findAllOptions());
-            HaloConst.OPTIONS.clear();
-            HaloConst.OPTIONS = optionsService.findAllOptions();
-            log.info("所保存的设置选项列表：" + options);
-            return true;
+            OPTIONS.clear();
+            OPTIONS = optionsService.findAllOptions();
+            session.removeAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME);
+            log.info("List of saved options: " + options);
+            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
         } catch (Exception e) {
-            log.error("未知错误：{0}", e.getMessage());
-            return false;
+            log.error("Save settings option failed: " + e.getMessage(), e);
+            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
         }
     }
 }

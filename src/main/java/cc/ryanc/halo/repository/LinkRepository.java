@@ -1,12 +1,16 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.domain.Link;
+import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
+ * <pre>
+ *     友情链接持久层
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/11/14
- * @version : 1.0
  */
-public interface LinkRepository extends JpaRepository<Link,Long>{
+public interface LinkRepository extends BaseRepository<Link, Long> {
 }

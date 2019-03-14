@@ -1,33 +1,31 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.domain.User;
+import cc.ryanc.halo.model.enums.TrueFalseEnum;
 import cc.ryanc.halo.repository.UserRepository;
 import cc.ryanc.halo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cc.ryanc.halo.service.base.AbstractCrudService;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 
 /**
+ * <pre>
+ *     用户业务逻辑实现类
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends AbstractCrudService<User, Long> implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    /**
-     * 保存个人资料
-     *
-     * @param user user
-     */
-    @Override
-    public void saveByUser(User user) {
-        userRepository.save(user);
+    public UserServiceImpl(UserRepository userRepository) {
+        super(userRepository);
+        this.userRepository = userRepository;
     }
 
     /**
@@ -35,10 +33,10 @@ public class UserServiceImpl implements UserService {
      *
      * @param userName userName
      * @param userPass userPass
-     * @return user
+     * @return User
      */
     @Override
-    public List<User> userLoginByName(String userName, String userPass) {
+    public User userLoginByName(String userName, String userPass) {
         return userRepository.findByUserNameAndUserPass(userName, userPass);
     }
 
@@ -47,21 +45,21 @@ public class UserServiceImpl implements UserService {
      *
      * @param userEmail userEmail
      * @param userPass  userPass
-     * @return list
+     * @return User
      */
     @Override
-    public List<User> userLoginByEmail(String userEmail, String userPass) {
+    public User userLoginByEmail(String userEmail, String userPass) {
         return userRepository.findByUserEmailAndUserPass(userEmail, userPass);
     }
 
     /**
      * 查询所有用户
      *
-     * @return list
+     * @return User
      */
     @Override
     public User findUser() {
-        List<User> users = userRepository.findAll();
+        final List<User> users = userRepository.findAll();
         if (users != null && users.size() > 0) {
             return users.get(0);
         } else {
@@ -88,47 +86,58 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserLoginEnable(String enable) {
-        User user = this.findUser();
+        final User user = this.findUser();
+        user.setLoginError(0);
         user.setLoginEnable(enable);
-        userRepository.save(user);
+
+        // Update user
+        update(user);
     }
 
     /**
      * 修改最后登录时间
      *
-     * @param lastDate lastDate
+     * @param lastDate 最后登录时间
+     * @return User
      */
     @Override
     public User updateUserLoginLast(Date lastDate) {
-        User user = this.findUser();
+        final User user = this.findUser();
         user.setLoginLast(lastDate);
-        userRepository.save(user);
-        return user;
+
+        // Update user
+        return update(user);
     }
 
     /**
-     * 修改登录错误次数
+     * 增加登录错误次数
      *
-     * @param error error
+     * @return 登录错误次数
      */
     @Override
     public Integer updateUserLoginError() {
-        User user = this.findUser();
+        final User user = this.findUser();
         user.setLoginError((user.getLoginError() == null ? 0 : user.getLoginError()) + 1);
-        userRepository.save(user);
+
+        // Update user
+        update(user);
+
+        // Return login error times
         return user.getLoginError();
     }
 
     /**
      * 修改用户的状态为正常
+     *
+     * @return User
      */
     @Override
     public User updateUserNormal() {
-        User user = this.findUser();
-        user.setLoginEnable("true");
+        final User user = this.findUser();
+        user.setLoginEnable(TrueFalseEnum.TRUE.getDesc());
         user.setLoginError(0);
         user.setLoginLast(new Date());
-        userRepository.save(user);
-        return user;
+
+        return update(user);
     }
 }

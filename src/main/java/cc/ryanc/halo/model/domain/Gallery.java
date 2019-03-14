@@ -9,9 +9,12 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
+ * <pre>
+ *     相册
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/2/26
- * @version : 1.0
  */
 @Data
 @Entity

@@ -1,21 +1,21 @@
-<#if options.theme_material_scheme?if_exists == "Paradox">
+<#if (options.theme_material_scheme!'Paradox') == "Paradox">
     <!-- Paradox Post Header -->
     <!-- Random Thumbnail -->
+    <#if (post.postThumbnail!) == "${options.blog_url}/static/images/thumbnail.png">
     <div class="post_thumbnail-random mdl-card__media mdl-color-text--grey-50">
-        <script type="text/ls-javascript" id="post-thumbnail-script">
-            var randomNum = Math.floor(Math.random() * 19 + 1);
-            $('.post_thumbnail-random').attr('data-original', '/material/source/img/random/material-' + randomNum + '.png');
-            $('.post_thumbnail-random').addClass('lazy');
-        </script>
+    <#include "Paradox-post-thumbnail.ftl">
+    <#else>
+    <div class="post_thumbnail-custom mdl-card__media mdl-color-text--grey-50" style="background-image:url(${post.postThumbnail!})">
+    </#if>
         <p class="article-headline-p">
             ${post.postTitle}
         </p>
     </div>
 </#if>
-<#if options.theme_material_scheme?if_exists == "Isolation">
+<#if (options.theme_material_scheme!'Paradox') == "Isolation">
     <div class="post-header_info without-thumbnail">
         <!-- Author Avatar & Name -->
-        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName?default('halo')}'s avatar">
-        <span class="name-span">${user.userDisplayName?default('halo')}</span>
+        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName!'Halo'}'s avatar">
+        <span class="name-span">${user.userDisplayName!'Halo'}</span>
     </div>
 </#if>

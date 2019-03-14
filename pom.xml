@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cc.ryanc</groupId>
 	<artifactId>halo</artifactId>
-	<version>0.0.2</version>
+	<version>latest</version>
 	<name>halo</name>
-
+	<!-- 虽然Halo使用了宽松的GPL协议，但开发不易，希望您可以保留一下版权声明。笔芯~ -->
 	<description>
 		halo，一个基于SpringBoot的博客系统，最求轻快，易用，以内容为中心。
 	</description>
@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.1.RELEASE</version>
+		<version>2.1.2.RELEASE</version>
 		<relativePath/>
 	</parent>
 
@@ -31,38 +31,45 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<oh-my-email.version>0.0.3</oh-my-email.version>
-        <druid.version>1.1.9</druid.version>
-        <lombok.version>1.16.20</lombok.version>
-        <ehcache.version>3.5.2</ehcache.version>
-        <rome.version>1.0</rome.version>
-        <commons-lang3.version>3.7</commons-lang3.version>
+		<oh-my-email.version>0.0.4</oh-my-email.version>
+		<lombok.version>1.18.4</lombok.version>
+		<ehcache.version>3.6.3</ehcache.version>
+		<hutool.version>4.4.2</hutool.version>
+		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
+		<qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
+		<thumbnailator.version>0.4.8</thumbnailator.version>
+		<commonmark.version>0.12.1</commonmark.version>
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- undertow -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-undertow</artifactId>
+		</dependency>
 
         <!-- JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<!-- freemarker依赖 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-freemarker</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
-		<!-- 邮件 -->
-		<dependency>
-			<groupId>io.github.biezhi</groupId>
-			<artifactId>oh-my-email</artifactId>
-			<version>${oh-my-email.version}</version>
 		</dependency>
 
 		<!-- mysql-->
@@ -79,17 +86,22 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- druid数据源 -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid-spring-boot-starter</artifactId>
-			<version>${druid.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+
+		<!-- freemarker依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+
+		<!-- 邮件 -->
+		<dependency>
+			<groupId>io.github.biezhi</groupId>
+			<artifactId>oh-my-email</artifactId>
+			<version>${oh-my-email.version}</version>
 		</dependency>
 
 		<!-- Lombok -->
@@ -100,42 +112,102 @@
             <scope>provided</scope>
         </dependency>
 
-		<!-- ehCache -->
+		<!-- EhCache -->
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
 			<version>${ehcache.version}</version>
 		</dependency>
 
-		<!-- rss -->
+		<!-- hutool工具包 -->
 		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome</artifactId>
-			<version>${rome.version}</version>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-core</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-http</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-crypto</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-extra</artifactId>
+			<version>${hutool.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.hutool</groupId>
+			<artifactId>hutool-cron</artifactId>
+			<version>${hutool.version}</version>
 		</dependency>
 
+        <!-- 又拍云SDK -->
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>${commons-lang3.version}</version>
+			<groupId>com.upyun</groupId>
+			<artifactId>java-sdk</artifactId>
+			<version>${upyun-java-sdk.version}</version>
 		</dependency>
 
+		<!-- 七牛云SDK -->
 		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.9.2</version>
+			<groupId>com.qiniu</groupId>
+			<artifactId>qiniu-java-sdk</artifactId>
+			<version>${qiniu-java-sdk.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>okhttp</artifactId>
+					<groupId>com.squareup.okhttp3</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
+		<!-- 图片操作 -->
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>18.0</version>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>${thumbnailator.version}</version>
 		</dependency>
+
+		<!-- Markdown渲染 -->
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark</artifactId>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark-ext-gfm-tables</artifactId>
+			<version>${commonmark.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.commonmark</groupId>
+			<artifactId>commonmark-ext-yaml-front-matter</artifactId>
+			<version>${commonmark.version}</version>
+		</dependency>
+
 	</dependencies>
+
 	<profiles>
 		<!-- 生产环境打包配置 -->
 		<profile>
 			<id>prod</id>
+            <repositories>
+                <repository>
+                    <id>aliyun</id>
+                    <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>aliyun</id>
+                    <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+                </pluginRepository>
+            </pluginRepositories>
 			<build>
 				<finalName>halo</finalName>
 				<resources>
@@ -148,7 +220,6 @@
 					</resource>
 				</resources>
 				<plugins>
-					<!-- 跳过单元测试，不然打包的时候会因为加载不了application.yaml报错 -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
@@ -185,12 +256,10 @@
 							</execution>
 						</executions>
 					</plugin>
-
-					<!-- 打包成jar文件，并指定lib文件夹以及resources资源文件夹 -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.4</version>
+						<version>3.1.0</version>
 						<configuration>
 							<archive>
 								<manifest>
@@ -208,16 +277,96 @@
 			</build>
 		</profile>
 
+        <!--CI环境-->
+        <profile>
+            <id>ci</id>
+            <build>
+                <finalName>halo</finalName>
+                <resources>
+                    <resource>
+                        <directory>src/main/java</directory>
+                        <filtering>false</filtering>
+                        <excludes>
+                            <exclude>**/*.java</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/dist/</outputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>cc.ryanc.halo.Application</mainClass>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                    <addClasspath>true</addClasspath>
+                                </manifest>
+                                <manifestEntries>
+                                    <Class-Path>resources/</Class-Path>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
 		<!-- 开发环境 -->
 		<profile>
 			<id>dev</id>
 			<build>
 				<plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                        </configuration>
+                    </plugin>
 					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.0.0</version>
 					</plugin>
-				</plugins>
+                </plugins>
 			</build>
 		</profile>
 	</profiles>

@@ -1,163 +1,178 @@
 <#compress >
 <#include "module/_macro.ftl">
-<@head title="${options.blog_title} | 后台管理：文章">
-</@head>
-<div class="wrapper">
-    <!-- 顶部栏模块 -->
-    <#include "module/_header.ftl">
-    <!-- 菜单栏模块 -->
-    <#include "module/_sidebar.ftl">
-    <div class="content-wrapper">
-        <style type="text/css" rel="stylesheet">
-            .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}
-            #btnNewPost{margin-left:4px;padding:3px 6px;position:relative;top:-4px;border:1px solid #ccc;border-radius:2px;background:#fff;text-shadow:none;font-weight:600;font-size:12px;line-height:normal;color:#3c8dbc;cursor:pointer;transition:all .2s ease-in-out}
-            #btnNewPost:hover{background:#3c8dbc;color:#fff}
-        </style>
-        <section class="content-header">
-            <h1 style="display: inline-block;">文章</h1>
-            <a data-pjax="false" id="btnNewPost" href="/admin/posts/new">
-                写文章
-            </a>
-            <ol class="breadcrumb">
-                <li>
-                    <a data-pjax="true" href="/admin">
-                        <i class="fa fa-dashboard"></i> 首页</a>
-                </li>
-                <li><a data-pjax="true" href="#">文章</a></li>
-                <li class="active">所有文章</li>
-            </ol>
-        </section>
-        <section class="content container-fluid">
-            <div class="row">
-                <div class="col-xs-12">
-                    <ul style="list-style: none;padding-left: 0">
-                        <li class="publish">
-                            <a data-pjax="true" href="/admin/posts" <#if status==0>style="color: #000" </#if>>已发布<span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
-                        </li>
-                        <li class="draft">
-                            <a data-pjax="true" href="/admin/posts?status=1" <#if status==1>style="color: #000" </#if>>草稿<span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
-                        </li>
-                        <li class="trash">
-                            <a data-pjax="true" href="/admin/posts?status=2" <#if status==2>style="color: #000" </#if>>回收站<span class="count">(${trashCount})</span></a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-xs-12">
-                    <div class="box box-primary">
-                        <div class="box-body table-responsive">
-                            <table class="table table-bordered table-hover">
-                                <thead>
-                                <tr>
-                                    <th>标题</th>
-                                    <th>分类目录</th>
-                                    <th>标签</th>
-                                    <th>评论</th>
-                                    <th>日期</th>
-                                    <th>操作</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <#if posts.content?size gt 0>
-                                        <#list posts.content as post>
-                                            <tr>
-                                                <td>${post.postTitle}</td>
-                                                <td>
-                                                    <#if post.categories?size gt 0>
-                                                        <#list post.categories as cate>
-                                                            <label>${cate.cateName}</label>
-                                                        </#list>
-                                                    <#else >
-                                                        <label>无分类</label>
-                                                    </#if>
-                                                </td>
-                                                <td>
-                                                    <#if post.tags?size gt 0>
-                                                        <#list post.tags as tag>
-                                                            <label>${tag.tagName}</label>
-                                                        </#list>
-                                                    <#else >
-                                                        <label>无标签</label>
-                                                    </#if>
-                                                </td>
-                                                <td>
-                                                    ${post.getComments()?size}
-                                                </td>
-                                                <td>${post.postDate?if_exists?string("yyyy-MM-dd HH:mm")}</td>
-                                                <td>
-                                                    <#switch post.postStatus>
-                                                        <#case 0>
-                                                            <a href="/archives/${post.postUrl}" class="btn btn-primary btn-xs " target="_blank">查看</a>
-                                                            <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
-                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId}','确定移到回收站？')">丢弃</button>
-                                                            <#break >
-                                                        <#case 1>
-                                                            <a href="/admin/posts/view?postId=${post.postId}" class="btn btn-primary btn-xs " target="_blank">预览</a>
-                                                            <a href="/admin/posts/edit?postId=${post.postId}" class="btn btn-info btn-xs ">修改</a>
-                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId}&status=1','确定发布该文章？')">发布</button>
-                                                            <#break >
-                                                        <#case 2>
-                                                            <a href="/admin/posts/revert?postId=${post.postId}&status=2" class="btn btn-primary btn-xs ">还原</a>
-                                                            <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId}&postType=${post.postType}','确定永久删除？(不可逆)')">永久删除</button>
-                                                            <#break >
-                                                    </#switch>
-                                                </td>
-                                            </tr>
-                                        </#list>
-                                        <#else>
-                                        <tr>
-                                            <th colspan="6" style="text-align: center">暂无文章</th>
-                                        </tr>
-                                    </#if>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="box-footer clearfix">
-                            <div class="no-margin pull-left">
-                                第${posts.number+1}/${posts.totalPages}页
-                            </div>
-                            <ul class="pagination no-margin pull-right">
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}">首页</a> </li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}">上页</a></li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}">下页</a></li>
-                                <li><a data-pjax="true" class="btn btn-sm <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}">尾页</a> </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+<@head>${options.blog_title!} | <@spring.message code='admin.posts.title' /></@head>
+<div class="content-wrapper">
+    <style type="text/css" rel="stylesheet">
+        .draft,.publish,.trash{list-style:none;float:left;margin:0;padding-bottom:10px}
+        .pretty{margin: 0;}
+    </style>
+    <section class="content-header" id="animated-header">
+        <h1 style="display: inline-block;"><@spring.message code='admin.posts.title' /></h1>
+        <a data-pjax="true" class="btn-header" id="btnNewPost" href="/admin/posts/write">
+            <@spring.message code='admin.posts.btn.new-post' />
+        </a>
+        <ol class="breadcrumb">
+            <li>
+                <a data-pjax="true" href="/admin">
+                    <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' />
+                </a>
+            </li>
+            <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.posts.title' /></a></li>
+            <li class="active"><@spring.message code='admin.posts.bread.all-posts' /></li>
+        </ol>
+    </section>
+    <section class="content container-fluid" id="animated-content">
+        <div class="row">
+            <div class="col-xs-12">
+                <ul style="list-style: none;padding-left: 0">
+                    <li class="publish">
+                        <a data-pjax="true" href="/admin/posts" <#if status==0>style="color: #000" </#if>><@spring.message code='common.status.published' /><span class="count">(${publishCount})</span></a>&nbsp;|&nbsp;
+                    </li>
+                    <li class="draft">
+                        <a data-pjax="true" href="/admin/posts?status=1" <#if status==1>style="color: #000" </#if>><@spring.message code='common.status.draft' /><span class="count">(${draftCount})</span></a>&nbsp;|&nbsp;
+                    </li>
+                    <li class="trash">
+                        <a data-pjax="true" href="/admin/posts?status=2" <#if status==2>style="color: #000" </#if>><@spring.message code='common.status.recycle-bin' /><span class="count">(${trashCount})</span></a>
+                    </li>
+                </ul>
             </div>
-        </section>
-        <!-- 删除确认弹出层 -->
-        <div class="modal fade" id="removePostModal">
-            <div class="modal-dialog">
-                <div class="modal-content message_align">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title">提示信息</h4>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box box-primary">
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th><@spring.message code='common.th.title' /></th>
+                                    <th><@spring.message code='common.th.categories' /></th>
+                                    <th><@spring.message code='common.th.tags' /></th>
+                                    <th><@spring.message code='common.th.comments' /></th>
+                                    <th><@spring.message code='common.th.views' /></th>
+                                    <th><@spring.message code='common.th.date' /></th>
+                                    <th><@spring.message code='common.th.control' /></th>
+                                </tr>
+                                <#if posts.content?size gt 0>
+                                    <#list posts.content as post>
+                                        <tr>
+                                            <td>
+                                                <#if post.postStatus==0>
+                                                    <a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a>
+                                                <#else>
+                                                    ${post.postTitle}
+                                                </#if>
+                                            </td>
+                                            <td>
+                                                <#if post.categories?size gt 0>
+                                                    <#list post.categories as cate>
+                                                        <label>${cate.cateName}</label>
+                                                    </#list>
+                                                <#else >
+                                                    <label>无分类</label>
+                                                </#if>
+                                            </td>
+                                            <td>
+                                                <#if post.tags?size gt 0>
+                                                    <#list post.tags as tag>
+                                                        <label>${tag.tagName}</label>
+                                                    </#list>
+                                                <#else >
+                                                    <label>无标签</label>
+                                                </#if>
+                                            </td>
+                                            <td>
+                                                <span class="label" style="background-color: #d6cdcd;">${post.getComments()?size}</span>
+                                            </td>
+                                            <td>
+                                                <span class="label" style="background-color: #d6cdcd;">${post.postViews}</span>
+                                            </td>
+                                            <td>${post.postDate!?string("yyyy-MM-dd HH:mm")}</td>
+                                            <td>
+                                                <#switch post.postStatus>
+                                                    <#case 0>
+                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs "><@spring.message code='common.btn.edit' /></a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
+                                                        <#break >
+                                                    <#case 1>
+                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}"
+                                                           class="btn btn-info btn-xs "><@spring.message code="common.btn.edit" /></a>
+                                                        <button class="btn btn-primary btn-xs " onclick="modelShow('/admin/posts/revert?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-release-post" />')"><@spring.message code='common.btn.release' /></button>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/throw?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
+                                                        <#break >
+                                                    <#case 2>
+                                                        <a data-pjax="true" href="/admin/posts/revert?postId=${post.postId?c}&status=2" class="btn btn-primary btn-xs "><@spring.message code='common.btn.reduction' /></a>
+                                                        <button class="btn btn-danger btn-xs " onclick="modelShow('/admin/posts/remove?postId=${post.postId?c}&postType=${post.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
+                                                        <#break >
+                                                </#switch>
+                                            </td>
+                                        </tr>
+                                    </#list>
+                                <#else>
+                                    <tr>
+                                        <th colspan="7" style="text-align: center"><@spring.message code='common.text.no-data' /></th>
+                                    </tr>
+                                </#if>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="modal-body">
-                        <p id="message"></p>
-                    </div>
-                    <div class="modal-footer">
-                        <input type="hidden" id="url"/>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal">确定</a>
+                    <div class="box-footer clearfix">
+                        <div class="no-margin pull-left">
+                            <@spring.message code='admin.pageinfo.text.no' />${posts.number+1}/${posts.totalPages}<@spring.message code='admin.pageinfo.text.page' />
+                        </div>
+                        <div class="btn-group pull-right btn-group-sm" role="group">
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}">
+                                <@spring.message code='admin.pageinfo.btn.first' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasPrevious()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number-1}">
+                                <@spring.message code='admin.pageinfo.btn.pre' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?status=${status}&page=${posts.number+1}">
+                                <@spring.message code='admin.pageinfo.btn.next' />
+                            </a>
+                            <a data-pjax="true" class="btn btn-default <#if !posts.hasNext()>disabled</#if>" href="/admin/posts?page=${posts.totalPages-1}&status=${status}">
+                                <@spring.message code='admin.pageinfo.btn.last' />
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            function modelShow(url,message) {
-                $('#url').val(url);
-                $('#message').html(message);
-                $('#removePostModal').modal();
-            }
-            function removeIt(){
-                var url=$.trim($("#url").val());
-                window.location.href=url;
-            }
-        </script>
+    </section>
+    <!-- 删除确认弹出层 -->
+    <div class="modal fade" id="removePostModal">
+        <div class="modal-dialog">
+            <div class="modal-content message_align">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title"><@spring.message code='common.text.tips' /></h4>
+                </div>
+                <div class="modal-body">
+                    <p id="message"></p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="url"/>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><@spring.message code='common.btn.cancel' /></button>
+                    <a onclick="removeIt()" class="btn btn-danger" data-dismiss="modal"><@spring.message code='common.btn.define' /></a>
+                </div>
+            </div>
+        </div>
     </div>
-    <#include "module/_footer.ftl">
 </div>
-<@footer></@footer>
+<@footer>
+<script type="application/javascript" id="footer_script">
+    function modelShow(url,message) {
+        $('#url').val(url);
+        $('#message').html(message);
+        $('#removePostModal').modal();
+    }
+    function removeIt(){
+        var url=$.trim($("#url").val());
+        <#if (options.admin_pjax!'true') == 'true'>
+            pjax.loadUrl(url);
+        <#else>
+            window.location.href = url;
+        </#if>
+    }
+</script>
+</@footer>
 </#compress>

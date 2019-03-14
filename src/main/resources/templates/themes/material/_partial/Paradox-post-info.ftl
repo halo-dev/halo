@@ -2,18 +2,18 @@
 
     <!-- Author Avatar -->
     <div id="author-avatar">
-        <img src="${user.userAvatar?default('/material/source/img/avatar.png')}" width="44px" height="44px" alt="Author Avatar"/>
+        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" width="44px" height="44px" alt="Author Avatar"/>
     </div>
     <!-- Author Name & Date -->
     <div>
-        <strong>${user.userDisplayName?default('halo')}</strong>
+        <strong>${user.userDisplayName!'Halo'}</strong>
         <span>${post.postDate?string("MM月 dd,yyyy")}</span>
     </div>
 
     <div class="section-spacer"></div>
 
     <!-- Favorite -->
-    <!--
+    <#--
         <button id="article-functions-like-button" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon btn-like">
             <i class="material-icons" role="presentation">favorite</i>
             <span class="visuallyhidden">favorites</span>
@@ -21,7 +21,7 @@
     -->
 
     <!-- Qrcode -->
-    <!--
+    <#--
     <% if(theme.qrcode.enable === true) { %>
     <%- partial('_widget/qrcode') %>
     <% } %>
@@ -35,7 +35,7 @@
         <#if post.tags??>
             <#list post.tags as tag>
                 <li class="mdl-menu__item">
-                    <a class="post_tag-link" href="/tags/${tag.tagUrl}/">${tag.tagName}</a>
+                    <a class="post_tag-link" href="${options.blog_url!}/tags/${tag.tagUrl}/">${tag.tagName}</a>
                 </li>
             </#list>
         </#if>

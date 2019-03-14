@@ -6,17 +6,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 /**
+ * <pre>
+ *     友情链接
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2017/11/14
- * @version : 1.0
  */
 @Data
 @Entity
 @Table(name = "halo_link")
-public class Link implements Serializable{
+public class Link implements Serializable {
 
     private static final long serialVersionUID = 5441686055841177588L;
 
@@ -30,11 +34,13 @@ public class Link implements Serializable{
     /**
      * 友情链接名称
      */
+    @NotEmpty(message = "友情链接名称不能为空！")
     private String linkName;
 
     /**
      * 友情链接地址
      */
+    @NotEmpty(message = "友情链接地址不能为空！")
     private String linkUrl;
 
     /**

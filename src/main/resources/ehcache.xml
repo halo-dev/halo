@@ -1,0 +1,83 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
+
+    <defaultCache
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="600"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="links"
+            eternal="false"
+            maxElementsInMemory="100"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="menus"
+            eternal="false"
+            maxElementsInMemory="20"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="posts"
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="comments"
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="attachments"
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="galleries"
+            eternal="false"
+            maxElementsInMemory="100"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <cache
+            name="tags"
+            eternal="false"
+            maxElementsInMemory="100"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="300"
+            memoryStoreEvictionPolicy="LRU"/>
+</ehcache>

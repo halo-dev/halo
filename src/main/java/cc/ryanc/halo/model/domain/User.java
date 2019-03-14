@@ -1,17 +1,23 @@
 package cc.ryanc.halo.model.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * <pre>
+ *     博主信息
+ * </pre>
+ *
  * @author : RYAN0UP
- * @version : 1.0
  * @date : 2017/11/14
  */
 @Data
@@ -31,6 +37,8 @@ public class User implements Serializable {
     /**
      * 用户名
      */
+    @NotBlank(message = "用户名不能为空")
+    @JsonIgnore
     private String userName;
 
     /**
@@ -41,11 +49,13 @@ public class User implements Serializable {
     /**
      * 密码
      */
+    @JsonIgnore
     private String userPass;
 
     /**
      * 邮箱
      */
+    @Email(message = "邮箱格式不正确")
     private String userEmail;
 
     /**
@@ -61,15 +71,18 @@ public class User implements Serializable {
     /**
      * 是否禁用登录
      */
-    private String loginEnable;
+    @JsonIgnore
+    private String loginEnable = "true";
 
     /**
      * 最后一次登录时间
      */
+    @JsonIgnore
     private Date loginLast;
 
     /**
      * 登录错误次数记录
      */
-    private Integer loginError;
+    @JsonIgnore
+    private Integer loginError = 0;
 }

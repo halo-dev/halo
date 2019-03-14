@@ -3,16 +3,21 @@ package cc.ryanc.halo.model.dto;
 import cc.ryanc.halo.model.domain.Post;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
+ * <pre>
+ *     文章归档
+ * </pre>
+ *
  * @author : RYAN0UP
  * @date : 2018/1/20
- * @version : 1.0
- * description : 文章归档数据
  */
 @Data
-public class Archive {
+public class Archive implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * 年份

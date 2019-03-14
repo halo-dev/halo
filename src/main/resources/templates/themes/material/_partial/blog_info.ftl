@@ -1,5 +1,5 @@
 <!-- Blog info -->
-<div class="mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation?default(2)}dp something-else mdl-cell mdl-cell--8-col mdl-cell--4-col-desktop index-top-block">
+<div class="mdl-card mdl-shadow--${options.theme_material_uiux_card_elevation!'2'}dp something-else mdl-cell mdl-cell--8-col mdl-cell--4-col-desktop index-top-block">
 
     <!-- Search -->
     <#include "Paradox-search.ftl">
@@ -7,7 +7,7 @@
     <!-- LOGO -->
     <div class="something-else-logo mdl-color--white mdl-color-text--grey-600">
         <a href="#" target="_blank">
-            <img src="${options.blog_logo?default('/material/source/img/logo.png')}" alt="logo" />
+            <img src="${options.blog_logo!'/material/source/img/logo.png'}" alt="logo" />
         </a>
     </div>
 
@@ -15,7 +15,7 @@
     <div class="mdl-card__supporting-text meta meta--fill mdl-color-text--grey-600">
         <!-- Blog Title -->
         <div>
-            <strong>${options.blog_title?if_exists}</strong>
+            <strong>${options.blog_title!}</strong>
         </div>
         <div class="section-spacer"></div>
 
@@ -25,7 +25,7 @@
             <span class="visuallyhidden">Pages</span>
         </button>
         <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right" for="show-pages-button">
-            <a class="index_share-link" href="/tags" title="标签">
+            <a class="index_share-link" href="${options.blog_url!}/tags" title="标签">
                 <li class="mdl-menu__item mdl-js-ripple-effect">
                     标签
                 </li>
@@ -71,7 +71,7 @@
                 </li>
             </a>
 
-            <#if options.theme_material_sns_share_weibo?if_exists=='true'>
+            <#if (options.theme_material_sns_share_weibo!'true')=='true'>
             <a class="post_share-link" href="http://service.weibo.com/share/share.php?appkey=&title=<%= page.title %>&url=<%= config.url + url_for(path) %>&pic=<%- config.url + theme.head.favicon %>&searchPic=false&style=simple" target="_blank">
                 <li class="mdl-menu__item">
                     分享到Weibo
@@ -80,7 +80,7 @@
             </#if>
 
             <!-- Share Twitter -->
-            <#if options.theme_material_sns_share_twitter?if_exists=='true'>
+            <#if (options.theme_material_sns_share_twitter!'true')=='true'>
             <a class="post_share-link" href="https://twitter.com/intent/tweet?text=<%= page.title %>&url=<%= config.url + url_for(path) %>&via=<%= config.author %>" target="_blank">
                 <li class="mdl-menu__item">
                     分享到Twitter
@@ -88,7 +88,7 @@
             </a>
             </#if>
 
-            <#if options.theme_material_sns_share_facebook?if_exists=='true'>
+            <#if (options.theme_material_sns_share_facebook!'true')=='true'>
             <a class="post_share-link" href="https://www.facebook.com/sharer/sharer.php?u=<%= config.url + url_for(path) %>" target="_blank">
                 <li class="mdl-menu__item">
                     分享到FaceBook
@@ -96,7 +96,7 @@
             </a>
             </#if>
 
-            <#if options.theme_material_sns_share_googleplus?if_exists=='true'>
+            <#if (options.theme_material_sns_share_googleplus!'true')=='true'>
             <a class="post_share-link" href="https://plus.google.com/share?url=<%= config.url + url_for(path) %>" target="_blank">
                 <li class="mdl-menu__item">
                     分享到Google+
@@ -104,7 +104,7 @@
             </a>
             </#if>
 
-            <#if options.theme_material_sns_share_linkedin?if_exists=='true'>
+            <#if (options.theme_material_sns_share_linkedin!'true')=='true'>
             <a class="post_share-link" href="https://www.linkedin.com/shareArticle?mini=true&url=<%- config.url + url_for(path) %>&title=<%= page.title %>" target="_blank">
                 <li class="mdl-menu__item">
                     分享到LinkedIn
@@ -113,7 +113,7 @@
             </#if>
 
             <!-- Share QQ -->
-            <#if options.theme_material_sns_share_qq?if_exists=='true'>
+            <#if (options.theme_material_sns_share_qq!'true')=='true'>
             <a class="post_share-link" href="http://connect.qq.com/widget/shareqq/index.html?site=<%= config.title %>&title=<%= page.title %>&summary=<%= config.description %>&pics=<%- config.url + theme.head.favicon %>&url=<%- config.url +  url_for(path) %>" target="_blank">
                 <li class="mdl-menu__item">
                     分享到QQ
@@ -121,7 +121,7 @@
             </a>
             </#if>
 
-            <#if options.theme_material_sns_share_telegram?if_exists=='true'>
+            <#if (options.theme_material_sns_share_telegram!'true')=='true'>
             <a class="post_share-link" href="https://telegram.me/share/url?url=<%- config.url + url_for(path) %>&text=<%= page.title %>" target="_blank">
                 <li class="mdl-menu__item">
                     分享到Telegram
