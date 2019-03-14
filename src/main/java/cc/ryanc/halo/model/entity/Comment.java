@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.entity;
 
+import cc.ryanc.halo.model.enums.CommentStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -56,6 +57,12 @@ public class Comment {
      */
     @Column(name = "content", columnDefinition = "varchar(1024) not null")
     private String content;
+
+    /**
+     * Comment status.
+     */
+    @Column(name = "status", columnDefinition = "int default 1")
+    private CommentStatus status;
 
     /**
      * UA 信息
