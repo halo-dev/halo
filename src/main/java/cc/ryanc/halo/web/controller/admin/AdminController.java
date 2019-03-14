@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.model.dto.PostSimpleOutputDTO;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.CommentService;
+import cc.ryanc.halo.service.LogService;
 import cc.ryanc.halo.service.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -26,12 +27,16 @@ public class AdminController {
 
     private final AttachmentService attachmentService;
 
+    private final LogService logService;
+
     public AdminController(PostService postService,
                            CommentService commentService,
-                           AttachmentService attachmentService) {
+                           AttachmentService attachmentService,
+                           LogService logService) {
         this.postService = postService;
         this.commentService = commentService;
         this.attachmentService = attachmentService;
+        this.logService = logService;
     }
 
     /**
@@ -50,6 +55,7 @@ public class AdminController {
         model.addAttribute("attachmentsCount", attachmentService.count());
 
         model.addAttribute("latestPosts", postPage.getContent());
+        model.addAttribute("latestLogs", logService.listLatest(10).getContent());
         return "admin/admin_index";
     }
 }
