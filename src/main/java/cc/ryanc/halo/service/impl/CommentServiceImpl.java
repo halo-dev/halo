@@ -1,6 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
-import cc.ryanc.halo.model.dto.post.PostWithTitleDTO;
+import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.vo.CommentVO;
@@ -59,7 +59,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
             CommentVO commentVO = new CommentVO().convertFrom(comment);
 
             // Get post and set to the vo
-            commentVO.setPost(new PostWithTitleDTO().convertFrom(postMap.get(comment.getPostId())));
+            commentVO.setPost(new PostMinimalOutputDTO().convertFrom(postMap.get(comment.getPostId())));
 
             return commentVO;
         });

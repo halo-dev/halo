@@ -1,6 +1,7 @@
 package cc.ryanc.halo.model.entity;
 
 import cc.ryanc.halo.model.enums.PostCreateFrom;
+import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -43,6 +44,18 @@ public class Post {
      */
     @Column(name = "type", columnDefinition = "int default 0")
     private PostType type;
+
+    /**
+     * Post status.
+     */
+    @Column(name = "status", columnDefinition = "int default 1")
+    private PostStatus status;
+
+    /**
+     * Post url.
+     */
+    @Column(name = "url", columnDefinition = "varchar(255) not null")
+    private String url;
 
     /**
      * 源内容
