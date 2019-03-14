@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Page with title only dto.
+ * Post minimal output dto.
  *
  * @author johnniang
  */

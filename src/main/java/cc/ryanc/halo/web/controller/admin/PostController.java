@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,12 +41,12 @@ public class PostController {
      * @param status post status
      * @param page   current page
      * @param sort   sort
-     *
      * @return template path: admin/admin_post.ftl
      */
     @GetMapping
     public String posts(Model model,
-                        @RequestParam(value = "status", defaultValue = "0") PostStatus status,
+                        @RequestParam(value = "status", defaultValue = "PUBLISHED") PostStatus status,
+                        @PageableDefault Pageable defaultPageable,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @SortDefault.SortDefaults({
                                 @SortDefault(sort = "postPriority", direction = DESC),
