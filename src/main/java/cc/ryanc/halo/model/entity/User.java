@@ -1,6 +1,8 @@
 package cc.ryanc.halo.model.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,6 +16,8 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "users")
+@SQLDelete(sql = "update users set deleted = true where id = ?")
+@Where(clause = "deleted = false")
 public class User {
 
     @Id

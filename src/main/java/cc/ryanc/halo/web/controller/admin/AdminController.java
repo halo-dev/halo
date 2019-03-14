@@ -1,8 +1,10 @@
 package cc.ryanc.halo.web.controller.admin;
 
+import cc.ryanc.halo.model.dto.PostSimpleOutputDTO;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.PostService;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,13 +42,14 @@ public class AdminController {
      */
     @GetMapping(value = {"", "/index"})
     public String admin(Model model) {
-        final Long postsCount = postService.count();
-        final Long commentsCount = commentService.count();
-        final Long attachmentsCount = attachmentService.count();
 
-        model.addAttribute("postsCount", postsCount);
-        model.addAttribute("commentsCount", commentsCount);
-        model.addAttribute("attachmentsCount", attachmentsCount);
+        Page<PostSimpleOutputDTO> postPage = postService.listLatest(10);
+
+        model.addAttribute("postsCount", postPage.getTotalElements());
+        model.addAttribute("commentsCount", commentService.count());
+        model.addAttribute("attachmentsCount", attachmentService.count());
+
+        model.addAttribute("latestPosts", postPage.getContent());
         return "admin/admin_index";
     }
 }
