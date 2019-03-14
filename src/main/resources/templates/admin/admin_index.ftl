@@ -156,7 +156,7 @@
             <#if (options.widget_postcount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetPostCountBody">
                 <div class="small-box bg-aqua">
-                    <div class="inner"><h3><@articleTag method="postsCount">${postsCount!0}</@articleTag></h3><p><@spring.message code='admin.index.widgets.posts' /></p></div>
+                    <div class="inner"><h3>${postsCount!0}</h3><p><@spring.message code='admin.index.widgets.posts' /></p></div>
                     <div class="icon"><i class="ion ion-bag"></i></div>
                     <a data-pjax="true" href="/admin/posts" class="small-box-footer"><@spring.message code='common.btn.view-all' /> <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
@@ -165,7 +165,7 @@
             <#if (options.widget_commentcount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetCommentCountBody">
                 <div class="small-box bg-green">
-                    <div class="inner"><h3>${commentCount!0}</h3><p><@spring.message code='admin.index.widgets.comments' /></p></div>
+                    <div class="inner"><h3>${commentsCount!0}</h3><p><@spring.message code='admin.index.widgets.comments' /></p></div>
                     <div class="icon"><i class="ion ion-stats-bars"></i></div>
                     <a data-pjax="true" href="/admin/comments" class="small-box-footer"><@spring.message code='common.btn.view-all' /> <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
@@ -174,7 +174,7 @@
             <#if (options.widget_attachmentcount!'true')=='true'>
             <div class="col-lg-3 col-xs-6" id="widgetAttachmentCountBody">
                 <div class="small-box bg-yellow">
-                    <div class="inner"><h3>${mediaCount!0}</h3><p><@spring.message code='admin.index.widgets.attachments' /></p></div>
+                    <div class="inner"><h3>${attachmentsCount!0}</h3><p><@spring.message code='admin.index.widgets.attachments' /></p></div>
                     <div class="icon"><i class="ion ion-person-add"></i></div>
                     <a data-pjax="true" href="/admin/attachments" class="small-box-footer"><@spring.message code='common.btn.upload-image' /> <i class="fa fa-arrow-circle-right"></i></a>
                 </div>
@@ -211,13 +211,13 @@
                                     <th><@spring.message code='common.th.status' /></th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                                <#if postsLatest??>
-                                    <#list postsLatest as post>
+                                <#if latestPosts??>
+                                    <#list latestPosts as post>
                                         <tr>
                                             <#if post.postStatus == 0>
-                                                <td><a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a></td>
+                                                <td><a target="_blank" href="/archives/${post.postUrl}">${post.title}</a></td>
                                             <#else >
-                                                <td>${post.postTitle}</td>
+                                                <td>${post.title}</td>
                                             </#if>
                                             <td class="text-center">
                                                 <#if post.postStatus==0>
@@ -228,7 +228,7 @@
                                                     <span class="label bg-red"><@spring.message code='common.status.recycle-bin' /></span>
                                                 </#if>
                                             </td>
-                                            <td><@common.timeline datetime="${post.postDate!}"?datetime /></td>
+                                            <td><@common.timeline datetime="${post.createTime!}"?datetime /></td>
                                         </tr>
                                     </#list>
                                 <#else>
@@ -261,29 +261,19 @@
                                     <th><@spring.message code='common.th.status' /></th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                                <#if commentsLatest??>
-                                <#list commentsLatest as comment>
+                                <#if latestComments??>
+                                <#list latestComments as comment>
                                     <tr>
-                                        <td>${comment.commentAuthor}</td>
+                                        <td>${comment.author!}</td>
                                         <td>
-                                            <#if comment.post.postType=="post">
-                                                <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                            <#if comment.post.type=="post">
+                                                <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.title!}</a>
                                             <#else>
-                                                <a target="_blank" href="/p/${comment.post.getPostUrl()}">${comment.post.postTitle}</a>
+                                                <a target="_blank" href="/p/${comment.post.getPostUrl()}">${comment.post.title!}</a>
                                             </#if>
                                         </td>
                                         <td>
-                                            <#switch comment.commentStatus>
-                                                <#case 0>
-                                                ${comment.commentContent}
-                                                <#break>
-                                                <#case 1>
-                                                ${comment.commentContent}
-                                                <#break>
-                                                <#case 2>
-                                                ${comment.commentContent}
-                                                <#break>
-                                            </#switch>
+                                            ${comment.content!}
                                         </td>
                                         <td>
                                             <#switch comment.commentStatus>
@@ -298,7 +288,7 @@
                                             <#break >
                                             </#switch>
                                         </td>
-                                        <td><@common.timeline datetime="${comment.commentDate}"?datetime /></td>
+                                        <td><@common.timeline datetime="${comment.createTime}"?datetime /></td>
                                     </tr>
                                 </#list>
                                 <#else>
@@ -338,15 +328,15 @@
                                     <th>IP</th>
                                     <th><@spring.message code='common.th.date' /></th>
                                 </tr>
-                                <#if logsLatest??>
-                                <#list logsLatest as log>
-                                    <tr>
-                                        <td>${log.logTitle}</td>
-                                        <td>${log.logContent}</td>
-                                        <td>${log.logIp}</td>
-                                        <td>${log.logCreated?string("yyyy-MM-dd HH:mm")}</td>
-                                    </tr>
-                                </#list>
+                                <#if latestLogs??>
+                                    <#list latestLogs as log>
+                                        <tr>
+                                            <td>${log.type}</td>
+                                            <td>${log.content}</td>
+                                            <td>${log.ipAddress}</td>
+                                            <td>${log.createTime?string("yyyy-MM-dd HH:mm")}</td>
+                                        </tr>
+                                    </#list>
                                 <#else>
                                     <tr><td><@spring.message code='common.text.no-data' /></td></tr>
                                 </#if>
@@ -368,9 +358,9 @@
                 <div class="modal-body">
                     <p>「${options.blog_title!}」<@spring.message code='admin.index.blog-data.days-count-before' /><span id="blogStartDay">${hadDays!}</span><@spring.message code='admin.index.blog-data.days-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.during' /></p>
-                    <p><@spring.message code='admin.index.blog-data.posts-count-before' />&nbsp;<@articleTag method="postsCount">${postsCount!0}</@articleTag>&nbsp;<@spring.message code='admin.index.blog-data.posts-count-after' /></p>
+                    <p><@spring.message code='admin.index.blog-data.posts-count-before' />&nbsp;${postsCount!0}&nbsp;<@spring.message code='admin.index.blog-data.posts-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.tags-count-before' />&nbsp;<@commonTag method="tags">${tags?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.tags-count-after' /></p>
-                    <p><@spring.message code='admin.index.blog-data.comments-count-before' />&nbsp;${commentCount}&nbsp;<@spring.message code='admin.index.blog-data.comments-count-after' /></p>
+                    <p><@spring.message code='admin.index.blog-data.comments-count-before' />&nbsp;${commentsCount!}&nbsp;<@spring.message code='admin.index.blog-data.comments-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.links-count-before' />&nbsp;<@commonTag method="links">${links?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.links-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.views-count-before' />&nbsp;${postViewsSum!0}&nbsp;<@spring.message code='admin.index.blog-data.views-count-after' /></p>
                     <p><@spring.message code='admin.index.blog-data.motto' /></p>
