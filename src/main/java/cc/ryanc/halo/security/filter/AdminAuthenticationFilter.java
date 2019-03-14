@@ -21,6 +21,7 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // TODO Handle admin authentication
+        filterChain.doFilter(request, response);
     }
 
     public void setFailureHandler(AuthenticationFailureHandler failureHandler) {
