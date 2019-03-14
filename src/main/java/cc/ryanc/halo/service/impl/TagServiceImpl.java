@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements TagService {
 
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
 
     public TagServiceImpl(TagRepository tagRepository) {
         super(tagRepository);

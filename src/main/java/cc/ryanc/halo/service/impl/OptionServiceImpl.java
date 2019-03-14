@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OptionServiceImpl extends AbstractCrudService<Option, Integer> implements OptionService {
 
-    private OptionRepository optionRepository;
+    private final OptionRepository optionRepository;
 
     public OptionServiceImpl(OptionRepository optionRepository) {
         super(optionRepository);

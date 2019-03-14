@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LogServiceImpl extends AbstractCrudService<Log, Long> implements LogService {
 
-    private LogRepository logRepository;
+    private final LogRepository logRepository;
 
     public LogServiceImpl(LogRepository logRepository) {
         super(logRepository);
