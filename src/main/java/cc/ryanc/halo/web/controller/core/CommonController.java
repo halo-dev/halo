@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.logging.Logger;
-import cc.ryanc.halo.model.enums.CommonParamsEnum;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -48,11 +47,13 @@ public class CommonController implements ErrorController {
             }
         }
 
-        if (statusCode.equals(CommonParamsEnum.NOT_FOUND.getValue())) {
-            return "redirect:/404";
-        } else {
-            return "redirect:/500";
-        }
+//        if (statusCode.equals(CommonParamsEnum.NOT_FOUND.getValue())) {
+//            return "redirect:/404";
+//        } else {
+//            return "redirect:/500";
+//        }
+        // TODO Complete error handler
+        return "redirect:/500";
     }
 
     /**

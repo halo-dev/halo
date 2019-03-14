@@ -1,6 +1,5 @@
 package cc.ryanc.halo.model.support;
 
-import cc.ryanc.halo.model.enums.ResultCodeEnum;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
@@ -115,55 +114,55 @@ public class JsonResult {
         return ok(message, null);
     }
 
-    /**
-     * Creates an fail result with message only.
-     *
-     * @param message message of result must not be blank
-     * @return fail result with message only
-     */
-    public static JsonResult fail(@NonNull String message) {
-        Assert.hasText(message, "Message of result must not be blank");
+//    /**
+//     * Creates an fail result with message only.
+//     *
+//     * @param message message of result must not be blank
+//     * @return fail result with message only
+//     */
+//    public static JsonResult fail(@NonNull String message) {
+//        Assert.hasText(message, "Message of result must not be blank");
+//
+//        return new JsonResult(ResultCodeEnum.FAIL.getCode(), message);
+//    }
 
-        return new JsonResult(ResultCodeEnum.FAIL.getCode(), message);
-    }
+//    /**
+//     * Creates an fail result.
+//     *
+//     * @param message message of result must not be blank
+//     * @return fail result
+//     */
+//    public static JsonResult fail(@NonNull String message, @NonNull Object data) {
+//        Assert.notNull(data, "Data of result must not be null");
+//
+//        JsonResult failResult = fail(message);
+//        failResult.setResult(data);
+//        return failResult;
+//    }
 
-    /**
-     * Creates an fail result.
-     *
-     * @param message message of result must not be blank
-     * @return fail result
-     */
-    public static JsonResult fail(@NonNull String message, @NonNull Object data) {
-        Assert.notNull(data, "Data of result must not be null");
+//    /**
+//     * Creates an success result with message only.
+//     *
+//     * @param message message of result must not be blank
+//     * @return success result with message only
+//     */
+//    public static JsonResult success(@NonNull String message) {
+//        Assert.hasText(message, "Message of result must not be blank");
+//
+//        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), message);
+//    }
 
-        JsonResult failResult = fail(message);
-        failResult.setResult(data);
-        return failResult;
-    }
-
-    /**
-     * Creates an success result with message only.
-     *
-     * @param message message of result must not be blank
-     * @return success result with message only
-     */
-    public static JsonResult success(@NonNull String message) {
-        Assert.hasText(message, "Message of result must not be blank");
-
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), message);
-    }
-
-    /**
-     * Creates an success result.
-     *
-     * @param message message of result must not be blank
-     * @return success result
-     */
-    public static JsonResult success(@NonNull String message, @NonNull Object data) {
-        Assert.notNull(data, "Data of result must not be null");
-
-        JsonResult successResult = success(message);
-        successResult.setResult(data);
-        return successResult;
-    }
+//    /**
+//     * Creates an success result.
+//     *
+//     * @param message message of result must not be blank
+//     * @return success result
+//     */
+//    public static JsonResult success(@NonNull String message, @NonNull Object data) {
+//        Assert.notNull(data, "Data of result must not be null");
+//
+//        JsonResult successResult = success(message);
+//        successResult.setResult(data);
+//        return successResult;
+//    }
 }
