@@ -11,12 +11,22 @@
 		halo，一个基于SpringBoot的博客系统，最求轻快，易用，以内容为中心。
 	</description>
 
+	<organization>
+		<name>halo-dev</name>
+		<url>https://github.com/halo-dev</url>
+	</organization>
+
 	<developers>
 		<developer>
 			<id>ruibaby</id>
 			<name>Ryan Wang</name>
 			<email>i@ryanc.cc</email>
 			<url>https://ryanc.cc</url>
+		</developer>
+		<developer>
+			<id>JohnNiang</id>
+			<name>John Niang</name>
+			<url>https://johnniang.me</url>
 		</developer>
 	</developers>
 
