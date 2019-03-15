@@ -39,6 +39,7 @@
 		<qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
 		<commonmark.version>0.12.1</commonmark.version>
+		<commons-collections.version>3.2.2</commons-collections.version>
 	</properties>
 
 	<dependencies>
@@ -189,6 +190,14 @@
 			<artifactId>commonmark-ext-yaml-front-matter</artifactId>
 			<version>${commonmark.version}</version>
 		</dependency>
+
+		<!--切分集合-->
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>${commons-collections.version}</version>
+		</dependency>
+
 
 	</dependencies>
 
