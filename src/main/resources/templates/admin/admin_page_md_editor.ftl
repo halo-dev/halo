@@ -4,13 +4,6 @@
 <div class="content-wrapper">
     <link rel="stylesheet" href="/static/halo-admin/plugins/easymde/easymde.min.css">
     <link rel="stylesheet" href="/static/halo-admin/plugins/datetimepicker/css/bootstrap-datetimepicker.min.css">
-    <style type="text/css">
-        #postTitle{font-weight: 400;}
-        .CodeMirror .cm-spell-error:not(.cm-url):not(.cm-comment):not(.cm-tag):not(.cm-word) {background: none;}
-        .CodeMirror-fullscreen,.editor-toolbar.fullscreen{z-index: 1030;}
-        .CodeMirror, .CodeMirror-scroll {min-height: 480px;}
-        .editor-preview-active img,.editor-preview-active-side img{width: 100%;}
-    </style>
     <section class="content-header" id="animated-header">
         <h1 style="display: inline-block;">
             <@spring.message code='admin.pages.edit.title' />
