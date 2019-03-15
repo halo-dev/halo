@@ -3,6 +3,7 @@ package cc.ryanc.halo.model.dto.post;
 import cc.ryanc.halo.model.dto.base.OutputConverter;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -23,7 +24,7 @@ public class PostMinimalOutputDTO implements OutputConverter<PostMinimalOutputDT
     private Integer id;
 
     /**
-     * 文章标题
+     * Post title
      */
     private String title;
 
@@ -36,4 +37,9 @@ public class PostMinimalOutputDTO implements OutputConverter<PostMinimalOutputDT
      * Post url.
      */
     private String url;
+
+    /**
+     * Post type
+     */
+    private PostType type;
 }
