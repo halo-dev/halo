@@ -9,7 +9,7 @@
         </a>
         <ol class="breadcrumb">
             <li>
-                <a href="/admin"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
+                <a href="/admin/"><i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
             </li>
             <li class="active"><@spring.message code='admin.index.bread.active' /></li>
         </ol>
@@ -214,15 +214,15 @@
                                 <#if latestPosts??>
                                     <#list latestPosts as post>
                                         <tr>
-                                            <#if post.postStatus == 0>
-                                                <td><a target="_blank" href="/archives/${post.postUrl}">${post.title}</a></td>
+                                            <#if post.status == 0>
+                                                <td><a target="_blank" href="/archives/${post.url}">${post.title}</a></td>
                                             <#else >
                                                 <td>${post.title}</td>
                                             </#if>
                                             <td class="text-center">
-                                                <#if post.postStatus==0>
+                                                <#if post.status==0>
                                                     <span class="label bg-green"><@spring.message code='common.status.published' /></span>
-                                                <#elseif post.postStatus==1>
+                                                <#elseif post.status==1>
                                                     <span class="label bg-yellow"><@spring.message code='common.status.draft' /></span>
                                                 <#else>
                                                     <span class="label bg-red"><@spring.message code='common.status.recycle-bin' /></span>
@@ -266,17 +266,17 @@
                                     <tr>
                                         <td>${comment.author!}</td>
                                         <td>
-                                            <#if comment.post.type=="post">
-                                                <a target="_blank" href="/archives/${comment.post.getPostUrl()}">${comment.post.title!}</a>
+                                            <#if comment.post.type.getValue()==0>
+                                                <a target="_blank" href="/archives/${comment.post.url}">${comment.post.title!}</a>
                                             <#else>
-                                                <a target="_blank" href="/p/${comment.post.getPostUrl()}">${comment.post.title!}</a>
+                                                <a target="_blank" href="/p/${comment.post.url}">${comment.post.title!}</a>
                                             </#if>
                                         </td>
                                         <td>
                                             ${comment.content!}
                                         </td>
                                         <td>
-                                            <#switch comment.commentStatus>
+                                            <#switch comment.status>
                                             <#case 0>
                                             <span class="label bg-green"><@spring.message code='common.status.published' /></span>
                                             <#break >

@@ -45,7 +45,7 @@ public class PostController {
                             @RequestParam(value = "status", defaultValue = "published") PostStatus status) {
         final Page<PostSimpleOutputDTO> postPage = postService.pageByStatusAndType(status, PostType.POST, pageable);
 
-        model.addAttribute("posts", postPage.getContent());
+        model.addAttribute("posts", postPage);
         model.addAttribute("publishedCount", postService.countByStatusAndType(PostStatus.PUBLISHED, PostType.POST));
         model.addAttribute("draftCount", postService.countByStatusAndType(PostStatus.DRAFT, PostType.POST));
         model.addAttribute("recycleCount", postService.countByStatusAndType(PostStatus.RECYCLE, PostType.POST));

@@ -58,10 +58,10 @@
                                     <#list posts.content as post>
                                         <tr>
                                             <td>
-                                                <#if post.postStatus==0>
-                                                    <a target="_blank" href="/archives/${post.postUrl}">${post.postTitle}</a>
+                                                <#if post.status==0>
+                                                    <a target="_blank" href="/archives/${post.url!}">${post.title!}</a>
                                                 <#else>
-                                                    ${post.postTitle}
+                                                    ${post.title!}
                                                 </#if>
                                             </td>
                                             <td>
@@ -86,29 +86,29 @@
                                                 <span class="label" style="background-color: #d6cdcd;">${post.getComments()?size}</span>
                                             </td>
                                             <td>
-                                                <span class="label" style="background-color: #d6cdcd;">${post.postViews}</span>
+                                                <span class="label" style="background-color: #d6cdcd;">${post.visits!0}</span>
                                             </td>
-                                            <td>${post.postDate!?string("yyyy-MM-dd HH:mm")}</td>
+                                            <td>${post.createTime!?string("yyyy-MM-dd HH:mm")}</td>
                                             <td>
-                                                <#switch post.postStatus>
+                                                <#switch post.status>
                                                     <#case 0>
-                                                        <#if post.postPriority == 0>
-                                                            <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/topPost?postId=${post.postId?c}&priority=1','是否置顶该文章？')">置顶</button>
+                                                        <#if post.topPriority == 0>
+                                                            <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/topPost?postId=${post.id?c}&priority=1','是否置顶该文章？')">置顶</button>
                                                         <#else>
-                                                            <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/topPost?postId=${post.postId?c}&priority=0','是否取消置顶该文章？')">取消置顶</button>
+                                                            <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/topPost?postId=${post.id?c}&priority=0','是否取消置顶该文章？')">取消置顶</button>
                                                         </#if>
-                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}" class="btn btn-info btn-xs"><@spring.message code='common.btn.edit' /></a>
-                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/throw?postId=${post.postId?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
+                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.id?c}" class="btn btn-info btn-xs"><@spring.message code='common.btn.edit' /></a>
+                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/throw?postId=${post.id?c}&status=0','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                         <#break >
                                                     <#case 1>
-                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.postId?c}"
+                                                        <a data-pjax="true" href="/admin/posts/edit?postId=${post.id?c}"
                                                            class="btn btn-info btn-xs"><@spring.message code="common.btn.edit" /></a>
-                                                        <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/revert?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-release-post" />')"><@spring.message code='common.btn.release' /></button>
-                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/throw?postId=${post.postId?c}&status=1','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
+                                                        <button class="btn btn-primary btn-xs" onclick="modalShow('/admin/posts/revert?postId=${post.id?c}&status=1','<@spring.message code="common.text.tips.to-release-post" />')"><@spring.message code='common.btn.release' /></button>
+                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/throw?postId=${post.id?c}&status=1','<@spring.message code="common.text.tips.to-recycle-bin" />')"><@spring.message code='common.btn.recycling' /></button>
                                                         <#break >
                                                     <#case 2>
-                                                        <a data-pjax="true" href="/admin/posts/revert?postId=${post.postId?c}&status=2" class="btn btn-primary btn-xs "><@spring.message code='common.btn.reduction' /></a>
-                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/remove?postId=${post.postId?c}&postType=${post.postType}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
+                                                        <a data-pjax="true" href="/admin/posts/revert?postId=${post.id?c}&status=2" class="btn btn-primary btn-xs "><@spring.message code='common.btn.reduction' /></a>
+                                                        <button class="btn btn-danger btn-xs" onclick="modalShow('/admin/posts/remove?postId=${post.id?c}&postType=${post.type}','<@spring.message code="common.text.tips.to-delete" />')"><@spring.message code='common.btn.delete' /></button>
                                                         <#break >
                                                 </#switch>
                                             </td>
