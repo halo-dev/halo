@@ -6,8 +6,9 @@
         <h1 style="display: inline-block;"><@spring.message code='admin.tools.title' /></h1>
         <ol class="breadcrumb">
             <li>
-                <a data-pjax="true" href="/admin">
-                    <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' /></a>
+                <a data-pjax="true" href="/admin/">
+                    <i class="fa fa-dashboard"></i> <@spring.message code='admin.index.bread.index' />
+                </a>
             </li>
             <li><a data-pjax="true" href="javascript:void(0)"><@spring.message code='admin.setting.bread.setting' /></a></li>
             <li class="active"><@spring.message code='admin.tools.title' /></li>
