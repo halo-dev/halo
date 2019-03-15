@@ -355,15 +355,20 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="blog-data"><@spring.message code='admin.index.blog-data.title' /></h4>
                 </div>
+                <#assign daysArgs = ['${hadDays!}'] />
+                <#assign postsArgs= ['${postsCount!0}'] />
+                <#assign tagsArgs= [1] />
+                <#assign commentsArgs= ['${commentsCount!}'] />
+                <#assign linksArgs= [1] />
+                <#assign viewsArgs= ['${postViewsSum}'] />
                 <div class="modal-body">
-                    <#--<p>「${options.blog_title!}」<@spring.message code='admin.index.blog-data.days-count-before' /><span id="blogStartDay">${hadDays!}</span><@spring.message code='admin.index.blog-data.days-count-after' /></p>-->
-                    <#--<p><@spring.message code='admin.index.blog-data.during' /></p>-->
-                    <#--<p><@spring.message code='admin.index.blog-data.posts-count-before' />&nbsp;${postsCount!0}&nbsp;<@spring.message code='admin.index.blog-data.posts-count-after' /></p>-->
-                    <#--<p><@spring.message code='admin.index.blog-data.tags-count-before' />&nbsp;<@commonTag method="tags">${tags?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.tags-count-after' /></p>-->
-                    <#--<p><@spring.message code='admin.index.blog-data.comments-count-before' />&nbsp;${commentsCount!}&nbsp;<@spring.message code='admin.index.blog-data.comments-count-after' /></p>-->
-                    <#--<p><@spring.message code='admin.index.blog-data.links-count-before' />&nbsp;<@commonTag method="links">${links?size}</@commonTag>&nbsp;<@spring.message code='admin.index.blog-data.links-count-after' /></p>-->
-                    <#--<p><@spring.message code='admin.index.blog-data.views-count-before' />&nbsp;${postViewsSum!0}&nbsp;<@spring.message code='admin.index.blog-data.views-count-after' /></p>-->
-                    开发中...
+                    <p>「${options.blog_title!}」<@spring.message 'admin.index.blog-data.days-count' daysArgs/></p>
+                    <p><@spring.message 'admin.index.blog-data.during' /></p>
+                    <p><@spring.message 'admin.index.blog-data.posts-count' postsArgs/></p>
+                    <p><@spring.message 'admin.index.blog-data.tags-count' tagsArgs/></p>
+                    <p><@spring.message 'admin.index.blog-data.comments-count' commentsArgs/></p>
+                    <p><@spring.message 'admin.index.blog-data.links-count' linksArgs/></p>
+                    <p><@spring.message 'admin.index.blog-data.views-count' viewsArgs/></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal"><@spring.message code='common.btn.define' /></button>
