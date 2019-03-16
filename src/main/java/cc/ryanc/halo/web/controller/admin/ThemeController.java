@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import static cc.ryanc.halo.model.support.HaloConst.THEMES;
@@ -81,9 +80,9 @@ public class ThemeController extends BaseController {
             BaseFrontController.THEME = themeName;
             configuration.setSharedVariable("themeName", themeName);
             log.info("Changed theme to {}", themeName);
-            return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-success", new Object[]{themeName}));
+            return new JsonResult(1, localeMessage("code.admin.theme.change-success", new Object[]{themeName}));
         } catch (Exception e) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.change-failed"));
+            return new JsonResult(0, localeMessage("code.admin.theme.change-failed"));
         } finally {
             refreshCache();
         }
@@ -102,23 +101,23 @@ public class ThemeController extends BaseController {
                                   HttpServletRequest request) {
         try {
             if (!file.isEmpty()) {
-                final File themePath = new File(ThemeUtils.getUsersThemesPath().getAbsolutePath(), new StrBuilder("templates/themes/").append(file.getOriginalFilename()).toString());
+                final File themePath = new File(ThemeUtils.getUsersThemesPath().getAbsolutePath(), file.getOriginalFilename());
                 file.transferTo(themePath);
-                log.info("Upload topic success, path is " + themePath.getAbsolutePath());
-                ZipUtil.unzip(themePath, new File(basePath.getAbsolutePath(), "templates/themes/"));
+                ZipUtil.unzip(themePath, ThemeUtils.getUsersThemesPath());
                 FileUtil.del(themePath);
-                logsService.save(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), request);
+                log.info("Upload topic success, path is " + themePath.getAbsolutePath());
+//                logsService.save(LogsRecord.UPLOAD_THEME, file.getOriginalFilename(), request);
             } else {
                 log.error("Upload theme failed, no file selected");
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-no-file"));
+                return new JsonResult(0, localeMessage("code.admin.theme.upload-no-file"));
             }
         } catch (Exception e) {
             log.error("Upload theme failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-failed"));
-        }finally {
+            return new JsonResult(0, localeMessage("code.admin.theme.upload-failed"));
+        } finally {
             refreshCache();
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.theme.upload-success"));
+        return new JsonResult(1, localeMessage("code.admin.theme.upload-success"));
     }
 
     /**
@@ -162,20 +161,20 @@ public class ThemeController extends BaseController {
     public JsonResult cloneFromRemote(@RequestParam(value = "remoteAddr") String remoteAddr,
                                       @RequestParam(value = "themeName") String themeName) {
         if (StrUtil.isBlank(remoteAddr) || StrUtil.isBlank(themeName)) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.info-no-complete"));
+            return new JsonResult(0, localeMessage("code.admin.common.info-no-complete"));
         }
         try {
             final String cmdResult = RuntimeUtil.execForStr("git clone " + remoteAddr + " " + ThemeUtils.getUsersThemesPath().getAbsolutePath() + "/" + themeName);
-            if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
+            if ("".equals(cmdResult)) {
+                return new JsonResult(0, localeMessage("code.admin.theme.no-git"));
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             log.error("Cloning theme failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.clone-theme-failed") + e.getMessage());
-        }finally {
+            return new JsonResult(0, localeMessage("code.admin.theme.clone-theme-failed"));
+        } finally {
             refreshCache();
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.install-success"));
+        return new JsonResult(1, localeMessage("code.admin.common.install-success"));
     }
 
     /**
@@ -189,16 +188,16 @@ public class ThemeController extends BaseController {
     public JsonResult pullFromRemote(@RequestParam(value = "themeName") String themeName) {
         try {
             final String cmdResult = RuntimeUtil.execForStr("cd " + ThemeUtils.getUsersThemesPath().getAbsolutePath() + "/" + themeName + " && git pull");
-            if (NOT_FOUND_GIT.equals(cmdResult)) {
-                return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.no-git"));
+            if ("".equals(cmdResult)) {
+                return new JsonResult(0, localeMessage("code.admin.theme.no-git"));
             }
         } catch (Exception e) {
             log.error("Update theme failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.update-theme-failed") + e.getMessage());
+            return new JsonResult(0, localeMessage("code.admin.theme.update-theme-failed"));
         } finally {
             refreshCache();
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.update-success"));
+        return new JsonResult(1, localeMessage("code.admin.common.update-success"));
     }
 
     /**
@@ -213,7 +212,7 @@ public class ThemeController extends BaseController {
                           @RequestParam("theme") String theme,
                           @RequestParam("hasUpdate") String hasUpdate) {
         model.addAttribute("themeDir", theme);
-        if (StrUtil.equals(hasUpdate, TrueFalseEnum.TRUE.getDesc())) {
+        if (StrUtil.equals(hasUpdate, "true")) {
             model.addAttribute("hasUpdate", true);
         } else {
             model.addAttribute("hasUpdate", false);
@@ -270,20 +269,20 @@ public class ThemeController extends BaseController {
     public JsonResult saveTpl(@RequestParam("tplName") String tplName,
                               @RequestParam("tplContent") String tplContent) {
         if (StrUtil.isBlank(tplContent)) {
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.theme.edit.no-content"));
+            return new JsonResult(0, localeMessage("code.admin.theme.edit.no-content"));
         }
         try {
             final StrBuilder themePath = new StrBuilder(ThemeUtils.getUsersThemesPath().getAbsolutePath());
             themePath.append(BaseFrontController.THEME);
             themePath.append("/");
             themePath.append(tplName);
-            final File tplPath = new File(themePath);
+            final File tplPath = new File(themePath.toString());
             final FileWriter fileWriter = new FileWriter(tplPath);
             fileWriter.write(tplContent);
         } catch (Exception e) {
             log.error("Template save failed: {}", e.getMessage());
-            return new JsonResult(ResultCodeEnum.FAIL.getCode(), localeMessageUtil.getMessage("code.admin.common.save-failed"));
+            return new JsonResult(0, localeMessage("code.admin.common.save-failed"));
         }
-        return new JsonResult(ResultCodeEnum.SUCCESS.getCode(), localeMessageUtil.getMessage("code.admin.common.save-success"));
+        return new JsonResult(1, localeMessage("code.admin.common.save-success"));
     }
 }

@@ -47,6 +47,12 @@ public class Comment {
     private String ipAddress;
 
     /**
+     * 评论者网址
+     */
+    @Column(name = "author_url",columnDefinition = "varchar(512) default ''")
+    private String authorUrl;
+
+    /**
      * Gavatar md5
      */
     @Column(name = "gavatar_md5", columnDefinition = "varchar(128) default ''")
@@ -55,7 +61,7 @@ public class Comment {
     /**
      * 评论内容
      */
-    @Column(name = "content", columnDefinition = "varchar(1024) not null")
+    @Column(name = "content", columnDefinition = "varchar(1023) not null")
     private String content;
 
     /**
