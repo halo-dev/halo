@@ -1,8 +1,6 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.support.BackupDto;
 import cc.ryanc.halo.model.support.Theme;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import com.qiniu.common.Zone;
@@ -208,17 +206,35 @@ public class HaloUtils {
     }
 
     /**
-     * 获取所有主题
+     * Scan internal themes and user's themes
      *
      * @return List
      */
     public static List<Theme> getThemes() {
         final List<Theme> themes = new ArrayList<>();
         try {
-            // 获取项目根路径
-            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            // 获取主题路径
-            final File themesPath = new File(basePath.getAbsolutePath(), "templates/themes");
+            final File classPath = new File(ResourceUtils.getURL("classpath:").getPath());
+            final File internalThemesPath = new File(classPath.getAbsolutePath(), "templates/themes");
+            themes.addAll(getThemesByPath(internalThemesPath));
+
+            final File userPath = new File(System.getProperties().getProperty("user.home"));
+            final File userThemesPath = new File(userPath.getAbsolutePath(),"halo/templates/themes");
+            themes.addAll(getThemesByPath(userThemesPath));
+        } catch (Exception e) {
+            log.error("Themes scan failed", e);
+        }
+        return themes;
+    }
+
+    /**
+     * Scan themes by directory
+     *
+     * @param file file
+     * @return List<Theme>
+     */
+    private static List<Theme> getThemesByPath(File themesPath) {
+        final List<Theme> themes = new ArrayList<>();
+        try {
             final File[] files = themesPath.listFiles();
             if (null != files) {
                 Theme theme;
