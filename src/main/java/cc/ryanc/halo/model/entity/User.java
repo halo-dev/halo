@@ -62,6 +62,13 @@ public class User {
     private String description;
 
     /**
+     * Expire time.
+     */
+    @Column(name = "expire_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date expireTime;
+
+    /**
      * 创建时间戳
      */
     @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
