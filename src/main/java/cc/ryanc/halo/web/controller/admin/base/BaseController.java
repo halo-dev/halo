@@ -17,11 +17,11 @@ import static cc.ryanc.halo.model.support.HaloConst.THEMES;
  */
 public abstract class BaseController {
 
-    private final Configuration configuration;
+    public final Configuration configuration;
 
-    private final OptionService optionService;
+    public final OptionService optionService;
 
-    private final LocaleMessageUtil localeMessageUtil;
+    public final LocaleMessageUtil localeMessageUtil;
 
     public BaseController(Configuration configuration,
                           OptionService optionService,
@@ -44,5 +44,26 @@ public abstract class BaseController {
         } catch (TemplateModelException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get message with code
+     *
+     * @param code code
+     * @return String
+     */
+    public String localeMessage(String code) {
+        return localeMessageUtil.getMessage(code);
+    }
+
+    /**
+     * Get message with code and params
+     *
+     * @param code code
+     * @param args args
+     * @return String
+     */
+    public String localeMessage(String code, Object[] args) {
+        return localeMessageUtil.getMessage(code, args);
     }
 }
