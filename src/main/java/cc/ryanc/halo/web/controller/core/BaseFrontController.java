@@ -11,7 +11,7 @@ import cn.hutool.core.text.StrBuilder;
  * @author : RYAN0UP
  * @date : 2017/12/15
  */
-public abstract class BaseController {
+public abstract class BaseFrontController {
 
     /**
      * 定义默认主题
