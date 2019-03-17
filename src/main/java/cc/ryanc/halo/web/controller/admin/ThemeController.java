@@ -7,7 +7,7 @@ import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.admin.base.BaseController;
-import cc.ryanc.halo.web.controller.core.BaseContentController;
+import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;

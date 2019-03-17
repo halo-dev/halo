@@ -1,12 +1,10 @@
-package cc.ryanc.halo.web.controller.core;
+package cc.ryanc.halo.web.controller.content.base;
 
 import cc.ryanc.halo.logging.Logger;
 import cn.hutool.core.text.StrBuilder;
 
 /**
- * <pre>
- *     Controller抽象类
- * </pre>
+ * Content base Controller
  *
  * @author : RYAN0UP
  * @date : 2017/12/15
@@ -14,16 +12,17 @@ import cn.hutool.core.text.StrBuilder;
 public abstract class BaseContentController {
 
     /**
-     * 定义默认主题
+     * Default theme
      */
     public static String THEME = "anatole";
+
     protected Logger log = Logger.getLogger(getClass());
 
     /**
-     * 根据模板名称渲染页面
+     * Render page by template name
      *
      * @param pageName pageName
-     * @return 返回拼接好的模板路径
+     * @return template path
      */
     public String render(String pageName) {
         final StrBuilder themeStr = new StrBuilder("themes/");
@@ -34,7 +33,7 @@ public abstract class BaseContentController {
     }
 
     /**
-     * 渲染404页面
+     * Redirect to 404
      *
      * @return redirect:/404
      */
