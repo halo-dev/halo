@@ -2,7 +2,7 @@ package cc.ryanc.halo.utils;
 
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
-import cc.ryanc.halo.web.controller.core.BaseContentController;
+import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;

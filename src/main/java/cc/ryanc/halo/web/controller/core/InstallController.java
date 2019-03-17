@@ -85,12 +85,14 @@ public class InstallController {
     /**
      * Do install
      *
-     * @param blogLocale      language
-     * @param userName        username
-     * @param userDisplayName nickname
-     * @param userEmail       user email
-     * @param userPwd         user password
-     * @param request         request
+     * @param blogLocale language
+     * @param blogTitle  blog title
+     * @param blogUrl    blog url
+     * @param userName   user name
+     * @param nickName   nick name
+     * @param userEmail  user email
+     * @param userPwd    user password
+     * @param request    request
      * @return JsonResult
      */
     @PostMapping(value = "/do")
@@ -99,7 +101,7 @@ public class InstallController {
                                 @RequestParam("blogTitle") String blogTitle,
                                 @RequestParam("blogUrl") String blogUrl,
                                 @RequestParam("userName") String userName,
-                                @RequestParam("userDisplayName") String userDisplayName,
+                                @RequestParam("userDisplayName") String nickName,
                                 @RequestParam("userEmail") String userEmail,
                                 @RequestParam("userPwd") String userPwd,
                                 HttpServletRequest request) {
@@ -107,23 +109,20 @@ public class InstallController {
             if (StrUtil.equals("true", OPTIONS.get("is_install"))) {
                 return new JsonResult(0, "该博客已初始化，不能再次安装！");
             }
-            //创建新的用户
+            // Create new user
             final User user = new User();
             user.setUsername(userName);
-            if (StrUtil.isBlank(userDisplayName)) {
-                userDisplayName = userName;
-            }
-            user.setNickname(userDisplayName);
+            user.setNickname(StrUtil.isBlank(nickName) ? userName : nickName);
             user.setEmail(userEmail);
             user.setPassword(SecureUtil.md5(userPwd));
             userService.create(user);
 
             //默认分类
-            final Category category = new Category();
+            Category category = new Category();
             category.setName("未分类");
             category.setSnakeName("default");
             category.setDescription("未分类");
-            categoryService.create(category);
+            category = categoryService.create(category);
 
             //第一篇文章
             final Post post = new Post();

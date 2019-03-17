@@ -4,6 +4,7 @@ import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.utils.ThemeUtils;
+import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
@@ -15,9 +16,7 @@ import javax.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 
 /**
- * <pre>
- *     错误页面控制器
- * </pre>
+ * Error page Controller
  *
  * @author : RYAN0UP
  * @date : 2017/12/26
@@ -27,10 +26,16 @@ public class CommonController implements ErrorController {
 
     private static final String ERROR_PATH = "/error";
 
+    private static final String NOT_FROUND_TEMPLATE = "404.ftl";
+
+    private static final String INTERNAL_ERROR_TEMPLATE = "500.ftl";
+
+    private static final String ADMIN_URL = "/admin";
+
     private final Logger log = Logger.getLogger(getClass());
 
     /**
-     * 渲染404，500
+     * Handle error
      *
      * @param request request
      * @return String
@@ -54,14 +59,14 @@ public class CommonController implements ErrorController {
             if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
                 // TODO May cause unreasoned problem
                 // if Ftl was not found then redirect to /404
-                if (requestURI.contains("/admin") && null != user) {
+                if (requestURI.contains(ADMIN_URL) && null != user) {
                     return "redirect:/admin/404";
                 } else {
                     return "redirect:/404";
                 }
             }
         }
-        if (requestURI.contains("/admin") && null != user) {
+        if (requestURI.contains(ADMIN_URL) && null != user) {
             return "redirect:/admin/500";
         } else {
             return "redirect:/500";
@@ -95,7 +100,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/404")
     public String contentNotFround() throws FileNotFoundException {
-        if(ThemeUtils.isTemplateExist("404.ftl")){
+        if (ThemeUtils.isTemplateExist(NOT_FROUND_TEMPLATE)) {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");
@@ -111,7 +116,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/500")
     public String contentInternalError() throws FileNotFoundException {
-        if(ThemeUtils.isTemplateExist("500.ftl")){
+        if (ThemeUtils.isTemplateExist(INTERNAL_ERROR_TEMPLATE)) {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");

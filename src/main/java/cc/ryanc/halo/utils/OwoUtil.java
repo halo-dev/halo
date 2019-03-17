@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import static cc.ryanc.halo.model.support.HaloConst.OWO;
 
 /**
- * <pre>
- *     OwO表情工具类
- * </pre>
+ * Owo util
  *
  * @author : RYAN0UP
  * @date : 2017/12/22
@@ -16,15 +14,15 @@ import static cc.ryanc.halo.model.support.HaloConst.OWO;
 public class OwoUtil {
 
     /**
-     * 将表情标志转化为图片地址
+     * Owo mark converted into a picture address
      *
-     * @param mark 表情标志
-     * @return 表情图片地址
+     * @param content content
+     * @return picture address
      */
-    public static String markToImg(String mark) {
+    public static String parseOwo(String content) {
         for (String key : OWO.keySet()) {
-            mark = mark.replace(key, OWO.get(key));
+            content = content.replace(key, OWO.get(key).toString());
         }
-        return mark;
+        return content;
     }
 }
