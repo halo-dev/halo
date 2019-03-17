@@ -26,18 +26,18 @@
                             <ul class="menu">
                                 <#if newComments?size gt 0>
                                 <#assign x=0>
-                                <#list newComments?sort_by("commentDate")?reverse as comment>
+                                <#list newComments?sort_by("createTime")?reverse as comment>
                                 <#assign x = x+1>
                                     <li>
                                         <a data-pjax="true" href="/admin/comments?status=1">
                                             <div class="pull-left">
-                                                <img src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5?default("hash")}?s=256&d=${options.native_comment_avatar?default("mm")}" class="img-circle" alt="User Image">
+                                                <img src="//gravatar.loli.net/avatar/${comment.gavatarMd5!'hash'}?s=256&d=${options.native_comment_avatar!'mm'}" class="img-circle" alt="User Image">
                                             </div>
                                             <h4>
-                                                ${comment.commentAuthor}
-                                                <small> <@common.timeline datetime="${comment.commentDate}"?datetime /></small>
+                                                ${comment.author!}
+                                                <small> <@common.timeline datetime="${comment.createTime}"?datetime /></small>
                                             </h4>
-                                            <object>${comment.commentContent}</object>
+                                            <object>${comment.content!}</object>
                                         </a>
                                     </li>
                                 <#if x==10>

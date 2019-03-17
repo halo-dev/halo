@@ -1,8 +1,5 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.support.BackupDto;
-import cc.ryanc.halo.model.support.Theme;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import com.qiniu.common.Zone;
@@ -10,7 +7,6 @@ import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
-import org.springframework.util.ResourceUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -25,7 +21,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
 
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
@@ -205,113 +203,6 @@ public class HaloUtils {
             log.error("Failed to get read image file", e);
         }
         return "";
-    }
-
-    /**
-     * 获取所有主题
-     *
-     * @return List
-     */
-    public static List<Theme> getThemes() {
-        final List<Theme> themes = new ArrayList<>();
-        try {
-            // 获取项目根路径
-            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            // 获取主题路径
-            final File themesPath = new File(basePath.getAbsolutePath(), "templates/themes");
-            final File[] files = themesPath.listFiles();
-            if (null != files) {
-                Theme theme;
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        if (StrUtil.equals("__MACOSX", file.getName())) {
-                            continue;
-                        }
-                        theme = new Theme();
-                        theme.setThemeName(file.getName());
-                        File optionsPath = new File(themesPath.getAbsolutePath(),
-                                file.getName() + "/module/options.ftl");
-                        if (optionsPath.exists()) {
-                            theme.setHasOptions(true);
-                        } else {
-                            theme.setHasOptions(false);
-                        }
-                        File gitPath = new File(themesPath.getAbsolutePath(), file.getName() + "/.git");
-                        if (gitPath.exists()) {
-                            theme.setHasUpdate(true);
-                        } else {
-                            theme.setHasUpdate(false);
-                        }
-                        themes.add(theme);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("Themes scan failed", e);
-        }
-        return themes;
-    }
-
-    /**
-     * 获取主题下的模板文件名
-     *
-     * @param theme theme
-     * @return List
-     */
-    public static List<String> getTplName(String theme) {
-        final List<String> tpls = new ArrayList<>();
-        try {
-            // 获取项目根路径
-            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            // 获取主题路径
-            final File themesPath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
-            final File modulePath = new File(themesPath.getAbsolutePath(), "module");
-            final File[] baseFiles = themesPath.listFiles();
-            final File[] moduleFiles = modulePath.listFiles();
-            if (null != moduleFiles) {
-                for (File file : moduleFiles) {
-                    if (file.isFile() && file.getName().endsWith(".ftl")) {
-                        tpls.add("module/" + file.getName());
-                    }
-                }
-            }
-            if (null != baseFiles) {
-                for (File file : baseFiles) {
-                    if (file.isFile() && file.getName().endsWith(".ftl")) {
-                        tpls.add(file.getName());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to get theme template", e);
-        }
-        return tpls;
-    }
-
-    /**
-     * 获取定制模板 格式 page_xxx
-     *
-     * @return List
-     */
-    public static List<String> getCustomTpl(String theme) {
-        final List<String> tpls = new ArrayList<>();
-        try {
-            final File basePath = new File(ResourceUtils.getURL("classpath:").getPath());
-            // 获取主题路径
-            final File themePath = new File(basePath.getAbsolutePath(), "templates/themes/" + theme);
-            final File[] themeFiles = themePath.listFiles();
-            if (null != themeFiles && themeFiles.length > 0) {
-                for (File file : themeFiles) {
-                    String[] split = StrUtil.removeSuffix(file.getName(), ".ftl").split("_");
-                    if (split.length == 2 && "page".equals(split[0])) {
-                        tpls.add(StrUtil.removeSuffix(file.getName(), ".ftl"));
-                    }
-                }
-            }
-        } catch (FileNotFoundException e) {
-            log.error("File not found", e);
-        }
-        return tpls;
     }
 
     /**

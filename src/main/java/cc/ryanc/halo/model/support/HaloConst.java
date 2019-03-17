@@ -1,5 +1,7 @@
 package cc.ryanc.halo.model.support;
 
+import cn.hutool.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,22 +23,22 @@ public class HaloConst {
     public static final String HALO_VERSION = "0.4.2";
 
     /**
-     * Token key
+     * Token of header param
      */
     public static final String TOKEN_HEADER = "token";
 
     /**
-     * 所有设置选项（key,value）
+     * All of the options
      */
     public static Map<String, String> OPTIONS = new HashMap<>();
 
     /**
-     * OwO表情
+     * All of the Owo
      */
-    public static Map<String, String> OWO = new HashMap<>();
+    public static JSONObject OWO;
 
     /**
-     * 所有主题
+     * All of the themes
      */
     public static List<Theme> THEMES = new ArrayList<>();
 
