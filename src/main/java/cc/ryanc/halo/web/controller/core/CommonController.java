@@ -1,6 +1,8 @@
 package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.logging.Logger;
+import cc.ryanc.halo.model.entity.User;
+import cc.ryanc.halo.model.support.HaloConst;
 import cn.hutool.core.text.StrBuilder;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
@@ -8,6 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * <pre>
@@ -31,10 +34,12 @@ public class CommonController implements ErrorController {
      * @return String
      */
     @GetMapping(value = ERROR_PATH)
-    public String handleError(HttpServletRequest request) {
+    public String handleError(HttpServletRequest request, HttpSession session) {
         final Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
 
         final String requestURI = request.getRequestURI();
+
+        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
         log.error("Error path: [{}], status: [{}]", request.getRequestURI(), statusCode);
 
@@ -47,14 +52,14 @@ public class CommonController implements ErrorController {
             if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
                 // TODO May cause unreasoned problem
                 // if Ftl was not found then redirect to /404
-                if (requestURI.contains("/admin")) {
+                if (requestURI.contains("/admin") && null != user) {
                     return "redirect:/admin/404";
                 } else {
                     return "redirect:/404";
                 }
             }
         }
-        if (requestURI.contains("/admin")) {
+        if (requestURI.contains("/admin") && null != user) {
             return "redirect:/admin/500";
         } else {
             return "redirect:/500";
