@@ -15,33 +15,35 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Markdown utils
+ *
  * @author : RYAN0UP
  * @date : 2018/11/14
  */
 public class MarkdownUtils {
 
     /**
-     * Front-matter 插件
+     * Front-matter extension
      */
     private static final Set<Extension> EXTENSIONS_YAML = Collections.singleton(YamlFrontMatterExtension.create());
 
     /**
-     * Table 插件
+     * Table extension
      */
     private static final Set<Extension> EXTENSIONS_TABLE = Collections.singleton(TablesExtension.create());
 
     /**
-     * 解析 Markdown 文档
+     * Parse Markdown content
      */
     private static final Parser PARSER = Parser.builder().extensions(EXTENSIONS_YAML).extensions(EXTENSIONS_TABLE).build();
 
     /**
-     * 渲染 HTML 文档
+     * Render HTML content
      */
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder().extensions(EXTENSIONS_YAML).extensions(EXTENSIONS_TABLE).build();
 
     /**
-     * 渲染 Markdown
+     * Render Markdown content
      *
      * @param content content
      * @return String
@@ -66,7 +68,7 @@ public class MarkdownUtils {
     }
 
     /**
-     * 获取元数据
+     * Get front-matter
      *
      * @param content content
      * @return Map

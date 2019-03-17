@@ -5,9 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * <pre>
- *     主题信息
- * </pre>
+ * Theme DTO
  *
  * @author : RYAN0UP
  * @date : 2018/1/3
@@ -18,17 +16,22 @@ public class Theme implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主题名称
+     * theme name
      */
     private String themeName;
 
     /**
-     * 是否支持设置
+     * is support setting options
      */
     private boolean hasOptions;
 
     /**
-     * 是否支持更新
+     * is support update
      */
     private boolean hasUpdate;
+
+    /**
+     * is internal theme
+     */
+    private boolean isInternal;
 }
