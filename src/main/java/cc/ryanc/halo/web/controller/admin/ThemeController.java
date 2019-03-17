@@ -7,7 +7,7 @@ import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.admin.base.BaseController;
-import cc.ryanc.halo.web.controller.core.BaseFrontController;
+import cc.ryanc.halo.web.controller.core.BaseContentController;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
@@ -58,7 +58,7 @@ public class ThemeController extends BaseController {
      */
     @GetMapping
     public String themes(Model model) {
-        model.addAttribute("activeTheme", BaseFrontController.THEME);
+        model.addAttribute("activeTheme", BaseContentController.THEME);
         model.addAttribute("themes", THEMES);
         return "admin/admin_theme";
     }
@@ -77,7 +77,7 @@ public class ThemeController extends BaseController {
                                   HttpServletRequest request) {
         try {
             optionService.saveOption("theme", themeName);
-            BaseFrontController.THEME = themeName;
+            BaseContentController.THEME = themeName;
             configuration.setSharedVariable("themeName", themeName);
             log.info("Changed theme to {}", themeName);
             return new JsonResult(1, localeMessage("code.admin.theme.change-success", new Object[]{themeName}));
@@ -228,7 +228,7 @@ public class ThemeController extends BaseController {
      */
     @GetMapping(value = "/editor")
     public String editor(Model model) {
-        final List<String> templates = ThemeUtils.getTplName(BaseFrontController.THEME);
+        final List<String> templates = ThemeUtils.getTplName(BaseContentController.THEME);
         model.addAttribute("tpls", templates);
         return "admin/admin_theme-editor";
     }
@@ -245,7 +245,7 @@ public class ThemeController extends BaseController {
         String tplContent = "";
         try {
             final StrBuilder themePath = new StrBuilder(ThemeUtils.getUsersThemesPath().getAbsolutePath());
-            themePath.append(BaseFrontController.THEME);
+            themePath.append(BaseContentController.THEME);
             themePath.append("/");
             themePath.append(tplName);
             final File themesPath = new File(themePath.toString());
@@ -273,7 +273,7 @@ public class ThemeController extends BaseController {
         }
         try {
             final StrBuilder themePath = new StrBuilder(ThemeUtils.getUsersThemesPath().getAbsolutePath());
-            themePath.append(BaseFrontController.THEME);
+            themePath.append(BaseContentController.THEME);
             themePath.append("/");
             themePath.append(tplName);
             final File tplPath = new File(themePath.toString());

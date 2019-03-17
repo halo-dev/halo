@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.logging.Logger;
+import cn.hutool.core.text.StrBuilder;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 public class CommonController implements ErrorController {
 
     private static final String ERROR_PATH = "/error";
+
     private final Logger log = Logger.getLogger(getClass());
 
     /**
@@ -32,6 +34,8 @@ public class CommonController implements ErrorController {
     public String handleError(HttpServletRequest request) {
         final Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
 
+        final String requestURI = request.getRequestURI();
+
         log.error("Error path: [{}], status: [{}]", request.getRequestURI(), statusCode);
 
         // Get the exception
@@ -43,37 +47,64 @@ public class CommonController implements ErrorController {
             if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
                 // TODO May cause unreasoned problem
                 // if Ftl was not found then redirect to /404
-                return "redirect:/404";
+                if (requestURI.contains("/admin")) {
+                    return "redirect:/admin/404";
+                } else {
+                    return "redirect:/404";
+                }
             }
         }
-
-//        if (statusCode.equals(CommonParamsEnum.NOT_FOUND.getValue())) {
-//            return "redirect:/404";
-//        } else {
-//            return "redirect:/500";
-//        }
-        // TODO Complete error handler
-        return "redirect:/500";
+        if (requestURI.contains("/admin")) {
+            return "redirect:/admin/500";
+        } else {
+            return "redirect:/500";
+        }
     }
 
     /**
-     * 渲染404页面
+     * Render 404 error page
      *
-     * @return String
+     * @return template path:
      */
-    @GetMapping(value = "/404")
-    public String fourZeroFour() {
+    @GetMapping(value = "/admin/404")
+    public String adminNotFround() {
         return "common/error/404";
     }
 
     /**
-     * 渲染500页面
+     * Render 500 error page
+     *
+     * @return template path:
+     */
+    @GetMapping(value = "/admin/500")
+    public String adminInternalError() {
+        return "common/error/500";
+    }
+
+    /**
+     * Render 404 error page
      *
      * @return String
      */
+    @GetMapping(value = "/404")
+    public String contentNotFround() {
+        StrBuilder path = new StrBuilder("themes/");
+        path.append(BaseContentController.THEME);
+        path.append("/404");
+        return path.toString();
+    }
+
+    /**
+     * Render 500 error page
+     *
+     * @return template path:
+     */
     @GetMapping(value = "/500")
-    public String fiveZeroZero() {
-        return "common/error/500";
+    public String contentInternalError() {
+        StrBuilder path = new StrBuilder("themes/");
+        path.append(BaseContentController.THEME);
+        path.append("/500");
+        return path.toString();
     }
 
     /**
