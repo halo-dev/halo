@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.model.entity.*;
 import cc.ryanc.halo.model.enums.CommentStatus;
+import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.MarkdownUtils;
@@ -133,9 +134,9 @@ public class InstallController {
                     "欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
             post.setFormatContent(MarkdownUtils.renderMarkdown(post.getOriginalContent()));
             post.setSummary("欢迎使用Halo进行创作，删除这篇文章后赶紧开始吧。");
-            post.setStatus(0);
+            post.setStatus(PostStatus.PUBLISHED);
             post.setUrl("hello-halo");
-            post.setDisallowComment(1);
+            post.setDisallowComment(true);
             post.setThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
             postService.create(post);
 

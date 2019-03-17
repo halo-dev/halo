@@ -1,6 +1,9 @@
 package cc.ryanc.halo.utils;
 
+import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
+import cc.ryanc.halo.web.controller.core.BaseContentController;
+import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ResourceUtils;
@@ -27,8 +30,8 @@ public class ThemeUtils {
     public static List<Theme> getThemes() {
         final List<Theme> themes = new ArrayList<>();
         try {
-            themes.addAll(getThemesByPath(getInternalThemesPath()));
-            themes.addAll(getThemesByPath(getUsersThemesPath()));
+            themes.addAll(getThemesByPath(getInternalThemesPath(), true));
+            themes.addAll(getThemesByPath(getUsersThemesPath(), false));
         } catch (Exception e) {
             log.error("Themes scan failed", e);
         }
@@ -41,7 +44,7 @@ public class ThemeUtils {
      * @param file file
      * @return List<Theme>
      */
-    private static List<Theme> getThemesByPath(File themesPath) {
+    private static List<Theme> getThemesByPath(File themesPath, boolean isInternal) {
         final List<Theme> themes = new ArrayList<>();
         try {
             final File[] files = themesPath.listFiles();
@@ -67,6 +70,7 @@ public class ThemeUtils {
                         } else {
                             theme.setHasUpdate(false);
                         }
+                        theme.setInternal(isInternal);
                         themes.add(theme);
                     }
                 }
@@ -78,7 +82,7 @@ public class ThemeUtils {
     }
 
     /**
-     * Get internal themes
+     * Get internal themes path
      *
      * @return File
      * @throws FileNotFoundException FileNotFoundException
@@ -88,12 +92,26 @@ public class ThemeUtils {
     }
 
     /**
-     * Get user's themes
+     * Get user's themes path
      *
      * @return File
      */
     public static File getUsersThemesPath() {
         return new File(System.getProperties().getProperty("user.home"), "halo/templates/themes");
+    }
+
+    /**
+     * Get themes path by theme name
+     *
+     * @param themeName themeName
+     * @return File
+     */
+    public static File getThemesPath(String themeName) throws FileNotFoundException {
+        if (isInternal(themeName)) {
+            return getInternalThemesPath();
+        } else {
+            return getUsersThemesPath();
+        }
     }
 
     /**
@@ -105,7 +123,7 @@ public class ThemeUtils {
     public static List<String> getTplName(String theme) {
         final List<String> templates = new ArrayList<>();
         try {
-            final File themesPath = new File(getUsersThemesPath(), "templates/themes/" + theme);
+            final File themesPath = new File(getThemesPath(theme), theme);
             final File modulePath = new File(themesPath.getAbsolutePath(), "module");
             final File[] baseFiles = themesPath.listFiles();
             final File[] moduleFiles = modulePath.listFiles();
@@ -134,9 +152,9 @@ public class ThemeUtils {
      *
      * @return List
      */
-    public static List<String> getCustomTpl(String theme) {
+    public static List<String> getCustomTpl(String theme) throws FileNotFoundException {
         final List<String> templates = new ArrayList<>();
-        final File themePath = new File(getUsersThemesPath(), "templates/themes/" + theme);
+        final File themePath = new File(getThemesPath(theme), theme);
         final File[] themeFiles = themePath.listFiles();
         if (null != themeFiles && themeFiles.length > 0) {
             for (File file : themeFiles) {
@@ -147,5 +165,42 @@ public class ThemeUtils {
             }
         }
         return templates;
+    }
+
+
+    /**
+     * Judging whether template exists under the specified theme
+     *
+     * @param template template
+     * @return boolean
+     */
+    public static boolean isTemplateExist(String template) throws FileNotFoundException {
+        boolean result = false;
+        StrBuilder templatePath = new StrBuilder(BaseContentController.THEME);
+        templatePath.append("/");
+        templatePath.append(template);
+        File file = new File(getThemesPath(BaseContentController.THEME), templatePath.toString());
+        if (file.exists()) {
+            result = true;
+        }
+        return result;
+    }
+
+    /**
+     * Judging whether the theme is a internal theme or not
+     *
+     * @param themeName themeName
+     * @return boolean
+     */
+    public static boolean isInternal(String themeName) {
+        boolean result = false;
+        List<Theme> themes = HaloConst.THEMES;
+        for (Theme theme : themes) {
+            if (theme.getThemeName().equals(themeName) && theme.isInternal()) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 }

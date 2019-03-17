@@ -3,6 +3,7 @@ package cc.ryanc.halo.web.controller.core;
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.support.HaloConst;
+import cc.ryanc.halo.utils.ThemeUtils;
 import cn.hutool.core.text.StrBuilder;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.FileNotFoundException;
 
 /**
  * <pre>
@@ -92,7 +94,10 @@ public class CommonController implements ErrorController {
      * @return String
      */
     @GetMapping(value = "/404")
-    public String contentNotFround() {
+    public String contentNotFround() throws FileNotFoundException {
+        if(ThemeUtils.isTemplateExist("404.ftl")){
+            return "common/error/404";
+        }
         StrBuilder path = new StrBuilder("themes/");
         path.append(BaseContentController.THEME);
         path.append("/404");
@@ -105,7 +110,10 @@ public class CommonController implements ErrorController {
      * @return template path:
      */
     @GetMapping(value = "/500")
-    public String contentInternalError() {
+    public String contentInternalError() throws FileNotFoundException {
+        if(ThemeUtils.isTemplateExist("500.ftl")){
+            return "common/error/404";
+        }
         StrBuilder path = new StrBuilder("themes/");
         path.append(BaseContentController.THEME);
         path.append("/500");
