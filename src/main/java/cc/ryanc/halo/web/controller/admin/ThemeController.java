@@ -129,7 +129,7 @@ public class ThemeController extends BaseController {
     @GetMapping(value = "/remove")
     public String removeTheme(@RequestParam("themeName") String themeName) {
         try {
-            final File themePath = new File(ThemeUtils.getUsersThemesPath(), themeName);
+            final File themePath = new File(ThemeUtils.getThemesPath(themeName), themeName);
             FileUtil.del(themePath);
         } catch (Exception e) {
             log.error("Delete theme failed: {}", e.getMessage());
@@ -244,7 +244,7 @@ public class ThemeController extends BaseController {
     public String getTplContent(@RequestParam("tplName") String tplName) {
         String tplContent = "";
         try {
-            final StrBuilder themePath = new StrBuilder(ThemeUtils.getUsersThemesPath().getAbsolutePath());
+            final StrBuilder themePath = new StrBuilder(ThemeUtils.getThemesPath(BaseContentController.THEME).getAbsolutePath());
             themePath.append(BaseContentController.THEME);
             themePath.append("/");
             themePath.append(tplName);
@@ -272,7 +272,7 @@ public class ThemeController extends BaseController {
             return new JsonResult(0, localeMessage("code.admin.theme.edit.no-content"));
         }
         try {
-            final StrBuilder themePath = new StrBuilder(ThemeUtils.getUsersThemesPath().getAbsolutePath());
+            final StrBuilder themePath = new StrBuilder(ThemeUtils.getThemesPath(BaseContentController.THEME).getAbsolutePath());
             themePath.append(BaseContentController.THEME);
             themePath.append("/");
             themePath.append(tplName);
