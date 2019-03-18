@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.content;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -12,4 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping
 public class IndexController {
+
+    @GetMapping(value = "/sweetalert")
+    public String sweetalert(){
+        return "sweetalert";
+    }
 }

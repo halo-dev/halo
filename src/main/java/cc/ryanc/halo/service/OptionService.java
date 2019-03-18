@@ -18,14 +18,14 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param key   key
      * @param value value
      */
-    void saveOption(String key, String value);
+    void save(String key, String value);
 
     /**
      * Save multiple options
      *
      * @param options options
      */
-    void saveOptions(Map<String, String> options);
+    void save(Map<String, String> options);
 
     /**
      * Get all options
