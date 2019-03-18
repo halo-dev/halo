@@ -32,7 +32,7 @@ public class PostController {
     }
 
     /**
-     * posts manage
+     * Posts manage
      *
      * @param model    model
      * @param status   post status
