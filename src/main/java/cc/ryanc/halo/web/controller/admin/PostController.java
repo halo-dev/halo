@@ -43,12 +43,12 @@ public class PostController {
     public String listPosts(Model model,
                             @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
                             @RequestParam(value = "status", defaultValue = "published") PostStatus status) {
-        final Page<PostSimpleOutputDTO> postPage = postService.pageByStatusAndType(status, PostType.POST, pageable);
+        final Page<PostSimpleOutputDTO> postPage = postService.pageByStatus(status, PostType.POST, pageable);
 
         model.addAttribute("posts", postPage);
-        model.addAttribute("publishedCount", postService.countByStatusAndType(PostStatus.PUBLISHED, PostType.POST));
-        model.addAttribute("draftCount", postService.countByStatusAndType(PostStatus.DRAFT, PostType.POST));
-        model.addAttribute("recycleCount", postService.countByStatusAndType(PostStatus.RECYCLE, PostType.POST));
+        model.addAttribute("publishedCount", postService.countByStatus(PostStatus.PUBLISHED, PostType.POST));
+        model.addAttribute("draftCount", postService.countByStatus(PostStatus.DRAFT, PostType.POST));
+        model.addAttribute("recycleCount", postService.countByStatus(PostStatus.RECYCLE, PostType.POST));
         model.addAttribute("status", status);
         return "admin/admin_post";
     }

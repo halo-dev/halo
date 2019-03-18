@@ -37,7 +37,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return Page<PostSimpleOutputDTO>
      */
     @NonNull
-    Page<PostSimpleOutputDTO> pageByStatusAndType(PostStatus status, PostType type, Pageable pageable);
+    Page<PostSimpleOutputDTO> pageByStatus(PostStatus status, PostType type, Pageable pageable);
 
     /**
      * Count posts by status and type
@@ -46,5 +46,5 @@ public interface PostService extends CrudService<Post, Integer> {
      * @param type type
      * @return posts count
      */
-    Long countByStatusAndType(PostStatus status, PostType type);
+    Long countByStatus(PostStatus status, PostType type);
 }

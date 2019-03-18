@@ -34,7 +34,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      * @param value value
      */
     @Override
-    public void saveOption(String key, String value) {
+    public void save(String key, String value) {
         if (StrUtil.equals(value, "")) {
             optionRepository.removeByOptionKey(key);
         } else if (StrUtil.isNotEmpty(key)) {
@@ -61,9 +61,9 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      * @param options options
      */
     @Override
-    public void saveOptions(Map<String, String> options) {
+    public void save(Map<String, String> options) {
         if (!CollectionUtils.isEmpty(options)) {
-            options.forEach(this::saveOption);
+            options.forEach(this::save);
         }
     }
 

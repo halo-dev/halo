@@ -258,3 +258,61 @@ function saveOptions(option) {
         }
     }, 'JSON');
 }
+
+// sweetalert 封装
+$.halo.prototype.alertChoose = function (title,text,btnCancel,btnConfirm,ajaxUrl,ajaxType,data) {
+    swal({
+        title: title,
+        text: text,
+        icon: "warning",
+        buttons: [btnCancel, btnConfirm],
+        dangerMode: true
+    }).then(function (isOk) {
+        if (isOk) {
+            $.ajax({
+                type: ajaxType,
+                url: ajaxUrl,
+                dataType: 'JSON',
+                data: data,
+                async: false,
+                success: function (data) {
+                    if(data.code===1){
+                        swal(data.msg, {
+                            icon: "success",
+                            button: button
+                        });
+                    }else{
+                        swal(data.msg, {
+                            icon: "error",
+                            button: button
+                        });
+                    }
+                }
+            })
+        }
+    })
+};
+
+$.halo.prototype.alertSimple = function (ajaxUrl,ajaxType,data,button) {
+    $.ajax({
+        type: ajaxType,
+        url: ajaxUrl,
+        dataType: 'JSON',
+        data: data,
+        async: false,
+        success: function (data) {
+            if(data.code===1){
+                swal(data.msg, {
+                    icon: "success",
+                    button: button
+                });
+            }else{
+                swal(data.msg, {
+                    icon: "error",
+                    button: button
+                });
+            }
+        }
+    })
+};
+
