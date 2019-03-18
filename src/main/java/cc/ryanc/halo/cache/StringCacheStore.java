@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Wechat cache store.
+ * String cache store.
  *
  * @author johnniang
  */
