@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public abstract class StringCacheStore implements CacheStore<String, String> {
 
-    public <T> void putForWechat(String key, T value, long timeout, TimeUnit timeUnit) {
+    public <T> void putForString(String key, T value, long timeout, TimeUnit timeUnit) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(value, "Cache value must not be null");
         Assert.isTrue(timeout > 0, "Timeout must not be less than 0");
@@ -59,7 +59,7 @@ public abstract class StringCacheStore implements CacheStore<String, String> {
 
     @SuppressWarnings("unchecked")
     @NonNull
-    public <T> Optional<T> getForWechat(@NonNull String key, @NonNull Class<T> type) {
+    public <T> Optional<T> getForString(@NonNull String key, @NonNull Class<T> type) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(type, "Cache type must not be null");
 
