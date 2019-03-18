@@ -48,6 +48,7 @@
         <qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
         <thumbnailator.version>0.4.8</thumbnailator.version>
         <commonmark.version>0.12.1</commonmark.version>
+        <commons-lang3.version>3.8.1</commons-lang3.version>
     </properties>
 
     <dependencies>
@@ -211,6 +212,13 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
+        </dependency>
+
+        <!-- Apache commons lang3-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
         </dependency>
 
     </dependencies>

@@ -1,5 +1,7 @@
 package cc.ryanc.halo.config;
 
+import cc.ryanc.halo.cache.InMemoryCacheStore;
+import cc.ryanc.halo.cache.StringCacheStore;
 import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.filter.CorsFilter;
 import cc.ryanc.halo.filter.LogFilter;
@@ -8,6 +10,7 @@ import cc.ryanc.halo.security.filter.ApiAuthenticationFilter;
 import cc.ryanc.halo.security.handler.AdminAuthenticationFailureHandler;
 import cc.ryanc.halo.security.handler.DefaultAuthenticationFailureHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +25,12 @@ import org.springframework.core.Ordered;
 @Configuration
 @EnableConfigurationProperties(HaloProperties.class)
 public class HaloConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public StringCacheStore stringCacheStore() {
+        return new InMemoryCacheStore();
+    }
 
     /**
      * Creates a CorsFilter.
