@@ -21,4 +21,14 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         super(tagRepository);
         this.tagRepository = tagRepository;
     }
+
+    /**
+     * Remove tag and relationship
+     *
+     * @param id id
+     */
+    @Override
+    public void remove(Integer id) {
+         // TODO 删除标签，以及对应的文章关系
+    }
 }

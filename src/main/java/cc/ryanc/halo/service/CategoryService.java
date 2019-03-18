@@ -10,4 +10,10 @@ import cc.ryanc.halo.service.base.CrudService;
  */
 public interface CategoryService extends CrudService<Category, Integer> {
 
+    /**
+     * Remove category and relationship
+     *
+     * @param id id
+     */
+    void remove(Integer id);
 }
