@@ -21,4 +21,13 @@ public interface UserRepository extends BaseRepository<User, Integer> {
      */
     @NonNull
     Optional<User> findByUsername(@NonNull String username);
+
+    /**
+     * Gets user by email.
+     *
+     * @param email email must not be blank
+     * @return an optional user
+     */
+    @NonNull
+    Optional<User> findByEmail(@NonNull String email);
 }
