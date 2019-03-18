@@ -28,6 +28,11 @@ public class UserDetail {
         return user;
     }
 
+    /**
+     * Sets user info.
+     *
+     * @param user user info
+     */
     public void setUser(User user) {
         this.user = user;
     }
