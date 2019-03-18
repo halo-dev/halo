@@ -22,7 +22,7 @@ public class AttachmentController {
     }
 
     /**
-     * attachments list
+     * Attachments list
      *
      * @return template path: admin/admin_attachment
      */

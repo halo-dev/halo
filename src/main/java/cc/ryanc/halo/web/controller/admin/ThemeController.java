@@ -3,8 +3,6 @@ package cc.ryanc.halo.web.controller.admin;
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.LogService;
-import cc.ryanc.halo.service.OptionService;
-import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.admin.base.BaseController;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
@@ -15,7 +13,6 @@ import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.RuntimeUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
-import freemarker.template.Configuration;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,11 +39,7 @@ public class ThemeController extends BaseController {
 
     private LogService logsService;
 
-    public ThemeController(Configuration configuration,
-                           OptionService optionService,
-                           LocaleMessageUtil localeMessageUtil,
-                           LogService logsService) {
-        super(configuration, optionService, localeMessageUtil);
+    public ThemeController(LogService logsService) {
         this.logsService = logsService;
     }
 
@@ -70,7 +63,7 @@ public class ThemeController extends BaseController {
      * @param request   request
      * @return JsonResult
      */
-    @GetMapping(value = "/set")
+    @PostMapping(value = "/active")
     @ResponseBody
     @CacheEvict(value = "posts", allEntries = true, beforeInvocation = true)
     public JsonResult activeTheme(@RequestParam("themeName") String themeName,
@@ -208,7 +201,7 @@ public class ThemeController extends BaseController {
      * @param hasUpdate hasUpdate
      */
     @GetMapping(value = "/options")
-    public String setting(Model model,
+    public String options(Model model,
                           @RequestParam("theme") String theme,
                           @RequestParam("hasUpdate") String hasUpdate) {
         model.addAttribute("themeDir", theme);
