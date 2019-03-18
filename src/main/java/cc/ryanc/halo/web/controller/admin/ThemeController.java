@@ -69,7 +69,7 @@ public class ThemeController extends BaseController {
     public JsonResult activeTheme(@RequestParam("themeName") String themeName,
                                   HttpServletRequest request) {
         try {
-            optionService.saveOption("theme", themeName);
+            optionService.save("theme", themeName);
             BaseContentController.THEME = themeName;
             configuration.setSharedVariable("themeName", themeName);
             log.info("Changed theme to {}", themeName);

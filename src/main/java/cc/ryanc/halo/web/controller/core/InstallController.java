@@ -1,11 +1,13 @@
 package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.model.entity.*;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.MarkdownUtils;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -152,19 +154,19 @@ public class InstallController {
             comment.setIsAdmin(false);
             commentService.create(comment);
 
-            final Map<String, String> options = new HashMap<>();
-//            options.put(BlogPropertiesEnum.IS_INSTALL.getProp(), TrueFalseEnum.TRUE.getDesc());
-//            options.put(BlogPropertiesEnum.BLOG_LOCALE.getProp(), blogLocale);
-//            options.put(BlogPropertiesEnum.BLOG_TITLE.getProp(), blogTitle);
-//            options.put(BlogPropertiesEnum.BLOG_URL.getProp(), blogUrl);
-//            options.put(BlogPropertiesEnum.THEME.getProp(), "anatole");
-//            options.put(BlogPropertiesEnum.BLOG_START.getProp(), DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
-//            options.put(BlogPropertiesEnum.SMTP_EMAIL_ENABLE.getProp(), TrueFalseEnum.FALSE.getDesc());
-//            options.put(BlogPropertiesEnum.NEW_COMMENT_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
-//            options.put(BlogPropertiesEnum.COMMENT_PASS_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
-//            options.put(BlogPropertiesEnum.COMMENT_REPLY_NOTICE.getProp(), TrueFalseEnum.FALSE.getDesc());
-//            options.put(BlogPropertiesEnum.ATTACH_LOC.getProp(), AttachLocationEnum.SERVER.getDesc());
-            optionService.saveOptions(options);
+            final Map<BlogProperties, Object> options = new HashMap<>();
+//            options.put(BlogProperties.IS_INSTALL, TrueFalseEnum.TRUE.getDesc());
+//            options.put(BlogProperties.BLOG_LOCALE, blogLocale);
+//            options.put(BlogProperties.BLOG_TITLE, blogTitle);
+//            options.put(BlogProperties.BLOG_URL, blogUrl);
+//            options.put(BlogProperties.THEME, "anatole");
+//            options.put(BlogProperties.BLOG_START, DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
+//            options.put(BlogProperties.SMTP_EMAIL_ENABLE, TrueFalseEnum.FALSE.getDesc());
+//            options.put(BlogProperties.NEW_COMMENT_NOTICE, TrueFalseEnum.FALSE.getDesc());
+//            options.put(BlogProperties.COMMENT_PASS_NOTICE, TrueFalseEnum.FALSE.getDesc());
+//            options.put(BlogProperties.COMMENT_REPLY_NOTICE, TrueFalseEnum.FALSE.getDesc());
+//            options.put(BlogProperties.ATTACH_LOC, AttachLocationEnum.SERVER.getDesc());
+//            optionService.saveOptions(options);
 
             //更新日志
 //            logsService.save(LogsRecord.INSTALL, "安装成功，欢迎使用Halo。", request);
