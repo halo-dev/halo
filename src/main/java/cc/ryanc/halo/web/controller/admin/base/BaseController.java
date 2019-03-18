@@ -5,6 +5,7 @@ import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cc.ryanc.halo.utils.ThemeUtils;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static cc.ryanc.halo.model.support.HaloConst.THEMES;
@@ -17,19 +18,14 @@ import static cc.ryanc.halo.model.support.HaloConst.THEMES;
  */
 public abstract class BaseController {
 
-    public final Configuration configuration;
+    @Autowired
+    public Configuration configuration;
 
-    public final OptionService optionService;
+    @Autowired
+    public OptionService optionService;
 
-    public final LocaleMessageUtil localeMessageUtil;
-
-    public BaseController(Configuration configuration,
-                          OptionService optionService,
-                          LocaleMessageUtil localeMessageUtil) {
-        this.configuration = configuration;
-        this.optionService = optionService;
-        this.localeMessageUtil = localeMessageUtil;
-    }
+    @Autowired
+    public LocaleMessageUtil localeMessageUtil;
 
     /**
      * Clear all caches

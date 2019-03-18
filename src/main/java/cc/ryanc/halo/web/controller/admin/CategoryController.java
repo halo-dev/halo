@@ -22,7 +22,7 @@ public class CategoryController {
     }
 
     /**
-     * categories manage
+     * Categories manage
      *
      * @return template path: admin/admin_category.ftl
      */

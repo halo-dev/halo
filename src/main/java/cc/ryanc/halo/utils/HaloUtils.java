@@ -200,9 +200,8 @@ public class HaloUtils {
             final BufferedImage image = ImageIO.read(new FileInputStream(file));
             return image.getWidth() + "x" + image.getHeight();
         } catch (Exception e) {
-            log.error("Failed to get read image file", e);
+            throw new RuntimeException("Failed to get read image file",e);
         }
-        return "";
     }
 
     /**
@@ -224,7 +223,7 @@ public class HaloUtils {
             bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(data);
         } catch (Exception e) {
-            log.error("Failed to export file", e);
+            throw new RuntimeException("Failed to export file",e);
         } finally {
             if (null != bufferedWriter) {
                 bufferedWriter.close();
@@ -298,7 +297,7 @@ public class HaloUtils {
                 result.append(line);
             }
         } catch (Exception e) {
-            log.error("Failed to create baidu post", e);
+            throw new RuntimeException("Failed to push posts to baidu",e);
         } finally {
             try {
                 if (null != out) {
