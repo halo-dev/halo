@@ -107,11 +107,7 @@ public class ThemeUtils {
      * @return File
      */
     public static File getThemesPath(String themeName) throws FileNotFoundException {
-        if (isInternal(themeName)) {
-            return getInternalThemesPath();
-        } else {
-            return getUsersThemesPath();
-        }
+        return isInternal(themeName)?getInternalThemesPath():getUsersThemesPath();
     }
 
     /**

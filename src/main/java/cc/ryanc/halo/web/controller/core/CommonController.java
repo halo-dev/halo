@@ -100,7 +100,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/404")
     public String contentNotFround() throws FileNotFoundException {
-        if (ThemeUtils.isTemplateExist(NOT_FROUND_TEMPLATE)) {
+        if (!ThemeUtils.isTemplateExist(NOT_FROUND_TEMPLATE)) {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");
@@ -116,8 +116,8 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/500")
     public String contentInternalError() throws FileNotFoundException {
-        if (ThemeUtils.isTemplateExist(INTERNAL_ERROR_TEMPLATE)) {
-            return "common/error/404";
+        if (!ThemeUtils.isTemplateExist(INTERNAL_ERROR_TEMPLATE)) {
+            return "common/error/500";
         }
         StrBuilder path = new StrBuilder("themes/");
         path.append(BaseContentController.THEME);
