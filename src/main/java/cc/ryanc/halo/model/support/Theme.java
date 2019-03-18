@@ -16,22 +16,22 @@ public class Theme implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * theme name
+     * Theme name
      */
     private String themeName;
 
     /**
-     * is support setting options
+     * Is support setting options
      */
     private boolean hasOptions;
 
     /**
-     * is support update
+     * Is support update
      */
     private boolean hasUpdate;
 
     /**
-     * is internal theme
+     * Is internal theme
      */
     private boolean isInternal;
 }

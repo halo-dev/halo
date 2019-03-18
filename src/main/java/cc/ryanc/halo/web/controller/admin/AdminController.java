@@ -66,4 +66,10 @@ public class AdminController {
 
         return "admin/admin_index";
     }
+
+    @GetMapping(value = "/login")
+    public String login(){
+
+        return "";
+    }
 }

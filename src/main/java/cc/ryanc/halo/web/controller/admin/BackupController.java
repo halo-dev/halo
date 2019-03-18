@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class BackupController {
 
     /**
-     * backup manage
+     * Backup manage
      *
      * @return template path: admin/admin_backup.ftl
      */
