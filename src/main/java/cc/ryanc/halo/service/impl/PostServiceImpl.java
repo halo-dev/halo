@@ -1,7 +1,9 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
+import cc.ryanc.halo.model.entity.Category;
 import cc.ryanc.halo.model.entity.Post;
+import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.repository.PostRepository;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * Post service implementation.
@@ -28,6 +32,30 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     public PostServiceImpl(PostRepository postRepository) {
         super(postRepository);
         this.postRepository = postRepository;
+    }
+
+    /**
+     * Save post with tags and categories
+     *
+     * @param post       post
+     * @param tags       tags
+     * @param categories categories
+     * @return saved post
+     */
+    @Override
+    public Post save(Post post, List<Tag> tags, List<Category> categories) {
+        // TODO 保存文章以及对应标签和分类
+        return null;
+    }
+
+    /**
+     * Remove post and relationship
+     *
+     * @param id id
+     */
+    @Override
+    public void remove(Integer id) {
+        // TODO 删除文章以及关联关系
     }
 
     @Override

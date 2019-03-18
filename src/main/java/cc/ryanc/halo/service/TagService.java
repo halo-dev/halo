@@ -10,4 +10,11 @@ import cc.ryanc.halo.service.base.CrudService;
  * @author johnniang
  */
 public interface TagService extends CrudService<Tag, Integer> {
+
+    /**
+     * Remove tag and relationship
+     *
+     * @param id id
+     */
+    void remove(Integer id);
 }

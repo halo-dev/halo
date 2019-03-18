@@ -21,4 +21,14 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
     }
+
+    /**
+     * Remove category and relationship
+     *
+     * @param id id
+     */
+    @Override
+    public void remove(Integer id) {
+        // TODO 删除分类，以及和文章的对应关系
+    }
 }
