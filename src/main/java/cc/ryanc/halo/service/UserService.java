@@ -38,6 +38,7 @@ public interface UserService extends CrudService<User, Integer> {
     /**
      * Gets non null user by username.
      *
+     * @param username username
      * @return user info
      * @throws NotFoundException throws when the username does not exist
      */
@@ -45,12 +46,30 @@ public interface UserService extends CrudService<User, Integer> {
     User getByUsernameOfNonNull(@NonNull String username);
 
     /**
+     * Gets user by email.
+     *
+     * @param email email must not be blank
+     * @return an optional user
+     */
+    @NonNull
+    Optional<User> getByEmail(@NonNull String email);
+
+    /**
+     * Gets non null user by email.
+     *
+     * @param email email
+     * @return user info
+     * @throws NotFoundException throws when the username does not exist
+     */
+    User getByEmailOfNonNull(@NonNull String email);
+
+    /**
      * Logins by username and password.
      *
-     * @param username username must not be blank
+     * @param key      username or email must not be blank
      * @param password password must not be blank
      * @return user info
      */
     @NonNull
-    User login(@NonNull String username, @NonNull String password);
+    User login(@NonNull String key, @NonNull String password);
 }
