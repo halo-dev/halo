@@ -8,6 +8,8 @@ import cc.ryanc.halo.repository.UserRepository;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.DateUtils;
+import cc.ryanc.halo.utils.LocaleMessageUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -28,11 +30,15 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     private final StringCacheStore stringCacheStore;
 
+    private final LocaleMessageUtil localeMessageUtil;
+
     public UserServiceImpl(UserRepository userRepository,
-                           StringCacheStore stringCacheStore) {
+                           StringCacheStore stringCacheStore,
+                           LocaleMessageUtil localeMessageUtil) {
         super(userRepository);
         this.userRepository = userRepository;
         this.stringCacheStore = stringCacheStore;
+        this.localeMessageUtil = localeMessageUtil;
     }
 
     @Override
@@ -45,19 +51,41 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         return getByUsername(username).orElseThrow(() -> new NotFoundException("The username dose not exist").setErrorData(username));
     }
 
+    /**
+     * Gets user by email.
+     *
+     * @param email email must not be blank
+     * @return an optional user
+     */
     @Override
-    public User login(String username, String password) {
-        Assert.hasText(username, "Username must not be blank");
+    public Optional<User> getByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    /**
+     * Gets non null user by email.
+     *
+     * @param email email
+     * @return user info
+     * @throws NotFoundException throws when the username does not exist
+     */
+    @Override
+    public User getByEmailOfNonNull(String email) {
+        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email dose not exist").setErrorData(email));
+    }
+
+    @Override
+    public User login(String key, String password) {
+        Assert.hasText(key, "Username or email must not be blank");
         Assert.hasText(password, "Password must not be blank");
 
         // Ger user by username
-        User user = getByUsernameOfNonNull(username);
+        User user = Validator.isEmail(key) ? getByEmailOfNonNull(key) : getByUsernameOfNonNull(key);
 
         // Check expiration
         if (user.getExpireTime() != null && DateUtils.now().before(user.getExpireTime())) {
             // If expired
-            // TODO replace by i18n
-            throw new BadRequestException("You have been locked temporarily");
+            throw new BadRequestException(localeMessageUtil.getMessage("code.admin.login.disabled"));
         }
 
 
@@ -77,8 +105,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
             stringCacheStore.put(LOGIN_FAILURE_COUNT_KEY, loginFailureCount.toString(), LOCK_MINUTES, TimeUnit.MINUTES);
 
-            // TODO replace by i18n
-            throw new BadRequestException("Username or password is mismatched, last " + (MAX_LOGIN_TRY - loginFailureCount) + " retry(s)");
+            throw new BadRequestException(localeMessageUtil.getMessage("code.admin.login.failed", new Integer[]{(MAX_LOGIN_TRY - loginFailureCount)}));
         }
 
         // TODO Set session
