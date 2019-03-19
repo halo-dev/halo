@@ -1,7 +1,9 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.repository.OptionRepository;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
@@ -11,8 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * OptionService implementation class
@@ -79,6 +83,16 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public void save(List<OptionParam> optionParams) {
+        if (CollectionUtils.isEmpty(optionParams)) {
+            return;
+        }
+
+        // TODO Optimize the query
+        optionParams.forEach(optionParam -> save(optionParam.getOptionKey(), optionParam.getOptionValue()));
+    }
+
+    @Override
     public void saveProperties(Map<BlogProperties, String> properties) {
         if (CollectionUtils.isEmpty(properties)) {
             return;
@@ -95,6 +109,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public Map<String, String> listOptions() {
         return ServiceUtils.convertToMap(listAll(), Option::getOptionKey, Option::getOptionValue);
+    }
+
+    @Override
+    public List<OptionOutputDTO> listDtos() {
+        return listAll().stream().map(option -> (OptionOutputDTO) new OptionOutputDTO().convertFrom(option)).collect(Collectors.toList());
     }
 
     /**
