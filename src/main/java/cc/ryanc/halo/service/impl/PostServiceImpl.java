@@ -1,5 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.model.dto.CategoryOutputDTO;
+import cc.ryanc.halo.model.dto.TagOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Category;
@@ -7,9 +9,13 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.repository.PostRepository;
+import cc.ryanc.halo.service.PostCategoryService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.PostTagService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
+import cc.ryanc.halo.utils.ServiceUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Post service implementation.
@@ -30,9 +39,17 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
     private final PostRepository postRepository;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    private final PostTagService postTagService;
+
+    private final PostCategoryService postCategoryService;
+
+    public PostServiceImpl(PostRepository postRepository,
+                           PostTagService postTagService,
+                           PostCategoryService postCategoryService) {
         super(postRepository);
         this.postRepository = postRepository;
+        this.postTagService = postTagService;
+        this.postCategoryService = postCategoryService;
     }
 
     /**
@@ -78,6 +95,15 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return listAll(latestPageable);
     }
 
+    @Override
+    public Page<Post> pageBy(PostStatus status, PostType type, Pageable pageable) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(type, "Post type must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        return postRepository.findAllByStatusAndType(status, type, pageable);
+    }
+
     /**
      * List by status and type
      *
@@ -87,9 +113,35 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @return Page<PostSimpleOutputDTO>
      */
     @Override
-    public Page<PostSimpleOutputDTO> pageByStatus(PostStatus status, PostType type, Pageable pageable) {
-        Page<Post> posts = postRepository.findAllByStatusAndType(status, type, pageable);
-        return posts.map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    public Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(PostStatus status, PostType type, Pageable pageable) {
+        return pageBy(status, type, pageable).map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    }
+
+    @Override
+    public Page<PostListVO> pageListVoBy(PostStatus status, PostType type, Pageable pageable) {
+        Page<Post> postPage = pageBy(status, type, pageable);
+
+        List<Post> posts = postPage.getContent();
+
+        Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
+
+        Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
+
+        Map<Integer, List<Category>> categoryListMap = postCategoryService.listCategoryListMap(postIds);
+
+        return postPage.map(post -> {
+            PostListVO postListVO = new PostListVO().convertFrom(post);
+
+            // Set tags
+            List<TagOutputDTO> tagOutputDTOS = tagListMap.get(post.getId()).stream().map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag)).collect(Collectors.toList());
+            postListVO.setTags(tagOutputDTOS);
+
+            // Set categories
+            List<CategoryOutputDTO> categoryOutputDTOS = categoryListMap.get(post.getId()).stream().map(category -> (CategoryOutputDTO) new CategoryOutputDTO().convertFrom(category)).collect(Collectors.toList());
+            postListVO.setCategories(categoryOutputDTOS);
+
+            return postListVO;
+        });
     }
 
     /**

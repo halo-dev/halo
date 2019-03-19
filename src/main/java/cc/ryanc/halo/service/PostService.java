@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,17 +69,39 @@ public interface PostService extends CrudService<Post, Integer> {
     @NonNull
     Page<Post> pageLatest(int top);
 
-
     /**
      * List by status and type
      *
-     * @param status   status
-     * @param type     type
-     * @param pageable pageable
+     * @param status   post status must not be null
+     * @param type     post type must not be null
+     * @param pageable page info must not be null
      * @return Page<PostSimpleOutputDTO>
      */
     @NonNull
-    Page<PostSimpleOutputDTO> pageByStatus(PostStatus status, PostType type, Pageable pageable);
+    Page<Post> pageBy(@NonNull PostStatus status, @NonNull PostType type, @NonNull Pageable pageable);
+
+
+    /**
+     * List simple output dto by status and type
+     *
+     * @param status   post status must not be null
+     * @param type     post type must not be null
+     * @param pageable page info must not be null
+     * @return Page<PostSimpleOutputDTO>
+     */
+    @NonNull
+    Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(@NonNull PostStatus status, @NonNull PostType type, @NonNull Pageable pageable);
+
+    /**
+     * Lists page list vo by status, type and pageable.
+     *
+     * @param status   post status must not be null
+     * @param type     post type must not be null
+     * @param pageable page info must not be null
+     * @return a page of page list vo
+     */
+    @NonNull
+    Page<PostListVO> pageListVoBy(@NonNull PostStatus status, @NonNull PostType type, @NonNull Pageable pageable);
 
     /**
      * Count posts by status and type

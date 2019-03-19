@@ -1,6 +1,5 @@
 package cc.ryanc.halo.model.enums;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.util.Assert;
 
 import java.util.stream.Stream;
@@ -38,6 +37,5 @@ public interface ValueEnum<T> {
      *
      * @return enum value
      */
-    @JsonValue
     T getValue();
 }
