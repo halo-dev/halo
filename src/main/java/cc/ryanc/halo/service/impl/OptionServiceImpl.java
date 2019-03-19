@@ -1,11 +1,11 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.entity.Option;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.repository.OptionRepository;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.ServiceUtils;
-import cn.hutool.core.util.StrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -68,9 +68,22 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      */
     @Override
     public void save(Map<String, String> options) {
-        if (!CollectionUtils.isEmpty(options)) {
-            options.forEach(this::save);
+        if (CollectionUtils.isEmpty(options)) {
+            return;
         }
+
+        // (Not recommended) Don't write "this::save" here
+        // Types of key and value are String
+        options.forEach((key, value) -> save(key, value));
+    }
+
+    @Override
+    public void saveProperties(Map<BlogProperties, String> properties) {
+        if (CollectionUtils.isEmpty(properties)) {
+            return;
+        }
+
+        properties.forEach((property, value) -> save(property.getValue(), value));
     }
 
     /**
