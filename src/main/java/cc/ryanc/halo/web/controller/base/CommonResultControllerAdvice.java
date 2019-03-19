@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJack
  *
  * @author johnniang
  */
-@ControllerAdvice("cc.ryanc.halo.web.controller.api")
+@ControllerAdvice("cc.ryanc.halo.web.controller")
 public class CommonResultControllerAdvice extends AbstractMappingJacksonResponseBodyAdvice {
 
     @Override

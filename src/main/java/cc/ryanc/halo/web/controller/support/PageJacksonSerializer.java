@@ -24,7 +24,12 @@ public class PageJacksonSerializer extends JsonSerializer<Page> {
         generator.writeNumberField("total", page.getTotalElements());
         generator.writeNumberField("page", page.getNumber());
         generator.writeNumberField("rpp", page.getSize());
-
+        generator.writeBooleanField("hasNext", page.hasNext());
+        generator.writeBooleanField("hasPrevious", page.hasPrevious());
+        generator.writeBooleanField("isFirst", page.isFirst());
+        generator.writeBooleanField("isLast", page.isLast());
+        generator.writeBooleanField("isEmpty", page.isEmpty());
+        generator.writeBooleanField("hasContent", page.hasContent());
         generator.writeEndObject();
     }
 }

@@ -1,15 +1,18 @@
 package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
+import cc.ryanc.halo.model.entity.User;
+import cc.ryanc.halo.security.support.UserDetail;
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +23,7 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.spring.web.plugins.JacksonSerializerConvention;
 import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -139,7 +143,7 @@ public class SwaggerConfiguration {
     }
 
     @Bean
-    public AlternateTypeRuleConvention pageableConvention(final TypeResolver resolver) {
+    public AlternateTypeRuleConvention customizeConvention(TypeResolver resolver) {
         return new AlternateTypeRuleConvention() {
             @Override
             public int getOrder() {
@@ -149,6 +153,8 @@ public class SwaggerConfiguration {
             @Override
             public List<AlternateTypeRule> rules() {
                 return Arrays.asList(
+                        newRule(User.class, emptyMixin(User.class)),
+                        newRule(UserDetail.class, emptyMixin(UserDetail.class)),
                         newRule(resolver.resolve(Pageable.class), resolver.resolve(pageableMixin())),
                         newRule(resolver.resolve(Sort.class), resolver.resolve(sortMixin())));
             }
