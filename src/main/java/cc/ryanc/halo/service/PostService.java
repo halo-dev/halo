@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service;
 
+import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Category;
 import cc.ryanc.halo.model.entity.Post;
@@ -33,9 +34,30 @@ public interface PostService extends CrudService<Post, Integer> {
 
     /**
      * Remove post and relationship
+     *
      * @param id id
      */
     void remove(Integer id);
+
+    /**
+     * Lists latest posts of minimal.
+     *
+     * @param top top number must not be less than 0
+     * @return latest posts of minimal
+     */
+    @NonNull
+    Page<PostMinimalOutputDTO> pageLatestOfMinimal(int top);
+
+
+    /**
+     * Lists latest posts of simple .
+     *
+     * @param top top number must not be less than 0
+     * @return latest posts of simple
+     */
+    @NonNull
+    Page<PostSimpleOutputDTO> pageLatestOfSimple(int top);
+
 
     /**
      * Lists latest posts.
@@ -44,7 +66,8 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return latest posts
      */
     @NonNull
-    Page<PostSimpleOutputDTO> pageLatest(int top);
+    Page<Post> pageLatest(int top);
+
 
     /**
      * List by status and type
