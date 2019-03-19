@@ -17,6 +17,12 @@ import java.util.Map;
  */
 public class HaloConst {
 
+
+    /**
+     * Default theme name.
+     */
+    public final static String DEFAULT_THEME_NAME = "anatole";
+
     /**
      * version constant
      */

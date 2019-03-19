@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
@@ -41,8 +42,6 @@ import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 @Controller
 @RequestMapping("/installations")
 public class InstallController {
-
-    private final static String DEFAULT_THEME_NAME = "anatole";
 
     private final UserService userService;
 

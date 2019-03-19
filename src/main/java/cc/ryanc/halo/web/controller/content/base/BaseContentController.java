@@ -3,6 +3,8 @@ package cc.ryanc.halo.web.controller.content.base;
 import cc.ryanc.halo.logging.Logger;
 import cn.hutool.core.text.StrBuilder;
 
+import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
+
 /**
  * Content base Controller
  *
@@ -14,7 +16,7 @@ public abstract class BaseContentController {
     /**
      * Default theme
      */
-    public static String THEME = "anatole";
+    public static String THEME = DEFAULT_THEME_NAME;
 
     protected Logger log = Logger.getLogger(getClass());
 

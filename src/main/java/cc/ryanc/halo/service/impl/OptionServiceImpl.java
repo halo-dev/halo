@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * OptionService implementation class
@@ -103,7 +104,26 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      * @return String
      */
     @Override
-    public String getByKey(String key) {
-        return optionRepository.findByOptionKey(key).map(Option::getOptionValue).orElse(null);
+    public String getByKeyOfNullable(String key) {
+        return getByKey(key).orElse(null);
+    }
+
+    @Override
+    public Optional<String> getByKey(String key) {
+        Assert.hasText(key, "Option key must not be blank");
+
+        return optionRepository.findByOptionKey(key).map(Option::getOptionValue);
+    }
+
+    @Override
+    public String getByPropertyOfNullable(BlogProperties property) {
+        return getByProperty(property).orElse(null);
+    }
+
+    @Override
+    public Optional<String> getByProperty(BlogProperties property) {
+        Assert.notNull(property, "Blog property must not be null");
+
+        return getByKey(property.getValue());
     }
 }
