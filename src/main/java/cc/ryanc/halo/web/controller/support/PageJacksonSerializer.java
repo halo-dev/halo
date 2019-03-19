@@ -1,9 +1,8 @@
-package cc.ryanc.halo.web.support;
+package cc.ryanc.halo.web.controller.support;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.io.IOException;
  * @author johnniang
  * @date 3/19/19
  */
-@JsonComponent
 public class PageJacksonSerializer extends JsonSerializer<Page> {
 
     @Override
