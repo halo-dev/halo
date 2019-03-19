@@ -48,6 +48,7 @@ public class MailServiceImpl implements MailService {
                     .text(content)
                     .send();
         } catch (Exception e) {
+            // TODO Handle this exception.
             e.printStackTrace();
         }
     }
@@ -76,6 +77,7 @@ public class MailServiceImpl implements MailService {
                     .html(text.toString())
                     .send();
         } catch (Exception e) {
+            // TODO Handle this exception.
             e.printStackTrace();
         }
     }
@@ -107,6 +109,7 @@ public class MailServiceImpl implements MailService {
                     .attach(file, file.getName())
                     .send();
         } catch (Exception e) {
+            // TODO Handle this exception.
             e.printStackTrace();
         }
     }

@@ -1,9 +1,13 @@
 package cc.ryanc.halo.web.controller.core;
 
+import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.model.entity.*;
+import cc.ryanc.halo.model.enums.AttachOrigin;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.params.InstallParam;
+import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.model.support.JsonResult;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.utils.MarkdownUtils;
@@ -11,6 +15,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.BCrypt;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -18,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +32,17 @@ import java.util.Map;
 import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
+ * Installation controller.
+ *
  * @author : RYAN0UP
  * @date : 2019-03-17
  */
 @Slf4j
 @Controller
-@RequestMapping("/install")
+@RequestMapping("/installations")
 public class InstallController {
+
+    private final static String DEFAULT_THEME_NAME = "anatole";
 
     private final UserService userService;
 
@@ -79,9 +89,113 @@ public class InstallController {
                 model.addAttribute("isInstall", false);
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Error occurred", e);
         }
         return "common/install";
+    }
+
+    @PostMapping
+    @ResponseBody
+    public BaseResponse<?> installBlog(@Valid InstallParam installParam) {
+        // TODO Install blog.
+        // Check is installed
+        boolean isInstalled = Boolean.parseBoolean(OPTIONS.getOrDefault(BlogProperties.IS_INSTALL, "false"));
+
+        if (isInstalled) {
+            // TODO i18n
+            throw new BadRequestException("该博客已初始化，不能再次安装！");
+        }
+
+        // Initialize settings
+        initSettings(installParam);
+
+        // Create default user
+        User user = createDefaultUser(installParam);
+
+        // Create default category
+        Category category = createDefaultCategory();
+
+        // Create default post
+        Post post = createDefaultPost(category);
+
+        // Create default comment
+        Comment comment = createDefaultComment();
+
+        // Create default menu
+        createDefaultMenu();
+
+        // TODO Handle option cache
+
+        // TODO i18n
+        return BaseResponse.ok("Setup successfully!");
+    }
+
+    private void createDefaultMenu() {
+        Menu menuIndex = new Menu();
+        // TODO i18n
+        menuIndex.setName("首页");
+        menuIndex.setUrl("/");
+        menuIndex.setSort(1);
+        menuService.create(menuIndex);
+
+        Menu menuArchive = new Menu();
+        menuArchive.setName("归档");
+        menuArchive.setUrl("/archives");
+        menuArchive.setSort(2);
+        menuService.create(menuArchive);
+    }
+
+
+    private Comment createDefaultComment() {
+        // TODO Create default comment
+        return null;
+    }
+
+    private Post createDefaultPost(Category category) {
+        // TODO Create default post
+        return null;
+    }
+
+    private Category createDefaultCategory() {
+        Category category = new Category();
+
+        // TODO Multi level category
+        // TODO and i18n for the category name, description
+
+        category.setName("Initial Blog");
+        category.setSnakeName("initial_blog");
+        category.setDescription("Initial Blog for alphabet");
+        return categoryService.create(category);
+    }
+
+    private User createDefaultUser(InstallParam installParam) {
+        User user = new User();
+        user.setUsername(installParam.getUsername());
+        user.setNickname(installParam.getNickname());
+        user.setEmail(installParam.getEmail());
+        // Hash password with BCrypt
+        user.setPassword(BCrypt.hashpw(installParam.getPassword(), BCrypt.gensalt()));
+
+        return userService.create(user);
+    }
+
+    private void initSettings(InstallParam installParam) {
+        // Init properties
+        Map<BlogProperties, String> properties = new HashMap<>(11);
+        properties.put(BlogProperties.IS_INSTALL, Boolean.TRUE.toString());
+        properties.put(BlogProperties.BLOG_LOCALE, installParam.getLocale());
+        properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
+        properties.put(BlogProperties.BLOG_URL, installParam.getUrl());
+        properties.put(BlogProperties.THEME, DEFAULT_THEME_NAME);
+        properties.put(BlogProperties.BLOG_START, DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
+        properties.put(BlogProperties.SMTP_EMAIL_ENABLE, Boolean.FALSE.toString());
+        properties.put(BlogProperties.NEW_COMMENT_NOTICE, Boolean.FALSE.toString());
+        properties.put(BlogProperties.COMMENT_PASS_NOTICE, Boolean.FALSE.toString());
+        properties.put(BlogProperties.COMMENT_REPLY_NOTICE, Boolean.FALSE.toString());
+        properties.put(BlogProperties.ATTACH_LOC, AttachOrigin.SERVER.getValue().toString());
+
+        // Create properties
+        optionService.saveProperties(properties);
     }
 
     /**
@@ -99,6 +213,7 @@ public class InstallController {
      */
     @PostMapping(value = "/do")
     @ResponseBody
+    @Deprecated
     public JsonResult doInstall(@RequestParam("blogLocale") String blogLocale,
                                 @RequestParam("blogTitle") String blogTitle,
                                 @RequestParam("blogUrl") String blogUrl,

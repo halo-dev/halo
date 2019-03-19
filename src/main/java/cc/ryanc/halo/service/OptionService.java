@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.entity.Option;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.lang.NonNull;
 
@@ -27,6 +28,13 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param options options
      */
     void save(@NonNull Map<String, String> options);
+
+    /**
+     * Saves blog properties.
+     *
+     * @param properties blog properties
+     */
+    void saveProperties(@NonNull Map<BlogProperties, String> properties);
 
     /**
      * Get all options
