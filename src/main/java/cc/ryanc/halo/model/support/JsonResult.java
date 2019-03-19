@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
  * @date : 2018/5/24
  */
 @Data
+@Deprecated
 public class JsonResult {
 
     /**

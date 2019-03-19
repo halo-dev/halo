@@ -1,6 +1,6 @@
 package cc.ryanc.halo.web.controller.base;
 
-import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.BaseResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,17 +27,16 @@ public class CommonResultControllerAdvice extends AbstractMappingJacksonResponse
         // Get return body
         Object returnBody = bodyContainer.getValue();
 
-        if (returnBody instanceof JsonResult) {
-            // If the return body is instance of JsonResult
-            JsonResult jsonResult = (JsonResult) returnBody;
-            response.setStatusCode(HttpStatus.resolve(jsonResult.getCode()));
+        if (returnBody instanceof BaseResponse) {
+            // If the return body is instance of BaseResponse
+            BaseResponse<?> baseResponse = (BaseResponse) returnBody;
+            response.setStatusCode(HttpStatus.resolve(baseResponse.getStatus()));
             return;
         }
 
-        // Normal return body
-        HttpStatus okStatus = HttpStatus.OK;
-        JsonResult jsonResult = new JsonResult(okStatus.value(), okStatus.getReasonPhrase(), returnBody);
-        bodyContainer.setValue(jsonResult);
-        response.setStatusCode(okStatus);
+        // Wrap the return body
+        BaseResponse<?> baseResponse = BaseResponse.ok(returnBody);
+        bodyContainer.setValue(baseResponse);
+        response.setStatusCode(HttpStatus.valueOf(baseResponse.getStatus()));
     }
 }

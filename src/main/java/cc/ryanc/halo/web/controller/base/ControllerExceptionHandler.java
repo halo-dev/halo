@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.base;
 
 import cc.ryanc.halo.exception.HaloException;
 import cc.ryanc.halo.logging.Logger;
-import cc.ryanc.halo.model.support.JsonResult;
+import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.utils.ExceptionUtils;
 import cc.ryanc.halo.utils.ValidationUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Exception handler of controller.
@@ -33,102 +35,102 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public JsonResult handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-        JsonResult jsonResult = handleBaseException(e);
+    public BaseResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
         if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
-            jsonResult = handleBaseException(e.getCause());
+            baseResponse = handleBaseException(e.getCause());
         }
-        jsonResult.setMsg("Failed to validate request parameter");
-        return jsonResult;
+        baseResponse.setMessage("Failed to validate request parameter");
+        return baseResponse;
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public JsonResult handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        JsonResult jsonResult = handleBaseException(e);
-        jsonResult.setMsg(String.format("Missing request parameter, required %s type %s parameter", e.getParameterType(), e.getParameterName()));
-        return jsonResult;
+    public BaseResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
+        baseResponse.setMessage(String.format("Missing request parameter, required %s type %s parameter", e.getParameterType(), e.getParameterName()));
+        return baseResponse;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public JsonResult handleConstraintViolationException(ConstraintViolationException e) {
-        JsonResult jsonResult = handleBaseException(e);
-        jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
-        jsonResult.setMsg("Field validation error");
-        jsonResult.setResult(e.getConstraintViolations());
-        return jsonResult;
+    public BaseResponse handleConstraintViolationException(ConstraintViolationException e) {
+        BaseResponse<Set<ConstraintViolation<?>>> baseResponse = handleBaseException(e);
+        baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        baseResponse.setMessage("Field validation error");
+        baseResponse.setData(e.getConstraintViolations());
+        return baseResponse;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public JsonResult handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        JsonResult jsonResult = handleBaseException(e);
-        jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
-        jsonResult.setMsg("Field validation error");
+    public BaseResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        BaseResponse<Map<String, String>> baseResponse = handleBaseException(e);
+        baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        baseResponse.setMessage("Field validation error");
         Map<String, String> errMap = ValidationUtils.mapWithFieldError(e.getBindingResult().getFieldErrors());
-        jsonResult.setResult(errMap);
-        return jsonResult;
+        baseResponse.setData(errMap);
+        return baseResponse;
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public JsonResult handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-        JsonResult jsonResult = handleBaseException(e);
-        jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
-        return jsonResult;
+    public BaseResponse handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
+        baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        return baseResponse;
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public JsonResult handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        JsonResult jsonResult = handleBaseException(e);
-        jsonResult.setCode(HttpStatus.BAD_REQUEST.value());
-        jsonResult.setMsg("Required request body is missing");
-        return jsonResult;
+    public BaseResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
+        baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        baseResponse.setMessage("Required request body is missing");
+        return baseResponse;
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    public JsonResult handleNoHandlerFoundException(NoHandlerFoundException e) {
-        JsonResult jsonResult = handleBaseException(e);
+    public BaseResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
         HttpStatus status = HttpStatus.BAD_GATEWAY;
-        jsonResult.setCode(status.value());
-        jsonResult.setMsg(status.getReasonPhrase());
-        return jsonResult;
+        baseResponse.setStatus(status.value());
+        baseResponse.setMessage(status.getReasonPhrase());
+        return baseResponse;
     }
 
     @ExceptionHandler(HaloException.class)
-    public ResponseEntity<JsonResult> handleHaloException(HaloException e) {
-        JsonResult jsonResult = handleBaseException(e);
-        jsonResult.setCode(e.getStatus().value());
-        jsonResult.setResult(e.getErrorData());
-        return new ResponseEntity<>(jsonResult, e.getStatus());
+    public ResponseEntity<BaseResponse> handleHaloException(HaloException e) {
+        BaseResponse<Object> baseResponse = handleBaseException(e);
+        baseResponse.setStatus(e.getStatus().value());
+        baseResponse.setData(e.getErrorData());
+        return new ResponseEntity<>(baseResponse, e.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public JsonResult handleGlobalException(Exception e) {
-        JsonResult jsonResult = handleBaseException(e);
+    public BaseResponse handleGlobalException(Exception e) {
+        BaseResponse baseResponse = handleBaseException(e);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        jsonResult.setCode(status.value());
-        jsonResult.setMsg(status.getReasonPhrase());
-        return jsonResult;
+        baseResponse.setStatus(status.value());
+        baseResponse.setMessage(status.getReasonPhrase());
+        return baseResponse;
     }
 
-    private JsonResult handleBaseException(Throwable t) {
+    private <T> BaseResponse<T> handleBaseException(Throwable t) {
         Assert.notNull(t, "Throwable must not be null");
 
         log.error("Captured an exception", t);
 
-        JsonResult jsonResult = new JsonResult();
-        jsonResult.setMsg(t.getMessage());
+        BaseResponse<T> baseResponse = new BaseResponse<>();
+        baseResponse.setMessage(t.getMessage());
 
         if (log.isDebugEnabled()) {
-            jsonResult.setDevMsg(ExceptionUtils.getStackTrace(t));
+            baseResponse.setDevMessage(ExceptionUtils.getStackTrace(t));
         }
 
-        return jsonResult;
+        return baseResponse;
     }
 
 }
