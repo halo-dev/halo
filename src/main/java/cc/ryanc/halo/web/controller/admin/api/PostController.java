@@ -26,7 +26,7 @@ public class PostController {
     }
 
     @GetMapping("latest")
-    @ApiOperation("Page latest post")
+    @ApiOperation("Pages latest post")
     public Page<PostSimpleOutputDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         return postService.pageLatest(top);
     }
