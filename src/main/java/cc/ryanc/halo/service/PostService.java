@@ -44,7 +44,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return latest posts
      */
     @NonNull
-    Page<PostSimpleOutputDTO> listLatest(int top);
+    Page<PostSimpleOutputDTO> pageLatest(int top);
 
     /**
      * List by status and type

@@ -52,11 +52,11 @@ public class AdminController {
     @GetMapping(value = {"", "index"})
     public String admin(Model model) {
 
-        Page<PostSimpleOutputDTO> postPage = postService.listLatest(5);
+        Page<PostSimpleOutputDTO> postPage = postService.pageLatest(5);
 
-        Page<CommentVO> commentPage = commentService.listLatest(5);
+        Page<CommentVO> commentPage = commentService.pageLatest(5);
 
-        Page<LogOutputDTO> logPage = logService.listLatest(5);
+        Page<LogOutputDTO> logPage = logService.pageLatest(5);
 
         model.addAttribute("postsCount", postPage.getTotalElements());
         model.addAttribute("commentsCount", commentPage.getTotalElements());

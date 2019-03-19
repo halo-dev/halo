@@ -30,7 +30,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     /**
-     * Save one option
+     * Saves one option
      *
      * @param key   key
      * @param value value
@@ -45,24 +45,24 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        Option options = optionRepository.findByOptionKey(key).map(option -> {
+        Option option = optionRepository.findByOptionKey(key).map(anOption -> {
             // Exist
-            option.setOptionValue(value);
-            return option;
+            anOption.setOptionValue(value);
+            return anOption;
         }).orElseGet(() -> {
             // Not exist
-            Option option = new Option();
-            option.setOptionKey(key);
-            option.setOptionValue(value);
-            return option;
+            Option anOption = new Option();
+            anOption.setOptionKey(key);
+            anOption.setOptionValue(value);
+            return anOption;
         });
 
         // Save or update the options
-        optionRepository.save(options);
+        optionRepository.save(option);
     }
 
     /**
-     * Save multiple options
+     * Saves multiple options
      *
      * @param options options
      */
@@ -74,7 +74,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     /**
-     * Get all options
+     * Gets all options
      *
      * @return Map
      */
@@ -84,7 +84,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     /**
-     * Get option by key
+     * Gets option by key
      *
      * @param key key
      * @return String
