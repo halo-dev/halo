@@ -39,7 +39,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     @Override
-    public Page<CommentVO> listLatest(int top) {
+    public Page<CommentVO> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
         // Build page request

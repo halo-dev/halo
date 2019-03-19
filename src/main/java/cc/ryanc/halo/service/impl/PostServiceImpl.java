@@ -59,7 +59,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Page<PostSimpleOutputDTO> listLatest(int top) {
+    public Page<PostSimpleOutputDTO> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
         PageRequest latestPageable = PageRequest.of(0, top, Sort.by(Sort.Direction.DESC, "editTime"));

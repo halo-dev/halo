@@ -28,7 +28,7 @@ public class LogServiceImpl extends AbstractCrudService<Log, Long> implements Lo
     }
 
     @Override
-    public Page<LogOutputDTO> listLatest(int top) {
+    public Page<LogOutputDTO> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
         // Build page request

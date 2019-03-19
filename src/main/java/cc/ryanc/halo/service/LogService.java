@@ -18,5 +18,5 @@ public interface LogService extends CrudService<Log, Long> {
      * @param top top number must not be less than 0
      * @return a page of latest logs
      */
-    Page<LogOutputDTO> listLatest(int top);
+    Page<LogOutputDTO> pageLatest(int top);
 }

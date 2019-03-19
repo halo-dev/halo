@@ -12,7 +12,7 @@ import lombok.*;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorResponse {
+public class BaseResponse {
 
     private Integer status;
 

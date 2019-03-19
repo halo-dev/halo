@@ -1,7 +1,7 @@
 package cc.ryanc.halo.security.handler;
 
 import cc.ryanc.halo.exception.HaloException;
-import cc.ryanc.halo.model.support.ErrorResponse;
+import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.utils.ExceptionUtils;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +36,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     public void onFailure(HttpServletRequest request, HttpServletResponse response, HaloException exception) throws IOException, ServletException {
         log.warn("Handle unsuccessful authentication, ip: [{}]", ServletUtil.getClientIP(request));
 
-        ErrorResponse errorDetail = new ErrorResponse();
+        BaseResponse errorDetail = new BaseResponse();
 
         errorDetail.setMessage(exception.getMessage());
 
