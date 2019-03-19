@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.json.JSONObject;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -48,7 +49,7 @@ public class CommonController implements ErrorController {
 
         final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
-        log.error("Error path: [{}], status: [{}]", request.getRequestURI(), statusCode);
+        log.error("Error path: [{}], status: [{}]", getErrorPath(), statusCode);
 
         // Get the exception
         Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");

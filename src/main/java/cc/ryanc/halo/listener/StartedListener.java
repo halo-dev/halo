@@ -1,12 +1,14 @@
 package cc.ryanc.halo.listener;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
+import cc.ryanc.halo.web.controller.support.PageJacksonSerializer;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import freemarker.template.TemplateModelException;
@@ -22,6 +24,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.util.List;
+
+import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
+import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -79,12 +84,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * Get active theme
      */
     private void getActiveTheme() {
-        final String themeValue = optionService.getByKey("theme");
-        if (StrUtil.isNotEmpty(themeValue) && !StrUtil.equals(themeValue, null)) {
-            BaseContentController.THEME = themeValue;
-        } else {
-            BaseContentController.THEME = "anatole";
-        }
+        BaseContentController.THEME = optionService.getByProperty(BlogProperties.THEME).orElse(DEFAULT_THEME_NAME);
+
         try {
             configuration.setSharedVariable("themeName", BaseContentController.THEME);
         } catch (TemplateModelException e) {
@@ -114,7 +115,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // Get server port
         String serverPort = applicationContext.getEnvironment().getProperty("server.port");
 
-        String blogUrl = null;
+        String blogUrl = OPTIONS.get(BlogProperties.BLOG_URL);
 
         if (StrUtil.isNotBlank(blogUrl)) {
             blogUrl = StrUtil.removeSuffix(blogUrl, "/");

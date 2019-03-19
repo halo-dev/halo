@@ -68,6 +68,15 @@ public class SwaggerConfiguration {
     }
 
     @Bean
+    public Docket haloAdminApi() {
+        log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
+        return buildApiDocket("cc.ryanc.halo.admin",
+                "cc.ryanc.halo.web.controller.admin",
+                "/api/admin/**")
+                .enable(!haloProperties.getDocDisabled());
+    }
+
+    @Bean
     SecurityConfiguration security() {
         return SecurityConfigurationBuilder.builder()
                 .clientId("halo-app-client-id")
