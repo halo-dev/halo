@@ -26,7 +26,7 @@ public class LogController {
     }
 
     @GetMapping("latest")
-    @ApiOperation("Page latest logs")
+    @ApiOperation("Pages latest logs")
     public Page<LogOutputDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         return logService.pageLatest(top);
     }
