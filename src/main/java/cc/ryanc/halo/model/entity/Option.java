@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.entity;
 
+import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -58,4 +59,16 @@ public class Option {
      */
     @Column(name = "deleted", columnDefinition = "TINYINT default 0")
     private Boolean deleted;
+
+    @PrePersist
+    public void prePersist() {
+        id = null;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (updateTime == null) {
+            updateTime = DateUtils.now();
+        }
+    }
 }
