@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <a-button type="danger">Danger</a-button>
     <h1>{{ msg }}</h1>
     <p>
       For a guide and recipes on how to configure / customize this project,<br />
