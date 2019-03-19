@@ -72,7 +72,7 @@ public class SwaggerConfiguration {
         log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
         return buildApiDocket("cc.ryanc.halo.admin",
                 "cc.ryanc.halo.web.controller.admin",
-                "/api/admin/**")
+                "/admin/api/**")
                 .enable(!haloProperties.getDocDisabled());
     }
 
