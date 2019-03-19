@@ -93,4 +93,11 @@ public class User {
     public void prePersist() {
         id = null;
     }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (updateTime == null) {
+            updateTime = DateUtils.now();
+        }
+    }
 }
