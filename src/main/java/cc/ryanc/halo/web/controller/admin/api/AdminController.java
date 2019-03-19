@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * Admin controller.
+ *
  * @author johnniang
  * @date 3/19/19
  */

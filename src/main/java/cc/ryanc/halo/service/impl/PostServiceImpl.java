@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Category;
 import cc.ryanc.halo.model.entity.Post;
@@ -59,14 +60,22 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Page<PostSimpleOutputDTO> pageLatest(int top) {
+    public Page<PostMinimalOutputDTO> pageLatestOfMinimal(int top) {
+        return pageLatest(top).map(post -> new PostMinimalOutputDTO().convertFrom(post));
+    }
+
+    @Override
+    public Page<PostSimpleOutputDTO> pageLatestOfSimple(int top) {
+        return pageLatest(top).map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    }
+
+    @Override
+    public Page<Post> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
         PageRequest latestPageable = PageRequest.of(0, top, Sort.by(Sort.Direction.DESC, "editTime"));
 
-        Page<Post> posts = listAll(latestPageable);
-
-        return posts.map(post -> new PostSimpleOutputDTO().convertFrom(post));
+        return listAll(latestPageable);
     }
 
     /**
@@ -75,7 +84,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @param status   status
      * @param type     type
      * @param pageable pageable
-     *
      * @return Page<PostSimpleOutputDTO>
      */
     @Override
@@ -89,11 +97,10 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      *
      * @param status status
      * @param type   type
-     *
      * @return posts count
      */
     @Override
     public Long countByStatus(PostStatus status, PostType type) {
-        return postRepository.countByStatusAndType(status,type);
+        return postRepository.countByStatusAndType(status, type);
     }
 }
