@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.model.dto.TagWithCountOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.entity.PostTag;
 import cc.ryanc.halo.model.entity.Tag;
@@ -9,11 +10,13 @@ import cc.ryanc.halo.repository.TagRepository;
 import cc.ryanc.halo.service.PostTagService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.ServiceUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Post tag service implementation.
@@ -40,13 +43,28 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     }
 
     @Override
-    public List<Tag> listTagBy(Integer postId) {
+    public List<Tag> listTagsBy(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
         // Find all tag ids
         Set<Integer> tagIds = postTagRepository.findAllTagIdsByPostId(postId);
 
         return tagRepository.findAllById(tagIds);
+    }
+
+    @Override
+    public List<TagWithCountOutputDTO> listTagWithCountDtos(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+
+        // Find all tags
+        List<Tag> tags = tagRepository.findAll(sort);
+
+        // Find post count
+        return tags.stream().map(tag -> {
+            TagWithCountOutputDTO tagOutputDTO = new TagWithCountOutputDTO().convertFrom(tag);
+
+            return tagOutputDTO;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -78,7 +96,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
 
     @Override
-    public List<Post> listPostBy(Integer tagId) {
+    public List<Post> listPostsBy(Integer tagId) {
         Assert.notNull(tagId, "Tag id must not be null");
 
         // Find all post ids

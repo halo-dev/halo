@@ -49,6 +49,7 @@
         <thumbnailator.version>0.4.8</thumbnailator.version>
         <commonmark.version>0.12.1</commonmark.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
+        <slugify.version>2.3</slugify.version>
     </properties>
 
     <dependencies>

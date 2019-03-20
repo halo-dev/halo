@@ -1,9 +1,11 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.exception.AlreadyExistsException;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.repository.TagRepository;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
  * @author : RYAN0UP
  * @date : 2019-03-14
  */
+@Slf4j
 @Service
 public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements TagService {
 
@@ -29,6 +32,22 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
      */
     @Override
     public void remove(Integer id) {
-         // TODO 删除标签，以及对应的文章关系
+        // TODO 删除标签，以及对应的文章关系
+    }
+
+    @Override
+    public Tag create(Tag tag) {
+        // Check if the tag is exist
+        long count = tagRepository.countByNameOrSlugName(tag.getName(), tag.getSlugName());
+
+        log.debug("Tag count: [{}]", count);
+
+        if (count > 0) {
+            // If the tag has exist already
+            throw new AlreadyExistsException("The tag has already exist").setErrorData(tag);
+        }
+
+        // Get tag name
+        return super.create(tag);
     }
 }
