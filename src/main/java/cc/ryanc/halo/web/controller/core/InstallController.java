@@ -162,7 +162,7 @@ public class InstallController {
         // TODO and i18n for the category name, description
 
         category.setName("Initial Blog");
-        category.setSnakeName("initial_blog");
+        category.setSlugName("initial_blog");
         category.setDescription("Initial Blog for alphabet");
         return categoryService.create(category);
     }
@@ -236,7 +236,7 @@ public class InstallController {
             //默认分类
             Category category = new Category();
             category.setName("未分类");
-            category.setSnakeName("default");
+            category.setSlugName("default");
             category.setDescription("未分类");
             category = categoryService.create(category);
 
