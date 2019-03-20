@@ -22,11 +22,11 @@ import java.util.Date;
 @Where(clause = "deleted = false")
 @Data
 @ToString
-@EqualsAndHashCode
-public class Comment {
+@EqualsAndHashCode(callSuper = true)
+public class Comment extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
@@ -50,7 +50,7 @@ public class Comment {
     /**
      * 评论者网址
      */
-    @Column(name = "author_url",columnDefinition = "varchar(512) default ''")
+    @Column(name = "author_url", columnDefinition = "varchar(512) default ''")
     private String authorUrl;
 
     /**
@@ -95,35 +95,10 @@ public class Comment {
     @Column(name = "parent_id", columnDefinition = "bigint default 0")
     private Long parentId;
 
-    /**
-     * 创建时间戳
-     */
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    /**
-     * 更新时间戳
-     */
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    /**
-     * 是否已删除
-     */
-    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
-    private Boolean deleted;
-
-    @PrePersist
+    @Override
     public void prePersist() {
+        super.prePersist();
         id = null;
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (updateTime == null) {
-            updateTime = DateUtils.now();
-        }
-    }
 }

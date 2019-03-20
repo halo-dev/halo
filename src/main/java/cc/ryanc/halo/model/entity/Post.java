@@ -3,7 +3,6 @@ package cc.ryanc.halo.model.entity;
 import cc.ryanc.halo.model.enums.PostCreateFrom;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -24,11 +23,11 @@ import java.util.Date;
 @Where(clause = "deleted = false")
 @Data
 @ToString
-@EqualsAndHashCode
-public class Post {
+@EqualsAndHashCode(callSuper = true)
+public class Post extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     /**
@@ -131,35 +130,10 @@ public class Post {
     @Temporal(TemporalType.TIMESTAMP)
     private Date editTime;
 
-    /**
-     * 创建时间戳
-     */
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    /**
-     * 更新时间戳
-     */
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    /**
-     * 是否已删除
-     */
-    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
-    private Boolean deleted;
-
-    @PrePersist
+    @Override
     public void prePersist() {
+        super.prePersist();
         id = null;
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (updateTime == null) {
-            updateTime = DateUtils.now();
-        }
-    }
 }

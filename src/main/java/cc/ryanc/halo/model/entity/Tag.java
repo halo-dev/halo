@@ -1,9 +1,12 @@
 package cc.ryanc.halo.model.entity;
 
-import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,13 +19,15 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "menus")
-@SQLDelete(sql = "update menus set deleted = true where id = ?")
+@Table(name = "tags")
+@SQLDelete(sql = "update tags set deleted = true where id = ?")
 @Where(clause = "deleted = false")
-public class Tag {
+@ToString
+@EqualsAndHashCode(callSuper = true)
+public class Tag extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -38,35 +43,9 @@ public class Tag {
     @Column(name = "slug_name", columnDefinition = "varchar(255) not null")
     private String slugName;
 
-    /**
-     * 创建时间戳
-     */
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    /**
-     * 更新时间戳
-     */
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    /**
-     * 是否已删除
-     */
-    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
-    private Boolean deleted;
-
-    @PrePersist
-    public void prePersist() {
+    @Override
+    protected void prePersist() {
+        super.prePersist();
         id = null;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        if (updateTime == null) {
-            updateTime = DateUtils.now();
-        }
     }
 }
