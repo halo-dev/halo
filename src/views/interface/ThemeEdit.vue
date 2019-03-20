@@ -1,7 +1,9 @@
-<template> </template>
+<template>
+  <div> Theme Edit </div>
+</template>
 
 <script>
-export default {};
+export default {}
 </script>
 
 <style scoped>

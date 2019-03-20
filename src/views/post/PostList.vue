@@ -1,9 +1,9 @@
 <template>
-  <div>Post list</div>
+  <div> Post list </div>
 </template>
 
 <script>
-export default {};
+export default {}
 </script>
 
 <style scoped></style>

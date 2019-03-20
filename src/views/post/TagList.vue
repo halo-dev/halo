@@ -1,7 +1,9 @@
-<template> </template>
+<template>
+  <div> Tag List </div>
+</template>
 
 <script>
-export default {};
+export default {}
 </script>
 
 <style scoped>

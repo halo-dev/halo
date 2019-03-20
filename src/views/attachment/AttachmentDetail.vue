@@ -1,7 +1,9 @@
-<template> </template>
+<template>
+  <div :loading="loading"> Attachment Detail </div>
+</template>
 
 <script>
-export default {};
+export default {}
 </script>
 
 <style scoped>
