@@ -15,7 +15,7 @@ public class CategoryOutputDTO implements OutputConverter<CategoryOutputDTO, Cat
 
     private String name;
 
-    private String snakeName;
+    private String slugName;
 
     private String description;
 
