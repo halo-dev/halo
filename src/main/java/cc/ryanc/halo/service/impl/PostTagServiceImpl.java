@@ -71,7 +71,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         Map<Integer, List<Tag>> tagListMap = new HashMap<>();
 
         // Foreach and collect
-        postTags.forEach(postTag -> tagListMap.putIfAbsent(postTag.getPostId(), new LinkedList<>()).add(tagMap.get(postTag.getTagId())));
+        postTags.forEach(postTag -> tagListMap.computeIfAbsent(postTag.getPostId(), postId -> new LinkedList<>()).add(tagMap.get(postTag.getTagId())));
 
         return tagListMap;
     }
