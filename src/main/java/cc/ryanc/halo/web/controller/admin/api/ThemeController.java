@@ -27,6 +27,4 @@ public class ThemeController {
     public List<Theme> listAll() {
         return ThemeUtils.getThemes();
     }
-
-
 }

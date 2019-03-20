@@ -116,7 +116,7 @@ public class ThemeUtils {
      * @param theme theme
      * @return List<String>
      */
-    public static List<String> getTplName(String theme) {
+    public static List<String> getTemplates(String theme) {
         final List<String> templates = new ArrayList<>();
         try {
             final File themesPath = new File(getThemesPath(theme), theme);
