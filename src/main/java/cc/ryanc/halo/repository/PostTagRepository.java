@@ -62,4 +62,5 @@ public interface PostTagRepository extends BaseRepository<PostTag, Integer> {
      */
     @NonNull
     List<PostTag> findAllByPostIdIn(@NonNull Iterable<Integer> postIds);
+
 }
