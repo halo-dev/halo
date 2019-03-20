@@ -37,8 +37,8 @@ public class Category {
     /**
      * 缩略名
      */
-    @Column(name = "snake_name", columnDefinition = "varchar(50) not null")
-    private String snakeName;
+    @Column(name = "slug_name", columnDefinition = "varchar(50) not null")
+    private String slugName;
 
     /**
      * 描述

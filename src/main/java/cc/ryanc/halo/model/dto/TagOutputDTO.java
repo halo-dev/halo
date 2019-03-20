@@ -15,5 +15,5 @@ public class TagOutputDTO implements OutputConverter<TagOutputDTO, Tag> {
 
     private String name;
 
-    private String snakeName;
+    private String slugName;
 }

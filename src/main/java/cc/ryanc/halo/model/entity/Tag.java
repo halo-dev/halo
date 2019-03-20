@@ -35,8 +35,8 @@ public class Tag {
     /**
      * 缩略名
      */
-    @Column(name = "snake_name", columnDefinition = "varchar(255) not null")
-    private String snakeName;
+    @Column(name = "slug_name", columnDefinition = "varchar(255) not null")
+    private String slugName;
 
     /**
      * 创建时间戳
