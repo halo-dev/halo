@@ -41,8 +41,9 @@ public class ThemeUtils {
     /**
      * Scan themes by directory
      *
-     * @param file file
-     * @return List<Theme>
+     * @param themesPath themes Path
+     * @param isInternal isInternal
+     * @return themes
      */
     private static List<Theme> getThemesByPath(File themesPath, boolean isInternal) {
         final List<Theme> themes = new ArrayList<>();
@@ -146,6 +147,7 @@ public class ThemeUtils {
     /**
      * Get custom template, such as page_xxx.ftl, and xxx will be template name
      *
+     * @param theme theme name
      * @return List
      */
     public static List<String> getCustomTpl(String theme) throws FileNotFoundException {
