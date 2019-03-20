@@ -1,12 +1,13 @@
 package cc.ryanc.halo.model.entity;
 
-import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Attachment entity
@@ -19,10 +20,12 @@ import java.util.Date;
 @Table(name = "attachments")
 @SQLDelete(sql = "update attachments set deleted = true where id = ?")
 @Where(clause = "deleted = false")
-public class Attachment {
+@ToString
+@EqualsAndHashCode(callSuper = true)
+public class Attachment extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -74,35 +77,10 @@ public class Attachment {
     @Column(name = "type", columnDefinition = "int default 0")
     private Integer type;
 
-    /**
-     * 创建时间戳
-     */
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    /**
-     * 更新时间戳
-     */
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    /**
-     * 是否已删除
-     */
-    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
-    private Boolean deleted;
-
-    @PrePersist
+    @Override
     public void prePersist() {
+        super.prePersist();
         id = null;
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (updateTime == null) {
-            updateTime = DateUtils.now();
-        }
-    }
 }

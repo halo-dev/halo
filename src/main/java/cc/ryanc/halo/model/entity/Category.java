@@ -21,11 +21,11 @@ import java.util.Date;
 @Where(clause = "deleted = false")
 @Data
 @ToString
-@EqualsAndHashCode
-public class Category {
+@EqualsAndHashCode(callSuper = true)
+public class Category extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     /**
@@ -52,35 +52,10 @@ public class Category {
     @Column(name = "parent_id", columnDefinition = "int default 0")
     private Integer parentId;
 
-    /**
-     * 创建时间戳
-     */
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    /**
-     * 更新时间戳
-     */
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    /**
-     * 是否已删除
-     */
-    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
-    private Boolean deleted;
-
-    @PrePersist
+    @Override
     public void prePersist() {
+        super.prePersist();
         id = null;
     }
 
-    @PreUpdate
-    public void preUpdate() {
-        if (updateTime == null) {
-            updateTime = DateUtils.now();
-        }
-    }
 }
