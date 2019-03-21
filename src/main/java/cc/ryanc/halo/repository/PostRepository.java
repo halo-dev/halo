@@ -37,4 +37,12 @@ public interface PostRepository extends BaseRepository<Post, Integer>, JpaSpecif
      * @return posts count
      */
     long countByStatusAndType(@NonNull PostStatus status, @NonNull PostType type);
+
+    /**
+     * Count by post url.
+     *
+     * @param url post url must not be blank
+     * @return the count
+     */
+    long countByUrl(@NonNull String url);
 }

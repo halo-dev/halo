@@ -1,16 +1,20 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
+import cc.ryanc.halo.model.dto.post.PostDetailOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
+import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.model.params.PostParam;
+import cc.ryanc.halo.service.*;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -27,8 +31,24 @@ public class PostController {
 
     private final PostService postService;
 
-    public PostController(PostService postService) {
+    private final TagService tagService;
+
+    private final CategoryService categoryService;
+
+    private final PostTagService postTagService;
+
+    private final PostCategoryService postCategoryService;
+
+    public PostController(PostService postService,
+                          TagService tagService,
+                          CategoryService categoryService,
+                          PostTagService postTagService,
+                          PostCategoryService postCategoryService) {
         this.postService = postService;
+        this.tagService = tagService;
+        this.categoryService = categoryService;
+        this.postTagService = postTagService;
+        this.postCategoryService = postCategoryService;
     }
 
     @GetMapping("latest")
@@ -43,4 +63,13 @@ public class PostController {
                                                   @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
         return postService.pageSimpleDtoByStatus(status, PostType.POST, pageable);
     }
+
+    @PostMapping
+    public PostDetailOutputDTO createBy(@Valid @RequestBody PostParam postParam) {
+        // Convert to
+        Post post = postParam.convertTo();
+
+        return new PostDetailOutputDTO().convertFrom(postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds()));
+    }
+
 }

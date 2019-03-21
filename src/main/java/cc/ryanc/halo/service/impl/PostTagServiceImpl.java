@@ -60,11 +60,9 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         List<Tag> tags = tagRepository.findAll(sort);
 
         // Find post count
-        return tags.stream().map(tag -> {
-            TagWithCountOutputDTO tagOutputDTO = new TagWithCountOutputDTO().convertFrom(tag);
-
-            return tagOutputDTO;
-        }).collect(Collectors.toList());
+        return tags.stream().map(
+                tag -> new TagWithCountOutputDTO().<TagWithCountOutputDTO>convertFrom(tag)
+        ).collect(Collectors.toList());
     }
 
     @Override
@@ -103,5 +101,26 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId);
 
         return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<PostTag> createBy(Integer postId, Set<Integer> tagIds) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        if (CollectionUtils.isEmpty(tagIds)) {
+            return Collections.emptyList();
+        }
+
+        // Create post tags
+        Set<PostTag> postTags = tagIds.stream().map(tagId -> {
+            // Build post tag
+            PostTag postTag = new PostTag();
+            postTag.setPostId(postId);
+            postTag.setTagId(tagId);
+            return postTag;
+        }).collect(Collectors.toSet());
+
+        // Create in batch
+        return createInBatch(postTags);
     }
 }

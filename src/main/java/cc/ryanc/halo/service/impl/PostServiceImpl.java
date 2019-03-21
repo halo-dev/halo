@@ -1,21 +1,23 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.exception.AlreadyExistsException;
 import cc.ryanc.halo.model.dto.CategoryOutputDTO;
 import cc.ryanc.halo.model.dto.TagOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
-import cc.ryanc.halo.model.entity.Category;
-import cc.ryanc.halo.model.entity.Post;
-import cc.ryanc.halo.model.entity.Tag;
+import cc.ryanc.halo.model.entity.*;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.params.PostParam;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.repository.PostRepository;
-import cc.ryanc.halo.service.PostCategoryService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.PostTagService;
+import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.service.base.AbstractCrudService;
+import cc.ryanc.halo.utils.HaloUtils;
+import cc.ryanc.halo.utils.MarkdownUtils;
 import cc.ryanc.halo.utils.ServiceUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,20 +36,29 @@ import java.util.stream.Collectors;
  * @author johnniang
  * @author RYAN0UP
  */
+@Slf4j
 @Service
 public class PostServiceImpl extends AbstractCrudService<Post, Integer> implements PostService {
 
     private final PostRepository postRepository;
+
+    private final TagService tagService;
+
+    private final CategoryService categoryService;
 
     private final PostTagService postTagService;
 
     private final PostCategoryService postCategoryService;
 
     public PostServiceImpl(PostRepository postRepository,
+                           TagService tagService,
+                           CategoryService categoryService,
                            PostTagService postTagService,
                            PostCategoryService postCategoryService) {
         super(postRepository);
         this.postRepository = postRepository;
+        this.tagService = tagService;
+        this.categoryService = categoryService;
         this.postTagService = postTagService;
         this.postCategoryService = postCategoryService;
     }
@@ -154,5 +165,43 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     @Override
     public Long countByStatus(PostStatus status, PostType type) {
         return postRepository.countByStatusAndType(status, type);
+    }
+
+    @Override
+    public Post createBy(Post post, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        Assert.notNull(post, "Post param must not be null");
+
+        // TODO Check url
+        long count = postRepository.countByUrl(post.getUrl());
+
+        if (count > 0) {
+            throw new AlreadyExistsException("The post url has been exist already").setErrorData(post.getUrl());
+        }
+
+        // Render content
+        post.setFormatContent(MarkdownUtils.renderMarkdown(post.getOriginalContent()));
+
+        // TODO Handle thumbnail
+
+        // Create post
+        create(post);
+
+        // List all tags
+        List<Tag> tags = tagService.listAllByIds(tagIds);
+
+        // List all categories
+        List<Category> categories = categoryService.listAllByIds(categoryIds);
+
+        // Create post tags
+        List<PostTag> postTags = postTagService.createBy(post.getId(), ServiceUtils.fetchProperty(tags, Tag::getId));
+
+        log.debug("Created post tags: [{}]", postTags);
+
+        // Create post categories
+        List<PostCategory> postCategories = postCategoryService.createBy(post.getId(), ServiceUtils.fetchProperty(categories, Category::getId));
+
+        log.debug("Created post categories: [{}]", postCategories);
+
+        return post;
     }
 }

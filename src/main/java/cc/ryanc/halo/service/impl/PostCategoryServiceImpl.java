@@ -14,6 +14,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Post category service implementation.
@@ -84,5 +85,25 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId);
 
         return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<PostCategory> createBy(Integer postId, Set<Integer> categoryIds) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        if (CollectionUtils.isEmpty(categoryIds)) {
+            return Collections.emptyList();
+        }
+
+        // Build post categories
+        List<PostCategory> postCategories = categoryIds.stream().map(categoryId -> {
+            PostCategory postCategory = new PostCategory();
+            postCategory.setPostId(postId);
+            postCategory.setCategoryId(categoryId);
+            return postCategory;
+        }).collect(Collectors.toList());
+
+        // Create them
+        return createInBatch(postCategories);
     }
 }

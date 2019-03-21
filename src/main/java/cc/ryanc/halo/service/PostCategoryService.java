@@ -9,6 +9,7 @@ import org.springframework.lang.NonNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Post category service interface.
@@ -44,4 +45,14 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     List<Post> listPostBy(@NonNull Integer categoryId);
+
+    /**
+     * Creates post categories by post id and category id set.
+     *
+     * @param postId      post id must not be null
+     * @param categoryIds category id set
+     * @return a list of post category
+     */
+    @NonNull
+    List<PostCategory> createBy(@NonNull Integer postId, Set<Integer> categoryIds);
 }
