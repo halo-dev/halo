@@ -1,16 +1,16 @@
 package cc.ryanc.halo.model.entity;
 
-import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.Objects;
 
 /**
+ * Post tag entity.
+ *
  * @author : RYAN0UP
  * @date : 2019-03-12
  */
@@ -20,7 +20,6 @@ import java.util.Date;
 @SQLDelete(sql = "update post_tags set deleted = true where id = ?")
 @Where(clause = "deleted = false")
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class PostTag extends BaseEntity {
 
     @Id
@@ -44,5 +43,20 @@ public class PostTag extends BaseEntity {
     public void prePersist() {
         super.prePersist();
         id = null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PostTag postTag = (PostTag) o;
+        return Objects.equals(postId, postTag.postId) &&
+                Objects.equals(tagId, postTag.tagId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), postId, tagId);
     }
 }
