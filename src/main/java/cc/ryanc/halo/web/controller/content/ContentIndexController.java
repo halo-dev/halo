@@ -34,7 +34,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @RequestMapping
 public class ContentIndexController extends BaseContentController {
 
-    private PostService postService;
+    private final PostService postService;
 
     public ContentIndexController(PostService postService) {
         this.postService = postService;

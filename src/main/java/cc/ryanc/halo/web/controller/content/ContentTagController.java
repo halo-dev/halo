@@ -31,9 +31,9 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @RequestMapping(value = "/tags")
 public class ContentTagController extends BaseContentController {
 
-    private TagService tagService;
+    private final TagService tagService;
 
-    private PostService postService;
+    private final PostService postService;
 
     public ContentTagController(TagService tagService, PostService postService) {
         this.tagService = tagService;
