@@ -9,6 +9,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Post category entity.
@@ -21,7 +22,6 @@ import java.util.Date;
 @Where(clause = "deleted = false")
 @Data
 @ToString
-@EqualsAndHashCode(callSuper = true)
 public class PostCategory extends BaseEntity {
 
     @Id
@@ -45,5 +45,20 @@ public class PostCategory extends BaseEntity {
     public void prePersist() {
         super.prePersist();
         id = null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PostCategory that = (PostCategory) o;
+        return categoryId.equals(that.categoryId) &&
+                postId.equals(that.postId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), categoryId, postId);
     }
 }
