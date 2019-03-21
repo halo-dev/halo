@@ -3,7 +3,7 @@
     <li class="dropdown">
         <ul id="settings-dropdown" class="dropdown-menu">
             <li>
-                <a href="mailto:${user.userEmail!}" target="_blank" title="Email Me">
+                <a href="mailto:${user.email!}" target="_blank" title="Email Me">
                     <i class="material-icons sidebar-material-icons sidebar-indent-left1pc-element">email</i>
                     Email Me
                 </a>
@@ -53,7 +53,7 @@
             <@commonTag method="categories">
                 <#list categories as cate>
                     <li>
-                        <a class="sidebar_archives-link" href="${options.blog_url!}/categories/${cate.cateUrl}/">${cate.cateName}<span class="sidebar_archives-count">${cate.posts?size}</span></a>
+                        <a class="sidebar_archives-link" href="${options.blog_url!}/categories/${cate.url}/">${cate.name}<span class="sidebar_archives-count">${cate.posts?size}</span></a>
                     </li>
                 </#list>
             </@commonTag>

@@ -32,7 +32,7 @@
         <@commonTag method="tags">
             <#if tags?? && tags?size gt 0>
                 <#list tags as tag>
-                    <a href="${options.blog_url!}/tags/${tag.tagUrl}/" style="font-size: 22.33px; color: #757575">${tag.tagName}</a>
+                    <a href="${options.blog_url!}/tags/${tag.slugName}/" style="font-size: 22.33px; color: #757575">${tag.name}</a>
                 </#list>
             </#if>
         </@commonTag>

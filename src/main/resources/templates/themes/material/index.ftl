@@ -2,7 +2,7 @@
 <@layout title="${options.blog_title!'Material'}" keywords="${options.seo_keywords!'Material'}}" description="${options.seo_desc!'Material'}}">
     <!-- Index Module -->
     <div class="material-index mdl-grid">
-        <#if (options.theme_material_scheme!'Paradox') == "Paradox" && posts.number==0 && !isArchives??>
+        <#if (options.theme_material_scheme!'Paradox') == "Paradox" && posts.page==0 && !isArchives??>
         <!-- Paradox Header -->
         <#include "_partial/daily_pic.ftl">
         <#include "_partial/blog_info.ftl">

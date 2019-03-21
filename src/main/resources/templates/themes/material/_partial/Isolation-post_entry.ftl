@@ -4,7 +4,7 @@
     <!-- Post Header Info -->
     <div class="post_entry-header_info without-thumbnail">
         <!-- Author Avatar & Name -->
-        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" class="avatar-img" width="44px" height="44px" alt="${user.userDisplayName!'Halo'}'s avatar">
+        <img src="${user.avatar!'/material/source/img/avatar.png'}" class="avatar-img" width="44px" height="44px" alt="${user.nickName!'Halo'}'s avatar">
         <span class="name-span">RYAN0UP</span>
     </div>
     <!-- Null Thumbnail -->
@@ -14,14 +14,14 @@
     <div class="post_entry-content mdl-color-text--grey-600 mdl-card__supporting-text">
         <!-- Post Title -->
         <p class="post_entry-title">
-            <a href="${options.blog_url!}/archives/${post.postUrl}">${post.postTitle}</a>
+            <a href="${options.blog_url!}/archives/${post.url}">${post.title}</a>
         </p>
         <!-- Post Excerpt -->
         <p class="post_entry-excerpt">
-            ${post.postSummary!}...
+            ${post.summary!}...
             &nbsp;&nbsp;&nbsp;
             <span>
-                <a href="${options.blog_url!}/archives/${post.postUrl}" target="_self">阅读全文</a>
+                <a href="${options.blog_url!}/archives/${post.url}" target="_self">阅读全文</a>
             </span>
         </p>
         <!-- Post Tags -->
@@ -29,7 +29,7 @@
             <#if post.tags??>
                 <#list post.tags as tag>
                     <li class="post_entry-tags-list-item">
-                        <a class="post_entry-tags-list-link" href="${options.blog_url!}/tags/${tag.tagUrl}/">${tag.tagName}</a>
+                        <a class="post_entry-tags-list-link" href="${options.blog_url!}/tags/${tag.slugName}/">${tag.name}</a>
                     </li>
                 </#list>
             </#if>
@@ -40,7 +40,7 @@
         <div class="post_entry-footer-border"></div>
         <div class="post_entry-footer-info">
             <div class="post_entry-footer-date">
-                ${post.postDate?string("MM月 dd,yyyy")}
+                ${post.createTime?string("MM月 dd,yyyy")}
             </div>
             <div class="post_entry-footer-comment">
             </div>

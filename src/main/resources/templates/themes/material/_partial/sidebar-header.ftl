@@ -13,12 +13,12 @@
 
     <!-- Sidebar Avatar -->
     <div class="sidebar-image">
-        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" alt="${user.userDisplayName!'Halo'}'s avatar">
+        <img src="${user.avatar!'/material/source/img/avatar.png'}" alt="${user.nickName!'Halo'}'s avatar">
     </div>
 
     <!-- Sidebar Email -->
     <a data-toggle="dropdown" class="sidebar-brand" href="#settings-dropdown">
-        ${user.userEmail!'i@example.com'}
+        ${user.email!'i@example.com'}
         <b class="caret"></b>
     </a>
 </div>

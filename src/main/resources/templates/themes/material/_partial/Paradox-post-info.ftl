@@ -2,12 +2,12 @@
 
     <!-- Author Avatar -->
     <div id="author-avatar">
-        <img src="${user.userAvatar!'/material/source/img/avatar.png'}" width="44px" height="44px" alt="Author Avatar"/>
+        <img src="${user.avatar!'/material/source/img/avatar.png'}" width="44px" height="44px" alt="Author Avatar"/>
     </div>
     <!-- Author Name & Date -->
     <div>
-        <strong>${user.userDisplayName!'Halo'}</strong>
-        <span>${post.postDate?string("MM月 dd,yyyy")}</span>
+        <strong>${user.nickName!'Halo'}</strong>
+        <span>${post.createTime?string("MM月 dd,yyyy")}</span>
     </div>
 
     <div class="section-spacer"></div>
@@ -35,7 +35,7 @@
         <#if post.tags??>
             <#list post.tags as tag>
                 <li class="mdl-menu__item">
-                    <a class="post_tag-link" href="${options.blog_url!}/tags/${tag.tagUrl}/">${tag.tagName}</a>
+                    <a class="post_tag-link" href="${options.blog_url!}/tags/${tag.slugName}/">${tag.name}</a>
                 </li>
             </#list>
         </#if>
