@@ -1,12 +1,11 @@
 import axios from 'axios'
 import NProgress from 'nprogress'
 import Vue from 'vue'
+import 'nprogress/nprogress.css'
 
 const service = axios.create({
-  baseURL:
-    process.env.NODE_ENV === 'production'
-      ? 'https://ryanc.cc/'
-      : 'http://localhost:8090'
+  baseURL: process.env.NODE_ENV === 'production' ? 'https://ryanc.cc/' : 'http://localhost:8090',
+  timeout: 5000
 })
 
 service.interceptors.request.use(
