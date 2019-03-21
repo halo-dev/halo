@@ -101,7 +101,6 @@ public class InstallController {
         boolean isInstalled = Boolean.parseBoolean(OPTIONS.getOrDefault(BlogProperties.IS_INSTALL, "false"));
 
         if (isInstalled) {
-            // TODO i18n
             throw new BadRequestException("该博客已初始化，不能再次安装！");
         }
 
@@ -125,8 +124,7 @@ public class InstallController {
 
         // TODO Handle option cache
 
-        // TODO i18n
-        return BaseResponse.ok("Setup successfully!");
+        return BaseResponse.ok("安装完成！");
     }
 
     private void createDefaultMenu() {
@@ -159,11 +157,10 @@ public class InstallController {
         Category category = new Category();
 
         // TODO Multi level category
-        // TODO and i18n for the category name, description
 
-        category.setName("Initial Blog");
-        category.setSlugName("initial_blog");
-        category.setDescription("Initial Blog for alphabet");
+        category.setName("未分类");
+        category.setSlugName("default");
+        category.setDescription("未分类");
         return categoryService.create(category);
     }
 
