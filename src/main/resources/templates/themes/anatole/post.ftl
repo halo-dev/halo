@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="${post.postTitle!} · ${options.blog_title!'Anatole'}" keywords="${post.postTitle!},${options.seo_keywords!'Anatole'},${tagWords!}" description="${post.postSummary!}"></@head>
+<@head title="${post.title!} · ${options.blog_title!'Halo'}" keywords="${post.title!},${options.seo_keywords!'Halo'},${tagWords!}" description="${post.summary!'Halo'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <link href="/anatole/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
@@ -40,23 +40,23 @@
                 <div class="post animated fadeInDown">
                     <div class="post-title">
                         <h3>
-                            <a>${post.postTitle}</a>
+                            <a>${post.title}</a>
                         </h3>
                     </div>
                     <div class="post-content">
-                        ${post.postContent!}
+                        ${post.formatContent!}
                     </div>
                     <div class="post-footer">
                         <div class="meta">
                             <div class="info">
                                 <i class="fa fa-sun-o"></i>
-                                <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
+                                <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="${options.blog_url!}/archives/${post.postUrl}#comment_widget">Comments</a>
+                                <a href="${options.blog_url!}/archives/${post.url}#comment_widget">Comments</a>
                                 <#if post.tags?size gt 0>
                                     <i class="fa fa-tag"></i>
                                     <#list post.tags as tag>
-                                        <a href="${options.blog_url!}/tags/${tag.tagUrl}" class="tag">&nbsp;${tag.tagName}</a>
+                                        <a href="${options.blog_url!}/tags/${tag.slugName}" class="tag">&nbsp;${tag.name}</a>
                                     </#list>
                                 </#if>
                             </div>
@@ -73,7 +73,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${options.blog_url}/archives/${post.postUrl} ,${options.blog_title!},${post.postTitle},;"
+                        <a href="http://twitter.com/home?status=${options.blog_url}/archives/${post.url} ,${options.blog_title!},${post.title},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
@@ -81,12 +81,12 @@
                     <ul class="clearfix">
                         <#if nextPost??>
                         <li class="pre pagbuttons">
-                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${nextPost.postUrl}" title="${nextPost.postTitle}">上一篇</a>
+                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${nextPost.url}" title="${nextPost.title}">上一篇</a>
                         </li>
                         </#if>
                         <#if prePost??>
                         <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${prePost.postUrl}" title="${prePost.postTitle}">下一篇</a>
+                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${prePost.url}" title="${prePost.title}">下一篇</a>
                         </li>
                         </#if>
                     </ul>

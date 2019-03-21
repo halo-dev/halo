@@ -1,9 +1,9 @@
 <div class="page-top animated fadeInDown">
     <div class="nav">
         <@commonTag method="menus">
-            <#list menus?sort_by('menuSort') as menu>
+            <#list menus?sort_by('sort') as menu>
                 <li>
-                    <a href="${menu.menuUrl}" target="${menu.menuTarget!}">${menu.menuName} </a>
+                    <a href="${menu.url}" target="${menu.target!}">${menu.name} </a>
                 </li>
             </#list>
         </@commonTag>
