@@ -1,10 +1,13 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.exception.AlreadyExistsException;
+import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.entity.Category;
 import cc.ryanc.halo.model.vo.CategoryVO;
 import cc.ryanc.halo.repository.CategoryRepository;
 import cc.ryanc.halo.service.CategoryService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -14,7 +17,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * CategoryService implementation class
@@ -22,6 +24,7 @@ import java.util.Optional;
  * @author : RYAN0UP
  * @date : 2019-03-14
  */
+@Slf4j
 @Service
 public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> implements CategoryService {
 
@@ -40,6 +43,32 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     public void remove(Integer id) {
         // TODO 删除分类，以及和文章的对应关系
+    }
+
+    @Override
+    public Category create(Category category) {
+        Assert.notNull(category, "Category to create must not be null");
+
+        // Check the category name
+        long count = categoryRepository.countByName(category.getName());
+
+        if (count > 0) {
+            log.error("Category has exist already: [{}]", category);
+            throw new AlreadyExistsException("The category has exist already");
+        }
+
+        // Check parent id
+        if (category.getParentId() > 0) {
+            count = categoryRepository.countById(category.getParentId());
+
+            if (count == 0) {
+                log.error("Parent category with id: [{}] was not found, category: [{}]", category.getParentId(), category);
+                throw new NotFoundException("Parent category with id = " + category.getParentId() + " was not found");
+            }
+        }
+
+        // Create it
+        return super.create(category);
     }
 
     @Override
@@ -87,7 +116,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
                 CategoryVO child = new CategoryVO().convertFrom(category);
 
                 // Init children if absent
-                Optional.ofNullable(parentCategory.getChildren()).orElseGet(LinkedList::new).add(child);
+                if (parentCategory.getChildren() == null) {
+                    parentCategory.setChildren(new LinkedList<>());
+                }
+                parentCategory.getChildren().add(child);
             }
         });
 

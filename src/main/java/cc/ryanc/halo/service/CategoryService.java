@@ -24,7 +24,7 @@ public interface CategoryService extends CrudService<Category, Integer> {
     void remove(@NonNull Integer id);
 
     /**
-     * List as category tree.
+     * Lists as category tree.
      *
      * @param sort sort info must not be null
      * @return a category tree
