@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.exception.AlreadyExistsException;
+import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.dto.CategoryOutputDTO;
 import cc.ryanc.halo.model.dto.TagOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
@@ -200,5 +201,17 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         log.debug("Created post categories: [{}]", postCategories);
 
         return post;
+    }
+
+    /**
+     * Get post by url.
+     *
+     * @param url  post url.
+     * @param type post type enum.
+     * @return Post
+     */
+    @Override
+    public Post getByUrl(String url, PostType type) {
+        return postRepository.getByUrlAndType(url, type).orElseThrow(()->new NotFoundException("The post does not exist").setErrorData(url));
     }
 }
