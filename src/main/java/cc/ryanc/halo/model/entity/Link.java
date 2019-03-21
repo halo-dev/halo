@@ -57,8 +57,8 @@ public class Link extends BaseEntity {
     /**
      * 分组
      */
-    @Column(name = "group", columnDefinition = "varchar(255) default ''")
-    private String group;
+    @Column(name = "team", columnDefinition = "varchar(255) default ''")
+    private String team;
 
 
     @Override
