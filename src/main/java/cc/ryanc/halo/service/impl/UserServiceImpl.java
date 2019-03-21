@@ -80,7 +80,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         // Check expiration
         if (user.getExpireTime() != null && DateUtils.now().before(user.getExpireTime())) {
             // If expired
-            throw new BadRequestException("账号已被禁止登陆，请10分钟后再试");
+            throw new BadRequestException("账号已被禁止登陆，请 " + LOCK_MINUTES + " 分钟后再试");
         }
 
 
@@ -100,7 +100,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
             stringCacheStore.put(LOGIN_FAILURE_COUNT_KEY, loginFailureCount.toString(), LOCK_MINUTES, TimeUnit.MINUTES);
 
-            throw new BadRequestException("账号或者密码错误，您还有" + (5 - loginFailureCount) + "次机会");
+            throw new BadRequestException("账号或者密码错误，您还有" + (MAX_LOGIN_TRY - loginFailureCount) + "次机会");
         }
 
         // TODO Set session
