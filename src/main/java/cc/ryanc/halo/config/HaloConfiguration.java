@@ -43,7 +43,7 @@ public class HaloConfiguration {
 
         corsFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 10);
         corsFilter.setFilter(new CorsFilter());
-        corsFilter.addUrlPatterns("/api/*");
+        corsFilter.addUrlPatterns("/api/*", "/admin/api/*");
 
         return corsFilter;
     }
