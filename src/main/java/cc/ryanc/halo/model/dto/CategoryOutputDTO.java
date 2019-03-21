@@ -13,6 +13,8 @@ import lombok.Data;
 @Data
 public class CategoryOutputDTO implements OutputConverter<CategoryOutputDTO, Category> {
 
+    private Integer id;
+
     private String name;
 
     private String slugName;
