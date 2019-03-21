@@ -92,10 +92,10 @@
         <#if links?? && links?size gt 0>
             <#list links! as link>
                 <li class="md-links-item">
-                    <a href="${link.linkUrl}" title="${link.linkName}" target="_blank">
-                        <img src="${link.linkPic}" alt="${link.linkName}" height="72px"/>
-                        <span class="md-links-title">${link.linkName}</span><br/>
-                        <span>${link.linkDesc!}</span>
+                    <a href="${link.url}" title="${link.name}" target="_blank">
+                        <img src="${link.logo}" alt="${link.name}" height="72px"/>
+                        <span class="md-links-title">${link.name}</span><br/>
+                        <span>${link.description!}</span>
                     </a>
                 </li>
             </#list>

@@ -12,7 +12,7 @@
             <ul>
                 <li>
                     <a href="#footer" class="icon fa-info-circle">
-                        ©&nbsp;${user.userDisplayName!'Halo'}
+                        ©&nbsp;${user.nickName!'Halo'}
                     </a>
                 </li>
             </ul>
@@ -23,11 +23,11 @@
     <div id="main">
         <#list galleries as gallery>
             <article class="thumb">
-                <a href="${gallery.galleryThumbnailUrl}" class="image lazy" data-original="${gallery.galleryThumbnailUrl}">
-                    <img class="lazy" data-original="${gallery.galleryUrl}" alt="${gallery.galleryDesc}" />
+                <a href="${gallery.thumbnail}" class="image lazy" data-original="${gallery.thumbnail}">
+                    <img class="lazy" data-original="${gallery.url}" alt="${gallery.description}" />
                 </a>
-                <h2>${gallery.galleryName}</h2>
-                <p>${gallery.galleryDate!}</p>
+                <h2>${gallery.name}</h2>
+                <p>${gallery.takeTime!}</p>
             </article>
         </#list>
     </div>

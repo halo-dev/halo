@@ -11,10 +11,10 @@
     <div class="mdl-card__supporting-text meta mdl-color-text--grey-600">
         <!-- Author Avatar -->
         <div id="author-avatar">
-            <img src="${user.userAvatar!'/material/source/img/avatar.png'}" width="32px" height="32px" alt="avatar">
+            <img src="${user.avatar!'/material/source/img/avatar.png'}" width="32px" height="32px" alt="avatar">
         </div>
         <div>
-            <strong>${user.userDisplayName!'Material'}</strong>
+            <strong>${user.nickName!'Material'}</strong>
         </div>
     </div>
 </div>
