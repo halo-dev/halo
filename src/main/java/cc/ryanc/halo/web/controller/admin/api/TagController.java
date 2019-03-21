@@ -42,7 +42,7 @@ public class TagController {
 
     @GetMapping
     public List<TagOutputDTO> listTags(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
-        return tagService.listDtos(sort);
+        return tagService.convertTo(tagService.listAll(sort));
     }
 
     @PostMapping

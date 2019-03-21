@@ -9,6 +9,7 @@ import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.*;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.*;
@@ -168,16 +169,16 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Post createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds) {
+    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds) {
         return createOrUpdate(postToCreate, tagIds, categoryIds, this::create);
     }
 
     @Override
-    public Post updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds) {
+    public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds) {
         return createOrUpdate(postToUpdate, tagIds, categoryIds, this::update);
     }
 
-    private Post createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, @NonNull Function<Post, Post> postOperation) {
+    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, @NonNull Function<Post, Post> postOperation) {
         Assert.notNull(post, "Post param must not be null");
         Assert.notNull(postOperation, "Post operation must not be null");
 
@@ -210,7 +211,14 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         log.debug("Created post categories: [{}]", postCategories);
 
-        return post;
+        // Build post detail vo
+        PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
+
+        postDetailVO.setTagIds(ServiceUtils.fetchProperty(postTags, PostTag::getTagId));
+
+        postDetailVO.setCategoryIds(ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId));
+
+        return postDetailVO;
     }
 
     /**
@@ -223,5 +231,10 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     @Override
     public Post getByUrl(String url, PostType type) {
         return postRepository.getByUrlAndType(url, type).orElseThrow(() -> new NotFoundException("The post does not exist").setErrorData(url));
+    }
+
+    @Override
+    public PostDetailVO getDetailVoBy(Integer postId) {
+        return null;
     }
 }

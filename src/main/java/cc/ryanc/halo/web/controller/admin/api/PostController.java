@@ -1,12 +1,12 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
-import cc.ryanc.halo.model.dto.post.PostDetailOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.params.PostParam;
+import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.service.PostService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
@@ -48,27 +48,28 @@ public class PostController {
         return postService.pageSimpleDtoByStatus(status, PostType.POST, pageable);
     }
 
+    @GetMapping("{postId:\\d+}")
+    public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
+        return postService.getDetailVoBy(postId);
+    }
+
     @PostMapping
-    public PostDetailOutputDTO createBy(@Valid @RequestBody PostParam postParam) {
+    public PostDetailVO createBy(@Valid @RequestBody PostParam postParam) {
         // Convert to
         Post post = postParam.convertTo();
 
-        Post createdPost = postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds());
-
-        return new PostDetailOutputDTO().convertFrom(createdPost);
+        return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds());
     }
 
     @PutMapping("{postId:\\d+}")
-    public PostDetailOutputDTO updateBy(@Valid @RequestBody PostParam postParam,
-                                        @PathVariable("postId") Integer postId) {
+    public PostDetailVO updateBy(@Valid @RequestBody PostParam postParam,
+                                 @PathVariable("postId") Integer postId) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
 
         postParam.update(postToUpdate);
 
-        Post updatedPost = postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds());
-
-        return new PostDetailOutputDTO().convertFrom(updatedPost);
+        return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds());
     }
 
 }
