@@ -32,4 +32,11 @@ public interface TagService extends CrudService<Tag, Integer> {
     @NonNull
     List<TagOutputDTO> listDtos(@NonNull Sort sort);
 
+    /**
+     * Get tag by slug name
+     *
+     * @param slugName slug name
+     * @return Tag
+     */
+    Tag getBySlugName(@NonNull String slugName);
 }

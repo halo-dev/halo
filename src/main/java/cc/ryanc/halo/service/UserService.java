@@ -61,6 +61,7 @@ public interface UserService extends CrudService<User, Integer> {
      * @return user info
      * @throws NotFoundException throws when the username does not exist
      */
+    @NonNull
     User getByEmailOfNonNull(@NonNull String email);
 
     /**

@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.exception.AlreadyExistsException;
+import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.dto.TagOutputDTO;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.repository.TagRepository;
@@ -62,5 +63,16 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
 
         // Get tag name
         return super.create(tag);
+    }
+
+    /**
+     * Get tag by slug name
+     *
+     * @param slugName slug name
+     * @return Tag
+     */
+    @Override
+    public Tag getBySlugName(String slugName) {
+        return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("The tag does not exist").setErrorData(slugName));
     }
 }
