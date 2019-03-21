@@ -64,6 +64,10 @@
       "parser": "babel-eslint"
     },
     "rules": {
+      "space-before-function-paren": [
+        "error",
+        "never"
+      ],
       "generator-star-spacing": "off",
       "no-mixed-operators": 0,
       "vue/max-attributes-per-line": [
