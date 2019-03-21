@@ -24,9 +24,9 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @RequestMapping(value = "/categories")
 public class ContentCategoryController extends BaseContentController {
 
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    private PostService postService;
+    private final PostService postService;
 
     public ContentCategoryController(CategoryService categoryService,
                                      PostService postService) {

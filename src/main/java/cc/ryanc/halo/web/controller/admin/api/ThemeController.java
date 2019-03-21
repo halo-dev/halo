@@ -29,7 +29,7 @@ public class ThemeController {
 
     private final OptionService optionService;
 
-    private Configuration configuration;
+    private final Configuration configuration;
 
     public ThemeController(OptionService optionService,
                            Configuration configuration) {
