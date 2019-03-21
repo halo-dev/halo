@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.lang.NonNull;
 
+import java.util.Optional;
+
 
 /**
  * Post repository.
@@ -45,4 +47,13 @@ public interface PostRepository extends BaseRepository<Post, Integer>, JpaSpecif
      * @return the count
      */
     long countByUrl(@NonNull String url);
+
+    /**
+     * Get post by url
+     *
+     * @param url  post url
+     * @param type post type enum
+     * @return Optional<Post>
+     */
+    Optional<Post> getByUrlAndType(@NonNull String url, @NonNull PostType type);
 }

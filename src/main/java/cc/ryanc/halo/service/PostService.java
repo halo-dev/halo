@@ -125,4 +125,13 @@ public interface PostService extends CrudService<Post, Integer> {
     @NonNull
     @Transactional
     Post createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds);
+
+    /**
+     * Get post by url.
+     *
+     * @param url  post url.
+     * @param type post type enum.
+     * @return Post
+     */
+    Post getByUrl(@NonNull String url, @NonNull PostType type);
 }
