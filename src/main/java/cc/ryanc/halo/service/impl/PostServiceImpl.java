@@ -14,6 +14,7 @@ import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.*;
 import cc.ryanc.halo.service.base.AbstractCrudService;
+import cc.ryanc.halo.utils.DateUtils;
 import cc.ryanc.halo.utils.MarkdownUtils;
 import cc.ryanc.halo.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -175,6 +178,9 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
     @Override
     public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        // Set edit time
+        postToUpdate.setEditTime(DateUtils.now());
+
         return createOrUpdate(postToUpdate, tagIds, categoryIds, this::update);
     }
 
@@ -211,14 +217,10 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         log.debug("Created post categories: [{}]", postCategories);
 
-        // Build post detail vo
-        PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
-
-        postDetailVO.setTagIds(ServiceUtils.fetchProperty(postTags, PostTag::getTagId));
-
-        postDetailVO.setCategoryIds(ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId));
-
-        return postDetailVO;
+        // Convert to post detail vo
+        return convertTo(post,
+                () -> ServiceUtils.fetchProperty(postTags, PostTag::getTagId),
+                () -> ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId));
     }
 
     /**
@@ -235,6 +237,47 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
     @Override
     public PostDetailVO getDetailVoBy(Integer postId) {
-        return null;
+        Assert.notNull(postId, "post id must not be null");
+
+        Post post = getById(postId);
+
+        // Convert to post detail vo
+        return convertTo(post);
+    }
+
+    /**
+     * Convert to post detail vo.
+     *
+     * @param post post must not be null
+     * @return post detail vo
+     */
+    @NonNull
+    private PostDetailVO convertTo(@NonNull Post post) {
+        return convertTo(post,
+                () -> postTagService.listTagIdsByPostId(post.getId()),
+                () -> postCategoryService.listCategoryIdsByPostId(post.getId()));
+    }
+
+    /**
+     * Convert to post detail vo.
+     *
+     * @param post                  post must not be null
+     * @param tagIdSetSupplier      tag id set supplier
+     * @param categoryIdSetSupplier category id set supplier
+     * @return post detail vo
+     */
+    @NonNull
+    private PostDetailVO convertTo(@NonNull Post post, Supplier<Set<Integer>> tagIdSetSupplier, Supplier<Set<Integer>> categoryIdSetSupplier) {
+        Assert.notNull(post, "Post must not be null");
+
+        PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
+
+        // Get post tag ids
+        postDetailVO.setTagIds(tagIdSetSupplier == null ? Collections.emptySet() : tagIdSetSupplier.get());
+
+        // Get post category ids
+        postDetailVO.setCategoryIds(categoryIdSetSupplier == null ? Collections.emptySet() : categoryIdSetSupplier.get());
+
+        return postDetailVO;
     }
 }
