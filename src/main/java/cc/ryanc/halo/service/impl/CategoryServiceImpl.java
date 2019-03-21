@@ -147,4 +147,15 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         return topCategory;
     }
+
+    /**
+     * Get category by slug name
+     *
+     * @param slugName slug name
+     * @return Category
+     */
+    @Override
+    public Category getBySlugName(String slugName) {
+        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("The Category does not exist").setErrorData(slugName));
+    }
 }

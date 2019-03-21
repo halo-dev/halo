@@ -4,6 +4,8 @@ import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.lang.NonNull;
 
+import java.util.Optional;
+
 /**
  * Tag repository.
  *
@@ -19,4 +21,12 @@ public interface TagRepository extends BaseRepository<Tag, Integer> {
      * @return tag count
      */
     long countByNameOrSlugName(@NonNull String name, @NonNull String slugName);
+
+    /**
+     * Get tag by slug name
+     *
+     * @param slugName slug name
+     * @return Tag
+     */
+    Optional<Tag> getBySlugName(@NonNull String slugName);
 }
