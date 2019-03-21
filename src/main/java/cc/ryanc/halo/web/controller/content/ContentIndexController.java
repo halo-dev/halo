@@ -1,13 +1,12 @@
 package cc.ryanc.halo.web.controller.content;
 
-import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.util.PageUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
@@ -68,16 +66,14 @@ public class ContentIndexController extends BaseContentController {
                         }) Sort sort) {
         log.debug("Requested index page, sort info: [{}]", sort);
 
-        int size = 10;
-        if (StrUtil.isNotBlank(OPTIONS.get(BlogProperties.INDEX_POSTS.getValue()))) {
-            size = Integer.parseInt(OPTIONS.get(BlogProperties.INDEX_POSTS.getValue()));
-        }
-        final Pageable pageable = PageRequest.of(page - 1, size, sort);
-        final Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, PostType.POST, pageable);
+        int size = HaloUtils.getDefaultPageSize();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, PostType.POST, pageable);
         if (null == posts) {
+            // TODO There will never be null
             return this.renderNotFound();
         }
-        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
