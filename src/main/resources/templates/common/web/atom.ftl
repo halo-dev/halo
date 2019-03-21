@@ -10,7 +10,7 @@
         <title>${options.blog_title!}</title>
         <atom:link href="${options.blog_url!}/atom.xml" rel="self" type="application/rss+xml"/>
         <link>${options.blog_url!}</link>
-        <description>${user.userDesc!}</description>
+        <description>${user.description!}</description>
         <language>zh-CN</language>
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>
@@ -19,25 +19,25 @@
     <#if posts?? && posts?size gt 0>
         <#list posts as post>
             <item>
-                <title>${post.postTitle!}</title>
-                <link>${options.blog_url!}/archives/${post.postUrl!}</link>
-                <comments>${options.blog_url!}/archives/${post.postUrl!}#comments</comments>
-                <pubDate>${post.postDate}</pubDate>
-                <dc:creator><![CDATA[${user.userDisplayName!}]]></dc:creator>
+                <title>${post.title!}</title>
+                <link>${options.blog_url!}/archives/${post.url!}</link>
+                <comments>${options.blog_url!}/archives/${post.url!}#comments</comments>
+                <pubDate>${post.createTime}</pubDate>
+                <dc:creator><![CDATA[${user.nickName!}]]></dc:creator>
 
                 <#if post.categories?? && post.categories?size gt 0>
                     <#list post.categories as cate>
-                        <category><![CDATA[${cate.cateName!}]]></category>
+                        <category><![CDATA[${cate.name!}]]></category>
                     </#list>
                 </#if>
                 <description>
                     <![CDATA[
-                        ${post.postSummary!}
+                        ${post.summary!}
                     ]]>
                 </description>
                 <content:encoded>
                     <![CDATA[
-                        ${post.postContent!}
+                        ${post.formatContent!}
                     ]]>
                 </content:encoded>
                 <slash:comments>${post.comments?size}</slash:comments>

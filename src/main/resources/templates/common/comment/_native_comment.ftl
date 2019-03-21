@@ -32,23 +32,23 @@ ${options.native_css!}
     <#macro childComments comments>
         <ul class="comment-list" style="margin-left: 30px; border-left: 1px solid #f1f1f1">
         <#if comments?? && comments?size gt 0>
-            <#list comments?sort_by("commentDate") as comment>
-                <li class="comment-list-one" id="comment-id-${comment.commentId?c}" style="margin-left: 5px;">
-                    <img class="comment-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5!}?s=256&d=${options.native_comment_avatar!'mm'}">
+            <#list comments?sort_by("createTime") as comment>
+                <li class="comment-list-one" id="comment-id-${comment.id?c}" style="margin-left: 5px;">
+                    <img class="comment-list-one-img" src="//gravatar.loli.net/avatar/${comment.gavatarMd5!}?s=256&d=${options.native_comment_avatar!'mm'}">
                     <section>
                         <div class="comment-list-one-head">
-                            <a class="comment-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl!}">${comment.commentAuthor!}</a>
-                            <span class="comment-ua-info" style="display: none">${comment.commentAgent!}</span>
+                            <a class="comment-list-one-head-name" rel="nofollow" href="${comment.authorUrl!}">${comment.author!}</a>
+                            <span class="comment-ua-info" style="display: none">${comment.userAgent!}</span>
                             <#if comment.isAdmin==1>
                                 <span class="comment-list-one-head-admin">博主</span>
                             </#if>
                         </div>
                         <div class="comment-list-one-content">
-                            <p>${comment.commentContent!}</p>
+                            <p>${comment.content!}</p>
                         </div>
                         <div class="comment-list-one-footer">
-                            <span class="comment-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
-                            <span at="${comment.commentId?c}" class="comment-list-one-footer-reback">回复</span>
+                            <span class="comment-list-one-footer-time">${comment.createTime?string("yyyy-MM-dd HH:mm")}</span>
+                            <span at="${comment.id?c}" class="comment-list-one-footer-reback">回复</span>
                         </div>
                     </section>
                     <#if comment.childComments?? && comment.childComments?size gt 0>
@@ -61,23 +61,23 @@ ${options.native_css!}
     </#macro>
     <ul class="comment-list" id="comments-list">
         <#if comments?? && comments.getPageList()?size gt 0>
-            <#list comments.getPageList()?sort_by("commentDate")?reverse as comment>
-                <li class="comment-list-one" id="comment-id-${comment.commentId?c}">
-                    <img class="comment-list-one-img" src="//gravatar.loli.net/avatar/${comment.commentAuthorAvatarMd5!}?s=256&d=${options.native_comment_avatar!'mm'}">
+            <#list comments.getPageList()?sort_by("createTime")?reverse as comment>
+                <li class="comment-list-one" id="comment-id-${comment.id?c}">
+                    <img class="comment-list-one-img" src="//gravatar.loli.net/avatar/${comment.gavatarMd5!}?s=256&d=${options.native_comment_avatar!'mm'}">
                     <section>
                         <div class="comment-list-one-head">
-                            <a class="comment-list-one-head-name" rel="nofollow" href="${comment.commentAuthorUrl!}">${comment.commentAuthor!}</a>
-                            <span class="comment-ua-info" style="display: none">${comment.commentAgent!}</span>
+                            <a class="comment-list-one-head-name" rel="nofollow" href="${comment.authorUrl!}">${comment.author!}</a>
+                            <span class="comment-ua-info" style="display: none">${comment.userAgent!}</span>
                             <#if comment.isAdmin==1>
                                 <label class="comment-list-one-head-admin">博主</label>
                             </#if>
                         </div>
                         <div class="comment-list-one-content">
-                            <p>${comment.commentContent!}</p>
+                            <p>${comment.content!}</p>
                         </div>
                         <div class="comment-list-one-footer">
-                            <span class="comment-list-one-footer-time">${comment.commentDate?string("yyyy-MM-dd HH:mm")}</span>
-                            <span at="${comment.commentId?c}" class="comment-list-one-footer-reback">回复</span>
+                            <span class="comment-list-one-footer-time">${comment.createTime?string("yyyy-MM-dd HH:mm")}</span>
+                            <span at="${comment.id?c}" class="comment-list-one-footer-reback">回复</span>
                         </div>
                     </section>
                     <#if comment.childComments?? && comment.childComments?size gt 0>
