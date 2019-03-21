@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
@@ -124,7 +125,7 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     @Transactional
-    Post createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds);
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds);
 
     /**
      * Updates post by post, tag id set and category id set.
@@ -136,7 +137,7 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     @Transactional
-    Post updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds);
+    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds);
 
     /**
      * Get post by url.
@@ -146,4 +147,13 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return Post
      */
     Post getByUrl(@NonNull String url, @NonNull PostType type);
+
+    /**
+     * Get post detail vo by post id.
+     *
+     * @param postId post id must not be null
+     * @return post detail vo
+     */
+    @NonNull
+    PostDetailVO getDetailVoBy(@NonNull Integer postId);
 }

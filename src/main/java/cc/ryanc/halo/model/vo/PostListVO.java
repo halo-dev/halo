@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.dto.CategoryOutputDTO;
 import cc.ryanc.halo.model.dto.TagOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @author johnniang
  * @date 3/19/19
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class PostListVO extends PostSimpleOutputDTO {
 

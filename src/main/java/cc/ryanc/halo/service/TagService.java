@@ -24,19 +24,19 @@ public interface TagService extends CrudService<Tag, Integer> {
     void remove(Integer id);
 
     /**
-     * Lists all tag dtos.
-     *
-     * @param sort sort info must not be null
-     * @return a list of tag dto
-     */
-    @NonNull
-    List<TagOutputDTO> listDtos(@NonNull Sort sort);
-
-    /**
      * Get tag by slug name
      *
      * @param slugName slug name
      * @return Tag
      */
     Tag getBySlugName(@NonNull String slugName);
+
+    /**
+     * Converts to tag output dtos.
+     *
+     * @param tags tag list
+     * @return a list of tag output dto
+     */
+    @NonNull
+    List<TagOutputDTO> convertTo(List<Tag> tags);
 }

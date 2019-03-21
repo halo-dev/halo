@@ -8,10 +8,10 @@ import cc.ryanc.halo.repository.TagRepository;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,13 +43,6 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     }
 
     @Override
-    public List<TagOutputDTO> listDtos(Sort sort) {
-        Assert.notNull(sort, "Sort info must not be null");
-
-        return listAll(sort).stream().map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag)).collect(Collectors.toList());
-    }
-
-    @Override
     public Tag create(Tag tag) {
         // Check if the tag is exist
         long count = tagRepository.countByNameOrSlugName(tag.getName(), tag.getSlugName());
@@ -74,5 +67,12 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     @Override
     public Tag getBySlugName(String slugName) {
         return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("The tag does not exist").setErrorData(slugName));
+    }
+
+    @Override
+    public List<TagOutputDTO> convertTo(List<Tag> tags) {
+        return CollectionUtils.isEmpty(tags) ?
+                Collections.emptyList() :
+                tags.stream().map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag)).collect(Collectors.toList());
     }
 }
