@@ -31,24 +31,8 @@ public class PostController {
 
     private final PostService postService;
 
-    private final TagService tagService;
-
-    private final CategoryService categoryService;
-
-    private final PostTagService postTagService;
-
-    private final PostCategoryService postCategoryService;
-
-    public PostController(PostService postService,
-                          TagService tagService,
-                          CategoryService categoryService,
-                          PostTagService postTagService,
-                          PostCategoryService postCategoryService) {
+    public PostController(PostService postService) {
         this.postService = postService;
-        this.tagService = tagService;
-        this.categoryService = categoryService;
-        this.postTagService = postTagService;
-        this.postCategoryService = postCategoryService;
     }
 
     @GetMapping("latest")

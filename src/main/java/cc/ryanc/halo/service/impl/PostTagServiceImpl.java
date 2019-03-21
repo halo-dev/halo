@@ -120,6 +120,9 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
             return postTag;
         }).collect(Collectors.toSet());
 
+        // Get post tag exist and remove them
+        postTags.removeAll(postTagRepository.findAllByPostId(postId));
+
         // Create in batch
         return createInBatch(postTags);
     }

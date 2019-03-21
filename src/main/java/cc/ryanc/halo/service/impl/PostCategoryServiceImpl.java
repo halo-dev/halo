@@ -96,12 +96,15 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         }
 
         // Build post categories
-        List<PostCategory> postCategories = categoryIds.stream().map(categoryId -> {
+        Set<PostCategory> postCategories = categoryIds.stream().map(categoryId -> {
             PostCategory postCategory = new PostCategory();
             postCategory.setPostId(postId);
             postCategory.setCategoryId(categoryId);
             return postCategory;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toSet());
+
+        // List all post categories and remove them
+        postCategories.removeAll(postCategoryRepository.findAllByPostId(postId));
 
         // Create them
         return createInBatch(postCategories);
