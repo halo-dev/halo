@@ -50,6 +50,7 @@
 <script>
 import postApi from '@/api/post'
 import commentApi from '@/api/comment'
+import adminApi from '@/api/admin'
 
 const postColumns = [
   {
@@ -95,16 +96,18 @@ export default {
   components: {},
   data() {
     return {
-      loading: true,
       postLoading: true,
       commentLoading: true,
+      countsLoading: true,
       postColumns,
       postData: [],
       commentColumns,
-      commentData: []
+      commentData: [],
+      countsData: { attachmentCount: 0, commentCount: 0, establishDays: 0, postCount: 0 }
     }
   },
   created() {
+    this.getCounts()
     this.listLatestPosts()
     this.listLatestComments()
   },
@@ -119,6 +122,12 @@ export default {
       commentApi.listLatest().then(response => {
         this.commentLoading = false
         this.commentData = response.data.data
+      })
+    },
+    getCounts() {
+      adminApi.counts().then(response => {
+        this.countsLoading = false
+        this.countsData = response.data.data
       })
     }
   }
