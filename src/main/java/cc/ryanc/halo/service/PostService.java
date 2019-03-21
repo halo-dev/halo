@@ -12,8 +12,10 @@ import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Post service.
@@ -111,4 +113,16 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return posts count
      */
     Long countByStatus(PostStatus status, PostType type);
+
+    /**
+     * Creates post by post param.
+     *
+     * @param post        post must not be null
+     * @param tagIds      tag id set
+     * @param categoryIds category id set
+     * @return post created
+     */
+    @NonNull
+    @Transactional
+    Post createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds);
 }

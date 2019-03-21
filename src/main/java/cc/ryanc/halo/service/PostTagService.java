@@ -11,6 +11,7 @@ import org.springframework.lang.NonNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Post tag service interface.
@@ -56,4 +57,13 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
     @NonNull
     List<Post> listPostsBy(@NonNull Integer tagId);
 
+    /**
+     * Creates post tags by post id and tag id set.
+     *
+     * @param postId post id must not be null
+     * @param tagIds tag id set
+     * @return a list of post tag
+     */
+    @NonNull
+    List<PostTag> createBy(@NonNull Integer postId, Set<Integer> tagIds);
 }

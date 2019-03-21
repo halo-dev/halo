@@ -5,7 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import com.qiniu.common.Zone;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import javax.imageio.ImageIO;
@@ -39,6 +41,37 @@ import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 public class HaloUtils {
 
     public final static int DEFAULT_PAGE_SIZE = 10;
+
+    /**
+     * Initialize url if blank.
+     *
+     * @param url url can be blank
+     * @return initial url
+     */
+    @NonNull
+    public static String initializeUrlIfBlank(@Nullable String url) {
+        if (!StringUtils.isBlank(url)) {
+            return url;
+        }
+        // TODO Consider to UUID
+        return String.valueOf(System.currentTimeMillis());
+    }
+
+    /**
+     * Normalize url.
+     *
+     * @param url url must not be blank
+     * @return normalized url
+     */
+    @NonNull
+    public static String normalizeUrl(@NonNull String url) {
+        Assert.hasText(url, "Url must not be blank");
+
+        StringUtils.removeEnd(url, "html");
+        StringUtils.removeEnd(url, "htm");
+
+        return SlugUtils.slugify(url);
+    }
 
     /**
      * Gets machine IP address.
@@ -200,7 +233,7 @@ public class HaloUtils {
             final BufferedImage image = ImageIO.read(new FileInputStream(file));
             return image.getWidth() + "x" + image.getHeight();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get read image file",e);
+            throw new RuntimeException("Failed to get read image file", e);
         }
     }
 
@@ -223,7 +256,7 @@ public class HaloUtils {
             bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(data);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to export file",e);
+            throw new RuntimeException("Failed to export file", e);
         } finally {
             if (null != bufferedWriter) {
                 bufferedWriter.close();
@@ -297,7 +330,7 @@ public class HaloUtils {
                 result.append(line);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to push posts to baidu",e);
+            throw new RuntimeException("Failed to push posts to baidu", e);
         } finally {
             try {
                 if (null != out) {
