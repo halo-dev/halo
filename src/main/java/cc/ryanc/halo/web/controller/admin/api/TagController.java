@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Tag controller.
@@ -35,9 +36,14 @@ public class TagController {
         this.postTagService = postTagService;
     }
 
-    @GetMapping
-    public List<TagWithCountOutputDTO> listTags(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
+    @GetMapping("/addition")
+    public List<TagWithCountOutputDTO> listTagsWithCount(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
         return postTagService.listTagWithCountDtos(sort);
+    }
+
+    @GetMapping
+    public List<TagOutputDTO> listTags(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
+        return tagService.listDtos(sort);
     }
 
     @PostMapping

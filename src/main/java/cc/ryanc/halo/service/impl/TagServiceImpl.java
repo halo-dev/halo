@@ -1,12 +1,18 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.exception.AlreadyExistsException;
+import cc.ryanc.halo.model.dto.TagOutputDTO;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.repository.TagRepository;
 import cc.ryanc.halo.service.TagService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * TagService implementation class
@@ -33,6 +39,13 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     @Override
     public void remove(Integer id) {
         // TODO 删除标签，以及对应的文章关系
+    }
+
+    @Override
+    public List<TagOutputDTO> listDtos(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+
+        return listAll(sort).stream().map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag)).collect(Collectors.toList());
     }
 
     @Override
