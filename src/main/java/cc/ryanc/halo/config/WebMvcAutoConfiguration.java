@@ -83,6 +83,8 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/halo-admin/images/favicon.ico");
         registry.addResourceHandler("/backup/**")
                 .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/backup/");
+        registry.addResourceHandler("/admin/**")
+                .addResourceLocations("classpath:/static/admin/");
 
         if (!haloProperties.getDocDisabled()) {
             // If doc is enable
@@ -91,30 +93,6 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
             registry.addResourceHandler("/webjars/**")
                     .addResourceLocations("classpath:/META-INF/resources/webjars/");
         }
-    }
-
-    /**
-     * 国际化设置
-     *
-     * @return LocaleResolver
-     */
-    @Bean
-    public LocaleResolver localeResolver() {
-        final SessionLocaleResolver slr = new SessionLocaleResolver();
-        slr.setDefaultLocale(Locale.CHINA);
-        return slr;
-    }
-
-    /**
-     * 国际化参数拦截器
-     *
-     * @return LocaleChangeInterceptor
-     */
-    @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
-        final LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-        lci.setParamName("lang");
-        return lci;
     }
 
     @Override
