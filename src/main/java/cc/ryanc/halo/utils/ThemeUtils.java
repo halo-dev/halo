@@ -185,6 +185,22 @@ public class ThemeUtils {
     }
 
     /**
+     * Judging whether theme exists under template path
+     *
+     * @param theme theme name
+     * @return boolean
+     * @throws FileNotFoundException FileNotFoundException
+     */
+    public static boolean isThemeExist(String theme) throws FileNotFoundException {
+        boolean result = false;
+        File file = new File(getThemesPath(theme), theme);
+        if (file.exists()) {
+            result = true;
+        }
+        return result;
+    }
+
+    /**
      * Judging whether the theme is a internal theme or not
      *
      * @param themeName themeName
