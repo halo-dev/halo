@@ -47,12 +47,12 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     List<Post> listPostBy(@NonNull Integer categoryId);
 
     /**
-     * Creates post categories by post id and category id set.
+     * Merges or creates post categories by post id and category id set if absent.
      *
      * @param postId      post id must not be null
      * @param categoryIds category id set
      * @return a list of post category
      */
     @NonNull
-    List<PostCategory> createBy(@NonNull Integer postId, Set<Integer> categoryIds);
+    List<PostCategory> mergeOrCreateByIfAbsent(@NonNull Integer postId, Set<Integer> categoryIds);
 }

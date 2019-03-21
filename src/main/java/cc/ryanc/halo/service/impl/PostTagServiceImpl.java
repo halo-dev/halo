@@ -104,7 +104,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     }
 
     @Override
-    public List<PostTag> createBy(Integer postId, Set<Integer> tagIds) {
+    public List<PostTag> mergeOrCreateByIfAbsent(Integer postId, Set<Integer> tagIds) {
         Assert.notNull(postId, "Post id must not be null");
 
         if (CollectionUtils.isEmpty(tagIds)) {
@@ -112,18 +112,41 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         }
 
         // Create post tags
-        Set<PostTag> postTags = tagIds.stream().map(tagId -> {
+        List<PostTag> postTagsStaging = tagIds.stream().map(tagId -> {
             // Build post tag
             PostTag postTag = new PostTag();
             postTag.setPostId(postId);
             postTag.setTagId(tagId);
             return postTag;
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
 
-        // Get post tag exist and remove them
-        postTags.removeAll(postTagRepository.findAllByPostId(postId));
+        List<PostTag> postTagsToRemove = new LinkedList<>();
+        List<PostTag> postTagsToCreate = new LinkedList<>();
 
-        // Create in batch
-        return createInBatch(postTags);
+        List<PostTag> postTags = postTagRepository.findAllByPostId(postId);
+
+        postTags.forEach(postTag -> {
+            if (!postTagsStaging.contains(postTag)) {
+                postTagsToRemove.add(postTag);
+            }
+        });
+
+        postTagsStaging.forEach(postTagStaging -> {
+            if (!postTags.contains(postTagStaging)) {
+                postTagsToCreate.add(postTagStaging);
+            }
+        });
+
+        // Remove post tags
+        removeAll(postTagsToRemove);
+
+        // Remove all post tags need to remove
+        postTags.removeAll(postTagsToRemove);
+
+        // Add all created post tags
+        postTags.addAll(createInBatch(postTagsToCreate));
+
+        // Return post tags
+        return postTags;
     }
 }

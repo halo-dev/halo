@@ -127,6 +127,18 @@ public interface PostService extends CrudService<Post, Integer> {
     Post createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds);
 
     /**
+     * Updates post by post, tag id set and category id set.
+     *
+     * @param postToUpdate post to update must not be null
+     * @param tagIds       tag id set
+     * @param categoryIds  category id set
+     * @return updated post
+     */
+    @NonNull
+    @Transactional
+    Post updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds);
+
+    /**
      * Get post by url.
      *
      * @param url  post url.

@@ -58,12 +58,12 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
     List<Post> listPostsBy(@NonNull Integer tagId);
 
     /**
-     * Creates post tags by post id and tag id set.
+     * Merges or creates post tags by post id and tag id set if absent.
      *
      * @param postId post id must not be null
      * @param tagIds tag id set
      * @return a list of post tag
      */
     @NonNull
-    List<PostTag> createBy(@NonNull Integer postId, Set<Integer> tagIds);
+    List<PostTag> mergeOrCreateByIfAbsent(@NonNull Integer postId, Set<Integer> tagIds);
 }
