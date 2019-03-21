@@ -50,6 +50,7 @@
 <script>
 import postApi from '@/api/post'
 import commentApi from '@/api/comment'
+import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 
 const postColumns = [
@@ -98,18 +99,21 @@ export default {
     return {
       postLoading: true,
       commentLoading: true,
+      logLoading: true,
       countsLoading: true,
       postColumns,
       postData: [],
       commentColumns,
       commentData: [],
-      countsData: { attachmentCount: 0, commentCount: 0, establishDays: 0, postCount: 0 }
+      logData: [],
+      countsData: null
     }
   },
   created() {
     this.getCounts()
     this.listLatestPosts()
     this.listLatestComments()
+    this.listLatestLogs()
   },
   methods: {
     listLatestPosts() {
@@ -122,6 +126,12 @@ export default {
       commentApi.listLatest().then(response => {
         this.commentLoading = false
         this.commentData = response.data.data
+      })
+    },
+    listLatestLogs() {
+      logApi.listLatest().then(response => {
+        this.logLoading = false
+        this.logData = response.data.data
       })
     },
     getCounts() {
