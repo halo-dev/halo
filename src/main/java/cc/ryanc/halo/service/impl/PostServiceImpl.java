@@ -189,7 +189,12 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         Assert.notNull(postOperation, "Post operation must not be null");
 
         // Check url
-        long count = postRepository.countByUrl(post.getUrl());
+        long count;
+        if (post.getId() != null) {
+            count = postRepository.countByIdNotAndUrl(post.getId(), post.getUrl());
+        } else {
+            count = postRepository.countByUrl(post.getUrl());
+        }
 
         if (count > 0) {
             throw new AlreadyExistsException("The post url has been exist already").setErrorData(post.getUrl());

@@ -49,6 +49,15 @@ public interface PostRepository extends BaseRepository<Post, Integer>, JpaSpecif
     long countByUrl(@NonNull String url);
 
     /**
+     * Count by not url and post id not in.
+     *
+     * @param id  post id must not be null
+     * @param url post url must not be null
+     * @return the count
+     */
+    long countByIdNotAndUrl(@NonNull Integer id, @NonNull String url);
+
+    /**
      * Get post by url
      *
      * @param url  post url
