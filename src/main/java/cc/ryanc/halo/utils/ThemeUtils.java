@@ -33,7 +33,7 @@ public class ThemeUtils {
             themes.addAll(getThemesByPath(getInternalThemesPath(), true));
             themes.addAll(getThemesByPath(getUsersThemesPath(), false));
         } catch (Exception e) {
-            throw new RuntimeException("Themes scan failed",e);
+            throw new RuntimeException("Themes scan failed", e);
         }
         return themes;
     }
@@ -77,7 +77,7 @@ public class ThemeUtils {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Themes scan failed",e);
+            throw new RuntimeException("Themes scan failed", e);
         }
         return themes;
     }
@@ -108,7 +108,7 @@ public class ThemeUtils {
      * @return File
      */
     public static File getThemesPath(String themeName) throws FileNotFoundException {
-        return isInternal(themeName)?getInternalThemesPath():getUsersThemesPath();
+        return isInternal(themeName) ? getInternalThemesPath() : getUsersThemesPath();
     }
 
     /**
@@ -139,7 +139,7 @@ public class ThemeUtils {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get theme template",e);
+            throw new RuntimeException("Failed to get theme template", e);
         }
         return templates;
     }
