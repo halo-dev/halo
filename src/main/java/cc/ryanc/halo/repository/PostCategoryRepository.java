@@ -5,7 +5,6 @@ import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -50,8 +49,17 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
      * Finds all post categories by post id.
      *
      * @param postId post id must not be null
-     * @return a list of post categories
+     * @return a list of post category
      */
     @NonNull
     List<PostCategory> findAllByPostId(@NonNull Integer postId);
+
+    /**
+     * Finds all post categories by category id.
+     *
+     * @param categoryId category id must not be null
+     * @return a list of post category
+     */
+    @NonNull
+    List<PostCategory> findAllByCategoryId(@NonNull Integer categoryId);
 }

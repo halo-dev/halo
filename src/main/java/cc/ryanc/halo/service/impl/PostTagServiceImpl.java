@@ -149,4 +149,25 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         // Return post tags
         return postTags;
     }
+
+    @Override
+    public List<PostTag> listByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        return postTagRepository.findAllByPostId(postId);
+    }
+
+    @Override
+    public List<PostTag> listByTagId(Integer tagId) {
+        Assert.notNull(tagId, "Tag id must not be null");
+
+        return postTagRepository.findAllByTagId(tagId);
+    }
+
+    @Override
+    public Set<Integer> listTagIdsByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        return postTagRepository.findAllTagIdsByPostId(postId);
+    }
 }

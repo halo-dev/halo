@@ -47,11 +47,6 @@ public class PostSimpleOutputDTO extends PostMinimalOutputDTO {
     private Boolean disallowComment;
 
     /**
-     * 文章密码
-     */
-    private String password;
-
-    /**
      * 自定义渲染模板名称
      */
     private String template;
