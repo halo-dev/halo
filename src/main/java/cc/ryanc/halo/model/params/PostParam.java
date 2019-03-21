@@ -66,8 +66,28 @@ public class PostParam implements InputConverter<Post> {
 
         Post post = InputConverter.super.convertTo();
         // Crypt password
-        post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        if (StringUtils.isNotBlank(password)) {
+            post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        }
 
         return post;
+    }
+
+    @Override
+    public void update(Post post) {
+        if (StringUtils.isBlank(url)) {
+            url = HaloUtils.normalizeUrl(title);
+        } else {
+            url = HaloUtils.normalizeUrl(url);
+        }
+
+        url = HaloUtils.initializeUrlIfBlank(url);
+
+        InputConverter.super.update(post);
+
+        // Crypt password
+        if (StringUtils.isNotBlank(password)) {
+            post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        }
     }
 }

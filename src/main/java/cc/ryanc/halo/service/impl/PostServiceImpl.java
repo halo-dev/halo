@@ -20,12 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -166,10 +168,20 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Post createBy(Post post, Set<Integer> tagIds, Set<Integer> categoryIds) {
-        Assert.notNull(post, "Post param must not be null");
+    public Post createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        return createOrUpdate(postToCreate, tagIds, categoryIds, this::create);
+    }
 
-        // TODO Check url
+    @Override
+    public Post updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        return createOrUpdate(postToUpdate, tagIds, categoryIds, this::update);
+    }
+
+    private Post createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, @NonNull Function<Post, Post> postOperation) {
+        Assert.notNull(post, "Post param must not be null");
+        Assert.notNull(postOperation, "Post operation must not be null");
+
+        // Check url
         long count = postRepository.countByUrl(post.getUrl());
 
         if (count > 0) {
@@ -179,10 +191,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         // Render content
         post.setFormatContent(MarkdownUtils.renderMarkdown(post.getOriginalContent()));
 
-        // TODO Handle thumbnail
-
-        // Create post
-        create(post);
+        // Update post
+        post = postOperation.apply(post);
 
         // List all tags
         List<Tag> tags = tagService.listAllByIds(tagIds);
@@ -191,12 +201,12 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         List<Category> categories = categoryService.listAllByIds(categoryIds);
 
         // Create post tags
-        List<PostTag> postTags = postTagService.createBy(post.getId(), ServiceUtils.fetchProperty(tags, Tag::getId));
+        List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(tags, Tag::getId));
 
         log.debug("Created post tags: [{}]", postTags);
 
         // Create post categories
-        List<PostCategory> postCategories = postCategoryService.createBy(post.getId(), ServiceUtils.fetchProperty(categories, Category::getId));
+        List<PostCategory> postCategories = postCategoryService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(categories, Category::getId));
 
         log.debug("Created post categories: [{}]", postCategories);
 
@@ -212,6 +222,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      */
     @Override
     public Post getByUrl(String url, PostType type) {
-        return postRepository.getByUrlAndType(url, type).orElseThrow(()->new NotFoundException("The post does not exist").setErrorData(url));
+        return postRepository.getByUrlAndType(url, type).orElseThrow(() -> new NotFoundException("The post does not exist").setErrorData(url));
     }
 }

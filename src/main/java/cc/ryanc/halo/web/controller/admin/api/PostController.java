@@ -7,7 +7,7 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.params.PostParam;
-import cc.ryanc.halo.service.*;
+import cc.ryanc.halo.service.PostService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +53,22 @@ public class PostController {
         // Convert to
         Post post = postParam.convertTo();
 
-        return new PostDetailOutputDTO().convertFrom(postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds()));
+        Post createdPost = postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds());
+
+        return new PostDetailOutputDTO().convertFrom(createdPost);
+    }
+
+    @PutMapping("{postId:\\d+}")
+    public PostDetailOutputDTO updateBy(@Valid @RequestBody PostParam postParam,
+                                        @PathVariable("postId") Integer postId) {
+        // Get the post info
+        Post postToUpdate = postService.getById(postId);
+
+        postParam.update(postToUpdate);
+
+        Post updatedPost = postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds());
+
+        return new PostDetailOutputDTO().convertFrom(updatedPost);
     }
 
 }

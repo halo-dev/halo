@@ -88,7 +88,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
-    public List<PostCategory> createBy(Integer postId, Set<Integer> categoryIds) {
+    public List<PostCategory> mergeOrCreateByIfAbsent(Integer postId, Set<Integer> categoryIds) {
         Assert.notNull(postId, "Post id must not be null");
 
         if (CollectionUtils.isEmpty(categoryIds)) {
@@ -96,17 +96,41 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         }
 
         // Build post categories
-        Set<PostCategory> postCategories = categoryIds.stream().map(categoryId -> {
+        List<PostCategory> postCategoriesStaging = categoryIds.stream().map(categoryId -> {
             PostCategory postCategory = new PostCategory();
             postCategory.setPostId(postId);
             postCategory.setCategoryId(categoryId);
             return postCategory;
-        }).collect(Collectors.toSet());
+        }).collect(Collectors.toList());
 
-        // List all post categories and remove them
-        postCategories.removeAll(postCategoryRepository.findAllByPostId(postId));
+        List<PostCategory> postCategoriesToCreate = new LinkedList<>();
+        List<PostCategory> postCategoriesToRemove = new LinkedList<>();
+
+        // Find all exist post categories
+        List<PostCategory> postCategories = postCategoryRepository.findAllByPostId(postId);
+
+        postCategories.forEach(postCategory -> {
+            if (!postCategoriesStaging.contains(postCategory)) {
+                postCategoriesToRemove.add(postCategory);
+            }
+        });
+
+        postCategoriesStaging.forEach(postCategoryStaging -> {
+            if (!postCategories.contains(postCategoryStaging)) {
+                postCategoriesToCreate.add(postCategoryStaging);
+            }
+        });
+
+        // Remove post categories
+        removeAll(postCategoriesToRemove);
+
+        // Remove all post categories need to remove
+        postCategories.removeAll(postCategoriesToRemove);
+
+        // Add all created post categories
+        postCategories.addAll(createInBatch(postCategoriesToCreate));
 
         // Create them
-        return createInBatch(postCategories);
+        return postCategories;
     }
 }
