@@ -1,5 +1,6 @@
 package cc.ryanc.halo.utils;
 
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import com.qiniu.common.Zone;
@@ -88,18 +89,18 @@ public class HaloUtils {
         return machineAddress.getHostAddress();
     }
 
-//    /**
-//     * Gets default page size.
-//     *
-//     * @return default page size
-//     */
-//    public static int getDefaultPageSize() {
-//        if (StrUtil.isNotBlank(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()))) {
-//            return Integer.parseInt(OPTIONS.get(BlogPropertiesEnum.INDEX_POSTS.getProp()));
-//        }
-//
-//        return DEFAULT_PAGE_SIZE;
-//    }
+    /**
+     * Gets default page size.
+     *
+     * @return default page size
+     */
+    public static int getDefaultPageSize() {
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogProperties.INDEX_POSTS))) {
+            return Integer.parseInt(OPTIONS.get(BlogProperties.INDEX_POSTS));
+        }
+
+        return DEFAULT_PAGE_SIZE;
+    }
 
     /**
      * Gets default qiniuyun zone.
