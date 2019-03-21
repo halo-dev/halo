@@ -8,7 +8,6 @@ import cc.ryanc.halo.repository.UserRepository;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.DateUtils;
-import cc.ryanc.halo.utils.LocaleMessageUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.BCrypt;
 import org.springframework.stereotype.Service;
@@ -30,15 +29,11 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     private final StringCacheStore stringCacheStore;
 
-    private final LocaleMessageUtil localeMessageUtil;
-
     public UserServiceImpl(UserRepository userRepository,
-                           StringCacheStore stringCacheStore,
-                           LocaleMessageUtil localeMessageUtil) {
+                           StringCacheStore stringCacheStore) {
         super(userRepository);
         this.userRepository = userRepository;
         this.stringCacheStore = stringCacheStore;
-        this.localeMessageUtil = localeMessageUtil;
     }
 
     @Override
@@ -85,7 +80,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         // Check expiration
         if (user.getExpireTime() != null && DateUtils.now().before(user.getExpireTime())) {
             // If expired
-            throw new BadRequestException(localeMessageUtil.getMessage("code.admin.login.disabled"));
+            throw new BadRequestException("账号已被禁止登陆，请10分钟后再试");
         }
 
 
@@ -105,7 +100,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
             stringCacheStore.put(LOGIN_FAILURE_COUNT_KEY, loginFailureCount.toString(), LOCK_MINUTES, TimeUnit.MINUTES);
 
-            throw new BadRequestException(localeMessageUtil.getMessage("code.admin.login.failed", new Integer[]{(MAX_LOGIN_TRY - loginFailureCount)}));
+            throw new BadRequestException("账号或者密码错误，您还有" + (5 - loginFailureCount) + "次机会");
         }
 
         // TODO Set session

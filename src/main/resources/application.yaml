@@ -57,10 +57,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  # 多语言资源文件路径
-  messages:
-    basename: i18n/messages
-
   cache:
     type: ehcache
     ehcache:
