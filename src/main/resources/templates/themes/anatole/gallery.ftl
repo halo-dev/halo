@@ -12,7 +12,7 @@
 <div id="main">
     <header id="header">
         <h1>图库</h1>
-        <p>${user.userDesc!}</p>
+        <p>${user.description!}</p>
         <ul class="icons">
             <!--
             <li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
@@ -26,9 +26,9 @@
         <#if galleries?size gt 0>
         <#list galleries as gallery>
             <article>
-                <a class="thumbnail" href="${gallery.galleryUrl}" data-position="left center"><img src="${gallery.galleryThumbnailUrl}" alt="${gallery.galleryDesc}" /></a>
-                <h2>${gallery.galleryName}</h2>
-                <p>${gallery.galleryDate!}</p>
+                <a class="thumbnail" href="${gallery.url}" data-position="left center"><img src="${gallery.thumbnail}" alt="${gallery.description}" /></a>
+                <h2>${gallery.name}</h2>
+                <p>${gallery.takeTime!}</p>
             </article>
         </#list>
         </#if>
