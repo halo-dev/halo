@@ -2,6 +2,7 @@ package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.service.MailService;
+import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.text.StrBuilder;
 import freemarker.template.Template;
@@ -13,8 +14,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import java.io.File;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
-
 /**
  * @author : RYAN0UP
  * @date : 2019-03-17
@@ -24,8 +23,12 @@ public class MailServiceImpl implements MailService {
 
     private final FreeMarkerConfigurer freeMarker;
 
-    public MailServiceImpl(FreeMarkerConfigurer freeMarker) {
+    private final OptionService optionService;
+
+    public MailServiceImpl(FreeMarkerConfigurer freeMarker,
+                           OptionService optionService) {
         this.freeMarker = freeMarker;
+        this.optionService = optionService;
     }
 
     /**
@@ -38,12 +41,12 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendMail(String to, String subject, String content) {
         HaloUtils.configMail(
-                OPTIONS.get(BlogProperties.MAIL_SMTP_HOST.getValue()),
-                OPTIONS.get(BlogProperties.MAIL_SMTP_USERNAME.getValue()),
-                OPTIONS.get(BlogProperties.MAIL_SMTP_PASSWORD.getValue()));
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_HOST),
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_USERNAME),
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_PASSWORD));
         try {
             OhMyEmail.subject(subject)
-                    .from(OPTIONS.get(BlogProperties.MAIL_FROM_NAME.getValue()))
+                    .from(optionService.getByPropertyOfNonNull(BlogProperties.MAIL_FROM_NAME))
                     .to(to)
                     .text(content)
                     .send();
@@ -64,15 +67,15 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         HaloUtils.configMail(
-                OPTIONS.get(BlogProperties.MAIL_SMTP_HOST.getValue()),
-                OPTIONS.get(BlogProperties.MAIL_SMTP_USERNAME.getValue()),
-                OPTIONS.get(BlogProperties.MAIL_SMTP_PASSWORD.getValue()));
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_HOST),
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_USERNAME),
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_PASSWORD));
         StrBuilder text = new StrBuilder();
         try {
             final Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, content));
             OhMyEmail.subject(subject)
-                    .from(OPTIONS.get(BlogProperties.MAIL_FROM_NAME.getValue()))
+                    .from(optionService.getByPropertyOfNonNull(BlogProperties.MAIL_FROM_NAME))
                     .to(to)
                     .html(text.toString())
                     .send();
@@ -94,16 +97,16 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachSrc) {
         HaloUtils.configMail(
-                OPTIONS.get(BlogProperties.MAIL_SMTP_HOST.getValue()),
-                OPTIONS.get(BlogProperties.MAIL_SMTP_USERNAME.getValue()),
-                OPTIONS.get(BlogProperties.MAIL_SMTP_PASSWORD.getValue()));
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_HOST),
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_USERNAME),
+                optionService.getByPropertyOfNonNull(BlogProperties.MAIL_SMTP_PASSWORD));
         File file = new File(attachSrc);
         StrBuilder text = new StrBuilder();
         try {
             final Template template = freeMarker.getConfiguration().getTemplate(templateName);
             text.append(FreeMarkerTemplateUtils.processTemplateIntoString(template, content));
             OhMyEmail.subject(subject)
-                    .from(OPTIONS.get(BlogProperties.MAIL_FROM_NAME.getValue()))
+                    .from(optionService.getByPropertyOfNonNull(BlogProperties.MAIL_FROM_NAME))
                     .to(to)
                     .html(text.toString())
                     .attach(file, file.getName())

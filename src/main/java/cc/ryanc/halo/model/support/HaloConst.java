@@ -4,8 +4,6 @@ import cn.hutool.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * <pre>
@@ -32,12 +30,6 @@ public class HaloConst {
      * Token of header param
      */
     public static final String TOKEN_HEADER = "token";
-
-    /**
-     * All of the options
-     */
-    @Deprecated
-    public final static ConcurrentMap<String, String> OPTIONS = new ConcurrentHashMap<>();
 
     /**
      * All of the Owo

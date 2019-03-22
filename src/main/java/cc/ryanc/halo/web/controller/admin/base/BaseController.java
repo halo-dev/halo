@@ -6,7 +6,6 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static cc.ryanc.halo.model.support.HaloConst.THEMES;
 
 /**
@@ -28,11 +27,9 @@ public abstract class BaseController {
      */
     public void refreshCache() {
         try {
-            OPTIONS.clear();
             THEMES.clear();
-            OPTIONS.putAll(optionService.listOptions());
             THEMES = ThemeUtils.getThemes();
-            configuration.setSharedVariable("options", OPTIONS);
+            configuration.setSharedVariable("options", optionService.listOptions());
         } catch (TemplateModelException e) {
             e.printStackTrace();
         }

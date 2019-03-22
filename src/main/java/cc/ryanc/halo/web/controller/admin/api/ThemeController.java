@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
-
 /**
  * @author : RYAN0UP
  * @date : 2019/3/20
@@ -59,11 +57,9 @@ public class ThemeController {
     public void active(@RequestParam(name = "themeName", defaultValue = "anatole") String themeName) throws TemplateModelException {
         Map<BlogProperties, String> properties = new HashMap<>(1);
         properties.put(BlogProperties.THEME, themeName);
-        optionService.saveProperties(properties,"system");
+        optionService.saveProperties(properties, "system");
         BaseContentController.THEME = themeName;
-        OPTIONS.clear();
-        OPTIONS.putAll(optionService.listOptions());
         configuration.setSharedVariable("themeName", themeName);
-        configuration.setSharedVariable("options", OPTIONS);
+        configuration.setSharedVariable("options", optionService.listOptions());
     }
 }
