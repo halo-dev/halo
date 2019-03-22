@@ -62,37 +62,15 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
                            TagService tagService,
                            CategoryService categoryService,
                            PostTagService postTagService,
-                           PostCategoryService postCategoryService) {
+                           PostCategoryService postCategoryService,
+                           CommentService commentService) {
         super(postRepository);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
         this.postTagService = postTagService;
         this.postCategoryService = postCategoryService;
-    }
-
-    /**
-     * Save post with tags and categories
-     *
-     * @param post       post
-     * @param tags       tags
-     * @param categories categories
-     * @return saved post
-     */
-    @Override
-    public Post save(Post post, List<Tag> tags, List<Category> categories) {
-        // TODO 保存文章以及对应标签和分类
-        return null;
-    }
-
-    /**
-     * Remove post and relationship
-     *
-     * @param id id
-     */
-    @Override
-    public void remove(Integer id) {
-        // TODO 删除文章以及关联关系
+        this.commentService = commentService;
     }
 
     @Override
@@ -144,9 +122,15 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
 
+        // Get tag list map
         Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
 
+        // Get category list map
         Map<Integer, List<Category>> categoryListMap = postCategoryService.listCategoryListMap(postIds);
+
+        // Get comment count
+        Map<Integer, Long> commentCountMap = commentService.countByPostIds(postIds);
+
 
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
@@ -158,6 +142,9 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
             // Set categories
             List<CategoryOutputDTO> categoryOutputDTOS = categoryListMap.get(post.getId()).stream().map(category -> (CategoryOutputDTO) new CategoryOutputDTO().convertFrom(category)).collect(Collectors.toList());
             postListVO.setCategories(categoryOutputDTOS);
+
+            // Set comment count
+            postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
             return postListVO;
         });

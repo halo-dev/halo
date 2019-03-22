@@ -18,7 +18,10 @@ import java.util.List;
 @Data
 public class PostListVO extends PostSimpleOutputDTO {
 
+    private Long commentCount;
+
     private List<TagOutputDTO> tags;
 
     private List<CategoryOutputDTO> categories;
+
 }
