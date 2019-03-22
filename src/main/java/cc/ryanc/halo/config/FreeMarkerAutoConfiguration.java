@@ -3,10 +3,8 @@ package cc.ryanc.halo.config;
 import cc.ryanc.halo.model.freemarker.method.RandomMethod;
 import cc.ryanc.halo.model.freemarker.method.RecentCommentsMethod;
 import cc.ryanc.halo.model.freemarker.method.RecentPostsMethod;
-import cc.ryanc.halo.model.freemarker.tag.ArticleTagDirective;
-import cc.ryanc.halo.model.freemarker.tag.CommonTagDirective;
+import cc.ryanc.halo.model.freemarker.tag.*;
 import cc.ryanc.halo.service.OptionService;
-import cc.ryanc.halo.service.UserService;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +31,22 @@ public class FreeMarkerAutoConfiguration {
     private OptionService optionsService;
 
     @Autowired
-    private UserService userService;
+    private PostTagDirective postTagDirective;
 
     @Autowired
-    private CommonTagDirective commonTagDirective;
+    private CategoryTagDirective categoryTagDirective;
 
     @Autowired
-    private ArticleTagDirective articleTagDirective;
+    private CommentTagDirective commentTagDirective;
+
+    @Autowired
+    private LinkTagDirective linkTagDirective;
+
+    @Autowired
+    private MenuTagDirective menuTagDirective;
+
+    @Autowired
+    private TagTagDirective tagTagDirective;
 
     @Autowired
     private RandomMethod randomMethod;
@@ -53,11 +60,14 @@ public class FreeMarkerAutoConfiguration {
     @PostConstruct
     public void setSharedVariable() {
         try {
-            //自定义标签
-            configuration.setSharedVariable("commonTag", commonTagDirective);
-            configuration.setSharedVariable("articleTag", articleTagDirective);
             configuration.setSharedVariable("options", optionsService.listOptions());
-//            configuration.setSharedVariable("user", userService.findUser());
+            //自定义标签
+            configuration.setSharedVariable("categoryTag", categoryTagDirective);
+            configuration.setSharedVariable("commentTag", commentTagDirective);
+            configuration.setSharedVariable("linkTag", linkTagDirective);
+            configuration.setSharedVariable("menuTag", menuTagDirective);
+            configuration.setSharedVariable("tagTag", tagTagDirective);
+            configuration.setSharedVariable("postTag", postTagDirective);
             configuration.setSharedVariable("randomMethod", randomMethod);
             configuration.setSharedVariable("recentPostsMethod", recentPostsMethod);
             configuration.setSharedVariable("recentCommentsMethod", recentCommentsMethod);

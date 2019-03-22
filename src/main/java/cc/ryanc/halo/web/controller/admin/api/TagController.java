@@ -78,5 +78,6 @@ public class TagController {
     @ApiOperation("Delete tag by id")
     public void deletePermanently(@PathVariable("id") Integer id) {
         tagService.removeById(id);
+        postTagService.removeByTagId(id);
     }
 }

@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.entity.Category;
 import cc.ryanc.halo.model.params.CategoryParam;
 import cc.ryanc.halo.model.vo.CategoryVO;
 import cc.ryanc.halo.service.CategoryService;
+import cc.ryanc.halo.service.PostCategoryService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -27,8 +28,11 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    private final PostCategoryService postCategoryService;
+
+    public CategoryController(CategoryService categoryService, PostCategoryService postCategoryService) {
         this.categoryService = categoryService;
+        this.postCategoryService = postCategoryService;
     }
 
     @GetMapping("tree")
@@ -67,5 +71,6 @@ public class CategoryController {
     @ApiOperation("Delete category by id")
     public void deletePermanently(@PathVariable("id") Integer id) {
         categoryService.removeById(id);
+        postCategoryService.removeByCategoryId(id);
     }
 }

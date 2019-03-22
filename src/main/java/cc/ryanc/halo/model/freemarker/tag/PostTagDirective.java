@@ -19,7 +19,7 @@ import java.util.Map;
  * @date : 2018/4/26
  */
 @Component
-public class ArticleTagDirective implements TemplateDirectiveModel {
+public class PostTagDirective implements TemplateDirectiveModel {
 
     private static final String METHOD_KEY = "method";
 

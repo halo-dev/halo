@@ -7,7 +7,9 @@ import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.params.PostParam;
 import cc.ryanc.halo.model.vo.PostDetailVO;
+import cc.ryanc.halo.service.PostCategoryService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.service.PostTagService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,8 +33,14 @@ public class PostController {
 
     private final PostService postService;
 
-    public PostController(PostService postService) {
+    private final PostCategoryService postCategoryService;
+
+    private final PostTagService postTagService;
+
+    public PostController(PostService postService, PostCategoryService postCategoryService, PostTagService postTagService) {
         this.postService = postService;
+        this.postCategoryService = postCategoryService;
+        this.postTagService = postTagService;
     }
 
     @GetMapping("latest")
@@ -80,5 +88,7 @@ public class PostController {
     public void deletePermanently(@PathVariable("postId") Integer postId) {
         // Remove it
         postService.removeById(postId);
+        postCategoryService.removeByPostId(postId);
+        postTagService.removeByPostId(postId);
     }
 }
