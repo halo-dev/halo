@@ -28,10 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -135,13 +132,21 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
+            Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
+
             // Set tags
-            List<TagOutputDTO> tagOutputDTOS = tagListMap.get(post.getId()).stream().map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag)).collect(Collectors.toList());
-            postListVO.setTags(tagOutputDTOS);
+            postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
+                    .orElseGet(LinkedList::new)
+                    .stream()
+                    .map(tag -> new TagOutputDTO().<TagOutputDTO>convertFrom(tag))
+                    .collect(Collectors.toList()));
 
             // Set categories
-            List<CategoryOutputDTO> categoryOutputDTOS = categoryListMap.get(post.getId()).stream().map(category -> (CategoryOutputDTO) new CategoryOutputDTO().convertFrom(category)).collect(Collectors.toList());
-            postListVO.setCategories(categoryOutputDTOS);
+            postListVO.setCategories(Optional.ofNullable(categoryListMap.get(post.getId()))
+                    .orElseGet(LinkedList::new)
+                    .stream()
+                    .map(category -> new CategoryOutputDTO().<CategoryOutputDTO>convertFrom(category))
+                    .collect(Collectors.toList()));
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
