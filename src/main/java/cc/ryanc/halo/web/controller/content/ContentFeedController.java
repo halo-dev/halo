@@ -5,9 +5,11 @@ import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import javafx.geometry.Pos;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -57,15 +59,7 @@ public class ContentFeedController {
         }
         final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
         final Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
-        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, PostType.POST, pageable).map(post -> {
-            if (StrUtil.isNotEmpty(post.getPassword())) {
-                post.setFormatContent("该文章为加密文章");
-                post.setSummary("该文章为加密文章");
-            }
-            return post;
-        });
-        final List<Post> posts = postsPage.getContent();
-        model.addAttribute("posts", posts);
+        model.addAttribute("posts", buildPosts(pageable));
         final Template template = freeMarker.getConfiguration().getTemplate("common/web/rss.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -81,21 +75,10 @@ public class ContentFeedController {
     @GetMapping(value = {"atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String atom(Model model) throws IOException, TemplateException {
-        String rssPosts = OPTIONS.get(BlogProperties.RSS_POSTS.getValue());
-        if (StrUtil.isBlank(rssPosts)) {
-            rssPosts = "20";
-        }
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        final Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
-        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, PostType.POST, pageable).map(post -> {
-            if (StrUtil.isNotEmpty(post.getPassword())) {
-                post.setFormatContent("该文章为加密文章");
-                post.setSummary("该文章为加密文章");
-            }
-            return post;
-        });
-        final List<Post> posts = postsPage.getContent();
-        model.addAttribute("posts", posts);
+        int pageSize = HaloUtils.getDefaultPageSize(20);
+        final Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        final Pageable pageable = PageRequest.of(0, pageSize, sort);
+        model.addAttribute("posts", buildPosts(pageable));
         final Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -111,15 +94,7 @@ public class ContentFeedController {
     @GetMapping(value = {"sitemap", "sitemap.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String sitemapXml(Model model) throws IOException, TemplateException {
-        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, PostType.POST, null).map(post -> {
-            if (StrUtil.isNotEmpty(post.getPassword())) {
-                post.setFormatContent("该文章为加密文章");
-                post.setSummary("该文章为加密文章");
-            }
-            return post;
-        });
-        final List<Post> posts = postsPage.getContent();
-        model.addAttribute("posts", posts);
+        model.addAttribute("posts", buildPosts(null));
         final Template template = freeMarker.getConfiguration().getTemplate("common/web/sitemap_xml.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -132,15 +107,7 @@ public class ContentFeedController {
      */
     @GetMapping(value = "sitemap.html", produces = {"text/html"})
     public String sitemapHtml(Model model) {
-        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, PostType.POST, null).map(post -> {
-            if (StrUtil.isNotEmpty(post.getPassword())) {
-                post.setFormatContent("该文章为加密文章");
-                post.setSummary("该文章为加密文章");
-            }
-            return post;
-        });
-        final List<Post> posts = postsPage.getContent();
-        model.addAttribute("posts", posts);
+        model.addAttribute("posts", buildPosts(null));
         return "common/web/sitemap_html";
     }
 
@@ -157,5 +124,21 @@ public class ContentFeedController {
     public String robots(Model model) throws IOException, TemplateException {
         final Template template = freeMarker.getConfiguration().getTemplate("common/web/robots.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+    }
+
+    /**
+     * Build posts for feed
+     * @param pageable pageable
+     * @return List<Post>
+     */
+    private List<Post> buildPosts(Pageable pageable){
+        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, PostType.POST, pageable).map(post -> {
+            if (StrUtil.isNotEmpty(post.getPassword())) {
+                post.setFormatContent("该文章为加密文章");
+                post.setSummary("该文章为加密文章");
+            }
+            return post;
+        });
+        return postsPage.getContent();
     }
 }

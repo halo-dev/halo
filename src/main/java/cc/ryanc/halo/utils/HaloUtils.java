@@ -94,10 +94,12 @@ public class HaloUtils {
      *
      * @return default page size
      */
-    public static int getDefaultPageSize() {
-        return Integer.valueOf(OPTIONS.getOrDefault(
-                BlogProperties.INDEX_POSTS.getValue(),
-                String.valueOf(DEFAULT_PAGE_SIZE)));
+    public static int getDefaultPageSize(int pageSize) {
+        if (StrUtil.isNotBlank(OPTIONS.get(BlogProperties.INDEX_POSTS))) {
+            return Integer.parseInt(OPTIONS.get(BlogProperties.INDEX_POSTS));
+        }
+
+        return pageSize;
     }
 
     /**
