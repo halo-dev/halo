@@ -65,7 +65,7 @@ public class ContentIndexController extends BaseContentController {
                                 @SortDefault(sort = "createTime", direction = DESC)
                         }) Sort sort) {
         log.debug("Requested index page, sort info: [{}]", sort);
-        int pageSize = HaloUtils.getDefaultPageSize(10);
+        int pageSize = HaloUtils.getDefaultPageSize();
         Pageable pageable = PageRequest.of(page - 1, pageSize, sort);
         Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, PostType.POST, pageable);
         int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
