@@ -22,8 +22,8 @@ services:
       - 8090:8090
     environment:
       - VIRTUAL_PORT=8090
-      - VIRTUAL_HOST=localhost  # 监听的地址（务必修改）
-      - LETSENCRYPT_HOST=localhost # 证书的域名 （务必修改）
+      - VIRTUAL_HOST=localhost  # 你的博客地址（务必修改）
+      - LETSENCRYPT_HOST=localhost # 你的博客地址 （务必修改）
       - LETSENCRYPT_EMAIL=i@example.com # 证书所有者的邮箱，快过期时会提醒（务必修改）
       - DB_USER=admin # h2数据库用户名，自定义（务必修改）
       - DB_PASSWORD=123456 # h2数据库密码，自定义（务必修改）
