@@ -37,11 +37,12 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     /**
      * Saves one option
      *
-     * @param key   key
-     * @param value value
+     * @param key    key
+     * @param value  value
+     * @param source source
      */
     @Override
-    public void save(String key, String value) {
+    public void save(String key, String value, String source) {
         Assert.hasText(key, "Option key must not be blank");
 
         if (StringUtils.isNotBlank(value)) {
@@ -59,6 +60,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             Option anOption = new Option();
             anOption.setOptionKey(key);
             anOption.setOptionValue(value);
+            anOption.setOptionSource(source);
             return anOption;
         });
 
@@ -70,35 +72,36 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      * Saves multiple options
      *
      * @param options options
+     * @param source  source
      */
     @Override
-    public void save(Map<String, String> options) {
+    public void save(Map<String, String> options, String source) {
         if (CollectionUtils.isEmpty(options)) {
             return;
         }
 
         // (Not recommended) Don't write "this::save" here
         // Types of key and value are String
-        options.forEach((key, value) -> save(key, value));
+        options.forEach((key, value) -> save(key, value, source));
     }
 
     @Override
-    public void save(List<OptionParam> optionParams) {
+    public void save(List<OptionParam> optionParams, String source) {
         if (CollectionUtils.isEmpty(optionParams)) {
             return;
         }
 
         // TODO Optimize the query
-        optionParams.forEach(optionParam -> save(optionParam.getOptionKey(), optionParam.getOptionValue()));
+        optionParams.forEach(optionParam -> save(optionParam.getOptionKey(), optionParam.getOptionValue(), source));
     }
 
     @Override
-    public void saveProperties(Map<BlogProperties, String> properties) {
+    public void saveProperties(Map<BlogProperties, String> properties, String source) {
         if (CollectionUtils.isEmpty(properties)) {
             return;
         }
 
-        properties.forEach((property, value) -> save(property.getValue(), value));
+        properties.forEach((property, value) -> save(property.getValue(), value, source));
     }
 
     /**

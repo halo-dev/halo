@@ -22,31 +22,35 @@ public interface OptionService extends CrudService<Option, Integer> {
     /**
      * Save one option
      *
-     * @param key   key must not be blank
-     * @param value value
+     * @param key    key must not be blank
+     * @param value  value
+     * @param source source
      */
-    void save(@NonNull String key, String value);
+    void save(@NonNull String key, String value, String source);
 
     /**
      * Save multiple options
      *
      * @param options options
+     * @param source  source
      */
-    void save(@NonNull Map<String, String> options);
+    void save(@NonNull Map<String, String> options, String source);
 
     /**
      * SAve multiple options
      *
      * @param optionParams option params
+     * @param source       source
      */
-    void save(List<OptionParam> optionParams);
+    void save(List<OptionParam> optionParams, String source);
 
     /**
      * Saves blog properties.
      *
      * @param properties blog properties
+     * @param source     source
      */
-    void saveProperties(@NonNull Map<BlogProperties, String> properties);
+    void saveProperties(@NonNull Map<BlogProperties, String> properties, String source);
 
     /**
      * Get all options
