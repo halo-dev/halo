@@ -4,12 +4,11 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
+import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import javafx.geometry.Pos;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,10 +34,15 @@ public class ContentFeedController {
 
     private final PostService postService;
 
+    private final OptionService optionService;
+
     private final FreeMarkerConfigurer freeMarker;
 
-    public ContentFeedController(PostService postService, FreeMarkerConfigurer freeMarker) {
+    public ContentFeedController(PostService postService,
+                                 OptionService optionService,
+                                 FreeMarkerConfigurer freeMarker) {
         this.postService = postService;
+        this.optionService = optionService;
         this.freeMarker = freeMarker;
     }
 
@@ -75,7 +79,7 @@ public class ContentFeedController {
     @GetMapping(value = {"atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String atom(Model model) throws IOException, TemplateException {
-        int pageSize = HaloUtils.getDefaultPageSize(10);
+        int pageSize = optionService.getPostPageSize();
         final Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         final Pageable pageable = PageRequest.of(0, pageSize, sort);
         model.addAttribute("posts", buildPosts(pageable));
@@ -128,10 +132,11 @@ public class ContentFeedController {
 
     /**
      * Build posts for feed
+     *
      * @param pageable pageable
      * @return List<Post>
      */
-    private List<Post> buildPosts(Pageable pageable){
+    private List<Post> buildPosts(Pageable pageable) {
         final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, PostType.POST, pageable).map(post -> {
             if (StrUtil.isNotEmpty(post.getPassword())) {
                 post.setFormatContent("该文章为加密文章");

@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import lombok.NoArgsConstructor;
 
 /**
  * Setting entity.
@@ -20,6 +21,7 @@ import javax.persistence.*;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 public class Option extends BaseEntity {
 
     @Id
@@ -43,6 +45,11 @@ public class Option extends BaseEntity {
      */
     @Column(name = "option_source", columnDefinition = "varchar(127) default 'system'")
     private String optionSource;
+
+    public Option(String optionKey, String optionValue) {
+        this.optionKey = optionKey;
+        this.optionValue = optionValue;
+    }
 
     @Override
     public void prePersist() {

@@ -36,7 +36,7 @@ public class Comment extends BaseEntity {
     /**
      * 评论者邮箱
      */
-    @Column(name = "email", columnDefinition = "varchar(50) default ''")
+    @Column(name = "email", columnDefinition = "varchar(255) default ''")
     private String email;
 
     /**

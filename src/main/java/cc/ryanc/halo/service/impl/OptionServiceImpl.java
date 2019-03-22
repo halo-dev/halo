@@ -8,6 +8,8 @@ import cc.ryanc.halo.repository.OptionRepository;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.ServiceUtils;
+import com.qiniu.common.Zone;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
  * @author : RYAN0UP
  * @date : 2019-03-14
  */
+@Slf4j
 @Service
 public class OptionServiceImpl extends AbstractCrudService<Option, Integer> implements OptionService {
 
@@ -148,4 +151,56 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         return getByKey(property.getValue());
     }
+
+    @Override
+    public int getPostPageSize() {
+        try {
+            return getByProperty(BlogProperties.INDEX_POSTS).map(Integer::valueOf).orElse(DEFAULT_POST_PAGE_SIZE);
+        } catch (NumberFormatException e) {
+            log.error(BlogProperties.INDEX_POSTS + " option was not a number format", e);
+            return DEFAULT_POST_PAGE_SIZE;
+        }
+    }
+
+    @Override
+    public int getCommentPageSize() {
+        try {
+            return getByProperty(BlogProperties.INDEX_COMMENTS).map(Integer::valueOf).orElse(DEFAULT_COMMENT_PAGE_SIZE);
+        } catch (NumberFormatException e) {
+            log.error(BlogProperties.INDEX_COMMENTS + " option was not a number format", e);
+            return DEFAULT_COMMENT_PAGE_SIZE;
+        }
+    }
+
+    @Override
+    public Zone getQiniuZone() {
+        return getByProperty(BlogProperties.QINIU_ZONE).map(qiniuZone -> {
+
+            Zone zone;
+            switch (qiniuZone) {
+                case "z0":
+                    zone = Zone.zone0();
+                    break;
+                case "z1":
+                    zone = Zone.zone1();
+                    break;
+                case "z2":
+                    zone = Zone.zone2();
+                    break;
+                case "na0":
+                    zone = Zone.zoneNa0();
+                    break;
+                case "as0":
+                    zone = Zone.zoneAs0();
+                    break;
+                default:
+                    // Default is detecting zone automatically
+                    zone = Zone.autoZone();
+            }
+            return zone;
+
+        }).orElseGet(Zone::autoZone);
+    }
+
+
 }

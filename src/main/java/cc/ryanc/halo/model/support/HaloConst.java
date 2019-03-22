@@ -36,6 +36,7 @@ public class HaloConst {
     /**
      * All of the options
      */
+    @Deprecated
     public final static ConcurrentMap<String, String> OPTIONS = new ConcurrentHashMap<>();
 
     /**
