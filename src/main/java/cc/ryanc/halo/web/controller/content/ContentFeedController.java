@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.content;
 
 import cc.ryanc.halo.model.entity.Post;
-import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.service.OptionService;
@@ -22,8 +21,6 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.IOException;
 import java.util.List;
-
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * @author : RYAN0UP
@@ -57,12 +54,9 @@ public class ContentFeedController {
     @GetMapping(value = {"feed", "feed.xml", "rss", "rss.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String feed(Model model) throws IOException, TemplateException {
-        String rssPosts = OPTIONS.get(BlogProperties.RSS_POSTS.getValue());
-        if (StrUtil.isBlank(rssPosts)) {
-            rssPosts = "20";
-        }
+        int rssPageSize = optionService.getRssPageSize();
         final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        final Pageable pageable = PageRequest.of(0, Integer.parseInt(rssPosts), sort);
+        final Pageable pageable = PageRequest.of(0, rssPageSize, sort);
         model.addAttribute("posts", buildPosts(pageable));
         final Template template = freeMarker.getConfiguration().getTemplate("common/web/rss.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);

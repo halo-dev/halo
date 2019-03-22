@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service;
 
+import cc.ryanc.halo.exception.MissingPropertyValueException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.BlogProperties;
@@ -23,6 +24,8 @@ public interface OptionService extends CrudService<Option, Integer> {
     int DEFAULT_POST_PAGE_SIZE = 10;
 
     int DEFAULT_COMMENT_PAGE_SIZE = 10;
+
+    int DEFAULT_RSS_PAGE_SIZE = 20;
 
     /**
      * Save one option
@@ -81,6 +84,15 @@ public interface OptionService extends CrudService<Option, Integer> {
     String getByKeyOfNullable(@NonNull String key);
 
     /**
+     * Gets option value of non null.
+     *
+     * @param key option key must not be null
+     * @return option value of non null
+     */
+    @NonNull
+    String getByKeyOfNonNull(@NonNull String key);
+
+    /**
      * Get option by key
      *
      * @param key option key must not be blank
@@ -90,7 +102,7 @@ public interface OptionService extends CrudService<Option, Integer> {
     Optional<String> getByKey(@NonNull String key);
 
     /**
-     * Gets option by blog property.
+     * Gets option value by blog property.
      *
      * @param property blog property must not be null
      * @return an option value
@@ -99,7 +111,17 @@ public interface OptionService extends CrudService<Option, Integer> {
     String getByPropertyOfNullable(@NonNull BlogProperties property);
 
     /**
-     * Gets option by blog property.
+     * Gets option value by blog property.
+     *
+     * @param property blog property
+     * @return an optiona value
+     * @throws MissingPropertyValueException throws when property value dismisses
+     */
+    @NonNull
+    String getByPropertyOfNonNull(@NonNull BlogProperties property);
+
+    /**
+     * Gets option value by blog property.
      *
      * @param property blog property must not be null
      * @return an optional option value
@@ -120,6 +142,13 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return page size
      */
     int getCommentPageSize();
+
+    /**
+     * Gets rss page size.
+     *
+     * @return page size
+     */
+    int getRssPageSize();
 
     /**
      * Get quniu zone.

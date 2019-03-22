@@ -36,8 +36,6 @@ import java.util.Properties;
 @Slf4j
 public class HaloUtils {
 
-    public final static int DEFAULT_PAGE_SIZE = 10;
-
     /**
      * Initialize url if blank.
      *

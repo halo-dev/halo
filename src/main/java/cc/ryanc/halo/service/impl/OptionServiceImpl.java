@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.exception.MissingPropertyValueException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.BlogProperties;
@@ -134,6 +135,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public String getByKeyOfNonNull(String key) {
+        return getByKey(key).orElseThrow(() -> new MissingPropertyValueException("You have to config " + key + " setting"));
+    }
+
+    @Override
     public Optional<String> getByKey(String key) {
         Assert.hasText(key, "Option key must not be blank");
 
@@ -143,6 +149,13 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public String getByPropertyOfNullable(BlogProperties property) {
         return getByProperty(property).orElse(null);
+    }
+
+    @Override
+    public String getByPropertyOfNonNull(BlogProperties property) {
+        Assert.notNull(property, "Blog property must not be null");
+
+        return getByKeyOfNonNull(property.getValue());
     }
 
     @Override
@@ -157,7 +170,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         try {
             return getByProperty(BlogProperties.INDEX_POSTS).map(Integer::valueOf).orElse(DEFAULT_POST_PAGE_SIZE);
         } catch (NumberFormatException e) {
-            log.error(BlogProperties.INDEX_POSTS + " option was not a number format", e);
+            log.error(BlogProperties.INDEX_POSTS + " option is not a number format", e);
             return DEFAULT_POST_PAGE_SIZE;
         }
     }
@@ -167,8 +180,18 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         try {
             return getByProperty(BlogProperties.INDEX_COMMENTS).map(Integer::valueOf).orElse(DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
-            log.error(BlogProperties.INDEX_COMMENTS + " option was not a number format", e);
+            log.error(BlogProperties.INDEX_COMMENTS + " option is not a number format", e);
             return DEFAULT_COMMENT_PAGE_SIZE;
+        }
+    }
+
+    @Override
+    public int getRssPageSize() {
+        try {
+            return getByProperty(BlogProperties.RSS_POSTS).map(Integer::valueOf).orElse(DEFAULT_RSS_PAGE_SIZE);
+        } catch (NumberFormatException e) {
+            log.error(BlogProperties.RSS_POSTS + " setting is not a number format", e);
+            return DEFAULT_RSS_PAGE_SIZE;
         }
     }
 

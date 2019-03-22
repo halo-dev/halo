@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -54,20 +53,10 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
-        // TODO Complete cache option value
-        this.cacheOptions();
         this.cacheThemes();
         this.cacheOwo();
         this.getActiveTheme();
         this.printStartInfo();
-    }
-
-    /**
-     * Cache options to map
-     */
-    private void cacheOptions() {
-        OPTIONS.clear();
-        OPTIONS.putAll(optionService.listOptions());
     }
 
     /**
@@ -115,7 +104,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // Get server port
         String serverPort = applicationContext.getEnvironment().getProperty("server.port");
 
-        String blogUrl = OPTIONS.get(BlogProperties.BLOG_URL);
+        String blogUrl = optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL);
 
         if (StrUtil.isNotBlank(blogUrl)) {
             blogUrl = StrUtil.removeSuffix(blogUrl, "/");
