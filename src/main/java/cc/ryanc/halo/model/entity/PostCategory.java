@@ -51,7 +51,6 @@ public class PostCategory extends BaseEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         PostCategory that = (PostCategory) o;
         return categoryId.equals(that.categoryId) &&
                 postId.equals(that.postId);
@@ -59,6 +58,6 @@ public class PostCategory extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), categoryId, postId);
+        return Objects.hash(categoryId, postId);
     }
 }

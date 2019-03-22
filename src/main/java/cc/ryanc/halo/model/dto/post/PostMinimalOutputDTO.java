@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.Date;
+
 /**
  * Post minimal output dto.
  *
@@ -42,4 +44,19 @@ public class PostMinimalOutputDTO implements OutputConverter<PostMinimalOutputDT
      * Post type
      */
     private PostType type;
+
+    /**
+     * 更新时间戳
+     */
+    private Date updateTime;
+
+    /**
+     * 创建时间戳
+     */
+    private Date createTime;
+
+    /**
+     * Edit time.
+     */
+    private Date editTime;
 }

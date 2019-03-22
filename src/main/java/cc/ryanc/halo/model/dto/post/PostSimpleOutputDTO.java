@@ -66,18 +66,4 @@ public class PostSimpleOutputDTO extends PostMinimalOutputDTO {
      */
     private Long likes;
 
-    /**
-     * 创建时间戳
-     */
-    private Date createTime;
-
-    /**
-     * 更新时间戳
-     */
-    private Date updateTime;
-
-    /**
-     * Edit time.
-     */
-    private Date editTime;
 }
