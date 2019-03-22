@@ -31,6 +31,6 @@ public class OptionController {
 
     @PostMapping("saving")
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
-        optionService.save(optionParams);
+        optionService.save(optionParams,"system");
     }
 }

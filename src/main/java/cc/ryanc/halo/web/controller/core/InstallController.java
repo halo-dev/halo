@@ -191,7 +191,7 @@ public class InstallController {
         properties.put(BlogProperties.ATTACH_LOC, AttachOrigin.SERVER.getValue().toString());
 
         // Create properties
-        optionService.saveProperties(properties);
+        optionService.saveProperties(properties,"system");
     }
 
     /**

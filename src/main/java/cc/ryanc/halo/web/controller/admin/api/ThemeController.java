@@ -59,7 +59,7 @@ public class ThemeController {
     public void active(@RequestParam(name = "themeName", defaultValue = "anatole") String themeName) throws TemplateModelException {
         Map<BlogProperties, String> properties = new HashMap<>(1);
         properties.put(BlogProperties.THEME, themeName);
-        optionService.saveProperties(properties);
+        optionService.saveProperties(properties,"system");
         BaseContentController.THEME = themeName;
         OPTIONS.clear();
         OPTIONS.putAll(optionService.listOptions());

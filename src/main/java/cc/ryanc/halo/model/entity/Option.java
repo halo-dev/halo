@@ -41,13 +41,13 @@ public class Option extends BaseEntity {
     /**
      * source,default is system
      */
-    @Column(name = "source", columnDefinition = "varchar(127) default 'system'")
-    private String source;
+    @Column(name = "option_source", columnDefinition = "varchar(127) default 'system'")
+    private String optionSource;
 
     @Override
     public void prePersist() {
         super.prePersist();
         id = null;
-        source = "system";
+        optionSource = "system";
     }
 }
