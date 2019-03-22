@@ -42,18 +42,18 @@ export default {
       default: ''
     }
   },
-  data () {
+  data() {
     return {
       data: [],
       scale,
       tooltip
     }
   },
-  created () {
+  created() {
     this.getMonthBar()
   },
   methods: {
-    getMonthBar () {
+    getMonthBar() {
       this.$http.get('/analysis/month-bar')
         .then(res => {
           this.data = res.result

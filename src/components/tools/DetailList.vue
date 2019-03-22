@@ -24,7 +24,7 @@ const Item = {
       type: Number
     }
   },
-  render () {
+  render() {
     return (
       <Col {...{ props: responsive[this.col] }}>
         <div class="term">{this.$props.term}</div>
@@ -69,7 +69,7 @@ export default {
       default: 'horizontal'
     }
   },
-  provide () {
+  provide() {
     return {
       col: this.col > 4 ? 4 : this.col
     }

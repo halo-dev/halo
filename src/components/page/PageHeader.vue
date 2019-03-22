@@ -70,17 +70,17 @@ export default {
       required: false
     }
   },
-  data () {
+  data() {
     return {
       name: '',
       breadList: []
     }
   },
-  created () {
+  created() {
     this.getBreadcrumb()
   },
   methods: {
-    getBreadcrumb () {
+    getBreadcrumb() {
       this.breadList = []
       // this.breadList.push({name: 'index', path: '/dashboard/', meta: {title: '首页'}})
 
@@ -92,7 +92,7 @@ export default {
     }
   },
   watch: {
-    $route () {
+    $route() {
       this.getBreadcrumb()
     }
   }

@@ -17,14 +17,14 @@ import icons from './icons'
 
 export default {
   name: 'IconSelect',
-  data () {
+  data() {
     return {
       selectedIcon: '',
       icons
     }
   },
   methods: {
-    handleSelectedIcon (icon) {
+    handleSelectedIcon(icon) {
       this.selectedIcon = icon
       this.$emit('change', icon)
     }

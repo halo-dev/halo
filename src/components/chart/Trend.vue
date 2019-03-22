@@ -36,13 +36,13 @@ export default {
       default: 2
     }
   },
-  data () {
+  data() {
     return {
       trend: this.type && 'up' || 'down',
       rate: this.percentage
     }
   },
-  created () {
+  created() {
     const type = this.type === null ? this.value >= this.target : this.type
     this.trend = type ? 'up' : 'down'
     this.rate = (this.percentage === null ? Math.abs(this.value - this.target) * 100 / this.target : this.percentage).toFixed(this.fixed)

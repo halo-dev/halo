@@ -9,7 +9,7 @@
 <script>
 export default {
   name: 'LayoutFooter',
-  data () {
+  data() {
     return {
     }
   }

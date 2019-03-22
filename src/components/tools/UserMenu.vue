@@ -52,13 +52,13 @@ export default {
   methods: {
     ...mapActions(['Logout']),
     ...mapGetters(['nickname', 'avatar']),
-    handleLogout () {
+    handleLogout() {
       const that = this
 
       this.$confirm({
         title: '提示',
         content: '真的要注销登录吗 ?',
-        onOk () {
+        onOk() {
           return that.Logout({}).then(() => {
             window.location.reload()
           }).catch(err => {
@@ -68,7 +68,7 @@ export default {
             })
           })
         },
-        onCancel () {
+        onCancel() {
         }
       })
     }

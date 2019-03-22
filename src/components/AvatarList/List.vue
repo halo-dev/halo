@@ -60,11 +60,11 @@ export default {
       }
     }
   },
-  data () {
+  data() {
     return {}
   },
   methods: {
-    getItems (items) {
+    getItems(items) {
       const classString = {
         [`${this.prefixCls}-item`]: true,
         [`${this.size}`]: true
@@ -80,7 +80,7 @@ export default {
       return itemList
     }
   },
-  render () {
+  render() {
     const { prefixCls, size } = this.$props
     const classString = {
       [`${prefixCls}`]: true,

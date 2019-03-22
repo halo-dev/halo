@@ -43,7 +43,7 @@ export default {
   components: {
     Icon
   },
-  data () {
+  data() {
     return {}
   }
 }

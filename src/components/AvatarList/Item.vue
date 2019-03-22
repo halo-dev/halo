@@ -27,18 +27,18 @@ export default {
       default: ''
     }
   },
-  data () {
+  data() {
     return {
       size: this.$parent.size
     }
   },
   computed: {
-    avatarSize () {
+    avatarSize() {
       return this.size !== 'mini' && this.size || 20
     }
   },
   watch: {
-    '$parent.size' (val) {
+    '$parent.size'(val) {
       this.size = val
     }
   }

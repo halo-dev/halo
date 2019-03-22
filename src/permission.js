@@ -81,7 +81,7 @@ router.afterEach(() => {
  *  @see https://github.com/sendya/ant-design-pro-vue/pull/53
  */
 const action = Vue.directive('action', {
-  bind: function (el, binding, vnode) {
+  bind: function(el, binding, vnode) {
     const actionName = binding.arg
     const roles = store.getters.roles
     const elVal = vnode.context.$route.meta.permission

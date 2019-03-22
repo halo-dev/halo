@@ -79,16 +79,16 @@ export default {
       default: 'desktop'
     }
   },
-  data () {
+  data() {
     return {
       headerBarFixed: false
     }
   },
-  mounted () {
+  mounted() {
     window.addEventListener('scroll', this.handleScroll)
   },
   methods: {
-    handleScroll () {
+    handleScroll() {
       if (this.autoHideHeader) {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
         if (scrollTop > 100) {
@@ -100,7 +100,7 @@ export default {
         this.headerBarFixed = false
       }
     },
-    toggle () {
+    toggle() {
       this.$emit('toggle')
     }
   }

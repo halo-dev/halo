@@ -11,17 +11,17 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       name: '',
       breadList: []
     }
   },
-  created () {
+  created() {
     this.getBreadcrumb()
   },
   methods: {
-    getBreadcrumb () {
+    getBreadcrumb() {
       console.log('this.$route.matched', this.$route.matched)
 
       this.breadList = []
@@ -35,7 +35,7 @@ export default {
     }
   },
   watch: {
-    $route () {
+    $route() {
       this.getBreadcrumb()
     }
   }

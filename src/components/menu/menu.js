@@ -26,7 +26,7 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       openKeys: [],
       selectedKeys: [],
@@ -40,11 +40,11 @@ export default {
       return keys
     }
   },
-  created () {
+  created() {
     this.updateMenu()
   },
   watch: {
-    collapsed (val) {
+    collapsed(val) {
       if (val) {
         this.cachedOpenKeys = this.openKeys.concat()
         this.openKeys = []
@@ -52,13 +52,13 @@ export default {
         this.openKeys = this.cachedOpenKeys
       }
     },
-    $route: function () {
+    $route: function() {
       this.updateMenu()
     }
   },
   methods: {
     // select menu item
-    onOpenChange (openKeys) {
+    onOpenChange(openKeys) {
       // 在水平模式下时执行，并且不再执行后续
       if (this.mode === 'horizontal') {
         this.openKeys = openKeys
@@ -72,7 +72,7 @@ export default {
         this.openKeys = latestOpenKey ? [latestOpenKey] : []
       }
     },
-    updateMenu () {
+    updateMenu() {
       const routes = this.$route.matched.concat()
 
       if (routes.length >= 4 && this.$route.meta.hidden) {
@@ -93,13 +93,13 @@ export default {
     },
 
     // render
-    renderItem (menu) {
+    renderItem(menu) {
       if (!menu.hidden) {
         return menu.children && !menu.hideChildrenInMenu ? this.renderSubMenu(menu) : this.renderMenuItem(menu)
       }
       return null
     },
-    renderMenuItem (menu) {
+    renderMenuItem(menu) {
       const target = menu.meta.target || null
       const props = {
         to: { name: menu.name },
@@ -114,7 +114,7 @@ export default {
         </Item>
       )
     },
-    renderSubMenu (menu) {
+    renderSubMenu(menu) {
       const itemArr = []
       if (!menu.hideChildrenInMenu) {
         menu.children.forEach(item => itemArr.push(this.renderItem(item)))
@@ -129,7 +129,7 @@ export default {
         </SubMenu>
       )
     },
-    renderIcon (icon) {
+    renderIcon(icon) {
       if (icon === 'none' || icon === undefined) {
         return null
       }
@@ -140,7 +140,7 @@ export default {
       )
     }
   },
-  render () {
+  render() {
     const { mode, theme, menu } = this
     const props = {
       mode: mode,

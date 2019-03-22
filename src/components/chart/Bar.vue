@@ -46,7 +46,7 @@ export default {
       default: ''
     }
   },
-  data () {
+  data() {
     return {
       data,
       scale,

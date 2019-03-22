@@ -24,13 +24,13 @@ export default {
       default: '404'
     }
   },
-  data () {
+  data() {
     return {
       config: types
     }
   },
   methods: {
-    handleToHome () {
+    handleToHome() {
       this.$router.push({ name: 'dashboard' })
     }
   }

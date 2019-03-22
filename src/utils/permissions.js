@@ -1,4 +1,4 @@
-export function actionToObject (json) {
+export function actionToObject(json) {
   try {
     return JSON.parse(json)
   } catch (e) {

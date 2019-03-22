@@ -40,7 +40,7 @@ const scale = [{
 
 export default {
   name: 'MiniArea',
-  data () {
+  data() {
     return {
       data,
       tooltip,

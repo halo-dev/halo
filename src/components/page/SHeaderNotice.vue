@@ -27,13 +27,13 @@ export default {
       required: true
     }
   },
-  data () {
+  data() {
     return {
       loadding: false
     }
   },
   methods: {
-    fetchNotice () {
+    fetchNotice() {
       if (this.loadding) {
         this.loadding = false
         return

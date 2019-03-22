@@ -180,7 +180,7 @@ export default {
     SettingItem
   },
   mixins: [mixin, mixinDevice],
-  data () {
+  data() {
     return {
       visible: true,
       colorList,
@@ -190,7 +190,7 @@ export default {
   watch: {
 
   },
-  mounted () {
+  mounted() {
     const vm = this
     setTimeout(() => {
       vm.visible = false
@@ -204,29 +204,29 @@ export default {
     }
   },
   methods: {
-    showDrawer () {
+    showDrawer() {
       this.visible = true
     },
-    onClose () {
+    onClose() {
       this.visible = false
     },
-    toggle () {
+    toggle() {
       this.visible = !this.visible
     },
-    onColorWeak (checked) {
+    onColorWeak(checked) {
       this.baseConfig.colorWeak = checked
       this.$store.dispatch('ToggleWeak', checked)
       updateColorWeak(checked)
     },
-    onMultiTab (checked) {
+    onMultiTab(checked) {
       this.baseConfig.multiTab = checked
       this.$store.dispatch('ToggleMultiTab', checked)
     },
-    handleMenuTheme (theme) {
+    handleMenuTheme(theme) {
       this.baseConfig.navTheme = theme
       this.$store.dispatch('ToggleTheme', theme)
     },
-    doCopy () {
+    doCopy() {
       const text = `export default {
   primaryColor: '${this.baseConfig.primaryColor}', // primary color of ant design
   navTheme: '${this.baseConfig.navTheme}', // theme for nav menu
@@ -252,33 +252,33 @@ export default {
         this.$message.error('复制失败')
       })
     },
-    handleLayout (mode) {
+    handleLayout(mode) {
       this.baseConfig.layout = mode
       this.$store.dispatch('ToggleLayoutMode', mode)
       // 因为顶部菜单不能固定左侧菜单栏，所以强制关闭
       //
       this.handleFixSiderbar(false)
     },
-    handleContentWidthChange (type) {
+    handleContentWidthChange(type) {
       this.baseConfig.contentWidth = type
       this.$store.dispatch('ToggleContentWidth', type)
     },
-    changeColor (color) {
+    changeColor(color) {
       this.baseConfig.primaryColor = color
       if (this.primaryColor !== color) {
         this.$store.dispatch('ToggleColor', color)
         updateTheme(color)
       }
     },
-    handleFixedHeader (fixed) {
+    handleFixedHeader(fixed) {
       this.baseConfig.fixedHeader = fixed
       this.$store.dispatch('ToggleFixedHeader', fixed)
     },
-    handleFixedHeaderHidden (autoHidden) {
+    handleFixedHeaderHidden(autoHidden) {
       this.baseConfig.autoHideHeader = autoHidden
       this.$store.dispatch('ToggleFixedHeaderHidden', autoHidden)
     },
-    handleFixSiderbar (fixed) {
+    handleFixSiderbar(fixed) {
       if (this.layoutMode === 'topmenu') {
         this.baseConfig.fixSiderbar = false
         this.$store.dispatch('ToggleFixSiderbar', false)

@@ -1,10 +1,10 @@
 <script>
 export default {
   name: 'RouteView',
-  data () {
+  data() {
     return {}
   },
-  render () {
+  render() {
     const { $route: { meta }, $store: { getters } } = this
     const inKeep = (
       <keep-alive>

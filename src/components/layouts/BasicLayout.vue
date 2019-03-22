@@ -19,7 +19,7 @@ export default {
     MultiTab,
     GlobalLayout
   },
-  data () {
+  data() {
     return {}
   }
 }
