@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.dto.LinkOutputDTO;
+import cc.ryanc.halo.model.dto.LinkTeamOutputDTO;
 import cc.ryanc.halo.model.entity.Link;
 import cc.ryanc.halo.repository.LinkRepository;
 import cc.ryanc.halo.service.LinkService;
@@ -39,5 +40,16 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         Assert.notNull(sort, "Sort info must not be null");
 
         return listAll(sort).stream().map(link -> (LinkOutputDTO) new LinkOutputDTO().convertFrom(link)).collect(Collectors.toList());
+    }
+
+    /**
+     * List link by group
+     *
+     * @return List<LinkTeamOutputDTO>
+     */
+    @Override
+    public List<LinkTeamOutputDTO> listTeam() {
+        // TODO list team
+        return null;
     }
 }

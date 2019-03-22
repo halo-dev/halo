@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Date;
-
 /**
  * Page simple output dto.
  *
@@ -18,52 +16,21 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 public class PostSimpleOutputDTO extends PostMinimalOutputDTO {
 
-    /**
-     * 文章类型
-     * 0: 普通文章
-     * 1: 自定义页面
-     * 2: 日志
-     */
     private PostType type;
 
-    /**
-     * 摘要
-     */
     private String summary;
 
-    /**
-     * 缩略图
-     */
     private String thumbnail;
 
-    /**
-     * 浏览量
-     */
     private Long visits;
 
-    /**
-     * 是否允许评论
-     */
     private Boolean disallowComment;
 
-    /**
-     * 自定义渲染模板名称
-     */
     private String template;
 
-    /**
-     * 是否置顶
-     */
     private Integer topPriority;
 
-    /**
-     * 发布来源
-     */
     private PostCreateFrom createFrom;
 
-    /**
-     * 点赞量/喜欢量
-     */
     private Long likes;
-
 }

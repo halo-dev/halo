@@ -3,7 +3,6 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.dto.TagOutputDTO;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.service.base.CrudService;
-import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
