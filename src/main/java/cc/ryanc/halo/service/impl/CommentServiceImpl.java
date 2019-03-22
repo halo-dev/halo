@@ -4,10 +4,11 @@ import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.CommentStatus;
+import cc.ryanc.halo.model.projection.CommentCountProjection;
 import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.repository.CommentRepository;
+import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.ServiceUtils;
 import org.springframework.data.domain.*;
@@ -17,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -34,13 +32,13 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
 
     private final CommentRepository commentRepository;
 
-    private final PostService postService;
+    private final PostRepository postRepository;
 
     public CommentServiceImpl(CommentRepository commentRepository,
-                              PostService postService) {
+                              PostRepository postRepository) {
         super(commentRepository);
         this.commentRepository = commentRepository;
-        this.postService = postService;
+        this.postRepository = postRepository;
     }
 
     @Override
@@ -62,6 +60,25 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         Page<Comment> commentPage = commentRepository.findAllByStatus(status, pageable);
 
         return convertBy(commentPage);
+    }
+
+    @Override
+    public List<Comment> listBy(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        return commentRepository.findAllByPostId(postId);
+    }
+
+    @Override
+    public Map<Integer, Long> countByPostIds(Collection<Integer> postIds) {
+        if (CollectionUtils.isEmpty(postIds)) {
+            return Collections.emptyMap();
+        }
+
+        // Get all comment counts
+        List<CommentCountProjection> commentCountProjections = commentRepository.countByPostIds(postIds);
+
+        return ServiceUtils.convertToMap(commentCountProjections, CommentCountProjection::getPostId, CommentCountProjection::getCount);
     }
 
     /**
@@ -93,7 +110,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         Set<Integer> postIds = ServiceUtils.fetchProperty(comments, Comment::getPostId);
 
         // Get all posts
-        Map<Integer, Post> postMap = ServiceUtils.convertToMap(postService.listAllByIds(postIds), Post::getId);
+        Map<Integer, Post> postMap = ServiceUtils.convertToMap(postRepository.findAllById(postIds), Post::getId);
 
         return comments.stream().map(comment -> {
             // Convert to vo
