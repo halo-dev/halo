@@ -81,7 +81,7 @@ public class ContentTagController extends BaseContentController {
         if (null == tag) {
             return this.renderNotFound();
         }
-        int size = HaloUtils.getDefaultPageSize();
+        int size = HaloUtils.getDefaultPageSize(10);
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         // TODO get posts by tag
