@@ -16,9 +16,9 @@ public class Theme implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Theme name
+     * Theme dir
      */
-    private String themeName;
+    private String themeDir;
 
     /**
      * Is support setting options
@@ -34,4 +34,6 @@ public class Theme implements Serializable {
      * Is internal theme
      */
     private boolean isInternal;
+
+    private ThemeProperties properties;
 }

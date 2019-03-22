@@ -157,6 +157,11 @@
             <artifactId>hutool-extra</artifactId>
             <version>${hutool.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-setting</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
 
         <!-- Upyun SDK -->
         <dependency>
