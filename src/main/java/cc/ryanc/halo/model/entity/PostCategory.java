@@ -1,14 +1,11 @@
 package cc.ryanc.halo.model.entity;
 
-import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.Objects;
 
 /**

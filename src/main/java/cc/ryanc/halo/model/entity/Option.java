@@ -1,6 +1,5 @@
 package cc.ryanc.halo.model.entity;
 
-import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -8,7 +7,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * Setting entity.
@@ -29,20 +27,27 @@ public class Option extends BaseEntity {
     private Integer id;
 
     /**
-     * 设置项 Key
+     * option key
      */
     @Column(name = "option_key", columnDefinition = "varchar(100) not null")
     private String optionKey;
 
     /**
-     * 设置项 Value
+     * option value
      */
     @Column(name = "option_value", columnDefinition = "varchar(1023) not null")
     private String optionValue;
+
+    /**
+     * source,default is system
+     */
+    @Column(name = "source", columnDefinition = "varchar(127) default 'system'")
+    private String source;
 
     @Override
     public void prePersist() {
         super.prePersist();
         id = null;
+        source = "system";
     }
 }
