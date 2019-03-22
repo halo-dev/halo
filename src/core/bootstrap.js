@@ -15,7 +15,7 @@ import {
 } from '@/store/mutation-types'
 import config from '@/config/defaultSettings'
 
-export default function Initializer () {
+export default function Initializer() {
   store.commit('SET_SIDEBAR_TYPE', Vue.ls.get(SIDEBAR_TYPE, true))
   store.commit('TOGGLE_THEME', Vue.ls.get(DEFAULT_THEME, config.navTheme))
   store.commit('TOGGLE_LAYOUT_MODE', Vue.ls.get(DEFAULT_LAYOUT_MODE, config.layout))

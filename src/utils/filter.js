@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
+import { timeAgo } from '@/utils/util'
 moment.locale('zh-cn')
 
-Vue.filter('NumberFormat', function (value) {
+Vue.filter('NumberFormat', function(value) {
   if (!value) {
     return '0'
   }
@@ -11,10 +12,12 @@ Vue.filter('NumberFormat', function (value) {
   return intPartFormat
 })
 
-Vue.filter('dayjs', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
+Vue.filter('dayjs', function(dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
   return moment(dataStr).format(pattern)
 })
 
-Vue.filter('moment', function (dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
+Vue.filter('moment', function(dataStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
   return moment(dataStr).format(pattern)
 })
+
+Vue.filter('timeAgo', timeAgo)

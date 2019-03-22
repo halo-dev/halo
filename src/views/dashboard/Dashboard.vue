@@ -16,9 +16,22 @@
         >
           <a-table
             :columns="postColumns"
-            :dataSource="postData"
+            :dataSource="formattedPostData"
             :pagination="false"
           >
+            <span
+              slot="status"
+              slot-scope="status"
+            >
+              <a-badge :status="status.status" />{{ status.statusText }}
+            </span>
+
+            <span
+              slot="editTime"
+              slot-scope="editTime"
+            >
+              {{ editTime | timeAgo }}
+            </span>
           </a-table>
         </a-card>
       </a-col>
@@ -62,11 +75,13 @@ const postColumns = [
   {
     title: '状态',
     className: 'status',
-    dataIndex: 'status'
+    dataIndex: 'status',
+    scopedSlots: { customRender: 'status' }
   },
   {
-    title: '发布时间',
-    dataIndex: 'date'
+    title: '最后编辑时间',
+    dataIndex: 'editTime',
+    scopedSlots: { customRender: 'editTime' }
   }
 ]
 
@@ -92,6 +107,13 @@ const commentColumns = [
   }
 ]
 
+const postStatus = {
+  PUBLISHED: {
+    status: 'success',
+    statusText: '已发布'
+  }
+}
+
 export default {
   name: 'Dashboard',
   components: {},
@@ -114,6 +136,15 @@ export default {
     this.listLatestPosts()
     this.listLatestComments()
     this.listLatestLogs()
+  },
+  computed: {
+    formattedPostData() {
+      return Object.assign([], this.postData).map(post => {
+        // Format the status
+        post.status = postStatus[post.status]
+        return post
+      })
+    }
   },
   methods: {
     listLatestPosts() {
