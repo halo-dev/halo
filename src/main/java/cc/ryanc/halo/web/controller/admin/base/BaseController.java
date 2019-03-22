@@ -30,7 +30,7 @@ public abstract class BaseController {
         try {
             OPTIONS.clear();
             THEMES.clear();
-            OPTIONS = optionService.listOptions();
+            OPTIONS.putAll(optionService.listOptions());
             THEMES = ThemeUtils.getThemes();
             configuration.setSharedVariable("options", OPTIONS);
         } catch (TemplateModelException e) {

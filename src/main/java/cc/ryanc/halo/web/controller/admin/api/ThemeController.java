@@ -62,7 +62,7 @@ public class ThemeController {
         optionService.saveProperties(properties);
         BaseContentController.THEME = themeName;
         OPTIONS.clear();
-        OPTIONS = optionService.listOptions();
+        OPTIONS.putAll(optionService.listOptions());
         configuration.setSharedVariable("themeName", themeName);
         configuration.setSharedVariable("options", OPTIONS);
     }

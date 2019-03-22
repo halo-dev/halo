@@ -2,10 +2,10 @@ package cc.ryanc.halo.model.support;
 
 import cn.hutool.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * <pre>
@@ -36,7 +36,7 @@ public class HaloConst {
     /**
      * All of the options
      */
-    public static Map<String, String> OPTIONS;
+    public final static ConcurrentMap<String, String> OPTIONS = new ConcurrentHashMap<>();
 
     /**
      * All of the Owo

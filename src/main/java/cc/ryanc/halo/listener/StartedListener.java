@@ -8,7 +8,6 @@ import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
-import cc.ryanc.halo.web.controller.support.PageJacksonSerializer;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import freemarker.template.TemplateModelException;
@@ -67,7 +66,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * Cache options to map
      */
     private void cacheOptions() {
-        HaloConst.OPTIONS = optionService.listOptions();
+        OPTIONS.clear();
+        OPTIONS.putAll(optionService.listOptions());
     }
 
     /**
