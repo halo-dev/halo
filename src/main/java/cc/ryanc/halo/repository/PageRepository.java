@@ -1,7 +1,7 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.entity.Page;
-import cc.ryanc.halo.repository.base.BaseRepository;
+import cc.ryanc.halo.repository.base.BasePostRepository;
 
 /**
  * Page repository.
@@ -9,6 +9,6 @@ import cc.ryanc.halo.repository.base.BaseRepository;
  * @author johnniang
  * @date 3/22/19
  */
-public interface PageRepository extends BaseRepository<Page, Integer> {
+public interface PageRepository extends BasePostRepository<Page> {
 
 }
