@@ -131,7 +131,7 @@ public class ContentFeedController {
      * @return List<Post>
      */
     private List<Post> buildPosts(Pageable pageable) {
-        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, PostType.POST, pageable).map(post -> {
+        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, pageable).map(post -> {
             if (StrUtil.isNotEmpty(post.getPassword())) {
                 post.setFormatContent("该文章为加密文章");
                 post.setSummary("该文章为加密文章");

@@ -90,30 +90,28 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Page<Post> pageBy(PostStatus status, PostType type, Pageable pageable) {
+    public Page<Post> pageBy(PostStatus status, Pageable pageable) {
         Assert.notNull(status, "Post status must not be null");
-        Assert.notNull(type, "Post type must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
-        return postRepository.findAllByStatusAndType(status, type, pageable);
+        return postRepository.findAllByStatus(status, pageable);
     }
 
     /**
      * List by status and type
      *
      * @param status   status
-     * @param type     type
      * @param pageable pageable
      * @return Page<PostSimpleOutputDTO>
      */
     @Override
-    public Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(PostStatus status, PostType type, Pageable pageable) {
-        return pageBy(status, type, pageable).map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    public Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(PostStatus status, Pageable pageable) {
+        return pageBy(status, pageable).map(post -> new PostSimpleOutputDTO().convertFrom(post));
     }
 
     @Override
-    public Page<PostListVO> pageListVoBy(PostStatus status, PostType type, Pageable pageable) {
-        Page<Post> postPage = pageBy(status, type, pageable);
+    public Page<PostListVO> pageListVoBy(PostStatus status, Pageable pageable) {
+        Page<Post> postPage = pageBy(status, pageable);
 
         List<Post> posts = postPage.getContent();
 
@@ -159,12 +157,11 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * Counts posts by status and type
      *
      * @param status status
-     * @param type   type
      * @return posts count
      */
     @Override
-    public Long countByStatus(PostStatus status, PostType type) {
-        return postRepository.countByStatusAndType(status, type);
+    public Long countByStatus(PostStatus status) {
+        return postRepository.countByStatus(status);
     }
 
     @Override
@@ -229,13 +226,12 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     /**
      * Gets post by url.
      *
-     * @param url  post url.
-     * @param type post type enum.
+     * @param url post url.
      * @return Post
      */
     @Override
-    public Post getByUrl(String url, PostType type) {
-        return postRepository.getByUrlAndType(url, type).orElseThrow(() -> new NotFoundException("The post does not exist").setErrorData(url));
+    public Post getByUrl(String url) {
+        return postRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("The post does not exist").setErrorData(url));
     }
 
     @Override

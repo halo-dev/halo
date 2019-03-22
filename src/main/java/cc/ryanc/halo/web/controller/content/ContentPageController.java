@@ -61,15 +61,15 @@ public class ContentPageController extends BaseContentController {
     /**
      * Render custom page
      *
-     * @param url page url
-     * @param model   model
+     * @param url   page url
+     * @param model model
      * @return template path: themes/{theme}/post
      */
     @GetMapping(value = "/p/{url}")
     public String getPage(@PathVariable(value = "url") String url,
                           @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
-        final Post post = postService.getByUrl(url, PostType.POST);
+        final Post post = postService.getByUrl(url);
         if (null == post || !post.getStatus().equals(PostStatus.PUBLISHED)) {
             return this.renderNotFound();
         }

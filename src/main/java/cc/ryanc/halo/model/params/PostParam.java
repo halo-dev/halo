@@ -72,7 +72,7 @@ public class PostParam implements InputConverter<Post> {
         }
 
         // Set post type to
-        post.setType(PostType.POST);
+//        post.setType(PostType.POST);
 
         return post;
     }

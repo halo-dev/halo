@@ -7,14 +7,15 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 /**
- * Post entity.
+ * Journal entity
  *
  * @author johnniang
+ * @date 3/22/19
  */
-@Entity(name = "post")
-@SQLDelete(sql = "update posts set deleted = true where id = ?")
+@Entity(name = "journal")
 @Where(clause = "deleted = false")
-@DiscriminatorValue(value = "0")
-public class Post extends BasePost {
+@SQLDelete(sql = "update posts set deleted = true where id = ?")
+@DiscriminatorValue("2")
+public class Journal extends BasePost {
 
 }
