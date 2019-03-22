@@ -90,6 +90,12 @@ public class Comment extends BaseEntity {
     private Integer postId;
 
     /**
+     * 是否置顶
+     */
+    @Column(name = "top_priority", columnDefinition = "int default 0")
+    private Integer topPriority;
+
+    /**
      * 上级评论
      */
     @Column(name = "parent_id", columnDefinition = "bigint default 0")
