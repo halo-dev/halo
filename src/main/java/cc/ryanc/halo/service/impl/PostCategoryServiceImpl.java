@@ -154,4 +154,18 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         return postCategoryRepository.findAllCategoryIdsByPostId(postId);
     }
+
+    @Override
+    public List<PostCategory> removeByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        return postCategoryRepository.deleteByPostId(postId);
+    }
+
+    @Override
+    public List<PostCategory> removeByCategoryId(Integer categoryId) {
+        Assert.notNull(categoryId, "Category id must not be null");
+
+        return postCategoryRepository.deleteByCategoryId(categoryId);
+    }
 }

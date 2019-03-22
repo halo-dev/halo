@@ -19,7 +19,7 @@ import java.util.Objects;
 @Table(name = "post_tags")
 @SQLDelete(sql = "update post_tags set deleted = true where id = ?")
 @Where(clause = "deleted = false")
-@ToString
+@ToString(callSuper = true)
 public class PostTag extends BaseEntity {
 
     @Id

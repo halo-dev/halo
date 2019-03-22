@@ -62,4 +62,22 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
      */
     @NonNull
     List<PostCategory> findAllByCategoryId(@NonNull Integer categoryId);
+
+    /**
+     * Deletes post categories by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of post category deleted
+     */
+    @NonNull
+    List<PostCategory> deleteByPostId(@NonNull Integer postId);
+
+    /**
+     * Deletes post categories by category id.
+     *
+     * @param categoryId category id must not be null
+     * @return a list of post category deleted
+     */
+    @NonNull
+    List<PostCategory> deleteByCategoryId(@NonNull Integer categoryId);
 }

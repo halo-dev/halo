@@ -72,4 +72,9 @@ public class PostController {
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds());
     }
 
+    @DeleteMapping("{postId:\\d+}")
+    public void deletePermanently(@PathVariable("postId") Integer postId) {
+        // Remove it
+        postService.removeById(postId);
+    }
 }

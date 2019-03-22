@@ -63,4 +63,21 @@ public interface PostTagRepository extends BaseRepository<PostTag, Integer> {
     @NonNull
     List<PostTag> findAllByPostIdIn(@NonNull Iterable<Integer> postIds);
 
+    /**
+     * Deletes post tags by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of post tag deleted
+     */
+    @NonNull
+    List<PostTag> deleteByPostId(@NonNull Integer postId);
+
+    /**
+     * Deletes post tags by tag id.
+     *
+     * @param tagId tag id must not be null
+     * @return a list of post tag deleted
+     */
+    @NonNull
+    List<PostTag> deleteByTagId(@NonNull Integer tagId);
 }
