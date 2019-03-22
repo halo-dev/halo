@@ -295,7 +295,7 @@ public class InstallController {
             menuService.create(menuArchive);
 
             OPTIONS.clear();
-            OPTIONS = optionService.listOptions();
+            OPTIONS.putAll(optionService.listOptions());
             configuration.setSharedVariable("options", OPTIONS);
 //            configuration.setSharedVariable("user", userService.findUser());
         } catch (Exception e) {
