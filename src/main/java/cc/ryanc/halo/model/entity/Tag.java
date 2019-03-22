@@ -5,11 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * Tag entity
