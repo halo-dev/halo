@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.dto.base.InputConverter;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostCreateFrom;
 import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.crypto.digest.BCrypt;
 import lombok.Data;
@@ -70,6 +71,9 @@ public class PostParam implements InputConverter<Post> {
             post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
         }
 
+        // Set post type to
+        post.setType(PostType.POST);
+
         return post;
     }
 
@@ -89,5 +93,6 @@ public class PostParam implements InputConverter<Post> {
         if (StringUtils.isNotBlank(password)) {
             post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
         }
+
     }
 }

@@ -135,6 +135,9 @@ public class Post extends BaseEntity {
         super.prePersist();
         id = null;
         editTime = getCreateTime();
+        if (type == null) {
+            type = PostType.POST;
+        }
     }
 
 }

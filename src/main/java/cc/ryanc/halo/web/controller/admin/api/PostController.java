@@ -43,8 +43,12 @@ public class PostController {
 
     @GetMapping("status/{status}")
     @ApiOperation("Gets a page of post by post status")
-    public Page<PostSimpleOutputDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
-                                                  @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    public Page<? extends PostSimpleOutputDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
+                                                            @RequestParam(value = "more_info", required = false, defaultValue = "false") Boolean moreInfo,
+                                                            @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+        if (moreInfo) {
+            return postService.pageListVoBy(status, PostType.POST, pageable);
+        }
         return postService.pageSimpleDtoByStatus(status, PostType.POST, pageable);
     }
 
