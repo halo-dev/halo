@@ -1,9 +1,6 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.model.enums.BlogProperties;
 import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.StrUtil;
-import com.qiniu.common.Zone;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,8 +24,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
-
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 
 /**
  * <pre>
@@ -87,59 +82,6 @@ public class HaloUtils {
             machineAddress = InetAddress.getLoopbackAddress();
         }
         return machineAddress.getHostAddress();
-    }
-
-    /**
-     * Gets default page size.
-     *
-     * @return default page size
-     */
-    public static int getDefaultPageSize(int pageSize) {
-        if (StrUtil.isNotBlank(OPTIONS.get(BlogProperties.INDEX_POSTS))) {
-            return Integer.parseInt(OPTIONS.get(BlogProperties.INDEX_POSTS));
-        }
-
-        return pageSize;
-    }
-
-    /**
-     * Gets default qiniuyun zone.
-     *
-     * @return qiniuyun zone
-     */
-    @NonNull
-    public static Zone getDefaultQiniuZone() {
-        // Get zone from setting
-        String qiniuZone = OPTIONS.get("qiniu_zone");
-
-        if (StrUtil.isBlank(qiniuZone)) {
-            return Zone.autoZone();
-        }
-
-        Zone zone;
-
-        switch (qiniuZone) {
-            case "z0":
-                zone = Zone.zone0();
-                break;
-            case "z1":
-                zone = Zone.zone1();
-                break;
-            case "z2":
-                zone = Zone.zone2();
-                break;
-            case "na0":
-                zone = Zone.zoneNa0();
-                break;
-            case "as0":
-                zone = Zone.zoneAs0();
-                break;
-            default:
-                // Default is detecting zone automatically
-                zone = Zone.autoZone();
-        }
-
-        return zone;
     }
 
 //    /**

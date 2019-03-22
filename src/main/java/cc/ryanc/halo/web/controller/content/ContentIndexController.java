@@ -3,8 +3,8 @@ package cc.ryanc.halo.web.controller.content;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.vo.PostListVO;
+import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +34,12 @@ public class ContentIndexController extends BaseContentController {
 
     private final PostService postService;
 
-    public ContentIndexController(PostService postService) {
+    private final OptionService optionService;
+
+    public ContentIndexController(PostService postService,
+                                  OptionService optionService) {
         this.postService = postService;
+        this.optionService = optionService;
     }
 
 
@@ -65,7 +69,7 @@ public class ContentIndexController extends BaseContentController {
                                 @SortDefault(sort = "createTime", direction = DESC)
                         }) Sort sort) {
         log.debug("Requested index page, sort info: [{}]", sort);
-        int pageSize = HaloUtils.getDefaultPageSize(10);
+        int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest.of(page - 1, pageSize, sort);
         Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, PostType.POST, pageable);
         int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);

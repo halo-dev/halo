@@ -149,7 +149,13 @@ public enum BlogProperties implements ValueEnum<String> {
     /**
      * 附件存储位置
      */
-    ATTACH_LOC("attach_loc");
+    ATTACH_LOC("attach_loc"),
+
+    /**
+     * 七牛云 Zone.
+     */
+    QINIU_ZONE("qiniu_zone");
+
 
     private String value;
 

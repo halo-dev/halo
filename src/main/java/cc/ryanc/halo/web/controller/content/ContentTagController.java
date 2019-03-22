@@ -1,13 +1,11 @@
 package cc.ryanc.halo.web.controller.content;
 
 import cc.ryanc.halo.model.entity.Tag;
-import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.vo.PostListVO;
+import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
-import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
-import cn.hutool.core.util.StrUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import static cc.ryanc.halo.model.support.HaloConst.OPTIONS;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
@@ -36,9 +33,14 @@ public class ContentTagController extends BaseContentController {
 
     private final PostService postService;
 
-    public ContentTagController(TagService tagService, PostService postService) {
+    private final OptionService optionService;
+
+    public ContentTagController(TagService tagService,
+                                PostService postService,
+                                OptionService optionService) {
         this.tagService = tagService;
         this.postService = postService;
+        this.optionService = optionService;
     }
 
     /**
@@ -81,7 +83,7 @@ public class ContentTagController extends BaseContentController {
         if (null == tag) {
             return this.renderNotFound();
         }
-        int size = HaloUtils.getDefaultPageSize(10);
+        int size = optionService.getPostPageSize();
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         // TODO get posts by tag
