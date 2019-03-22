@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.model.params.TagParam;
 import cc.ryanc.halo.service.PostTagService;
 import cc.ryanc.halo.service.TagService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -54,5 +55,28 @@ public class TagController {
 
         // Create and convert
         return new TagOutputDTO().convertFrom(tagService.create(tag));
+    }
+
+    /**
+     * Get tag by id
+     *
+     * @param id id
+     * @return TagOutputDTO
+     */
+    @GetMapping("{id:\\d+}")
+    @ApiOperation("Get tag detail by id")
+    public TagOutputDTO getBy(@PathVariable("id") Integer id) {
+        return new TagOutputDTO().convertFrom(tagService.getById(id));
+    }
+
+    /**
+     * Delete tag by id.
+     *
+     * @param id id
+     */
+    @DeleteMapping("{id:\\d+}")
+    @ApiOperation("Delete tag by id")
+    public void deletePermanently(@PathVariable("id") Integer id) {
+        tagService.removeById(id);
     }
 }

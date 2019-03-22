@@ -20,43 +20,19 @@ import java.util.Date;
 @EqualsAndHashCode
 public class PostMinimalOutputDTO implements OutputConverter<PostMinimalOutputDTO, Post> {
 
-    /**
-     * Post id.
-     */
     private Integer id;
 
-    /**
-     * Post title
-     */
     private String title;
 
-    /**
-     * Post status.
-     */
     private PostStatus status;
 
-    /**
-     * Post url.
-     */
     private String url;
 
-    /**
-     * Post type
-     */
     private PostType type;
 
-    /**
-     * 更新时间戳
-     */
     private Date updateTime;
 
-    /**
-     * 创建时间戳
-     */
     private Date createTime;
 
-    /**
-     * Edit time.
-     */
     private Date editTime;
 }

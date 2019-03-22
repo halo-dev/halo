@@ -45,4 +45,27 @@ public class CategoryController {
         // Save it
         return new CategoryOutputDTO().convertFrom(categoryService.create(category));
     }
+
+    /**
+     * Get Category by id
+     *
+     * @param id id
+     * @return CategoryOutputDTO
+     */
+    @GetMapping("{id:\\d+}")
+    @ApiOperation("Get category detail by id")
+    public CategoryOutputDTO getBy(@PathVariable("id") Integer id) {
+        return new CategoryOutputDTO().convertFrom(categoryService.getById(id));
+    }
+
+    /**
+     * Delete category by id.
+     *
+     * @param id id
+     */
+    @DeleteMapping("{id:\\d+}")
+    @ApiOperation("Delete category by id")
+    public void deletePermanently(@PathVariable("id") Integer id) {
+        categoryService.removeById(id);
+    }
 }

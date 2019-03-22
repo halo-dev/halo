@@ -26,9 +26,24 @@ public class LogController {
         this.logService = logService;
     }
 
+    /**
+     * List latest logs.
+     *
+     * @param top top
+     * @return List of logs
+     */
     @GetMapping("latest")
     @ApiOperation("Pages latest logs")
     public List<LogOutputDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         return logService.pageLatest(top).getContent();
+    }
+
+    /**
+     * Clear all logs.
+     */
+    @GetMapping("clear")
+    @ApiOperation("Clear all logs")
+    public void clear() {
+        logService.removeAll();
     }
 }

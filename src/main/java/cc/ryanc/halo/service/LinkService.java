@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.dto.LinkOutputDTO;
+import cc.ryanc.halo.model.dto.LinkTeamOutputDTO;
 import cc.ryanc.halo.model.entity.Link;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Sort;
@@ -22,4 +23,11 @@ public interface LinkService extends CrudService<Link, Integer> {
      * @return all links
      */
     List<LinkOutputDTO> listDtos(@NonNull Sort sort);
+
+    /**
+     * List link by group
+     *
+     * @return List<LinkTeamOutputDTO>
+     */
+    List<LinkTeamOutputDTO> listTeam();
 }

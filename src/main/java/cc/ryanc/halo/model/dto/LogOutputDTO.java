@@ -9,38 +9,24 @@ import lombok.ToString;
 
 import java.util.Date;
 
+/**
+ * @author johnniang
+ * @date 3/19/19
+ */
 @Data
 @ToString
 @EqualsAndHashCode
 public class LogOutputDTO implements OutputConverter<LogOutputDTO, Log> {
 
-    /**
-     * Log id.
-     */
     private Long id;
 
-    /**
-     * 日志标识
-     */
     private String logKey;
 
-    /**
-     * 日志事件类型
-     */
     private LogType type;
 
-    /**
-     * 日志内容
-     */
     private String content;
 
-    /**
-     * 操作 IP
-     */
     private String ipAddress;
 
-    /**
-     * 创建时间戳
-     */
     private Date createTime;
 }
