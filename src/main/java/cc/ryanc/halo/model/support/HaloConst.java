@@ -36,7 +36,7 @@ public class HaloConst {
     /**
      * All of the options
      */
-    public static Map<String, String> OPTIONS = new HashMap<>();
+    public static Map<String, String> OPTIONS;
 
     /**
      * All of the Owo
@@ -46,7 +46,7 @@ public class HaloConst {
     /**
      * All of the themes
      */
-    public static List<Theme> THEMES = new ArrayList<>();
+    public static List<Theme> THEMES;
 
     /**
      * user_session
@@ -56,7 +56,7 @@ public class HaloConst {
     /**
      * 文章阅读数缓存
      */
-    public static Map<Long, Long> POSTS_VIEWS = new HashMap<>();
+    public static Map<Long, Long> POSTS_VIEWS;
 
     /**
      * 网易云音乐短代码前缀

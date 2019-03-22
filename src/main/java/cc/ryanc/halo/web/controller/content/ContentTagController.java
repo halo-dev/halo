@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.service.TagService;
+import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.util.StrUtil;
 import org.springframework.data.domain.Page;
@@ -80,10 +81,7 @@ public class ContentTagController extends BaseContentController {
         if (null == tag) {
             return this.renderNotFound();
         }
-        int size = 10;
-        if (StrUtil.isNotBlank(OPTIONS.get(BlogProperties.INDEX_POSTS.getValue()))) {
-            size = Integer.parseInt(OPTIONS.get(BlogProperties.INDEX_POSTS.getValue()));
-        }
+        int size = HaloUtils.getDefaultPageSize();
         final Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         // TODO get posts by tag
