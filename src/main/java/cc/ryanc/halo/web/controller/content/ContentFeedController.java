@@ -75,7 +75,7 @@ public class ContentFeedController {
     @GetMapping(value = {"atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String atom(Model model) throws IOException, TemplateException {
-        int pageSize = HaloUtils.getDefaultPageSize();
+        int pageSize = HaloUtils.getDefaultPageSize(10);
         final Sort sort = new Sort(Sort.Direction.DESC, "createTime");
         final Pageable pageable = PageRequest.of(0, pageSize, sort);
         model.addAttribute("posts", buildPosts(pageable));
