@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.entity.PostCategory;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +36,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a category list map (key: postId, value: a list of category)
      */
     @NonNull
-    Map<Integer, List<Category>> listCategoryListMap(Collection<Integer> postIds);
+    Map<Integer, List<Category>> listCategoryListMap(@Nullable Collection<Integer> postIds);
 
     /**
      * Lists post by category id.
@@ -54,7 +55,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a list of post category
      */
     @NonNull
-    List<PostCategory> mergeOrCreateByIfAbsent(@NonNull Integer postId, Set<Integer> categoryIds);
+    List<PostCategory> mergeOrCreateByIfAbsent(@NonNull Integer postId, @Nullable Set<Integer> categoryIds);
 
     /**
      * Lists by post id.
@@ -82,4 +83,22 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     Set<Integer> listCategoryIdsByPostId(@NonNull Integer postId);
+
+    /**
+     * Removes post categories by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of post category deleted
+     */
+    @NonNull
+    List<PostCategory> removeByPostId(@NonNull Integer postId);
+
+    /**
+     * Removes post categories by category id.
+     *
+     * @param categoryId category id must not be null
+     * @return a list of post category deleted
+     */
+    @NonNull
+    List<PostCategory> removeByCategoryId(@NonNull Integer categoryId);
 }

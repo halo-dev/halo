@@ -170,4 +170,18 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
         return postTagRepository.findAllTagIdsByPostId(postId);
     }
+
+    @Override
+    public List<PostTag> removeByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        return postTagRepository.deleteByPostId(postId);
+    }
+
+    @Override
+    public List<PostTag> removeByTagId(Integer tagId) {
+        Assert.notNull(tagId, "Tag id must not be null");
+
+        return postTagRepository.deleteByTagId(tagId);
+    }
 }

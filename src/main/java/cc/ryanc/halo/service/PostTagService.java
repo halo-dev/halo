@@ -7,6 +7,7 @@ import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,7 +47,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      * @return tag map (key: postId, value: a list of tags)
      */
     @NonNull
-    Map<Integer, List<Tag>> listTagListMapBy(Collection<Integer> postIds);
+    Map<Integer, List<Tag>> listTagListMapBy(@Nullable Collection<Integer> postIds);
 
     /**
      * Lists posts by tag id.
@@ -65,7 +66,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      * @return a list of post tag
      */
     @NonNull
-    List<PostTag> mergeOrCreateByIfAbsent(@NonNull Integer postId, Set<Integer> tagIds);
+    List<PostTag> mergeOrCreateByIfAbsent(@NonNull Integer postId, @Nullable Set<Integer> tagIds);
 
     /**
      * Lists post tags by post id.
@@ -93,4 +94,22 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      */
     @NonNull
     Set<Integer> listTagIdsByPostId(@NonNull Integer postId);
+
+    /**
+     * Removes post tags by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of post tag
+     */
+    @NonNull
+    List<PostTag> removeByPostId(@NonNull Integer postId);
+
+    /**
+     * Removes post tags by tag id.
+     *
+     * @param tagId tag id must not be null
+     * @return a list of post tag
+     */
+    @NonNull
+    List<PostTag> removeByTagId(@NonNull Integer tagId);
 }

@@ -2,9 +2,7 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
-import cc.ryanc.halo.model.entity.Category;
 import cc.ryanc.halo.model.entity.Post;
-import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.vo.PostDetailVO;
@@ -15,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,23 +22,6 @@ import java.util.Set;
  * @author RYAN0UP
  */
 public interface PostService extends CrudService<Post, Integer> {
-
-    /**
-     * Save post with tags and categories
-     *
-     * @param post       post
-     * @param tags       tags
-     * @param categories categories
-     * @return saved post
-     */
-    Post save(Post post, List<Tag> tags, List<Category> categories);
-
-    /**
-     * Remove post and relationship
-     *
-     * @param id id
-     */
-    void remove(Integer id);
 
     /**
      * Lists latest posts of minimal.

@@ -23,7 +23,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.Collections;
@@ -53,6 +55,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     private final PostTagService postTagService;
 
     private final PostCategoryService postCategoryService;
+
+    private final CommentService commentService;
 
     public PostServiceImpl(PostRepository postRepository,
                            TagService tagService,
@@ -160,7 +164,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     /**
-     * Count posts by status and type
+     * Counts posts by status and type
      *
      * @param status status
      * @param type   type
@@ -191,8 +195,10 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         // Check url
         long count;
         if (post.getId() != null) {
+            // For updating
             count = postRepository.countByIdNotAndUrl(post.getId(), post.getUrl());
         } else {
+            // For creating
             count = postRepository.countByUrl(post.getUrl());
         }
 
@@ -229,7 +235,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     /**
-     * Get post by url.
+     * Gets post by url.
      *
      * @param url  post url.
      * @param type post type enum.
@@ -250,8 +256,28 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return convertTo(post);
     }
 
+    @Override
+    @Transactional
+    public Post removeById(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        log.debug("Removing post: [{}]", postId);
+
+        // Remove post tags
+        List<PostTag> postTags = postTagService.removeByPostId(postId);
+
+        log.debug("Removd post tags: [{}]", postTags);
+
+        // Remove post categories
+        List<PostCategory> postCategories = postCategoryService.removeByPostId(postId);
+
+        log.debug("Removed post categories: [{}]", postCategories);
+
+        return super.removeById(postId);
+    }
+
     /**
-     * Convert to post detail vo.
+     * Converts to post detail vo.
      *
      * @param post post must not be null
      * @return post detail vo
@@ -264,7 +290,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     /**
-     * Convert to post detail vo.
+     * Converts to post detail vo.
      *
      * @param post                  post must not be null
      * @param tagIdSetSupplier      tag id set supplier
@@ -272,7 +298,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @return post detail vo
      */
     @NonNull
-    private PostDetailVO convertTo(@NonNull Post post, Supplier<Set<Integer>> tagIdSetSupplier, Supplier<Set<Integer>> categoryIdSetSupplier) {
+    private PostDetailVO convertTo(@NonNull Post post, @Nullable Supplier<Set<Integer>> tagIdSetSupplier, @Nullable Supplier<Set<Integer>> categoryIdSetSupplier) {
         Assert.notNull(post, "Post must not be null");
 
         PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);

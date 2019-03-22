@@ -7,6 +7,11 @@ import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Comment service.
@@ -33,4 +38,22 @@ public interface CommentService extends CrudService<Comment, Long> {
      */
     @NonNull
     Page<CommentVO> pageBy(@NonNull CommentStatus status, @NonNull Pageable pageable);
+
+    /**
+     * Lists comments by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of comment
+     */
+    @NonNull
+    List<Comment> listBy(@NonNull Integer postId);
+
+    /**
+     * Count by post id collection.
+     *
+     * @param postIds post id collection
+     * @return a count map, key: post id, value: comment count
+     */
+    @NonNull
+    Map<Integer, Long> countByPostIds(@Nullable Collection<Integer> postIds);
 }
