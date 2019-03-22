@@ -55,9 +55,9 @@ public class PostController {
                                                             @RequestParam(value = "more_info", required = false, defaultValue = "false") Boolean moreInfo,
                                                             @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
         if (moreInfo) {
-            return postService.pageListVoBy(status, PostType.POST, pageable);
+            return postService.pageListVoBy(status, pageable);
         }
-        return postService.pageSimpleDtoByStatus(status, PostType.POST, pageable);
+        return postService.pageSimpleDtoByStatus(status, pageable);
     }
 
     @GetMapping("{postId:\\d+}")

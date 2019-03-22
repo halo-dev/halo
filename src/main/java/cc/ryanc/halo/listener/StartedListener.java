@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
+import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
 /**
  * <pre>
@@ -120,7 +121,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void cacheOwo() {
         try {
-            File file = new File(ResourceUtils.getURL("classpath:").getPath(), "static/halo-common/OwO/OwO.path.json");
+            File file = new File(ResourceUtils.getURL(CLASSPATH_URL_PREFIX).getPath(), "static/halo-common/OwO/OwO.path.json");
             HaloConst.OWO = JSONUtil.readJSONObject(file, Charset.forName("UTF-8"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();

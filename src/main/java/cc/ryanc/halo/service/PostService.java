@@ -56,44 +56,40 @@ public interface PostService extends CrudService<Post, Integer> {
      * List by status and type
      *
      * @param status   post status must not be null
-     * @param type     post type must not be null
      * @param pageable page info must not be null
      * @return Page<PostSimpleOutputDTO>
      */
     @NonNull
-    Page<Post> pageBy(@NonNull PostStatus status, @NonNull PostType type, @NonNull Pageable pageable);
+    Page<Post> pageBy(@NonNull PostStatus status, @NonNull Pageable pageable);
 
 
     /**
      * List simple output dto by status and type
      *
      * @param status   post status must not be null
-     * @param type     post type must not be null
      * @param pageable page info must not be null
      * @return Page<PostSimpleOutputDTO>
      */
     @NonNull
-    Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(@NonNull PostStatus status, @NonNull PostType type, @NonNull Pageable pageable);
+    Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
      * Lists page list vo by status, type and pageable.
      *
      * @param status   post status must not be null
-     * @param type     post type must not be null
      * @param pageable page info must not be null
      * @return a page of page list vo
      */
     @NonNull
-    Page<PostListVO> pageListVoBy(@NonNull PostStatus status, @NonNull PostType type, @NonNull Pageable pageable);
+    Page<PostListVO> pageListVoBy(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
      * Count posts by status and type
      *
      * @param status status
-     * @param type   type
      * @return posts count
      */
-    Long countByStatus(PostStatus status, PostType type);
+    Long countByStatus(PostStatus status);
 
     /**
      * Creates post by post param.
@@ -122,11 +118,10 @@ public interface PostService extends CrudService<Post, Integer> {
     /**
      * Get post by url.
      *
-     * @param url  post url.
-     * @param type post type enum.
+     * @param url post url.
      * @return Post
      */
-    Post getByUrl(@NonNull String url, @NonNull PostType type);
+    Post getByUrl(@NonNull String url);
 
     /**
      * Get post detail vo by post id.

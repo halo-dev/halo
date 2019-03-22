@@ -42,7 +42,7 @@ public class AdminController {
     @ApiOperation("Gets count info")
     public CountOutputDTO getCount() {
         CountOutputDTO countOutputDTO = new CountOutputDTO();
-        countOutputDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED, PostType.POST));
+        countOutputDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
         countOutputDTO.setAttachmentCount(attachmentService.count());
         countOutputDTO.setCommentCount(commentService.count());
         countOutputDTO.setEstablishDays(Long.valueOf(optionService.getByProperty(BlogProperties.WIDGET_DAYCOUNT).orElse("0")));
