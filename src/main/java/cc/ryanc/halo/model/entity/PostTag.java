@@ -49,7 +49,6 @@ public class PostTag extends BaseEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         PostTag postTag = (PostTag) o;
         return Objects.equals(postId, postTag.postId) &&
                 Objects.equals(tagId, postTag.tagId);
@@ -57,6 +56,6 @@ public class PostTag extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), postId, tagId);
+        return Objects.hash(postId, tagId);
     }
 }
