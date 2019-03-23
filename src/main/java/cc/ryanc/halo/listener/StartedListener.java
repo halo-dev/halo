@@ -86,9 +86,10 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     }
 
     private void printStartInfo() {
-        String blogUrl = getBlogUrl();
+        String blogUrl = getBaseUrl();
 
         log.info("Halo started at    {}", blogUrl);
+        // TODO admin may be changeable
         log.info("Halo admin is at   {}/admin", blogUrl);
         if (!haloProperties.getDocDisabled()) {
             log.debug("Halo doc enable at {}/swagger-ui.html", blogUrl);
@@ -100,7 +101,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      *
      * @return blog url (If blog url isn't present, current machine IP address will be default)
      */
-    private String getBlogUrl() {
+    private String getBaseUrl() {
         // Get server port
         String serverPort = applicationContext.getEnvironment().getProperty("server.port", "8080");
 
