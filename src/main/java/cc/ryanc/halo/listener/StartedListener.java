@@ -9,7 +9,7 @@ import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +19,12 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
-import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
 /**
  * <pre>
@@ -50,6 +49,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
     @Autowired
     private OptionService optionService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
@@ -84,9 +86,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     }
 
     private void printStartInfo() {
-        // Get server port
-        String serverPort = applicationContext.getEnvironment().getProperty("server.port");
-
         String blogUrl = getBlogUrl();
 
         log.info("Halo started at    {}", blogUrl);
@@ -103,7 +102,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private String getBlogUrl() {
         // Get server port
-        String serverPort = applicationContext.getEnvironment().getProperty("server.port");
+        String serverPort = applicationContext.getEnvironment().getProperty("server.port", "8080");
 
         String blogUrl = optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL);
 
@@ -121,10 +120,14 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void cacheOwo() {
         try {
-            File file = new File(ResourceUtils.getURL(CLASSPATH_URL_PREFIX).getPath(), "static/halo-common/OwO/OwO.path.json");
-            HaloConst.OWO = JSONUtil.readJSONObject(file, Charset.forName("UTF-8"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            // The Map is LinkedHashMap
+            @SuppressWarnings("unchecked")
+            Map<String, String> owoMap = objectMapper.readValue(ResourceUtils.getURL("classpath:static/halo-common/OwO/OwO.path.json"), Map.class);
+
+            HaloConst.OWO_MAP = Collections.unmodifiableMap(owoMap);
+        } catch (IOException e) {
+            log.error("Failed to read owo json", e);
+            // TODO Consider to throw an exception
         }
     }
 }
