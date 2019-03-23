@@ -1,8 +1,9 @@
 package cc.ryanc.halo.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
-import static cc.ryanc.halo.model.support.HaloConst.OWO;
+import static cc.ryanc.halo.model.support.HaloConst.OWO_MAP;
 
 /**
  * Owo util
@@ -20,8 +21,12 @@ public class OwoUtil {
      * @return picture address
      */
     public static String parseOwo(String content) {
-        for (String key : OWO.keySet()) {
-            content = content.replace(key, OWO.get(key).toString());
+        if (CollectionUtils.isEmpty(OWO_MAP)) {
+            return content;
+        }
+
+        for (String key : OWO_MAP.keySet()) {
+            content = content.replace(key, OWO_MAP.get(key).toString());
         }
         return content;
     }
