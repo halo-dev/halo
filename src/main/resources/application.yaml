@@ -40,18 +40,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
-  freemarker:
-    allow-request-override: false
-    cache: false
-    check-template-location: true
-    charset: utf-8
-    content-type: text/html
-    expose-request-attributes: false
-    expose-session-attributes: false
-    expose-spring-macro-helpers: true
-    suffix: .ftl
-    settings:
-      auto_import: /spring.ftl as spring
   servlet:
     multipart:
       max-file-size: 10MB

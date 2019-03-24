@@ -18,15 +18,14 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * <pre>
@@ -98,5 +97,26 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverterFactory(new StringToEnumConverterFactory());
+    }
+
+    @Bean
+    public FreeMarkerConfigurer freemarkerConfig() {
+        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+        configurer.setTemplateLoaderPaths("file:///" + System.getProperties().getProperty("user.home") + "/halo/templates/", "classpath:/templates/");
+        configurer.setDefaultEncoding("UTF-8");
+        return configurer;
+    }
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
+        resolver.setAllowRequestOverride(false);
+        resolver.setCache(false);
+        resolver.setExposeRequestAttributes(false);
+        resolver.setExposeSessionAttributes(false);
+        resolver.setExposeSpringMacroHelpers(true);
+        resolver.setSuffix(".ftl");
+        resolver.setContentType("text/html; charset=UTF-8");
+        registry.viewResolver(resolver);
     }
 }

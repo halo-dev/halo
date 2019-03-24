@@ -74,7 +74,6 @@ public class ThemeUtils {
                             theme.setHasUpdate(false);
                         }
                         theme.setProperties(getProperties(new File(themesBasePath,file.getName())));
-                        theme.setInternal(isInternal);
                         themes.add(theme);
                     }
                 }
