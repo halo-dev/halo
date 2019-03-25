@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.support;
 
+import cc.ryanc.halo.model.support.CommentPage;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -30,6 +31,13 @@ public class PageJacksonSerializer extends JsonSerializer<Page> {
         generator.writeBooleanField("isLast", page.isLast());
         generator.writeBooleanField("isEmpty", page.isEmpty());
         generator.writeBooleanField("hasContent", page.hasContent());
+
+        // Handle comment page
+        if (page instanceof CommentPage) {
+            CommentPage commentPage = (CommentPage) page;
+            generator.writeNumberField("commentCount", commentPage.getCommentCount());
+        }
+
         generator.writeEndObject();
     }
 }

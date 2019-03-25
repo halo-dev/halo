@@ -4,16 +4,17 @@ import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
-import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.params.PostParam;
+import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.model.vo.PostDetailVO;
-import cc.ryanc.halo.service.PostCategoryService;
-import cc.ryanc.halo.service.PostService;
-import cc.ryanc.halo.service.PostTagService;
+import cc.ryanc.halo.service.*;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,10 +38,20 @@ public class PostController {
 
     private final PostTagService postTagService;
 
-    public PostController(PostService postService, PostCategoryService postCategoryService, PostTagService postTagService) {
+    private final CommentService commentService;
+
+    private final OptionService optionService;
+
+    public PostController(PostService postService,
+                          PostCategoryService postCategoryService,
+                          PostTagService postTagService,
+                          CommentService commentService,
+                          OptionService optionService) {
         this.postService = postService;
         this.postCategoryService = postCategoryService;
         this.postTagService = postTagService;
+        this.commentService = commentService;
+        this.optionService = optionService;
     }
 
     @GetMapping("latest")
@@ -90,5 +101,12 @@ public class PostController {
         postService.removeById(postId);
         postCategoryService.removeByPostId(postId);
         postTagService.removeByPostId(postId);
+    }
+
+    @GetMapping("{postId:\\d+}/comments")
+    public Page<CommentVO> listComments(@PathVariable("postId") Integer postId,
+                                        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                        @SortDefault Sort sort) {
+        return commentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 }

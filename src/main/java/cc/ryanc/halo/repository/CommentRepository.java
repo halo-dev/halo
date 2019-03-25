@@ -48,7 +48,32 @@ public interface CommentRepository extends BaseRepository<Comment, Long> {
     @NonNull
     List<Comment> findAllByPostId(@NonNull Integer postId);
 
+    /**
+     * Counts comment count by post id collection.
+     *
+     * @param postIds post id collection must not be null
+     * @return a list of comment count
+     */
     @Query("select new cc.ryanc.halo.model.projection.CommentCountProjection(count(comment.id), comment.postId) from Comment comment where comment.postId in ?1 group by comment.postId")
     @NonNull
     List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
+
+    /**
+     * Finds comments by post id, comment status.
+     *
+     * @param postId post id must not be null
+     * @param status comment status must not be null
+     * @return a list of comment
+     */
+    List<Comment> findAllByPostIdAndStatus(Integer postId, CommentStatus status);
+
+    /**
+     * Finds comments by post id, comment status.
+     *
+     * @param postId   post id must not be null
+     * @param status   comment status must not be null
+     * @param pageable page info must not be null
+     * @return a page of comment
+     */
+    Page<Comment> findAllByPostIdAndStatus(Integer postId, CommentStatus status, Pageable pageable);
 }

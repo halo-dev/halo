@@ -3,6 +3,7 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.vo.CommentListVO;
+import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,4 +75,14 @@ public interface CommentService extends CrudService<Comment, Long> {
      */
     @NonNull
     Comment createBy(@NonNull Comment comment, @NonNull HttpServletRequest request);
+
+    /**
+     * Lists comment vos by post id.
+     *
+     * @param postId   post id must not be null
+     * @param pageable page info must not be null
+     * @return a page of comment vo
+     */
+    @NonNull
+    Page<CommentVO> pageVosBy(@NonNull Integer postId, @NonNull Pageable pageable);
 }
