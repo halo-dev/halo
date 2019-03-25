@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.CommentOutputDTO;
+import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.params.CommentParam;
 import cc.ryanc.halo.model.vo.CommentListVO;
@@ -66,6 +67,16 @@ public class CommentController {
         }
 
         return new CommentOutputDTO().convertFrom(commentService.createBy(commentParam.convertTo(), request));
+    }
+
+    @PutMapping("{commentId:\\d+}/status/{status}")
+    @ApiOperation("Update comment status")
+    public CommentOutputDTO deleteBy(@PathVariable("commentId") Long commentId,
+                                     @PathVariable("status") CommentStatus status) {
+        // Update comment status
+        Comment updatedComment = commentService.updateStatus(commentId, status);
+
+        return new CommentOutputDTO().convertFrom(updatedComment);
     }
 
 }
