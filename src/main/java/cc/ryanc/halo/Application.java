@@ -27,7 +27,8 @@ public class Application {
     private final static Logger LOG = Logger.getLogger(Application.class);
 
     public static void main(String[] args) {
-        System.setProperty("spring.config.additional-location", "file:${user.home}/halo/");
+        // Customize the spring config location
+        System.setProperty("spring.config.location", "classpath:/,classpath:/config/,file:./,file:./config/,file:${user.home}/halo/,file:${user.home}/halo-dev");
 
         // Run application
         SpringApplication.run(Application.class, args);
