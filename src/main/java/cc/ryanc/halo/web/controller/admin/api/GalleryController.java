@@ -39,23 +39,23 @@ public class GalleryController {
     /**
      * Get gallery by id.
      *
-     * @param id gallery id
+     * @param galleryId gallery id
      * @return GalleryOutputDTO
      */
-    @GetMapping("{id:\\d+}")
+    @GetMapping("{galleryId:\\d+}")
     @ApiOperation("Get gallery detail by id")
-    public GalleryOutputDTO getBy(@PathVariable("id") Integer id) {
-        return new GalleryOutputDTO().convertFrom(galleryService.getById(id));
+    public GalleryOutputDTO getBy(@PathVariable("galleryId") Integer galleryId) {
+        return new GalleryOutputDTO().convertFrom(galleryService.getById(galleryId));
     }
 
     /**
      * Delete gallery by id.
      *
-     * @param id id
+     * @param galleryId gallery id
      */
-    @DeleteMapping("{id:\\d+}")
+    @DeleteMapping("{galleryId:\\d+}")
     @ApiOperation("Delete gallery by id")
-    public void deletePermanently(@PathVariable("id") Integer id) {
-        galleryService.removeById(id);
+    public void deletePermanently(@PathVariable("galleryId") Integer galleryId) {
+        galleryService.removeById(galleryId);
     }
 }

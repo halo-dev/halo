@@ -70,7 +70,7 @@ public class CommentController {
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
-    @ApiOperation("Update comment status")
+    @ApiOperation("Updates comment status")
     public CommentOutputDTO updateStatusBy(@PathVariable("commentId") Long commentId,
                                            @PathVariable("status") CommentStatus status) {
         // Update comment status
@@ -80,6 +80,7 @@ public class CommentController {
     }
 
     @DeleteMapping("{commentId:\\d+}")
+    @ApiOperation("Deletes comment permanently and recursively")
     public CommentOutputDTO deleteBy(@PathVariable("commentId") Long commentId) {
         // Get comment by id
         Comment comment = commentService.getById(commentId);
