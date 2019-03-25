@@ -4,24 +4,36 @@ const baseUrl = '/admin/api/tags'
 
 const tagApi = {}
 
-tagApi.listAll = () => {
+tagApi.listAll = (more = false) => {
   return service({
     url: baseUrl,
-    method: 'get'
-  })
-}
-
-tagApi.listAllAddition = () => {
-  return service({
-    url: `${baseUrl}/addition`,
+    params: {
+      more: more
+    },
     method: 'get'
   })
 }
 
 tagApi.create = tag => {
   return service({
-    url: `${baseUrl}`,
+    url: baseUrl,
+    data: tag,
     method: 'post'
+  })
+}
+
+tagApi.update = (tagId, tag) => {
+  return service({
+    url: `${baseUrl}/${tagId}`,
+    data: tag,
+    method: 'put'
+  })
+}
+
+tagApi.delete = tagId => {
+  return service({
+    url: `${baseUrl}/${tagId}`,
+    method: 'delete'
   })
 }
 
