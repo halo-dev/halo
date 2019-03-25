@@ -6,7 +6,9 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.projection.CommentCountProjection;
+import cc.ryanc.halo.model.support.CommentPage;
 import cc.ryanc.halo.model.vo.CommentListVO;
+import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.repository.CommentRepository;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.CommentService;
@@ -20,6 +22,7 @@ import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -129,6 +132,113 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         // TODO Handle email sending
 
         return createdComment;
+    }
+
+    @Override
+    public Page<CommentVO> pageVosBy(Integer postId, Pageable pageable) {
+        Assert.notNull(postId, "Post id must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        log.debug("Getting comment of post: [{}], page info: [{}]", postId, pageable);
+
+        // List all the top comments (Caution: This list will be cleared)
+        List<Comment> comments = commentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
+
+        // Init the top virtual comment
+        CommentVO topVirtualComment = new CommentVO();
+        topVirtualComment.setId(0L);
+        topVirtualComment.setChildren(new LinkedList<>());
+
+        // Concrete the comment tree
+        concreteTree(topVirtualComment, new LinkedList<>(comments), buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime"))));
+
+        List<CommentVO> topComments = topVirtualComment.getChildren();
+
+        List<CommentVO> pageContent = null;
+
+        // Calc the shear index
+        int startIndex = pageable.getPageNumber() * pageable.getPageSize();
+        if (startIndex >= topComments.size() || startIndex < 0) {
+            pageContent = Collections.emptyList();
+        } else {
+            int endIndex = startIndex + pageable.getPageSize();
+            if (endIndex > topComments.size()) {
+                endIndex = topComments.size();
+            }
+
+            log.debug("Top comments size: [{}]", topComments.size());
+            log.debug("Start index: [{}]", startIndex);
+            log.debug("End index: [{}]", endIndex);
+
+            pageContent = topComments.subList(startIndex, endIndex);
+        }
+
+        return new CommentPage<>(pageContent, pageable, topComments.size(), comments.size());
+    }
+
+    /**
+     * Builds a comment comparator.
+     *
+     * @param sort sort info
+     * @return comment comparator
+     */
+    private Comparator<CommentVO> buildCommentComparator(Sort sort) {
+        return (currentComment, toCompareComment) -> {
+            Assert.notNull(currentComment, "Current comment must not be null");
+            Assert.notNull(toCompareComment, "Comment to compare must not be null");
+
+            // Get sort order
+            Order order = sort.filter(anOrder -> anOrder.getProperty().equals("createTime"))
+                    .get()
+                    .findFirst()
+                    .orElseGet(() -> Order.desc("createTime"));
+
+            // Init sign
+            int sign = order.getDirection().isAscending() ? 1 : -1;
+
+            // Compare createTime property
+            return sign * currentComment.getCreateTime().compareTo(toCompareComment.getCreateTime());
+        };
+    }
+
+    private void concreteTree(CommentVO parentComment, List<Comment> comments, Comparator<CommentVO> commentComparator) {
+        Assert.notNull(parentComment, "Parent comment must not be null");
+        Assert.notNull(commentComparator, "Comment comparator must not be null");
+
+        if (CollectionUtils.isEmpty(comments)) {
+            return;
+        }
+
+        List<Comment> children = new LinkedList<>();
+
+        comments.forEach(comment -> {
+            if (parentComment.getId().equals(comment.getParentId())) {
+                // Stage the child comment
+                children.add(comment);
+
+                // Convert to comment vo
+                CommentVO commentVO = new CommentVO().convertFrom(comment);
+
+                // TODO Add template
+
+                // Init children container
+                if (parentComment.getChildren() == null) {
+                    parentComment.setChildren(new LinkedList<>());
+                }
+
+                parentComment.getChildren().add(commentVO);
+            }
+        });
+
+        // Remove all children
+        comments.removeAll(children);
+
+        if (!CollectionUtils.isEmpty(parentComment.getChildren())) {
+            // Recursively concrete the children
+            parentComment.getChildren().forEach(childComment -> concreteTree(childComment, comments, commentComparator));
+            // Sort the children
+            parentComment.getChildren().sort(commentComparator);
+        }
     }
 
     /**
