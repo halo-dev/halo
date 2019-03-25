@@ -1,21 +1,16 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.CommentOutputDTO;
-import cc.ryanc.halo.model.entity.Comment;
-import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.params.CommentParam;
-import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.utils.HaloUtils;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.extra.servlet.ServletUtil;
+import cc.ryanc.halo.service.OptionService;
+import cc.ryanc.halo.service.PostService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,8 +31,16 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    public CommentController(CommentService commentService) {
+    private final PostService postService;
+
+    private final OptionService optionService;
+
+    public CommentController(CommentService commentService,
+                             PostService postService,
+                             OptionService optionService) {
         this.commentService = commentService;
+        this.postService = postService;
+        this.optionService = optionService;
     }
 
     @GetMapping("latest")
@@ -54,14 +57,6 @@ public class CommentController {
 
     @PostMapping
     public CommentOutputDTO createBy(@Valid @RequestBody CommentParam commentParam, HttpServletRequest request) {
-        Comment comment = commentParam.convertTo();
-
-        // Set some default value
-        comment.setGavatarMd5(SecureUtil.md5(comment.getEmail()));
-        comment.setIpAddress(ServletUtil.getClientIP(request));
-
-
-//        commentService.createBy(comment)
-        return null;
+        return new CommentOutputDTO().convertFrom(commentService.createBy(commentParam, request));
     }
 }

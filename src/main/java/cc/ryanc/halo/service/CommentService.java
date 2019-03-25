@@ -2,6 +2,7 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.enums.CommentStatus;
+import cc.ryanc.halo.model.params.CommentParam;
 import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,13 @@ import java.util.Map;
  * @author johnniang
  */
 public interface CommentService extends CrudService<Comment, Long> {
+
+    /**
+     * %d: parent commentator id
+     * %s: parent commentator author name
+     * %s: comment content
+     */
+    String COMMENT_TEMPLATE = "<a href='#comment-id-%d>@%s</a> %s";
 
     /**
      * Lists latest comments.
@@ -49,11 +58,21 @@ public interface CommentService extends CrudService<Comment, Long> {
     List<Comment> listBy(@NonNull Integer postId);
 
     /**
-     * Count by post id collection.
+     * Counts by post id collection.
      *
      * @param postIds post id collection
      * @return a count map, key: post id, value: comment count
      */
     @NonNull
     Map<Integer, Long> countByPostIds(@Nullable Collection<Integer> postIds);
+
+    /**
+     * Creates a comment by comment param.
+     *
+     * @param commentParam comment param must not be null and should be validated
+     * @param request      http servlet request must not be null
+     * @return created comment
+     */
+    @NonNull
+    Comment createBy(@NonNull CommentParam commentParam, @NonNull HttpServletRequest request);
 }

@@ -165,7 +165,7 @@ public enum BlogProperties implements ValueEnum<String> {
     private Class<?> type;
 
     BlogProperties(String value, Class<?> type) {
-        if (!supportType(type)) {
+        if (!isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);
         }
 
@@ -199,7 +199,7 @@ public enum BlogProperties implements ValueEnum<String> {
     public static <T> T convertTo(@NonNull String value, @NonNull Class<T> type) {
         Assert.hasText(value, "Property value must not be blank");
 
-        if (!supportType(type)) {
+        if (!isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);
         }
 
@@ -245,7 +245,7 @@ public enum BlogProperties implements ValueEnum<String> {
      * @param type type to check
      * @return true if supports; false else
      */
-    public static boolean supportType(Class<?> type) {
+    public static boolean isSupportedType(Class<?> type) {
         return type != null && (
                 type.isAssignableFrom(String.class)
                         || type.isAssignableFrom(Number.class)
