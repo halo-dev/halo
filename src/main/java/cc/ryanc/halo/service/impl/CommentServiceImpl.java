@@ -154,7 +154,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
 
         List<CommentVO> topComments = topVirtualComment.getChildren();
 
-        List<CommentVO> pageContent = null;
+        List<CommentVO> pageContent;
 
         // Calc the shear index
         int startIndex = pageable.getPageNumber() * pageable.getPageSize();
@@ -174,6 +174,21 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         }
 
         return new CommentPage<>(pageContent, pageable, topComments.size(), comments.size());
+    }
+
+    @Override
+    public Comment updateStatus(Long commentId, CommentStatus status) {
+        Assert.notNull(commentId, "Comment id must not be null");
+        Assert.notNull(status, "Comment status must not be null");
+
+        // Get comment by id
+        Comment comment = getById(commentId);
+
+        // Set comment status
+        comment.setStatus(status);
+
+        // Update comment
+        return update(comment);
     }
 
     /**
@@ -201,7 +216,14 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         };
     }
 
-    private void concreteTree(CommentVO parentComment, List<Comment> comments, Comparator<CommentVO> commentComparator) {
+    /**
+     * Concretes comment tree.
+     *
+     * @param parentComment     parent comment vo must not be null
+     * @param comments          comment list must not null
+     * @param commentComparator comment vo comparator
+     */
+    private void concreteTree(@NonNull CommentVO parentComment, Collection<Comment> comments, @NonNull Comparator<CommentVO> commentComparator) {
         Assert.notNull(parentComment, "Parent comment must not be null");
         Assert.notNull(commentComparator, "Comment comparator must not be null");
 

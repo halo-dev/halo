@@ -85,4 +85,14 @@ public interface CommentService extends CrudService<Comment, Long> {
      */
     @NonNull
     Page<CommentVO> pageVosBy(@NonNull Integer postId, @NonNull Pageable pageable);
+
+    /**
+     * Updates comment status.
+     *
+     * @param commentId comment id must not be null
+     * @param status    comment status must not be null
+     * @return updated comment
+     */
+    @NonNull
+    Comment updateStatus(Long commentId, CommentStatus status);
 }

@@ -1,7 +1,5 @@
 package cc.ryanc.halo.model.support;
 
-import cn.hutool.json.JSONObject;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +31,7 @@ public class HaloConst {
     public static final String TOKEN_HEADER = "token";
 
     /**
-     * All of the Owo
-     */
-    @Deprecated
-    public static JSONObject OWO;
-
-    /**
-     * Owo map. (Unmodified)
+     * Owo map. (Unmodified map)
      */
     public static Map<String, String> OWO_MAP = Collections.emptyMap();
 
