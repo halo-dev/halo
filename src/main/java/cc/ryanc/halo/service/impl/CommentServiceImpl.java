@@ -103,38 +103,27 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         Assert.notNull(commentParam, "Comment param must not be null");
         Assert.notNull(request, "Http servlet request must not be null");
 
-        // Post id must exist
-        boolean postExist = postRepository.existsById(commentParam.getPostId());
-        if (!postExist) {
+        if (!postRepository.existsById(commentParam.getPostId())) {
+            // Post id must exist
             log.error("Post: [{}] was not found", commentParam.getPostId());
             throw new NotFoundException("The post was not found").setErrorData(commentParam.getPostId());
+        }
+
+        if (commentParam.getParentId() != null && commentParam.getParentId() > 0) {
+            // Validate the comment parent id
+            mustExistById(commentParam.getParentId());
         }
 
         // Convert to comment
         Comment comment = commentParam.convertTo();
 
         // Set some default value
+        comment.setContent(OwoUtil.parseOwo(formatContent(comment.getContent())));
         comment.setIpAddress(ServletUtil.getClientIP(request));
         // TODO Check user login status and set this field
         comment.setIsAdmin(false);
         comment.setAuthor(HtmlUtils.htmlEscape(comment.getAuthor()));
         comment.setGavatarMd5(SecureUtil.md5(comment.getEmail()));
-
-        if (comment.getParentId() != null && comment.getParentId() > 0) {
-            // Validate the comment parent id
-            Comment parentComment = getById(comment.getParentId());
-
-            // Format content and set it
-            String formattedContent = String.format(COMMENT_TEMPLATE,
-                    parentComment.getId(),
-                    parentComment.getAuthor(),
-                    OwoUtil.parseOwo(formatContent(comment.getContent())));
-            comment.setContent(formattedContent);
-        } else {
-            comment.setParentId(0L);
-            // Top comment
-            comment.setContent(OwoUtil.parseOwo(formatContent(comment.getContent())));
-        }
 
         if (StringUtils.isNotBlank(comment.getAuthorUrl())) {
             // Normalize the author url and set it
