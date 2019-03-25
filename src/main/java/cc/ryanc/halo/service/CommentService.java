@@ -27,7 +27,7 @@ public interface CommentService extends CrudService<Comment, Long> {
      * %s: parent commentator author name
      * %s: comment content
      */
-    String COMMENT_TEMPLATE = "<a href='#comment-id-%d>@%s</a> %s";
+    String COMMENT_TEMPLATE = "<a href='#comment-id-%d'>@%s</a> %s";
 
     /**
      * Lists latest comments.
