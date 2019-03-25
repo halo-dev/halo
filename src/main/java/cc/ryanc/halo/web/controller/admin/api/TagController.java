@@ -1,7 +1,6 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.TagOutputDTO;
-import cc.ryanc.halo.model.dto.TagWithCountOutputDTO;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.model.params.TagParam;
 import cc.ryanc.halo.service.PostTagService;
@@ -36,13 +35,12 @@ public class TagController {
         this.postTagService = postTagService;
     }
 
-    @GetMapping("/addition")
-    public List<TagWithCountOutputDTO> listTagsWithCount(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
-        return postTagService.listTagWithCountDtos(sort);
-    }
-
     @GetMapping
-    public List<TagOutputDTO> listTags(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
+    public List<? extends TagOutputDTO> listTags(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort,
+                                                 @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
+        if (more) {
+            return postTagService.listTagWithCountDtos(sort);
+        }
         return tagService.convertTo(tagService.listAll(sort));
     }
 
