@@ -58,24 +58,38 @@ public class TagController {
     /**
      * Get tag by id
      *
-     * @param id id
+     * @param tagId tag id
      * @return TagOutputDTO
      */
-    @GetMapping("{id:\\d+}")
+    @GetMapping("{tagId:\\d+}")
     @ApiOperation("Get tag detail by id")
-    public TagOutputDTO getBy(@PathVariable("id") Integer id) {
-        return new TagOutputDTO().convertFrom(tagService.getById(id));
+    public TagOutputDTO getBy(@PathVariable("tagId") Integer tagId) {
+        return new TagOutputDTO().convertFrom(tagService.getById(tagId));
+    }
+
+    @PutMapping("{tagId:\\d+}")
+    @ApiOperation("Updates tag")
+    public TagOutputDTO updateBy(@PathVariable("tagId") Integer tagId,
+                                 @Valid @RequestBody TagParam tagParam) {
+        // Get old tag
+        Tag tag = tagService.getById(tagId);
+
+        // Update tag
+        tagParam.update(tag);
+
+        // Update tag
+        return new TagOutputDTO().convertFrom(tagService.update(tag));
     }
 
     /**
      * Delete tag by id.
      *
-     * @param id id
+     * @param tagId tag id
      */
-    @DeleteMapping("{id:\\d+}")
+    @DeleteMapping("{tagId:\\d+}")
     @ApiOperation("Delete tag by id")
-    public void deletePermanently(@PathVariable("id") Integer id) {
-        tagService.removeById(id);
-        postTagService.removeByTagId(id);
+    public void deletePermanently(@PathVariable("tagId") Integer tagId) {
+        tagService.removeById(tagId);
+        postTagService.removeByTagId(tagId);
     }
 }

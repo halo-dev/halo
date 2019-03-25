@@ -3,11 +3,9 @@ package cc.ryanc.halo.model.params;
 import cc.ryanc.halo.model.dto.base.InputConverter;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.utils.HaloUtils;
-import cc.ryanc.halo.utils.SlugUtils;
+import cn.hutool.core.util.URLUtil;
 import lombok.Data;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -32,7 +30,7 @@ public class TagParam implements InputConverter<Tag> {
     public Tag convertTo() {
         if (StringUtils.isBlank(slugName)) {
             // Handle slug name
-            slugName = SlugUtils.slugify(name);
+            slugName = URLUtil.normalize(name);
         }
 
         slugName = HaloUtils.initializeUrlIfBlank(slugName);
