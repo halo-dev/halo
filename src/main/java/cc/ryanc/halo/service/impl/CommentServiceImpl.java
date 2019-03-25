@@ -219,7 +219,11 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
                 // Convert to comment vo
                 CommentVO commentVO = new CommentVO().convertFrom(comment);
 
-                // TODO Add template
+                // Add additional content
+                if (commentVO.getParentId() > 0) {
+                    // TODO Provide an optional additional content
+                    commentVO.setContent(String.format(COMMENT_TEMPLATE, parentComment.getId(), parentComment.getAuthor(), commentVO.getContent()));
+                }
 
                 // Init children container
                 if (parentComment.getChildren() == null) {
