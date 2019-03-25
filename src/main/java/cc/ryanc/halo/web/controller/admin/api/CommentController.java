@@ -57,7 +57,15 @@ public class CommentController {
 
     @PostMapping
     public CommentOutputDTO createBy(@Valid @RequestBody CommentParam commentParam, HttpServletRequest request) {
-        return new CommentOutputDTO().convertFrom(commentService.createBy(commentParam, request));
+        // Check post id
+        postService.mustExistById(commentParam.getPostId());
+
+        // Check parent id
+        if (commentParam.getParentId() != null && commentParam.getParentId() > 0) {
+            commentService.mustExistById(commentParam.getParentId());
+        }
+
+        return new CommentOutputDTO().convertFrom(commentService.createBy(commentParam.convertTo(), request));
     }
 
 }

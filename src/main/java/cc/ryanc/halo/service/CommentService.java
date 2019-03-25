@@ -2,7 +2,6 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.enums.CommentStatus;
-import cc.ryanc.halo.model.params.CommentParam;
 import cc.ryanc.halo.model.vo.CommentListVO;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
@@ -69,10 +68,10 @@ public interface CommentService extends CrudService<Comment, Long> {
     /**
      * Creates a comment by comment param.
      *
-     * @param commentParam comment param must not be null and should be validated
-     * @param request      http servlet request must not be null
+     * @param comment comment must not be null
+     * @param request http servlet request must not be null
      * @return created comment
      */
     @NonNull
-    Comment createBy(@NonNull CommentParam commentParam, @NonNull HttpServletRequest request);
+    Comment createBy(@NonNull Comment comment, @NonNull HttpServletRequest request);
 }

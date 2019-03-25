@@ -1,12 +1,10 @@
 package cc.ryanc.halo.service.impl;
 
-import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
-import cc.ryanc.halo.model.params.CommentParam;
 import cc.ryanc.halo.model.projection.CommentCountProjection;
 import cc.ryanc.halo.model.vo.CommentListVO;
 import cc.ryanc.halo.repository.CommentRepository;
@@ -22,6 +20,7 @@ import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -99,27 +98,14 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     @Override
-    public Comment createBy(CommentParam commentParam, HttpServletRequest request) {
-        Assert.notNull(commentParam, "Comment param must not be null");
+    public Comment createBy(Comment comment, HttpServletRequest request) {
+        Assert.notNull(comment, "Comment must not be null");
         Assert.notNull(request, "Http servlet request must not be null");
-
-        if (!postRepository.existsById(commentParam.getPostId())) {
-            // Post id must exist
-            log.error("Post: [{}] was not found", commentParam.getPostId());
-            throw new NotFoundException("The post was not found").setErrorData(commentParam.getPostId());
-        }
-
-        if (commentParam.getParentId() != null && commentParam.getParentId() > 0) {
-            // Validate the comment parent id
-            mustExistById(commentParam.getParentId());
-        }
-
-        // Convert to comment
-        Comment comment = commentParam.convertTo();
 
         // Set some default value
         comment.setContent(OwoUtil.parseOwo(formatContent(comment.getContent())));
         comment.setIpAddress(ServletUtil.getClientIP(request));
+        comment.setUserAgent(ServletUtil.getHeaderIgnoreCase(request, HttpHeaders.USER_AGENT));
         // TODO Check user login status and set this field
         comment.setIsAdmin(false);
         comment.setAuthor(HtmlUtils.htmlEscape(comment.getAuthor()));
