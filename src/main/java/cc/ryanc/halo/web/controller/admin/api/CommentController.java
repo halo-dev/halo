@@ -3,7 +3,7 @@ package cc.ryanc.halo.web.controller.admin.api;
 import cc.ryanc.halo.model.dto.CommentOutputDTO;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.params.CommentParam;
-import cc.ryanc.halo.model.vo.CommentVO;
+import cc.ryanc.halo.model.vo.CommentListVO;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.PostService;
@@ -45,13 +45,13 @@ public class CommentController {
 
     @GetMapping("latest")
     @ApiOperation("Pages latest comments")
-    public List<CommentVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+    public List<CommentListVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         return commentService.pageLatest(top).getContent();
     }
 
     @GetMapping("status/{status}")
-    public Page<CommentVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-                                  @PathVariable("status") CommentStatus status) {
+    public Page<CommentListVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                      @PathVariable("status") CommentStatus status) {
         return commentService.pageBy(status, pageable);
     }
 
@@ -59,4 +59,5 @@ public class CommentController {
     public CommentOutputDTO createBy(@Valid @RequestBody CommentParam commentParam, HttpServletRequest request) {
         return new CommentOutputDTO().convertFrom(commentService.createBy(commentParam, request));
     }
+
 }

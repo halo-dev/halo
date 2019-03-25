@@ -8,7 +8,7 @@ import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.params.CommentParam;
 import cc.ryanc.halo.model.projection.CommentCountProjection;
-import cc.ryanc.halo.model.vo.CommentVO;
+import cc.ryanc.halo.model.vo.CommentListVO;
 import cc.ryanc.halo.repository.CommentRepository;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.service.CommentService;
@@ -59,7 +59,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     @Override
-    public Page<CommentVO> pageLatest(int top) {
+    public Page<CommentListVO> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
         // Build page request
@@ -69,7 +69,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     @Override
-    public Page<CommentVO> pageBy(CommentStatus status, Pageable pageable) {
+    public Page<CommentListVO> pageBy(CommentStatus status, Pageable pageable) {
         Assert.notNull(status, "Comment status must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
@@ -152,7 +152,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
      * @return a page of comment vo
      */
     @NonNull
-    private Page<CommentVO> convertBy(@NonNull Page<Comment> commentPage) {
+    private Page<CommentListVO> convertBy(@NonNull Page<Comment> commentPage) {
         Assert.notNull(commentPage, "Comment page must not be null");
 
         return new PageImpl<>(convertBy(commentPage.getContent()), commentPage.getPageable(), commentPage.getTotalElements());
@@ -165,7 +165,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
      * @return a list of comment vo
      */
     @NonNull
-    private List<CommentVO> convertBy(@Nullable List<Comment> comments) {
+    private List<CommentListVO> convertBy(@Nullable List<Comment> comments) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();
         }
@@ -178,12 +178,12 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
 
         return comments.stream().map(comment -> {
             // Convert to vo
-            CommentVO commentVO = new CommentVO().convertFrom(comment);
+            CommentListVO commentListVO = new CommentListVO().convertFrom(comment);
 
             // Get post and set to the vo
-            commentVO.setPost(new PostMinimalOutputDTO().convertFrom(postMap.get(comment.getPostId())));
+            commentListVO.setPost(new PostMinimalOutputDTO().convertFrom(postMap.get(comment.getPostId())));
 
-            return commentVO;
+            return commentListVO;
         }).collect(Collectors.toList());
     }
 

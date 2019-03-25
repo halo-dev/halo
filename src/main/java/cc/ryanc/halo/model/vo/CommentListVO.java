@@ -14,7 +14,7 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class CommentVO extends CommentOutputDTO {
+public class CommentListVO extends CommentOutputDTO {
 
     private PostMinimalOutputDTO post;
 }
