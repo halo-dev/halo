@@ -130,6 +130,48 @@ public interface OptionService extends CrudService<Option, Integer> {
     Optional<String> getByProperty(@NonNull BlogProperties property);
 
     /**
+     * Gets property value by blog property.
+     *
+     * @param property     blog property must not be null
+     * @param propertyType property type must not be null
+     * @param defaultValue default value
+     * @param <T>          property type
+     * @return property value
+     */
+    <T> T getByProperty(@NonNull BlogProperties property, @NonNull Class<T> propertyType, T defaultValue);
+
+    /**
+     * Gets property value by blog property.
+     *
+     * @param property     blog property must not be null
+     * @param propertyType property type must not be null
+     * @param <T>          property type
+     * @return property value
+     */
+    <T> Optional<T> getByProperty(@NonNull BlogProperties property, @NonNull Class<T> propertyType);
+
+    /**
+     * Gets value by key.
+     *
+     * @param key          key must not be null
+     * @param valueType    value type must not be null
+     * @param defaultValue default value
+     * @param <T>          property type
+     * @return value
+     */
+    <T> T getByKey(@NonNull String key, @NonNull Class<T> valueType, T defaultValue);
+
+    /**
+     * Gets value by key.
+     *
+     * @param key       key must not be null
+     * @param valueType value type must not be null
+     * @param <T>       value type
+     * @return value
+     */
+    <T> Optional<T> getByKey(@NonNull String key, @NonNull Class<T> valueType);
+
+    /**
      * Gets post page size.
      *
      * @return page size

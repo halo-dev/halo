@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static cc.ryanc.halo.model.enums.BlogProperties.convertTo;
+
 /**
  * OptionService implementation class
  *
@@ -163,6 +165,28 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         Assert.notNull(property, "Blog property must not be null");
 
         return getByKey(property.getValue());
+    }
+
+    @Override
+    public <T> T getByProperty(BlogProperties property, Class<T> propertyType, T defaultValue) {
+        Assert.notNull(property, "Blog property must not be null");
+
+        return getByProperty(property, propertyType).orElse(defaultValue);
+    }
+
+    @Override
+    public <T> Optional<T> getByProperty(BlogProperties property, Class<T> propertyType) {
+        return getByProperty(property).map(propertyValue -> convertTo(propertyValue, propertyType));
+    }
+
+    @Override
+    public <T> T getByKey(String key, Class<T> valueType, T defaultValue) {
+        return getByKey(key, valueType).orElse(defaultValue);
+    }
+
+    @Override
+    public <T> Optional<T> getByKey(String key, Class<T> valueType) {
+        return getByKey(key).map(value -> convertTo(value, valueType));
     }
 
     @Override
