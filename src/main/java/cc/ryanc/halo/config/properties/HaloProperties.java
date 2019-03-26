@@ -21,4 +21,9 @@ public class HaloProperties {
      * Production env. (Default is true)
      */
     private Boolean productionEnv = true;
+
+    /**
+     * Work directory.
+     */
+    private String workDir = "${user.home}/halo/";
 }
