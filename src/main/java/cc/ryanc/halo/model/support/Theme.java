@@ -26,11 +26,6 @@ public class Theme implements Serializable {
     private boolean hasOptions;
 
     /**
-     * Is internal theme
-     */
-    private boolean isInternal;
-
-    /**
      * Theme properties
      */
     private ThemeProperties properties;
