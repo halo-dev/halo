@@ -3,7 +3,7 @@ package cc.ryanc.halo.web.controller.admin.api;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionService;
-import cc.ryanc.halo.utils.ThemeUtils;
+import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
@@ -29,10 +29,14 @@ public class ThemeController {
 
     private final Configuration configuration;
 
+    private final ThemeService themeService;
+
     public ThemeController(OptionService optionService,
-                           Configuration configuration) {
+                           Configuration configuration,
+                           ThemeService themeService) {
         this.optionService = optionService;
         this.configuration = configuration;
+        this.themeService = themeService;
     }
 
     /**
@@ -43,7 +47,7 @@ public class ThemeController {
     @GetMapping
     @ApiOperation("List all themes")
     public List<Theme> listAll() {
-        return ThemeUtils.getThemes();
+        return themeService.getThemes();
     }
 
     /**

@@ -1,34 +1,33 @@
-package cc.ryanc.halo.utils;
+package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.support.ThemeProperties;
+import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.dialect.Props;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Theme utils
- *
  * @author : RYAN0UP
  * @date : 2019/3/26
  */
-@Slf4j
-public class ThemeUtils {
+@Service
+public class ThemeServiceImpl implements ThemeService {
 
     /**
      * Gets all themes
      *
      * @return list of themes
      */
-    public static List<Theme> getThemes() {
+    @Override
+    public List<Theme> getThemes() {
         final List<Theme> themes = new ArrayList<>();
         final File[] files = getThemeBasePath().listFiles();
         try {
@@ -62,7 +61,8 @@ public class ThemeUtils {
      * @param theme theme
      * @return List<String>
      */
-    public static List<String> getTemplates(String theme) {
+    @Override
+    public List<String> getTemplates(String theme) {
         final List<String> templates = new ArrayList<>();
         try {
             final File themesPath = new File(getThemeBasePath(), theme);
@@ -95,7 +95,8 @@ public class ThemeUtils {
      * @param theme theme name
      * @return List
      */
-    public static List<String> getCustomTpl(String theme) throws FileNotFoundException {
+    @Override
+    public List<String> getCustomTpl(String theme) {
         final List<String> templates = new ArrayList<>();
         final File themePath = new File(getThemeBasePath(), theme);
         final File[] themeFiles = themePath.listFiles();
@@ -116,7 +117,8 @@ public class ThemeUtils {
      * @param template template
      * @return boolean
      */
-    public static boolean isTemplateExist(String template) throws FileNotFoundException {
+    @Override
+    public boolean isTemplateExist(String template) {
         StrBuilder templatePath = new StrBuilder(BaseContentController.THEME);
         templatePath.append("/");
         templatePath.append(template);
@@ -129,9 +131,9 @@ public class ThemeUtils {
      *
      * @param theme theme name
      * @return boolean
-     * @throws FileNotFoundException FileNotFoundException
      */
-    public static boolean isThemeExist(String theme) throws FileNotFoundException {
+    @Override
+    public boolean isThemeExist(String theme) {
         File file = new File(getThemeBasePath(), theme);
         return file.exists();
     }
@@ -141,7 +143,8 @@ public class ThemeUtils {
      *
      * @return File
      */
-    private static File getThemeBasePath() {
+    @Override
+    public File getThemeBasePath() {
         return new File(System.getProperties().getProperty("user.home"), ".halo/templates/themes");
     }
 
@@ -151,7 +154,8 @@ public class ThemeUtils {
      * @param path path
      * @return ThemeProperties
      */
-    private static ThemeProperties getProperties(File path) {
+    @Override
+    public ThemeProperties getProperties(File path) {
         File propertiesFile = new File(path, "theme.properties");
         ThemeProperties properties = new ThemeProperties();
         if (propertiesFile.exists()) {
