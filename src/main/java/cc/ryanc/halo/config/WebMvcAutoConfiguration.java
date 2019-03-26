@@ -2,6 +2,7 @@ package cc.ryanc.halo.config;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.factory.StringToEnumConverterFactory;
+import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.security.resolver.AuthenticationArgumentResolver;
 import cc.ryanc.halo.web.controller.support.PageJacksonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -115,7 +116,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         resolver.setExposeRequestAttributes(false);
         resolver.setExposeSessionAttributes(false);
         resolver.setExposeSpringMacroHelpers(true);
-        resolver.setSuffix(".ftl");
+        resolver.setSuffix(HaloConst.SUFFIX_FTL);
         resolver.setContentType("text/html; charset=UTF-8");
         registry.viewResolver(resolver);
     }
