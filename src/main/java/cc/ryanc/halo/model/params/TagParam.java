@@ -3,7 +3,7 @@ package cc.ryanc.halo.model.params;
 import cc.ryanc.halo.model.dto.base.InputConverter;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.utils.HaloUtils;
-import cn.hutool.core.util.URLUtil;
+import cc.ryanc.halo.utils.SlugUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,7 +30,7 @@ public class TagParam implements InputConverter<Tag> {
     public Tag convertTo() {
         if (StringUtils.isBlank(slugName)) {
             // Handle slug name
-            slugName = URLUtil.normalize(name);
+            slugName = SlugUtils.slugify(name);
         }
 
         slugName = HaloUtils.initializeUrlIfBlank(slugName);

@@ -4,12 +4,14 @@ import cc.ryanc.halo.cache.StringCacheStore;
 import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.entity.User;
+import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.repository.UserRepository;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.DateUtils;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.BCrypt;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -87,7 +89,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         if (!BCrypt.checkpw(password, user.getPassword())) {
             // If the password is mismatched
             // Add login failure count
-            Integer loginFailureCount = stringCacheStore.get(LOGIN_FAILURE_COUNT_KEY).map(countString -> Integer.valueOf(countString)).orElse(0);
+            Integer loginFailureCount = stringCacheStore.get(LOGIN_FAILURE_COUNT_KEY).map(Integer::valueOf).orElse(0);
 
             if (loginFailureCount >= MAX_LOGIN_TRY) {
                 // Set expiration
@@ -103,9 +105,53 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
             throw new BadRequestException("账号或者密码错误，您还有" + (MAX_LOGIN_TRY - loginFailureCount) + "次机会");
         }
 
-        // TODO Set session
+        // TODO Set session or cache token
 
         return user;
+    }
+
+    @Override
+    public User updatePassword(String oldPassword, String newPassword, Integer userId) {
+        Assert.hasText(oldPassword, "Old password must not be blank");
+        Assert.hasText(newPassword, "New password must not be blank");
+        Assert.notNull(userId, "User id must not be blank");
+
+        if (oldPassword.equals(newPassword)) {
+            throw new BadRequestException("There is nothing changed because new password is equal to old password");
+        }
+
+        // Get the user
+        User user = getById(userId);
+
+        // Check the user old password
+        if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
+            throw new BadRequestException("Old password is mismatch").setErrorData(oldPassword);
+        }
+
+        // Set new password
+        setPassword(newPassword, user);
+
+        // Update this user
+        return update(user);
+    }
+
+    @Override
+    public User createBy(UserParam userParam, String password) {
+        Assert.notNull(userParam, "User param must not be null");
+        Assert.hasText(password, "Password must not be blank");
+
+        User user = userParam.convertTo();
+
+        setPassword(password, user);
+
+        return create(user);
+    }
+
+    private void setPassword(@NonNull String plainPassword, @NonNull User user) {
+        Assert.hasText(plainPassword, "Plain password must not be blank");
+        Assert.notNull(user, "User must not be null");
+
+        user.setPassword(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
     }
 
 }

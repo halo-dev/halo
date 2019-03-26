@@ -32,16 +32,6 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         this.tagRepository = tagRepository;
     }
 
-    /**
-     * Remove tag and relationship
-     *
-     * @param id id
-     */
-    @Override
-    public void remove(Integer id) {
-        // TODO 删除标签，以及对应的文章关系
-    }
-
     @Override
     public Tag create(Tag tag) {
         // Check if the tag is exist
@@ -73,6 +63,8 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     public List<TagOutputDTO> convertTo(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ?
                 Collections.emptyList() :
-                tags.stream().map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag)).collect(Collectors.toList());
+                tags.stream()
+                        .map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag))
+                        .collect(Collectors.toList());
     }
 }

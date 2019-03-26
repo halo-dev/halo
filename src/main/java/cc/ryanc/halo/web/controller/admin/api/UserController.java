@@ -2,6 +2,7 @@ package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.UserOutputDTO;
 import cc.ryanc.halo.model.entity.User;
+import cc.ryanc.halo.model.params.PasswordParam;
 import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +35,10 @@ public class UserController {
 
         // Update user and convert to dto
         return new UserOutputDTO().convertFrom(userService.update(user));
+    }
+
+    @PutMapping("profile/password")
+    public void updatePassword(@Valid @RequestBody PasswordParam passwordParam, User user) {
+        userService.updatePassword(passwordParam.getOldPassword(), passwordParam.getNewPassword(), user.getId());
     }
 }

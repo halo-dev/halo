@@ -9,7 +9,6 @@ import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.service.*;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.digest.BCrypt;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -158,14 +157,7 @@ public class InstallController {
     }
 
     private User createDefaultUser(InstallParam installParam) {
-        User user = new User();
-        user.setUsername(installParam.getUsername());
-        user.setNickname(installParam.getNickname());
-        user.setEmail(installParam.getEmail());
-        // Hash password with BCrypt
-        user.setPassword(BCrypt.hashpw(installParam.getPassword(), BCrypt.gensalt()));
-
-        return userService.create(user);
+        return userService.createBy(installParam, installParam.getPassword());
     }
 
     private void initSettings(InstallParam installParam) {
