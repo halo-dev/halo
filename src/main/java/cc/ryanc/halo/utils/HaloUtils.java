@@ -24,6 +24,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * <pre>
@@ -35,6 +36,16 @@ import java.util.Properties;
  */
 @Slf4j
 public class HaloUtils {
+
+    /**
+     * Gets random uuid without dash.
+     *
+     * @return random uuid without dash
+     */
+    @NonNull
+    public static String randomUUIDWithoutDash() {
+        return StringUtils.remove(UUID.randomUUID().toString(), '-');
+    }
 
     /**
      * Initialize url if blank.

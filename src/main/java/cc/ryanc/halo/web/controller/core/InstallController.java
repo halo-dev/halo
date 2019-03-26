@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.core;
 
 import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.model.entity.*;
-import cc.ryanc.halo.model.enums.AttachOrigin;
+import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.params.InstallParam;
 import cc.ryanc.halo.model.support.BaseResponse;
@@ -173,7 +173,7 @@ public class InstallController {
         properties.put(BlogProperties.NEW_COMMENT_NOTICE, Boolean.FALSE.toString());
         properties.put(BlogProperties.COMMENT_PASS_NOTICE, Boolean.FALSE.toString());
         properties.put(BlogProperties.COMMENT_REPLY_NOTICE, Boolean.FALSE.toString());
-        properties.put(BlogProperties.ATTACH_LOC, AttachOrigin.SERVER.getValue().toString());
+        properties.put(BlogProperties.ATTACH_LOC, AttachmentType.SERVER.getValue().toString());
 
         // Create properties
         optionService.saveProperties(properties, "system");

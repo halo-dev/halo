@@ -12,6 +12,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("halo")
 public class HaloProperties {
 
+    private final static String USER_HOME = System.getProperty("user.home");
+
     /**
      * Doc api disabled. (Default is true)
      */
@@ -25,5 +27,5 @@ public class HaloProperties {
     /**
      * Work directory.
      */
-    private String workDir = "${user.home}/halo/";
+    private String workDir = USER_HOME + "/halo/";
 }

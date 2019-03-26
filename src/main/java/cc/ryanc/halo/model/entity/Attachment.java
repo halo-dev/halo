@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.entity;
 
+import cc.ryanc.halo.model.enums.AttachmentType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -37,7 +38,7 @@ public class Attachment extends BaseEntity {
     /**
      * 附件路径
      */
-    @Column(name = "path", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "path", columnDefinition = "varchar(1023) not null")
     private String path;
 
     /**
@@ -49,7 +50,7 @@ public class Attachment extends BaseEntity {
     /**
      * 附件类型
      */
-    @Column(name = "media_type", columnDefinition = "varchar(50) default ''")
+    @Column(name = "media_type", columnDefinition = "varchar(50) not null")
     private String mediaType;
 
     /**
@@ -59,27 +60,54 @@ public class Attachment extends BaseEntity {
     private String suffix;
 
     /**
-     * 附件尺寸
+     * Attachment width.
      */
-    @Column(name = "dimension", columnDefinition = "varchar(50) default ''")
-    private String dimension;
+    @Column(name = "width", columnDefinition = "int default 0")
+    private Integer width;
+
+    /**
+     * Attachment height.
+     */
+    @Column(name = "height", columnDefinition = "int default 0")
+    private Integer height;
 
     /**
      * 附件大小
      */
-    @Column(name = "size", columnDefinition = "varchar(50) default ''")
-    private String size;
+    @Column(name = "size", columnDefinition = "bigint not null")
+    private Long size;
 
     /**
      * 附件上传类型
      */
     @Column(name = "type", columnDefinition = "int default 0")
-    private Integer type;
+    private AttachmentType type;
 
     @Override
     public void prePersist() {
         super.prePersist();
         id = null;
+
+        if (thumbPath == null) {
+            thumbPath = "";
+        }
+
+        if (suffix == null) {
+            suffix = "";
+        }
+
+        if (width == null) {
+            width = 0;
+        }
+
+        if (height == null) {
+            height = 0;
+        }
+
+        if (type == null) {
+            type = AttachmentType.SERVER;
+        }
+
     }
 
 }
