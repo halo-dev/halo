@@ -16,13 +16,6 @@ import java.util.List;
 public interface TagService extends CrudService<Tag, Integer> {
 
     /**
-     * Remove tag and relationship
-     *
-     * @param id id
-     */
-    void remove(Integer id);
-
-    /**
      * Get tag by slug name
      *
      * @param slugName slug name

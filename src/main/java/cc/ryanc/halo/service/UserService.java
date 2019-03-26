@@ -2,6 +2,7 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.entity.User;
+import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.lang.NonNull;
 
@@ -73,4 +74,25 @@ public interface UserService extends CrudService<User, Integer> {
      */
     @NonNull
     User login(@NonNull String key, @NonNull String password);
+
+    /**
+     * Updates user password.
+     *
+     * @param oldPassword old password must not be blank
+     * @param newPassword new password must not be blank
+     * @param userId      user id must not be null
+     * @return updated user detail
+     */
+    @NonNull
+    User updatePassword(@NonNull String oldPassword, @NonNull String newPassword, @NonNull Integer userId);
+
+    /**
+     * Creates an user.
+     *
+     * @param userParam user param must not be null.
+     * @param password  password must not be blank
+     * @return created user
+     */
+    @NonNull
+    User createBy(@NonNull UserParam userParam, @NonNull String password);
 }

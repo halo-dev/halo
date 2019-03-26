@@ -1,9 +1,10 @@
 package cc.ryanc.halo.model.params;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Install parameters.
@@ -11,8 +12,9 @@ import javax.validation.constraints.NotBlank;
  * @author johnniang
  * @date 3/19/19
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class InstallParam {
+public class InstallParam extends UserParam {
 
     /**
      * Blog locale.
@@ -33,27 +35,9 @@ public class InstallParam {
     private String url;
 
     /**
-     * Username.
-     */
-    @NotBlank(message = "Username must not be blank")
-    private String username;
-
-    /**
-     * Nickname.
-     */
-    @NotBlank(message = "Nickname must not be blank")
-    private String nickname;
-
-    /**
-     * Email.
-     */
-    @NotBlank(message = "Email must not be blank")
-    @Email(message = "It is not an email format")
-    private String email;
-
-    /**
      * Password.
      */
     @NotBlank(message = "Password must not be blank")
+    @Size(max = 100, message = "Length of password must not be more than {max}")
     private String password;
 }

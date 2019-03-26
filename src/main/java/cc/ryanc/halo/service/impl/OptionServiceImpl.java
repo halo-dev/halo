@@ -192,7 +192,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getPostPageSize() {
         try {
-            return getByProperty(BlogProperties.INDEX_POSTS).map(Integer::valueOf).orElse(DEFAULT_POST_PAGE_SIZE);
+            return getByProperty(BlogProperties.INDEX_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(BlogProperties.INDEX_POSTS + " option is not a number format", e);
             return DEFAULT_POST_PAGE_SIZE;
@@ -202,7 +202,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getCommentPageSize() {
         try {
-            return getByProperty(BlogProperties.INDEX_COMMENTS).map(Integer::valueOf).orElse(DEFAULT_COMMENT_PAGE_SIZE);
+            return getByProperty(BlogProperties.INDEX_COMMENTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(BlogProperties.INDEX_COMMENTS + " option is not a number format", e);
             return DEFAULT_COMMENT_PAGE_SIZE;
@@ -212,7 +212,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getRssPageSize() {
         try {
-            return getByProperty(BlogProperties.RSS_POSTS).map(Integer::valueOf).orElse(DEFAULT_RSS_PAGE_SIZE);
+            return getByProperty(BlogProperties.RSS_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(BlogProperties.RSS_POSTS + " setting is not a number format", e);
             return DEFAULT_RSS_PAGE_SIZE;
