@@ -3,7 +3,6 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.exception.MissingPropertyValueException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
-import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PropertyEnum;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.service.base.CrudService;
@@ -60,7 +59,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param properties blog properties
      * @param source     source
      */
-    void saveProperties(@NonNull Map<? extends PropertyEnum<String>, String> properties, String source);
+    void saveProperties(@NonNull Map<? extends PropertyEnum, String> properties, String source);
 
     /**
      * Get all options
@@ -110,7 +109,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return an option value
      */
     @Nullable
-    String getByPropertyOfNullable(@NonNull PropertyEnum<String> property);
+    String getByPropertyOfNullable(@NonNull PropertyEnum property);
 
     /**
      * Gets option value by blog property.
@@ -120,7 +119,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @throws MissingPropertyValueException throws when property value dismisses
      */
     @NonNull
-    String getByPropertyOfNonNull(@NonNull PropertyEnum<String> property);
+    String getByPropertyOfNonNull(@NonNull PropertyEnum property);
 
     /**
      * Gets option value by blog property.
@@ -129,7 +128,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return an optional option value
      */
     @NonNull
-    Optional<String> getByProperty(@NonNull PropertyEnum<String> property);
+    Optional<String> getByProperty(@NonNull PropertyEnum property);
 
     /**
      * Gets property value by blog property.
@@ -140,7 +139,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param <T>          property type
      * @return property value
      */
-    <T> T getByProperty(@NonNull PropertyEnum<String> property, @NonNull Class<T> propertyType, T defaultValue);
+    <T> T getByProperty(@NonNull PropertyEnum property, @NonNull Class<T> propertyType, T defaultValue);
 
     /**
      * Gets property value by blog property.
@@ -150,7 +149,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param <T>          property type
      * @return property value
      */
-    <T> Optional<T> getByProperty(@NonNull PropertyEnum<String> property, @NonNull Class<T> propertyType);
+    <T> Optional<T> getByProperty(@NonNull PropertyEnum property, @NonNull Class<T> propertyType);
 
     /**
      * Gets value by key.
@@ -195,12 +194,12 @@ public interface OptionService extends CrudService<Option, Integer> {
     int getRssPageSize();
 
     /**
-     * Get quniu zone.
+     * Get qi niu yun zone.
      *
      * @return qiniu zone
      */
     @NonNull
-    Zone getQiniuZone();
+    Zone getQnYunZone();
 
     /**
      * Gets locale.
