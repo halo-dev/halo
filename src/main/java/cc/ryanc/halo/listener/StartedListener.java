@@ -8,6 +8,7 @@ import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateModelException;
@@ -19,6 +20,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ResourceUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -63,6 +65,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         this.cacheOwo();
         this.getActiveTheme();
         this.printStartInfo();
+        this.initThemes();
     }
 
     /**
@@ -132,6 +135,27 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         } catch (IOException e) {
             log.error("Failed to read owo json", e);
             // TODO Consider to throw an exception
+        }
+    }
+
+    /**
+     * Init internal themes
+     */
+    private void initThemes() {
+        // Whether the blog is initialized
+        String isInstall = optionService.getByKeyOfNullable(BlogProperties.IS_INSTALL.getValue());
+        try {
+            if (null == isInstall) {
+                File internalThemePath = new File(ResourceUtils.getURL("classpath:").getPath(), "templates/themes");
+                File[] internalThemes = internalThemePath.listFiles();
+                if (null != internalThemes) {
+                    for (File theme : internalThemes) {
+                        FileUtil.copy(theme, themeService.getThemeBasePath(), true);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Init internal theme to user path error");
         }
     }
 }
