@@ -5,8 +5,8 @@ import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionService;
+import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.utils.HaloUtils;
-import cc.ryanc.halo.utils.ThemeUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,6 +53,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private ThemeService themeService;
+
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
@@ -66,7 +69,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * Cache themes to map
      */
     private void cacheThemes() {
-        final List<Theme> themes = ThemeUtils.getThemes();
+        final List<Theme> themes = themeService.getThemes();
         if (null != themes) {
             HaloConst.THEMES = themes;
         }
