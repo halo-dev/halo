@@ -1,5 +1,5 @@
 <template>
-  <div :loading="loading"> Attachment Detail </div>
+  <div class="page-header-index-wide"> Attachment Detail </div>
 </template>
 
 <script>

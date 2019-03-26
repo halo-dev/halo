@@ -1,5 +1,5 @@
 <template>
-  <div> Attachment List </div>
+  <div class="page-header-index-wide"> Attachment List </div>
 </template>
 
 <script>

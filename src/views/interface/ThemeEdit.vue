@@ -1,5 +1,5 @@
 <template>
-  <div> Theme Edit </div>
+  <div class="page-header-index-wide"> Theme Edit </div>
 </template>
 
 <script>

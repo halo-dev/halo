@@ -1,5 +1,5 @@
 <template>
-  <div> Menu List </div>
+  <div class="page-header-index-wide"> Menu List </div>
 </template>
 
 <script>

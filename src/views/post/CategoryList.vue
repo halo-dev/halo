@@ -1,5 +1,5 @@
 <template>
-  <div> Category List </div>
+  <div class="page-header-index-wide"> Category List </div>
 </template>
 
 <script>

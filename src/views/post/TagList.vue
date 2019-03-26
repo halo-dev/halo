@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-header-index-wide">
     <a-row :gutter="12">
       <a-col
         :xl="10"
@@ -7,6 +7,7 @@
         :md="10"
         :sm="24"
         :xs="24"
+        class="a-col"
       >
         <a-card
           hoverable
@@ -40,6 +41,7 @@
         :md="14"
         :sm="24"
         :xs="24"
+        class="a-col"
       >
         <a-card
           hoverable
@@ -100,4 +102,7 @@ export default {
 </script>
 
 <style scoped>
+.a-col{
+  padding:6px;
+}
 </style>

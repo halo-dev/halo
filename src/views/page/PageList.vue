@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-header-index-wide">
     Page list
   </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div> Profile </div>
+  <div class="page-header-index-wide"> Profile </div>
 </template>
 
 <script>
