@@ -1,6 +1,7 @@
 package cc.ryanc.halo.repository;
 
 import cc.ryanc.halo.model.entity.PostTag;
+import cc.ryanc.halo.model.projection.TagPostCountProjection;
 import cc.ryanc.halo.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
@@ -80,4 +81,23 @@ public interface PostTagRepository extends BaseRepository<PostTag, Integer> {
      */
     @NonNull
     List<PostTag> deleteByTagId(@NonNull Integer tagId);
+
+    /**
+     * Finds post count by tag id collection.
+     *
+     * @param tagIds tag id collection must not be null
+     * @return a list of tag post count projection
+     */
+    @Query("select new cc.ryanc.halo.model.projection.TagPostCountProjection(count(pt.postId), pt.tagId) from PostTag pt where pt.tagId in ?1 group by pt.tagId")
+    @NonNull
+    List<TagPostCountProjection> findPostCountByTagIds(@NonNull Iterable<Integer> tagIds);
+
+    /**
+     * Finds post count of tag.
+     *
+     * @return a list of tag post count projection
+     */
+    @Query("select new cc.ryanc.halo.model.projection.TagPostCountProjection(count(pt.postId), pt.tagId) from PostTag pt group by pt.tagId")
+    @NonNull
+    List<TagPostCountProjection> findPostCount();
 }

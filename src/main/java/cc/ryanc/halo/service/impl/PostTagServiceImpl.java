@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.dto.TagWithCountOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.entity.PostTag;
 import cc.ryanc.halo.model.entity.Tag;
+import cc.ryanc.halo.model.projection.TagPostCountProjection;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.repository.PostTagRepository;
 import cc.ryanc.halo.repository.TagRepository;
@@ -59,9 +60,16 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         // Find all tags
         List<Tag> tags = tagRepository.findAll(sort);
 
+        // Find all post count
+        Map<Integer, Long> tagPostCountMap = ServiceUtils.convertToMap(postTagRepository.findPostCount(), TagPostCountProjection::getTagId, TagPostCountProjection::getCount);
+
         // Find post count
         return tags.stream().map(
-                tag -> new TagWithCountOutputDTO().<TagWithCountOutputDTO>convertFrom(tag)
+                tag -> {
+                    TagWithCountOutputDTO tagWithCountOutputDTO = new TagWithCountOutputDTO().convertFrom(tag);
+                    tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+                    return tagWithCountOutputDTO;
+                }
         ).collect(Collectors.toList());
     }
 
