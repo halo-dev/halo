@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
  * @author johnniang
  * @date 3/26/19
  */
-public interface PropertyEnum<T> extends ValueEnum<T> {
+public interface PropertyEnum extends ValueEnum<String> {
 
     /**
      * Get property type.
@@ -67,7 +67,26 @@ public interface PropertyEnum<T> extends ValueEnum<T> {
         }
 
         // Should never happen
-        throw new UnsupportedOperationException("Unsupported blog property type:" + type.getName() + " provided");
+        throw new UnsupportedOperationException("Unsupported convention for blog property type:" + type.getName() + " provided");
+    }
+
+    /**
+     * Converts to enum.
+     *
+     * @param value string value must not be null
+     * @param type  propertye value enum type must not be null
+     * @param <T>   property value enum type
+     * @return property enum value or null
+     */
+    static <T extends Enum<T>> T convertToEnum(@NonNull String value, @NonNull Class<T> type) {
+        Assert.hasText(value, "Property value must not be blank");
+
+        try {
+            return Enum.valueOf(type, value);
+        } catch (Exception e) {
+            // Ignore this exception
+            return null;
+        }
     }
 
     /**
@@ -87,6 +106,7 @@ public interface PropertyEnum<T> extends ValueEnum<T> {
                         || type.isAssignableFrom(Byte.class)
                         || type.isAssignableFrom(Double.class)
                         || type.isAssignableFrom(Float.class)
+                        || type.isAssignableFrom(Enum.class)
         );
     }
 }

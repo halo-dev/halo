@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PropertyEnum;
+import cc.ryanc.halo.model.enums.QnYunProperties;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.repository.OptionRepository;
 import cc.ryanc.halo.service.OptionService;
@@ -86,8 +87,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        // (Not recommended) Don't write "this::save" here
-        // Types of key and value are String
         options.forEach((key, value) -> save(key, value, source));
     }
 
@@ -102,7 +101,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public void saveProperties(Map<? extends PropertyEnum<String>, String> properties, String source) {
+    public void saveProperties(Map<? extends PropertyEnum, String> properties, String source) {
         if (CollectionUtils.isEmpty(properties)) {
             return;
         }
@@ -151,33 +150,33 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public String getByPropertyOfNullable(PropertyEnum<String> property) {
+    public String getByPropertyOfNullable(PropertyEnum property) {
         return getByProperty(property).orElse(null);
     }
 
     @Override
-    public String getByPropertyOfNonNull(PropertyEnum<String> property) {
+    public String getByPropertyOfNonNull(PropertyEnum property) {
         Assert.notNull(property, "Blog property must not be null");
 
         return getByKeyOfNonNull(property.getValue());
     }
 
     @Override
-    public Optional<String> getByProperty(PropertyEnum<String> property) {
+    public Optional<String> getByProperty(PropertyEnum property) {
         Assert.notNull(property, "Blog property must not be null");
 
         return getByKey(property.getValue());
     }
 
     @Override
-    public <T> T getByProperty(PropertyEnum<String> property, Class<T> propertyType, T defaultValue) {
+    public <T> T getByProperty(PropertyEnum property, Class<T> propertyType, T defaultValue) {
         Assert.notNull(property, "Blog property must not be null");
 
         return getByProperty(property, propertyType).orElse(defaultValue);
     }
 
     @Override
-    public <T> Optional<T> getByProperty(PropertyEnum<String> property, Class<T> propertyType) {
+    public <T> Optional<T> getByProperty(PropertyEnum property, Class<T> propertyType) {
         return getByProperty(property).map(propertyValue -> PropertyEnum.convertTo(propertyValue, propertyType));
     }
 
@@ -222,8 +221,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public Zone getQiniuZone() {
-        return getByProperty(BlogProperties.QINIU_ZONE).map(qiniuZone -> {
+    public Zone getQnYunZone() {
+        return getByProperty(QnYunProperties.ZONE).map(qiniuZone -> {
 
             Zone zone;
             switch (qiniuZone) {
@@ -261,6 +260,5 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             }
         }).orElseGet(Locale::getDefault);
     }
-
 
 }

@@ -14,6 +14,15 @@ import lombok.Data;
 public class QiNiuPutSet {
 
     /**
+     * 文件hash值
+     */
+    public String hash;
+    /**
+     * 文件名
+     */
+    public String key;
+
+    /**
      * 图片大小
      */
     private Long size;
@@ -21,10 +30,10 @@ public class QiNiuPutSet {
     /**
      * 长
      */
-    private Integer w;
+    private Integer width;
 
     /**
      * 宽
      */
-    private Integer h;
+    private Integer height;
 }

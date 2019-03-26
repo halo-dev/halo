@@ -173,7 +173,7 @@ public class InstallController {
         properties.put(BlogProperties.NEW_COMMENT_NOTICE, Boolean.FALSE.toString());
         properties.put(BlogProperties.COMMENT_PASS_NOTICE, Boolean.FALSE.toString());
         properties.put(BlogProperties.COMMENT_REPLY_NOTICE, Boolean.FALSE.toString());
-        properties.put(BlogProperties.ATTACH_LOC, AttachmentType.SERVER.getValue().toString());
+        properties.put(BlogProperties.ATTACHMENT_TYPE, AttachmentType.SERVER.getValue().toString());
 
         // Create properties
         optionService.saveProperties(properties, "system");
@@ -261,7 +261,7 @@ public class InstallController {
 ////            options.put(BlogProperties.NEW_COMMENT_NOTICE, TrueFalseEnum.FALSE.getDesc());
 ////            options.put(BlogProperties.COMMENT_PASS_NOTICE, TrueFalseEnum.FALSE.getDesc());
 ////            options.put(BlogProperties.COMMENT_REPLY_NOTICE, TrueFalseEnum.FALSE.getDesc());
-////            options.put(BlogProperties.ATTACH_LOC, AttachLocationEnum.SERVER.getDesc());
+////            options.put(BlogProperties.ATTACHMENT_TYPE, AttachLocationEnum.SERVER.getDesc());
 ////            optionService.saveOptions(options);
 //
 //            //更新日志

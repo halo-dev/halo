@@ -1,7 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.entity.Option;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.QnYunProperties;
 import cc.ryanc.halo.repository.OptionRepository;
 import com.qiniu.common.Zone;
 import org.junit.Test;
@@ -73,13 +73,13 @@ public class OptionServiceImplTest {
     }
 
     private void getQiniuZoneTest(Zone actualZone, Option option) {
-        BlogProperties zoneProperty = BlogProperties.QINIU_ZONE;
+        QnYunProperties zoneProperty = QnYunProperties.ZONE;
 
         // Given
         given(optionRepository.findByOptionKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
 
         // When
-        Zone zone = optionService.getQiniuZone();
+        Zone zone = optionService.getQnYunZone();
 
         // Then
         then(optionRepository).should().findByOptionKey(zoneProperty.getValue());

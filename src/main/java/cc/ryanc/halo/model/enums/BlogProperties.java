@@ -4,7 +4,7 @@ package cc.ryanc.halo.model.enums;
  * @author : RYAN0UP
  * @date : 2019-03-17
  */
-public enum BlogProperties implements PropertyEnum<String> {
+public enum BlogProperties implements PropertyEnum {
 
     /**
      * 博客语言
@@ -149,13 +149,7 @@ public enum BlogProperties implements PropertyEnum<String> {
     /**
      * 附件存储位置
      */
-    ATTACH_LOC("attach_loc", String.class),
-
-    /**
-     * 七牛云 Zone.
-     */
-    QINIU_ZONE("qiniu_zone", String.class);
-
+    ATTACHMENT_TYPE("attachment_type", String.class);
 
     private String value;
 

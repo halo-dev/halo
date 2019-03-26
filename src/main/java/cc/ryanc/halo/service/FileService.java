@@ -35,4 +35,22 @@ public interface FileService {
      */
     @NonNull
     UploadResult uploadToLocal(@NonNull MultipartFile file);
+
+    /**
+     * Uploads file to qi niu yun.
+     *
+     * @param file multipart file must not be null
+     * @return upload result
+     */
+    @NonNull
+    UploadResult uploadToQnYun(@NonNull MultipartFile file);
+
+    /**
+     * Uploads file to you pai yun.
+     *
+     * @param file multipart file must not be null
+     * @return upload result
+     */
+    @NonNull
+    UploadResult uploadToYpYun(@NonNull MultipartFile file);
 }
