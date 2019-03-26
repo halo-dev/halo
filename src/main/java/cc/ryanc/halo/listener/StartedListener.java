@@ -143,9 +143,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void initThemes() {
         // Whether the blog is initialized
-        String isInstall = optionService.getByKeyOfNullable(BlogProperties.IS_INSTALL.getValue());
+        Boolean isInstall = optionService.getByProperty(BlogProperties.IS_INSTALL, Boolean.class, false);
         try {
-            if (null == isInstall) {
+            if (!isInstall) {
                 File internalThemePath = new File(ResourceUtils.getURL("classpath:").getPath(), "templates/themes");
                 File[] internalThemes = internalThemePath.listFiles();
                 if (null != internalThemes) {
