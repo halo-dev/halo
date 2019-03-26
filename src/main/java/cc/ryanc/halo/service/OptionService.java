@@ -11,6 +11,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -199,5 +200,13 @@ public interface OptionService extends CrudService<Option, Integer> {
      */
     @NonNull
     Zone getQiniuZone();
+
+    /**
+     * Gets locale.
+     *
+     * @return locale user set or default locale
+     */
+    @NonNull
+    Locale getLocale();
 
 }
