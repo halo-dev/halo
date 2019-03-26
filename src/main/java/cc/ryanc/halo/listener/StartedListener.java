@@ -142,20 +142,23 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * Init internal themes
      */
     private void initThemes() {
-        // Whether the blog is initialized
-        Boolean isInstall = optionService.getByProperty(BlogProperties.IS_INSTALL, Boolean.class, false);
+        // Whether the blog has initialized
+        Boolean isInstalled = optionService.getByProperty(BlogProperties.IS_INSTALL, Boolean.class, false);
         try {
-            if (!isInstall) {
-                File internalThemePath = new File(ResourceUtils.getURL("classpath:").getPath(), "templates/themes");
-                File[] internalThemes = internalThemePath.listFiles();
-                if (null != internalThemes) {
-                    for (File theme : internalThemes) {
-                        FileUtil.copy(theme, themeService.getThemeBasePath(), true);
-                    }
+            if (isInstalled) {
+                // Skip
+                return;
+            }
+
+            File internalThemePath = new File(ResourceUtils.getURL(ResourceUtils.CLASSPATH_URL_PREFIX).getPath(), "templates/themes");
+            File[] internalThemes = internalThemePath.listFiles();
+            if (null != internalThemes) {
+                for (File theme : internalThemes) {
+                    FileUtil.copy(theme, themeService.getThemeBasePath(), true);
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Init internal theme to user path error");
+            throw new RuntimeException("Init internal theme to user path error", e);
         }
     }
 }
