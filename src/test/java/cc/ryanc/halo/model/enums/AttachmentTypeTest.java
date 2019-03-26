@@ -17,15 +17,16 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class AttachOriginTest {
+public class AttachmentTypeTest {
 
     @Autowired
     private ConversionService conversionService;
 
     @Test
     public void conversionTest() {
-        assertThat(conversionService.convert("SERVER", AttachOrigin.class), equalTo(AttachOrigin.SERVER));
-        assertThat(conversionService.convert("server", AttachOrigin.class), equalTo(AttachOrigin.SERVER));
-        assertThat(conversionService.convert("Server", AttachOrigin.class), equalTo(AttachOrigin.SERVER));
+        assertThat(conversionService.convert("SERVER", AttachmentType.class), equalTo(AttachmentType.SERVER));
+        assertThat(conversionService.convert("server", AttachmentType.class), equalTo(AttachmentType.SERVER));
+        assertThat(conversionService.convert("Server", AttachmentType.class), equalTo(AttachmentType.SERVER));
+        assertThat(conversionService.convert("SerVer", AttachmentType.class), equalTo(AttachmentType.SERVER));
     }
 }
