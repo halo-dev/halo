@@ -17,6 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -247,6 +248,17 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return zone;
 
         }).orElseGet(Zone::autoZone);
+    }
+
+    @Override
+    public Locale getLocale() {
+        return getByProperty(BlogProperties.BLOG_LOCALE).map(localeStr -> {
+            try {
+                return Locale.forLanguageTag(localeStr);
+            } catch (Exception e) {
+                return Locale.getDefault();
+            }
+        }).orElseGet(Locale::getDefault);
     }
 
 
