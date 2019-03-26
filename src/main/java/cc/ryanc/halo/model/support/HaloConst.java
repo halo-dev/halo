@@ -31,6 +31,11 @@ public class HaloConst {
     public static final String TOKEN_HEADER = "token";
 
     /**
+     * Suffix of freemarker template file
+     */
+    public static final String SUFFIX_FTL = ".ftl";
+
+    /**
      * Owo map. (Unmodified map)
      */
     public static Map<String, String> OWO_MAP = Collections.emptyMap();
