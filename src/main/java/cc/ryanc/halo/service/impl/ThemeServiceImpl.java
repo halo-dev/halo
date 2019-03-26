@@ -145,7 +145,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public File getThemeBasePath() {
-        return new File(System.getProperties().getProperty("user.home"), ".halo/templates/themes");
+        return new File(System.getProperties().getProperty("user.home"), "halo/templates/themes");
     }
 
     /**
