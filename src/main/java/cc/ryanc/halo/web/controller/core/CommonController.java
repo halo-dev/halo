@@ -3,10 +3,10 @@ package cc.ryanc.halo.web.controller.core;
 import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.support.HaloConst;
-import cc.ryanc.halo.utils.ThemeUtils;
+import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
-import cn.hutool.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -34,6 +34,9 @@ public class CommonController implements ErrorController {
     private static final String ADMIN_URL = "/admin";
 
     private final Logger log = Logger.getLogger(getClass());
+
+    @Autowired
+    private ThemeService themeService;
 
     /**
      * Handle error
@@ -101,7 +104,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/404")
     public String contentNotFround() throws FileNotFoundException {
-        if (!ThemeUtils.isTemplateExist(NOT_FROUND_TEMPLATE)) {
+        if (!themeService.isTemplateExist(NOT_FROUND_TEMPLATE)) {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");
@@ -117,7 +120,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/500")
     public String contentInternalError() throws FileNotFoundException {
-        if (!ThemeUtils.isTemplateExist(INTERNAL_ERROR_TEMPLATE)) {
+        if (!themeService.isTemplateExist(INTERNAL_ERROR_TEMPLATE)) {
             return "common/error/500";
         }
         StrBuilder path = new StrBuilder("themes/");
