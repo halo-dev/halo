@@ -1,6 +1,6 @@
 package cc.ryanc.halo.repository.base;
 
-import cc.ryanc.halo.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -22,9 +22,8 @@ import java.util.List;
  * @param <ID>     id type
  * @author johnniang
  */
+@Slf4j
 public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, ID> implements BaseRepository<DOMAIN, ID> {
-
-    private final Logger log = Logger.getLogger(getClass());
 
     private final JpaEntityInformation<DOMAIN, ID> entityInformation;
 

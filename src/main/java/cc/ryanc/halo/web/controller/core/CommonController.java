@@ -1,11 +1,11 @@
 package cc.ryanc.halo.web.controller.core;
 
-import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
  * @author : RYAN0UP
  * @date : 2017/12/26
  */
+@Slf4j
 @Controller
 public class CommonController implements ErrorController {
 
@@ -32,8 +33,6 @@ public class CommonController implements ErrorController {
     private static final String INTERNAL_ERROR_TEMPLATE = "500.ftl";
 
     private static final String ADMIN_URL = "/admin";
-
-    private final Logger log = Logger.getLogger(getClass());
 
     @Autowired
     private ThemeService themeService;

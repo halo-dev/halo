@@ -1,7 +1,6 @@
 package cc.ryanc.halo.utils;
 
 import cc.ryanc.halo.exception.BeanUtilsException;
-import cc.ryanc.halo.logging.Logger;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.lang.NonNull;
@@ -19,8 +18,6 @@ import java.util.stream.Collectors;
  * @author johnniang
  */
 public class BeanUtils {
-
-    private final static Logger LOG = Logger.getLogger(BeanUtils.class);
 
     private BeanUtils() {
     }
