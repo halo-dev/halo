@@ -20,6 +20,10 @@ public enum UpYunProperties implements PropertyEnum {
     private Class<?> type;
 
     UpYunProperties(String value, Class<?> type) {
+        if (!PropertyEnum.isSupportedType(type)) {
+            throw new IllegalArgumentException("Unsupported blog property type: " + type);
+        }
+
         this.value = value;
         this.type = type;
     }
@@ -27,11 +31,11 @@ public enum UpYunProperties implements PropertyEnum {
 
     @Override
     public Class<?> getType() {
-        return null;
+        return type;
     }
 
     @Override
     public String getValue() {
-        return null;
+        return value;
     }
 }
