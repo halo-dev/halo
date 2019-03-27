@@ -11,6 +11,7 @@ import cc.ryanc.halo.utils.JsonUtils;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;
+import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.persistent.FileRecorder;
@@ -56,6 +57,7 @@ public class QnYunFileHandler implements FileHandler {
         String domain = optionService.getByPropertyOfNonNull(QnYunProperties.DOMAIN);
         String smallUrl = optionService.getByPropertyOfNullable(QnYunProperties.SMALL_URL);
 
+        // TODO Consider to cache the configuration
         // Create configuration
         Configuration configuration = new Configuration(zone);
 
@@ -125,9 +127,27 @@ public class QnYunFileHandler implements FileHandler {
     @Override
     public void delete(String key) {
         Assert.notNull(key, "File key must not be blank");
+        // Get all config
+        Zone zone = optionService.getQnYunZone();
+        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY);
+        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY);
+        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET);
 
+        // TODO Consider to cache the configuration
+        // Create configuration
+        Configuration configuration = new Configuration(zone);
 
-        // TODO Handle file deletion
+        // Create auth
+        Auth auth = Auth.create(accessKey, secretKey);
+
+        BucketManager bucketManager = new BucketManager(auth, configuration);
+
+        try {
+            bucketManager.delete(bucket, key);
+        } catch (QiniuException e) {
+            log.error("QnYun error response: [{}]", e.response);
+            throw new FileOperationException("Failed to delete file with " + key + " key", e);
+        }
     }
 
     @Override

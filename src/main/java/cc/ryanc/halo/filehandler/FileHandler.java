@@ -36,6 +36,7 @@ public interface FileHandler {
      * Deletes file.
      *
      * @param key file key must not be null
+     * @throws FileOperationException throws when fail to delete the file
      */
     void delete(@NonNull String key);
 
