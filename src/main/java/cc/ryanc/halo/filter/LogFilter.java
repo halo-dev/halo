@@ -1,7 +1,7 @@
 package cc.ryanc.halo.filter;
 
-import cc.ryanc.halo.logging.Logger;
 import cn.hutool.extra.servlet.ServletUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -15,17 +15,16 @@ import java.io.IOException;
  *
  * @author johnniang
  */
+@Slf4j
 public class LogFilter extends OncePerRequestFilter {
-
-    private Logger logger = Logger.getLogger(getClass());
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String remoteAddr = ServletUtil.getClientIP(request);
 
-        logger.debug("");
-        logger.debug("Starting url: [{}], method: [{}], ip: [{}]", request.getRequestURL(), request.getMethod(), remoteAddr);
+        log.debug("");
+        log.debug("Starting url: [{}], method: [{}], ip: [{}]", request.getRequestURL(), request.getMethod(), remoteAddr);
 
         // Set start time
         long startTime = System.currentTimeMillis();
@@ -33,7 +32,7 @@ public class LogFilter extends OncePerRequestFilter {
         // Do filter
         filterChain.doFilter(request, response);
 
-        logger.debug("Ending   url: [{}], method: [{}], ip: [{}], status: [{}], usage: [{}] ms", request.getRequestURL(), request.getMethod(), remoteAddr, response.getStatus(), (System.currentTimeMillis() - startTime));
-        logger.debug("");
+        log.debug("Ending   url: [{}], method: [{}], ip: [{}], status: [{}], usage: [{}] ms", request.getRequestURL(), request.getMethod(), remoteAddr, response.getStatus(), (System.currentTimeMillis() - startTime));
+        log.debug("");
     }
 }

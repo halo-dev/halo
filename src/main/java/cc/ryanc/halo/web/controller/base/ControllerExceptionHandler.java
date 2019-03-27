@@ -1,10 +1,10 @@
 package cc.ryanc.halo.web.controller.base;
 
 import cc.ryanc.halo.exception.HaloException;
-import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.utils.ExceptionUtils;
 import cc.ryanc.halo.utils.ValidationUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +29,8 @@ import java.util.Set;
  * @author johnniang
  */
 @RestControllerAdvice
+@Slf4j
 public class ControllerExceptionHandler {
-
-    private final Logger log = Logger.getLogger(getClass());
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -134,3 +133,4 @@ public class ControllerExceptionHandler {
     }
 
 }
+

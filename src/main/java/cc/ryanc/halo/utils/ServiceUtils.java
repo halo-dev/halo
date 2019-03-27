@@ -1,6 +1,5 @@
 package cc.ryanc.halo.utils;
 
-import cc.ryanc.halo.logging.Logger;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -14,8 +13,6 @@ import java.util.stream.Collectors;
  * @author johnniang
  */
 public class ServiceUtils {
-
-    private final static Logger LOGGER = Logger.getLogger(ServiceUtils.class);
 
     private ServiceUtils() {
     }

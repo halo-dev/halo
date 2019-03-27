@@ -1,8 +1,8 @@
 package cc.ryanc.halo.service.base;
 
 import cc.ryanc.halo.exception.NotFoundException;
-import cc.ryanc.halo.logging.Logger;
 import cc.ryanc.halo.repository.base.BaseRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,9 +23,8 @@ import java.util.Optional;
  * @param <ID>     id type
  * @author johnniang
  */
+@Slf4j
 public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOMAIN, ID> {
-
-    private final Logger log = Logger.getLogger(getClass());
 
     private final String domainName;
 
@@ -35,6 +34,7 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
         this.repository = repository;
 
         // Get domain name
+        @SuppressWarnings("unchecked")
         Class<DOMAIN> domainClass = (Class<DOMAIN>) fetchType(0);
         domainName = domainClass.getSimpleName();
     }
