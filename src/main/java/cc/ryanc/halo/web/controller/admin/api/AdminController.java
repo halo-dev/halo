@@ -1,17 +1,17 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.CountOutputDTO;
+import cc.ryanc.halo.model.dto.UserOutputDTO;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
-import cc.ryanc.halo.model.enums.PostType;
-import cc.ryanc.halo.service.AttachmentService;
-import cc.ryanc.halo.service.CommentService;
-import cc.ryanc.halo.service.OptionService;
-import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.model.params.LoginParam;
+import cc.ryanc.halo.service.*;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 /**
  * Admin controller.
@@ -31,11 +31,18 @@ public class AdminController {
 
     private final OptionService optionService;
 
-    public AdminController(PostService postService, AttachmentService attachmentService, CommentService commentService, OptionService optionService) {
+    private final UserService userService;
+
+    public AdminController(PostService postService,
+                           AttachmentService attachmentService,
+                           CommentService commentService,
+                           OptionService optionService,
+                           UserService userService) {
         this.postService = postService;
         this.attachmentService = attachmentService;
         this.commentService = commentService;
         this.optionService = optionService;
+        this.userService = userService;
     }
 
     @GetMapping("counts")
@@ -47,5 +54,11 @@ public class AdminController {
         countOutputDTO.setCommentCount(commentService.count());
         countOutputDTO.setEstablishDays(Long.valueOf(optionService.getByProperty(BlogProperties.WIDGET_DAYCOUNT).orElse("0")));
         return countOutputDTO;
+    }
+
+    @PostMapping("login")
+    @ApiOperation("Logins with session")
+    public UserOutputDTO login(@Valid @RequestBody LoginParam loginParam, HttpServletRequest request) {
+        return new UserOutputDTO().convertFrom(userService.login(loginParam.getUsername(), loginParam.getPassword(), request.getSession()));
     }
 }

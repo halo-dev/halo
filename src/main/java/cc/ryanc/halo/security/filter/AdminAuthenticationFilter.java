@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,6 +21,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -48,8 +52,14 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private final StringCacheStore cacheStore;
 
-    public AdminAuthenticationFilter(StringCacheStore cacheStore) {
+    private final Collection<String> excludeUrlPatterns;
+
+    private final AntPathMatcher antPathMatcher;
+
+    public AdminAuthenticationFilter(StringCacheStore cacheStore, String... excludeUrls) {
         this.cacheStore = cacheStore;
+        this.excludeUrlPatterns = excludeUrls == null ? Collections.emptyList() : Collections.unmodifiableCollection(Arrays.asList(excludeUrls));
+        antPathMatcher = new AntPathMatcher();
     }
 
     @Override
@@ -93,6 +103,11 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
         failureHandler.onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, request.getServletPath()));
+    }
+
     public void setFailureHandler(AuthenticationFailureHandler failureHandler) {
         this.failureHandler = failureHandler;
     }
@@ -117,4 +132,5 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
         return token;
     }
+
 }

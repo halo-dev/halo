@@ -81,7 +81,7 @@ public class HaloConfiguration {
     public FilterRegistrationBean<AdminAuthenticationFilter> adminAuthenticationFilter(HaloProperties haloProperties,
                                                                                        ObjectMapper objectMapper,
                                                                                        StringCacheStore cacheStore) {
-        AdminAuthenticationFilter adminFilter = new AdminAuthenticationFilter(cacheStore);
+        AdminAuthenticationFilter adminFilter = new AdminAuthenticationFilter(cacheStore, "/admin/api/login");
         // Set failure handler
         adminFilter.setFailureHandler(new AdminAuthenticationFailureHandler(haloProperties.getProductionEnv(), objectMapper));
 

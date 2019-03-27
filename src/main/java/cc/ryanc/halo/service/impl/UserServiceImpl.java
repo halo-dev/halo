@@ -6,6 +6,8 @@ import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.repository.UserRepository;
+import cc.ryanc.halo.security.filter.AdminAuthenticationFilter;
+import cc.ryanc.halo.security.support.UserDetail;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.DateUtils;
@@ -15,6 +17,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import javax.servlet.http.HttpSession;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -72,9 +75,10 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     }
 
     @Override
-    public User login(String key, String password) {
+    public User login(String key, String password, HttpSession httpSession) {
         Assert.hasText(key, "Username or email must not be blank");
         Assert.hasText(password, "Password must not be blank");
+        Assert.notNull(httpSession, "Http session must not be null");
 
         // Ger user by username
         User user = Validator.isEmail(key) ? getByEmailOfNonNull(key) : getByUsernameOfNonNull(key);
@@ -105,7 +109,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
             throw new BadRequestException("账号或者密码错误，您还有" + (MAX_LOGIN_TRY - loginFailureCount) + "次机会");
         }
 
-        // TODO Set session or cache token
+        // Set session
+        httpSession.setAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY, new UserDetail(user));
 
         return user;
     }

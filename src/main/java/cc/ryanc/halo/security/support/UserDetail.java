@@ -2,7 +2,9 @@ package cc.ryanc.halo.security.support;
 
 import cc.ryanc.halo.exception.AuthenticationException;
 import cc.ryanc.halo.model.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
 
@@ -13,6 +15,8 @@ import org.springframework.lang.NonNull;
  */
 @ToString
 @EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDetail {
 
     private User user;

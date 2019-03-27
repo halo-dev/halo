@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.lang.NonNull;
 
+import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 /**
@@ -68,12 +69,13 @@ public interface UserService extends CrudService<User, Integer> {
     /**
      * Logins by username and password.
      *
-     * @param key      username or email must not be blank
-     * @param password password must not be blank
+     * @param key         username or email must not be blank
+     * @param password    password must not be blank
+     * @param httpSession http session must not be null
      * @return user info
      */
     @NonNull
-    User login(@NonNull String key, @NonNull String password);
+    User login(@NonNull String key, @NonNull String password, @NonNull HttpSession httpSession);
 
     /**
      * Updates user password.
