@@ -115,7 +115,7 @@ public class Attachment extends BaseEntity {
         }
 
         if (type == null) {
-            type = AttachmentType.SERVER;
+            type = AttachmentType.LOCAL;
         }
     }
 }

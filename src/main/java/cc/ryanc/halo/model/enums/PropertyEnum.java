@@ -1,6 +1,7 @@
 package cc.ryanc.halo.model.enums;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -78,6 +79,7 @@ public interface PropertyEnum extends ValueEnum<String> {
      * @param <T>   property value enum type
      * @return property enum value or null
      */
+    @Nullable
     static <T extends Enum<T>> T convertToEnum(@NonNull String value, @NonNull Class<T> type) {
         Assert.hasText(value, "Property value must not be blank");
 

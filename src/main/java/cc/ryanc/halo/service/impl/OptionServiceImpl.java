@@ -167,7 +167,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public <T> T getByProperty(PropertyEnum property, Class<T> propertyType, T defaultValue) {
+    public <T> T getByPropertyOrDefault(PropertyEnum property, Class<T> propertyType, T defaultValue) {
         Assert.notNull(property, "Blog property must not be null");
 
         return getByProperty(property, propertyType).orElse(defaultValue);
@@ -179,7 +179,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public <T> T getByKey(String key, Class<T> valueType, T defaultValue) {
+    public <T> T getByKeyOrDefault(String key, Class<T> valueType, T defaultValue) {
         return getByKey(key, valueType).orElse(defaultValue);
     }
 
@@ -189,9 +189,19 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public <T extends Enum<T>> Optional<T> getEnumByProperty(PropertyEnum property, Class<T> valueType) {
+        return getByProperty(property).map(value -> PropertyEnum.convertToEnum(value, valueType));
+    }
+
+    @Override
+    public <T extends Enum<T>> T getEnumByPropertyOrDefault(PropertyEnum property, Class<T> valueType, T defaultValue) {
+        return getEnumByProperty(property, valueType).orElse(defaultValue);
+    }
+
+    @Override
     public int getPostPageSize() {
         try {
-            return getByProperty(BlogProperties.INDEX_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(BlogProperties.INDEX_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(BlogProperties.INDEX_POSTS + " option is not a number format", e);
             return DEFAULT_POST_PAGE_SIZE;
@@ -201,7 +211,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getCommentPageSize() {
         try {
-            return getByProperty(BlogProperties.INDEX_COMMENTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(BlogProperties.INDEX_COMMENTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(BlogProperties.INDEX_COMMENTS + " option is not a number format", e);
             return DEFAULT_COMMENT_PAGE_SIZE;
@@ -211,7 +221,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getRssPageSize() {
         try {
-            return getByProperty(BlogProperties.RSS_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(BlogProperties.RSS_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(BlogProperties.RSS_POSTS + " setting is not a number format", e);
             return DEFAULT_RSS_PAGE_SIZE;

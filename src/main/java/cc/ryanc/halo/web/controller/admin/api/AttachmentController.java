@@ -1,9 +1,7 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.AttachmentOutputDTO;
-import cc.ryanc.halo.model.support.UploadResult;
 import cc.ryanc.halo.service.AttachmentService;
-import cc.ryanc.halo.service.FileService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +23,9 @@ public class AttachmentController {
 
     private final AttachmentService attachmentService;
 
-    private final FileService fileService;
 
-    public AttachmentController(AttachmentService attachmentService,
-                                FileService fileService) {
+    public AttachmentController(AttachmentService attachmentService) {
         this.attachmentService = attachmentService;
-        this.fileService = fileService;
     }
 
     /**
@@ -68,8 +63,7 @@ public class AttachmentController {
     }
 
     @PostMapping("upload")
-    public UploadResult uploadAttachment(@RequestParam("file") MultipartFile file) {
-        // TODO Just for test
-        return fileService.uploadToLocal(file);
+    public AttachmentOutputDTO uploadAttachment(@RequestParam("file") MultipartFile file) {
+        return new AttachmentOutputDTO().convertFrom(attachmentService.upload(file));
     }
 }

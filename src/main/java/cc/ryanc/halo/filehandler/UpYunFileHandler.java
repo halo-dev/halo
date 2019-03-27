@@ -1,7 +1,8 @@
-package cc.ryanc.halo.service.upload;
+package cc.ryanc.halo.filehandler;
 
 import cc.ryanc.halo.exception.FileUploadException;
 import cc.ryanc.halo.exception.PropertyFormatException;
+import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.enums.UpYunProperties;
 import cc.ryanc.halo.model.support.UploadResult;
 import cc.ryanc.halo.service.OptionService;
@@ -17,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
-
-import static cc.ryanc.halo.service.upload.FileHandler.isImageType;
 
 /**
  * Up Yun file handler.
@@ -87,7 +86,7 @@ public class UpYunFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // Handle thumbnail
-            if (isImageType(uploadResult.getMediaType())) {
+            if (FileHandler.isImageType(uploadResult.getMediaType())) {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
@@ -103,5 +102,10 @@ public class UpYunFileHandler implements FileHandler {
     @Override
     public boolean delete(String key) {
         return false;
+    }
+
+    @Override
+    public boolean supportType(AttachmentType type) {
+        return AttachmentType.UPYUN.equals(type);
     }
 }

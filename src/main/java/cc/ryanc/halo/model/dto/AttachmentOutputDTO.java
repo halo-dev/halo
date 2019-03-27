@@ -19,6 +19,8 @@ public class AttachmentOutputDTO implements OutputConverter<AttachmentOutputDTO,
 
     private String path;
 
+    private String fileKey;
+
     private String thumbPath;
 
     private String mediaType;

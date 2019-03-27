@@ -1,6 +1,7 @@
-package cc.ryanc.halo.service.upload;
+package cc.ryanc.halo.filehandler;
 
 import cc.ryanc.halo.exception.FileUploadException;
+import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.support.UploadResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -37,6 +38,14 @@ public interface FileHandler {
      * @param key file key must not be null
      */
     boolean delete(@NonNull String key);
+
+    /**
+     * Checks if the given type is supported.
+     *
+     * @param type attachment type
+     * @return true if supported; false or else
+     */
+    boolean supportType(AttachmentType type);
 
 
     /**
