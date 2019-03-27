@@ -2,6 +2,7 @@ package cc.ryanc.halo.model.dto;
 
 import cc.ryanc.halo.model.dto.base.OutputConverter;
 import cc.ryanc.halo.model.entity.Attachment;
+import cc.ryanc.halo.model.enums.AttachmentType;
 import lombok.Data;
 
 /**
@@ -27,9 +28,11 @@ public class AttachmentOutputDTO implements OutputConverter<AttachmentOutputDTO,
 
     private String suffix;
 
-    private String dimension;
+    private Integer width;
 
-    private String size;
+    private Integer height;
 
-    private Integer type;
+    private Long size;
+
+    private AttachmentType type;
 }
