@@ -79,6 +79,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         attachment.setSize(uploadResult.getSize());
         attachment.setType(attachmentType);
 
+        log.debug("Creating attachment: [{}]", attachment);
+
         // Create and return
         return create(attachment);
     }
