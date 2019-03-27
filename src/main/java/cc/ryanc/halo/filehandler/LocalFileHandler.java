@@ -120,6 +120,7 @@ public class LocalFileHandler implements FileHandler {
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
             uploadResult.setFilePath(subFilePath);
+            uploadResult.setKey(subFilePath);
             uploadResult.setSuffix(extension);
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSize(file.getSize());

@@ -74,7 +74,11 @@ public class QnYunFileHandler implements FileHandler {
         // Create temp path
         Path tmpPath = Paths.get(System.getProperty("java.io.tmpdir"), bucket);
 
+
         try {
+            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+
             // Get file recorder for temp directory
             FileRecorder fileRecorder = new FileRecorder(tmpPath.toFile());
             // Get upload manager
@@ -96,9 +100,10 @@ public class QnYunFileHandler implements FileHandler {
 
             // Build upload result
             UploadResult result = new UploadResult();
-            result.setFilename(putSet.getHash());
+            result.setFilename(basename);
             result.setFilePath(filePath);
-            result.setSuffix(FilenameUtils.getExtension(file.getOriginalFilename()));
+            result.setKey(putSet.getKey());
+            result.setSuffix(extension);
             result.setWidth(putSet.getWidth());
             result.setHeight(putSet.getHeight());
             result.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
