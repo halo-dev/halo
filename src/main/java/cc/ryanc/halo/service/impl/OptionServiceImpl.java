@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PropertyEnum;
 import cc.ryanc.halo.model.enums.QnYunProperties;
+import cc.ryanc.halo.model.enums.ValueEnum;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.repository.OptionRepository;
 import cc.ryanc.halo.service.OptionService;
@@ -196,6 +197,16 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public <T extends Enum<T>> T getEnumByPropertyOrDefault(PropertyEnum property, Class<T> valueType, T defaultValue) {
         return getEnumByProperty(property, valueType).orElse(defaultValue);
+    }
+
+    @Override
+    public <V, E extends ValueEnum<V>> Optional<E> getValueEnumByProperty(PropertyEnum property, Class<V> valueType, Class<E> enumType) {
+        return getByProperty(property).map(value -> ValueEnum.valueToEnum(enumType, PropertyEnum.convertTo(value, valueType)));
+    }
+
+    @Override
+    public <V, E extends ValueEnum<V>> E getValueEnumByPropertyOrDefault(PropertyEnum property, Class<V> valueType, Class<E> enumType, E defaultValue) {
+        return getValueEnumByProperty(property, valueType, enumType).orElse(defaultValue);
     }
 
     @Override
