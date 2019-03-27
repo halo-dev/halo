@@ -1,7 +1,6 @@
 package cc.ryanc.halo.filehandler;
 
 import cc.ryanc.halo.exception.FileOperationException;
-import cc.ryanc.halo.exception.PropertyFormatException;
 import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.enums.UpYunProperties;
 import cc.ryanc.halo.model.support.UploadResult;
@@ -39,11 +38,6 @@ public class UpYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         String ossSource = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE);
-
-        if (StringUtils.startsWith(ossSource, "/")) {
-            throw new PropertyFormatException(UpYunProperties.OSS_SOURCE.getValue() + ": " + ossSource + " doesn't start with '/'");
-        }
-
         String ossPassword = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD);
         String ossBucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET);
         String ossDomain = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_DOMAIN);
@@ -102,8 +96,29 @@ public class UpYunFileHandler implements FileHandler {
 
     @Override
     public void delete(String key) {
+        Assert.notNull(key, "File key must not be blank");
 
-        // TODO Handle file deletion
+        // Get config
+        String ossSource = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE);
+        String ossPassword = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD);
+        String ossBucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET);
+        String ossOperator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR);
+
+        // Create up yun
+        UpYun upYun = new UpYun(ossBucket, ossOperator, ossPassword);
+        // Set api domain with ED_AUTO
+        upYun.setApiDomain(UpYun.ED_AUTO);
+
+        try {
+            String filePath = ossSource + key;
+            // Delete the file
+            boolean deleteResult = upYun.deleteFile(filePath);
+            if (!deleteResult) {
+                log.warn("Failed to delete file " + filePath + " from UpYun");
+            }
+        } catch (Exception e) {
+            throw new FileOperationException("Failed to delete file " + key + " from UpYun", e);
+        }
     }
 
     @Override
