@@ -12,6 +12,10 @@
         <div style="margin-bottom: 16px">
           <a-input addonBefore="https://ryanc.cc/archives/" defaultValue="mysite" style="width: 360px" />
         </div>
+
+        <div id="editor">
+          <mavon-editor v-model="value"/>
+        </div>
       </a-col>
 
       <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24">
@@ -22,8 +26,27 @@
 </template>
 
 <script>
-export default {}
+import { mavonEditor } from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+export default {
+  name: 'Editor',
+  components: {
+    mavonEditor
+  },
+  data() {
+    return {
+      value: 'Hello World'
+    }
+  }
+}
 </script>
-
 <style scoped>
+  #editor {
+    margin: auto;
+    width: 100%;
+  }
+
+  .v-note-wrapper{
+    z-index: 1000;
+  }
 </style>
