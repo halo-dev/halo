@@ -11,6 +11,11 @@ import java.util.Map;
 public interface MailService {
 
     /**
+     * Reload email config.
+     */
+    void reloadMailConfig();
+
+    /**
      * Send a simple email
      *
      * @param to      recipient
@@ -36,7 +41,7 @@ public interface MailService {
      * @param subject      subject
      * @param content      content
      * @param templateName template name
-     * @param attachSrc    attachment path
+     * @param attachFilename    attachment path
      */
-    void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachSrc);
+    void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilename);
 }
