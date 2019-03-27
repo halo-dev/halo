@@ -36,10 +36,11 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     public void onFailure(HttpServletRequest request, HttpServletResponse response, HaloException exception) throws IOException, ServletException {
         log.warn("Handle unsuccessful authentication, ip: [{}]", ServletUtil.getClientIP(request));
 
-        BaseResponse errorDetail = new BaseResponse();
+        BaseResponse<Object> errorDetail = new BaseResponse<>();
 
         errorDetail.setStatus(exception.getStatus().value());
         errorDetail.setMessage(exception.getMessage());
+        errorDetail.setData(exception.getErrorData());
 
         if (!productionEnv) {
             errorDetail.setDevMessage(ExceptionUtils.getStackTrace(exception));
