@@ -23,7 +23,8 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @param pageable page info must not be null
      * @return a page of attachment output dto
      */
-    Page<AttachmentOutputDTO> pageDtosBy(Pageable pageable);
+    @NonNull
+    Page<AttachmentOutputDTO> pageDtosBy(@NonNull Pageable pageable);
 
     /**
      * Uploads file.
@@ -34,4 +35,13 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      */
     @NonNull
     Attachment upload(@NonNull MultipartFile file);
+
+    /**
+     * Removes attachment permanently.
+     *
+     * @param id attachment id must not be null
+     * @return attachment detail deleted
+     */
+    @NonNull
+    Attachment removePermanently(@NonNull Integer id);
 }

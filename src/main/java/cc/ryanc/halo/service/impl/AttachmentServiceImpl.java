@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.filehandler.FileHandlers;
 import cc.ryanc.halo.model.dto.AttachmentOutputDTO;
 import cc.ryanc.halo.model.entity.Attachment;
 import cc.ryanc.halo.model.enums.AttachmentType;
@@ -9,7 +10,6 @@ import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
-import cc.ryanc.halo.filehandler.FileHandlers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,6 +81,19 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
         // Create and return
         return create(attachment);
+    }
+
+    @Override
+    public Attachment removePermanently(Integer id) {
+        // Remove it from database
+        Attachment deletedAttachment = removeById(id);
+
+        // Remove the file
+        fileHandlers.delete(deletedAttachment);
+
+        log.debug("Deleted attachment: [{}]", deletedAttachment);
+
+        return deletedAttachment;
     }
 
     /**
