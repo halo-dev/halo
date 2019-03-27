@@ -1,7 +1,8 @@
-package cc.ryanc.halo.service.upload;
+package cc.ryanc.halo.filehandler;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.exception.ServiceException;
+import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.support.UploadResult;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.utils.FilenameUtils;
@@ -22,8 +23,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.Objects;
-
-import static cc.ryanc.halo.service.upload.FileHandler.isImageType;
 
 /**
  * Local file handler.
@@ -126,7 +125,7 @@ public class LocalFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // Check file type
-            if (isImageType(uploadResult.getMediaType())) {
+            if (FileHandler.isImageType(uploadResult.getMediaType())) {
                 // Upload a thumbnail
                 String thumbnailBasename = basename + '-' + "thumbnail";
                 String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
@@ -159,6 +158,11 @@ public class LocalFileHandler implements FileHandler {
     @Override
     public boolean delete(String key) {
         return false;
+    }
+
+    @Override
+    public boolean supportType(AttachmentType type) {
+        return AttachmentType.LOCAL.equals(type);
     }
 
     /**

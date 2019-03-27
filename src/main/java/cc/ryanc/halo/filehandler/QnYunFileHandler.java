@@ -1,6 +1,7 @@
-package cc.ryanc.halo.service.upload;
+package cc.ryanc.halo.filehandler;
 
 import cc.ryanc.halo.exception.FileUploadException;
+import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.enums.QnYunProperties;
 import cc.ryanc.halo.model.support.QiNiuPutSet;
 import cc.ryanc.halo.model.support.UploadResult;
@@ -26,7 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static cc.ryanc.halo.service.upload.FileHandler.isImageType;
+import static cc.ryanc.halo.filehandler.FileHandler.isImageType;
 
 /**
  * Qi niu yun file handler.
@@ -119,5 +120,10 @@ public class QnYunFileHandler implements FileHandler {
     @Override
     public boolean delete(String key) {
         return false;
+    }
+
+    @Override
+    public boolean supportType(AttachmentType type) {
+        return AttachmentType.QNYUN.equals(type);
     }
 }

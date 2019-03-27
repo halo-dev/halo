@@ -11,7 +11,7 @@ public enum AttachmentType implements ValueEnum<Integer> {
     /**
      * 服务器
      */
-    SERVER(0),
+    LOCAL(0),
 
     /**
      * 又拍云
@@ -21,7 +21,7 @@ public enum AttachmentType implements ValueEnum<Integer> {
     /**
      * 七牛云
      */
-    QINIUYUN(2);
+    QNYUN(2);
 
     private Integer value;
 

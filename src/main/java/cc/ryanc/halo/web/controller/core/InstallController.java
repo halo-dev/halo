@@ -7,7 +7,6 @@ import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.params.InstallParam;
 import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.service.*;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
@@ -168,12 +167,12 @@ public class InstallController {
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
         properties.put(BlogProperties.BLOG_URL, installParam.getUrl());
         properties.put(BlogProperties.THEME, DEFAULT_THEME_NAME);
-        properties.put(BlogProperties.BLOG_START, DateUtil.format(DateUtil.date(), "yyyy-MM-dd"));
+        properties.put(BlogProperties.BLOG_START, String.valueOf(System.currentTimeMillis()));
         properties.put(BlogProperties.SMTP_EMAIL_ENABLE, Boolean.FALSE.toString());
         properties.put(BlogProperties.NEW_COMMENT_NOTICE, Boolean.FALSE.toString());
         properties.put(BlogProperties.COMMENT_PASS_NOTICE, Boolean.FALSE.toString());
         properties.put(BlogProperties.COMMENT_REPLY_NOTICE, Boolean.FALSE.toString());
-        properties.put(BlogProperties.ATTACHMENT_TYPE, AttachmentType.SERVER.getValue().toString());
+        properties.put(BlogProperties.ATTACHMENT_TYPE, AttachmentType.LOCAL.getValue().toString());
 
         // Create properties
         optionService.saveProperties(properties, "system");
