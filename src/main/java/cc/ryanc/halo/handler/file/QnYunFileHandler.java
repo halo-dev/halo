@@ -1,4 +1,4 @@
-package cc.ryanc.halo.filehandler;
+package cc.ryanc.halo.handler.file;
 
 import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.model.enums.AttachmentType;
@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static cc.ryanc.halo.filehandler.FileHandler.isImageType;
+import static cc.ryanc.halo.handler.file.FileHandler.isImageType;
 
 /**
  * Qi niu yun file handler.
