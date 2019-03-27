@@ -52,7 +52,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     public void save(String key, String value, String source) {
         Assert.hasText(key, "Option key must not be blank");
 
-        if (StringUtils.isNotBlank(value)) {
+        if (StringUtils.isBlank(value)) {
             // If the value is blank, remove the key
             optionRepository.removeByOptionKey(key);
             return;
