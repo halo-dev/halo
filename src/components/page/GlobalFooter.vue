@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: 'LayoutFooter',
+  name: 'GlobalFooter',
   data() {
     return {
     }

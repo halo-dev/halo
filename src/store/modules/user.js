@@ -2,7 +2,6 @@ const user = {
   state: {
     token: '',
     name: '',
-    welcome: '',
     avatar: '',
     roles: [],
     info: {}
@@ -12,9 +11,8 @@ const user = {
     SET_TOKEN: (state, token) => {
       state.token = token
     },
-    SET_NAME: (state, { name, welcome }) => {
+    SET_NAME: (state, { name }) => {
       state.name = name
-      state.welcome = welcome
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
