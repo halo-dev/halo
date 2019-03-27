@@ -1,6 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
-import cc.ryanc.halo.exception.MissingPropertyValueException;
+import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.BlogProperties;
@@ -106,9 +106,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        properties.forEach((property, value) -> {
-            save(property.getValue(), value, source);
-        });
+        properties.forEach((property, value) -> save(property.getValue(), value, source));
     }
 
     /**
@@ -139,7 +137,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public String getByKeyOfNonNull(String key) {
-        return getByKey(key).orElseThrow(() -> new MissingPropertyValueException("You have to config " + key + " setting"));
+        return getByKey(key).orElseThrow(() -> new MissingPropertyException("You have to config " + key + " setting"));
     }
 
     @Override

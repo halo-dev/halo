@@ -1,6 +1,6 @@
 package cc.ryanc.halo.service;
 
-import cc.ryanc.halo.exception.MissingPropertyValueException;
+import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.PropertyEnum;
@@ -116,7 +116,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      *
      * @param property blog property
      * @return an optiona value
-     * @throws MissingPropertyValueException throws when property value dismisses
+     * @throws MissingPropertyException throws when property value dismisses
      */
     @NonNull
     String getByPropertyOfNonNull(@NonNull PropertyEnum property);
