@@ -1,6 +1,6 @@
 package cc.ryanc.halo.filehandler;
 
-import cc.ryanc.halo.exception.FileUploadException;
+import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.exception.PropertyFormatException;
 import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.enums.UpYunProperties;
@@ -72,7 +72,7 @@ public class UpYunFileHandler implements FileHandler {
             // Write file
             boolean uploadSuccess = upYun.writeFile(upFilePath, file.getInputStream(), true, null);
             if (!uploadSuccess) {
-                throw new FileUploadException("Failed to upload file " + file.getOriginalFilename() + " to UpYun " + upFilePath);
+                throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to UpYun " + upFilePath);
             }
 
             String filePath = StringUtils.removeEnd(ossDomain, "/") + upFilePath;
@@ -96,13 +96,14 @@ public class UpYunFileHandler implements FileHandler {
 
             return uploadResult;
         } catch (Exception e) {
-            throw new FileUploadException("Failed to upload file " + file.getOriginalFilename() + " to UpYun", e);
+            throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to UpYun", e);
         }
     }
 
     @Override
-    public boolean delete(String key) {
-        return false;
+    public void delete(String key) {
+
+        // TODO Handle file deletion
     }
 
     @Override
