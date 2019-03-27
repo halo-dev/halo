@@ -1,6 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
-import cc.ryanc.halo.filehandler.FileHandlers;
+import cc.ryanc.halo.handler.file.FileHandlers;
 import cc.ryanc.halo.model.dto.AttachmentOutputDTO;
 import cc.ryanc.halo.model.entity.Attachment;
 import cc.ryanc.halo.model.enums.AttachmentType;

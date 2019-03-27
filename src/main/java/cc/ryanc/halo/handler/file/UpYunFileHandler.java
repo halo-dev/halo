@@ -1,4 +1,4 @@
-package cc.ryanc.halo.filehandler;
+package cc.ryanc.halo.handler.file;
 
 import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.model.enums.AttachmentType;

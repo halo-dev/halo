@@ -1,4 +1,4 @@
-package cc.ryanc.halo.filehandler;
+package cc.ryanc.halo.handler.file;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.service.OptionService;
