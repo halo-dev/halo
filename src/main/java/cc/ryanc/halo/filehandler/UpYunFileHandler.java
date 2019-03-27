@@ -66,7 +66,7 @@ public class UpYunFileHandler implements FileHandler {
             // Get md5 value of the file
             String md5OfFile = DigestUtils.md5DigestAsHex(file.getInputStream());
             // Build file path
-            String upFilePath = ossSource + md5OfFile + '.' + extension;
+            String upFilePath = StringUtils.appendIfMissing(ossSource, "/") + md5OfFile + '.' + extension;
             // Set md5Content
             upYun.setContentMD5(md5OfFile);
             // Write file
@@ -81,6 +81,7 @@ public class UpYunFileHandler implements FileHandler {
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
             uploadResult.setFilePath(filePath);
+            uploadResult.setKey(upFilePath);
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
             uploadResult.setSize(file.getSize());
