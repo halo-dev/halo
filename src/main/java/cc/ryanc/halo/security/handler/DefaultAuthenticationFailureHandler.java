@@ -38,6 +38,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
 
         BaseResponse errorDetail = new BaseResponse();
 
+        errorDetail.setStatus(exception.getStatus().value());
         errorDetail.setMessage(exception.getMessage());
 
         if (!productionEnv) {

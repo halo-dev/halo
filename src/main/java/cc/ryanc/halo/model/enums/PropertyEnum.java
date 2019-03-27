@@ -109,6 +109,7 @@ public interface PropertyEnum extends ValueEnum<String> {
                         || type.isAssignableFrom(Double.class)
                         || type.isAssignableFrom(Float.class)
                         || type.isAssignableFrom(Enum.class)
+                        || type.isAssignableFrom(ValueEnum.class)
         );
     }
 }

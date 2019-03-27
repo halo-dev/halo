@@ -96,8 +96,10 @@ public class LocalFileHandler implements FileHandler {
         // Build directory
         String subDir = UPLOAD_SUB_DIR + year + File.separator + month + File.separator;
 
+        String originalBasename = FilenameUtils.getBasename(file.getOriginalFilename());
+
         // Get basename
-        String basename = FilenameUtils.getBasename(file.getOriginalFilename()) + '-' + HaloUtils.randomUUIDWithoutDash();
+        String basename = originalBasename + '-' + HaloUtils.randomUUIDWithoutDash();
 
         // Get extension
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -123,7 +125,7 @@ public class LocalFileHandler implements FileHandler {
 
             // Build upload result
             UploadResult uploadResult = new UploadResult();
-            uploadResult.setFilename(basename);
+            uploadResult.setFilename(originalBasename);
             uploadResult.setFilePath(subFilePath);
             uploadResult.setKey(subFilePath);
             uploadResult.setSuffix(extension);

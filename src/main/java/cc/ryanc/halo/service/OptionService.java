@@ -4,6 +4,7 @@ import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.PropertyEnum;
+import cc.ryanc.halo.model.enums.ValueEnum;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.service.base.CrudService;
 import com.qiniu.common.Zone;
@@ -170,6 +171,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param <T>       value type
      * @return value
      */
+    @NonNull
     <T> Optional<T> getByKey(@NonNull String key, @NonNull Class<T> valueType);
 
     /**
@@ -180,6 +182,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param <T>       enum value type
      * @return an optional enum value
      */
+    @NonNull
     <T extends Enum<T>> Optional<T> getEnumByProperty(@NonNull PropertyEnum property, @NonNull Class<T> valueType);
 
     /**
@@ -191,7 +194,36 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param <T>          enum value type
      * @return enum value
      */
-    <T extends Enum<T>> T getEnumByPropertyOrDefault(@NonNull PropertyEnum property, @NonNull Class<T> valueType, T defaultValue);
+    @Nullable
+    <T extends Enum<T>> T getEnumByPropertyOrDefault(@NonNull PropertyEnum property, @NonNull Class<T> valueType, @Nullable T defaultValue);
+
+    /**
+     * Gets value enum by property.
+     *
+     * @param property  property must not be blank
+     * @param valueType enum value type must not be null
+     * @param enumType  enum type must not be null
+     * @param <V>       enum value type
+     * @param <E>       value enum type
+     * @return an optional value enum value
+     */
+    @NonNull
+    <V, E extends ValueEnum<V>> Optional<E> getValueEnumByProperty(@NonNull PropertyEnum property, @NonNull Class<V> valueType, @NonNull Class<E> enumType);
+
+    /**
+     * Gets value enum by property.
+     *
+     * @param property     property must not be blank
+     * @param valueType    enum value type must not be null
+     * @param enumType     enum type must not be null
+     * @param defaultValue default value enum value
+     * @param <V>          enum value type
+     * @param <E>          value enum type
+     * @return value enum value or null if the default value is null
+     */
+    @Nullable
+    <V, E extends ValueEnum<V>> E getValueEnumByPropertyOrDefault(@NonNull PropertyEnum property, @NonNull Class<V> valueType, @NonNull Class<E> enumType, @Nullable E defaultValue);
+
 
     /**
      * Gets post page size.
