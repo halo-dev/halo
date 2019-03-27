@@ -31,8 +31,6 @@ public class UserOutputDTO implements OutputConverter<UserOutputDTO, User> {
 
     private String description;
 
-    private Date expireTime;
-
     private Date createTime;
 
     private Date updateTime;
