@@ -42,6 +42,12 @@ public class Attachment extends BaseEntity {
     private String path;
 
     /**
+     * File key: oss file key or local file key (Just for deleting)
+     */
+    @Column(name = "file_key", columnDefinition = "varchar(2047) default ''")
+    private String fileKey;
+
+    /**
      * 缩略图路径
      */
     @Column(name = "thumb_path", columnDefinition = "varchar(1023) default ''")
@@ -88,6 +94,10 @@ public class Attachment extends BaseEntity {
         super.prePersist();
         id = null;
 
+        if (fileKey == null) {
+            fileKey = "";
+        }
+
         if (thumbPath == null) {
             thumbPath = "";
         }
@@ -107,7 +117,5 @@ public class Attachment extends BaseEntity {
         if (type == null) {
             type = AttachmentType.SERVER;
         }
-
     }
-
 }
