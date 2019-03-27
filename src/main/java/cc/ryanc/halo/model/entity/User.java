@@ -1,5 +1,6 @@
 package cc.ryanc.halo.model.entity;
 
+import cc.ryanc.halo.utils.DateUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,7 +21,7 @@ import java.util.Date;
 @Table(name = "users")
 @SQLDelete(sql = "update users set deleted = true where id = ?")
 @Where(clause = "deleted = false")
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseEntity {
 
@@ -76,6 +77,23 @@ public class User extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
+
         id = null;
+
+        if (email == null) {
+            email = "";
+        }
+
+        if (avatar == null) {
+            avatar = "";
+        }
+
+        if (description == null) {
+            description = "";
+        }
+
+        if (expireTime == null) {
+            expireTime = DateUtils.now();
+        }
     }
 }
