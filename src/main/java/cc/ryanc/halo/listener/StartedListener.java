@@ -1,11 +1,14 @@
 package cc.ryanc.halo.listener;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
+import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.ThemeService;
+import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.io.FileUtil;
@@ -58,6 +61,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Autowired
     private ThemeService themeService;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
@@ -66,6 +72,32 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         this.getActiveTheme();
         this.printStartInfo();
         this.initThemes();
+
+        // Init user in development environment
+        if (!haloProperties.getProductionEnv()) {
+            initAnTestUserIfAbsent();
+        }
+    }
+
+    /**
+     * Initialize an test user if absent
+     */
+    private void initAnTestUserIfAbsent() {
+        // Create an user if absent
+        List<User> users = userService.listAll();
+
+        if (users.isEmpty()) {
+            UserParam userParam = new UserParam();
+            userParam.setUsername("test");
+            userParam.setNickname("developer");
+            userParam.setEmail("test@test.com");
+
+            log.debug("Initializing a test user: [{}]", userParam);
+
+            User testUser = userService.createBy(userParam, "opentest");
+
+            log.debug("Initialized a test user: [{}]", testUser);
+        }
     }
 
     /**
