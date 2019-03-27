@@ -139,7 +139,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param <T>          property type
      * @return property value
      */
-    <T> T getByProperty(@NonNull PropertyEnum property, @NonNull Class<T> propertyType, T defaultValue);
+    <T> T getByPropertyOrDefault(@NonNull PropertyEnum property, @NonNull Class<T> propertyType, T defaultValue);
 
     /**
      * Gets property value by blog property.
@@ -160,7 +160,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param <T>          property type
      * @return value
      */
-    <T> T getByKey(@NonNull String key, @NonNull Class<T> valueType, T defaultValue);
+    <T> T getByKeyOrDefault(@NonNull String key, @NonNull Class<T> valueType, T defaultValue);
 
     /**
      * Gets value by key.
@@ -171,6 +171,27 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return value
      */
     <T> Optional<T> getByKey(@NonNull String key, @NonNull Class<T> valueType);
+
+    /**
+     * Gets enum value by property.
+     *
+     * @param property  property must not be blank
+     * @param valueType enum value type must not be null
+     * @param <T>       enum value type
+     * @return an optional enum value
+     */
+    <T extends Enum<T>> Optional<T> getEnumByProperty(@NonNull PropertyEnum property, @NonNull Class<T> valueType);
+
+    /**
+     * Gets enum value by property.
+     *
+     * @param property     property must not be blank
+     * @param valueType    enum value type must not be null
+     * @param defaultValue default value
+     * @param <T>          enum value type
+     * @return enum value
+     */
+    <T extends Enum<T>> T getEnumByPropertyOrDefault(@NonNull PropertyEnum property, @NonNull Class<T> valueType, T defaultValue);
 
     /**
      * Gets post page size.

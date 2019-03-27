@@ -120,7 +120,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         }
 
         // Handle comment status
-        Boolean needAudit = optionService.getByProperty(BlogProperties.NEW_COMMENT_NEED_CHECK, Boolean.class, true);
+        Boolean needAudit = optionService.getByPropertyOrDefault(BlogProperties.NEW_COMMENT_NEED_CHECK, Boolean.class, true);
         if (needAudit) {
             comment.setStatus(CommentStatus.AUDITING);
         } else {

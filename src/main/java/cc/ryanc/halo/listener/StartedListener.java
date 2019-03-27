@@ -143,7 +143,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void initThemes() {
         // Whether the blog has initialized
-        Boolean isInstalled = optionService.getByProperty(BlogProperties.IS_INSTALL, Boolean.class, false);
+        Boolean isInstalled = optionService.getByPropertyOrDefault(BlogProperties.IS_INSTALL, Boolean.class, false);
         try {
             if (isInstalled) {
                 // Skip

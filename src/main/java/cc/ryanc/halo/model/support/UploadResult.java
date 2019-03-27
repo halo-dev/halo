@@ -1,6 +1,7 @@
 package cc.ryanc.halo.model.support;
 
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.http.MediaType;
 
 /**
@@ -10,11 +11,14 @@ import org.springframework.http.MediaType;
  * @date 3/26/19
  */
 @Data
+@ToString
 public class UploadResult {
 
     private String filename;
 
     private String filePath;
+
+    private String key;
 
     private String thumbPath;
 
