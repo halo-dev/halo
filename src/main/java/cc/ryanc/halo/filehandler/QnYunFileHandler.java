@@ -127,6 +127,7 @@ public class QnYunFileHandler implements FileHandler {
     @Override
     public void delete(String key) {
         Assert.notNull(key, "File key must not be blank");
+
         // Get all config
         Zone zone = optionService.getQnYunZone();
         String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY);
