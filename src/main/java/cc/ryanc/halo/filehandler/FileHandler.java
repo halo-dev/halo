@@ -1,6 +1,6 @@
 package cc.ryanc.halo.filehandler;
 
-import cc.ryanc.halo.exception.FileUploadException;
+import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.support.UploadResult;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +27,7 @@ public interface FileHandler {
      *
      * @param file multipart file must not be null
      * @return upload result
-     * @throws FileUploadException throws when fail to upload the file
+     * @throws FileOperationException throws when fail to upload the file
      */
     @NonNull
     UploadResult upload(@NonNull MultipartFile file);
@@ -37,7 +37,7 @@ public interface FileHandler {
      *
      * @param key file key must not be null
      */
-    boolean delete(@NonNull String key);
+    void delete(@NonNull String key);
 
     /**
      * Checks if the given type is supported.
@@ -45,7 +45,7 @@ public interface FileHandler {
      * @param type attachment type
      * @return true if supported; false or else
      */
-    boolean supportType(AttachmentType type);
+    boolean supportType(@Nullable AttachmentType type);
 
 
     /**

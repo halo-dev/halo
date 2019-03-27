@@ -66,4 +66,5 @@ public class FilenameUtils {
 
         return filename.substring(dotLastIndex + 1);
     }
+
 }

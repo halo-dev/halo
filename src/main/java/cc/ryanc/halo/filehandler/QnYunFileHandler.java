@@ -1,6 +1,6 @@
 package cc.ryanc.halo.filehandler;
 
-import cc.ryanc.halo.exception.FileUploadException;
+import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.enums.QnYunProperties;
 import cc.ryanc.halo.model.support.QiNiuPutSet;
@@ -118,13 +118,13 @@ public class QnYunFileHandler implements FileHandler {
                 log.error("QnYun error response: [{}]", ((QiniuException) e).response);
             }
 
-            throw new FileUploadException("Failed to upload file " + file.getOriginalFilename() + " to QnYun", e);
+            throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to QnYun", e);
         }
     }
 
     @Override
-    public boolean delete(String key) {
-        return false;
+    public void delete(String key) {
+        // TODO Handle file deletion
     }
 
     @Override

@@ -1,6 +1,6 @@
 package cc.ryanc.halo.filehandler;
 
-import cc.ryanc.halo.exception.FileUploadException;
+import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.support.UploadResult;
 import lombok.extern.slf4j.Slf4j;
@@ -42,18 +42,19 @@ public class FileHandlers {
         }
 
         log.error("There is no available file handle for attachment type: [{}]", attachmentType);
-        throw new FileUploadException("No available file handler to filehandler the file").setErrorData(attachmentType);
+        throw new FileOperationException("No available file handler to filehandler the file").setErrorData(attachmentType);
     }
 
-    public boolean delete(String key, AttachmentType attachmentType) {
+    public void delete(String key, AttachmentType attachmentType) {
         for (FileHandler fileHandler : fileHandlers) {
             if (fileHandler.supportType(attachmentType)) {
-                return fileHandler.delete(key);
+                fileHandler.delete(key);
+                return;
             }
         }
 
         log.error("There is no available file handle for attachment type: [{}]", attachmentType);
-        throw new FileUploadException("No available file handler to delete the file").setErrorData(attachmentType);
+        throw new FileOperationException("No available file handler to delete the file").setErrorData(attachmentType);
     }
 
     /**

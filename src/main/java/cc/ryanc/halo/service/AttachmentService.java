@@ -1,6 +1,6 @@
 package cc.ryanc.halo.service;
 
-import cc.ryanc.halo.exception.FileUploadException;
+import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.model.dto.AttachmentOutputDTO;
 import cc.ryanc.halo.model.entity.Attachment;
 import cc.ryanc.halo.service.base.CrudService;
@@ -30,7 +30,7 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      *
      * @param file multipart file must not be null
      * @return attachment info
-     * @throws FileUploadException throws when failed to filehandler the file
+     * @throws FileOperationException throws when failed to filehandler the file
      */
     @NonNull
     Attachment upload(@NonNull MultipartFile file);

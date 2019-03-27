@@ -1,6 +1,7 @@
 package cc.ryanc.halo.filehandler;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
+import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.exception.ServiceException;
 import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.support.UploadResult;
@@ -36,7 +37,9 @@ public class LocalFileHandler implements FileHandler {
     /**
      * Upload sub directory.
      */
-    private final static String UPLOAD_SUB_DIR = "upload";
+    private final static String UPLOAD_SUB_DIR = "upload/";
+
+    private final static String THUMBNAIL_SUFFIX = "-thumbnail";
 
     /**
      * Thumbnail width.
@@ -59,6 +62,8 @@ public class LocalFileHandler implements FileHandler {
         // Get work dir
         workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
 
+        // Check work directory
+        checkWorkDir();
     }
 
     /**
@@ -89,7 +94,7 @@ public class LocalFileHandler implements FileHandler {
         int month = current.get(Calendar.MONTH) + 1;
 
         // Build directory
-        String subDir = UPLOAD_SUB_DIR + File.separator + year + File.separator + month + File.separator;
+        String subDir = UPLOAD_SUB_DIR + year + File.separator + month + File.separator;
 
         // Get basename
         String basename = FilenameUtils.getBasename(file.getOriginalFilename()) + '-' + HaloUtils.randomUUIDWithoutDash();
@@ -103,9 +108,9 @@ public class LocalFileHandler implements FileHandler {
         String subFilePath = subDir + basename + '.' + extension;
 
         // Get upload path
-        Path uploadPath = Paths.get(workDir + subFilePath);
+        Path uploadPath = Paths.get(workDir, subFilePath);
 
-        log.info("Uploading to directory: [{}]", uploadPath.getFileName());
+        log.info("Uploading to directory: [{}]", uploadPath.toString());
 
         try {
             // TODO Synchronize here
@@ -128,7 +133,7 @@ public class LocalFileHandler implements FileHandler {
             // Check file type
             if (FileHandler.isImageType(uploadResult.getMediaType())) {
                 // Upload a thumbnail
-                String thumbnailBasename = basename + '-' + "thumbnail";
+                String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
                 String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
                 Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
@@ -151,14 +156,44 @@ public class LocalFileHandler implements FileHandler {
 
             return uploadResult;
         } catch (IOException e) {
-            log.error("Failed to upload file to local: " + uploadPath.getFileName(), e);
-            throw new ServiceException("Failed to upload file to local").setErrorData(uploadPath.getFileName());
+            log.error("Failed to upload file to local: " + uploadPath, e);
+            throw new ServiceException("Failed to upload file to local").setErrorData(uploadPath);
         }
     }
 
     @Override
-    public boolean delete(String key) {
-        return false;
+    public void delete(String key) {
+        Assert.hasText(key, "File key must not be blank");
+        // Get path
+        Path path = Paths.get(workDir, key);
+
+
+        // Delete the file key
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new FileOperationException("Failed to delete " + key + " file", e);
+        }
+
+        // Delete thumb if necessary
+        String basename = FilenameUtils.getBasename(key);
+        String extension = FilenameUtils.getExtension(key);
+
+        // Get thumbnail name
+        String thumbnailName = basename + THUMBNAIL_SUFFIX + '.' + extension;
+
+        // Get thumbnail path
+        Path thumbnailPath = Paths.get(path.getParent().toString(), thumbnailName);
+
+        // Delete thumbnail file
+        try {
+            boolean deleteResult = Files.deleteIfExists(thumbnailPath);
+            if (!deleteResult) {
+                log.warn("Thumbnail: [{}] way not exist", thumbnailPath.toString());
+            }
+        } catch (IOException e) {
+            throw new FileOperationException("Failed to delete " + thumbnailName + " thumbnail", e);
+        }
     }
 
     @Override
@@ -182,4 +217,5 @@ public class LocalFileHandler implements FileHandler {
         // Convert to thumbnail and copy the thumbnail
         Thumbnails.of(imagePath.toFile()).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
     }
+
 }
