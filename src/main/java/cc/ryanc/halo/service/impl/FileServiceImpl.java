@@ -57,7 +57,7 @@ public class FileServiceImpl implements FileService {
     private final MediaType imageType = MediaType.valueOf("image/*");
 
     public FileServiceImpl(HaloProperties haloProperties,
-                           OptionService optionService) throws URISyntaxException {
+                           OptionService optionService) {
         this.optionService = optionService;
 
         // Get work dir
@@ -146,7 +146,7 @@ public class FileServiceImpl implements FileService {
             uploadResult.setSize(file.getSize());
 
             // Check file type
-            if (isImageType(file.getContentType())) {
+            if (isImageType(uploadResult.getMediaType())) {
                 // Upload a thumbnail
                 String thumbnailBasename = basename + '-' + "thumbnail";
                 String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
@@ -230,11 +230,14 @@ public class FileServiceImpl implements FileService {
             UploadResult result = new UploadResult();
             result.setFilename(putSet.getHash());
             result.setFilePath(filePath);
-            result.setThumbPath(StringUtils.isBlank(smallUrl) ? filePath : filePath + smallUrl);
             result.setSuffix(FilenameUtils.getExtension(file.getOriginalFilename()));
             result.setWidth(putSet.getWidth());
             result.setHeight(putSet.getHeight());
             result.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
+
+            if (isImageType(result.getMediaType())) {
+                result.setThumbPath(StringUtils.isBlank(smallUrl) ? filePath : filePath + smallUrl);
+            }
 
             return result;
         } catch (IOException e) {
