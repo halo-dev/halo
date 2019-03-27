@@ -58,8 +58,8 @@ public class AttachmentController {
      */
     @DeleteMapping("{id:\\d+}")
     @ApiOperation("Delete attachment by id")
-    public void deletePermanently(@PathVariable("id") Integer id) {
-        attachmentService.removeById(id);
+    public AttachmentOutputDTO deletePermanently(@PathVariable("id") Integer id) {
+        return new AttachmentOutputDTO().convertFrom(attachmentService.removePermanently(id));
     }
 
     @PostMapping("upload")

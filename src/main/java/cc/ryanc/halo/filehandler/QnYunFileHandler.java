@@ -124,6 +124,9 @@ public class QnYunFileHandler implements FileHandler {
 
     @Override
     public void delete(String key) {
+        Assert.notNull(key, "File key must not be blank");
+
+
         // TODO Handle file deletion
     }
 
