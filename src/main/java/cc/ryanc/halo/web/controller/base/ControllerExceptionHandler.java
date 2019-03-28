@@ -18,10 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Exception handler of controller.
@@ -54,10 +52,10 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseResponse handleConstraintViolationException(ConstraintViolationException e) {
-        BaseResponse<Set<ConstraintViolation<?>>> baseResponse = handleBaseException(e);
+        BaseResponse<Map<String, String>> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         baseResponse.setMessage("Field validation error");
-        baseResponse.setData(e.getConstraintViolations());
+        baseResponse.setData(ValidationUtils.mapWithValidError(e.getConstraintViolations()));
         return baseResponse;
     }
 
