@@ -1,7 +1,8 @@
 import axios from 'axios'
 import NProgress from 'nprogress'
-import Vue from 'vue'
 import 'nprogress/nprogress.css'
+import Vue from 'vue'
+import { message } from 'ant-design-vue'
 
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? 'https://ryanc.cc/' : 'http://localhost:8090',
@@ -26,8 +27,8 @@ service.interceptors.response.use(
     return response
   },
   error => {
-    Vue.$log.error('Response failed', error)
     NProgress.done()
+    Vue.$log.error('Response failed', error)
 
     const response = error.response
     const status = response ? response.status : -1
@@ -49,9 +50,9 @@ service.interceptors.response.use(
         // TODO handle 500 status error
       }
 
-      Vue.$message.error(data.message)
+      message.error(data.message)
     } else {
-      Vue.$message.error('Unkown reason')
+      message.error('Unkown reason')
     }
 
     return Promise.reject(error)
