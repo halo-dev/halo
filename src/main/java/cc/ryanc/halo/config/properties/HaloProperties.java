@@ -25,6 +25,11 @@ public class HaloProperties {
     private Boolean productionEnv = true;
 
     /**
+     * Authentication enabled
+     */
+    private Boolean authEnabled = true;
+
+    /**
      * Work directory.
      */
     private String workDir = USER_HOME + "/halo/";

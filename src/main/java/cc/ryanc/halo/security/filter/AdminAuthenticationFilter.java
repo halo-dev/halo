@@ -50,6 +50,11 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private AuthenticationFailureHandler failureHandler;
 
+    /**
+     * Authentication enabled.
+     */
+    private boolean authEnabled = true;
+
     private final StringCacheStore cacheStore;
 
     private final Collection<String> excludeUrlPatterns;
@@ -64,6 +69,13 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        if (!authEnabled) {
+            // If authentication disabled
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Get token from request
         String token = getTokenFromRequest(request);
 
@@ -110,6 +122,10 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     public void setFailureHandler(AuthenticationFailureHandler failureHandler) {
         this.failureHandler = failureHandler;
+    }
+
+    public void setAuthEnabled(boolean authEnabled) {
+        this.authEnabled = authEnabled;
     }
 
     /**
