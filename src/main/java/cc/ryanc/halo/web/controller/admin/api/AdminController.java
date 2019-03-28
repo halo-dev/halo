@@ -1,5 +1,6 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
+import cc.ryanc.halo.cache.lock.CacheLock;
 import cc.ryanc.halo.model.dto.CountOutputDTO;
 import cc.ryanc.halo.model.dto.UserOutputDTO;
 import cc.ryanc.halo.model.enums.BlogProperties;
@@ -10,7 +11,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 /**
@@ -57,7 +57,8 @@ public class AdminController {
     }
 
     @PostMapping("login")
-    @ApiOperation("Logins with session")
+    @ApiOperation("Login with session")
+    @CacheLock(autoDelete = false, traceRequest = true)
     public UserOutputDTO login(@Valid @RequestBody LoginParam loginParam, HttpServletRequest request) {
         return new UserOutputDTO().convertFrom(userService.login(loginParam.getUsername(), loginParam.getPassword(), request.getSession()));
     }

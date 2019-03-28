@@ -123,7 +123,7 @@ public class BeanUtils {
             String propertyName = propertyDescriptor.getName();
             Object propertyValue = beanWrapper.getPropertyValue(propertyName);
 
-            // if propertye value is equal to null, add it to empty name set
+            // if property value is equal to null, add it to empty name set
             if (propertyValue == null) {
                 emptyNames.add(propertyName);
             }

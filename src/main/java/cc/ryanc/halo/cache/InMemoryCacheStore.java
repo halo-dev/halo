@@ -27,7 +27,7 @@ public class InMemoryCacheStore extends StringCacheStore {
     }
 
     @Override
-    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+    synchronized void putInternal(String key, CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
@@ -38,32 +38,30 @@ public class InMemoryCacheStore extends StringCacheStore {
     }
 
     @Override
-    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+    synchronized Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
         log.debug("Preparing to put key: [{}], value: [{}]", key, cacheWrapper);
 
-        // Put the cache wrapper
-        CacheWrapper<String> putCacheWrapper = cacheContainer.putIfAbsent(key, cacheWrapper);
+        // Get the value before
+        Optional<String> valueOptional = get(key);
 
-        if (putCacheWrapper == null) {
-            putCacheWrapper = cacheWrapper;
-        }
-
-        boolean isEqual = cacheWrapper.equals(putCacheWrapper);
-
-        if (isEqual) {
-            log.debug("Put successfully");
-        } else {
+        if (valueOptional.isPresent()) {
             log.warn("Failed to put the cache, because the key: [{}] has been present already", key);
+            return false;
         }
 
-        return isEqual;
+        // Put the cache wrapper
+        putInternal(key, cacheWrapper);
+
+        log.debug("Put successfully");
+
+        return true;
     }
 
     @Override
-    public void delete(String key) {
+    public synchronized void delete(String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
         cacheContainer.remove(key);
