@@ -38,6 +38,17 @@ public class InMemoryCacheStore extends StringCacheStore {
     }
 
     @Override
+    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+        Assert.hasText(key, "Cache key must not be blank");
+        Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
+
+        // Put the cache wrapper
+        CacheWrapper<String> putCacheWrapper = cacheContainer.putIfAbsent(key, cacheWrapper);
+
+        return cacheWrapper.equals(putCacheWrapper);
+    }
+
+    @Override
     public void delete(String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
