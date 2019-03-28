@@ -42,10 +42,24 @@ public class InMemoryCacheStore extends StringCacheStore {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
+        log.debug("Preparing to put key: [{}], value: [{}]", key, cacheWrapper);
+
         // Put the cache wrapper
         CacheWrapper<String> putCacheWrapper = cacheContainer.putIfAbsent(key, cacheWrapper);
 
-        return cacheWrapper.equals(putCacheWrapper);
+        if (putCacheWrapper == null) {
+            putCacheWrapper = cacheWrapper;
+        }
+
+        boolean isEqual = cacheWrapper.equals(putCacheWrapper);
+
+        if (isEqual) {
+            log.debug("Put successfully");
+        } else {
+            log.warn("Failed to put the cache, because the key: [{}] has been present already", key);
+        }
+
+        return isEqual;
     }
 
     @Override
