@@ -6,7 +6,8 @@ import { message } from 'ant-design-vue'
 
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? 'https://ryanc.cc/' : 'http://localhost:8090',
-  timeout: 5000
+  timeout: 5000,
+  withCredentials: true
 })
 
 service.interceptors.request.use(
