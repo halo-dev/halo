@@ -2,6 +2,7 @@ package cc.ryanc.halo.cache;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,11 +11,11 @@ import java.util.Date;
  * @author johnniang
  */
 @Data
-@EqualsAndHashCode
 @ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class CacheWrapper<V> {
+class CacheWrapper<V> implements Serializable {
 
     /**
      * Cache data

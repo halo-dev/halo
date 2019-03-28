@@ -38,7 +38,7 @@ public class HaloConfiguration {
      * @return Cors filter registration bean
      */
     @Bean
-    FilterRegistrationBean<CorsFilter> corsFilter() {
+    public FilterRegistrationBean<CorsFilter> corsFilter() {
         FilterRegistrationBean<CorsFilter> corsFilter = new FilterRegistrationBean<>();
 
         corsFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 10);
@@ -54,7 +54,7 @@ public class HaloConfiguration {
      * @return Log filter registration bean
      */
     @Bean
-    FilterRegistrationBean<LogFilter> logFilter() {
+    public FilterRegistrationBean<LogFilter> logFilter() {
         FilterRegistrationBean<LogFilter> logFilter = new FilterRegistrationBean<>();
 
         logFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 9);

@@ -111,7 +111,6 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
             expireAt = DateUtils.addMilliseconds(now, Long.valueOf(millis).intValue());
         }
 
-
         // Build cache wrapper
         CacheWrapper<V> cacheWrapper = new CacheWrapper<>();
         cacheWrapper.setCreateAt(now);
