@@ -27,7 +27,7 @@ public class InMemoryCacheStore extends StringCacheStore {
     }
 
     @Override
-    synchronized void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
@@ -61,7 +61,7 @@ public class InMemoryCacheStore extends StringCacheStore {
     }
 
     @Override
-    public synchronized void delete(String key) {
+    public void delete(String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
         cacheContainer.remove(key);
