@@ -28,13 +28,13 @@ public class PostTag extends BaseEntity {
     private Integer id;
 
     /**
-     * 文章编号
+     * Post id.
      */
     @Column(name = "post_id", columnDefinition = "int not null")
     private Integer postId;
 
     /**
-     * 标签编号
+     * Tag id.
      */
     @Column(name = "tag_id", columnDefinition = "int not null")
     private Integer tagId;

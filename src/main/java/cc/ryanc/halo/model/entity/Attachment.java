@@ -30,13 +30,13 @@ public class Attachment extends BaseEntity {
     private Integer id;
 
     /**
-     * 附件名称
+     * Attachment name.
      */
     @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
-     * 附件路径
+     * Attachment access path.
      */
     @Column(name = "path", columnDefinition = "varchar(1023) not null")
     private String path;
@@ -48,19 +48,19 @@ public class Attachment extends BaseEntity {
     private String fileKey;
 
     /**
-     * 缩略图路径
+     * Thumbnail access path.
      */
     @Column(name = "thumb_path", columnDefinition = "varchar(1023) default ''")
     private String thumbPath;
 
     /**
-     * 附件类型
+     * Attachment media type.
      */
     @Column(name = "media_type", columnDefinition = "varchar(50) not null")
     private String mediaType;
 
     /**
-     * 附件后缀
+     * Attachment suffix,such as .png,.jpg
      */
     @Column(name = "suffix", columnDefinition = "varchar(50) default ''")
     private String suffix;
@@ -78,13 +78,13 @@ public class Attachment extends BaseEntity {
     private Integer height;
 
     /**
-     * 附件大小
+     * Attachment size.
      */
     @Column(name = "size", columnDefinition = "bigint not null")
     private Long size;
 
     /**
-     * 附件上传类型
+     * Attachment upload type,LOCAL,UPYUN or QNYUN.
      */
     @Column(name = "type", columnDefinition = "int default 0")
     private AttachmentType type;

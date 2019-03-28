@@ -27,25 +27,25 @@ public class Category extends BaseEntity {
     private Integer id;
 
     /**
-     * 分类名称
+     * Category name.
      */
     @Column(name = "name", columnDefinition = "varchar(50) not null")
     private String name;
 
     /**
-     * 缩略名
+     * Category slug name.
      */
     @Column(name = "slug_name", columnDefinition = "varchar(50) not null")
     private String slugName;
 
     /**
-     * 描述
+     * Description,can be display on category page.
      */
     @Column(name = "description", columnDefinition = "varchar(100) default ''")
     private String description;
 
     /**
-     * 上级目录
+     * Parent category.
      */
     @Column(name = "parent_id", columnDefinition = "int default 0")
     private Integer parentId;

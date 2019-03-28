@@ -23,7 +23,7 @@ public class HaloConst {
     /**
      * version constant
      */
-    public static final String HALO_VERSION = "0.4.2";
+    public static final String HALO_VERSION = "1.0.0";
 
     /**
      * Token of header param

@@ -29,13 +29,13 @@ public class Tag extends BaseEntity {
     private Integer id;
 
     /**
-     * 标签名
+     * Tag name.
      */
     @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
-     * 缩略名
+     * Tag slug name.
      */
     @Column(name = "slug_name", columnDefinition = "varchar(255) not null")
     private String slugName;

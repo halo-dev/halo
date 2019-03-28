@@ -29,31 +29,31 @@ public class Link extends BaseEntity {
     private Integer id;
 
     /**
-     * 友链名称
+     * Link name.
      */
     @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
-     * 友链地址
+     * Link website address.
      */
     @Column(name = "url", columnDefinition = "varchar(255) not null")
     private String url;
 
     /**
-     * 友链 Logo
+     * Website logo.
      */
     @Column(name = "logo", columnDefinition = "varchar(255) default ''")
     private String logo;
 
     /**
-     * 描述
+     * Website description.
      */
     @Column(name = "description", columnDefinition = "varchar(255) default ''")
     private String description;
 
     /**
-     * 分组
+     * Link group name.
      */
     @Column(name = "team", columnDefinition = "varchar(255) default ''")
     private String team;

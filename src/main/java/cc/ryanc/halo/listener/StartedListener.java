@@ -32,9 +32,7 @@ import java.util.Map;
 import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
 
 /**
- * <pre>
- *     应用启动完成后所执行的方法
- * </pre>
+ * The method executed after the application is started.
  *
  * @author : RYAN0UP
  * @date : 2018/12/5

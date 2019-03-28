@@ -28,25 +28,25 @@ public class Comment extends BaseEntity {
     private Long id;
 
     /**
-     * 评论者昵称
+     * Commentator's name.
      */
     @Column(name = "author", columnDefinition = "varchar(50) not null")
     private String author;
 
     /**
-     * 评论者邮箱
+     * Commentator's email.
      */
     @Column(name = "email", columnDefinition = "varchar(255) default ''")
     private String email;
 
     /**
-     * 评论者 ip 地址
+     * Commentator's ip address.
      */
     @Column(name = "ip_address", columnDefinition = "varchar(127) default ''")
     private String ipAddress;
 
     /**
-     * 评论者网址
+     * Commentator's website.
      */
     @Column(name = "author_url", columnDefinition = "varchar(512) default ''")
     private String authorUrl;
@@ -58,7 +58,7 @@ public class Comment extends BaseEntity {
     private String gavatarMd5;
 
     /**
-     * 评论内容
+     * Comment content.
      */
     @Column(name = "content", columnDefinition = "varchar(1023) not null")
     private String content;
@@ -70,13 +70,13 @@ public class Comment extends BaseEntity {
     private CommentStatus status;
 
     /**
-     * UA 信息
+     * Commentator's userAgent.
      */
     @Column(name = "user_agent", columnDefinition = "varchar(512) default ''")
     private String userAgent;
 
     /**
-     * 是否为博主
+     * Is admin's comment.
      */
     @Column(name = "is_admin", columnDefinition = "tinyint default 0")
     private Boolean isAdmin;
@@ -88,13 +88,13 @@ public class Comment extends BaseEntity {
     private Integer postId;
 
     /**
-     * 是否置顶
+     * Whether to top the comment.
      */
     @Column(name = "top_priority", columnDefinition = "int default 0")
     private Integer topPriority;
 
     /**
-     * 上级评论
+     * Parent comment.
      */
     @Column(name = "parent_id", columnDefinition = "bigint default 0")
     private Long parentId;

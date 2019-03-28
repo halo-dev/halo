@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -23,7 +21,6 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.spring.web.plugins.JacksonSerializerConvention;
 import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -137,7 +134,7 @@ public class SwaggerConfiguration {
                 .title("Halo API Documentation")
                 .description("Documentation for Halo API")
                 .version(HALO_VERSION)
-                .termsOfServiceUrl("https://ryanc.cc/")
+                .termsOfServiceUrl("https://github.com/halo-dev")
                 .contact(new Contact("RYAN0UP", "https://ryanc.cc/", "i#ryanc.cc"))
                 .build();
     }

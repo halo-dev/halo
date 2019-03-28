@@ -27,7 +27,7 @@ public class BasePost extends BaseEntity {
     private Integer id;
 
     /**
-     * 文章标题
+     * Post title.
      */
     @Column(name = "title", columnDefinition = "varchar(100) not null")
     private String title;
@@ -45,67 +45,69 @@ public class BasePost extends BaseEntity {
     private String url;
 
     /**
-     * 源内容
+     * Original content,not format.
      */
     @Column(name = "original_content", columnDefinition = "text not null")
     private String originalContent;
 
     /**
-     * 渲染后内容
+     * Rendered content.
+     *
+     * @see cc.ryanc.halo.utils.MarkdownUtils#renderMarkdown(String)
      */
     @Column(name = "format_content", columnDefinition = "text not null")
     private String formatContent;
 
     /**
-     * 摘要
+     * Post summary.
      */
     @Column(name = "summary", columnDefinition = "varchar(500) default ''")
     private String summary;
 
     /**
-     * 缩略图
+     * Cover thumbnail of the post.
      */
     @Column(name = "thumbnail", columnDefinition = "varchar(1023) default ''")
     private String thumbnail;
 
     /**
-     * 浏览量
+     * Post visits.
      */
     @Column(name = "visits", columnDefinition = "bigint default 0")
     private Long visits;
 
     /**
-     * 是否允许评论
+     * Whether to allow comments.
      */
     @Column(name = "disallow_comment", columnDefinition = "int default 0")
     private Boolean disallowComment;
 
     /**
-     * 文章密码
+     * Post password.
      */
     @Column(name = "password", columnDefinition = "varchar(255) default ''")
     private String password;
 
     /**
-     * 自定义渲染模板名称
+     * Custom template.
      */
     @Column(name = "template", columnDefinition = "varchar(255) default ''")
     private String template;
 
     /**
-     * 是否置顶
+     * Whether to top the post.
      */
     @Column(name = "top_priority", columnDefinition = "int default 0")
     private Integer topPriority;
 
     /**
-     * 发布来源
+     * Create from,server or WeChat.
      */
     @Column(name = "create_from", columnDefinition = "int default 0")
     private PostCreateFrom createFrom;
 
     /**
-     * 点赞量/喜欢量
+     * Likes
      */
     @Column(name = "likes", columnDefinition = "bigint default 0")
     private Long likes;

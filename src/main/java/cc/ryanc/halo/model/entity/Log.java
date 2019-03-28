@@ -29,25 +29,25 @@ public class Log extends BaseEntity {
     private Long id;
 
     /**
-     * 日志标识
+     * Log key.
      */
     @Column(name = "log_key", columnDefinition = "varchar(1023) default ''")
     private String logKey;
 
     /**
-     * 日志事件类型
+     * Log type.
      */
     @Column(name = "type", columnDefinition = "int not null")
     private LogType type;
 
     /**
-     * 日志内容
+     * Log content.
      */
     @Column(name = "content", columnDefinition = "varchar(1023) not null")
     private String content;
 
     /**
-     * 操作 IP
+     * Operator's ip address.
      */
     @Column(name = "ip_address", columnDefinition = "varchar(127) default ''")
     private String ipAddress;

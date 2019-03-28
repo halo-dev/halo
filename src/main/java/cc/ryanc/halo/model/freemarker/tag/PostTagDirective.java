@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * <pre>
- *     FreeMarker自定义标签
- * </pre>
+ * Freemarker custom tag of post.
  *
  * @author : RYAN0UP
  * @date : 2018/4/26

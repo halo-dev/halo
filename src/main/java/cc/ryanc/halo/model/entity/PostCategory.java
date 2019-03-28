@@ -26,13 +26,13 @@ public class PostCategory extends BaseEntity {
     private Integer id;
 
     /**
-     * 分类目录编号
+     * Category id.
      */
     @Column(name = "category_id")
     private Integer categoryId;
 
     /**
-     * 文章编号
+     * Post id.
      */
     @Column(name = "post_id")
     private Integer postId;
