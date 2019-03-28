@@ -5,6 +5,8 @@ import org.springframework.util.Assert;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * In-memory cache store.
@@ -18,6 +20,11 @@ public class InMemoryCacheStore extends StringCacheStore {
      * Cache container.
      */
     private final static ConcurrentHashMap<String, CacheWrapper<String>> cacheContainer = new ConcurrentHashMap<>();
+
+    /**
+     * Lock.
+     */
+    private Lock lock = new ReentrantLock();
 
     @Override
     Optional<CacheWrapper<String>> getInternal(String key) {
@@ -38,26 +45,29 @@ public class InMemoryCacheStore extends StringCacheStore {
     }
 
     @Override
-    synchronized Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
         log.debug("Preparing to put key: [{}], value: [{}]", key, cacheWrapper);
 
-        // Get the value before
-        Optional<String> valueOptional = get(key);
+        try {
+            lock.lock();
+            // Get the value before
+            Optional<String> valueOptional = get(key);
 
-        if (valueOptional.isPresent()) {
-            log.warn("Failed to put the cache, because the key: [{}] has been present already", key);
-            return false;
+            if (valueOptional.isPresent()) {
+                log.warn("Failed to put the cache, because the key: [{}] has been present already", key);
+                return false;
+            }
+
+            // Put the cache wrapper
+            putInternal(key, cacheWrapper);
+            log.debug("Put successfully");
+            return true;
+        } finally {
+            lock.unlock();
         }
-
-        // Put the cache wrapper
-        putInternal(key, cacheWrapper);
-
-        log.debug("Put successfully");
-
-        return true;
     }
 
     @Override
