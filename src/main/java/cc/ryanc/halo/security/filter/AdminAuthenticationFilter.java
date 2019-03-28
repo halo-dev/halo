@@ -2,11 +2,13 @@ package cc.ryanc.halo.security.filter;
 
 import cc.ryanc.halo.cache.StringCacheStore;
 import cc.ryanc.halo.exception.AuthenticationException;
+import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.security.authentication.AuthenticationImpl;
 import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.security.context.SecurityContextImpl;
 import cc.ryanc.halo.security.handler.AuthenticationFailureHandler;
 import cc.ryanc.halo.security.support.UserDetail;
+import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.JsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Admin authentication filter.
@@ -57,12 +56,15 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private final StringCacheStore cacheStore;
 
+    private final UserService userService;
+
     private final Collection<String> excludeUrlPatterns;
 
     private final AntPathMatcher antPathMatcher;
 
-    public AdminAuthenticationFilter(StringCacheStore cacheStore, String... excludeUrls) {
+    public AdminAuthenticationFilter(StringCacheStore cacheStore, UserService userService, String... excludeUrls) {
         this.cacheStore = cacheStore;
+        this.userService = userService;
         this.excludeUrlPatterns = excludeUrls == null ? Collections.emptyList() : Collections.unmodifiableCollection(Arrays.asList(excludeUrls));
         antPathMatcher = new AntPathMatcher();
     }
@@ -71,6 +73,12 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         if (!authEnabled) {
+            List<User> users = userService.listAll();
+            if (!users.isEmpty()) {
+                // Set security context
+                User user = users.get(0);
+                SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user))));
+            }
             // If authentication disabled
             filterChain.doFilter(request, response);
             return;

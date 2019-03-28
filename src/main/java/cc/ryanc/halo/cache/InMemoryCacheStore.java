@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.util.Optional;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -75,5 +76,20 @@ public class InMemoryCacheStore extends StringCacheStore {
         Assert.hasText(key, "Cache key must not be blank");
 
         cacheContainer.remove(key);
+    }
+
+    /**
+     * Cache store cleaner.
+     *
+     * @author johnniang
+     * @date 03/28/19
+     */
+    private class CacheStoreCleaner extends TimerTask {
+
+        @Override
+        public void run() {
+
+            cacheContainer.keySet().forEach(InMemoryCacheStore.this::get);
+        }
     }
 }

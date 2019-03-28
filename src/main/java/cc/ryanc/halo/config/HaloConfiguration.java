@@ -9,6 +9,7 @@ import cc.ryanc.halo.security.filter.AdminAuthenticationFilter;
 import cc.ryanc.halo.security.filter.ApiAuthenticationFilter;
 import cc.ryanc.halo.security.handler.AdminAuthenticationFailureHandler;
 import cc.ryanc.halo.security.handler.DefaultAuthenticationFailureHandler;
+import cc.ryanc.halo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -80,8 +81,9 @@ public class HaloConfiguration {
     @Bean
     public FilterRegistrationBean<AdminAuthenticationFilter> adminAuthenticationFilter(HaloProperties haloProperties,
                                                                                        ObjectMapper objectMapper,
-                                                                                       StringCacheStore cacheStore) {
-        AdminAuthenticationFilter adminFilter = new AdminAuthenticationFilter(cacheStore, "/admin/api/login");
+                                                                                       StringCacheStore cacheStore,
+                                                                                       UserService userService) {
+        AdminAuthenticationFilter adminFilter = new AdminAuthenticationFilter(cacheStore, userService, "/admin/api/login");
         // Set auth enabled
         adminFilter.setAuthEnabled(haloProperties.getAuthEnabled());
 
