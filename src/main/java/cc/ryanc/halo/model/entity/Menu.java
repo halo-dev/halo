@@ -29,31 +29,31 @@ public class Menu extends BaseEntity {
     private Integer id;
 
     /**
-     * 菜单名称
+     * Menu name.
      */
     @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
-     * 菜单地址
+     * Menu access url.
      */
     @Column(name = "url", columnDefinition = "varchar(255) not null")
     private String url;
 
     /**
-     * 排序
+     * Sort.
      */
     @Column(name = "sort", columnDefinition = "int default 0")
     private Integer sort;
 
     /**
-     * 窗口打开方式
+     * Page opening method
      */
     @Column(name = "target", columnDefinition = "varchar(20) default '_self'")
     private String target;
 
     /**
-     * 菜单图标
+     * Menu icon,Template support required.
      */
     @Column(name = "icon", columnDefinition = "varchar(50) default ''")
     private String icon;

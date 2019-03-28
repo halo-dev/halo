@@ -29,9 +29,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import java.util.List;
 
 /**
- * <pre>
- *     拦截器，资源路径配置
- * </pre>
+ * Mvc configuration.
  *
  * @author : RYAN0UP
  * @date : 2018/1/2
@@ -66,7 +64,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * 配置静态资源路径
+     * Configuring static resource path
      *
      * @param registry registry
      */
@@ -100,6 +98,11 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addConverterFactory(new StringToEnumConverterFactory());
     }
 
+    /**
+     * Configuring freemarker template file path.
+     *
+     * @return new FreeMarkerConfigurer
+     */
     @Bean
     public FreeMarkerConfigurer freemarkerConfig() {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
@@ -108,6 +111,11 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         return configurer;
     }
 
+    /**
+     * Configuring view resolver
+     *
+     * @param registry registry
+     */
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
         FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();

@@ -19,26 +19,26 @@ import javax.validation.constraints.Size;
 public class CategoryParam implements InputConverter<Category> {
 
     /**
-     * 分类名称
+     * Category name.
      */
     @NotBlank(message = "Category name must not be blank")
     @Size(max = 50, message = "Length of category name must not be more than {max}")
     private String name;
 
     /**
-     * 缩略名
+     * Category slug name.
      */
     @Size(max = 50, message = "Length of category slug name must not be more than {max}")
     private String slugName;
 
     /**
-     * 描述
+     * Category description.
      */
     @Size(max = 100, message = "Length of category description must not be more than {max}")
     private String description;
 
     /**
-     * 上级目录
+     * Parent category.
      */
     private Integer parentId;
 

@@ -13,9 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 
 /**
- * <pre>
- *     FreeMarker配置
- * </pre>
+ * FreeMarker configuration.
  *
  * @author : RYAN0UP
  * @date : 2018/4/26
@@ -61,7 +59,7 @@ public class FreeMarkerAutoConfiguration {
     public void setSharedVariable() {
         try {
             configuration.setSharedVariable("options", optionsService.listOptions());
-            //自定义标签
+            //Freemarker custom tags
             configuration.setSharedVariable("categoryTag", categoryTagDirective);
             configuration.setSharedVariable("commentTag", commentTagDirective);
             configuration.setSharedVariable("linkTag", linkTagDirective);

@@ -31,37 +31,37 @@ public class User extends BaseEntity {
     private Integer id;
 
     /**
-     * 用户名
+     * User name.
      */
     @Column(name = "username", columnDefinition = "varchar(50) not null")
     private String username;
 
     /**
-     * 昵称
+     * User nick name,used to display on page.
      */
     @Column(name = "nickname", columnDefinition = "varchar(255) not null")
     private String nickname;
 
     /**
-     * 密码
+     * Password.
      */
     @Column(name = "password", columnDefinition = "varchar(255) not null")
     private String password;
 
     /**
-     * 邮箱
+     * User email.
      */
     @Column(name = "email", columnDefinition = "varchar(127) default ''")
     private String email;
 
     /**
-     * 头像
+     * User avatar.
      */
     @Column(name = "avatar", columnDefinition = "varchar(1023) default ''")
     private String avatar;
 
     /**
-     * 描述
+     * User description.
      */
     @Column(name = "description", columnDefinition = "varchar(1023) default ''")
     private String description;

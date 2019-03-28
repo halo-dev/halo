@@ -21,21 +21,21 @@ import java.util.Date;
 public class BaseEntity {
 
     /**
-     * 创建时间戳
+     * Create time.
      */
     @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
     /**
-     * 更新时间戳
+     * Update time.
      */
     @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
     /**
-     * 是否已删除
+     * Delete flag.
      */
     @Column(name = "deleted", columnDefinition = "TINYINT default 0")
     private Boolean deleted = false;
