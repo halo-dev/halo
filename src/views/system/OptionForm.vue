@@ -18,7 +18,7 @@
                 <a-form-item label="Favicon：" :wrapper-col="wrapperCol">
                   <a-input />
                 </a-form-item>
-                <a-form-item label="页脚信息： " :wrapper-col="wrapperCol">
+                <a-form-item label="页脚信息：" :wrapper-col="wrapperCol">
                   <a-input type="textarea" :autosize="{ minRows: 5 }" />
                 </a-form-item>
                 <a-form-item>
