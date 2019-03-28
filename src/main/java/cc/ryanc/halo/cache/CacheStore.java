@@ -25,14 +25,22 @@ public interface CacheStore<K, V> {
     Optional<V> get(@NonNull K key);
 
     /**
-     * Puts a cache.
+     * Puts a cache which will be expired.
      *
      * @param key      cache key must not be null
      * @param value    cache value must not be null
-     * @param timeout  the key expiration must not be less than 0
+     * @param timeout  the key expiration must not be less than 1
      * @param timeUnit timeout unit
      */
     void put(@NonNull K key, @NonNull V value, long timeout, @NonNull TimeUnit timeUnit);
+
+    /**
+     * Puts a non-expired cache.
+     *
+     * @param key   cache key must not be null
+     * @param value cache value must not be null
+     */
+    void put(@NonNull K key, @NonNull V value);
 
     /**
      * Delete a key.

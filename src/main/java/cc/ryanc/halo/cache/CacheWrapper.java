@@ -14,17 +14,12 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class CacheWrapper<T> {
-
-    /**
-     * Cache key.
-     */
-    private String key;
+public class CacheWrapper<V> {
 
     /**
      * Cache data
      */
-    private T data;
+    private V data;
 
     /**
      * Expired time.
