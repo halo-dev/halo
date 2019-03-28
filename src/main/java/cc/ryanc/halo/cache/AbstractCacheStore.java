@@ -3,6 +3,7 @@ package cc.ryanc.halo.cache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.Date;
@@ -35,6 +36,15 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
      */
     abstract void putInternal(@NonNull K key, @NonNull CacheWrapper<V> cacheWrapper);
 
+    /**
+     * Puts the cache wrapper if the key is absent.
+     *
+     * @param key          key must not be null
+     * @param cacheWrapper cache wrapper must not be null
+     * @return true if the key is absent and the value is set, false if the key is present before, or null if any other reason
+     */
+    abstract Boolean putInternalIfAbsent(@NonNull K key, @NonNull CacheWrapper<V> cacheWrapper);
+
     @Override
     public Optional<V> get(K key) {
         Assert.notNull(key, "Cache key must not be blank");
@@ -60,20 +70,47 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
 
     @Override
     public void put(K key, V value, long timeout, TimeUnit timeUnit) {
-        Assert.notNull(key, "Cache key must not be blank");
-        Assert.notNull(value, "Cache value must not be null");
-        Assert.isTrue(timeout > 0, "Cache expiration timeout must not be less than 1");
-        Assert.notNull(timeUnit, "Time unit must not be null");
+        putInternal(key, buildCacheWrapper(value, timeout, timeUnit));
+    }
 
-        // Handle expiration
+    @Override
+    public Boolean putIfAbsent(K key, V value, long timeout, TimeUnit timeUnit) {
+        return putInternalIfAbsent(key, buildCacheWrapper(value, timeout, timeUnit));
+    }
+
+    @Override
+    public void put(K key, V value) {
+        putInternal(key, buildCacheWrapper(value, 0, null));
+    }
+
+    /**
+     * Builds cache wrapper.
+     *
+     * @param value    cache value must not be null
+     * @param timeout  the key expiry time, if the expiry time is less than 1, the cache won't be expired
+     * @param timeUnit timeout unit must
+     * @return cache wrapper
+     */
+    @NonNull
+    private CacheWrapper<V> buildCacheWrapper(@NonNull V value, long timeout, @Nullable TimeUnit timeUnit) {
+        Assert.notNull(value, "Cache value must not be null");
+        Assert.isTrue(timeout >= 0, "Cache expiration timeout must not be less than 1");
+
         Date now = cc.ryanc.halo.utils.DateUtils.now();
 
-        long millis = timeUnit.toMillis(timeout);
-        if (millis <= 0) {
-            millis = 1L;
+        Date expireAt = null;
+
+        if (timeout > 0 && timeUnit != null) {
+            // Handle expiration
+            long millis = timeUnit.toMillis(timeout);
+            if (millis <= 0) {
+                millis = 1L;
+            }
+
+            // Calc the expiry time
+            expireAt = DateUtils.addMilliseconds(now, Long.valueOf(millis).intValue());
         }
 
-        Date expireAt = DateUtils.addMilliseconds(now, Long.valueOf(millis).intValue());
 
         // Build cache wrapper
         CacheWrapper<V> cacheWrapper = new CacheWrapper<>();
@@ -81,24 +118,6 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
         cacheWrapper.setExpireAt(expireAt);
         cacheWrapper.setData(value);
 
-        putInternal(key, cacheWrapper);
-    }
-
-    @Override
-    public void put(K key, V value) {
-        Assert.notNull(key, "Cache key must not be blank");
-        Assert.notNull(value, "Cache value must not be null");
-
-        // Get current time
-        Date now = cc.ryanc.halo.utils.DateUtils.now();
-
-        // Build cache wrapper
-        CacheWrapper<V> cacheWrapper = new CacheWrapper<>();
-        cacheWrapper.setCreateAt(now);
-        cacheWrapper.setExpireAt(null);
-        cacheWrapper.setData(value);
-
-        putInternal(key, cacheWrapper);
-
+        return cacheWrapper;
     }
 }
