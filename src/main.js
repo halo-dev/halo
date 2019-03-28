@@ -3,7 +3,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store/'
-import { VueAxios } from '@/utils/request' // axios 不建议引入到 Vue 原型链上
+import './logger'
 
 import './core/use'
 import bootstrap from './core/bootstrap'
@@ -12,7 +12,7 @@ import '@/utils/filter' // global filter
 
 Vue.config.productionTip = false
 
-Vue.use(VueAxios, router)
+Vue.use(router)
 
 new Vue({
   router,
