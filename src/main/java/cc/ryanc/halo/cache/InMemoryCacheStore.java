@@ -1,31 +1,46 @@
 package cc.ryanc.halo.cache;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
+
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * In-memory cache store.
  *
  * @author johnniang
  */
+@Slf4j
 public class InMemoryCacheStore extends StringCacheStore {
 
-    private final static ConcurrentHashMap<String, String> cacheContainer = new ConcurrentHashMap<>();
+    /**
+     * Cache container.
+     */
+    private final static ConcurrentHashMap<String, CacheWrapper<String>> cacheContainer = new ConcurrentHashMap<>();
 
     @Override
-    public Optional<String> get(String key) {
+    Optional<CacheWrapper<String>> getInternal(String key) {
+        Assert.hasText(key, "Cache key must not be blank");
+
         return Optional.ofNullable(cacheContainer.get(key));
     }
 
     @Override
-    public void put(String key, String value, long timeout, TimeUnit timeUnit) {
-        cacheContainer.put(key, value);
+    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+        Assert.hasText(key, "Cache key must not be blank");
+        Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
+
+        // Put the cache wrapper
+        CacheWrapper<String> putCacheWrapper = cacheContainer.put(key, cacheWrapper);
+
+        log.debug("Put cache wrapper: [{}]", putCacheWrapper);
     }
 
     @Override
     public void delete(String key) {
-        // TODO Consider to delete the cache periodic
+        Assert.hasText(key, "Cache key must not be blank");
+
         cacheContainer.remove(key);
     }
 }
