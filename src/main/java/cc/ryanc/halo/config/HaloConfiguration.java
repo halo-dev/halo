@@ -82,6 +82,9 @@ public class HaloConfiguration {
                                                                                        ObjectMapper objectMapper,
                                                                                        StringCacheStore cacheStore) {
         AdminAuthenticationFilter adminFilter = new AdminAuthenticationFilter(cacheStore, "/admin/api/login");
+        // Set auth enabled
+        adminFilter.setAuthEnabled(haloProperties.getAuthEnabled());
+
         // Set failure handler
         adminFilter.setFailureHandler(new AdminAuthenticationFailureHandler(haloProperties.getProductionEnv(), objectMapper));
 
