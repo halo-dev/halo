@@ -10,6 +10,7 @@ import com.UpYun;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ import java.util.Objects;
  * @date 3/27/19
  */
 @Slf4j
+@Component
 public class UpYunFileHandler implements FileHandler {
 
     private final OptionService optionService;
