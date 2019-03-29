@@ -2,12 +2,17 @@ package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.CommentOutputDTO;
 import cc.ryanc.halo.model.entity.Comment;
+import cc.ryanc.halo.model.entity.User;
+import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.params.CommentParam;
 import cc.ryanc.halo.model.vo.CommentListVO;
+import cc.ryanc.halo.security.authentication.Authentication;
+import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.PostService;
+import cc.ryanc.halo.utils.ValidationUtils;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,6 +63,19 @@ public class CommentController {
 
     @PostMapping
     public CommentOutputDTO createBy(@Valid @RequestBody CommentParam commentParam, HttpServletRequest request) {
+        // Get authentication
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            User user = authentication.getDetail().getUser();
+            // If the admin is login
+            commentParam.setAuthor(user.getNickname());
+            commentParam.setEmail(user.getEmail());
+            commentParam.setAuthor(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
+        }
+
+        // Validate the comment param manually
+        ValidationUtils.validate(commentParam);
+
         // Check post id
         postService.mustExistById(commentParam.getPostId());
 

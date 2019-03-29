@@ -3,10 +3,12 @@ package cc.ryanc.halo.security.handler;
 import cc.ryanc.halo.exception.HaloException;
 import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.utils.ExceptionUtils;
+import cc.ryanc.halo.utils.JsonUtils;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,14 +24,11 @@ import java.io.IOException;
 @Slf4j
 public class DefaultAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-    private final boolean productionEnv;
+    private boolean productionEnv = true;
 
-    private final ObjectMapper objectMapper;
+    private ObjectMapper objectMapper = JsonUtils.DEFAULT_JSON_MAPPER;
 
-    public DefaultAuthenticationFailureHandler(boolean productionEnv,
-                                               ObjectMapper objectMapper) {
-        this.productionEnv = productionEnv;
-        this.objectMapper = objectMapper;
+    public DefaultAuthenticationFailureHandler() {
     }
 
     @Override
@@ -52,4 +51,21 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
         response.getWriter().write(objectMapper.writeValueAsString(errorDetail));
     }
 
+    /**
+     * Sets custom object mapper.
+     *
+     * @param objectMapper object mapper
+     * @return current authentication failure handler
+     */
+    public DefaultAuthenticationFailureHandler setObjectMapper(ObjectMapper objectMapper) {
+        Assert.notNull(objectMapper, "Object mapper must not be null");
+
+        this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public DefaultAuthenticationFailureHandler setProductionEnv(boolean productionEnv) {
+        this.productionEnv = productionEnv;
+        return this;
+    }
 }

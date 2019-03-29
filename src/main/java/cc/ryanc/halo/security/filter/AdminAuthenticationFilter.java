@@ -1,12 +1,14 @@
 package cc.ryanc.halo.security.filter;
 
 import cc.ryanc.halo.cache.StringCacheStore;
+import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.exception.AuthenticationException;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.security.authentication.AuthenticationImpl;
 import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.security.context.SecurityContextImpl;
 import cc.ryanc.halo.security.handler.AuthenticationFailureHandler;
+import cc.ryanc.halo.security.handler.DefaultAuthenticationFailureHandler;
 import cc.ryanc.halo.security.support.UserDetail;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.JsonUtils;
@@ -49,30 +51,29 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private AuthenticationFailureHandler failureHandler;
 
-    /**
-     * Authentication enabled.
-     */
-    private boolean authEnabled = true;
+    private final HaloProperties haloProperties;
 
     private final StringCacheStore cacheStore;
 
     private final UserService userService;
 
-    private final Collection<String> excludeUrlPatterns;
-
     private final AntPathMatcher antPathMatcher;
 
-    public AdminAuthenticationFilter(StringCacheStore cacheStore, UserService userService, String... excludeUrls) {
+    private Collection<String> excludeUrlPatterns;
+
+    public AdminAuthenticationFilter(StringCacheStore cacheStore,
+                                     UserService userService,
+                                     HaloProperties haloProperties) {
         this.cacheStore = cacheStore;
         this.userService = userService;
-        this.excludeUrlPatterns = excludeUrls == null ? Collections.emptyList() : Collections.unmodifiableCollection(Arrays.asList(excludeUrls));
+        this.haloProperties = haloProperties;
         antPathMatcher = new AntPathMatcher();
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (!authEnabled) {
+        if (!haloProperties.getAuthEnabled()) {
             List<User> users = userService.listAll();
             if (!users.isEmpty()) {
                 // Set security context
@@ -93,7 +94,7 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
             Optional<String> userDetailOptional = cacheStore.get(token);
 
             if (!userDetailOptional.isPresent()) {
-                failureHandler.onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
+                getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
                 return;
             }
 
@@ -120,7 +121,7 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        failureHandler.onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
+        getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
     }
 
     @Override
@@ -128,12 +129,39 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
         return excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, request.getServletPath()));
     }
 
-    public void setFailureHandler(AuthenticationFailureHandler failureHandler) {
-        this.failureHandler = failureHandler;
+    /**
+     * Gets authentication failure handler. (Default: @DefaultAuthenticationFailureHandler)
+     *
+     * @return authentication failure handler
+     */
+    public AuthenticationFailureHandler getFailureHandler() {
+        if (failureHandler == null) {
+            synchronized (this) {
+                // Create default authentication failure handler
+                failureHandler = new DefaultAuthenticationFailureHandler().setProductionEnv(haloProperties.getProductionEnv());
+            }
+        }
+        return failureHandler;
     }
 
-    public void setAuthEnabled(boolean authEnabled) {
-        this.authEnabled = authEnabled;
+    /**
+     * Sets authentication failure handler.
+     *
+     * @param failureHandler authentication failure handler
+     */
+    public AdminAuthenticationFilter setFailureHandler(AuthenticationFailureHandler failureHandler) {
+        this.failureHandler = failureHandler;
+        return this;
+    }
+
+    /**
+     * Set exclude url patterns.
+     *
+     * @param excludeUrls exclude urls
+     */
+    public AdminAuthenticationFilter setExcludeUrlPatterns(String... excludeUrls) {
+        this.excludeUrlPatterns = excludeUrls == null ? Collections.emptyList() : Collections.unmodifiableCollection(Arrays.asList(excludeUrls));
+        return this;
     }
 
     /**
