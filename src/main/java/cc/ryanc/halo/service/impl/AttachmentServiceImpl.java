@@ -60,6 +60,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
         AttachmentType attachmentType = getAttachmentType();
 
+        log.debug("Starting uploading... type: [{}], file: [{}]", attachmentType, file.getOriginalFilename());
+
         // Upload file
         UploadResult uploadResult = fileHandlers.upload(file, attachmentType);
 
@@ -105,6 +107,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
      */
     @NonNull
     private AttachmentType getAttachmentType() {
-        return optionService.getEnumByPropertyOrDefault(BlogProperties.ATTACHMENT_TYPE, AttachmentType.class, AttachmentType.LOCAL);
+        return optionService.getValueEnumByPropertyOrDefault(BlogProperties.ATTACHMENT_TYPE, Integer.class, AttachmentType.class, AttachmentType.LOCAL);
     }
 }

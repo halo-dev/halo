@@ -84,7 +84,7 @@ public class HaloUtils {
         Assert.hasText(pluralLabel, "Plural label must not be blank");
 
         if (times <= 0) {
-            return "no " + label;
+            return "no " + pluralLabel;
         }
 
         if (times == 1) {
@@ -219,7 +219,6 @@ public class HaloUtils {
     public static Date getCreateTime(String srcPath) {
         try {
             BasicFileAttributes basicFileAttributes = Files.readAttributes(Paths.get(srcPath), BasicFileAttributes.class);
-            basicFileAttributes.creationTime().toMillis();
             return new Date(basicFileAttributes.creationTime().toMillis());
         } catch (IOException e) {
             throw new RuntimeException("Failed to open the " + srcPath + " file", e);
@@ -269,23 +268,6 @@ public class HaloUtils {
                 fileWriter.close();
             }
         }
-    }
-
-    /**
-     * 配置邮件
-     *
-     * @param smtpHost smtpHost
-     * @param userName 邮件地址
-     * @param password password
-     */
-    public static void configMail(String smtpHost, String userName, String password) {
-        Assert.hasText(smtpHost, "SMTP host config must not be blank");
-        Assert.hasText(userName, "Email username must not be blank");
-        Assert.hasText(password, "Email password must not be blank");
-
-        final Properties properties = OhMyEmail.defaultConfig(false);
-        properties.setProperty("mail.smtp.host", smtpHost);
-        OhMyEmail.config(properties, userName, password);
     }
 
     /**

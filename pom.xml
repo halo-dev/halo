@@ -48,6 +48,7 @@
         <thumbnailator.version>0.4.8</thumbnailator.version>
         <commonmark.version>0.12.1</commonmark.version>
         <commons-lang3.version>3.8.1</commons-lang3.version>
+        <httpclient.version>4.5.7</httpclient.version>
     </properties>
 
     <dependencies>
@@ -142,11 +143,6 @@
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-http</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
             <artifactId>hutool-crypto</artifactId>
             <version>${hutool.version}</version>
         </dependency>
@@ -223,6 +219,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
         </dependency>
 
     </dependencies>

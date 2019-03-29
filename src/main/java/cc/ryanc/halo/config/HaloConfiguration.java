@@ -10,13 +10,22 @@ import cc.ryanc.halo.security.filter.ApiAuthenticationFilter;
 import cc.ryanc.halo.security.handler.AdminAuthenticationFailureHandler;
 import cc.ryanc.halo.security.handler.DefaultAuthenticationFailureHandler;
 import cc.ryanc.halo.service.UserService;
+import cc.ryanc.halo.utils.HttpClientUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.web.client.RestTemplate;
+
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Halo configuration.
@@ -26,6 +35,21 @@ import org.springframework.core.Ordered;
 @Configuration
 @EnableConfigurationProperties(HaloProperties.class)
 public class HaloConfiguration {
+
+    private final static int TIMEOUT = 5000;
+
+    @Bean
+    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+        builder.failOnEmptyBeans(false);
+        return builder.build();
+    }
+
+    @Bean
+    public RestTemplate httpsRestTemplate(RestTemplateBuilder builder) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        RestTemplate httpsRestTemplate = builder.build();
+        httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(TIMEOUT)));
+        return httpsRestTemplate;
+    }
 
     @Bean
     @ConditionalOnMissingBean
