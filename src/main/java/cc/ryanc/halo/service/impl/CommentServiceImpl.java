@@ -11,6 +11,8 @@ import cc.ryanc.halo.model.vo.CommentListVO;
 import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.repository.CommentRepository;
 import cc.ryanc.halo.repository.PostRepository;
+import cc.ryanc.halo.security.authentication.Authentication;
+import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
@@ -110,7 +112,12 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         comment.setIpAddress(ServletUtil.getClientIP(request));
         comment.setUserAgent(ServletUtil.getHeaderIgnoreCase(request, HttpHeaders.USER_AGENT));
         // TODO Check user login status and set this field
-        comment.setIsAdmin(false);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            // If the user is login
+            comment.setIsAdmin(true);
+        }
+
         comment.setAuthor(HtmlUtils.htmlEscape(comment.getAuthor()));
         comment.setGavatarMd5(SecureUtil.md5(comment.getEmail()));
 
