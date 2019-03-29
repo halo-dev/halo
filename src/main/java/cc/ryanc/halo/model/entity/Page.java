@@ -12,7 +12,7 @@ import javax.persistence.Entity;
  * @author johnniang
  * @date 3/22/19
  */
-@Entity(name = "page")
+@Entity(name = "Page")
 @Where(clause = "deleted = false")
 @SQLDelete(sql = "update posts set deleted = true where id = ?")
 @DiscriminatorValue("1")

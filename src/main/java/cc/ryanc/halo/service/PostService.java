@@ -4,7 +4,6 @@ import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
-import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.service.base.CrudService;
@@ -131,4 +130,18 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     PostDetailVO getDetailVoBy(@NonNull Integer postId);
+
+    /**
+     * Counts visit total number.
+     *
+     * @return visit total number
+     */
+    long countVisit();
+
+    /**
+     * Counts like total number.
+     *
+     * @return like total number
+     */
+    long countLike();
 }

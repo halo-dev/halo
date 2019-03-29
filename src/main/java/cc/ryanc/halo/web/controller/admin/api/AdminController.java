@@ -38,16 +38,20 @@ public class AdminController {
 
     private final UserService userService;
 
+    private final LinkService linkService;
+
     public AdminController(PostService postService,
                            AttachmentService attachmentService,
                            CommentService commentService,
                            OptionService optionService,
-                           UserService userService) {
+                           UserService userService,
+                           LinkService linkService) {
         this.postService = postService;
         this.attachmentService = attachmentService;
         this.commentService = commentService;
         this.optionService = optionService;
         this.userService = userService;
+        this.linkService = linkService;
     }
 
     @GetMapping("counts")
@@ -58,6 +62,9 @@ public class AdminController {
         countOutputDTO.setAttachmentCount(attachmentService.count());
         countOutputDTO.setCommentCount(commentService.count());
         countOutputDTO.setEstablishDays(Long.valueOf(optionService.getByProperty(BlogProperties.WIDGET_DAYCOUNT).orElse("0")));
+        countOutputDTO.setLinkCount(linkService.count());
+        countOutputDTO.setVisitCount(postService.countVisit());
+        countOutputDTO.setLikeCount(postService.countLike());
         return countOutputDTO;
     }
 
