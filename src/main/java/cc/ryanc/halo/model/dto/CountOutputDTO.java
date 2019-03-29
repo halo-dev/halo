@@ -11,11 +11,17 @@ import lombok.Data;
 @Data
 public class CountOutputDTO {
 
-    private Long postCount;
+    private long postCount;
 
-    private Long commentCount;
+    private long commentCount;
 
-    private Long attachmentCount;
+    private long attachmentCount;
 
-    private Long establishDays;
+    private long establishDays;
+
+    private long linkCount;
+
+    private long visitCount;
+
+    private long likeCount;
 }

@@ -11,7 +11,7 @@ import javax.persistence.Entity;
  *
  * @author johnniang
  */
-@Entity(name = "post")
+@Entity(name = "Post")
 @SQLDelete(sql = "update posts set deleted = true where id = ?")
 @Where(clause = "deleted = false")
 @DiscriminatorValue(value = "0")

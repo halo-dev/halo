@@ -8,7 +8,6 @@ import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.*;
 import cc.ryanc.halo.model.enums.PostStatus;
-import cc.ryanc.halo.model.enums.PostType;
 import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.repository.PostRepository;
@@ -245,6 +244,16 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
+    public long countVisit() {
+        return Optional.ofNullable(postRepository.countVisit()).orElse(0L);
+    }
+
+    @Override
+    public long countLike() {
+        return Optional.ofNullable(postRepository.countLike()).orElse(0L);
+    }
+
+    @Override
     @Transactional
     public Post removeById(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
@@ -254,7 +263,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         // Remove post tags
         List<PostTag> postTags = postTagService.removeByPostId(postId);
 
-        log.debug("Removd post tags: [{}]", postTags);
+        log.debug("Removed post tags: [{}]", postTags);
 
         // Remove post categories
         List<PostCategory> postCategories = postCategoryService.removeByPostId(postId);
