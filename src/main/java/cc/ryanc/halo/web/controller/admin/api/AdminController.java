@@ -1,13 +1,17 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.cache.lock.CacheLock;
+import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.model.dto.CountOutputDTO;
 import cc.ryanc.halo.model.dto.UserOutputDTO;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.params.LoginParam;
+import cc.ryanc.halo.security.context.SecurityContextHolder;
+import cc.ryanc.halo.security.filter.AdminAuthenticationFilter;
 import cc.ryanc.halo.service.*;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +23,7 @@ import javax.validation.Valid;
  * @author johnniang
  * @date 3/19/19
  */
+@Slf4j
 @RestController
 @RequestMapping("/admin/api")
 public class AdminController {
@@ -61,5 +66,21 @@ public class AdminController {
     @CacheLock(autoDelete = false, traceRequest = true)
     public UserOutputDTO login(@Valid @RequestBody LoginParam loginParam, HttpServletRequest request) {
         return new UserOutputDTO().convertFrom(userService.login(loginParam.getUsername(), loginParam.getPassword(), request.getSession()));
+    }
+
+    @PostMapping("logout")
+    @ApiOperation("Logs out (Clear session)")
+    @CacheLock
+    public void logout(HttpServletRequest request) {
+        // Check if the current is logging in
+        boolean authenticated = SecurityContextHolder.getContext().isAuthenticated();
+
+        if (!authenticated) {
+            throw new BadRequestException("You haven't logged in yet, so you can't log out");
+        }
+
+        request.getSession().removeAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY);
+
+        log.info("You have been logged out, Welcome to you next time!");
     }
 }

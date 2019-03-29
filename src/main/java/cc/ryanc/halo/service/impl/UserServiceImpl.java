@@ -84,7 +84,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         Assert.notNull(httpSession, "Http session must not be null");
 
         // Check login status
-        if (SecurityContextHolder.getContext().isAuthenticate()) {
+        if (SecurityContextHolder.getContext().isAuthenticated()) {
             throw new BadRequestException("You have logged in already, no need to log in again");
         }
 
