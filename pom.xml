@@ -129,12 +129,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- EhCache -->
-        <dependency>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-        </dependency>
-
         <!-- Hutool tool pack -->
         <dependency>
             <groupId>cn.hutool</groupId>
