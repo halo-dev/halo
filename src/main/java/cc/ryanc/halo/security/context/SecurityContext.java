@@ -24,4 +24,13 @@ public interface SecurityContext {
      * @param authentication the new authentication or null if no further authentication should not be stored
      */
     void setAuthentication(@Nullable Authentication authentication);
+
+    /**
+     * Check if the current context has authenticated or not.
+     *
+     * @return true if authenticate; false otherwise
+     */
+    default boolean isAuthenticate() {
+        return getAuthentication() != null;
+    }
 }

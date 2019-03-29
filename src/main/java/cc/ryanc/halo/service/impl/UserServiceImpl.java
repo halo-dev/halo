@@ -6,11 +6,13 @@ import cc.ryanc.halo.exception.NotFoundException;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.repository.UserRepository;
+import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.security.filter.AdminAuthenticationFilter;
 import cc.ryanc.halo.security.support.UserDetail;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.DateUtils;
+import cc.ryanc.halo.utils.HaloUtils;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.BCrypt;
 import org.springframework.lang.NonNull;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -80,24 +83,32 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         Assert.hasText(password, "Password must not be blank");
         Assert.notNull(httpSession, "Http session must not be null");
 
+        // Check login status
+        if (SecurityContextHolder.getContext().isAuthenticate()) {
+            throw new BadRequestException("You have logged in already, no need to log in again");
+        }
+
         // Ger user by username
         User user = Validator.isEmail(key) ? getByEmailOfNonNull(key) : getByUsernameOfNonNull(key);
 
+        Date now = DateUtils.now();
+
         // Check expiration
-        if (user.getExpireTime() != null && DateUtils.now().before(user.getExpireTime())) {
+        if (user.getExpireTime() != null && user.getExpireTime().after(now)) {
+            long seconds = TimeUnit.MINUTES.toSeconds(user.getExpireTime().getTime() - now.getTime());
             // If expired
-            throw new BadRequestException("账号已被禁止登陆，请 " + LOCK_MINUTES + " 分钟后再试");
+            throw new BadRequestException("You have been temporarily disabled，please try again " + seconds + " second(s) later").setErrorData(seconds);
         }
 
 
         if (!BCrypt.checkpw(password, user.getPassword())) {
-            // If the password is mismatched
+            // If the password is mismatch
             // Add login failure count
             Integer loginFailureCount = stringCacheStore.get(LOGIN_FAILURE_COUNT_KEY).map(Integer::valueOf).orElse(0);
 
-            if (loginFailureCount >= MAX_LOGIN_TRY) {
+            if (loginFailureCount >= MAX_LOGIN_TRY - 1) {
                 // Set expiration
-                user.setExpireTime(org.apache.commons.lang3.time.DateUtils.addMilliseconds(DateUtils.now(), LOCK_MINUTES));
+                user.setExpireTime(org.apache.commons.lang3.time.DateUtils.addMinutes(now, LOCK_MINUTES));
                 // Update user
                 update(user);
             }
@@ -106,8 +117,15 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
             stringCacheStore.put(LOGIN_FAILURE_COUNT_KEY, loginFailureCount.toString(), LOCK_MINUTES, TimeUnit.MINUTES);
 
-            throw new BadRequestException("账号或者密码错误，您还有" + (MAX_LOGIN_TRY - loginFailureCount) + "次机会");
+            int remainder = MAX_LOGIN_TRY - loginFailureCount;
+
+            String errorMessage = String.format("Username or password incorrect, you%shave %s", remainder <= 0 ? "" : " still ", HaloUtils.pluralize(remainder, "chance", "chances"));
+
+            throw new BadRequestException(errorMessage);
         }
+
+        // Clear the login failure count cache
+        stringCacheStore.delete(LOGIN_FAILURE_COUNT_KEY);
 
         // Set session
         httpSession.setAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY, new UserDetail(user));
