@@ -1,32 +1,22 @@
 <template>
   <div class="user-wrapper">
-    <a href="https://pro.loacg.com/docs/getting-started" target="_blank">
+    <a href="/" target="_blank">
       <span class="action">
-        <a-icon type="question-circle-o"></a-icon>
+        <a-icon type="link"></a-icon>
       </span>
     </a>
     <header-notice class="action"/>
     <a-dropdown>
       <span class="action ant-dropdown-link user-dropdown-menu">
-        <a-avatar class="avatar" size="small" :src="avatar()"/>
-        <span>{{ nickname() }}</span>
+        <a-avatar class="avatar" size="small" :src="avatar"/>
+        <span>RYAN0UP</span>
       </span>
       <a-menu slot="overlay" class="user-dropdown-menu-wrapper">
         <a-menu-item key="0">
-          <router-link :to="{ name: 'center' }">
+          <router-link :to="{ name: 'Profile' }">
             <a-icon type="user"/>
-            <span>个人中心</span>
+            <span>个人资料</span>
           </router-link>
-        </a-menu-item>
-        <a-menu-item key="1">
-          <router-link :to="{ name: 'settings' }">
-            <a-icon type="setting"/>
-            <span>账户设置</span>
-          </router-link>
-        </a-menu-item>
-        <a-menu-item key="2" disabled>
-          <a-icon type="setting"/>
-          <span>测试</span>
         </a-menu-item>
         <a-menu-divider/>
         <a-menu-item key="3">
@@ -49,6 +39,11 @@ export default {
   components: {
     HeaderNotice
   },
+  data() {
+    return {
+      avatar: 'https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm'
+    }
+  },
   methods: {
     ...mapActions(['Logout']),
     ...mapGetters(['nickname', 'avatar']),
@@ -59,17 +54,19 @@ export default {
         title: '提示',
         content: '真的要注销登录吗 ?',
         onOk() {
-          return that.Logout({}).then(() => {
-            window.location.reload()
-          }).catch(err => {
-            that.$message.error({
-              title: '错误',
-              description: err.message
+          return that
+            .Logout({})
+            .then(() => {
+              window.location.reload()
             })
-          })
+            .catch(err => {
+              that.$message.error({
+                title: '错误',
+                description: err.message
+              })
+            })
         },
-        onCancel() {
-        }
+        onCancel() {}
       })
     }
   }
