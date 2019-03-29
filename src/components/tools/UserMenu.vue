@@ -5,11 +5,15 @@
         <a-icon type="link"></a-icon>
       </span>
     </a>
-    <header-notice class="action"/>
+    <a href="javascript:void(0)" @click="showOptionModal">
+      <span class="action">
+        <a-icon type="setting"></a-icon>
+      </span>
+    </a>
+    <header-comment class="action"/>
     <a-dropdown>
       <span class="action ant-dropdown-link user-dropdown-menu">
         <a-avatar class="avatar" size="small" :src="avatar"/>
-        <span>RYAN0UP</span>
       </span>
       <a-menu slot="overlay" class="user-dropdown-menu-wrapper">
         <a-menu-item key="0">
@@ -27,20 +31,24 @@
         </a-menu-item>
       </a-menu>
     </a-dropdown>
+    <a-modal title="样式设置" v-model="optionVisible">
+
+    </a-modal>
   </div>
 </template>
 
 <script>
-import HeaderNotice from './HeaderNotice'
+import HeaderComment from './HeaderComment'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'UserMenu',
   components: {
-    HeaderNotice
+    HeaderComment
   },
   data() {
     return {
+      optionVisible: false,
       avatar: 'https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm'
     }
   },
@@ -68,6 +76,9 @@ export default {
         },
         onCancel() {}
       })
+    },
+    showOptionModal() {
+      this.optionVisible = true
     }
   }
 }
