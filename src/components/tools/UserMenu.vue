@@ -47,12 +47,12 @@ export default {
   data() {
     return {
       optionVisible: false,
-      avatar: 'https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm'
+      avatar: 'https://gravatar.loli.net/avatar/?s=256&d=mm'
     }
   },
   methods: {
     ...mapActions(['Logout']),
-    ...mapGetters(['nickname', 'avatar']),
+    ...mapGetters(['nickname']),
     handleLogout() {
       const that = this
 

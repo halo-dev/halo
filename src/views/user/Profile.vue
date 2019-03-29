@@ -5,7 +5,7 @@
         <a-card :bordered="false">
           <div class="profile-center-avatarHolder">
             <div class="avatar">
-              <img :src="user.avatar" />
+              <img :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'" />
             </div>
             <div class="username"> {{ user.nickname }} </div>
             <div class="bio"> {{ user.description }} </div>
@@ -38,7 +38,7 @@
         </a-card>
       </a-col>
       <a-col :md="24" :lg="14">
-        <a-card :bordered="false" title="个人资料" :loading="profileLoading">
+        <a-card :bordered="false" title="个人资料" :bodyStyle="{ padding: '0' }">
           <div class="card-container">
             <a-tabs type="card">
               <a-tab-pane tab="基本资料" key="1">
@@ -92,10 +92,8 @@ export default {
   data() {
     return {
       countsLoading: true,
-      profileLoading: true,
       user: [],
-      counts: [],
-      avatar: 'https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm'
+      counts: []
     }
   },
   mounted() {
