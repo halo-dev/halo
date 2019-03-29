@@ -38,6 +38,30 @@ import java.util.UUID;
 public class HaloUtils {
 
     /**
+     * Pluralize the time label format.
+     *
+     * @param time        time
+     * @param label       label
+     * @param pluralLabel plural label
+     * @return pluralized format
+     */
+    @NonNull
+    public static String pluralize(long time, @NonNull String label, @NonNull String pluralLabel) {
+        Assert.hasText(label, "Label must not be blank");
+        Assert.hasText(pluralLabel, "Plural label must not be blank");
+
+        if (time <= 0) {
+            return "no " + label;
+        }
+
+        if (time == 1) {
+            return time + " " + label;
+        }
+
+        return time + " " + pluralLabel;
+    }
+
+    /**
      * Gets random uuid without dash.
      *
      * @return random uuid without dash
