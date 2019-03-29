@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.util.Optional;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -18,6 +19,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class InMemoryCacheStore extends StringCacheStore {
 
     /**
+     * Cleaner schedule period. (ms)
+     */
+    private final static long PERIOD = 60 * 1000;
+
+    /**
      * Cache container.
      */
     private final static ConcurrentHashMap<String, CacheWrapper<String>> cacheContainer = new ConcurrentHashMap<>();
@@ -26,6 +32,11 @@ public class InMemoryCacheStore extends StringCacheStore {
      * Lock.
      */
     private Lock lock = new ReentrantLock();
+
+    public InMemoryCacheStore() {
+        // Run a cache store cleaner
+        new Timer().scheduleAtFixedRate(new CacheExpiryCleaner(), 0, PERIOD);
+    }
 
     @Override
     Optional<CacheWrapper<String>> getInternal(String key) {
@@ -79,17 +90,18 @@ public class InMemoryCacheStore extends StringCacheStore {
     }
 
     /**
-     * Cache store cleaner.
+     * Cache cleaner.
      *
      * @author johnniang
      * @date 03/28/19
      */
-    private class CacheStoreCleaner extends TimerTask {
+    private class CacheExpiryCleaner extends TimerTask {
 
         @Override
         public void run() {
-
+            log.trace("Cache clean task is cleaning");
             cacheContainer.keySet().forEach(InMemoryCacheStore.this::get);
+            log.trace("Cache lean task cleaned");
         }
     }
 }
