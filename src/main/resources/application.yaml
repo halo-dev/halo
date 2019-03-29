@@ -44,10 +44,6 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  cache:
-    type: ehcache
-    ehcache:
-      config: classpath:ehcache.xml
 logging:
   level:
     cc.ryanc.halo: INFO

@@ -3,7 +3,6 @@ package cc.ryanc.halo;
 import cc.ryanc.halo.repository.base.BaseRepositoryImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -17,7 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @date : 2017/11/14
  */
 @SpringBootApplication
-@EnableCaching
 @EnableJpaAuditing
 @EnableScheduling
 @EnableJpaRepositories(basePackages = {"cc.ryanc.halo.repository"}, repositoryBaseClass = BaseRepositoryImpl.class)
