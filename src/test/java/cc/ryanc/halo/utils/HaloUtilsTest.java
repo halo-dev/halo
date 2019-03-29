@@ -17,6 +17,47 @@ import static org.junit.Assert.assertThat;
 public class HaloUtilsTest {
 
     @Test
+    public void timeFormatTest() {
+        long seconds = 0;
+        String timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("0 second"));
+
+        seconds = -1;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("0 second"));
+
+        seconds = 30;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("30 seconds"));
+
+        seconds = 60;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("1 minute"));
+
+        seconds = 120;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("2 minutes"));
+
+        seconds = 3600;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("1 hour"));
+
+        seconds = 7200;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("2 hours"));
+
+        seconds = 7200 + 30;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("2 hours, 30 seconds"));
+
+        seconds = 7200 + 60 + 30;
+        timeFormat = HaloUtils.timeFormat(seconds);
+        assertThat(timeFormat, equalTo("2 hours, 1 minute, 30 seconds"));
+
+
+    }
+
+    @Test
     public void pluralizeTest() {
 
         String label = "chance";

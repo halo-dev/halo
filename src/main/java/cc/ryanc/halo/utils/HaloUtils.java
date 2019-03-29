@@ -16,12 +16,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
@@ -37,28 +33,65 @@ import java.util.UUID;
 @Slf4j
 public class HaloUtils {
 
+
+    @NonNull
+    public static String timeFormat(long totalSeconds) {
+        if (totalSeconds <= 0) {
+            return "0 second";
+        }
+
+        StringBuilder timeBuilder = new StringBuilder();
+
+        long hours = totalSeconds / 3600;
+        long minutes = totalSeconds % 3600 / 60;
+        long seconds = totalSeconds % 3600 % 60;
+
+        if (hours > 0) {
+            if (StringUtils.isNotBlank(timeBuilder)) {
+                timeBuilder.append(", ");
+            }
+            timeBuilder.append(pluralize(hours, "hour", "hours"));
+        }
+
+        if (minutes > 0) {
+            if (StringUtils.isNotBlank(timeBuilder)) {
+                timeBuilder.append(", ");
+            }
+            timeBuilder.append(pluralize(minutes, "minute", "minutes"));
+        }
+
+        if (seconds > 0) {
+            if (StringUtils.isNotBlank(timeBuilder)) {
+                timeBuilder.append(", ");
+            }
+            timeBuilder.append(pluralize(seconds, "second", "seconds"));
+        }
+
+        return timeBuilder.toString();
+    }
+
     /**
-     * Pluralize the time label format.
+     * Pluralize the times label format.
      *
-     * @param time        time
+     * @param times       times
      * @param label       label
      * @param pluralLabel plural label
      * @return pluralized format
      */
     @NonNull
-    public static String pluralize(long time, @NonNull String label, @NonNull String pluralLabel) {
+    public static String pluralize(long times, @NonNull String label, @NonNull String pluralLabel) {
         Assert.hasText(label, "Label must not be blank");
         Assert.hasText(pluralLabel, "Plural label must not be blank");
 
-        if (time <= 0) {
+        if (times <= 0) {
             return "no " + label;
         }
 
-        if (time == 1) {
-            return time + " " + label;
+        if (times == 1) {
+            return times + " " + label;
         }
 
-        return time + " " + pluralLabel;
+        return times + " " + pluralLabel;
     }
 
     /**
@@ -184,18 +217,13 @@ public class HaloUtils {
      * @return 时间
      */
     public static Date getCreateTime(String srcPath) {
-        final Path path = Paths.get(srcPath);
-        final BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
-        BasicFileAttributes attr;
         try {
-            attr = basicview.readAttributes();
-            return new Date(attr.creationTime().toMillis());
-        } catch (Exception e) {
-            e.printStackTrace();
+            BasicFileAttributes basicFileAttributes = Files.readAttributes(Paths.get(srcPath), BasicFileAttributes.class);
+            basicFileAttributes.creationTime().toMillis();
+            return new Date(basicFileAttributes.creationTime().toMillis());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to open the " + srcPath + " file", e);
         }
-        final Calendar cal = Calendar.getInstance();
-        cal.set(1970, 0, 1, 0, 0, 0);
-        return cal.getTime();
     }
 
     /**
