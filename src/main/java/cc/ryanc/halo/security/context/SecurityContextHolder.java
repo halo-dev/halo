@@ -58,6 +58,6 @@ public class SecurityContextHolder {
      */
     @NonNull
     private static SecurityContext createEmptyContext() {
-        return new SecurityContextImpl();
+        return new SecurityContextImpl(null);
     }
 }

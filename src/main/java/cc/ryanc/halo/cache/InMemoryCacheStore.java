@@ -99,9 +99,11 @@ public class InMemoryCacheStore extends StringCacheStore {
 
         @Override
         public void run() {
-            log.trace("Cache clean task is cleaning");
-            cacheContainer.keySet().forEach(InMemoryCacheStore.this::get);
-            log.trace("Cache lean task cleaned");
+            cacheContainer.keySet().forEach(key -> {
+                if (!InMemoryCacheStore.this.get(key).isPresent()) {
+                    log.debug("Deleted the cache: [{}] for expiration", key);
+                }
+            });
         }
     }
 }

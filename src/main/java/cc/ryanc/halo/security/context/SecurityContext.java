@@ -30,7 +30,7 @@ public interface SecurityContext {
      *
      * @return true if authenticate; false otherwise
      */
-    default boolean isAuthenticate() {
+    default boolean isAuthenticated() {
         return getAuthentication() != null;
     }
 }

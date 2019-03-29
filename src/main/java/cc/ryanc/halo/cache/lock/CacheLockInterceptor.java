@@ -95,6 +95,8 @@ public class CacheLockInterceptor {
 
         if (StringUtils.isNotBlank(cacheLock.prefix())) {
             cacheKeyBuilder.append(cacheLock.prefix());
+        } else {
+            cacheKeyBuilder.append(methodSignature.getMethod().toString());
         }
 
         // Handle cache lock key building
