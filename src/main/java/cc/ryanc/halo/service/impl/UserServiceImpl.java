@@ -95,11 +95,10 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
         // Check expiration
         if (user.getExpireTime() != null && user.getExpireTime().after(now)) {
-            long seconds = TimeUnit.MINUTES.toSeconds(user.getExpireTime().getTime() - now.getTime());
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(user.getExpireTime().getTime() - now.getTime());
             // If expired
-            throw new BadRequestException("You have been temporarily disabled，please try again " + seconds + " second(s) later").setErrorData(seconds);
+            throw new BadRequestException("You have been temporarily disabled，please try again " + HaloUtils.timeFormat(seconds) + " later").setErrorData(seconds);
         }
-
 
         if (!BCrypt.checkpw(password, user.getPassword())) {
             // If the password is mismatch
