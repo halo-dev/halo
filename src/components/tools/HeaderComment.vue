@@ -10,31 +10,13 @@
   >
     <template slot="content">
       <a-spin :spinning="loadding">
-        <a-list>
-          <a-list-item v-for="comment in comments" :key="comment.id">
-            <a-list-item-meta title="立个Flag，共同努力" description="一天前">
+        <a-list :dataSource="comments">
+          <a-list-item slot="renderItem" slot-scope="item">
+            <a-list-item-meta :title="item.content" :description="item.createTime">
               <a-avatar
                 style="background-color: white"
                 slot="avatar"
-                src="https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm"
-              />
-            </a-list-item-meta>
-          </a-list-item>
-          <a-list-item>
-            <a-list-item-meta title="感谢！！！非常好的博客系统" description="一天前">
-              <a-avatar
-                style="background-color: white"
-                slot="avatar"
-                src="https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm"
-              />
-            </a-list-item-meta>
-          </a-list-item>
-          <a-list-item>
-            <a-list-item-meta title="token就是P2DygQ1psV86JIag，百度验证是在百度资源平台绑定域名的时候验证用的。" description="一天前">
-              <a-avatar
-                style="background-color: white"
-                slot="avatar"
-                src="https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm"
+                :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
               />
             </a-list-item-meta>
           </a-list-item>

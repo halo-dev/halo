@@ -31,9 +31,7 @@
         </a-menu-item>
       </a-menu>
     </a-dropdown>
-    <a-modal title="样式设置" v-model="optionVisible">
-
-    </a-modal>
+    <a-modal title="样式设置" v-model="optionVisible"></a-modal>
   </div>
 </template>
 
