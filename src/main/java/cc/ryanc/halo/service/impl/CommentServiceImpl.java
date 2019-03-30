@@ -111,11 +111,22 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         comment.setContent(OwoUtil.parseOwo(formatContent(comment.getContent())));
         comment.setIpAddress(ServletUtil.getClientIP(request));
         comment.setUserAgent(ServletUtil.getHeaderIgnoreCase(request, HttpHeaders.USER_AGENT));
-        // TODO Check user login status and set this field
+
+
+        // Check user login status and set this field
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             // If the user is login
             comment.setIsAdmin(true);
+            comment.setStatus(CommentStatus.PUBLISHED);
+        } else {
+            // Handle comment status
+            Boolean needAudit = optionService.getByPropertyOrDefault(BlogProperties.NEW_COMMENT_NEED_CHECK, Boolean.class, true);
+            if (needAudit) {
+                comment.setStatus(CommentStatus.AUDITING);
+            } else {
+                comment.setStatus(CommentStatus.PUBLISHED);
+            }
         }
 
         comment.setAuthor(HtmlUtils.htmlEscape(comment.getAuthor()));
@@ -124,14 +135,6 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         if (StringUtils.isNotBlank(comment.getAuthorUrl())) {
             // Normalize the author url and set it
             comment.setAuthorUrl(URLUtil.normalize(comment.getAuthorUrl()));
-        }
-
-        // Handle comment status
-        Boolean needAudit = optionService.getByPropertyOrDefault(BlogProperties.NEW_COMMENT_NEED_CHECK, Boolean.class, true);
-        if (needAudit) {
-            comment.setStatus(CommentStatus.AUDITING);
-        } else {
-            comment.setStatus(CommentStatus.PUBLISHED);
         }
 
         Comment createdComment = create(comment);
