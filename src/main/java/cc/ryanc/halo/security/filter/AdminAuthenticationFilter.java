@@ -12,6 +12,7 @@ import cc.ryanc.halo.security.handler.DefaultAuthenticationFailureHandler;
 import cc.ryanc.halo.security.support.UserDetail;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.JsonUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
@@ -32,6 +33,7 @@ import java.util.*;
  *
  * @author johnniang
  */
+@Slf4j
 public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     /**
@@ -59,7 +61,15 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher antPathMatcher;
 
-    private Set<String> excludeUrlPatterns = new HashSet<>(1);
+    /**
+     * Exclude url patterns.
+     */
+    private Set<String> excludeUrlPatterns = new HashSet<>(2);
+
+    /**
+     * Try authenticating url, method patterns.
+     */
+    private Map<String, String> tryAuthUrlMethodPatterns = new HashMap<>(2);
 
     public AdminAuthenticationFilter(StringCacheStore cacheStore,
                                      UserService userService,
@@ -121,12 +131,40 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (shouldSkipAuthenticateFailure(request)) {
+            // If should skip this authentication failure
+            log.debug("Skipping authentication failure, url: [{}], method: [{}]", request.getServletPath(), request.getMethod());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        Assert.notNull(request, "Http servlet request must not be null");
+
         return excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, request.getServletPath()));
+    }
+
+    /**
+     * Should skip authentication failure.
+     *
+     * @param request http servlet request must not be null.
+     * @return true if the request should skip authentication failure; false otherwise
+     */
+    protected boolean shouldSkipAuthenticateFailure(@NonNull HttpServletRequest request) {
+        Assert.notNull(request, "Http servlet request must not be null");
+
+        for (String url : tryAuthUrlMethodPatterns.keySet()) {
+            if (antPathMatcher.match(url, request.getServletPath())
+                    && tryAuthUrlMethodPatterns.get(url).equalsIgnoreCase(request.getMethod())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -137,8 +175,13 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
     public AuthenticationFailureHandler getFailureHandler() {
         if (failureHandler == null) {
             synchronized (this) {
-                // Create default authentication failure handler
-                failureHandler = new DefaultAuthenticationFailureHandler().setProductionEnv(haloProperties.getProductionEnv());
+                if (failureHandler == null) {
+                    // Create default authentication failure handler
+                    DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
+                    failureHandler.setProductionEnv(haloProperties.getProductionEnv());
+
+                    this.failureHandler = failureHandler;
+                }
             }
         }
         return failureHandler;
@@ -149,9 +192,10 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
      *
      * @param failureHandler authentication failure handler
      */
-    public AdminAuthenticationFilter setFailureHandler(AuthenticationFailureHandler failureHandler) {
+    public void setFailureHandler(@NonNull AuthenticationFailureHandler failureHandler) {
+        Assert.notNull(failureHandler, "Authentication failure handler must not be null");
+
         this.failureHandler = failureHandler;
-        return this;
     }
 
     /**
@@ -159,11 +203,10 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
      *
      * @param excludeUrlPatterns exclude urls
      */
-    public AdminAuthenticationFilter setExcludeUrlPatterns(Collection<String> excludeUrlPatterns) {
+    public void setExcludeUrlPatterns(@NonNull Collection<String> excludeUrlPatterns) {
         Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
 
         this.excludeUrlPatterns = new HashSet<>(excludeUrlPatterns);
-        return this;
     }
 
     /**
@@ -171,11 +214,32 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
      *
      * @param excludeUrlPatterns exclude urls
      */
-    public AdminAuthenticationFilter addExcludeUrlPatterns(String... excludeUrlPatterns) {
+    public void addExcludeUrlPatterns(@NonNull String... excludeUrlPatterns) {
         Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
 
         Collections.addAll(this.excludeUrlPatterns, excludeUrlPatterns);
-        return this;
+    }
+
+    /**
+     * Gets exclude url patterns.
+     *
+     * @return exclude url patterns.
+     */
+    public Set<String> getExcludeUrlPatterns() {
+        return excludeUrlPatterns;
+    }
+
+    /**
+     * Adds try authenticating url method pattern.
+     *
+     * @param url    url must not be blank
+     * @param method method must not be blank
+     */
+    public void addTryAuthUrlMethodPattern(@NonNull String url, @NonNull String method) {
+        Assert.hasText(url, "Try authenticating url must not be blank");
+        Assert.hasText(method, "Try authenticating method must not be blank");
+
+        tryAuthUrlMethodPatterns.put(url, method);
     }
 
     /**

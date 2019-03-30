@@ -55,17 +55,19 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
      * Sets custom object mapper.
      *
      * @param objectMapper object mapper
-     * @return current authentication failure handler
      */
-    public DefaultAuthenticationFailureHandler setObjectMapper(ObjectMapper objectMapper) {
+    public void setObjectMapper(ObjectMapper objectMapper) {
         Assert.notNull(objectMapper, "Object mapper must not be null");
 
         this.objectMapper = objectMapper;
-        return this;
     }
 
-    public DefaultAuthenticationFailureHandler setProductionEnv(boolean productionEnv) {
+    /**
+     * Sets production environment.
+     *
+     * @param productionEnv production environment
+     */
+    public void setProductionEnv(boolean productionEnv) {
         this.productionEnv = productionEnv;
-        return this;
     }
 }
