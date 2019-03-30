@@ -21,16 +21,16 @@
                 累计发表了 {{ counts.postCount }} 篇文章。
               </a-list-item>
               <a-list-item>
-                累计创建了 14 个标签。
+                累计创建了 {{ counts.linkCount }} 个标签。
               </a-list-item>
               <a-list-item>
                 累计获得了 {{ counts.commentCount }} 条评论。
               </a-list-item>
               <a-list-item>
-                累计添加了 32 个友链。
+                累计添加了 {{ counts.linkCount }} 个友链。
               </a-list-item>
               <a-list-item>
-                文章总访问 1213,312 次。
+                文章总访问 {{ counts.visitCount }} 次。
               </a-list-item>
               <a-list-item> </a-list-item>
             </a-list>

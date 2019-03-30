@@ -10,7 +10,11 @@
           />
         </div>
         <div style="margin-bottom: 16px">
-          <a-input addonBefore="https://ryanc.cc/archives/" defaultValue="mysite" style="width: 360px" />
+          <a-input
+            addonBefore="https://ryanc.cc/archives/"
+            defaultValue="mysite"
+            style="width: 360px"
+          />
         </div>
 
         <div id="editor">
@@ -19,7 +23,18 @@
       </a-col>
 
       <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24">
-        this is other
+        <a-card title="发布">
+          
+        </a-card>
+        <a-card title="分类目录">
+          
+        </a-card>
+        <a-card title="标签">
+          
+        </a-card>
+        <a-card title="缩略图">
+          
+        </a-card>
       </a-col>
     </a-row>
   </div>
@@ -41,12 +56,12 @@ export default {
 }
 </script>
 <style scoped>
-  #editor {
-    margin: auto;
-    width: 100%;
-  }
+#editor {
+  margin: auto;
+  width: 100%;
+}
 
-  .v-note-wrapper{
-    z-index: 1000;
-  }
+.v-note-wrapper {
+  z-index: 1000;
+}
 </style>
