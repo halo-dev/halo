@@ -36,7 +36,7 @@ public class Comment extends BaseEntity {
     /**
      * Commentator's email.
      */
-    @Column(name = "email", columnDefinition = "varchar(255) default ''")
+    @Column(name = "email", columnDefinition = "varchar(255) not null")
     private String email;
 
     /**
@@ -107,6 +107,31 @@ public class Comment extends BaseEntity {
         if (parentId == null || parentId < 0) {
             parentId = 0L;
         }
+
+        if (ipAddress == null) {
+            ipAddress = "";
+        }
+
+        if (authorUrl == null) {
+            authorUrl = "";
+        }
+
+        if (gavatarMd5 == null) {
+            gavatarMd5 = "";
+        }
+
+        if (status == null) {
+            status = CommentStatus.AUDITING;
+        }
+
+        if (userAgent == null) {
+            userAgent = "";
+        }
+
+        if (isAdmin == null) {
+            isAdmin = false;
+        }
+
     }
 
 }
