@@ -14,13 +14,13 @@ import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.utils.ValidationUtils;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -62,15 +62,15 @@ public class CommentController {
     }
 
     @PostMapping
-    public CommentOutputDTO createBy(@Valid @RequestBody CommentParam commentParam, HttpServletRequest request) {
+    public CommentOutputDTO createBy(@RequestBody CommentParam commentParam, HttpServletRequest request) {
         // Get authentication
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             User user = authentication.getDetail().getUser();
             // If the admin is login
-            commentParam.setAuthor(user.getNickname());
+            commentParam.setAuthor(StringUtils.isEmpty(user.getNickname()) ? user.getUsername() : user.getNickname());
             commentParam.setEmail(user.getEmail());
-            commentParam.setAuthor(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
+            commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
         }
 
         // Validate the comment param manually
