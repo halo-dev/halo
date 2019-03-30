@@ -59,7 +59,7 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher antPathMatcher;
 
-    private Collection<String> excludeUrlPatterns;
+    private Set<String> excludeUrlPatterns = new HashSet<>(1);
 
     public AdminAuthenticationFilter(StringCacheStore cacheStore,
                                      UserService userService,
@@ -155,12 +155,26 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Set exclude url patterns.
+     * Sets exclude url patterns.
      *
-     * @param excludeUrls exclude urls
+     * @param excludeUrlPatterns exclude urls
      */
-    public AdminAuthenticationFilter setExcludeUrlPatterns(String... excludeUrls) {
-        this.excludeUrlPatterns = excludeUrls == null ? Collections.emptyList() : Collections.unmodifiableCollection(Arrays.asList(excludeUrls));
+    public AdminAuthenticationFilter setExcludeUrlPatterns(Collection<String> excludeUrlPatterns) {
+        Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
+
+        this.excludeUrlPatterns = new HashSet<>(excludeUrlPatterns);
+        return this;
+    }
+
+    /**
+     * Adds exclude url patterns.
+     *
+     * @param excludeUrlPatterns exclude urls
+     */
+    public AdminAuthenticationFilter addExcludeUrlPatterns(String... excludeUrlPatterns) {
+        Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
+
+        Collections.addAll(this.excludeUrlPatterns, excludeUrlPatterns);
         return this;
     }
 
