@@ -111,7 +111,7 @@ public class HaloConfiguration {
                                                                                        ObjectMapper objectMapper) {
         AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties);
         // Config the admin filter
-        adminAuthenticationFilter.setExcludeUrlPatterns("/admin/api/login")
+        adminAuthenticationFilter.addExcludeUrlPatterns("/admin/api/login")
                 .setFailureHandler(new AdminAuthenticationFailureHandler()
                         .setProductionEnv(haloProperties.getProductionEnv())
                         .setObjectMapper(objectMapper));
