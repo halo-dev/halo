@@ -19,6 +19,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.RestTemplate;
@@ -92,10 +93,13 @@ public class HaloConfiguration {
     @Bean
     public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties, ObjectMapper objectMapper) {
         ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter();
+
+        DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
+        failureHandler.setProductionEnv(haloProperties.getProductionEnv());
+        failureHandler.setObjectMapper(objectMapper);
+
         // Set failure handler
-        apiFilter.setFailureHandler(new DefaultAuthenticationFailureHandler()
-                .setProductionEnv(haloProperties.getProductionEnv())
-                .setObjectMapper(objectMapper));
+        apiFilter.setFailureHandler(failureHandler);
 
         FilterRegistrationBean<ApiAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(apiFilter);
@@ -110,11 +114,16 @@ public class HaloConfiguration {
                                                                                        HaloProperties haloProperties,
                                                                                        ObjectMapper objectMapper) {
         AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties);
+
+        AdminAuthenticationFailureHandler failureHandler = new AdminAuthenticationFailureHandler();
+        failureHandler.setProductionEnv(haloProperties.getProductionEnv());
+        failureHandler.setObjectMapper(objectMapper);
+
         // Config the admin filter
-        adminAuthenticationFilter.addExcludeUrlPatterns("/admin/api/login")
-                .setFailureHandler(new AdminAuthenticationFailureHandler()
-                        .setProductionEnv(haloProperties.getProductionEnv())
-                        .setObjectMapper(objectMapper));
+        adminAuthenticationFilter.addExcludeUrlPatterns("/admin/api/login");
+        adminAuthenticationFilter.addTryAuthUrlMethodPattern("/admin/api/comments", HttpMethod.POST.name());
+        adminAuthenticationFilter.setFailureHandler(
+                failureHandler);
 
         FilterRegistrationBean<AdminAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(adminAuthenticationFilter);
