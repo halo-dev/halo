@@ -132,16 +132,6 @@ public enum BlogProperties implements PropertyEnum {
     WIDGET_DAYCOUNT("widget_daycount", Boolean.class),
 
     /**
-     * 默认缩略图地址
-     */
-    DEFAULT_THUMBNAIL("/static/halo-content/images/thumbnail/thumbnail.png", String.class),
-
-    /**
-     * 自动备份
-     */
-    AUTO_BACKUP("auto_backup", Boolean.class),
-
-    /**
      * API Token
      */
     API_TOKEN("api_token", String.class),

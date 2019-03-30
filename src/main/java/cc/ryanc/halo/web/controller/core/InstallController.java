@@ -233,7 +233,6 @@ public class InstallController {
 //            post.setStatus(PostStatus.PUBLISHED);
 //            post.setUrl("hello-halo");
 //            post.setDisallowComment(true);
-//            post.setThumbnail("/static/halo-frontend/images/thumbnail/thumbnail-" + RandomUtil.randomInt(1, 11) + ".jpg");
 //            postService.create(post);
 //
 //            //第一个评论
