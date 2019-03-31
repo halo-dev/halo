@@ -12,25 +12,25 @@
           </div>
           <div class="profile-center-detail">
             <p><a-icon type="mail" /> {{ user.email }} </p>
-            <p><a-icon type="calendar" /> {{ counts.establishDays }} 天</p>
+            <p><a-icon type="calendar" /> {{ counts.establishDays || 0 }} 天</p>
           </div>
           <a-divider />
           <div class="general-profile">
             <a-list itemLayout="horizontal" :loading="countsLoading">
               <a-list-item>
-                累计发表了 {{ counts.postCount }} 篇文章。
+                累计发表了 {{ counts.postCount || 0 }} 篇文章。
               </a-list-item>
               <a-list-item>
-                累计创建了 {{ counts.linkCount }} 个标签。
+                累计创建了 {{ counts.linkCount || 0 }} 个标签。
               </a-list-item>
               <a-list-item>
-                累计获得了 {{ counts.commentCount }} 条评论。
+                累计获得了 {{ counts.commentCount || 0 }} 条评论。
               </a-list-item>
               <a-list-item>
-                累计添加了 {{ counts.linkCount }} 个友链。
+                累计添加了 {{ counts.linkCount || 0 }} 个友链。
               </a-list-item>
               <a-list-item>
-                文章总访问 {{ counts.visitCount }} 次。
+                文章总访问 {{ counts.visitCount || 0 }} 次。
               </a-list-item>
               <a-list-item> </a-list-item>
             </a-list>

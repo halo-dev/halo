@@ -23,18 +23,10 @@
       </a-col>
 
       <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24">
-        <a-card title="发布">
-          
-        </a-card>
-        <a-card title="分类目录">
-          
-        </a-card>
-        <a-card title="标签">
-          
-        </a-card>
-        <a-card title="缩略图">
-          
-        </a-card>
+        <a-card title="发布"> </a-card>
+        <a-card title="分类目录"> </a-card>
+        <a-card title="标签"> </a-card>
+        <a-card title="缩略图"> </a-card>
       </a-col>
     </a-row>
   </div>

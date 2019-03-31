@@ -14,7 +14,7 @@ export const asyncRouterMap = [
       // dashboard
       {
         path: '/dashboard',
-        name: 'dashboard',
+        name: 'Dashboard',
         component: () => import('@/views/dashboard/Dashboard'),
         meta: { title: '仪表盘', icon: 'dashboard', hiddenHeaderContent: true }
       },
@@ -22,7 +22,7 @@ export const asyncRouterMap = [
       // posts
       {
         path: '/posts',
-        name: 'posts',
+        name: 'Posts',
         redirect: '/posts/list',
         component: RouteView,
         meta: { title: '文章', icon: 'form' },
@@ -57,7 +57,7 @@ export const asyncRouterMap = [
       // pages
       {
         path: '/pages',
-        name: 'pages',
+        name: 'Pages',
         component: RouteView,
         redirect: '/pages/list',
         meta: { title: '页面', icon: 'read' },
@@ -80,7 +80,7 @@ export const asyncRouterMap = [
       // attachments
       {
         path: '/attachments',
-        name: 'attachments',
+        name: 'Attachments',
         component: () => import('@/views/attachment/AttachmentList'),
         meta: { title: '附件', icon: 'picture', hiddenHeaderContent: true }
       },
@@ -88,7 +88,7 @@ export const asyncRouterMap = [
       // comments
       {
         path: '/comments',
-        name: 'comments',
+        name: 'Comments',
         component: () => import('@/views/comment/CommentList'),
         meta: { title: '评论', icon: 'message', hiddenHeaderContent: true }
       },
@@ -96,7 +96,7 @@ export const asyncRouterMap = [
       // interface
       {
         path: '/interface',
-        name: 'interface',
+        name: 'Interface',
         component: RouteView,
         redirect: '/interface/themes',
         meta: { title: '外观', icon: 'skin' },
@@ -125,7 +125,7 @@ export const asyncRouterMap = [
       // user
       {
         path: '/user',
-        name: 'user',
+        name: 'User',
         component: RouteView,
         redirect: '/user/profile',
         meta: { title: '用户', icon: 'user' },
@@ -142,7 +142,7 @@ export const asyncRouterMap = [
       // system
       {
         path: '/system',
-        name: 'options',
+        name: 'System',
         component: RouteView,
         redirect: '/system/options',
         meta: { title: '系统', icon: 'setting' },
