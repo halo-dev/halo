@@ -7,14 +7,14 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Comment vo.
+ * Comment list with post vo.
  *
  * @author johnniang
  */
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class CommentListVO extends CommentOutputDTO {
+public class CommentWithPostVO extends CommentOutputDTO {
 
     private PostMinimalOutputDTO post;
 }

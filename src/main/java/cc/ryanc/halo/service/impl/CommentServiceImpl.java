@@ -7,8 +7,9 @@ import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.projection.CommentCountProjection;
 import cc.ryanc.halo.model.support.CommentPage;
-import cc.ryanc.halo.model.vo.CommentListVO;
 import cc.ryanc.halo.model.vo.CommentVO;
+import cc.ryanc.halo.model.vo.CommentWithParentVO;
+import cc.ryanc.halo.model.vo.CommentWithPostVO;
 import cc.ryanc.halo.repository.CommentRepository;
 import cc.ryanc.halo.repository.PostRepository;
 import cc.ryanc.halo.security.authentication.Authentication;
@@ -63,7 +64,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     @Override
-    public Page<CommentListVO> pageLatest(int top) {
+    public Page<CommentWithPostVO> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
         // Build page request
@@ -73,7 +74,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     @Override
-    public Page<CommentListVO> pageBy(CommentStatus status, Pageable pageable) {
+    public Page<CommentWithPostVO> pageBy(CommentStatus status, Pageable pageable) {
         Assert.notNull(status, "Comment status must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
@@ -149,7 +150,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         Assert.notNull(postId, "Post id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
-        log.debug("Getting comment of post: [{}], page info: [{}]", postId, pageable);
+        log.debug("Getting comment tree view of post: [{}], page info: [{}]", postId, pageable);
 
         // List all the top comments (Caution: This list will be cleared)
         List<Comment> comments = commentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
@@ -184,6 +185,57 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         }
 
         return new CommentPage<>(pageContent, pageable, topComments.size(), comments.size());
+    }
+
+    @Override
+    public Page<CommentWithParentVO> pageWithParentVoBy(Integer postId, Pageable pageable) {
+        Assert.notNull(postId, "Post id must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        log.debug("Getting comment list view of post: [{}], page info: [{}]", postId, pageable);
+
+        // List all the top comments (Caution: This list will be cleared)
+        Page<Comment> commentPage = commentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED, pageable);
+
+        // Get all comments
+        List<Comment> comments = commentPage.getContent();
+
+        // Get all comment parent ids
+        Set<Long> parentIds = ServiceUtils.fetchProperty(comments, Comment::getParentId);
+
+        // Get all parent comments
+        List<Comment> parentComments = commentRepository.findAllByIdIn(parentIds, pageable.getSort());
+
+        // Convert to comment map (Key: comment id, value: comment)
+        Map<Long, Comment> parentCommentMap = ServiceUtils.convertToMap(parentComments, Comment::getId);
+
+        Map<Long, CommentWithParentVO> parentCommentVoMap = new HashMap<>(parentCommentMap.size());
+
+        // Convert to comment page
+        return commentPage.map(comment -> {
+            // Convert to with parent vo
+            CommentWithParentVO commentWithParentVO = new CommentWithParentVO().convertFrom(comment);
+
+            // Get parent comment vo from cache
+            CommentWithParentVO parentCommentVo = parentCommentVoMap.get(comment.getParentId());
+
+            if (parentCommentVo == null) {
+                // Get parent comment
+                Comment parentComment = parentCommentMap.get(comment.getParentId());
+
+                if (parentComment != null) {
+                    // Convert to parent comment vo
+                    parentCommentVo = new CommentWithParentVO().convertFrom(parentComment);
+                    // Cache the parent comment vo
+                    parentCommentVoMap.put(parentComment.getId(), parentCommentVo);
+                }
+            }
+
+            // Set parent
+            commentWithParentVO.setParent(parentCommentVo == null ? null : parentCommentVo.clone());
+
+            return commentWithParentVO;
+        });
     }
 
     @Override
@@ -284,7 +336,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
      * @return a page of comment vo
      */
     @NonNull
-    private Page<CommentListVO> convertBy(@NonNull Page<Comment> commentPage) {
+    private Page<CommentWithPostVO> convertBy(@NonNull Page<Comment> commentPage) {
         Assert.notNull(commentPage, "Comment page must not be null");
 
         return new PageImpl<>(convertBy(commentPage.getContent()), commentPage.getPageable(), commentPage.getTotalElements());
@@ -297,7 +349,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
      * @return a list of comment vo
      */
     @NonNull
-    private List<CommentListVO> convertBy(@Nullable List<Comment> comments) {
+    private List<CommentWithPostVO> convertBy(@Nullable List<Comment> comments) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();
         }
@@ -310,12 +362,12 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
 
         return comments.stream().map(comment -> {
             // Convert to vo
-            CommentListVO commentListVO = new CommentListVO().convertFrom(comment);
+            CommentWithPostVO commentWithPostVO = new CommentWithPostVO().convertFrom(comment);
 
             // Get post and set to the vo
-            commentListVO.setPost(new PostMinimalOutputDTO().convertFrom(postMap.get(comment.getPostId())));
+            commentWithPostVO.setPost(new PostMinimalOutputDTO().convertFrom(postMap.get(comment.getPostId())));
 
-            return commentListVO;
+            return commentWithPostVO;
         }).collect(Collectors.toList());
     }
 

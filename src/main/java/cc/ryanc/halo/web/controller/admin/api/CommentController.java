@@ -6,7 +6,7 @@ import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.enums.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.params.CommentParam;
-import cc.ryanc.halo.model.vo.CommentListVO;
+import cc.ryanc.halo.model.vo.CommentWithPostVO;
 import cc.ryanc.halo.security.authentication.Authentication;
 import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.service.CommentService;
@@ -51,13 +51,13 @@ public class CommentController {
 
     @GetMapping("latest")
     @ApiOperation("Pages latest comments")
-    public List<CommentListVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+    public List<CommentWithPostVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         return commentService.pageLatest(top).getContent();
     }
 
     @GetMapping("status/{status}")
-    public Page<CommentListVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-                                      @PathVariable("status") CommentStatus status) {
+    public Page<CommentWithPostVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                          @PathVariable("status") CommentStatus status) {
         return commentService.pageBy(status, pageable);
     }
 
