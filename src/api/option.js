@@ -1,4 +1,4 @@
-import service from '@/util/service'
+import service from '@/utils/service'
 
 const baseUrl = '/admin/api/options'
 
