@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.params.PostParam;
+import cc.ryanc.halo.model.vo.CommentWithParentVO;
 import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.service.*;
@@ -103,10 +104,19 @@ public class PostController {
         postTagService.removeByPostId(postId);
     }
 
-    @GetMapping("{postId:\\d+}/comments")
-    public Page<CommentVO> listComments(@PathVariable("postId") Integer postId,
-                                        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                        @SortDefault Sort sort) {
+    @GetMapping("{postId:\\d+}/comments/tree_view")
+    @ApiOperation("Lists comments with tree view")
+    public Page<CommentVO> listCommentsTree(@PathVariable("postId") Integer postId,
+                                            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return commentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+    }
+
+    @GetMapping("{postId:\\d+}/comments/list_view")
+    @ApiOperation("Lists comment with list view")
+    public Page<CommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
+                                                  @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                  @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        return commentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 }

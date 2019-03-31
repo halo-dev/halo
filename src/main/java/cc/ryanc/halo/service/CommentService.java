@@ -2,7 +2,8 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.enums.CommentStatus;
-import cc.ryanc.halo.model.vo.CommentListVO;
+import cc.ryanc.halo.model.vo.CommentWithParentVO;
+import cc.ryanc.halo.model.vo.CommentWithPostVO;
 import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Page;
@@ -36,7 +37,7 @@ public interface CommentService extends CrudService<Comment, Long> {
      * @return a page of comments
      */
     @NonNull
-    Page<CommentListVO> pageLatest(int top);
+    Page<CommentWithPostVO> pageLatest(int top);
 
     /**
      * Pages comments.
@@ -46,7 +47,7 @@ public interface CommentService extends CrudService<Comment, Long> {
      * @return a page of comment
      */
     @NonNull
-    Page<CommentListVO> pageBy(@NonNull CommentStatus status, @NonNull Pageable pageable);
+    Page<CommentWithPostVO> pageBy(@NonNull CommentStatus status, @NonNull Pageable pageable);
 
     /**
      * Lists comments by post id.
@@ -87,6 +88,16 @@ public interface CommentService extends CrudService<Comment, Long> {
     Page<CommentVO> pageVosBy(@NonNull Integer postId, @NonNull Pageable pageable);
 
     /**
+     * Lists comment with parent vo.
+     *
+     * @param postId   post id must not be null
+     * @param pageable page info must not be null
+     * @return a page of comment with parent vo.
+     */
+    @NonNull
+    Page<CommentWithParentVO> pageWithParentVoBy(@NonNull Integer postId, @NonNull Pageable pageable);
+
+    /**
      * Updates comment status.
      *
      * @param commentId comment id must not be null
@@ -94,5 +105,5 @@ public interface CommentService extends CrudService<Comment, Long> {
      * @return updated comment
      */
     @NonNull
-    Comment updateStatus(Long commentId, CommentStatus status);
+    Comment updateStatus(@NonNull Long commentId, @NonNull CommentStatus status);
 }
