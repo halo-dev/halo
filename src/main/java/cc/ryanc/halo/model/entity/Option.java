@@ -1,13 +1,14 @@
 package cc.ryanc.halo.model.entity;
 
+import cc.ryanc.halo.model.enums.OptionSource;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import lombok.NoArgsConstructor;
 
 /**
  * Setting entity.
@@ -43,8 +44,8 @@ public class Option extends BaseEntity {
     /**
      * source,default is system
      */
-    @Column(name = "option_source", columnDefinition = "varchar(127) default 'system'")
-    private String optionSource;
+    @Column(name = "option_source", columnDefinition = "int default 0")
+    private OptionSource source;
 
     public Option(String optionKey, String optionValue) {
         this.optionKey = optionKey;
@@ -55,6 +56,9 @@ public class Option extends BaseEntity {
     public void prePersist() {
         super.prePersist();
         id = null;
-        optionSource = "system";
+
+        if (source == null) {
+            source = OptionSource.SYSTEM;
+        }
     }
 }

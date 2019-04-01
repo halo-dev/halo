@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.OptionSource;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.ThemeService;
@@ -61,7 +62,7 @@ public class ThemeController {
     public void active(@RequestParam(name = "themeName", defaultValue = "anatole") String themeName) throws TemplateModelException {
         Map<BlogProperties, String> properties = new HashMap<>(1);
         properties.put(BlogProperties.THEME, themeName);
-        optionService.saveProperties(properties, "system");
+        optionService.saveProperties(properties, OptionSource.SYSTEM);
         BaseContentController.THEME = themeName;
         configuration.setSharedVariable("themeName", themeName);
         configuration.setSharedVariable("options", optionService.listOptions());

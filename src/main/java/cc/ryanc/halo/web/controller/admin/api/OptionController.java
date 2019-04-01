@@ -1,6 +1,7 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
+import cc.ryanc.halo.model.enums.OptionSource;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.service.OptionService;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +34,7 @@ public class OptionController {
 
     @PostMapping("saving")
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
-        optionService.save(optionParams, "system");
+        optionService.save(optionParams, OptionSource.SYSTEM);
     }
 
     @GetMapping("map_view")
@@ -45,6 +46,6 @@ public class OptionController {
     @PostMapping("map_view/saving")
     @ApiOperation("Saves options by option map")
     public void saveOptionsWithMapView(@RequestBody Map<String, String> optionMap) {
-        optionService.save(optionMap, "system");
+        optionService.save(optionMap, OptionSource.SYSTEM);
     }
 }

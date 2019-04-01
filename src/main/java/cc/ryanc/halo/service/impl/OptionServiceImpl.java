@@ -3,10 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.PropertyEnum;
-import cc.ryanc.halo.model.enums.QnYunProperties;
-import cc.ryanc.halo.model.enums.ValueEnum;
+import cc.ryanc.halo.model.enums.*;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.repository.OptionRepository;
 import cc.ryanc.halo.service.OptionService;
@@ -50,7 +47,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      * @param source source
      */
     @Override
-    public void save(String key, String value, String source) {
+    public void save(String key, String value, OptionSource source) {
         Assert.hasText(key, "Option key must not be blank");
 
         if (StringUtils.isBlank(value)) {
@@ -68,7 +65,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             Option anOption = new Option();
             anOption.setOptionKey(key);
             anOption.setOptionValue(value);
-            anOption.setOptionSource(source);
+            anOption.setSource(source);
             return anOption;
         });
 
@@ -83,7 +80,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      * @param source  source
      */
     @Override
-    public void save(Map<String, String> options, String source) {
+    public void save(Map<String, String> options, OptionSource source) {
         if (CollectionUtils.isEmpty(options)) {
             return;
         }
@@ -92,7 +89,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public void save(List<OptionParam> optionParams, String source) {
+    public void save(List<OptionParam> optionParams, OptionSource source) {
         if (CollectionUtils.isEmpty(optionParams)) {
             return;
         }
@@ -102,7 +99,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public void saveProperties(Map<? extends PropertyEnum, String> properties, String source) {
+    public void saveProperties(Map<? extends PropertyEnum, String> properties, OptionSource source) {
         if (CollectionUtils.isEmpty(properties)) {
             return;
         }
