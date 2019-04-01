@@ -23,10 +23,27 @@
       </a-col>
 
       <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24">
-        <a-card title="发布"></a-card>
+        <a-card title="发布">
+          <a-form layout="vertical">
+            <a-form-item label="开启评论：">
+              <a-select defaultValue="true">
+                <a-select-option value="true">是</a-select-option>
+                <a-select-option value="false">否</a-select-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item label="文章密码：">
+              <a-input type="password"/>
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary" @click="saveOptions">保存</a-button>
+            </a-form-item>
+          </a-form>
+        </a-card>
         <a-card title="分类目录"></a-card>
         <a-card title="标签"></a-card>
-        <a-card title="缩略图"></a-card>
+        <a-card title="缩略图">
+          <img alt="example" src="https://ryanc.cc/material/screenshot.png" slot="cover">
+        </a-card>
       </a-col>
     </a-row>
   </div>
@@ -42,6 +59,11 @@ export default {
   },
   data() {
     return {
+      wrapperCol: {
+        xl: { span: 24 },
+        sm: { span: 24 },
+        xs: { span: 24 }
+      },
       value: 'Hello World'
     }
   }
@@ -55,5 +77,13 @@ export default {
 
 .v-note-wrapper {
   z-index: 1000;
+}
+
+.ant-card {
+  margin-bottom: 16px;
+}
+
+.ant-form-vertical .ant-form-item {
+  padding-bottom: 0;
 }
 </style>
