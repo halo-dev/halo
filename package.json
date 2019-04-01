@@ -18,6 +18,7 @@
     "viser-vue": "^2.4.5",
     "vue": "^2.6.10",
     "vue-clipboard2": "^0.3.0",
+    "vue-codemirror-lite": "^1.0.4",
     "vue-cropper": "0.4.9",
     "vue-ls": "^3.2.1",
     "vue-router": "^3.0.2",
