@@ -35,7 +35,7 @@
               <a-input type="password"/>
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" @click="saveOptions">保存</a-button>
+              <a-button type="primary">保存</a-button>
             </a-form-item>
           </a-form>
         </a-card>
