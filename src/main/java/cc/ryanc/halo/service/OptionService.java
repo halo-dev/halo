@@ -4,7 +4,7 @@ import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.OptionSource;
-import cc.ryanc.halo.model.enums.PropertyEnum;
+import cc.ryanc.halo.model.properties.PropertyEnum;
 import cc.ryanc.halo.model.enums.ValueEnum;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.service.base.CrudService;

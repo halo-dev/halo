@@ -4,7 +4,7 @@ import cc.ryanc.halo.handler.file.FileHandlers;
 import cc.ryanc.halo.model.dto.AttachmentOutputDTO;
 import cc.ryanc.halo.model.entity.Attachment;
 import cc.ryanc.halo.model.enums.AttachmentType;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.support.UploadResult;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;

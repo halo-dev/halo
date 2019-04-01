@@ -1,5 +1,6 @@
-package cc.ryanc.halo.model.enums;
+package cc.ryanc.halo.model.properties;
 
+import cc.ryanc.halo.model.enums.ValueEnum;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;

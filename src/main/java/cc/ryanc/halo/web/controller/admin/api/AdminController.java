@@ -4,7 +4,7 @@ import cc.ryanc.halo.cache.lock.CacheLock;
 import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.model.dto.CountOutputDTO;
 import cc.ryanc.halo.model.dto.UserOutputDTO;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.params.LoginParam;
 import cc.ryanc.halo.security.context.SecurityContextHolder;

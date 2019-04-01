@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.enums;
+package cc.ryanc.halo.model.properties;
 
 /**
  * You pai yun properties.

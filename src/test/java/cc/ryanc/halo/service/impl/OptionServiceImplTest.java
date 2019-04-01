@@ -1,7 +1,7 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.entity.Option;
-import cc.ryanc.halo.model.enums.QnYunProperties;
+import cc.ryanc.halo.model.properties.QnYunProperties;
 import cc.ryanc.halo.repository.OptionRepository;
 import com.qiniu.common.Zone;
 import org.junit.Test;

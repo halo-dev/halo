@@ -1,8 +1,8 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.exception.ServiceException;
-import cc.ryanc.halo.model.enums.BlogProperties;
-import cc.ryanc.halo.model.enums.EmailProperties;
+import cc.ryanc.halo.model.properties.BlogProperties;
+import cc.ryanc.halo.model.properties.EmailProperties;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.OptionService;
 import cn.hutool.core.text.StrBuilder;

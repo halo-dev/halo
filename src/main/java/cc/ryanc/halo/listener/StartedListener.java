@@ -2,7 +2,7 @@ package cc.ryanc.halo.listener;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.model.entity.User;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.params.UserParam;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
