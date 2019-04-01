@@ -35,7 +35,7 @@ service.interceptors.response.use(
     const status = response ? response.status : -1
     Vue.$log.error('Server response status', status)
 
-    const data = response.data
+    const data = response ? response.data : null
     if (data) {
       // Business response
       Vue.$log.error('Business response status', data.status)

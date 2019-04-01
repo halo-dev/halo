@@ -1,6 +1,6 @@
 import service from '@/utils/service'
 
-const baseUrl = '/admin/api/options'
+const baseUrl = '/admin/api/options/map_view'
 
 const optionApi = {}
 
