@@ -26,10 +26,10 @@ public enum PrimaryProperties implements PropertyEnum {
 
     @Override
     public Class<?> getType() {
-        return null;
+        return type;
     }
 
     @Override
     public String getValue() {
-        return null;
+        return value;
     }}
