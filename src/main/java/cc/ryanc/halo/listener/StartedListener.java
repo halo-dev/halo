@@ -2,8 +2,9 @@ package cc.ryanc.halo.listener;
 
 import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.model.entity.User;
-import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.params.UserParam;
+import cc.ryanc.halo.model.properties.BlogProperties;
+import cc.ryanc.halo.model.properties.PrimaryProperties;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionService;
@@ -112,7 +113,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * Get active theme
      */
     private void getActiveTheme() {
-        BaseContentController.THEME = optionService.getByProperty(BlogProperties.THEME).orElse(DEFAULT_THEME_NAME);
+        BaseContentController.THEME = optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
 
         try {
             configuration.setSharedVariable("themeName", BaseContentController.THEME);
@@ -173,7 +174,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void initThemes() {
         // Whether the blog has initialized
-        Boolean isInstalled = optionService.getByPropertyOrDefault(BlogProperties.IS_INSTALL, Boolean.class, false);
+        Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
         try {
             if (isInstalled) {
                 // Skip

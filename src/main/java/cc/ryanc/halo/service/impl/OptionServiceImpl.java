@@ -3,11 +3,10 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
-import cc.ryanc.halo.model.enums.*;
+import cc.ryanc.halo.model.enums.OptionSource;
+import cc.ryanc.halo.model.enums.ValueEnum;
 import cc.ryanc.halo.model.params.OptionParam;
-import cc.ryanc.halo.model.properties.BlogProperties;
-import cc.ryanc.halo.model.properties.PropertyEnum;
-import cc.ryanc.halo.model.properties.QnYunProperties;
+import cc.ryanc.halo.model.properties.*;
 import cc.ryanc.halo.repository.OptionRepository;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
@@ -212,9 +211,9 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getPostPageSize() {
         try {
-            return getByPropertyOrDefault(BlogProperties.INDEX_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(PostProperties.INDEX_PAGE_SIZE, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
-            log.error(BlogProperties.INDEX_POSTS + " option is not a number format", e);
+            log.error(PostProperties.INDEX_PAGE_SIZE.getValue() + " option is not a number format", e);
             return DEFAULT_POST_PAGE_SIZE;
         }
     }
@@ -222,9 +221,9 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getCommentPageSize() {
         try {
-            return getByPropertyOrDefault(BlogProperties.INDEX_COMMENTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(CommentProperties.PAGE_SIZE, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
-            log.error(BlogProperties.INDEX_COMMENTS + " option is not a number format", e);
+            log.error(CommentProperties.PAGE_SIZE.getValue() + " option is not a number format", e);
             return DEFAULT_COMMENT_PAGE_SIZE;
         }
     }
@@ -232,9 +231,9 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getRssPageSize() {
         try {
-            return getByPropertyOrDefault(BlogProperties.RSS_POSTS, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(PostProperties.RSS_PAGE_SIZE, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
         } catch (NumberFormatException e) {
-            log.error(BlogProperties.RSS_POSTS + " setting is not a number format", e);
+            log.error(PostProperties.RSS_PAGE_SIZE.getValue() + " setting is not a number format", e);
             return DEFAULT_RSS_PAGE_SIZE;
         }
     }

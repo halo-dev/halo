@@ -1,7 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.exception.ServiceException;
-import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.properties.EmailProperties;
 import cc.ryanc.halo.service.MailService;
 import cc.ryanc.halo.service.OptionService;
@@ -18,6 +17,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
+ * Mail service implementation.
+ *
  * @author : RYAN0UP
  * @date : 2019-03-17
  */
@@ -119,7 +120,7 @@ public class MailServiceImpl implements MailService {
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilename) {
         loadConfig();
 
-        String fromUsername = optionService.getByPropertyOfNonNull(BlogProperties.MAIL_FROM_NAME);
+        String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME);
 
         File file = new File(attachFilename);
         try {
@@ -148,11 +149,11 @@ public class MailServiceImpl implements MailService {
         // Get default properties
         Properties defaultProperties = OhMyEmail.defaultConfig(log.isDebugEnabled());
         // Set smtp host
-        defaultProperties.setProperty("mail.smtp.host", optionService.getByPropertyOfNonNull(EmailProperties.SMTP_HOST));
+        defaultProperties.setProperty("mail.smtp.host", optionService.getByPropertyOfNonNull(EmailProperties.HOST));
         // Config email
         OhMyEmail.config(defaultProperties,
-                optionService.getByPropertyOfNonNull(EmailProperties.SMTP_USERNAME),
-                optionService.getByPropertyOfNonNull(EmailProperties.SMTP_PASSWORD));
+                optionService.getByPropertyOfNonNull(EmailProperties.USERNAME),
+                optionService.getByPropertyOfNonNull(EmailProperties.PASSWORD));
 
         // Set config loaded with true
         loaded = true;

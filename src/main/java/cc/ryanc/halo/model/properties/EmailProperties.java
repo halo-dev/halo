@@ -8,14 +8,19 @@ package cc.ryanc.halo.model.properties;
  */
 public enum EmailProperties implements PropertyEnum {
 
-    SMTP_HOST("email_smtp_host", String.class),
-    SMTP_USERNAME("email_smtp_username", String.class),
-    SMTP_PASSWORD("email_smtp_password", String.class),
+    HOST("email_host", String.class),
+
+    PROTOCOL("email_protocol", String.class),
+
+    SSL_PORT("email_ssl_port", Integer.class),
+
+    USERNAME("email_username", String.class),
+
+    PASSWORD("email_password", String.class),
+
     FROM_NAME("email_from_name", String.class),
-    ENABLED("email_enabled", Boolean.class),
-    COMMENT_REPLY_NOTICE_ENABLED("email_comment_reply_notice_enabled", Boolean.class),
-    NEW_COMMENT_NOTICE_ENABLED("email_new_comment_notice_enabled", Boolean.class),
-    COMMENT_PASS_NOTICE_ENABLED("email_comment_pass_notice_enabled", Boolean.class);
+
+    ENABLED("email_enabled", Boolean.class);
 
     private final String value;
 
@@ -32,10 +37,10 @@ public enum EmailProperties implements PropertyEnum {
 
     @Override
     public Class<?> getType() {
-        return null;
+        return type;
     }
 
     @Override
     public String getValue() {
-        return null;
+        return value;
     }}

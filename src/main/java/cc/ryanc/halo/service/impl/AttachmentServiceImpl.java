@@ -4,7 +4,7 @@ import cc.ryanc.halo.handler.file.FileHandlers;
 import cc.ryanc.halo.model.dto.AttachmentOutputDTO;
 import cc.ryanc.halo.model.entity.Attachment;
 import cc.ryanc.halo.model.enums.AttachmentType;
-import cc.ryanc.halo.model.properties.BlogProperties;
+import cc.ryanc.halo.model.properties.AttachmentProperties;
 import cc.ryanc.halo.model.support.UploadResult;
 import cc.ryanc.halo.repository.AttachmentRepository;
 import cc.ryanc.halo.service.AttachmentService;
@@ -107,6 +107,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
      */
     @NonNull
     private AttachmentType getAttachmentType() {
-        return optionService.getValueEnumByPropertyOrDefault(BlogProperties.ATTACHMENT_TYPE, Integer.class, AttachmentType.class, AttachmentType.LOCAL);
+        return optionService.getEnumByPropertyOrDefault(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.class, AttachmentType.LOCAL);
     }
 }

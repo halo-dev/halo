@@ -8,12 +8,17 @@ package cc.ryanc.halo.model.properties;
  */
 public enum UpYunProperties implements PropertyEnum {
 
-    OSS_SOURCE("upyun_oss_source", String.class),
-    OSS_PASSWORD("upyun_oss_password", String.class),
-    OSS_BUCKET("upyun_oss_bucket", String.class),
-    OSS_DOMAIN("upyun_oss_domain", String.class),
-    OSS_OPERATOR("upyun_oss_operator", String.class),
-    OSS_SMALL_URL("ypyun_oss_small_url", String.class);
+    OSS_SOURCE("oss_upyun_source", String.class),
+
+    OSS_PASSWORD("oss_upyun_password", String.class),
+
+    OSS_BUCKET("oss_upyun_bucket", String.class),
+
+    OSS_DOMAIN("oss_upyun_domain", String.class),
+
+    OSS_OPERATOR("oss_upyun_operator", String.class),
+
+    OSS_SMALL_URL("oss_upyun_small_url", String.class);
 
     private String value;
 
