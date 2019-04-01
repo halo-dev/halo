@@ -78,7 +78,7 @@
                   label="博客描述："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.seo_desc" />
+                  <a-input v-model="options.seo_description" />
                 </a-form-item>
                 <a-form-item
                   label="百度推送 Token： "
@@ -90,25 +90,25 @@
                   label="百度站点验证："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_verification_baidu" />
+                  <a-input v-model="options.seo_verification_baidu" />
                 </a-form-item>
                 <a-form-item
                   label="Google 站点验证："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_verification_google" />
+                  <a-input v-model="options.seo_verification_google" />
                 </a-form-item>
                 <a-form-item
                   label="Bing 站点验证："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_verification_bing" />
+                  <a-input v-model="options.seo_verification_bing" />
                 </a-form-item>
                 <a-form-item
                   label="360 站点验证："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_verification_qihu" />
+                  <a-input v-model="options.seo_verification_qihu" />
                 </a-form-item>
                 <a-form-item>
                   <a-button
@@ -130,7 +130,7 @@
                   <a-input
                     type="number"
                     defaultValue="10"
-                    v-model="options.index_posts_size"
+                    v-model="options.post_index_pagesize"
                   />
                 </a-form-item>
                 <a-form-item
@@ -140,7 +140,7 @@
                   <a-input
                     type="number"
                     defaultValue="10"
-                    v-model="options.rss_posts_size"
+                    v-model="options.rss_pagesize"
                   />
                 </a-form-item>
                 <a-form-item
@@ -172,7 +172,7 @@
                 >
                   <a-select
                     defaultValue="mm"
-                    v-model="options.comment_gavatar_type"
+                    v-model="options.comment_gavatar_default"
                   >
                     <a-select-option value="mm">默认</a-select-option>
                     <a-select-option value="identicon">抽象几何图形</a-select-option>
@@ -190,7 +190,7 @@
                   <a-radio-group
                     v-decorator="['radio-group']"
                     defaultValue="true"
-                    v-model="options.new_comment_need_check"
+                    v-model="options.comment_new_need_check"
                   >
                     <a-radio value="true">启用</a-radio>
                     <a-radio value="false">禁用</a-radio>
@@ -203,7 +203,7 @@
                   <a-radio-group
                     v-decorator="['radio-group']"
                     defaultValue="true"
-                    v-model="options.new_comment_notice"
+                    v-model="options.comment_new_notice"
                   >
                     <a-radio value="true">启用</a-radio>
                     <a-radio value="false">禁用</a-radio>
@@ -255,14 +255,14 @@
                   <a-input
                     type="number"
                     defaultValue="10"
-                    v-model="options.index_comments"
+                    v-model="options.comment_post_pagesize"
                   />
                 </a-form-item>
                 <a-form-item
                   label="占位提示："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.native_comment_placeholder" />
+                  <a-input v-model="options.comment_content_placeholder" />
                 </a-form-item>
                 <a-form-item
                   label="自定义样式："
@@ -315,38 +315,38 @@
                       placement="right"
                       title="需要加上 http:// 或者 https://"
                     >
-                      <a-input v-model="options.upyun_oss_domain" />
+                      <a-input v-model="options.oss_upyun_domain" />
                     </a-tooltip>
                   </a-form-item>
                   <a-form-item
                     label="空间名称："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.upyun_oss_bucket" />
+                    <a-input v-model="options.oss_upyun_bucket" />
                   </a-form-item>
                   <a-form-item
                     label="操作员名称："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.upyun_oss_operator" />
+                    <a-input v-model="options.oss_upyun_operator" />
                   </a-form-item>
                   <a-form-item
                     label="操作员密码："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.upyun_oss_password" />
+                    <a-input v-model="options.oss_upyun_password" />
                   </a-form-item>
                   <a-form-item
                     label="文件目录："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.upyun_oss_src" />
+                    <a-input v-model="options.oss_upyun_src" />
                   </a-form-item>
                   <a-form-item
                     label="处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.upyun_oss_small" />
+                    <a-input v-model="options.oss_upyun_small" />
                   </a-form-item>
                 </div>
                 <div
@@ -359,7 +359,7 @@
                   >
                     <a-select
                       defaultValue="auto"
-                      v-model="options.qiniu_zone"
+                      v-model="options.oss_qiniu_zone"
                     >
                       <a-select-option value="auto">自动选择</a-select-option>
                       <a-select-option value="z0">华东</a-select-option>
@@ -378,32 +378,32 @@
                       placement="right"
                       title="需要加上 http:// 或者 https://"
                     >
-                      <a-input v-model="options.qiniu_domain" />
+                      <a-input v-model="options.oss_qiniu_domain" />
                     </a-tooltip>
                   </a-form-item>
                   <a-form-item
                     label="Access Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.qiniu_access_key" />
+                    <a-input v-model="options.oss_qiniu_access_key" />
                   </a-form-item>
                   <a-form-item
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.qiniu_secret_key" />
+                    <a-input v-model="options.oss_qiniu_secret_key" />
                   </a-form-item>
                   <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.qiniu_bucket" />
+                    <a-input v-model="options.oss_qiniu_bucket" />
                   </a-form-item>
                   <a-form-item
                     label="处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.qiniu_small_url" />
+                    <a-input v-model="options.oss_qiniu_small_url" />
                   </a-form-item>
                 </div>
                 <a-form-item>
@@ -441,25 +441,25 @@
                       label="SMTP 地址："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.mail_smtp_host" />
+                      <a-input v-model="options.smtp_email_host" />
                     </a-form-item>
                     <a-form-item
                       label="发送协议："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.mail_smtp_host" />
+                      <a-input v-model="options.smtp_email_host" />
                     </a-form-item>
                     <a-form-item
                       label="SSL 端口："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.mail_smtp_port" />
+                      <a-input v-model="options.smtp_email_port" />
                     </a-form-item>
                     <a-form-item
                       label="邮箱账号："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.mail_smtp_username" />
+                      <a-input v-model="options.smtp_email_username" />
                     </a-form-item>
                     <a-form-item
                       label="邮箱密码："
@@ -470,14 +470,14 @@
                         placement="right"
                         title="部分邮箱可能是授权码"
                       >
-                        <a-input v-model="options.mail_smtp_password" />
+                        <a-input v-model="options.smtp_email_password" />
                       </a-tooltip>
                     </a-form-item>
                     <a-form-item
                       label="发件人："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.mail_from_name" />
+                      <a-input v-model="options.smtp_from_name" />
                     </a-form-item>
                     <a-form-item>
                       <a-button
@@ -532,7 +532,7 @@
                   <a-radio-group
                     v-decorator="['radio-group']"
                     defaultValue="false"
-                    v-model="options.api_status"
+                    v-model="options.blog_api_status"
                   >
                     <a-radio value="true">启用</a-radio>
                     <a-radio value="false">禁用</a-radio>
@@ -542,7 +542,7 @@
                   label="Api Token："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.api_token" />
+                  <a-input v-model="options.blog_api_token" />
                 </a-form-item>
                 <a-form-item
                   label="统计代码："
@@ -551,7 +551,7 @@
                   <a-input
                     type="textarea"
                     :autosize="{ minRows: 5 }"
-                    v-model="options.statistics_code"
+                    v-model="options.blog_statistics_code"
                   />
                 </a-form-item>
                 <a-form-item>
