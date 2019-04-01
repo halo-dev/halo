@@ -130,7 +130,7 @@
                   <a-input
                     type="number"
                     defaultValue="10"
-                    v-model="options.post_index_pagesize"
+                    v-model="options.post_index_page_size"
                   />
                 </a-form-item>
                 <a-form-item
@@ -140,7 +140,7 @@
                   <a-input
                     type="number"
                     defaultValue="10"
-                    v-model="options.rss_pagesize"
+                    v-model="options.rss_page_size"
                   />
                 </a-form-item>
                 <a-form-item
@@ -242,7 +242,7 @@
                   <a-radio-group
                     v-decorator="['radio-group']"
                     defaultValue="false"
-                    v-model="options.comment_api_switch"
+                    v-model="options.comment_api_enabled"
                   >
                     <a-radio value="true">启用</a-radio>
                     <a-radio value="false">禁用</a-radio>
@@ -255,7 +255,7 @@
                   <a-input
                     type="number"
                     defaultValue="10"
-                    v-model="options.comment_post_pagesize"
+                    v-model="options.comment_page_size"
                   />
                 </a-form-item>
                 <a-form-item
@@ -292,14 +292,14 @@
                   :wrapper-col="wrapperCol"
                 >
                   <a-select
-                    defaultValue="0"
+                    defaultValue="local"
                     @change="handleAttachChange"
                     v-model="options.attachment_type"
                   >
-                    <a-select-option value="0">本地</a-select-option>
-                    <a-select-option value="1">又拍云</a-select-option>
-                    <a-select-option value="2">七牛云</a-select-option>
-                    <a-select-option value="3">SM.MS</a-select-option>
+                    <a-select-option value="local">本地</a-select-option>
+                    <a-select-option value="ypyun">又拍云</a-select-option>
+                    <a-select-option value="qnyun">七牛云</a-select-option>
+                    <a-select-option value="smms">SM.MS</a-select-option>
                   </a-select>
                 </a-form-item>
                 <div
@@ -340,13 +340,13 @@
                     label="文件目录："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_upyun_src" />
+                    <a-input v-model="options.oss_upyun_source" />
                   </a-form-item>
                   <a-form-item
                     label="处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_upyun_small" />
+                    <a-input v-model="options.oss_upyun_small_url" />
                   </a-form-item>
                 </div>
                 <div
@@ -431,7 +431,7 @@
                       <a-radio-group
                         v-decorator="['radio-group']"
                         defaultValue="false"
-                        v-model="options.smtp_email_enable"
+                        v-model="options.email_enabled"
                       >
                         <a-radio value="true">启用</a-radio>
                         <a-radio value="false">禁用</a-radio>
@@ -441,25 +441,25 @@
                       label="SMTP 地址："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.smtp_email_host" />
+                      <a-input v-model="options.email_host" />
                     </a-form-item>
                     <a-form-item
                       label="发送协议："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.smtp_email_host" />
+                      <a-input v-model="options.email_protocol" />
                     </a-form-item>
                     <a-form-item
                       label="SSL 端口："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.smtp_email_port" />
+                      <a-input v-model="options.email_ssl_port" />
                     </a-form-item>
                     <a-form-item
                       label="邮箱账号："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.smtp_email_username" />
+                      <a-input v-model="options.email_username" />
                     </a-form-item>
                     <a-form-item
                       label="邮箱密码："
@@ -470,14 +470,14 @@
                         placement="right"
                         title="部分邮箱可能是授权码"
                       >
-                        <a-input v-model="options.smtp_email_password" />
+                        <a-input v-model="options.email_password" />
                       </a-tooltip>
                     </a-form-item>
                     <a-form-item
                       label="发件人："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.smtp_from_name" />
+                      <a-input v-model="options.email_from_name" />
                     </a-form-item>
                     <a-form-item>
                       <a-button
@@ -532,7 +532,7 @@
                   <a-radio-group
                     v-decorator="['radio-group']"
                     defaultValue="false"
-                    v-model="options.blog_api_status"
+                    v-model="options.api_enabled"
                   >
                     <a-radio value="true">启用</a-radio>
                     <a-radio value="false">禁用</a-radio>
