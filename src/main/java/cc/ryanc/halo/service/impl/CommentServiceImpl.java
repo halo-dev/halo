@@ -3,7 +3,7 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.entity.Post;
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.projection.CommentCountProjection;
 import cc.ryanc.halo.model.support.CommentPage;

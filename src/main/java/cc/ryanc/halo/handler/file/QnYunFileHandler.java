@@ -2,7 +2,7 @@ package cc.ryanc.halo.handler.file;
 
 import cc.ryanc.halo.exception.FileOperationException;
 import cc.ryanc.halo.model.enums.AttachmentType;
-import cc.ryanc.halo.model.enums.QnYunProperties;
+import cc.ryanc.halo.model.properties.QnYunProperties;
 import cc.ryanc.halo.model.support.QiNiuPutSet;
 import cc.ryanc.halo.model.support.UploadResult;
 import cc.ryanc.halo.service.OptionService;

@@ -1,6 +1,6 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
-import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.enums.OptionSource;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.service.OptionService;

@@ -1,4 +1,4 @@
-package cc.ryanc.halo.model.enums;
+package cc.ryanc.halo.model.properties;
 
 /**
  * @author : RYAN0UP
@@ -99,7 +99,7 @@ public enum BlogProperties implements PropertyEnum {
     /**
      * 站点描述
      */
-    SEO_DESC("seo_desc", String.class),
+    SEO_DESCRIPTION("seo_description", String.class),
 
     /**
      * 博客主题
