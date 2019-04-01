@@ -4,13 +4,14 @@ import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
 import cc.ryanc.halo.model.enums.OptionSource;
-import cc.ryanc.halo.model.properties.PropertyEnum;
 import cc.ryanc.halo.model.enums.ValueEnum;
 import cc.ryanc.halo.model.params.OptionParam;
+import cc.ryanc.halo.model.properties.PropertyEnum;
 import cc.ryanc.halo.service.base.CrudService;
 import com.qiniu.common.Zone;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +38,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param value  value
      * @param source source
      */
+    @Transactional
     void save(@NonNull String key, String value, @NonNull OptionSource source);
 
     /**
@@ -45,6 +47,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param options options
      * @param source  source
      */
+    @Transactional
     void save(@NonNull Map<String, String> options, @NonNull OptionSource source);
 
     /**
@@ -53,6 +56,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param optionParams option params
      * @param source       source
      */
+    @Transactional
     void save(List<OptionParam> optionParams, @NonNull OptionSource source);
 
     /**
@@ -61,6 +65,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param properties blog properties
      * @param source     source
      */
+    @Transactional
     void saveProperties(@NonNull Map<? extends PropertyEnum, String> properties, @NonNull OptionSource source);
 
     /**
@@ -68,6 +73,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      *
      * @return Map
      */
+    @NonNull
     Map<String, String> listOptions();
 
     /**
@@ -75,6 +81,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      *
      * @return a list of option dto
      */
+    @NonNull
     List<OptionOutputDTO> listDtos();
 
     /**
