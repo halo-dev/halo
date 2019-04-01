@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide"> Backup List </div>
+  <div class="page-header-index-wide">Backup List</div>
 </template>
 
 <script>

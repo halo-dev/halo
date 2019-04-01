@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide"> Tool List </div>
+  <div class="page-header-index-wide">Tool List</div>
 </template>
 
 <script>
