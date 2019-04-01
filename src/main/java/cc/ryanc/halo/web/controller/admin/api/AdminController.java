@@ -4,9 +4,9 @@ import cc.ryanc.halo.cache.lock.CacheLock;
 import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.model.dto.CountOutputDTO;
 import cc.ryanc.halo.model.dto.UserOutputDTO;
-import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.enums.PostStatus;
 import cc.ryanc.halo.model.params.LoginParam;
+import cc.ryanc.halo.model.properties.PrimaryProperties;
 import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.security.filter.AdminAuthenticationFilter;
 import cc.ryanc.halo.service.*;
@@ -61,7 +61,15 @@ public class AdminController {
         countOutputDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
         countOutputDTO.setAttachmentCount(attachmentService.count());
         countOutputDTO.setCommentCount(commentService.count());
-        countOutputDTO.setEstablishDays(Long.valueOf(optionService.getByProperty(BlogProperties.WIDGET_DAYCOUNT).orElse("0")));
+
+        long currentTimeMillis = System.currentTimeMillis();
+
+        // Calculate birthday
+        // TODO Initialize the birthday if absent
+        Long birthday = optionService.getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, Long.class, currentTimeMillis);
+        long days = (currentTimeMillis - birthday) / (1000 * 24 * 3600);
+        countOutputDTO.setEstablishDays(days);
+
         countOutputDTO.setLinkCount(linkService.count());
         countOutputDTO.setVisitCount(postService.countVisit());
         countOutputDTO.setLikeCount(postService.countLike());

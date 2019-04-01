@@ -3,9 +3,9 @@ package cc.ryanc.halo.service.impl;
 import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.entity.Post;
-import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.projection.CommentCountProjection;
+import cc.ryanc.halo.model.properties.CommentProperties;
 import cc.ryanc.halo.model.support.CommentPage;
 import cc.ryanc.halo.model.vo.CommentVO;
 import cc.ryanc.halo.model.vo.CommentWithParentVO;
@@ -122,7 +122,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
             comment.setStatus(CommentStatus.PUBLISHED);
         } else {
             // Handle comment status
-            Boolean needAudit = optionService.getByPropertyOrDefault(BlogProperties.NEW_COMMENT_NEED_CHECK, Boolean.class, true);
+            Boolean needAudit = optionService.getByPropertyOrDefault(CommentProperties.NEW_NEED_CHECK, Boolean.class, true);
             if (needAudit) {
                 comment.setStatus(CommentStatus.AUDITING);
             } else {

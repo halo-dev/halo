@@ -85,7 +85,7 @@ public interface PropertyEnum extends ValueEnum<String> {
         Assert.hasText(value, "Property value must not be blank");
 
         try {
-            return Enum.valueOf(type, value);
+            return Enum.valueOf(type, value.toUpperCase());
         } catch (Exception e) {
             // Ignore this exception
             return null;
