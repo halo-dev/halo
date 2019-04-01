@@ -4,6 +4,7 @@ import cc.ryanc.halo.exception.BadRequestException;
 import cc.ryanc.halo.model.entity.*;
 import cc.ryanc.halo.model.enums.AttachmentType;
 import cc.ryanc.halo.model.enums.BlogProperties;
+import cc.ryanc.halo.model.enums.OptionSource;
 import cc.ryanc.halo.model.params.InstallParam;
 import cc.ryanc.halo.model.support.BaseResponse;
 import cc.ryanc.halo.service.*;
@@ -175,7 +176,7 @@ public class InstallController {
         properties.put(BlogProperties.ATTACHMENT_TYPE, AttachmentType.LOCAL.getValue().toString());
 
         // Create properties
-        optionService.saveProperties(properties, "system");
+        optionService.saveProperties(properties, OptionSource.SYSTEM);
     }
 
 //    /**

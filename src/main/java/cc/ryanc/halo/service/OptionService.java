@@ -3,6 +3,7 @@ package cc.ryanc.halo.service;
 import cc.ryanc.halo.exception.MissingPropertyException;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.entity.Option;
+import cc.ryanc.halo.model.enums.OptionSource;
 import cc.ryanc.halo.model.enums.PropertyEnum;
 import cc.ryanc.halo.model.enums.ValueEnum;
 import cc.ryanc.halo.model.params.OptionParam;
@@ -36,7 +37,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param value  value
      * @param source source
      */
-    void save(@NonNull String key, String value, String source);
+    void save(@NonNull String key, String value, @NonNull OptionSource source);
 
     /**
      * Save multiple options
@@ -44,7 +45,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param options options
      * @param source  source
      */
-    void save(@NonNull Map<String, String> options, String source);
+    void save(@NonNull Map<String, String> options, @NonNull OptionSource source);
 
     /**
      * SAve multiple options
@@ -52,7 +53,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param optionParams option params
      * @param source       source
      */
-    void save(List<OptionParam> optionParams, String source);
+    void save(List<OptionParam> optionParams, @NonNull OptionSource source);
 
     /**
      * Saves blog properties.
@@ -60,7 +61,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param properties blog properties
      * @param source     source
      */
-    void saveProperties(@NonNull Map<? extends PropertyEnum, String> properties, String source);
+    void saveProperties(@NonNull Map<? extends PropertyEnum, String> properties, @NonNull OptionSource source);
 
     /**
      * Get all options
