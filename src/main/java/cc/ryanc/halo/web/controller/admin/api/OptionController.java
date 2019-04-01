@@ -3,10 +3,12 @@ package cc.ryanc.halo.web.controller.admin.api;
 import cc.ryanc.halo.model.dto.OptionOutputDTO;
 import cc.ryanc.halo.model.params.OptionParam;
 import cc.ryanc.halo.service.OptionService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Option Controller.
@@ -31,6 +33,18 @@ public class OptionController {
 
     @PostMapping("saving")
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
-        optionService.save(optionParams,"system");
+        optionService.save(optionParams, "system");
+    }
+
+    @GetMapping("map_view")
+    @ApiOperation("Lists all options with map view")
+    public Map<String, String> listAllWithMapView() {
+        return optionService.listOptions();
+    }
+
+    @PostMapping("map_view/saving")
+    @ApiOperation("Saves options by option map")
+    public void saveOptionsWithMapView(@RequestBody Map<String, String> optionMap) {
+        optionService.save(optionMap, "system");
     }
 }
