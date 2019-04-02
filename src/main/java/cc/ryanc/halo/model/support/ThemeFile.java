@@ -15,6 +15,8 @@ public class ThemeFile {
 
     private String name;
 
+    private String path;
+
     private Boolean isFile;
 
     private List<ThemeFile> node;

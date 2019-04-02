@@ -72,11 +72,13 @@ public class ThemeServiceImpl implements ThemeService {
                 for (File base : baseFiles) {
                     ThemeFile file = new ThemeFile();
                     if (base.isDirectory()) {
-                        file.setName(base.getAbsolutePath());
+                        file.setName(base.getName());
+                        file.setPath(base.getAbsolutePath());
                         file.setIsFile(false);
                         file.setNode(listThemeFolder(base.getAbsolutePath()));
                     } else {
-                        file.setName(base.getAbsolutePath());
+                        file.setName(base.getName());
+                        file.setPath(base.getAbsolutePath());
                         file.setIsFile(true);
                     }
                     templates.add(file);
