@@ -79,7 +79,7 @@ public class ContentTagController extends BaseContentController {
                        @PathVariable("slugName") String slugName,
                        @PathVariable("page") Integer page,
                        @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
-        final Tag tag = tagService.getBySlugName(slugName);
+        final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
         if (null == tag) {
             return this.renderNotFound();
         }

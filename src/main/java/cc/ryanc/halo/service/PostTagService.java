@@ -5,6 +5,8 @@ import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.entity.PostTag;
 import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.service.base.CrudService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -57,6 +59,15 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      */
     @NonNull
     List<Post> listPostsBy(@NonNull Integer tagId);
+
+    /**
+     * Pages posts by tag id.
+     *
+     * @param tagId    must not be null
+     * @param pageable must not be null
+     * @return a page of post
+     */
+    Page<Post> pagePostsBy(@NonNull Integer tagId, Pageable pageable);
 
     /**
      * Merges or creates post tags by post id and tag id set if absent.

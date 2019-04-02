@@ -55,7 +55,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
      * @return Tag
      */
     @Override
-    public Tag getBySlugName(String slugName) {
+    public Tag getBySlugNameOfNonNull(String slugName) {
         return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("The tag does not exist").setErrorData(slugName));
     }
 
