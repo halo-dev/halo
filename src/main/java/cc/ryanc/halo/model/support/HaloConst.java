@@ -14,6 +14,10 @@ import java.util.Map;
  */
 public class HaloConst {
 
+    /**
+     * User home directory.
+     */
+    public final static String USER_HOME = System.getProperties().getProperty("user.home");
 
     /**
      * Default theme name.
