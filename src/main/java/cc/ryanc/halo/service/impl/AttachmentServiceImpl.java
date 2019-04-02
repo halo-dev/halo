@@ -13,6 +13,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import com.UpYun;
+import com.aliyun.oss.OSSClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.qiniu.common.QiniuException;
@@ -37,7 +38,9 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -143,6 +146,9 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
                 break;
             case "upyun":
                 resultMap = this.attachUpYunUpload(file, request);
+                break;
+            case "aliyun":
+                resultMap = this.attachAliyunUpload(file, request);
                 break;
             default:
                 resultMap = this.attachUpload(file, request);
@@ -353,6 +359,44 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
     }
 
     /**
+     * 阿里云上传
+     *
+     * @param file      文件
+     * @param request   request对象
+     * @return
+     */
+    @Override
+    public Map<String, String> attachAliyunUpload(MultipartFile file, HttpServletRequest request) {
+        final Map<String, String> resultMap = new HashMap<>(6);
+        try {
+            final String key = String.valueOf(new Date().getTime());
+            final String endPoint = OPTIONS.get("aliyun_endpoint");
+            final String accessKey = OPTIONS.get("aliyun_access_key");
+            final String accessSecret = OPTIONS.get("aliyun_access_secret");
+            final String bucketName = OPTIONS.get("aliyun_bucket_name");
+
+            final String fileName = file.getOriginalFilename();
+            final String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
+            final String filePath = "https://" + bucketName + "." + endPoint + "/" + key + fileSuffix;
+
+            OSSClient ossClient = new OSSClient(endPoint, accessKey, accessSecret);
+            InputStream inputStream = file.getInputStream();
+            ossClient.putObject(bucketName, key + fileSuffix, inputStream);
+            ossClient.shutdown();
+
+            resultMap.put("fileName", fileName);
+            resultMap.put("filePath", filePath.trim());
+            resultMap.put("smallPath", filePath.trim());
+            resultMap.put("suffix", fileSuffix);
+            resultMap.put("size", HaloUtils.parseSize(file.getSize()));
+            resultMap.put("location", AttachLocationEnum.ALIYUN.getDesc());
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultMap;
+    }
+
+    /**
      * 七牛云删除附件
      *
      * @param key key
@@ -403,6 +447,32 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
         } catch (IOException e) {
             e.printStackTrace();
         } catch (UpException e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    /**
+     * 阿里云删除附件
+     *
+     * @param fileName 文件名称
+     * @return
+     */
+    @Override
+    public boolean deleteAliyunAttachment(String fileName) {
+        boolean flag = true;
+        final String endPoint = OPTIONS.get("aliyun_endpoint");
+        final String accessKey = OPTIONS.get("aliyun_access_key");
+        final String accessSecret = OPTIONS.get("aliyun_access_secret");
+        final String bucketName = OPTIONS.get("aliyun_bucket_name");
+        if (StrUtil.isEmpty(endPoint) || StrUtil.isEmpty(accessKey) || StrUtil.isEmpty(accessSecret) || StrUtil.isEmpty(bucketName)) {
+            return false;
+        }
+        try {
+            OSSClient ossClient = new OSSClient(endPoint, accessKey, accessSecret);
+            ossClient.deleteObject(bucketName, fileName);
+            ossClient.shutdown();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return flag;

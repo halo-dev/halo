@@ -58,6 +58,14 @@ public interface AttachmentService extends CrudService<Attachment, Long> {
     Map<String, String> attachUpYunUpload(MultipartFile file, HttpServletRequest request);
 
     /**
+     * 阿里云上传
+     * @param file      文件
+     * @param request   request对象
+     * @return
+     */
+    Map<String, String> attachAliyunUpload(MultipartFile file, HttpServletRequest request);
+
+    /**
      * 七牛云删除附件
      *
      * @param key key
@@ -72,5 +80,12 @@ public interface AttachmentService extends CrudService<Attachment, Long> {
      * @return boolean
      */
     boolean deleteUpYunAttachment(String fileName);
+
+    /**
+     * 阿里云删除附件
+     * @param fileName 文件名称
+     * @return
+     */
+    boolean deleteAliyunAttachment(String fileName);
 
 }

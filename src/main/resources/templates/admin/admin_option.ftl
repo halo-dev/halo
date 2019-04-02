@@ -396,6 +396,12 @@
                                                     <label><@spring.message code='admin.setting.form.attach-loc-qiniu' /></label>
                                                 </div>
                                             </div>
+                                            <div class="pretty p-default p-round">
+                                                <input type="radio" name="attach_loc" value="aliyun" ${((options.attach_loc!)=='aliyun')?string('checked','')} >
+                                                <div class="state p-primary">
+                                                    <label><@spring.message code='admin.setting.form.attach-loc-aliyun' /></label>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -474,6 +480,34 @@
                                             <label for="qiniuSmallUrl" class="col-lg-2 col-sm-4 control-label"><@spring.message code='admin.setting.form.qiniu-small-url' /></label>
                                             <div class="col-lg-4 col-sm-8">
                                                 <input type="text" class="form-control" id="qiniuSamllUrl" name="qiniu_small_url" value="${options.qiniu_small_url!}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 阿里云 -->
+                                    <div class="aliyun-options" style="display: none">
+                                        <div class="form-group">
+                                            <label for="aliyunEndpoint" class="col-lg-2 col-sm-4 control-label">End Point：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="aliyunEndpoint" name="aliyun_endpoint" value="${options.aliyun_endpoint!}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="aliyunAccessKey" class="col-lg-2 col-sm-4 control-label">Access Key：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="aliyunAccessKey" name="aliyun_access_key" value="${options.aliyun_access_key!}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="aliyunAccessSecret" class="col-lg-2 col-sm-4 control-label">Access Secret：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="aliyunAccessSecret" name="aliyun_access_secret" value="${options.aliyun_access_secret!}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="aliyunBucketName" class="col-lg-2 col-sm-4 control-label">Bucket Name：</label>
+                                            <div class="col-lg-4 col-sm-8">
+                                                <input type="text" class="form-control" id="aliyunBucketName" name="aliyun_bucket_name" value="${options.aliyun_bucket_name!}">
                                             </div>
                                         </div>
                                     </div>
@@ -728,6 +762,7 @@
         var server = $('input:radio[value=server]:checked').val();
         var upyun = $('input:radio[value=upyun]:checked').val();
         var qiniu = $('input:radio[value=qiniu]:checked').val();
+        var aliyun = $('input:radio[value=aliyun]:checked').val();
         if(server!=null){
             $('.server-options').show();
         }else{
@@ -742,6 +777,11 @@
             $('.qiniu-options').show();
         }else{
             $('.qiniu-options').hide();
+        }
+        if(aliyun!=null){
+            $('.aliyun-options').show();
+        }else{
+            $('.aliyun-options').hide();
         }
     }
 

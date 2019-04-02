@@ -197,6 +197,9 @@ public class AttachmentController {
                 } else if (attachLocation.equals(UPYUN.getDesc())) {
                     String fileName = attachPath.substring(attachPath.lastIndexOf("/") + 1);
                     flag = attachmentService.deleteUpYunAttachment(fileName);
+                } else if (attachLocation.equals(ALIYUN.getDesc())) {
+                    String fileName = attachPath.substring(attachPath.lastIndexOf("/") + 1);
+                    flag = attachmentService.deleteAliyunAttachment(fileName);
                 }
             }
             if (flag) {

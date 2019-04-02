@@ -23,7 +23,12 @@ public enum AttachLocationEnum {
     /**
      * 又拍云
      */
-    UPYUN(2, "upyun");
+    UPYUN(2, "upyun"),
+
+    /**
+     * 阿里云
+     */
+    ALIYUN(3, "aliyun");
 
     private Integer code;
     private String desc;
