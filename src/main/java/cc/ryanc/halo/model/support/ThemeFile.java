@@ -19,5 +19,7 @@ public class ThemeFile {
 
     private Boolean isFile;
 
+    private Boolean canEdit;
+
     private List<ThemeFile> node;
 }
