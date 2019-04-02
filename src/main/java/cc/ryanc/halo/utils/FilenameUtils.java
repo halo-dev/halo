@@ -17,6 +17,15 @@ public class FilenameUtils {
     private FilenameUtils() {
     }
 
+    /**
+     * Gets base name of file name. <br>
+     * eg: <br>
+     * filename: /home/test/test.txt <br>
+     * basename: test
+     *
+     * @param filename filename must not be blank
+     * @return basename of the given file name
+     */
     @NonNull
     public static String getBasename(@NonNull String filename) {
         Assert.hasText(filename, "Filename must not be blank");
@@ -42,6 +51,17 @@ public class FilenameUtils {
         return filename.substring(0, dotLastIndex);
     }
 
+    /**
+     * Gets extension of the file name. <br>
+     * <code>
+     * eg: <br>
+     * filename: /home/test/test.txt <br>
+     * extension: txt
+     * </code>
+     *
+     * @param filename filename must not be blank
+     * @return an extension of the given file name
+     */
     @NonNull
     public static String getExtension(@NonNull String filename) {
         Assert.hasText(filename, "Filename must not be blank");
