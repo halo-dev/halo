@@ -539,10 +539,10 @@
                   </a-radio-group>
                 </a-form-item>
                 <a-form-item
-                  label="Api Token："
+                  label="Access key："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_api_token" />
+                  <a-input v-model="options.blog_api_access_key" />
                 </a-form-item>
                 <a-form-item
                   label="统计代码："
