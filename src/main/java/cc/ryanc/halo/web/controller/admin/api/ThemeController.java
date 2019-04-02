@@ -4,6 +4,7 @@ import cc.ryanc.halo.model.enums.OptionSource;
 import cc.ryanc.halo.model.properties.PrimaryProperties;
 import cc.ryanc.halo.model.properties.PropertyEnum;
 import cc.ryanc.halo.model.support.Theme;
+import cc.ryanc.halo.model.support.ThemeFile;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
@@ -50,6 +51,16 @@ public class ThemeController {
     @ApiOperation("List all themes")
     public List<Theme> listAll() {
         return themeService.getThemes();
+    }
+
+    /**
+     * List all of theme files.
+     *
+     * @return List<ThemeFile>
+     */
+    @GetMapping(value = "/files")
+    public List<ThemeFile> listFiles() {
+        return themeService.listThemeFolderBy(BaseContentController.THEME);
     }
 
     /**
