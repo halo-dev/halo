@@ -33,7 +33,6 @@ import java.util.UUID;
 @Slf4j
 public class HaloUtils {
 
-
     @NonNull
     public static String timeFormat(long totalSeconds) {
         if (totalSeconds <= 0) {

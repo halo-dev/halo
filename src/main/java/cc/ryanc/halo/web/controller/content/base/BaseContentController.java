@@ -15,6 +15,7 @@ public abstract class BaseContentController {
     /**
      * Default theme
      */
+    @Deprecated
     public static String THEME = DEFAULT_THEME_NAME;
 
     /**

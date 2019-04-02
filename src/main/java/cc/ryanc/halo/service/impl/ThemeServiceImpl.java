@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.support.ThemeFile;
@@ -23,6 +24,12 @@ import java.util.List;
  */
 @Service
 public class ThemeServiceImpl implements ThemeService {
+
+    private final HaloProperties haloProperties;
+
+    public ThemeServiceImpl(HaloProperties haloProperties) {
+        this.haloProperties = haloProperties;
+    }
 
     private static String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
 
@@ -99,7 +106,6 @@ public class ThemeServiceImpl implements ThemeService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to get theme template", e);
         }
-        templates.sort(Comparator.comparing(ThemeFile::getIsFile));
         return templates;
     }
 
@@ -171,7 +177,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public File getThemeBasePath() {
-        return new File(System.getProperties().getProperty("user.home"), "halo/templates/themes");
+        return new File(haloProperties.getWorkDir(), "templates/themes");
     }
 
     /**
