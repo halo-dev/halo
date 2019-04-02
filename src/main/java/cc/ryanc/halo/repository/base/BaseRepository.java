@@ -1,5 +1,7 @@
 package cc.ryanc.halo.repository.base;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -18,7 +20,7 @@ import java.util.List;
 public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
 
     /**
-     * Finds all domain by id list and the specified sort.
+     * Finds all domain by id list.
      *
      * @param ids  id list of domain must not be null
      * @param sort the specified sort must not be null
@@ -26,6 +28,16 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
      */
     @NonNull
     List<DOMAIN> findAllByIdIn(@NonNull Iterable<ID> ids, @NonNull Sort sort);
+
+    /**
+     * Finds all domain by domain id list.
+     *
+     * @param ids      must not be null
+     * @param pageable must not be null
+     * @return a list of domains
+     */
+    @NonNull
+    Page<DOMAIN> findAllByIdIn(@NonNull Iterable<ID> ids, @NonNull Pageable pageable);
 
     /**
      * Deletes by id list.
