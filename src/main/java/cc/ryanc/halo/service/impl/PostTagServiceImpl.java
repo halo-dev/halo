@@ -11,6 +11,8 @@ import cc.ryanc.halo.repository.TagRepository;
 import cc.ryanc.halo.service.PostTagService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
 import cc.ryanc.halo.utils.ServiceUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -109,6 +111,17 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId);
 
         return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public Page<Post> pagePostsBy(Integer tagId, Pageable pageable) {
+        Assert.notNull(tagId, "Tag id must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
     }
 
     @Override
