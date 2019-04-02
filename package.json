@@ -20,6 +20,7 @@
     "vue-clipboard2": "^0.3.0",
     "vue-codemirror-lite": "^1.0.4",
     "vue-cropper": "0.4.9",
+    "vue-fragment": "^1.5.0",
     "vue-ls": "^3.2.1",
     "vue-router": "^3.0.2",
     "vue-svg-component-runtime": "^1.0.1",

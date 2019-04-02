@@ -8,6 +8,7 @@ import Tree from '@/components/Tree/Tree'
 import MultiTab from '@/components/MultiTab'
 import Result from '@/components/Result'
 import IconSelector from '@/components/IconSelector'
+import ThemeFile from '@/components/Tree/ThemeFile'
 
 export {
   AvatarList,
@@ -18,5 +19,6 @@ export {
   Tree,
   MultiTab,
   Result,
-  IconSelector
+  IconSelector,
+  ThemeFile
 }
