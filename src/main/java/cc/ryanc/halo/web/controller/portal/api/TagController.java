@@ -19,7 +19,7 @@ import java.util.List;
  * @author johnniang
  * @date 4/2/19
  */
-@RestController
+@RestController("PortalTagController")
 @RequestMapping("/api/tags")
 public class TagController {
 
@@ -41,4 +41,5 @@ public class TagController {
         }
         return tagService.convertTo(tagService.listAll(sort));
     }
+
 }
