@@ -25,13 +25,12 @@ import java.util.List;
 @Service
 public class ThemeServiceImpl implements ThemeService {
 
+    private static String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
     private final HaloProperties haloProperties;
 
     public ThemeServiceImpl(HaloProperties haloProperties) {
         this.haloProperties = haloProperties;
     }
-
-    private static String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
 
     /**
      * Gets all themes
@@ -106,6 +105,7 @@ public class ThemeServiceImpl implements ThemeService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to get theme template", e);
         }
+        templates.sort(Comparator.comparing(ThemeFile::getIsFile));
         return templates;
     }
 
