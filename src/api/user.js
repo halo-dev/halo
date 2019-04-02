@@ -19,4 +19,15 @@ userApi.updateProfile = updatedUserProfile => {
   })
 }
 
+userApi.updatePassword = (oldPassword, newPassword) => {
+  return service({
+    url: `${baseUrl}/profile/password`,
+    method: 'put',
+    data: {
+      oldPassword: oldPassword,
+      newPassword: newPassword
+    }
+  })
+}
+
 export default userApi

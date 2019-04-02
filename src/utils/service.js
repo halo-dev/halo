@@ -53,7 +53,7 @@ service.interceptors.response.use(
 
       message.error(data.message)
     } else {
-      message.error('Unkown reason')
+      message.error('Server unavailable')
     }
 
     return Promise.reject(error)
