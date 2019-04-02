@@ -4,9 +4,11 @@ import cc.ryanc.halo.model.entity.BasePost;
 import cc.ryanc.halo.model.enums.PostStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,14 +21,33 @@ import java.util.Optional;
 public interface BasePostRepository<DOMAIN extends BasePost> extends BaseRepository<DOMAIN, Integer> {
 
     /**
-     * Finds posts by status and type.
+     * Finds posts by status and pageable.
      *
-     * @param status   status
-     * @param pageable pageable
-     * @return Page<Post>
+     * @param status   post status must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
      */
     @NonNull
     Page<DOMAIN> findAllByStatus(@NonNull PostStatus status, @NonNull Pageable pageable);
+
+    /**
+     * Finds posts by status.
+     *
+     * @param status post staus must not be null
+     * @return a list of post
+     */
+    @NonNull
+    List<DOMAIN> findAllByStatus(@NonNull PostStatus status);
+
+    /**
+     * Finds posts by status.
+     *
+     * @param status post staus must not be null
+     * @param sort   sort info must not be null
+     * @return a list of post
+     */
+    @NonNull
+    List<DOMAIN> findAllByStatus(@NonNull PostStatus status, @NonNull Sort sort);
 
     /**
      * Counts posts by status and type.

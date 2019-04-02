@@ -58,6 +58,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
+        // TODO Consider cache options with map
         Option option = optionRepository.findByOptionKey(key).map(anOption -> {
             // Exist
             anOption.setOptionValue(value);
@@ -87,6 +88,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
+        // TODO Optimize the queries
         options.forEach((key, value) -> save(key, value, source));
     }
 
@@ -121,7 +123,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public List<OptionOutputDTO> listDtos() {
-        return listAll().stream().map(option -> (OptionOutputDTO) new OptionOutputDTO().convertFrom(option)).collect(Collectors.toList());
+        return listAll().stream().map(option -> new OptionOutputDTO().<OptionOutputDTO>convertFrom(option)).collect(Collectors.toList());
     }
 
     /**

@@ -8,6 +8,8 @@ import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.*;
 import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.vo.ArchiveMonthVO;
+import cc.ryanc.halo.model.vo.ArchiveYearVO;
 import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.repository.PostRepository;
@@ -26,11 +28,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Post service implementation.
@@ -83,7 +88,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     public Page<Post> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
-        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(Sort.Direction.DESC, "editTime"));
+        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "editTime"));
 
         return listAll(latestPageable);
     }
@@ -254,6 +259,41 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
+    public List<ArchiveYearVO> listYearArchives() {
+        // Get all posts
+        List<Post> posts = postRepository.findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+
+        Map<Integer, List<Post>> yearPostMap = new HashMap<>();
+
+        posts.forEach(post -> {
+            Calendar calendar = DateUtils.convertTo(post.getCreateTime());
+            yearPostMap.computeIfAbsent(calendar.get(Calendar.YEAR), year -> new LinkedList<>())
+                    .add(post);
+        });
+
+        List<ArchiveYearVO> archives = new LinkedList<>();
+
+        yearPostMap.forEach((year, postList) -> {
+            // Build archive
+            ArchiveYearVO archive = new ArchiveYearVO();
+            archive.setYear(year);
+            archive.setPosts(convertTo(postList));
+
+            // Add archive
+            archives.add(archive);
+        });
+
+        // TODO Sort this list and inner list
+
+        return archives;
+    }
+
+    @Override
+    public List<ArchiveMonthVO> listMonthArchives() {
+        return null;
+    }
+
+    @Override
     @Transactional
     public Post removeById(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
@@ -271,6 +311,23 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         log.debug("Removed post categories: [{}]", postCategories);
 
         return super.removeById(postId);
+    }
+
+    /**
+     * Converts to post minimal output dto.
+     *
+     * @param posts a list of post
+     * @return a list of post minimal output dto
+     */
+    @NonNull
+    private List<PostMinimalOutputDTO> convertTo(@NonNull List<Post> posts) {
+        if (CollectionUtils.isEmpty(posts)) {
+            return Collections.emptyList();
+        }
+
+        // Convert
+        return posts.stream().map(post -> new PostMinimalOutputDTO().<PostMinimalOutputDTO>convertFrom(post))
+                .collect(Collectors.toList());
     }
 
     /**

@@ -63,7 +63,7 @@ public class SwaggerConfiguration {
     public Docket haloDefaultApi() {
         log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
         return buildApiDocket("cc.ryanc.halo.default",
-                "cc.ryanc.halo.web.controller.api",
+                "cc.ryanc.halo.web.controller.portal.api",
                 "/api/**")
                 .enable(!haloProperties.getDocDisabled());
     }
