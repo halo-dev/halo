@@ -1,14 +1,11 @@
 <template>
   <div class="page-header-index-wide page-header-wrapper-grid-content-main">
     <a-row :gutter="24">
-      <a-col
-        :md="24"
-        :lg="10"
-      >
-        <a-card :bordered="false">
+      <a-col :md="24" :lg="10">
+        <a-card :bordered="false" :bodyStyle="{ padding: '16' }">
           <div class="profile-center-avatarHolder">
             <div class="avatar">
-              <img :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'">
+              <img :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'" />
             </div>
             <div class="username">{{ user.nickname }}</div>
             <div class="bio">{{ user.description }}</div>
@@ -25,10 +22,7 @@
           </div>
           <a-divider />
           <div class="general-profile">
-            <a-list
-              itemLayout="horizontal"
-              :loading="countsLoading"
-            >
+            <a-list itemLayout="horizontal" :loading="countsLoading">
               <a-list-item>累计发表了 {{ counts.postCount || 0 }} 篇文章。</a-list-item>
               <a-list-item>累计创建了 {{ counts.linkCount || 0 }} 个标签。</a-list-item>
               <a-list-item>累计获得了 {{ counts.commentCount || 0 }} 条评论。</a-list-item>
@@ -39,21 +33,11 @@
           </div>
         </a-card>
       </a-col>
-      <a-col
-        :md="24"
-        :lg="14"
-      >
-        <a-card
-          :bordered="false"
-          title="个人资料"
-          :bodyStyle="{ padding: '0' }"
-        >
+      <a-col :md="24" :lg="14">
+        <a-card :bordered="false" title="个人资料" :bodyStyle="{ padding: '0' }">
           <div class="card-container">
             <a-tabs type="card">
-              <a-tab-pane
-                tab="基本资料"
-                key="1"
-              >
+              <a-tab-pane tab="基本资料" key="1">
                 <a-form layout="vertical">
                   <a-form-item label="用户名：">
                     <a-input v-model="user.username" />
@@ -65,49 +49,31 @@
                     <a-input v-model="user.email" />
                   </a-form-item>
                   <a-form-item label="个人说明：">
-                    <a-input
-                      type="textarea"
-                      :autosize="{ minRows: 5 }"
-                      v-model="user.description"
-                    />
+                    <a-input type="textarea" :autosize="{ minRows: 5 }" v-model="user.description" />
                   </a-form-item>
                   <a-form-item>
-                    <a-button
-                      type="primary"
-                      @click="updateProfile"
-                    >保存</a-button>
+                    <a-button type="primary" @click="updateProfile">保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
-              <a-tab-pane
-                tab="密码"
-                key="2"
-              >
+              <a-tab-pane tab="密码" key="2">
                 <a-form layout="vertical">
                   <a-form-item label="原密码：">
-                    <a-input
-                      v-model="passwordParam.oldPassword"
-                      type="password"
-                    />
+                    <a-input v-model="passwordParam.oldPassword" type="password" />
                   </a-form-item>
                   <a-form-item label="新密码：">
-                    <a-input
-                      v-model="passwordParam.newPassword"
-                      type="password"
-                    />
+                    <a-input v-model="passwordParam.newPassword" type="password" />
                   </a-form-item>
                   <a-form-item label="确认密码：">
-                    <a-input
-                      v-model="passwordParam.confirmPassword"
-                      type="password"
-                    />
+                    <a-input v-model="passwordParam.confirmPassword" type="password" />
                   </a-form-item>
                   <a-form-item>
                     <a-button
                       type="primary"
                       :disabled="passwordUpdateButtonDisabled"
                       @click="updatePassword"
-                    >确认更改</a-button>
+                    >确认更改</a-button
+                    >
                   </a-form-item>
                 </a-form>
               </a-tab-pane>

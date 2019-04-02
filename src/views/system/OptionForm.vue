@@ -600,16 +600,16 @@ export default {
     },
     handleAttachChange(e) {
       switch (e) {
-        case '0':
-        case '3':
+        case 'local':
+        case 'smms':
           this.upyunFormHidden = false
           this.qiniuFormHidden = false
           break
-        case '1':
+        case 'ypyun':
           this.upyunFormHidden = true
           this.qiniuFormHidden = false
           break
-        case '2':
+        case 'qnyun':
           this.qiniuFormHidden = true
           this.upyunFormHidden = false
           break

@@ -5,11 +5,11 @@ let lessNodesAppended
 
 const colorList = [
   {
-    key: '薄暮',
+    key: '红色',
     color: '#F5222D'
   },
   {
-    key: '火山',
+    key: '浅红色',
     color: '#FA541C'
   },
   {
@@ -17,23 +17,23 @@ const colorList = [
     color: '#FAAD14'
   },
   {
-    key: '明青',
+    key: '青色',
     color: '#13C2C2'
   },
   {
-    key: '极光绿',
+    key: '绿色',
     color: '#52C41A'
   },
   {
-    key: '拂晓蓝（默认）',
+    key: '默认',
     color: '#1890FF'
   },
   {
-    key: '极客蓝',
+    key: '蓝色',
     color: '#2F54EB'
   },
   {
-    key: '酱紫',
+    key: '紫色',
     color: '#722ED1'
   }
 ]
@@ -95,9 +95,4 @@ const updateTheme = primaryColor => {
   }
 }
 
-const updateColorWeak = colorWeak => {
-  // document.body.className = colorWeak ? 'colorWeak' : '';
-  colorWeak ? document.body.classList.add('colorWeak') : document.body.classList.remove('colorWeak')
-}
-
-export { updateTheme, colorList, updateColorWeak }
+export { updateTheme, colorList }

@@ -2,12 +2,12 @@
   <div class="user-wrapper">
     <a href="/" target="_blank">
       <span class="action">
-        <a-icon type="link"></a-icon>
+        <a-icon type="link" />
       </span>
     </a>
     <a href="javascript:void(0)" @click="showOptionModal">
       <span class="action">
-        <a-icon type="setting"></a-icon>
+        <a-icon type="setting" />
       </span>
     </a>
     <header-comment class="action"/>
@@ -31,24 +31,29 @@
         </a-menu-item>
       </a-menu>
     </a-dropdown>
-    <a-modal title="样式设置" v-model="optionVisible"></a-modal>
+    <setting-drawer ref="drawer"></setting-drawer>
   </div>
 </template>
 
 <script>
 import HeaderComment from './HeaderComment'
+import SettingDrawer from '@/components/setting/SettingDrawer'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'UserMenu',
   components: {
-    HeaderComment
+    HeaderComment,
+    SettingDrawer
   },
   data() {
     return {
-      optionVisible: false,
+      optionVisible: true,
       avatar: 'https://gravatar.loli.net/avatar/?s=256&d=mm'
     }
+  },
+  mounted() {
+    this.optionVisible = this.$refs.drawer.visible
   },
   methods: {
     ...mapActions(['Logout']),
@@ -76,7 +81,8 @@ export default {
       })
     },
     showOptionModal() {
-      this.optionVisible = true
+      this.optionVisible = this.$refs.drawer.visible
+      this.$refs.drawer.toggle()
     }
   }
 }

@@ -25,7 +25,7 @@
     </template>
     <span @click="fetchComment" class="header-comment">
       <a-badge dot>
-        <a-icon type="bell"/>
+        <a-icon type="bell" />
       </a-badge>
     </span>
   </a-popover>
