@@ -7,7 +7,7 @@ import lombok.ToString;
 import java.util.Comparator;
 
 /**
- * Archive vo.
+ * Month archive vo.
  *
  * @author johnniang
  * @date 4/2/19
