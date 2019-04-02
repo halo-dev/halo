@@ -60,7 +60,7 @@ public class ThemeController {
      *
      * @return List<ThemeFile>
      */
-    @GetMapping(value = "/files")
+    @GetMapping("files")
     public List<ThemeFile> listFiles() {
         return themeService.listThemeFolderBy(BaseContentController.THEME);
     }

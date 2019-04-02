@@ -9,7 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Archive vo.
+ * Year archive vo.
  *
  * @author johnniang
  * @date 4/2/19

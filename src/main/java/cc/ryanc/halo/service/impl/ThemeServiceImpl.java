@@ -1,5 +1,6 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.config.properties.HaloProperties;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.support.ThemeFile;
@@ -21,6 +22,12 @@ import java.util.List;
  */
 @Service
 public class ThemeServiceImpl implements ThemeService {
+
+    private final HaloProperties haloProperties;
+
+    public ThemeServiceImpl(HaloProperties haloProperties) {
+        this.haloProperties = haloProperties;
+    }
 
     /**
      * Gets all themes
@@ -158,7 +165,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public File getThemeBasePath() {
-        return new File(System.getProperties().getProperty("user.home"), "halo/templates/themes");
+        return new File(haloProperties.getWorkDir(), "templates/themes");
     }
 
     /**
