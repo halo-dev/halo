@@ -1,6 +1,7 @@
 package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.support.Theme;
+import cc.ryanc.halo.model.support.ThemeFile;
 import cc.ryanc.halo.model.support.ThemeProperties;
 
 import java.io.File;
@@ -20,12 +21,20 @@ public interface ThemeService {
     List<Theme> getThemes();
 
     /**
-     * Gets theme templates
+     * Lists theme folder by absolute path.
+     *
+     * @param absolutePath absolutePath
+     * @return List<ThemeFile>
+     */
+    List<ThemeFile> listThemeFolder(String absolutePath);
+
+    /**
+     * Lists theme folder by theme name.
      *
      * @param theme theme
-     * @return List<String>
+     * @return List<ThemeFile>
      */
-    List<String> getTemplates(String theme);
+    List<ThemeFile> listThemeFolderBy(String theme);
 
     /**
      * Gets custom template, such as page_xxx.ftl, and xxx will be template name

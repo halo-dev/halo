@@ -2,6 +2,7 @@ package cc.ryanc.halo.service.impl;
 
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
+import cc.ryanc.halo.model.support.ThemeFile;
 import cc.ryanc.halo.model.support.ThemeProperties;
 import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
@@ -56,37 +57,47 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     /**
-     * Gets theme templates
+     * Lists theme folder by absolute path.
      *
-     * @param theme theme
-     * @return List<String>
+     * @param absolutePath absolutePath
+     * @return List<ThemeFile>
      */
     @Override
-    public List<String> getTemplates(String theme) {
-        final List<String> templates = new ArrayList<>();
+    public List<ThemeFile> listThemeFolder(String absolutePath) {
+        final List<ThemeFile> templates = new ArrayList<>();
         try {
-            final File themesPath = new File(getThemeBasePath(), theme);
-            final File modulePath = new File(themesPath.getAbsolutePath(), "module");
-            final File[] baseFiles = themesPath.listFiles();
-            final File[] moduleFiles = modulePath.listFiles();
-            if (null != moduleFiles) {
-                for (File file : moduleFiles) {
-                    if (file.isFile() && file.getName().endsWith(HaloConst.SUFFIX_FTL)) {
-                        templates.add("module/" + file.getName());
-                    }
-                }
-            }
+            File absolutePathFile = new File(absolutePath);
+            File[] baseFiles = absolutePathFile.listFiles();
             if (null != baseFiles) {
-                for (File file : baseFiles) {
-                    if (file.isFile() && file.getName().endsWith(HaloConst.SUFFIX_FTL)) {
-                        templates.add(file.getName());
+                for (File base : baseFiles) {
+                    ThemeFile file = new ThemeFile();
+                    if (base.isDirectory()) {
+                        file.setName(base.getAbsolutePath());
+                        file.setIsFile(false);
+                        file.setNode(listThemeFolder(base.getAbsolutePath()));
+                    } else {
+                        file.setName(base.getAbsolutePath());
+                        file.setIsFile(true);
                     }
+                    templates.add(file);
                 }
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to get theme template", e);
         }
         return templates;
+    }
+
+    /**
+     * Lists theme folder by theme name.
+     *
+     * @param theme theme
+     * @return List<ThemeFile>
+     */
+    @Override
+    public List<ThemeFile> listThemeFolderBy(String theme) {
+        File themePath = new File(getThemeBasePath(), theme);
+        return listThemeFolder(themePath.getAbsolutePath());
     }
 
     /**
