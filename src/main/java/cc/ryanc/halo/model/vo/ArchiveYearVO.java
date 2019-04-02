@@ -17,14 +17,17 @@ import java.util.List;
 @Data
 @ToString
 @EqualsAndHashCode
-public class ArchiveYearVO implements Comparator<ArchiveYearVO> {
+public class ArchiveYearVO {
 
     private Integer year;
 
     private List<PostMinimalOutputDTO> posts;
 
-    @Override
-    public int compare(ArchiveYearVO current, ArchiveYearVO other) {
-        return current.year - other.year;
+    public static class ArchiveComparator implements Comparator<ArchiveYearVO> {
+
+        @Override
+        public int compare(ArchiveYearVO left, ArchiveYearVO right) {
+            return right.getYear() - left.getYear();
+        }
     }
 }
