@@ -8,17 +8,5 @@ import Tree from '@/components/Tree/Tree'
 import MultiTab from '@/components/MultiTab'
 import Result from '@/components/Result'
 import IconSelector from '@/components/IconSelector'
-import ThemeFile from '@/components/Tree/ThemeFile'
 
-export {
-  AvatarList,
-  Ellipsis,
-  FooterToolbar,
-  NumberInfo,
-  DetailList,
-  Tree,
-  MultiTab,
-  Result,
-  IconSelector,
-  ThemeFile
-}
+export { AvatarList, Ellipsis, FooterToolbar, NumberInfo, DetailList, Tree, MultiTab, Result, IconSelector }
