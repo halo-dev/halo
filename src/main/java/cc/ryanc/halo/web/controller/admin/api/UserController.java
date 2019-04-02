@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
+ * User controller.
+ *
  * @author johnniang
  * @date 3/19/19
  */

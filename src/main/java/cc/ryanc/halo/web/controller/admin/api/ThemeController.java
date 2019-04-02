@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Theme controller.
+ *
  * @author : RYAN0UP
  * @date : 2019/3/20
  */

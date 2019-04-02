@@ -4,6 +4,8 @@ import cc.ryanc.halo.model.dto.post.PostMinimalOutputDTO;
 import cc.ryanc.halo.model.dto.post.PostSimpleOutputDTO;
 import cc.ryanc.halo.model.entity.Post;
 import cc.ryanc.halo.model.enums.PostStatus;
+import cc.ryanc.halo.model.vo.ArchiveMonthVO;
+import cc.ryanc.halo.model.vo.ArchiveYearVO;
 import cc.ryanc.halo.model.vo.PostDetailVO;
 import cc.ryanc.halo.model.vo.PostListVO;
 import cc.ryanc.halo.service.base.CrudService;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -144,4 +147,20 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return like total number
      */
     long countLike();
+
+    /**
+     * Lists year archives.
+     *
+     * @return a list of year archive
+     */
+    @NonNull
+    List<ArchiveYearVO> listYearArchives();
+
+    /**
+     * Lists month archives.
+     *
+     * @return a list of month archive
+     */
+    @NonNull
+    List<ArchiveMonthVO> listMonthArchives();
 }

@@ -72,7 +72,8 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Map<Integer, List<Category>> categoryListMap = new HashMap<>();
 
         // Foreach and collect
-        postCategories.forEach(postCategory -> categoryListMap.computeIfAbsent(postCategory.getPostId(), postId -> new LinkedList<>()).add(categoryMap.get(postCategory.getCategoryId())));
+        postCategories.forEach(postCategory -> categoryListMap.computeIfAbsent(postCategory.getPostId(), postId -> new LinkedList<>())
+                .add(categoryMap.get(postCategory.getCategoryId())));
 
         return categoryListMap;
     }
