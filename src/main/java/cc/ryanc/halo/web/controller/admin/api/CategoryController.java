@@ -35,7 +35,7 @@ public class CategoryController {
         this.postCategoryService = postCategoryService;
     }
 
-    @GetMapping("tree")
+    @GetMapping("tree_view")
     @ApiOperation("List as category tree")
     public List<CategoryVO> listAsTree(@SortDefault(sort = "name", direction = ASC) Sort sort) {
         return categoryService.listAsTree(sort);
