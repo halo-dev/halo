@@ -1,5 +1,5 @@
 <template>
-  <span class="page-header-index-wide">
+  <div class="page-header-index-wide">
     <a-row :gutter="12">
       <a-col
         :xl="18"
@@ -8,7 +8,7 @@
         :sm="24"
         :xs="24"
       >
-        <a-card hoverable>
+        <a-card>
           <codemirror :value="value"></codemirror>
         </a-card>
       </a-col>
@@ -20,14 +20,13 @@
         :xs="24"
       >
         <a-card
-          hoverable
           title="Anatole 主题"
         >
           <theme-file :files="files" />
         </a-card>
       </a-col>
     </a-row>
-  </span>
+  </div>
 </template>
 
 <script>

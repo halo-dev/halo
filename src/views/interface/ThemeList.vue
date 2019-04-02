@@ -2,7 +2,7 @@
   <div class="page-header-index-wide">
     <a-row :gutter="12" type="flex" align="middle">
       <a-col :xl="6" :lg="6" :md="6" :sm="12" :xs="24">
-        <a-card hoverable>
+        <a-card>
           <img alt="example" src="https://ryanc.cc/material/screenshot.png" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <a-icon type="check"/>
@@ -12,7 +12,7 @@
         </a-card>
       </a-col>
       <a-col :xl="6" :lg="6" :md="6" :sm="12" :xs="24">
-        <a-card hoverable>
+        <a-card>
           <img alt="example" src="https://ryanc.cc/material/screenshot.png" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <a-icon type="check"/>
@@ -22,7 +22,7 @@
         </a-card>
       </a-col>
       <a-col :xl="6" :lg="6" :md="6" :sm="12" :xs="24">
-        <a-card hoverable>
+        <a-card>
           <img alt="example" src="https://ryanc.cc/material/screenshot.png" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <a-icon type="check"/>
@@ -32,7 +32,7 @@
         </a-card>
       </a-col>
       <a-col :xl="6" :lg="6" :md="6" :sm="12" :xs="24">
-        <a-card hoverable>
+        <a-card>
           <img alt="example" src="https://ryanc.cc/material/screenshot.png" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <a-icon type="check"/>
@@ -42,7 +42,7 @@
         </a-card>
       </a-col>
       <a-col :xl="6" :lg="6" :md="6" :sm="12" :xs="24">
-        <a-card hoverable>
+        <a-card>
           <img alt="example" src="https://ryanc.cc/material/screenshot.png" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <a-icon type="check"/>
@@ -52,7 +52,7 @@
         </a-card>
       </a-col>
       <a-col :xl="6" :lg="6" :md="6" :sm="12" :xs="24">
-        <a-card hoverable>
+        <a-card>
           <img alt="example" src="https://ryanc.cc/material/screenshot.png" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <a-icon type="check"/>
