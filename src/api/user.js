@@ -11,11 +11,11 @@ userApi.getProfile = () => {
   })
 }
 
-userApi.updateProfile = updatedUserProfile => {
+userApi.updateProfile = profile => {
   return service({
     url: `${baseUrl}/profile`,
     method: 'put',
-    data: updatedUserProfile
+    data: profile
   })
 }
 

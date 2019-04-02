@@ -72,7 +72,10 @@
                     />
                   </a-form-item>
                   <a-form-item>
-                    <a-button type="primary">保存</a-button>
+                    <a-button
+                      type="primary"
+                      @click="updateProfile"
+                    >保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
@@ -163,6 +166,11 @@ export default {
       }
 
       userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {})
+    },
+    updateProfile() {
+      userApi.updateProfile(this.user).then(response => {
+        this.user = response.data.data
+      })
     }
   }
 }
