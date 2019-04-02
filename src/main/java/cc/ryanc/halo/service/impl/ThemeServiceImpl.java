@@ -5,6 +5,7 @@ import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.support.ThemeFile;
 import cc.ryanc.halo.model.support.ThemeProperties;
 import cc.ryanc.halo.service.ThemeService;
+import cc.ryanc.halo.utils.FilenameUtils;
 import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -21,6 +23,8 @@ import java.util.List;
  */
 @Service
 public class ThemeServiceImpl implements ThemeService {
+
+    private static String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
 
     /**
      * Gets all themes
@@ -80,6 +84,14 @@ public class ThemeServiceImpl implements ThemeService {
                         file.setName(base.getName());
                         file.setPath(base.getAbsolutePath());
                         file.setIsFile(true);
+                        for (String suffix : CAN_EDIT_SUFFIX) {
+                            if (FilenameUtils.getExtension(file.getName()).equals(suffix)) {
+                                file.setCanEdit(true);
+                                break;
+                            } else {
+                                file.setCanEdit(false);
+                            }
+                        }
                     }
                     templates.add(file);
                 }
@@ -87,6 +99,7 @@ public class ThemeServiceImpl implements ThemeService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to get theme template", e);
         }
+        templates.sort(Comparator.comparing(ThemeFile::getIsFile));
         return templates;
     }
 
