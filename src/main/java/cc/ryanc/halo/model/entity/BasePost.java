@@ -122,8 +122,49 @@ public class BasePost extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
+
         id = null;
         editTime = getCreateTime();
+
+        if (status == null) {
+            status = PostStatus.DRAFT;
+        }
+
+        if (summary == null) {
+            summary = "";
+        }
+
+        if (thumbnail == null) {
+            thumbnail = "";
+        }
+
+        if (visits == null) {
+            visits = 0L;
+        }
+
+        if (disallowComment == null) {
+            disallowComment = false;
+        }
+
+        if (password == null) {
+            password = "";
+        }
+
+        if (template == null) {
+            template = "";
+        }
+
+        if (topPriority == null) {
+            topPriority = 0;
+        }
+
+        if (createFrom == null) {
+            createFrom = PostCreateFrom.ADMIN;
+        }
+
+        if (likes == null) {
+            likes = 0L;
+        }
     }
 
 }
