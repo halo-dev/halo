@@ -37,6 +37,7 @@
 		<hutool.version>4.4.2</hutool.version>
 		<upyun-java-sdk.version>4.0.1</upyun-java-sdk.version>
 		<qiniu-java-sdk.version>7.2.18</qiniu-java-sdk.version>
+		<aliyun-java-sdk.version>3.4.2</aliyun-java-sdk.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
 		<commonmark.version>0.12.1</commonmark.version>
 		<commons-collections.version>3.2.2</commons-collections.version>
@@ -165,6 +166,12 @@
 					<groupId>com.squareup.okhttp3</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.aliyun.oss</groupId>
+		    <artifactId>aliyun-sdk-oss</artifactId>
+		    <version>${aliyun-java-sdk.version}</version>
 		</dependency>
 
 		<!-- 图片操作 -->
