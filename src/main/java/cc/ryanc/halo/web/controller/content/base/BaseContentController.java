@@ -2,7 +2,7 @@ package cc.ryanc.halo.web.controller.content.base;
 
 import cn.hutool.core.text.StrBuilder;
 
-import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
+import static cc.ryanc.halo.model.support.HaloConst.ACTIVATED_THEME_NAME;
 
 /**
  * Content base Controller
@@ -13,12 +13,6 @@ import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
 public abstract class BaseContentController {
 
     /**
-     * Default theme
-     */
-    @Deprecated
-    public static String THEME = DEFAULT_THEME_NAME;
-
-    /**
      * Render page by template name
      *
      * @param pageName pageName
@@ -26,7 +20,7 @@ public abstract class BaseContentController {
      */
     public String render(String pageName) {
         final StrBuilder themeStr = new StrBuilder("themes/");
-        themeStr.append(THEME);
+        themeStr.append(ACTIVATED_THEME_NAME);
         themeStr.append("/");
         themeStr.append(pageName);
         return themeStr.toString();

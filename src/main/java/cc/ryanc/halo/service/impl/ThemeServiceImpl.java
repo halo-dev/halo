@@ -7,7 +7,6 @@ import cc.ryanc.halo.model.support.ThemeFile;
 import cc.ryanc.halo.model.support.ThemeProperties;
 import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.utils.FilenameUtils;
-import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.dialect.Props;
@@ -151,7 +150,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public boolean isTemplateExist(String template) {
-        StrBuilder templatePath = new StrBuilder(BaseContentController.THEME);
+        StrBuilder templatePath = new StrBuilder(HaloConst.ACTIVATED_THEME_NAME);
         templatePath.append("/");
         templatePath.append(template);
         File file = new File(getThemeBasePath(), templatePath.toString());

@@ -3,11 +3,11 @@ package cc.ryanc.halo.web.controller.admin.api;
 import cc.ryanc.halo.model.enums.OptionSource;
 import cc.ryanc.halo.model.properties.PrimaryProperties;
 import cc.ryanc.halo.model.properties.PropertyEnum;
+import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.model.support.Theme;
 import cc.ryanc.halo.model.support.ThemeFile;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.ThemeService;
-import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import io.swagger.annotations.ApiOperation;
@@ -62,7 +62,7 @@ public class ThemeController {
      */
     @GetMapping("files")
     public List<ThemeFile> listFiles() {
-        return themeService.listThemeFolderBy(BaseContentController.THEME);
+        return themeService.listThemeFolderBy(HaloConst.ACTIVATED_THEME_NAME);
     }
 
     /**
@@ -78,7 +78,7 @@ public class ThemeController {
         properties.put(PrimaryProperties.THEME, themeName);
         // TODO Refactor: saveProperties => saveProperty
         optionService.saveProperties(properties, OptionSource.SYSTEM);
-        BaseContentController.THEME = themeName;
+        HaloConst.ACTIVATED_THEME_NAME = themeName;
         configuration.setSharedVariable("themeName", themeName);
         configuration.setSharedVariable("options", optionService.listOptions());
     }
