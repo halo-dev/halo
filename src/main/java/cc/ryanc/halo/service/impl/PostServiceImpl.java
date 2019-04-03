@@ -307,14 +307,15 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         List<ArchiveMonthVO> archives = new LinkedList<>();
 
-        yearMonthPostMap.forEach((year, monthPostMap) -> monthPostMap.forEach((month, postList) -> {
-            ArchiveMonthVO archive = new ArchiveMonthVO();
-            archive.setYear(year);
-            archive.setMonth(month);
-            archive.setPosts(convertTo(postList));
+        yearMonthPostMap.forEach((year, monthPostMap) ->
+                monthPostMap.forEach((month, postList) -> {
+                    ArchiveMonthVO archive = new ArchiveMonthVO();
+                    archive.setYear(year);
+                    archive.setMonth(month);
+                    archive.setPosts(convertTo(postList));
 
-            archives.add(archive);
-        }));
+                    archives.add(archive);
+                }));
 
         // Sort this list
         archives.sort(new ArchiveMonthVO.ArchiveComparator());
@@ -355,7 +356,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         }
 
         // Convert
-        return posts.stream().map(post -> new PostMinimalOutputDTO().<PostMinimalOutputDTO>convertFrom(post))
+        return posts.stream()
+                .map(post -> new PostMinimalOutputDTO().<PostMinimalOutputDTO>convertFrom(post))
                 .collect(Collectors.toList());
     }
 

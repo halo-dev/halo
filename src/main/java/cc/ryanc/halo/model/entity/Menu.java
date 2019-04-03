@@ -62,6 +62,19 @@ public class Menu extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
+
         id = null;
+
+        if (sort == null) {
+            sort = 0;
+        }
+
+        if (target == null) {
+            target = "_self";
+        }
+
+        if (icon == null) {
+            icon = "";
+        }
     }
 }
