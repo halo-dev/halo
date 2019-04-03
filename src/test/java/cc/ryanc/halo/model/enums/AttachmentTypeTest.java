@@ -24,9 +24,9 @@ public class AttachmentTypeTest {
 
     @Test
     public void conversionTest() {
-        assertThat(conversionService.convert("SERVER", AttachmentType.class), equalTo(AttachmentType.LOCAL));
-        assertThat(conversionService.convert("server", AttachmentType.class), equalTo(AttachmentType.LOCAL));
-        assertThat(conversionService.convert("Server", AttachmentType.class), equalTo(AttachmentType.LOCAL));
-        assertThat(conversionService.convert("SerVer", AttachmentType.class), equalTo(AttachmentType.LOCAL));
+        assertThat(conversionService.convert("LOCAL", AttachmentType.class), equalTo(AttachmentType.LOCAL));
+        assertThat(conversionService.convert("local", AttachmentType.class), equalTo(AttachmentType.LOCAL));
+        assertThat(conversionService.convert("Local", AttachmentType.class), equalTo(AttachmentType.LOCAL));
+        assertThat(conversionService.convert("LoCal", AttachmentType.class), equalTo(AttachmentType.LOCAL));
     }
 }

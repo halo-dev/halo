@@ -70,7 +70,7 @@ public class HaloUtilsTest {
         assertThat(pluralizedFormat, equalTo("2 chances"));
 
         pluralizedFormat = HaloUtils.pluralize(0, label, pluralLabel);
-        assertThat(pluralizedFormat, equalTo("no chance"));
+        assertThat(pluralizedFormat, equalTo("no chances"));
 
         // Test random positive time
         IntStream.range(0, 10000).forEach(i -> {
@@ -83,7 +83,7 @@ public class HaloUtilsTest {
         IntStream.range(0, 10000).forEach(i -> {
             long time = (-1) * RandomUtils.nextLong();
             String result = HaloUtils.pluralize(time, label, pluralLabel);
-            assertThat(result, equalTo("no " + label));
+            assertThat(result, equalTo("no " + pluralLabel));
         });
 
     }
