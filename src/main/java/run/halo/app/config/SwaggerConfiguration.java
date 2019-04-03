@@ -1,8 +1,5 @@
 package run.halo.app.config;
 
-import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.model.entity.User;
-import run.halo.app.security.support.UserDetail;
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
+import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.model.entity.User;
 import run.halo.app.security.support.UserDetail;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.AlternateTypeRule;
@@ -103,8 +102,8 @@ public class SwaggerConfiguration {
                 .paths(PathSelectors.ant(antPattern))
                 .build()
                 .apiInfo(apiInfo())
-                .securitySchemes(Arrays.asList(apiKeys()))
-                .securityContexts(Arrays.asList(securityContext()))
+                .securitySchemes(Collections.singletonList(apiKeys()))
+                .securityContexts(Collections.singletonList(securityContext()))
                 .useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, globalResponses)
                 .globalResponseMessage(RequestMethod.POST, globalResponses)
@@ -126,7 +125,7 @@ public class SwaggerConfiguration {
 
     private List<SecurityReference> defaultAuth() {
         AuthorizationScope[] authorizationScopes = {new AuthorizationScope("global", "accessEverything")};
-        return Arrays.asList(new SecurityReference("TOKEN ACCESS", authorizationScopes));
+        return Collections.singletonList(new SecurityReference("TOKEN ACCESS", authorizationScopes));
     }
 
 
@@ -177,7 +176,7 @@ public class SwaggerConfiguration {
     private Type sortMixin() {
         return new AlternateTypeBuilder()
                 .fullyQualifiedClassName(String.format("%s.generated.%s", Sort.class.getPackage().getName(), Sort.class.getSimpleName()))
-                .withProperties(Arrays.asList(property(String[].class, "sort")))
+                .withProperties(Collections.singletonList(property(String[].class, "sort")))
                 .build();
     }
 
