@@ -1,12 +1,15 @@
 package cc.ryanc.halo.web.controller.admin.api;
 
 import cc.ryanc.halo.model.dto.LinkOutputDTO;
+import cc.ryanc.halo.model.entity.Link;
+import cc.ryanc.halo.model.params.LinkParam;
 import cc.ryanc.halo.service.LinkService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -16,7 +19,7 @@ import java.util.List;
  * @date : 2019/3/21
  */
 @RestController
-@RequestMapping(value = "/admin/api/links")
+@RequestMapping("/admin/api/links")
 public class LinkController {
 
     private final LinkService linkService;
@@ -46,6 +49,12 @@ public class LinkController {
     @ApiOperation("Get link detail by id")
     public LinkOutputDTO getBy(@PathVariable("id") Integer id) {
         return new LinkOutputDTO().convertFrom(linkService.getById(id));
+    }
+
+    @PostMapping
+    public LinkOutputDTO createBy(@RequestBody @Valid LinkParam linkParam) {
+        Link link = linkService.createBy(linkParam);
+        return new LinkOutputDTO().convertFrom(link);
     }
 
     /**

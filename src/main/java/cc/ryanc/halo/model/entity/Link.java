@@ -37,13 +37,13 @@ public class Link extends BaseEntity {
     /**
      * Link website address.
      */
-    @Column(name = "url", columnDefinition = "varchar(255) not null")
+    @Column(name = "url", columnDefinition = "varchar(1023) not null")
     private String url;
 
     /**
      * Website logo.
      */
-    @Column(name = "logo", columnDefinition = "varchar(255) default ''")
+    @Column(name = "logo", columnDefinition = "varchar(1023) default ''")
     private String logo;
 
     /**
@@ -62,6 +62,19 @@ public class Link extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
+
         id = null;
+
+        if (logo == null) {
+            logo = "";
+        }
+
+        if (description == null) {
+            description = "";
+        }
+
+        if (team == null) {
+            team = "";
+        }
     }
 }
