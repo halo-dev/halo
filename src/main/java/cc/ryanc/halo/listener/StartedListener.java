@@ -11,7 +11,6 @@ import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.ThemeService;
 import cc.ryanc.halo.service.UserService;
 import cc.ryanc.halo.utils.HaloUtils;
-import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static cc.ryanc.halo.model.support.HaloConst.ACTIVATED_THEME_NAME;
 import static cc.ryanc.halo.model.support.HaloConst.DEFAULT_THEME_NAME;
 
 /**
@@ -113,10 +113,10 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      * Get active theme
      */
     private void getActiveTheme() {
-        BaseContentController.THEME = optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
+        ACTIVATED_THEME_NAME = optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
 
         try {
-            configuration.setSharedVariable("themeName", BaseContentController.THEME);
+            configuration.setSharedVariable("themeName", ACTIVATED_THEME_NAME);
         } catch (TemplateModelException e) {
             e.printStackTrace();
         }

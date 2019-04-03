@@ -3,7 +3,6 @@ package cc.ryanc.halo.web.controller.core;
 import cc.ryanc.halo.model.entity.User;
 import cc.ryanc.halo.model.support.HaloConst;
 import cc.ryanc.halo.service.ThemeService;
-import cc.ryanc.halo.web.controller.content.base.BaseContentController;
 import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +106,7 @@ public class CommonController implements ErrorController {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");
-        path.append(BaseContentController.THEME);
+        path.append(HaloConst.ACTIVATED_THEME_NAME);
         path.append("/404");
         return path.toString();
     }
@@ -123,7 +122,7 @@ public class CommonController implements ErrorController {
             return "common/error/500";
         }
         StrBuilder path = new StrBuilder("themes/");
-        path.append(BaseContentController.THEME);
+        path.append(HaloConst.ACTIVATED_THEME_NAME);
         path.append("/500");
         return path.toString();
     }
