@@ -224,11 +224,11 @@
     </dependencies>
 
     <build>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/main/resources</directory>
-            </testResource>
-        </testResources>
+        <!--<testResources>-->
+            <!--<testResource>-->
+                <!--<directory>${basedir}/src/main/resources</directory>-->
+            <!--</testResource>-->
+        <!--</testResources>-->
         <plugins>
             <!-- Spring Boot plugin -->
             <plugin>
