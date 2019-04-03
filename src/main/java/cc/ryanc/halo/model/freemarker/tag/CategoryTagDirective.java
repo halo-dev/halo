@@ -37,6 +37,7 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(categoryService.count()));
+                    break;
                 default:
                     break;
             }

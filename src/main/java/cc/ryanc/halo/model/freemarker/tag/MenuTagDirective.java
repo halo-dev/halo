@@ -37,6 +37,7 @@ public class MenuTagDirective implements TemplateDirectiveModel {
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(menuService.count()));
+                    break;
                 default:
                     break;
             }
