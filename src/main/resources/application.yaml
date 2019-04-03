@@ -46,5 +46,5 @@ spring:
       max-request-size: 10MB
 logging:
   level:
-    cc.ryanc.halo: INFO
+    run.halo.app: INFO
   file: ./logs/log.log

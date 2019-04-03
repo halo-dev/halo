@@ -1,0 +1,90 @@
+package run.halo.app.web.controller.admin.api;
+
+import run.halo.app.model.enums.OptionSource;
+import run.halo.app.model.properties.PrimaryProperties;
+import run.halo.app.model.properties.PropertyEnum;
+import run.halo.app.model.support.HaloConst;
+import run.halo.app.model.support.Theme;
+import run.halo.app.model.support.ThemeFile;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.ThemeService;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateModelException;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.model.enums.OptionSource;
+import run.halo.app.model.properties.PrimaryProperties;
+import run.halo.app.model.support.Theme;
+import run.halo.app.model.support.ThemeFile;
+import run.halo.app.service.ThemeService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Theme controller.
+ *
+ * @author : RYAN0UP
+ * @date : 2019/3/20
+ */
+@RestController
+@RequestMapping("/admin/api/themes")
+public class ThemeController {
+
+    private final OptionService optionService;
+
+    private final Configuration configuration;
+
+    private final ThemeService themeService;
+
+    public ThemeController(OptionService optionService,
+                           Configuration configuration,
+                           ThemeService themeService) {
+        this.optionService = optionService;
+        this.configuration = configuration;
+        this.themeService = themeService;
+    }
+
+    /**
+     * List all themes
+     *
+     * @return themes
+     */
+    @GetMapping
+    @ApiOperation("List all themes")
+    public List<Theme> listAll() {
+        return themeService.getThemes();
+    }
+
+    /**
+     * List all of theme files.
+     *
+     * @return List<ThemeFile>
+     */
+    @GetMapping("files")
+    public List<ThemeFile> listFiles() {
+        return themeService.listThemeFolderBy(HaloConst.ACTIVATED_THEME_NAME);
+    }
+
+    /**
+     * Active theme
+     *
+     * @param themeName theme name
+     * @throws TemplateModelException TemplateModelException
+     */
+    @GetMapping(value = "active")
+    @ApiOperation("Active theme")
+    public void active(@RequestParam(name = "themeName", defaultValue = "anatole") String themeName) throws TemplateModelException {
+        Map<PropertyEnum, String> properties = new HashMap<>(1);
+        properties.put(PrimaryProperties.THEME, themeName);
+        // TODO Refactor: saveProperties => saveProperty
+        optionService.saveProperties(properties, OptionSource.SYSTEM);
+        HaloConst.ACTIVATED_THEME_NAME = themeName;
+        configuration.setSharedVariable("themeName", themeName);
+        configuration.setSharedVariable("options", optionService.listOptions());
+    }
+}

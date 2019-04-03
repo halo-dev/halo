@@ -14,4 +14,4 @@ RUN cd /tmp && mvn package -Pci && mv target/dist/halo/* /opt/halo/ \
 
 EXPOSE 8090
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Dlogging.level.cc.ryanc.halo=INFO", "-jar","/opt/halo/halo-latest.jar","--spring.datasource.username=${DB_USER}","--spring.datasource.password=${DB_PASSWORD}"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-Dlogging.level.run.halo.app=INFO", "-jar","/opt/halo/halo-latest.jar","--spring.datasource.username=${DB_USER}","--spring.datasource.password=${DB_PASSWORD}"]
