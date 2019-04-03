@@ -6,6 +6,7 @@ import cc.ryanc.halo.model.entity.Tag;
 import cc.ryanc.halo.service.PostTagService;
 import cc.ryanc.halo.service.TagService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,6 +40,7 @@ public class TagController {
     @GetMapping
     @ApiOperation("Lists tags")
     public List<? extends TagOutputDTO> listTags(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
+                                                 @ApiParam("If the param is true, post count of tag will be returned")
                                                  @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);

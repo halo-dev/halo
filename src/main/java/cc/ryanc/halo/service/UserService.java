@@ -26,7 +26,18 @@ public interface UserService extends CrudService<User, Integer> {
      */
     int MAX_LOGIN_TRY = 5;
 
+    /**
+     * Lock minutes.
+     */
     int LOCK_MINUTES = 10;
+
+    /**
+     * Gets current user.
+     *
+     * @return an optional user
+     */
+    @NonNull
+    Optional<User> getCurrentUser();
 
     /**
      * Gets user by username.
