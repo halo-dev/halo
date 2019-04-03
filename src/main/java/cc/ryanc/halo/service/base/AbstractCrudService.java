@@ -134,7 +134,7 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
      */
     @Override
     public DOMAIN getById(ID id) {
-        return fetchById(id).orElseThrow(() -> new NotFoundException(domainName + " was not found"));
+        return fetchById(id).orElseThrow(() -> new NotFoundException(domainName + " was not found or has been deleted"));
     }
 
     /**
