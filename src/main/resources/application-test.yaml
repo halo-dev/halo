@@ -47,7 +47,7 @@ spring:
     type: none
 logging:
   level:
-    cc.ryanc.halo: DEBUG
+    run.halo.app: DEBUG
     org.hibernate: ERROR
   file: ./logs/log.log
 
