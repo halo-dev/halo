@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableScheduling
-@EnableJpaRepositories(basePackages = {"run.halo.app.repository"}, repositoryBaseClass = BaseRepositoryImpl.class)
+@EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {
 
     public static void main(String[] args) {
