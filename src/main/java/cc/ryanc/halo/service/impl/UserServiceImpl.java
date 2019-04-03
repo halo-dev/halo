@@ -18,9 +18,11 @@ import cn.hutool.crypto.digest.BCrypt;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +44,20 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         super(userRepository);
         this.userRepository = userRepository;
         this.stringCacheStore = stringCacheStore;
+    }
+
+    @Override
+    public Optional<User> getCurrentUser() {
+        // Find all users
+        List<User> users = listAll();
+
+        if (CollectionUtils.isEmpty(users)) {
+            // Return empty user
+            return Optional.empty();
+        }
+
+        // Return the first user
+        return Optional.of(users.get(0));
     }
 
     @Override
