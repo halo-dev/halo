@@ -35,7 +35,7 @@ public class LinkTagDirective implements TemplateDirectiveModel {
                 case "list":
                     env.setVariable("links", builder.build().wrap(linkService.listAll()));
                     break;
-                case "listTeam":
+                case "listTeamVos":
                     env.setVariable("links", builder.build().wrap(null));
                     break;
                 case "count":
