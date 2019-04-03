@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { UserLayout, BasicLayout, RouteView, BlankLayout, PageView } from '@/components/layouts'
+import { BasicLayout, RouteView, BlankLayout, PageView } from '@/components/layouts'
 
 export const asyncRouterMap = [
 
@@ -24,7 +24,7 @@ export const asyncRouterMap = [
         path: '/posts',
         name: 'Posts',
         redirect: '/posts/list',
-        component: RouteView,
+        component: PageView,
         meta: { title: '文章', icon: 'form' },
         children: [
           {
@@ -58,7 +58,7 @@ export const asyncRouterMap = [
       {
         path: '/pages',
         name: 'Pages',
-        component: RouteView,
+        component: PageView,
         redirect: '/pages/list',
         meta: { title: '页面', icon: 'read' },
         children: [
@@ -97,7 +97,7 @@ export const asyncRouterMap = [
       {
         path: '/interface',
         name: 'Interface',
-        component: RouteView,
+        component: PageView,
         redirect: '/interface/themes',
         meta: { title: '外观', icon: 'skin' },
         children: [
@@ -126,7 +126,7 @@ export const asyncRouterMap = [
       {
         path: '/user',
         name: 'User',
-        component: RouteView,
+        component: PageView,
         redirect: '/user/profile',
         meta: { title: '用户', icon: 'user' },
         children: [
@@ -143,7 +143,7 @@ export const asyncRouterMap = [
       {
         path: '/system',
         name: 'System',
-        component: RouteView,
+        component: PageView,
         redirect: '/system/options',
         meta: { title: '系统', icon: 'setting' },
         children: [
