@@ -31,13 +31,13 @@ public class Menu extends BaseEntity {
     /**
      * Menu name.
      */
-    @Column(name = "name", columnDefinition = "varchar(255) not null")
+    @Column(name = "name", columnDefinition = "varchar(50) not null")
     private String name;
 
     /**
      * Menu access url.
      */
-    @Column(name = "url", columnDefinition = "varchar(255) not null")
+    @Column(name = "url", columnDefinition = "varchar(1023) not null")
     private String url;
 
     /**

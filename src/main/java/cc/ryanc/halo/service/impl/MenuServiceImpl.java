@@ -1,7 +1,9 @@
 package cc.ryanc.halo.service.impl;
 
+import cc.ryanc.halo.exception.AlreadyExistsException;
 import cc.ryanc.halo.model.dto.MenuOutputDTO;
 import cc.ryanc.halo.model.entity.Menu;
+import cc.ryanc.halo.model.params.MenuParam;
 import cc.ryanc.halo.repository.MenuRepository;
 import cc.ryanc.halo.service.MenuService;
 import cc.ryanc.halo.service.base.AbstractCrudService;
@@ -36,6 +38,22 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
 
         return convertTo(listAll(sort));
     }
+
+    @Override
+    public Menu createBy(MenuParam menuParam) {
+        Assert.notNull(menuParam, "Menu param must not be null");
+
+        // Check the name
+        boolean exists = menuRepository.existsByName(menuParam.getName());
+
+        if (exists) {
+            throw new AlreadyExistsException("The menu name " + menuParam.getName() + " has already existed").setErrorData(menuParam.getName());
+        }
+
+        // Create an return
+        return create(menuParam.convertTo());
+    }
+
 
     private List<MenuOutputDTO> convertTo(List<Menu> menus) {
         if (CollectionUtils.isEmpty(menus)) {

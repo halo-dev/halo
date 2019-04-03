@@ -2,6 +2,7 @@ package cc.ryanc.halo.service;
 
 import cc.ryanc.halo.model.dto.MenuOutputDTO;
 import cc.ryanc.halo.model.entity.Menu;
+import cc.ryanc.halo.model.params.MenuParam;
 import cc.ryanc.halo.service.base.CrudService;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -23,4 +24,13 @@ public interface MenuService extends CrudService<Menu, Integer> {
      */
     @NonNull
     List<MenuOutputDTO> listDtos(@NonNull Sort sort);
+
+    /**
+     * Creates a menu.
+     *
+     * @param menuParam must not be null
+     * @return created menu
+     */
+    @NonNull
+    Menu createBy(@NonNull MenuParam menuParam);
 }
