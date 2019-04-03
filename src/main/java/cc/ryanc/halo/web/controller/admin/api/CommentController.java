@@ -3,12 +3,10 @@ package cc.ryanc.halo.web.controller.admin.api;
 import cc.ryanc.halo.model.dto.CommentOutputDTO;
 import cc.ryanc.halo.model.entity.Comment;
 import cc.ryanc.halo.model.entity.User;
-import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.enums.CommentStatus;
 import cc.ryanc.halo.model.params.CommentParam;
+import cc.ryanc.halo.model.properties.BlogProperties;
 import cc.ryanc.halo.model.vo.CommentWithPostVO;
-import cc.ryanc.halo.security.authentication.Authentication;
-import cc.ryanc.halo.security.context.SecurityContextHolder;
 import cc.ryanc.halo.service.CommentService;
 import cc.ryanc.halo.service.OptionService;
 import cc.ryanc.halo.service.PostService;
@@ -62,16 +60,11 @@ public class CommentController {
     }
 
     @PostMapping
-    public CommentOutputDTO createBy(@RequestBody CommentParam commentParam, HttpServletRequest request) {
-        // Get authentication
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            User user = authentication.getDetail().getUser();
-            // If the admin is login
-            commentParam.setAuthor(StringUtils.isEmpty(user.getNickname()) ? user.getUsername() : user.getNickname());
-            commentParam.setEmail(user.getEmail());
-            commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
-        }
+    public CommentOutputDTO createBy(@RequestBody CommentParam commentParam, HttpServletRequest request, User user) {
+        // Set some default info
+        commentParam.setAuthor(StringUtils.isEmpty(user.getNickname()) ? user.getUsername() : user.getNickname());
+        commentParam.setEmail(user.getEmail());
+        commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
 
         // Validate the comment param manually
         ValidationUtils.validate(commentParam);

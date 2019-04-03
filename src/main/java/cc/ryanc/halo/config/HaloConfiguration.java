@@ -122,12 +122,13 @@ public class HaloConfiguration {
         // Config the admin filter
         adminAuthenticationFilter.addExcludeUrlPatterns("/admin/api/login");
         adminAuthenticationFilter.addTryAuthUrlMethodPattern("/admin/api/comments", HttpMethod.POST.name());
+        adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/comments", HttpMethod.POST.name());
         adminAuthenticationFilter.setFailureHandler(
                 failureHandler);
 
         FilterRegistrationBean<AdminAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(adminAuthenticationFilter);
-        authenticationFilter.addUrlPatterns("/admin/*");
+        authenticationFilter.addUrlPatterns("/admin/*", "/api/comments");
         authenticationFilter.setOrder(1);
         return authenticationFilter;
     }
