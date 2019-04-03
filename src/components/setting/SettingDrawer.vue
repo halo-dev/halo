@@ -15,25 +15,27 @@
           <h3 class="setting-drawer-index-title">整体风格设置</h3>
           <div class="setting-drawer-index-blockChecbox">
             <a-tooltip>
-              <template slot="title">
-                暗色菜单风格
-              </template>
+              <template slot="title">暗色菜单风格</template>
               <div class="setting-drawer-index-item" @click="handleMenuTheme('dark')">
-                <img src="https://gw.alipayobjects.com/zos/rmsportal/LCkqqYNmvBEbokSDscrm.svg" alt="dark" />
+                <img
+                  src="https://gw.alipayobjects.com/zos/rmsportal/LCkqqYNmvBEbokSDscrm.svg"
+                  alt="dark"
+                >
                 <div class="setting-drawer-index-selectIcon" v-if="navTheme === 'dark'">
-                  <a-icon type="check" />
+                  <a-icon type="check"/>
                 </div>
               </div>
             </a-tooltip>
 
             <a-tooltip>
-              <template slot="title">
-                亮色菜单风格
-              </template>
+              <template slot="title">亮色菜单风格</template>
               <div class="setting-drawer-index-item" @click="handleMenuTheme('light')">
-                <img src="https://gw.alipayobjects.com/zos/rmsportal/jpRkZQMyYRryryPNtyIC.svg" alt="light" />
+                <img
+                  src="https://gw.alipayobjects.com/zos/rmsportal/jpRkZQMyYRryryPNtyIC.svg"
+                  alt="light"
+                >
                 <div class="setting-drawer-index-selectIcon" v-if="navTheme !== 'dark'">
-                  <a-icon type="check" />
+                  <a-icon type="check"/>
                 </div>
               </div>
             </a-tooltip>
@@ -43,33 +45,41 @@
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">主题色</h3>
           <div style="height: 20px">
-            <a-tooltip class="setting-drawer-theme-color-colorBlock" v-for="(item, index) in colorList" :key="index">
-              <template slot="title">
-                {{ item.key }}
-              </template>
+            <a-tooltip
+              class="setting-drawer-theme-color-colorBlock"
+              v-for="(item, index) in colorList"
+              :key="index"
+            >
+              <template slot="title">{{ item.key }}</template>
               <a-tag :color="item.color" @click="changeColor(item.color)">
                 <a-icon type="check" v-if="item.color === primaryColor"></a-icon>
               </a-tag>
             </a-tooltip>
           </div>
         </div>
-        <a-divider />
+        <a-divider/>
 
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">导航模式</h3>
 
           <div class="setting-drawer-index-blockChecbox">
             <div class="setting-drawer-index-item" @click="handleLayout('sidemenu')">
-              <img src="https://gw.alipayobjects.com/zos/rmsportal/JopDzEhOqwOjeNTXkoje.svg" alt="sidemenu" />
+              <img
+                src="https://gw.alipayobjects.com/zos/rmsportal/JopDzEhOqwOjeNTXkoje.svg"
+                alt="sidemenu"
+              >
               <div class="setting-drawer-index-selectIcon" v-if="layoutMode === 'sidemenu'">
-                <a-icon type="check" />
+                <a-icon type="check"/>
               </div>
             </div>
 
             <div class="setting-drawer-index-item" @click="handleLayout('topmenu')">
-              <img src="https://gw.alipayobjects.com/zos/rmsportal/KDNDBbriJhLwuqMoxcAr.svg" alt="topmenu" />
+              <img
+                src="https://gw.alipayobjects.com/zos/rmsportal/KDNDBbriJhLwuqMoxcAr.svg"
+                alt="topmenu"
+              >
               <div class="setting-drawer-index-selectIcon" v-if="layoutMode !== 'sidemenu'">
-                <a-icon type="check" />
+                <a-icon type="check"/>
               </div>
             </div>
           </div>
@@ -77,9 +87,7 @@
             <a-list :split="false">
               <a-list-item>
                 <a-tooltip slot="actions">
-                  <template slot="title">
-                    该设定仅 [顶部栏导航] 时有效
-                  </template>
+                  <template slot="title">该设定仅 [顶部栏导航] 时有效</template>
                   <a-select
                     size="small"
                     style="width: 80px;"
@@ -95,7 +103,12 @@
                 </a-list-item-meta>
               </a-list-item>
               <a-list-item>
-                <a-switch slot="actions" size="small" :defaultChecked="fixedHeader" @change="handleFixedHeader" />
+                <a-switch
+                  slot="actions"
+                  size="small"
+                  :defaultChecked="fixedHeader"
+                  @change="handleFixedHeader"
+                />
                 <a-list-item-meta>
                   <div slot="title">固定 Header</div>
                 </a-list-item-meta>
@@ -109,9 +122,10 @@
                   @change="handleFixedHeaderHidden"
                 />
                 <a-list-item-meta>
-                  <div slot="title" :style="{ textDecoration: !fixedHeader ? 'line-through' : 'unset' }">
-                    下滑时隐藏 Header
-                  </div>
+                  <div
+                    slot="title"
+                    :style="{ textDecoration: !fixedHeader ? 'line-through' : 'unset' }"
+                  >下滑时隐藏 Header</div>
                 </a-list-item-meta>
               </a-list-item>
               <a-list-item>
@@ -123,19 +137,20 @@
                   @change="handleFixSiderbar"
                 />
                 <a-list-item-meta>
-                  <div slot="title" :style="{ textDecoration: layoutMode === 'topmenu' ? 'line-through' : 'unset' }">
-                    固定侧边菜单
-                  </div>
+                  <div
+                    slot="title"
+                    :style="{ textDecoration: layoutMode === 'topmenu' ? 'line-through' : 'unset' }"
+                  >固定侧边菜单</div>
                 </a-list-item-meta>
               </a-list-item>
             </a-list>
           </div>
         </div>
-        <a-divider />
+        <a-divider/>
         <div :style="{ marginBottom: '24px' }">
           <a-list :split="false">
             <a-list-item>
-               <a-icon type="double-right" @click="toggle" class="iconClose"/>
+              <a-icon type="double-right" @click="toggle" class="iconClose"/>
             </a-list-item>
           </a-list>
         </div>
@@ -274,7 +289,7 @@ export default {
       font-size: 14px;
     }
   }
-  .iconClose{
+  .iconClose {
     font-size: 24px;
     cursor: pointer;
   }
