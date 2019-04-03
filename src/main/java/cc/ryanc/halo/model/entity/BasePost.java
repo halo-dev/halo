@@ -5,6 +5,8 @@ import cc.ryanc.halo.model.enums.PostStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,7 +17,9 @@ import java.util.Date;
  * @author johnniang
  */
 @Entity(name = "base_post")
-@Table(name = "posts")
+@Table(name = "posts", indexes = @Index(columnList = "url"))
+@SQLDelete(sql = "update posts set deleted = true where id = ?")
+@Where(clause = "deleted = false")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
 @Data
 @ToString
