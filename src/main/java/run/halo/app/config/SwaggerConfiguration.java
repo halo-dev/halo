@@ -63,7 +63,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket haloDefaultApi() {
         log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
-        return buildApiDocket("run.halo.app.default",
+        return buildApiDocket("run.halo.app.portal.api",
                 "run.halo.app.web.controller.portal.api",
                 "/api/**")
                 .enable(!haloProperties.getDocDisabled());

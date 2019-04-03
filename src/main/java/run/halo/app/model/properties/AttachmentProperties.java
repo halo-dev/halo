@@ -22,7 +22,6 @@ public enum AttachmentProperties implements PropertyEnum {
         this.type = type;
     }
 
-
     @Override
     public Class<?> getType() {
         return type;
