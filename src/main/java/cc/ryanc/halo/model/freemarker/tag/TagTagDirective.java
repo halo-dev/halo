@@ -37,6 +37,7 @@ public class TagTagDirective implements TemplateDirectiveModel {
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(tagService.count()));
+                    break;
                 default:
                     break;
             }

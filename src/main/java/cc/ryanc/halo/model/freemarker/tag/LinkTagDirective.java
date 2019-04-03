@@ -40,6 +40,7 @@ public class LinkTagDirective implements TemplateDirectiveModel {
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(linkService.count()));
+                    break;
                 default:
                     break;
             }
