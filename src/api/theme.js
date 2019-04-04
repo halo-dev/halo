@@ -11,4 +11,11 @@ themeApi.listFiles = () => {
   })
 }
 
+themeApi.customTpls = () => {
+  return service({
+    url: `${baseUrl}/files/custom`,
+    method: 'get'
+  })
+}
+
 export default themeApi
