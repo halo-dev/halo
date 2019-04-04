@@ -1,5 +1,11 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.io.file.FileReader;
+import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.setting.dialect.Props;
+import org.springframework.stereotype.Service;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
@@ -7,11 +13,6 @@ import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperties;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FilenameUtils;
-import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.setting.dialect.Props;
-import org.springframework.stereotype.Service;
-import run.halo.app.model.support.ThemeFile;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -202,5 +203,29 @@ public class ThemeServiceImpl implements ThemeService {
             properties.setAuthorWebsite(props.getStr("theme.author.website"));
         }
         return properties;
+    }
+
+    /**
+     * Get template content by template absolute path.
+     *
+     * @param absolutePath absolute path
+     * @return template content
+     */
+    @Override
+    public String getTemplateContent(String absolutePath) {
+        final FileReader fileReader = new FileReader(absolutePath);
+        return fileReader.readString();
+    }
+
+    /**
+     * Save template content by template absolute path.
+     *
+     * @param absolutePath absolute path
+     * @param content      new content
+     */
+    @Override
+    public void saveTemplateContent(String absolutePath, String content) {
+        final FileWriter fileWriter = new FileWriter(absolutePath);
+        fileWriter.write(content);
     }
 }

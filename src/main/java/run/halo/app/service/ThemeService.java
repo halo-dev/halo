@@ -3,7 +3,6 @@ package run.halo.app.service;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperties;
-import run.halo.app.model.support.ThemeFile;
 
 import java.io.File;
 import java.util.List;
@@ -75,4 +74,20 @@ public interface ThemeService {
      * @return ThemeProperties
      */
     ThemeProperties getProperties(File path);
+
+    /**
+     * Get template content by template absolute path.
+     *
+     * @param absolutePath absolute path
+     * @return template content
+     */
+    String getTemplateContent(String absolutePath);
+
+    /**
+     * Save template content by template absolute path.
+     *
+     * @param absolutePath absolute path
+     * @param content      new content
+     */
+    void saveTemplateContent(String absolutePath, String content);
 }
