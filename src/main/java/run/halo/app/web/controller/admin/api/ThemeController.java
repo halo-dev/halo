@@ -1,5 +1,9 @@
 package run.halo.app.web.controller.admin.api;
 
+import freemarker.template.Configuration;
+import freemarker.template.TemplateModelException;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.enums.OptionSource;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.properties.PropertyEnum;
@@ -7,18 +11,6 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
-import run.halo.app.service.ThemeService;
-import freemarker.template.Configuration;
-import freemarker.template.TemplateModelException;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import run.halo.app.model.enums.OptionSource;
-import run.halo.app.model.properties.PrimaryProperties;
-import run.halo.app.model.support.Theme;
-import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.ThemeService;
 
 import java.util.HashMap;
@@ -68,6 +60,17 @@ public class ThemeController {
     @GetMapping("files")
     public List<ThemeFile> listFiles() {
         return themeService.listThemeFolderBy(HaloConst.ACTIVATED_THEME_NAME);
+    }
+
+    @GetMapping("files/content")
+    public String getContentBy(@RequestParam(name = "path") String path) {
+        return themeService.getTemplateContent(path);
+    }
+
+    @PutMapping("files/content")
+    public void updateContentBy(@RequestParam(name = "path") String path,
+                                @RequestParam(name = "content") String content) {
+        themeService.saveTemplateContent(path, content);
     }
 
     /**
