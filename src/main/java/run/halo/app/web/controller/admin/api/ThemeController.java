@@ -73,6 +73,11 @@ public class ThemeController {
         themeService.saveTemplateContent(path, content);
     }
 
+    @GetMapping("files/custom")
+    public List<String> customTemplate(){
+        return themeService.getCustomTpl(HaloConst.ACTIVATED_THEME_NAME);
+    }
+
     /**
      * Active theme
      *
