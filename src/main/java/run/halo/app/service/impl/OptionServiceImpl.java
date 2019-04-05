@@ -269,16 +269,4 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         }).orElseGet(Zone::autoZone);
     }
-
-    @Override
-    public Locale getLocale() {
-        return getByProperty(BlogProperties.BLOG_LOCALE).map(localeStr -> {
-            try {
-                return Locale.forLanguageTag(localeStr);
-            } catch (Exception e) {
-                return Locale.getDefault();
-            }
-        }).orElseGet(Locale::getDefault);
-    }
-
 }
