@@ -11,7 +11,7 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item label="文章状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
+                <a-select v-model="queryParam.status" placeholder="请选择文章状态" defaultValue="0">
                   <a-select-option value="0">已发布</a-select-option>
                   <a-select-option value="1">草稿箱</a-select-option>
                   <a-select-option value="2">回收站</a-select-option>
@@ -20,10 +20,8 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item label="分类目录">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                  <a-select-option value="0">xx</a-select-option>
-                  <a-select-option value="1">xx</a-select-option>
-                  <a-select-option value="2">xx</a-select-option>
+                <a-select v-model="queryParam.categoryId" placeholder="请选择分类">
+                  <a-select-option v-for="category in categories" :key="category.id">{{ category.name }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -39,7 +37,9 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleEdit()">新建</a-button>
+        <router-link :to="{name:'PostEdit'}">
+          <a-button type="primary" icon="plus">写文章</a-button>
+        </router-link>
         <a-dropdown>
           <a-menu slot="overlay">
             <a-menu-item key="1"> <a-icon type="delete" />回收站 </a-menu-item>
@@ -51,7 +51,7 @@
         </a-dropdown>
       </div>
       <div style="margin-top:15px">
-        <a-table :columns="columns" :dataSource="data">
+        <a-table :columns="columns">
           <a slot="name" slot-scope="text" href="javascript:;">{{ text }}</a>
           <span slot="customTitle"><a-icon type="smile-o" /> Name</span>
           <span slot="tags" slot-scope="tags">
@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import categoryApi from '@/api/category'
 export default {
   name: 'PostList',
   components: {},
@@ -120,10 +121,19 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       options: {},
-      optionAlertShow: false
+      optionAlertShow: false,
+      categories: []
     }
   },
-  created() {},
-  methods: {}
+  created() {
+    this.loadCategories()
+  },
+  methods: {
+    loadCategories() {
+      categoryApi.listAll().then(response => {
+        this.categories = response.data.data
+      })
+    }
+  }
 }
 </script>

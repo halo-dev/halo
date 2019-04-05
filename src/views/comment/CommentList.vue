@@ -11,7 +11,7 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item label="评论状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
+                <a-select v-model="queryParam.status" placeholder="请选择" defaultValue="0">
                   <a-select-option value="0">已发布</a-select-option>
                   <a-select-option value="1">待审核</a-select-option>
                   <a-select-option value="2">回收站</a-select-option>
@@ -41,7 +41,7 @@
         </a-dropdown>
       </div>
       <div style="margin-top:15px">
-        <a-table :columns="columns" :dataSource="data">
+        <a-table :columns="columns">
           <a slot="name" slot-scope="text" href="javascript:;">{{ text }}</a>
           <span slot="customTitle"><a-icon type="smile-o" /> Name</span>
           <span slot="tags" slot-scope="tags">
