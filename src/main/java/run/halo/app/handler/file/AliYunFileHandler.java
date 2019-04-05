@@ -53,7 +53,7 @@ public class AliYunFileHandler implements FileHandler {
         try {
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-            String timestamp = String.valueOf(new Date().getTime());
+            String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
             String filePath = StringUtils.join(StringUtils.appendIfMissing(ossSource, "/"), upFilePath);
 
