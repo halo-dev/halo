@@ -15,7 +15,7 @@
 
         <a-card>
           <div id="editor">
-            <mavon-editor :toolbars="markdownOption" v-model="value" :boxShadow="false" :ishljs = "true"/>
+            <mavon-editor :toolbars="markdownOption" v-model="value" :boxShadow="false" :ishljs="true"/>
           </div>
         </a-card>
       </a-col>

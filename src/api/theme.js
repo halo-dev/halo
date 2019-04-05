@@ -4,6 +4,13 @@ const baseUrl = '/admin/api/themes'
 
 const themeApi = {}
 
+themeApi.listAll = () => {
+  return service({
+    url: `${baseUrl}`,
+    method: 'get'
+  })
+}
+
 themeApi.listFiles = () => {
   return service({
     url: `${baseUrl}/files`,
@@ -14,6 +21,13 @@ themeApi.listFiles = () => {
 themeApi.customTpls = () => {
   return service({
     url: `${baseUrl}/files/custom`,
+    method: 'get'
+  })
+}
+
+themeApi.active = theme => {
+  return service({
+    url: `${baseUrl}/active?theme=${theme}`,
     method: 'get'
   })
 }
