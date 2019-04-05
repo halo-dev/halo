@@ -1,7 +1,7 @@
 <template>
   <div class="page-header-index-wide page-header-wrapper-grid-content-main">
     <a-row :gutter="24">
-      <a-col :lg="10" :md="24">
+      <a-col :lg="10" :md="24" :style="{ 'padding-bottom': '12px' }">
         <a-card :bodyStyle="{ padding: '16' }" :bordered="false">
           <div class="profile-center-avatarHolder">
             <div class="avatar">
@@ -33,7 +33,7 @@
           </div>
         </a-card>
       </a-col>
-      <a-col :lg="14" :md="24">
+      <a-col :lg="14" :md="24" :style="{ 'padding-bottom': '12px' }">
         <a-card :bodyStyle="{ padding: '0' }" :bordered="false" title="个人资料">
           <div class="card-container">
             <a-tabs type="card">

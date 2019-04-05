@@ -1,7 +1,13 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col :xl="10" :lg="10" :md="10" :sm="24" :xs="24">
+      <a-col
+        :xl="10"
+        :lg="10"
+        :md="10"
+        :sm="24"
+        :xs="24"
+        :style="{ 'padding-bottom': '12px' }">
         <a-card title="添加分类目录">
           <a-form layout="horizontal">
             <a-form-item label="名称：" help="*页面上所显示的名称">
@@ -24,7 +30,13 @@
           </a-form>
         </a-card>
       </a-col>
-      <a-col :xl="14" :lg="14" :md="14" :sm="24" :xs="24">
+      <a-col
+        :xl="14"
+        :lg="14"
+        :md="14"
+        :sm="24"
+        :xs="24"
+        :style="{ 'padding-bottom': '12px' }">
         <a-card title="所有分类">
           <a-table :columns="columns" :dataSource="data" :loading="loading"> </a-table>
         </a-card>
