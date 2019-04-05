@@ -22,7 +22,7 @@ spring:
     username: admin
     password: 123456
 
-    #MySql配置
+    # MySql 配置
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
 #    username: root
