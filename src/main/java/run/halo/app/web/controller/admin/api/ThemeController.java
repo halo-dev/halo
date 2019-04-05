@@ -81,18 +81,18 @@ public class ThemeController {
     /**
      * Active theme
      *
-     * @param themeName theme name
+     * @param theme theme name
      * @throws TemplateModelException TemplateModelException
      */
     @GetMapping(value = "active")
     @ApiOperation("Active theme")
-    public void active(@RequestParam(name = "themeName", defaultValue = "anatole") String themeName) throws TemplateModelException {
+    public void active(@RequestParam(name = "theme", defaultValue = "anatole") String theme) throws TemplateModelException {
         Map<PropertyEnum, String> properties = new HashMap<>(1);
-        properties.put(PrimaryProperties.THEME, themeName);
+        properties.put(PrimaryProperties.THEME, theme);
         // TODO Refactor: saveProperties => saveProperty
         optionService.saveProperties(properties, OptionSource.SYSTEM);
-        HaloConst.ACTIVATED_THEME_NAME = themeName;
-        configuration.setSharedVariable("themeName", themeName);
+        HaloConst.ACTIVATED_THEME_NAME = theme;
+        configuration.setSharedVariable("themeName", theme);
         configuration.setSharedVariable("options", optionService.listOptions());
     }
 }

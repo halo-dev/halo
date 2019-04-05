@@ -16,9 +16,9 @@ public class Theme implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Theme dir
+     * Theme key,is theme folder name.
      */
-    private String themeDir;
+    private String key;
 
     /**
      * Is support setting options
