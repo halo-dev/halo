@@ -191,10 +191,12 @@ export const constantRouterMap = [
       }
     ]
   },
-
+  {
+    path: '/login',
+    component: () => import('@/views/user/Login')
+  },
   {
     path: '/404',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
   }
-
 ]
