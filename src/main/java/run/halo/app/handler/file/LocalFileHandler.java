@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -90,7 +91,7 @@ public class LocalFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get current time
-        Calendar current = Calendar.getInstance(optionService.getLocale());
+        Calendar current = Calendar.getInstance(Locale.CHINESE);
         // Get month and day of month
         int year = current.get(Calendar.YEAR);
         int month = current.get(Calendar.MONTH) + 1;

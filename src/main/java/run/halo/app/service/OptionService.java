@@ -268,13 +268,4 @@ public interface OptionService extends CrudService<Option, Integer> {
      */
     @NonNull
     Zone getQnYunZone();
-
-    /**
-     * Gets locale.
-     *
-     * @return locale user set or default locale
-     */
-    @NonNull
-    Locale getLocale();
-
 }

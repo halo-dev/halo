@@ -164,7 +164,6 @@ public class InstallController {
         // Init default properties
         Map<PropertyEnum, String> properties = new HashMap<>(11);
         properties.put(PrimaryProperties.IS_INSTALLED, Boolean.TRUE.toString());
-        properties.put(BlogProperties.BLOG_LOCALE, installParam.getLocale());
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
         properties.put(BlogProperties.BLOG_URL, installParam.getUrl());
         properties.put(PrimaryProperties.THEME, DEFAULT_THEME_NAME);
