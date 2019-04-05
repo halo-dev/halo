@@ -54,6 +54,11 @@ public class AdminController {
         this.linkService = linkService;
     }
 
+    /**
+     * Get some statistics about the count of posts, the count of comments, etc.
+     *
+     * @return counts
+     */
     @GetMapping("counts")
     @ApiOperation("Gets count info")
     public CountOutputDTO getCount() {

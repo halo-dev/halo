@@ -26,7 +26,16 @@ import java.util.List;
 @Service
 public class ThemeServiceImpl implements ThemeService {
 
+    /**
+     * The type of file that can be modified.
+     */
     private static String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
+
+    /**
+     * These file names cannot be displayed.
+     */
+    private static String[] FILTER_FILES = {".git", ".DS_Store", "theme.properties"};
+
     private final HaloProperties haloProperties;
 
     public ThemeServiceImpl(HaloProperties haloProperties) {
@@ -50,13 +59,9 @@ public class ThemeServiceImpl implements ThemeService {
                         continue;
                     }
                     theme = new Theme();
-                    theme.setThemeDir(file.getName());
-                    File optionsPath = new File(getThemeBasePath().getAbsolutePath(), file.getName() + "/module/options.ftl");
-                    if (optionsPath.exists()) {
-                        theme.setHasOptions(true);
-                    } else {
-                        theme.setHasOptions(false);
-                    }
+                    theme.setKey(file.getName());
+                    File optionsPath = new File(file.getAbsolutePath(), "module/options.ftl");
+                    theme.setHasOptions(optionsPath.exists());
                     theme.setProperties(getProperties(new File(getThemeBasePath(), file.getName())));
                     themes.add(theme);
                 }
@@ -80,7 +85,13 @@ public class ThemeServiceImpl implements ThemeService {
             File absolutePathFile = new File(absolutePath);
             File[] baseFiles = absolutePathFile.listFiles();
             if (null != baseFiles) {
+                baseFileFor:
                 for (File base : baseFiles) {
+                    for (String filterFile : FILTER_FILES) {
+                        if (filterFile.equals(base.getName())) {
+                            continue baseFileFor;
+                        }
+                    }
                     ThemeFile file = new ThemeFile();
                     if (base.isDirectory()) {
                         file.setName(base.getName());

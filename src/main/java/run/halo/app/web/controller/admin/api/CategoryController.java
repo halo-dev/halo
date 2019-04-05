@@ -1,11 +1,5 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.CategoryOutputDTO;
-import run.halo.app.model.entity.Category;
-import run.halo.app.model.params.CategoryParam;
-import run.halo.app.model.vo.CategoryVO;
-import run.halo.app.service.CategoryService;
-import run.halo.app.service.PostCategoryService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -39,6 +33,12 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService, PostCategoryService postCategoryService) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
+    }
+
+    @GetMapping
+    @ApiOperation("List all categories")
+    public List<Category> listAll() {
+        return categoryService.listAll();
     }
 
     @GetMapping("tree_view")
