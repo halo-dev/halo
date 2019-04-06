@@ -7,6 +7,11 @@ package run.halo.app.model.properties;
 public enum BlogProperties implements PropertyEnum {
 
     /**
+     * Blog locale.
+     */
+    BLOG_LOCALE("blog_locale", String.class),
+
+    /**
      * Blog title.
      */
     BLOG_TITLE("blog_title", String.class),
