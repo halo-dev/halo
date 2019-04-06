@@ -91,7 +91,7 @@ public class LocalFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get current time
-        Calendar current = Calendar.getInstance(Locale.CHINESE);
+        Calendar current = Calendar.getInstance(optionService.getLocale());
         // Get month and day of month
         int year = current.get(Calendar.YEAR);
         int month = current.get(Calendar.MONTH) + 1;
