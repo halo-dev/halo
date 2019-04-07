@@ -1,19 +1,19 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.MenuOutputDTO;
-import run.halo.app.model.entity.Menu;
-import run.halo.app.model.params.MenuParam;
-import run.halo.app.service.MenuService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.dto.MenuOutputDTO;
 import run.halo.app.model.entity.Menu;
+import run.halo.app.model.params.MenuParam;
+import run.halo.app.model.vo.MenuVO;
 import run.halo.app.service.MenuService;
 
 import javax.validation.Valid;
 import java.util.List;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
@@ -36,6 +36,12 @@ public class MenuController {
     @ApiOperation("Lists all menus")
     public List<MenuOutputDTO> listAll(@SortDefault(sort = "sort", direction = DESC) Sort sort) {
         return menuService.listDtos(sort);
+    }
+
+    @GetMapping("tree_view")
+    @ApiOperation("List as category tree")
+    public List<MenuVO> listAsTree(@SortDefault(sort = "name", direction = ASC) Sort sort) {
+        return menuService.listAsTree(sort);
     }
 
     @PostMapping

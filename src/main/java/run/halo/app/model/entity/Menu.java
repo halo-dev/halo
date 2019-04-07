@@ -58,6 +58,11 @@ public class Menu extends BaseEntity {
     @Column(name = "icon", columnDefinition = "varchar(50) default ''")
     private String icon;
 
+    /**
+     * Parent menu.
+     */
+    @Column(name = "parent_id", columnDefinition = "int default 0")
+    private Integer parentId;
 
     @Override
     public void prePersist() {

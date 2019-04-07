@@ -26,4 +26,6 @@ public class MenuOutputDTO implements OutputConverter<MenuOutputDTO, Menu> {
     private String target;
 
     private String icon;
+
+    private Integer parentId;
 }

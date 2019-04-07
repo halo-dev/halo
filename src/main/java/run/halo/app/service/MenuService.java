@@ -1,11 +1,11 @@
 package run.halo.app.service;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.MenuOutputDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
-import run.halo.app.service.base.CrudService;
-import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
+import run.halo.app.model.vo.MenuVO;
 import run.halo.app.service.base.CrudService;
 
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.List;
  * Menu service.
  *
  * @author johnniang
+ * @author RYAN0UP
  */
 public interface MenuService extends CrudService<Menu, Integer> {
 
@@ -34,4 +35,12 @@ public interface MenuService extends CrudService<Menu, Integer> {
      */
     @NonNull
     Menu createBy(@NonNull MenuParam menuParam);
+
+    /**
+     * Lists as menu tree.
+     *
+     * @param sort sort info must not be null
+     * @return a menu tree
+     */
+    List<MenuVO> listAsTree(Sort sort);
 }
