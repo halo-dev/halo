@@ -9,7 +9,8 @@
         :sm="12"
         :xs="24"
         v-for="(theme, index) in themes"
-        :key="index">
+        :key="index"
+      >
         <a-card :bodyStyle="{ padding: '14px' }">
           <img
             :alt="theme.properties.name"
@@ -22,19 +23,18 @@
               {{ theme.properties.name }}
             </span>
             <a-button-group class="theme-button">
-              <a-button type="primary" v-if="activatedTheme==theme.key" disabled>已启用</a-button>
+              <a-button type="primary" v-if="activatedTheme == theme.key" disabled>已启用</a-button>
               <a-button type="primary" @click="activeTheme(theme.key)" v-else>启用</a-button>
-              <a-button @click="optionModal(theme.key)">设置</a-button>
+              <a-button @click="optionModal(theme.key)" v-if="activatedTheme == theme.key">设置</a-button>
+              <a-popconfirm :title="'确定删除【'+theme.properties.name+'】主题？'" @confirm="deleteTheme(theme.key)" okText="确定" cancelText="取消" v-else>
+                <a-button type="dashed">删除</a-button>
+              </a-popconfirm>
             </a-button-group>
           </div>
         </a-card>
       </a-col>
     </a-row>
-    <a-modal
-      :title="optionTheme+' 主题设置'"
-      width="90%"
-      v-model="visible"
-    >
+    <a-modal :title="optionTheme + ' 主题设置'" width="90%" v-model="visible">
       <iframe :src="optionUrl" height="560" width="100%" frameborder="0" scrolling="auto"></iframe>
     </a-modal>
   </div>
@@ -71,13 +71,16 @@ export default {
         this.$message.success('设置成功！')
         this.loadThemes()
       })
+    },
+    deleteTheme(theme) {
+      this.$message.success('删除' + theme)
     }
   }
 }
 </script>
 
 <style scoped>
-.ant-divider-horizontal{
+.ant-divider-horizontal {
   margin: 14px 0;
 }
 
@@ -85,11 +88,11 @@ export default {
   padding-bottom: 12px;
 }
 
-.theme-item .theme-control .theme-title{
+.theme-item .theme-control .theme-title {
   font-size: 18px;
 }
 
-.theme-item .theme-control .theme-button{
+.theme-item .theme-control .theme-button {
   float: right;
 }
 </style>

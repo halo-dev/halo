@@ -42,7 +42,8 @@
         </router-link>
         <a-dropdown>
           <a-menu slot="overlay">
-            <a-menu-item key="1"> <a-icon type="delete" />回收站 </a-menu-item>
+            <a-menu-item key="1" v-if="postStatus==0 || postStatus==1"> <a-icon type="delete" />移到回收站 </a-menu-item>
+            <a-menu-item key="1" v-else-if="postStatus==2"> <a-icon type="delete" />永久删除 </a-menu-item>
           </a-menu>
           <a-button style="margin-left: 8px;">
             批量操作
@@ -122,7 +123,8 @@ export default {
       selectedRows: [],
       options: {},
       optionAlertShow: false,
-      categories: []
+      categories: [],
+      postStatus: 0
     }
   },
   created() {
