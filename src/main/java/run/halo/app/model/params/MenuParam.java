@@ -1,7 +1,5 @@
 package run.halo.app.model.params;
 
-import run.halo.app.model.dto.base.InputConverter;
-import run.halo.app.model.entity.Menu;
 import lombok.Data;
 import lombok.ToString;
 import run.halo.app.model.dto.base.InputConverter;
@@ -37,4 +35,6 @@ public class MenuParam implements InputConverter<Menu> {
 
     @Size(max = 50, message = "Length of menu icon must not be more than {max}")
     private String icon;
+
+    private Integer parentId;
 }
