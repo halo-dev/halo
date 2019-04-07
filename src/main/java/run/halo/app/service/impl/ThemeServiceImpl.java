@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.dialect.Props;
 import org.springframework.stereotype.Service;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
@@ -248,7 +249,10 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public void deleteTheme(String key) {
-        File file = new File(this.getThemeBasePath(),key);
+        if (!this.isThemeExist(key)) {
+            throw new NotFoundException("该主题不存在！").setErrorData(key);
+        }
+        File file = new File(this.getThemeBasePath(), key);
         FileUtil.del(file);
         HaloConst.THEMES = this.getThemes();
     }
