@@ -55,6 +55,7 @@ export default {
       visible: false,
       optionTheme: '',
       optionUrl: 'https://ryanc.cc',
+      // TODO 从api获取当前使用的主题
       activatedTheme: 'anatole'
     }
   },
