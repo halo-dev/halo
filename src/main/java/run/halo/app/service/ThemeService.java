@@ -1,5 +1,6 @@
 package run.halo.app.service;
 
+import org.springframework.lang.NonNull;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperties;
@@ -26,7 +27,7 @@ public interface ThemeService {
      * @param absolutePath absolutePath
      * @return List<ThemeFile>
      */
-    List<ThemeFile> listThemeFolder(String absolutePath);
+    List<ThemeFile> listThemeFolder(@NonNull String absolutePath);
 
     /**
      * Lists theme folder by theme name.
@@ -34,7 +35,7 @@ public interface ThemeService {
      * @param theme theme
      * @return List<ThemeFile>
      */
-    List<ThemeFile> listThemeFolderBy(String theme);
+    List<ThemeFile> listThemeFolderBy(@NonNull String theme);
 
     /**
      * Gets custom template, such as page_xxx.ftl, and xxx will be template name
@@ -42,7 +43,7 @@ public interface ThemeService {
      * @param theme theme name
      * @return List
      */
-    List<String> getCustomTpl(String theme);
+    List<String> getCustomTpl(@NonNull String theme);
 
     /**
      * Judging whether template exists under the specified theme
@@ -50,7 +51,7 @@ public interface ThemeService {
      * @param template template
      * @return boolean
      */
-    boolean isTemplateExist(String template);
+    boolean isTemplateExist(@NonNull String template);
 
     /**
      * Judging whether theme exists under template path
@@ -58,7 +59,7 @@ public interface ThemeService {
      * @param theme theme name
      * @return boolean
      */
-    boolean isThemeExist(String theme);
+    boolean isThemeExist(@NonNull String theme);
 
     /**
      * Gets theme base path.
@@ -73,7 +74,7 @@ public interface ThemeService {
      * @param path path
      * @return ThemeProperties
      */
-    ThemeProperties getProperties(File path);
+    ThemeProperties getProperties(@NonNull File path);
 
     /**
      * Get template content by template absolute path.
@@ -81,7 +82,7 @@ public interface ThemeService {
      * @param absolutePath absolute path
      * @return template content
      */
-    String getTemplateContent(String absolutePath);
+    String getTemplateContent(@NonNull String absolutePath);
 
     /**
      * Save template content by template absolute path.
@@ -89,12 +90,12 @@ public interface ThemeService {
      * @param absolutePath absolute path
      * @param content      new content
      */
-    void saveTemplateContent(String absolutePath, String content);
+    void saveTemplateContent(@NonNull String absolutePath, @NonNull String content);
 
     /**
      * Delete a theme by key.
      *
      * @param key theme key
      */
-    void deleteTheme(String key);
+    void deleteTheme(@NonNull String key);
 }
