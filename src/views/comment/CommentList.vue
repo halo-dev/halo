@@ -42,17 +42,10 @@
       </div>
       <div style="margin-top:15px">
         <a-table :columns="columns">
-          <a slot="name" slot-scope="text" href="javascript:;">{{ text }}</a>
-          <span slot="customTitle"><a-icon type="smile-o" /> Name</span>
-          <span slot="tags" slot-scope="tags">
-            <a-tag v-for="tag in tags" color="blue" :key="tag">{{ tag }}</a-tag>
-          </span>
           <span slot="action" slot-scope="text, record">
-            <a href="javascript:;">Invite 一 {{ record.name }}</a>
+            <a href="javascript:;" @click="editComment(record.id)">编辑</a>
             <a-divider type="vertical" />
-            <a href="javascript:;">Delete</a>
-            <a-divider type="vertical" />
-            <a href="javascript:;" class="ant-dropdown-link"> More actions <a-icon type="down" /> </a>
+            <a href="javascript:;" @click="deleteComment(record.id)">删除</a>
           </span>
         </a-table>
       </div>
@@ -106,6 +99,13 @@ export default {
     }
   },
   created() {},
-  methods: {}
+  methods: {
+    editComment(id) {
+      this.$message.success('编辑')
+    },
+    deleteComment(id) {
+      this.$message.success('删除')
+    }
+  }
 }
 </script>
