@@ -48,7 +48,7 @@
         :style="{ 'padding-bottom': '12px' }">
         <a-card title="所有菜单">
           <a-table :columns="columns" :dataSource="menus" :loading="loading">
-            <ellipsis :length="10" tooltip slot="name" slot-scope="text">
+            <ellipsis :length="30" tooltip slot="name" slot-scope="text">
               {{ text }}
             </ellipsis>
             <span slot="action" slot-scope="text, record">
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { Ellipsis } from '@/components/Ellipsis'
+import { Ellipsis } from '@/components'
 import menuApi from '@/api/menu'
 const columns = [
   {

@@ -54,48 +54,47 @@
 </template>
 
 <script>
+const columns = [
+  {
+    title: '#',
+    scopedSlots: { customRender: 'serial' }
+  },
+  {
+    title: '评论者',
+    dataIndex: 'author'
+  },
+  {
+    title: '内容',
+    dataIndex: 'content'
+  },
+  {
+    title: '评论页面',
+    dataIndex: 'post.id'
+  },
+  {
+    title: '日期',
+    dataIndex: 'createTime'
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    width: '150px',
+    scopedSlots: { customRender: 'action' }
+  }
+]
 export default {
-  name: 'PostList',
+  name: 'CommentList',
   components: {},
   data() {
     return {
-      mdl: {},
       // 查询参数
       queryParam: {},
       // 表头
-      columns: [
-        {
-          title: '#',
-          scopedSlots: { customRender: 'serial' }
-        },
-        {
-          title: '评论者',
-          dataIndex: 'author'
-        },
-        {
-          title: '内容',
-          dataIndex: 'content'
-        },
-        {
-          title: '评论页面',
-          dataIndex: 'post.id'
-        },
-        {
-          title: '日期',
-          dataIndex: 'createTime'
-        },
-        {
-          title: '操作',
-          dataIndex: 'action',
-          width: '150px',
-          scopedSlots: { customRender: 'action' }
-        }
-      ],
+      columns,
       loadData: parameter => {},
       selectedRowKeys: [],
       selectedRows: [],
-      options: {},
-      optionAlertShow: false
+      options: {}
     }
   },
   created() {},
