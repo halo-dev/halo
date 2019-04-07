@@ -17,8 +17,8 @@
               <a-input v-model="menuToCreate.url" />
             </a-form-item>
             <a-form-item label="上级菜单：">
-              <a-select>
-                <a-select-option value="1">上级菜单</a-select-option>
+              <a-select v-model="menuToCreate.parentId">
+                <a-select-option v-for="(menu,index) in menus" :key="index" :value="menu.id">{{ menu.name }}</a-select-option>
               </a-select>
             </a-form-item>
             <a-form-item label="排序编号：">
