@@ -90,4 +90,11 @@ public interface ThemeService {
      * @param content      new content
      */
     void saveTemplateContent(String absolutePath, String content);
+
+    /**
+     * Delete a theme by key.
+     *
+     * @param key theme key
+     */
+    void deleteTheme(String key);
 }
