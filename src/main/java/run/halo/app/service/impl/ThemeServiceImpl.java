@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
@@ -238,5 +239,17 @@ public class ThemeServiceImpl implements ThemeService {
     public void saveTemplateContent(String absolutePath, String content) {
         final FileWriter fileWriter = new FileWriter(absolutePath);
         fileWriter.write(content);
+    }
+
+    /**
+     * Delete a theme by key.
+     *
+     * @param key theme key
+     */
+    @Override
+    public void deleteTheme(String key) {
+        File file = new File(this.getThemeBasePath(),key);
+        FileUtil.del(file);
+        HaloConst.THEMES = this.getThemes();
     }
 }

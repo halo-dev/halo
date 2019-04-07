@@ -74,12 +74,12 @@ public class ThemeController {
     }
 
     @GetMapping("files/custom")
-    public List<String> customTemplate(){
+    public List<String> customTemplate() {
         return themeService.getCustomTpl(HaloConst.ACTIVATED_THEME_NAME);
     }
 
     /**
-     * Active theme
+     * Active theme.
      *
      * @param theme theme name
      * @throws TemplateModelException TemplateModelException
@@ -94,5 +94,16 @@ public class ThemeController {
         HaloConst.ACTIVATED_THEME_NAME = theme;
         configuration.setSharedVariable("themeName", theme);
         configuration.setSharedVariable("options", optionService.listOptions());
+    }
+
+    /**
+     * Deletes a theme.
+     *
+     * @param key theme key
+     */
+    @DeleteMapping("{key}")
+    @ApiOperation("Deletes a theme")
+    public void deleteBy(@PathVariable("key") String key) {
+        themeService.deleteTheme(key);
     }
 }
