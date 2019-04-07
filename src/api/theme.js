@@ -32,4 +32,11 @@ themeApi.active = theme => {
   })
 }
 
+themeApi.delete = key => {
+  return service({
+    url: `${baseUrl}/${key}`,
+    method: 'delete'
+  })
+}
+
 export default themeApi

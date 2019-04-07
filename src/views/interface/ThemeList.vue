@@ -26,7 +26,13 @@
               <a-button type="primary" v-if="activatedTheme == theme.key" disabled>已启用</a-button>
               <a-button type="primary" @click="activeTheme(theme.key)" v-else>启用</a-button>
               <a-button @click="optionModal(theme.key)" v-if="activatedTheme == theme.key">设置</a-button>
-              <a-popconfirm :title="'确定删除【'+theme.properties.name+'】主题？'" @confirm="deleteTheme(theme.key)" okText="确定" cancelText="取消" v-else>
+              <a-popconfirm
+                :title="'确定删除【' + theme.properties.name + '】主题？'"
+                @confirm="deleteTheme(theme.key)"
+                okText="确定"
+                cancelText="取消"
+                v-else
+              >
                 <a-button type="dashed">删除</a-button>
               </a-popconfirm>
             </a-button-group>
@@ -72,8 +78,11 @@ export default {
         this.loadThemes()
       })
     },
-    deleteTheme(theme) {
-      this.$message.success('删除' + theme)
+    deleteTheme(key) {
+      themeApi.delete(key).then(response => {
+        this.$message.success('删除成功！')
+        this.loadThemes()
+      })
     }
   }
 }
