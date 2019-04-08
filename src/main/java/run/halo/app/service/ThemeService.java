@@ -7,6 +7,7 @@ import run.halo.app.model.support.ThemeProperties;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : RYAN0UP
@@ -27,6 +28,7 @@ public interface ThemeService {
      * @param absolutePath absolutePath
      * @return List<ThemeFile>
      */
+    @Deprecated
     List<ThemeFile> listThemeFolder(@NonNull String absolutePath);
 
     /**
@@ -82,6 +84,7 @@ public interface ThemeService {
      * @param absolutePath absolute path
      * @return template content
      */
+    @Deprecated
     String getTemplateContent(@NonNull String absolutePath);
 
     /**
@@ -98,4 +101,13 @@ public interface ThemeService {
      * @param key theme key
      */
     void deleteTheme(@NonNull String key);
+
+    /**
+     * Fetchs theme configuration.
+     *
+     * @param themeName theme name must not be blank
+     * @return theme configuration
+     */
+    @NonNull
+    Map<String, Object> fetchConfig(@NonNull String themeName);
 }
