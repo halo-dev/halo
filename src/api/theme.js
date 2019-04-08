@@ -39,4 +39,10 @@ themeApi.delete = key => {
   })
 }
 
+themeApi.listOptions = theme => {
+  return service({
+    url: `${baseUrl}/configurations?name=${theme}`
+  })
+}
+
 export default themeApi

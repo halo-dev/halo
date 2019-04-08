@@ -16,12 +16,10 @@
             :alt="theme.properties.name"
             :src="'http://localhost:8090/' + theme.key + '/screenshot.png'"
             slot="cover"
-          />
+          >
           <a-divider></a-divider>
           <div class="theme-control">
-            <span class="theme-title">
-              {{ theme.properties.name }}
-            </span>
+            <span class="theme-title">{{ theme.properties.name }}</span>
             <a-button-group class="theme-button">
               <a-button type="primary" v-if="activatedTheme == theme.key" disabled>已启用</a-button>
               <a-button type="primary" @click="activeTheme(theme.key)" v-else>启用</a-button>
@@ -41,22 +39,84 @@
       </a-col>
     </a-row>
     <a-modal :title="optionTheme + ' 主题设置'" width="90%" v-model="visible">
-      <iframe :src="optionUrl" height="560" width="100%" frameborder="0" scrolling="auto"></iframe>
+      <a-row>
+        <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+          <div class="card-container">
+            <a-tabs type="card">
+              <a-tab-pane
+                v-for="(group,index) in themeOptions"
+                :key="index"
+                :tab="group.description"
+              >
+                <a-form layout="vertical">
+                  <a-form-item
+                    v-for="(item,index1) in group.items"
+                    :label="item.description+'：'"
+                    :key="index1"
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input :v-model="'options.'+item.description" v-if="item.type=='text'"/>
+                    <a-input
+                      type="textarea"
+                      :autosize="{ minRows: 5 }"
+                      :v-model="'options.'+item.description"
+                      v-else-if="item.type=='textarea'"
+                    />
+                    <a-radio-group
+                      v-decorator="['radio-group']"
+                      defaultValue="false"
+                      :v-model="'options.'+item.description"
+                      v-else-if="item.type=='radio'"
+                    >
+                      <a-radio
+                        v-for="(option,index2) in item.options"
+                        :key="index2"
+                        :value="option.value"
+                      >{{ option.label }}</a-radio>
+                    </a-radio-group>
+                    <a-select
+                      :v-model="'options.'+item.description"
+                      v-else-if="item.type=='select'"
+                    >
+                      <a-select-option
+                        v-for="(option,index3) in item.options"
+                        :key="index3"
+                        :value="option.value"
+                      >{{ option.label }}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item>
+                    <a-button type="primary" @click="saveOptions">保存</a-button>
+                  </a-form-item>
+                </a-form>
+              </a-tab-pane>
+            </a-tabs>
+          </div>
+        </a-col>
+      </a-row>
     </a-modal>
   </div>
 </template>
 
 <script>
 import themeApi from '@/api/theme'
+import optionApi from '@/api/option'
 export default {
   data() {
     return {
+      wrapperCol: {
+        xl: { span: 8 },
+        sm: { span: 8 },
+        xs: { span: 24 }
+      },
       themes: [],
       visible: false,
       optionTheme: '',
       optionUrl: 'https://ryanc.cc',
       // TODO 从api获取当前使用的主题
-      activatedTheme: 'anatole'
+      activatedTheme: 'anatole',
+      themeOptions: [],
+      options: []
     }
   },
   created() {
@@ -69,8 +129,12 @@ export default {
       })
     },
     optionModal(theme) {
-      this.optionTheme = theme
-      this.visible = true
+      themeApi.listOptions('anatole').then(response => {
+        this.themeOptions = response.data.data
+        this.optionTheme = theme
+        this.visible = true
+        this.loadOptions()
+      })
     },
     activeTheme(theme) {
       themeApi.active(theme).then(response => {
@@ -83,6 +147,17 @@ export default {
       themeApi.delete(key).then(response => {
         this.$message.success('删除成功！')
         this.loadThemes()
+      })
+    },
+    saveOptions() {
+      optionApi.save(this.options).then(response => {
+        this.loadOptions()
+        this.$message.success('保存成功！')
+      })
+    },
+    loadOptions() {
+      optionApi.listAll().then(response => {
+        this.options = response.data.data
       })
     }
   }
