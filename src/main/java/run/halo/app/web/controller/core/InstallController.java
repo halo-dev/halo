@@ -176,7 +176,7 @@ public class InstallController {
         properties.put(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.LOCAL.getValue().toString());
 
         // Create properties
-        optionService.saveProperties(properties, OptionSource.SYSTEM);
+        optionService.saveProperties(properties);
     }
 
 }

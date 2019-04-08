@@ -1,6 +1,5 @@
 package run.halo.app.model.entity;
 
-import run.halo.app.model.enums.OptionSource;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -41,12 +40,6 @@ public class Option extends BaseEntity {
     @Column(name = "option_value", columnDefinition = "varchar(1023) not null")
     private String value;
 
-    /**
-     * source,default is system
-     */
-    @Column(name = "option_source", columnDefinition = "int default 0")
-    private OptionSource source;
-
     public Option(String key, String value) {
         this.key = key;
         this.value = value;
@@ -56,9 +49,5 @@ public class Option extends BaseEntity {
     public void prePersist() {
         super.prePersist();
         id = null;
-
-        if (source == null) {
-            source = OptionSource.SYSTEM;
-        }
     }
 }

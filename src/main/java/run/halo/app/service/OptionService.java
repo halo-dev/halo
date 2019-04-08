@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionOutputDTO;
 import run.halo.app.model.entity.Option;
-import run.halo.app.model.enums.OptionSource;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.properties.PropertyEnum;
@@ -34,49 +33,44 @@ public interface OptionService extends CrudService<Option, Integer> {
     /**
      * Save one option
      *
-     * @param key    key must not be blank
-     * @param value  value
-     * @param source source
+     * @param key   key must not be blank
+     * @param value value
      */
     @Transactional
-    void save(@NonNull String key, String value, @NonNull OptionSource source);
+    void save(@NonNull String key, String value);
 
     /**
      * Save multiple options
      *
      * @param options options
-     * @param source  source
      */
     @Transactional
-    void save(@NonNull Map<String, String> options, @NonNull OptionSource source);
+    void save(@Nullable Map<String, String> options);
 
     /**
      * SAve multiple options
      *
      * @param optionParams option params
-     * @param source       source
      */
     @Transactional
-    void save(List<OptionParam> optionParams, @NonNull OptionSource source);
+    void save(@Nullable List<OptionParam> optionParams);
 
     /**
      * Saves a property.
      *
      * @param property must not be null
      * @param value    could be null
-     * @param source   must not be null
      */
     @Transactional
-    void saveProperty(@NonNull PropertyEnum property, String value, @NonNull OptionSource source);
+    void saveProperty(@NonNull PropertyEnum property, @Nullable String value);
 
     /**
      * Saves blog properties.
      *
      * @param properties blog properties
-     * @param source     source
      */
     @Transactional
-    void saveProperties(@NonNull Map<? extends PropertyEnum, String> properties, @NonNull OptionSource source);
+    void saveProperties(@NonNull Map<? extends PropertyEnum, String> properties);
 
     /**
      * Get all options

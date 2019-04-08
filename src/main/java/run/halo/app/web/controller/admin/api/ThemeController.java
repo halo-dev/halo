@@ -4,7 +4,6 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.enums.OptionSource;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.Theme;
@@ -79,7 +78,7 @@ public class ThemeController {
     @ApiOperation("Active a theme")
     public void active(String theme) throws TemplateModelException {
         // TODO Check existence of the theme
-        optionService.saveProperty(PrimaryProperties.THEME, theme, OptionSource.SYSTEM);
+        optionService.saveProperty(PrimaryProperties.THEME, theme);
         configuration.setSharedVariable("themeName", theme);
         configuration.setSharedVariable("options", optionService.listOptions());
     }

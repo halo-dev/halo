@@ -6,6 +6,7 @@ package run.halo.app.model.enums;
  * @author johnniang
  * @date 4/1/19
  */
+@Deprecated
 public enum OptionSource implements ValueEnum<Integer> {
 
     SYSTEM(0),
@@ -20,4 +21,5 @@ public enum OptionSource implements ValueEnum<Integer> {
     @Override
     public Integer getValue() {
         return null;
-    }}
+    }
+}
