@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.enums.OptionSource;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.properties.PropertyEnum;
+import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
@@ -105,5 +106,11 @@ public class ThemeController {
     @ApiOperation("Deletes a theme")
     public void deleteBy(@PathVariable("key") String key) {
         themeService.deleteTheme(key);
+    }
+
+    @GetMapping("configurations")
+    @ApiOperation("Fetches theme configuration")
+    public BaseResponse<Object> fetchConfig(@RequestParam("name") String name) {
+        return BaseResponse.ok(themeService.fetchConfig(name));
     }
 }

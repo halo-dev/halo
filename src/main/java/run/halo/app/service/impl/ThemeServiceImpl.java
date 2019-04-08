@@ -6,6 +6,9 @@ import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.dialect.Props;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.config.properties.HaloProperties;
@@ -18,15 +21,19 @@ import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FilenameUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author : RYAN0UP
  * @date : 2019/3/26
  */
+@Slf4j
 @Service
 public class ThemeServiceImpl implements ThemeService {
 
@@ -40,10 +47,17 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private static String[] FILTER_FILES = {".git", ".DS_Store", "theme.properties"};
 
-    private final HaloProperties haloProperties;
+    private final static String THEME_FOLDER = "templates/themes";
+
+    private final static String[] OPTIONS_NAMES = {"options.yaml", "options.yml"};
+
+    private final Path workDir;
+
+    private final ObjectMapper yamlMapper;
 
     public ThemeServiceImpl(HaloProperties haloProperties) {
-        this.haloProperties = haloProperties;
+        yamlMapper = new ObjectMapper(new YAMLFactory());
+        workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
     }
 
     /**
@@ -193,7 +207,12 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public File getThemeBasePath() {
-        return new File(haloProperties.getWorkDir(), "templates/themes");
+        return getBasePath().toFile();
+    }
+
+    @Override
+    public Path getBasePath() {
+        return workDir;
     }
 
     /**
@@ -260,10 +279,29 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public Map<String, Object> fetchConfig(String themeName) {
+    public Object fetchConfig(String themeName) {
         Assert.hasText(themeName, "Theme name must not be blank");
 
+        try {
+            for (String optionsName : OPTIONS_NAMES) {
+                // Resolve the options path
+                Path optionsPath = workDir.resolve(themeName).resolve(optionsName);
 
-        return null;
+                log.debug("Finding options in: [{}]", optionsPath.toString());
+
+                // Check existence
+                if (!Files.exists(optionsPath)) {
+                    continue;
+                }
+
+                // Read the yaml file and return the object value
+                return yamlMapper.readValue(optionsPath.toFile(), Object.class);
+            }
+
+            return null;
+        } catch (IOException e) {
+            log.error("Failed to read options.yaml", e);
+            return null;
+        }
     }
 }

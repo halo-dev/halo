@@ -1,13 +1,14 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperties;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author : RYAN0UP
@@ -71,6 +72,13 @@ public interface ThemeService {
     File getThemeBasePath();
 
     /**
+     * Gets theme base path.
+     *
+     * @return theme base path
+     */
+    Path getBasePath();
+
+    /**
      * Get theme Properties.
      *
      * @param path path
@@ -93,6 +101,7 @@ public interface ThemeService {
      * @param absolutePath absolute path
      * @param content      new content
      */
+    @Deprecated
     void saveTemplateContent(@NonNull String absolutePath, @NonNull String content);
 
     /**
@@ -106,8 +115,8 @@ public interface ThemeService {
      * Fetchs theme configuration.
      *
      * @param themeName theme name must not be blank
-     * @return theme configuration
+     * @return theme configuration or null if not found
      */
-    @NonNull
-    Map<String, Object> fetchConfig(@NonNull String themeName);
+    @Nullable
+    Object fetchConfig(@NonNull String themeName);
 }

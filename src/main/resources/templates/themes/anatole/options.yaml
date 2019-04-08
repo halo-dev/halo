@@ -1,5 +1,4 @@
 sns:
-  name: sns
   description: 社交资料设置
   items:
     rss:
@@ -39,7 +38,6 @@ sns:
       description: Telegram
       type: text
 style:
-  name: style
   description: 样式设置
   items:
     icon:
