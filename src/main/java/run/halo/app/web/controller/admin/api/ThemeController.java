@@ -75,13 +75,7 @@ public class ThemeController {
         return themeService.getCustomTpl(themeService.getTheme());
     }
 
-    /**
-     * Active theme.
-     *
-     * @param theme theme name
-     * @throws TemplateModelException TemplateModelException
-     */
-    @GetMapping(value = "active")
+    @PostMapping("active")
     @ApiOperation("Active a theme")
     public void active(String theme) throws TemplateModelException {
         // TODO Check existence of the theme
@@ -90,11 +84,6 @@ public class ThemeController {
         configuration.setSharedVariable("options", optionService.listOptions());
     }
 
-    /**
-     * Deletes a theme.
-     *
-     * @param key theme key
-     */
     @DeleteMapping("{key}")
     @ApiOperation("Deletes a theme")
     public void deleteBy(@PathVariable("key") String key) {
