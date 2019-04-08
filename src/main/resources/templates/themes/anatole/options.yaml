@@ -34,7 +34,7 @@ sns:
     email:
       name: email
       label: Email
-      type: email
+      type: text
     github:
       name: github
       label: Github
