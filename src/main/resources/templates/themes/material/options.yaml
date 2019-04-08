@@ -118,7 +118,7 @@ style:
     background_bing:
       name: background_bing
       label: Bing 背景
-      type: select
+      type: radio
       default: false
       options:
         - value: true
@@ -147,4 +147,224 @@ style:
         - value: Twilight
           label: Twilight
 
+sns:
+  label: 社交资料
+  items:
+    sns_email:
+      name: sns_email
+      label: Email
+      type: text
 
+    sns_facebook:
+      name: sns_facebook
+      label: Facebook
+      type: text
+
+    sns_twitter:
+      name: sns_twitter
+      label: Twitter
+      type: text
+
+    sns_googleplus:
+      name: sns_googleplus
+      label: Google +
+      type: text
+
+    sns_weibo:
+      name: sns_weibo
+      label: 微博
+      type: text
+
+    sns_instagram:
+      name: sns_instagram
+      label: Instagram
+      type: text
+
+    sns_tumblr:
+      name: sns_tumblr
+      label: Tumblr
+      type: text
+
+    sns_github:
+      name: sns_github
+      label: Github
+      type: text
+
+    sns_linkedin:
+      name: sns_linkedin
+      label: Linkedin
+      type: text
+
+    sns_zhihu:
+      name: sns_zhihu
+      label: 知乎
+      type: text
+
+    sns_bilibili:
+      name: sns_bilibili
+      label: 哔哩哔哩
+      type: text
+
+    sns_telegram:
+      name: sns_telegram
+      label: Telegram
+      type: text
+
+    sns_v2ex:
+      name: sns_v2ex
+      label: V2EX
+      type: text
+
+sns-share:
+  label: 分享设置
+  items:
+    sns_share_twitter:
+      name: sns_share_twitter
+      label: 分享到 Twitter
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    sns_share_facebook:
+      name: sns_share_facebook
+      label: 分享到 Facebook
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    sns_share_googleplus:
+      name: sns_share_googleplus
+      label: 分享到 Google +
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    sns_share_weibo:
+      name: sns_share_weibo
+      label: 分享到微博
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    sns_share_linkedin:
+      name: sns_share_linkedin
+      label: 分享到 Linkedin
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    sns_share_qq:
+      name: sns_share_qq
+      label: 分享到 QQ
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    sns_share_telegram:
+      name: sns_share_telegram
+      label: 分享到 Telegram
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+other:
+  label: 其他设置
+  items:
+    other_js_fade:
+      name: other_js_fade
+      label: 渐显效果
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    other_js_smoothscroll:
+      name: other_js_smoothscroll
+      label: 平滑滚动效果
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    other_sidebar_archives:
+      name: other_sidebar_archives
+      label: 侧边栏归档
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    other_sidebar_cates:
+      name: other_sidebar_cates
+      label: 侧边栏分类
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    other_sidebar_postcount:
+      name: other_sidebar_postcount
+      label: 侧边栏文章总数
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    other_mathjax:
+      name: other_mathjax
+      label: MathJax 插件
+      type: radio
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    other_post_license:
+      name: other_post_license
+      label: 文章 License
+      type: textarea
