@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_NAME;
-
 /**
  * OptionService implementation class
  *
@@ -57,15 +55,18 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         if (StringUtils.isBlank(value)) {
             // If the value is blank, remove the key
             optionRepository.removeByOptionKey(key);
+            log.debug("Removed option key: [{}]", key);
             return;
         }
 
         // TODO Consider cache options with map
         Option option = optionRepository.findByOptionKey(key).map(anOption -> {
+            log.debug("Updating option key: [{}], value: from [{}] to [{}]", key, anOption.getOptionValue(), value);
             // Exist
             anOption.setOptionValue(value);
             return anOption;
         }).orElseGet(() -> {
+            log.debug("Creating option key: [{}], value: [{}]", key, value);
             // Not exist
             Option anOption = new Option();
             anOption.setOptionKey(key);
@@ -75,7 +76,9 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         });
 
         // Save or update the options
-        optionRepository.save(option);
+        Option savedOption = optionRepository.save(option);
+
+        log.debug("Saved option: [{}]", savedOption);
     }
 
     /**
