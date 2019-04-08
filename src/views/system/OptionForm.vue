@@ -313,7 +313,8 @@ export default {
     return {
       wrapperCol: {
         xl: { span: 8 },
-        sm: { span: 8 },
+        lg: { span: 8 },
+        sm: { span: 12 },
         xs: { span: 24 }
       },
       upyunFormHidden: false,
