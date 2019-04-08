@@ -1,0 +1,129 @@
+sns:
+  name: 社交资料
+  items:
+    theme_anatole_sns_rss:
+      id: themeAnatoleSnsRss
+      name: RSS
+      type: radio
+      defaultValue: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    theme_anatole_sns_twitter:
+      id: anatoleSnsTwitter
+      name: Twitter
+      type: text
+
+    theme_anatole_sns_facebook:
+      id: anatoleSnsFacebook
+      name: Facebook
+      type: text
+
+    theme_anatole_sns_instagram:
+      id: anatoleSnsInstagram
+      name: Instagram
+      type: text
+
+    theme_anatole_sns_dribbble:
+      id: anatoleSnsDribbble
+      name: Dribbble
+      type: text
+
+    theme_anatole_sns_weibo:
+      id: anatoleSnsWeibo
+      name: Weibo
+      type: text
+
+    theme_anatole_sns_email:
+      id: anatoleSnsEmail
+      name: Email
+      type: email
+
+    theme_anatole_sns_github:
+      id: anatoleSnsGithub
+      name: Github
+      type: text
+
+    theme_anatole_sns_qq:
+      id: anatoleSnsQQ
+      name: QQ
+      type: text
+
+    theme_anatole_sns_telegram:
+      id: anatoleSnsTelegram
+      name: Telegram
+      type: text
+
+style:
+  name: 样式设置
+  items:
+    anatole_style_right_icon:
+      id: anatoleStyleRightIcon
+      name: 右上角图标
+      type: text
+
+    anatole_style_post_title_lower:
+      id: anatoleStylePostTitleLower
+      name: 文章标题大写
+      type: radio
+      defaultValue: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    anatole_style_blog_title_lower:
+      id: anatoleStyleBlogTitleLower
+      name: 博客标题大写
+      type: radio
+      defaultValue: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    anatole_style_avatar_circle:
+      id: anatoleStyleAvatarCircle
+      name: 圆形头像
+      type: radio
+      defaultValue: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    anatole_style_hitokoto:
+      id: anatoleStyleHitokoto
+      name: 博客描述开启一言
+      type: radio
+      defaultValue: false
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    anatole_style_google_color:
+      id: anatoleStyleGoogleColor
+      name: 浏览器沉浸颜色
+      type: text
+      defaultValue: #fff
+
+    anatole_style_scrollbar:
+      id: anatoleStyleScrollbar
+      name: 全局滚动条颜色
+      type: text
+      defaultValue: #3798e8
+
+    anatole_style_self:
+      id: anatoleStyleSelf
+      name: 自定义样式
+      type: textarea
+
+
