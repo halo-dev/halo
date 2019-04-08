@@ -2,6 +2,7 @@ sns:
   description: 社交资料设置
   items:
     rss:
+      name: rss
       description: RSS
       type: radio
       default: true
@@ -11,39 +12,50 @@ sns:
         - value: false
           label: 关闭
     twitter:
+      name: twitter
       description: Twitter
       type: text
     facebook:
+      name: facebook
       description: Facebook
       type: text
     instagram:
+      name: instagram
       description: Instagram
       type: text
     dribbble:
+      name: dribbble
       description: Dribbble
       type: text
     weibo:
+      name: weibo
       description: 微博
       type: text
     email:
+      name: email
       description: Email
       type: email
     github:
+      name: github
       description: Github
       type: text
     qq:
+      name: qq
       description: QQ
       type: text
     telegram:
+      name: telegram
       description: Telegram
       type: text
 style:
   description: 样式设置
   items:
     icon:
+      name: icon
       description: 右上角图标
       type: text
     post_title_uppper:
+      name: post_title_uppper
       description: 文章标题大写
       type: radio
       default: true
@@ -53,6 +65,7 @@ style:
         - value: false
           label: 关闭
     blog_title_uppper:
+      name: blog_title_uppper
       description: 博客标题大写
       type: radio
       default: true
@@ -62,6 +75,7 @@ style:
         - value: false
           label: 关闭
     avatar_circle:
+      name: avatar_circle
       description: 圆形头像
       type: radio
       default: true
@@ -71,6 +85,7 @@ style:
         - value: false
           label: 关闭
     hitokoto:
+      name: hitokoto
       description: 博客描述开启一言
       type: radio
       default: false
@@ -80,15 +95,18 @@ style:
         - value: false
           label: 关闭
     google_color:
+      name: google_color
       description: 浏览器沉浸颜色
       type: text
       default: #fff
     scrollbar:
+      name: scrollbar
       description: 全局滚动条颜色
       type: text
       default: #3798e8
     custom:
-      name: 自定义样式
+      name: custom
+      description: 自定义样式
       type: textarea
 
 
