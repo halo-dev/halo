@@ -1,10 +1,6 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
+    <a-row :gutter="12" type="flex" align="middle">
       <a-col
         class="theme-item"
         :xl="6"
@@ -25,20 +21,9 @@
           <div class="theme-control">
             <span class="theme-title">{{ theme.properties.name }}</span>
             <a-button-group class="theme-button">
-              <a-button
-                type="primary"
-                v-if="activatedTheme == theme.key"
-                disabled
-              >已启用</a-button>
-              <a-button
-                type="primary"
-                @click="activeTheme(theme.key)"
-                v-else
-              >启用</a-button>
-              <a-button
-                @click="optionModal(theme.key)"
-                v-if="activatedTheme == theme.key"
-              >设置</a-button>
+              <a-button type="primary" v-if="activatedTheme == theme.key" disabled>已启用</a-button>
+              <a-button type="primary" @click="activeTheme(theme.key)" v-else>启用</a-button>
+              <a-button @click="optionModal(theme.key)" v-if="activatedTheme == theme.key">设置</a-button>
               <a-popconfirm
                 :title="'确定删除【' + theme.properties.name + '】主题？'"
                 @confirm="deleteTheme(theme.key)"
@@ -53,19 +38,9 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-modal
-      :title="optionTheme + ' 主题设置'"
-      width="90%"
-      v-model="visible"
-    >
+    <a-modal :title="optionTheme + ' 主题设置'" width="90%" v-model="visible" centered>
       <a-row>
-        <a-col
-          :xl="24"
-          :lg="24"
-          :md="24"
-          :sm="24"
-          :xs="24"
-        >
+        <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
           <div class="card-container">
             <a-tabs type="card">
               <a-tab-pane
@@ -80,15 +55,7 @@
                     :key="index1"
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input
-                      v-model="themeOptions[item.name]"
-                      v-if="item.type=='text'"
-                    />
-                    <a-input
-                      v-model="themeOptions[item.name]"
-                      v-if="item.type='email'"
-                      type="email"
-                    />
+                    <a-input v-model="themeOptions[item.name]" v-if="item.type=='text'"/>
                     <a-input
                       type="textarea"
                       :autosize="{ minRows: 5 }"
@@ -107,10 +74,7 @@
                         :value="option.value"
                       >{{ option.label }}</a-radio>
                     </a-radio-group>
-                    <a-select
-                      v-model="themeOptions[item.name]"
-                      v-else-if="item.type=='select'"
-                    >
+                    <a-select v-model="themeOptions[item.name]" v-else-if="item.type=='select'">
                       <a-select-option
                         v-for="(option,index3) in item.options"
                         :key="index3"
@@ -119,10 +83,7 @@
                     </a-select>
                   </a-form-item>
                   <a-form-item>
-                    <a-button
-                      type="primary"
-                      @click="saveOptions"
-                    >保存</a-button>
+                    <a-button type="primary" @click="saveOptions">保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
