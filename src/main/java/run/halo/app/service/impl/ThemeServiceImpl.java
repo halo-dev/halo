@@ -7,6 +7,7 @@ import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.dialect.Props;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.support.HaloConst;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : RYAN0UP
@@ -255,5 +257,13 @@ public class ThemeServiceImpl implements ThemeService {
         File file = new File(this.getThemeBasePath(), key);
         FileUtil.del(file);
         HaloConst.THEMES = this.getThemes();
+    }
+
+    @Override
+    public Map<String, Object> fetchConfig(String themeName) {
+        Assert.hasText(themeName, "Theme name must not be blank");
+
+
+        return null;
     }
 }
