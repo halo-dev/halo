@@ -37,7 +37,7 @@ public class OptionController {
 
     @PostMapping("saving")
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
-        optionService.save(optionParams, OptionSource.SYSTEM);
+        optionService.save(optionParams);
     }
 
     @GetMapping("map_view")
@@ -49,6 +49,6 @@ public class OptionController {
     @PostMapping("map_view/saving")
     @ApiOperation("Saves options by option map")
     public void saveOptionsWithMapView(@RequestBody Map<String, String> optionMap) {
-        optionService.save(optionMap, OptionSource.SYSTEM);
+        optionService.save(optionMap);
     }
 }

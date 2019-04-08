@@ -9,7 +9,6 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionOutputDTO;
 import run.halo.app.model.entity.Option;
-import run.halo.app.model.enums.OptionSource;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.properties.*;
@@ -41,15 +40,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         this.optionRepository = optionRepository;
     }
 
-    /**
-     * Saves one option
-     *
-     * @param key    key
-     * @param value  value
-     * @param source source
-     */
     @Override
-    public void save(String key, String value, OptionSource source) {
+    public void save(String key, String value) {
         Assert.hasText(key, "Option key must not be blank");
 
         if (StringUtils.isBlank(value)) {
@@ -71,7 +63,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             Option anOption = new Option();
             anOption.setKey(key);
             anOption.setValue(value);
-            anOption.setSource(source);
             return anOption;
         });
 
@@ -81,47 +72,40 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         log.debug("Saved option: [{}]", savedOption);
     }
 
-    /**
-     * Saves multiple options
-     *
-     * @param options options
-     * @param source  source
-     */
     @Override
-    public void save(Map<String, String> options, OptionSource source) {
+    public void save(Map<String, String> options) {
         if (CollectionUtils.isEmpty(options)) {
             return;
         }
 
         // TODO Optimize the queries
-        options.forEach((key, value) -> save(key, value, source));
+        options.forEach(this::save);
     }
 
     @Override
-    public void save(List<OptionParam> optionParams, OptionSource source) {
+    public void save(List<OptionParam> optionParams) {
         if (CollectionUtils.isEmpty(optionParams)) {
             return;
         }
 
         // TODO Optimize the query
-        optionParams.forEach(optionParam -> save(optionParam.getOptionKey(), optionParam.getOptionValue(), source));
+        optionParams.forEach(optionParam -> save(optionParam.getOptionKey(), optionParam.getOptionValue()));
     }
 
     @Override
-    public void saveProperty(PropertyEnum property, String value, OptionSource source) {
+    public void saveProperty(PropertyEnum property, String value) {
         Assert.notNull(property, "Property must not be null");
-        Assert.notNull(source, "Option source must not be null");
 
-        save(property.getValue(), value, source);
+        save(property.getValue(), value);
     }
 
     @Override
-    public void saveProperties(Map<? extends PropertyEnum, String> properties, OptionSource source) {
+    public void saveProperties(Map<? extends PropertyEnum, String> properties) {
         if (CollectionUtils.isEmpty(properties)) {
             return;
         }
 
-        properties.forEach((property, value) -> save(property.getValue(), value, source));
+        properties.forEach((property, value) -> save(property.getValue(), value));
     }
 
     /**
