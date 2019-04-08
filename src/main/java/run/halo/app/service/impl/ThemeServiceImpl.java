@@ -95,8 +95,16 @@ public class ThemeServiceImpl implements ThemeService {
                     }
                     theme = new Theme();
                     theme.setKey(file.getName());
-                    File optionsPath = new File(file.getAbsolutePath(), "module/options.ftl");
-                    theme.setHasOptions(optionsPath.exists());
+                    theme.setHasOptions(false);
+                    for (String optionsName : OPTIONS_NAMES) {
+                        // Resolve the options path
+                        Path optionsPath = workDir.resolve(file.getName()).resolve(optionsName);
+
+                        if (!Files.exists(optionsPath)) {
+                            continue;
+                        }
+                        theme.setHasOptions(true);
+                    }
                     theme.setProperties(getProperties(new File(getThemeBasePath(), file.getName())));
                     themes.add(theme);
                 }
