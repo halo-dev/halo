@@ -1,7 +1,13 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col :xl="10" :lg="10" :md="10" :sm="24" :xs="24">
+      <a-col
+        :xl="10"
+        :lg="10"
+        :md="10"
+        :sm="24"
+        :xs="24"
+        :style="{ 'padding-bottom': '12px' }">
         <a-card title="添加标签">
           <a-form layout="horizontal">
             <a-form-item label="名称：" help="*页面上所显示的名称">
@@ -16,7 +22,13 @@
           </a-form>
         </a-card>
       </a-col>
-      <a-col :xl="14" :lg="14" :md="14" :sm="24" :xs="24">
+      <a-col
+        :xl="14"
+        :lg="14"
+        :md="14"
+        :sm="24"
+        :xs="24"
+        :style="{ 'padding-bottom': '12px' }">
         <a-card title="所有标签">
           <a-tooltip placement="topLeft" v-for="tag in tags" :key="tag.id">
             <template slot="title">

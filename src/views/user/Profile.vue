@@ -1,8 +1,8 @@
 <template>
   <div class="page-header-index-wide page-header-wrapper-grid-content-main">
     <a-row :gutter="24">
-      <a-col :md="24" :lg="10">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16' }">
+      <a-col :lg="10" :md="24" :style="{ 'padding-bottom': '12px' }">
+        <a-card :bodyStyle="{ padding: '16' }" :bordered="false">
           <div class="profile-center-avatarHolder">
             <div class="avatar">
               <img :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'" />
@@ -22,7 +22,7 @@
           </div>
           <a-divider />
           <div class="general-profile">
-            <a-list itemLayout="horizontal" :loading="countsLoading">
+            <a-list :loading="countsLoading" itemLayout="horizontal">
               <a-list-item>累计发表了 {{ counts.postCount || 0 }} 篇文章。</a-list-item>
               <a-list-item>累计创建了 {{ counts.linkCount || 0 }} 个标签。</a-list-item>
               <a-list-item>累计获得了 {{ counts.commentCount || 0 }} 条评论。</a-list-item>
@@ -33,11 +33,11 @@
           </div>
         </a-card>
       </a-col>
-      <a-col :md="24" :lg="14">
-        <a-card :bordered="false" title="个人资料" :bodyStyle="{ padding: '0' }">
+      <a-col :lg="14" :md="24" :style="{ 'padding-bottom': '12px' }">
+        <a-card :bodyStyle="{ padding: '0' }" :bordered="false" title="个人资料">
           <div class="card-container">
             <a-tabs type="card">
-              <a-tab-pane tab="基本资料" key="1">
+              <a-tab-pane key="1" tab="基本资料">
                 <a-form layout="vertical">
                   <a-form-item label="用户名：">
                     <a-input v-model="user.username" />
@@ -49,31 +49,31 @@
                     <a-input v-model="user.email" />
                   </a-form-item>
                   <a-form-item label="个人说明：">
-                    <a-input type="textarea" :autosize="{ minRows: 5 }" v-model="user.description" />
+                    <a-input :autosize="{ minRows: 5 }" type="textarea" v-model="user.description" />
                   </a-form-item>
                   <a-form-item>
-                    <a-button type="primary" @click="updateProfile">保存</a-button>
+                    <a-button @click="updateProfile" type="primary">保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
-              <a-tab-pane tab="密码" key="2">
+              <a-tab-pane key="2" tab="密码">
                 <a-form layout="vertical">
                   <a-form-item label="原密码：">
-                    <a-input v-model="passwordParam.oldPassword" type="password" />
+                    <a-input type="password" v-model="passwordParam.oldPassword" />
                   </a-form-item>
                   <a-form-item label="新密码：">
-                    <a-input v-model="passwordParam.newPassword" type="password" />
+                    <a-input type="password" v-model="passwordParam.newPassword" />
                   </a-form-item>
                   <a-form-item label="确认密码：">
-                    <a-input v-model="passwordParam.confirmPassword" type="password" />
+                    <a-input type="password" v-model="passwordParam.confirmPassword" />
                   </a-form-item>
                   <a-form-item>
                     <a-button
-                      type="primary"
                       :disabled="passwordUpdateButtonDisabled"
                       @click="updatePassword"
-                    >确认更改</a-button
-                    >
+                      type="primary"
+                    >确认更改
+                    </a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
@@ -88,6 +88,7 @@
 <script>
 import userApi from '@/api/user'
 import adminApi from '@/api/admin'
+
 export default {
   components: {},
   data() {
@@ -127,7 +128,7 @@ export default {
     updatePassword() {
       // Check confirm password
       if (this.passwordParam.newPassword !== this.passwordParam.confirmPassword) {
-        this.$message.error('确认密码和新密码不匹配')
+        this.$message.error('确认密码和新密码不匹配！')
         return
       }
 
@@ -136,6 +137,7 @@ export default {
     updateProfile() {
       userApi.updateProfile(this.user).then(response => {
         this.user = response.data.data
+        this.$message.success('资料更新成功！')
       })
     }
   }
@@ -148,9 +150,11 @@ export default {
   height: 100%;
   min-height: 100%;
   transition: 0.3s;
+
   .profile-center-avatarHolder {
     text-align: center;
     margin-bottom: 24px;
+
     & > .avatar {
       margin: 0 auto;
       width: 104px;
@@ -158,11 +162,13 @@ export default {
       margin-bottom: 20px;
       border-radius: 50%;
       overflow: hidden;
+
       img {
         height: 100%;
         width: 100%;
       }
     }
+
     .username {
       color: rgba(0, 0, 0, 0.85);
       font-size: 20px;
@@ -171,12 +177,14 @@ export default {
       margin-bottom: 4px;
     }
   }
+
   .profile-center-detail {
     p {
       margin-bottom: 8px;
       padding-left: 26px;
       position: relative;
     }
+
     i {
       position: absolute;
       height: 14px;
@@ -192,6 +200,7 @@ export default {
 .card-container {
   background: #f5f5f5;
 }
+
 .card-container > .ant-tabs-card > .ant-tabs-content {
   margin-top: -16px;
 }
@@ -214,6 +223,7 @@ export default {
   border-color: #fff;
   background: #fff;
 }
+
 .ant-form-vertical .ant-form-item {
   padding-bottom: 0;
 }

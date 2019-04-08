@@ -43,10 +43,15 @@ export default {
         })
       )
     }
-    return h('p', 'No files')
+    return h('p', '没有文件')
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
+.ant-tree-child-tree {
+  li {
+    overflow: hidden;
+  }
+}
 </style>

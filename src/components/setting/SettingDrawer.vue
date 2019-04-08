@@ -3,12 +3,13 @@
     <a-drawer
       width="300"
       placement="right"
-      :closable="false"
+      :closable="true"
       @close="onClose"
       :visible="visible"
       :getContainer="() => $refs.settingDrawer"
       :style="{}"
       :mask="false"
+      :zIndex="9999"
     >
       <div class="setting-drawer-index-content">
         <div :style="{ marginBottom: '24px' }">
@@ -147,13 +148,6 @@
           </div>
         </div>
         <a-divider/>
-        <div :style="{ marginBottom: '24px' }">
-          <a-list :split="false">
-            <a-list-item>
-              <a-icon type="double-right" @click="toggle" class="iconClose"/>
-            </a-list-item>
-          </a-list>
-        </div>
       </div>
     </a-drawer>
   </div>
@@ -288,10 +282,6 @@ export default {
     i {
       font-size: 14px;
     }
-  }
-  .iconClose {
-    font-size: 24px;
-    cursor: pointer;
   }
 }
 

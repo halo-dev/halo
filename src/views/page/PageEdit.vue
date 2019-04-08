@@ -1,10 +1,166 @@
 <template>
-  <div class="page-header-index-wide"> Page Edit </div>
+  <div class="page-header-index-wide">
+    <a-row :gutter="12">
+      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+        <a-card>
+          <div style="margin-bottom: 16px">
+            <a-input
+              v-decorator="['title', { rules: [{ required: true, message: '请输入页面标题' }] }]"
+              size="large"
+              placeholder="请输入页面标题"
+            />
+          </div>
+          <a-button type="primary" @click="showDrawer">发布</a-button>
+        </a-card>
+
+        <a-card>
+          <div id="editor">
+            <mavon-editor v-model="value"/>
+          </div>
+        </a-card>
+      </a-col>
+
+      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+        <a-drawer
+          title="页面设置"
+          :width="drawerWidth"
+          :closable="true"
+          @close="onClose"
+          :visible="visible"
+        >
+          <div class="post-setting-drawer-content">
+            <div :style="{ marginBottom: '16px' }">
+              <h3 class="post-setting-drawer-title">基本设置</h3>
+              <div class="post-setting-drawer-item">
+                <a-form layout="vertical">
+                  <a-form-item label="页面路径：" :help="'https://localhost:8090/p/'+postUrl">
+                    <a-input v-model="postUrl"/>
+                  </a-form-item>
+                  <a-form-item label="页面密码：">
+                    <a-input type="password"/>
+                  </a-form-item>
+                  <a-form-item label="是否开启评论：">
+                    <a-select defaultValue="1">
+                      <a-select-option value="1">是</a-select-option>
+                      <a-select-option value="0">否</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item label="自定义模板：">
+                    <a-select>
+                      <a-select-option v-for="tpl in customTpls" :key="tpl" :value="tpl">{{ tpl }}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-form>
+              </div>
+            </div>
+            <a-divider/>
+
+            <div :style="{ marginBottom: '16px' }">
+              <h3 class="post-setting-drawer-title">缩略图</h3>
+              <div class="post-setting-drawer-item">
+                <div class="post-thum">
+                  <img class="img" src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png">
+                </div>
+              </div>
+            </div>
+            <a-divider/>
+          </div>
+          <div class="postControl">
+            <a-button style="marginRight: 8px" @click="onClose">保存草稿</a-button>
+            <a-button @click="onClose" type="primary">发布</a-button>
+          </div>
+        </a-drawer>
+      </a-col>
+    </a-row>
+  </div>
 </template>
 
 <script>
-export default {}
-</script>
+import { mavonEditor } from 'mavon-editor'
+import { mixin, mixinDevice } from '@/utils/mixin.js'
+import 'mavon-editor/dist/css/index.css'
+import tagApi from '@/api/theme'
+export default {
+  name: 'Editor',
+  components: {
+    mavonEditor
+  },
 
+  mixins: [mixin, mixinDevice],
+  data() {
+    return {
+      wrapperCol: {
+        xl: { span: 24 },
+        sm: { span: 24 },
+        xs: { span: 24 }
+      },
+      value: 'Hello World',
+      visible: false,
+      drawerWidth: '460',
+      postUrl: 'hello-world',
+      customTpls: []
+    }
+  },
+  mounted() {
+    if (this.isMobile()) {
+      this.drawerWidth = '100%'
+    } else {
+      this.drawerWidth = '460'
+    }
+  },
+  created() {
+    this.loadCustomTpls()
+  },
+  methods: {
+    loadCustomTpls() {
+      tagApi.customTpls().then(response => {
+        this.customTpls = response.data.data
+      })
+    },
+    showDrawer() {
+      this.visible = true
+    },
+    onClose() {
+      this.visible = false
+    }
+  }
+}
+</script>
 <style scoped>
+#editor {
+  margin: auto;
+  width: 100%;
+}
+
+.v-note-wrapper {
+  z-index: 1000;
+}
+
+.ant-card {
+  margin-bottom: 16px;
+}
+
+.ant-form-vertical .ant-form-item {
+  padding-bottom: 0;
+}
+
+.postControl {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  border-top: 1px solid rgb(232, 232, 232);
+  padding: 10px 16px;
+  text-align: right;
+  left: 0px;
+  background: rgb(255, 255, 255);
+  border-radius: 0px 0px 4px 4px;
+}
+
+.ant-form-vertical .ant-form-item {
+  padding-bottom: 0;
+}
+
+.post-thum .img {
+  width: 100%;
+}
 </style>

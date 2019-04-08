@@ -7,9 +7,16 @@
         :md="18"
         :sm="24"
         :xs="24"
-      >
+        :style="{'padding-bottom':'12px'}">
         <a-card>
-          <codemirror :value="value"></codemirror>
+          <a-form layout="vertical">
+            <a-form-item>
+              <codemirror :value="value"></codemirror>
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary">保存</a-button>
+            </a-form-item>
+          </a-form>
         </a-card>
       </a-col>
       <a-col
@@ -18,10 +25,8 @@
         :md="6"
         :sm="24"
         :xs="24"
-      >
-        <a-card
-          title="Anatole 主题"
-        >
+        :style="{'padding-bottom':'12px'}">
+        <a-card title="Anatole 主题">
           <theme-file :files="files" />
         </a-card>
       </a-col>
@@ -63,9 +68,14 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
 .CodeMirror-gutters {
   border-right: 1px solid #fff3f3;
   background-color: #ffffff;
+}
+.ant-card {
+  .ant-card-body {
+    padding: 16px;
+  }
 }
 </style>

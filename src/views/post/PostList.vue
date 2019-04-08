@@ -11,7 +11,7 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item label="文章状态">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
+                <a-select v-model="queryParam.status" placeholder="请选择文章状态" defaultValue="0">
                   <a-select-option value="0">已发布</a-select-option>
                   <a-select-option value="1">草稿箱</a-select-option>
                   <a-select-option value="2">回收站</a-select-option>
@@ -20,10 +20,8 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item label="分类目录">
-                <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
-                  <a-select-option value="0">xx</a-select-option>
-                  <a-select-option value="1">xx</a-select-option>
-                  <a-select-option value="2">xx</a-select-option>
+                <a-select v-model="queryParam.categoryId" placeholder="请选择分类">
+                  <a-select-option v-for="category in categories" :key="category.id">{{ category.name }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -39,10 +37,13 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleEdit()">新建</a-button>
+        <router-link :to="{name:'PostEdit'}">
+          <a-button type="primary" icon="plus">写文章</a-button>
+        </router-link>
         <a-dropdown>
           <a-menu slot="overlay">
-            <a-menu-item key="1"> <a-icon type="delete" />回收站 </a-menu-item>
+            <a-menu-item key="1" v-if="postStatus==0 || postStatus==1"> <a-icon type="delete" />移到回收站 </a-menu-item>
+            <a-menu-item key="1" v-else-if="postStatus==2"> <a-icon type="delete" />永久删除 </a-menu-item>
           </a-menu>
           <a-button style="margin-left: 8px;">
             批量操作
@@ -51,18 +52,11 @@
         </a-dropdown>
       </div>
       <div style="margin-top:15px">
-        <a-table :columns="columns" :dataSource="data">
-          <a slot="name" slot-scope="text" href="javascript:;">{{ text }}</a>
-          <span slot="customTitle"><a-icon type="smile-o" /> Name</span>
-          <span slot="tags" slot-scope="tags">
-            <a-tag v-for="tag in tags" color="blue" :key="tag">{{ tag }}</a-tag>
-          </span>
+        <a-table :columns="columns">
           <span slot="action" slot-scope="text, record">
-            <a href="javascript:;">Invite 一 {{ record.name }}</a>
+            <a href="javascript:;" @click="editPost(record.id)">编辑</a>
             <a-divider type="vertical" />
-            <a href="javascript:;">Delete</a>
-            <a-divider type="vertical" />
-            <a href="javascript:;" class="ant-dropdown-link"> More actions <a-icon type="down" /> </a>
+            <a href="javascript:;" @click="deletePost(record.id)">删除</a>
           </span>
         </a-table>
       </div>
@@ -71,6 +65,7 @@
 </template>
 
 <script>
+import categoryApi from '@/api/category'
 export default {
   name: 'PostList',
   components: {},
@@ -120,10 +115,26 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       options: {},
-      optionAlertShow: false
+      optionAlertShow: false,
+      categories: [],
+      postStatus: 0
     }
   },
-  created() {},
-  methods: {}
+  created() {
+    this.loadCategories()
+  },
+  methods: {
+    loadCategories() {
+      categoryApi.listAll().then(response => {
+        this.categories = response.data.data
+      })
+    },
+    editPost(id) {
+      this.$message.success('编辑')
+    },
+    deletePost(id) {
+      this.$message.success('删除')
+    }
+  }
 }
 </script>
