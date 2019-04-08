@@ -17,7 +17,6 @@ import run.halo.app.model.params.UserParam;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.model.support.Theme;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
@@ -63,7 +62,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
-        this.cacheThemes();
         this.cacheOwo();
         this.cacheActiveTheme();
         this.printStartInfo();
@@ -97,21 +95,11 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     }
 
     /**
-     * Cache themes to map
-     */
-    private void cacheThemes() {
-        final List<Theme> themes = themeService.getThemes();
-        if (null != themes) {
-            HaloConst.THEMES = themes;
-        }
-    }
-
-    /**
      * Get active theme
      */
     private void cacheActiveTheme() {
         try {
-            configuration.setSharedVariable("themeName", themeService.getTheme());
+            configuration.setSharedVariable("themeName", themeService.getActivatedTheme());
         } catch (TemplateModelException e) {
             log.error("", e);
         }

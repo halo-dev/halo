@@ -22,5 +22,4 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         this.themeSettingRepository = themeSettingRepository;
     }
 
-
 }

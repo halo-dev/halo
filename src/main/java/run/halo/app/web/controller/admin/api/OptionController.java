@@ -1,14 +1,10 @@
 package run.halo.app.web.controller.admin.api;
 
 import run.halo.app.model.dto.OptionOutputDTO;
-import run.halo.app.model.enums.OptionSource;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.service.OptionService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.OptionOutputDTO;
-import run.halo.app.model.enums.OptionSource;
-import run.halo.app.model.params.OptionParam;
 
 import javax.validation.Valid;
 import java.util.List;
