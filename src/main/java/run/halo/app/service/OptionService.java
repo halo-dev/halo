@@ -280,12 +280,4 @@ public interface OptionService extends CrudService<Option, Integer> {
     @NonNull
     Locale getLocale();
 
-    /**
-     * Gets current active theme.
-     *
-     * @return current active theme
-     */
-    @NonNull
-    String getTheme();
-
 }

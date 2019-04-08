@@ -9,11 +9,11 @@ import cn.hutool.setting.dialect.Props;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
@@ -30,6 +30,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_NAME;
 
 /**
  * @author : RYAN0UP
@@ -206,7 +208,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public boolean isTemplateExist(String template) {
-        StrBuilder templatePath = new StrBuilder(getThemeName());
+        StrBuilder templatePath = new StrBuilder(getTheme());
         templatePath.append("/");
         templatePath.append(template);
         File file = new File(getThemeBasePath(), templatePath.toString());
@@ -332,16 +334,12 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public String render(String pageName) {
-        return String.format(RENDER_TEMPLATE, optionService.getTheme(), pageName);
+        return String.format(RENDER_TEMPLATE, getTheme(), pageName);
     }
 
-    /**
-     * Gets theme name.
-     *
-     * @return theme name.
-     */
-    @NonNull
-    private String getThemeName() {
-        return optionService.getTheme();
+    @Override
+    public String getTheme() {
+        return optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
     }
+
 }

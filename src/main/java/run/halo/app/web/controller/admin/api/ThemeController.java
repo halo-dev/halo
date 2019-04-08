@@ -56,7 +56,7 @@ public class ThemeController {
      */
     @GetMapping("files")
     public List<ThemeFile> listFiles() {
-        return themeService.listThemeFolderBy(optionService.getTheme());
+        return themeService.listThemeFolderBy(themeService.getTheme());
     }
 
     @GetMapping("files/content")
@@ -72,7 +72,7 @@ public class ThemeController {
 
     @GetMapping("files/custom")
     public List<String> customTemplate() {
-        return themeService.getCustomTpl(optionService.getTheme());
+        return themeService.getCustomTpl(themeService.getTheme());
     }
 
     /**
@@ -103,7 +103,7 @@ public class ThemeController {
 
     @GetMapping("configurations")
     @ApiOperation("Fetches theme configuration")
-    public BaseResponse<Object> fetchConfig(@RequestParam("name") String name) {
-        return BaseResponse.ok(themeService.fetchConfig(name));
+    public BaseResponse<Object> fetchConfig() {
+        return BaseResponse.ok(themeService.fetchConfig(themeService.getTheme()));
     }
 }

@@ -129,4 +129,12 @@ public interface ThemeService {
     @NonNull
     String render(@NonNull String pageName);
 
+    /**
+     * Gets current theme name.
+     *
+     * @return current theme name
+     */
+    @NonNull
+    String getTheme();
+
 }
