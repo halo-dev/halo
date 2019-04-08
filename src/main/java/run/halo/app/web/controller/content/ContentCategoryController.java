@@ -1,9 +1,5 @@
 package run.halo.app.web.controller.content;
 
-import run.halo.app.model.entity.Category;
-import run.halo.app.service.CategoryService;
-import run.halo.app.service.PostService;
-import run.halo.app.web.controller.content.base.BaseContentController;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
@@ -14,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Category;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostService;
-import run.halo.app.web.controller.content.base.BaseContentController;
+import run.halo.app.service.ThemeService;
 
 import java.util.List;
 
@@ -26,16 +22,20 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  */
 @Controller
 @RequestMapping(value = "/categories")
-public class ContentCategoryController extends BaseContentController {
+public class ContentCategoryController {
 
     private final CategoryService categoryService;
 
     private final PostService postService;
 
+    private final ThemeService themeService;
+
     public ContentCategoryController(CategoryService categoryService,
-                                     PostService postService) {
+                                     PostService postService,
+                                     ThemeService themeService) {
         this.categoryService = categoryService;
         this.postService = postService;
+        this.themeService = themeService;
     }
 
     /**
@@ -48,7 +48,7 @@ public class ContentCategoryController extends BaseContentController {
     public String categories(Model model) {
         final List<Category> categories = categoryService.listAll();
         model.addAttribute("categories", categories);
-        return this.render("categories");
+        return themeService.render("categories");
     }
 
     /**
@@ -77,6 +77,7 @@ public class ContentCategoryController extends BaseContentController {
                              @PathVariable("slugName") String slugName,
                              @PathVariable("page") Integer page,
                              @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
+        // TODO Complete this api in the future
         return "";
     }
 }

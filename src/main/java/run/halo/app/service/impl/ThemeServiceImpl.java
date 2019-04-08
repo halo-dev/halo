@@ -9,6 +9,7 @@ import cn.hutool.setting.dialect.Props;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.config.properties.HaloProperties;
@@ -17,6 +18,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperties;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FilenameUtils;
 
@@ -47,15 +49,30 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private static String[] FILTER_FILES = {".git", ".DS_Store", "theme.properties"};
 
+    /**
+     * Theme folder location.
+     */
     private final static String THEME_FOLDER = "templates/themes";
 
+    /**
+     * Configuration file name.
+     */
     private final static String[] OPTIONS_NAMES = {"options.yaml", "options.yml"};
+
+    /**
+     * Render template.
+     */
+    private final static String RENDER_TEMPLATE = "themes/%s/%s";
 
     private final Path workDir;
 
     private final ObjectMapper yamlMapper;
 
-    public ThemeServiceImpl(HaloProperties haloProperties) {
+    private final OptionService optionService;
+
+    public ThemeServiceImpl(HaloProperties haloProperties,
+                            OptionService optionService) {
+        this.optionService = optionService;
         yamlMapper = new ObjectMapper(new YAMLFactory());
         workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
     }
@@ -181,7 +198,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public boolean isTemplateExist(String template) {
-        StrBuilder templatePath = new StrBuilder(HaloConst.ACTIVATED_THEME_NAME);
+        StrBuilder templatePath = new StrBuilder(getThemeName());
         templatePath.append("/");
         templatePath.append(template);
         File file = new File(getThemeBasePath(), templatePath.toString());
@@ -303,5 +320,20 @@ public class ThemeServiceImpl implements ThemeService {
             log.error("Failed to read options.yaml", e);
             return null;
         }
+    }
+
+    @Override
+    public String render(String pageName) {
+        return String.format(RENDER_TEMPLATE, optionService.getTheme(), pageName);
+    }
+
+    /**
+     * Gets theme name.
+     *
+     * @return theme name.
+     */
+    @NonNull
+    private String getThemeName() {
+        return optionService.getTheme();
     }
 }

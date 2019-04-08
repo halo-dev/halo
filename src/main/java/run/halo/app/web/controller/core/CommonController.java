@@ -1,16 +1,14 @@
 package run.halo.app.web.controller.core;
 
-import run.halo.app.model.entity.User;
-import run.halo.app.model.support.HaloConst;
-import run.halo.app.service.ThemeService;
 import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import run.halo.app.model.entity.User;
+import run.halo.app.model.support.HaloConst;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,8 +33,16 @@ public class CommonController implements ErrorController {
 
     private static final String ADMIN_URL = "/admin";
 
-    @Autowired
-    private ThemeService themeService;
+    private final ThemeService themeService;
+
+    private final OptionService optionService;
+
+    public CommonController(ThemeService themeService,
+                            OptionService optionService) {
+        this.themeService = themeService;
+        this.optionService = optionService;
+    }
+
 
     /**
      * Handle error
@@ -108,7 +114,7 @@ public class CommonController implements ErrorController {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");
-        path.append(HaloConst.ACTIVATED_THEME_NAME);
+        path.append(optionService.getTheme());
         path.append("/404");
         return path.toString();
     }
@@ -119,12 +125,12 @@ public class CommonController implements ErrorController {
      * @return template path:
      */
     @GetMapping(value = "/500")
-    public String contentInternalError() throws FileNotFoundException {
+    public String contentInternalError() {
         if (!themeService.isTemplateExist(INTERNAL_ERROR_TEMPLATE)) {
             return "common/error/500";
         }
         StrBuilder path = new StrBuilder("themes/");
-        path.append(HaloConst.ACTIVATED_THEME_NAME);
+        path.append(optionService.getTheme());
         path.append("/500");
         return path.toString();
     }

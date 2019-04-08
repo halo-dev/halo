@@ -124,6 +124,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @param url post url.
      * @return Post
      */
+    @NonNull
     Post getByUrl(@NonNull String url);
 
     /**

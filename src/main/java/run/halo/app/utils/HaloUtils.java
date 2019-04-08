@@ -1,7 +1,6 @@
 package run.halo.app.utils;
 
 import cn.hutool.core.text.StrBuilder;
-import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -19,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
-import java.util.Properties;
 import java.util.UUID;
 
 /**
@@ -33,6 +31,12 @@ import java.util.UUID;
 @Slf4j
 public class HaloUtils {
 
+    /**
+     * Time format.
+     *
+     * @param totalSeconds seconds
+     * @return formatted time
+     */
     @NonNull
     public static String timeFormat(long totalSeconds) {
         if (totalSeconds <= 0) {

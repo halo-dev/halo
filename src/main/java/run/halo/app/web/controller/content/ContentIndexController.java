@@ -1,11 +1,5 @@
 package run.halo.app.web.controller.content;
 
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.enums.PostType;
-import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
-import run.halo.app.web.controller.content.base.BaseContentController;
 import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,8 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
-import run.halo.app.web.controller.content.base.BaseContentController;
+import run.halo.app.service.ThemeService;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -34,16 +29,20 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Slf4j
 @Controller
 @RequestMapping
-public class ContentIndexController extends BaseContentController {
+public class ContentIndexController {
 
     private final PostService postService;
 
     private final OptionService optionService;
 
+    private final ThemeService themeService;
+
     public ContentIndexController(PostService postService,
-                                  OptionService optionService) {
+                                  OptionService optionService,
+                                  ThemeService themeService) {
         this.postService = postService;
         this.optionService = optionService;
+        this.themeService = themeService;
     }
 
 
@@ -80,6 +79,6 @@ public class ContentIndexController extends BaseContentController {
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
-        return this.render("index");
+        return themeService.render("index");
     }
 }

@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_NAME;
+
 /**
  * OptionService implementation class
  *
@@ -100,6 +102,14 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         // TODO Optimize the query
         optionParams.forEach(optionParam -> save(optionParam.getOptionKey(), optionParam.getOptionValue(), source));
+    }
+
+    @Override
+    public void saveProperty(PropertyEnum property, String value, OptionSource source) {
+        Assert.notNull(property, "Property must not be null");
+        Assert.notNull(source, "Option source must not be null");
+
+        save(property.getValue(), value, source);
     }
 
     @Override
@@ -279,5 +289,10 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
                 return Locale.getDefault();
             }
         }).orElseGet(Locale::getDefault);
+    }
+
+    @Override
+    public String getTheme() {
+        return getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
     }
 }

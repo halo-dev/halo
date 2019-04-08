@@ -1,13 +1,5 @@
 package run.halo.app.service;
 
-import run.halo.app.exception.MissingPropertyException;
-import run.halo.app.model.dto.OptionOutputDTO;
-import run.halo.app.model.entity.Option;
-import run.halo.app.model.enums.OptionSource;
-import run.halo.app.model.enums.ValueEnum;
-import run.halo.app.model.params.OptionParam;
-import run.halo.app.model.properties.PropertyEnum;
-import run.halo.app.service.base.CrudService;
 import com.qiniu.common.Zone;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -16,6 +8,7 @@ import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionOutputDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.OptionSource;
+import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.properties.PropertyEnum;
 import run.halo.app.service.base.CrudService;
@@ -65,6 +58,16 @@ public interface OptionService extends CrudService<Option, Integer> {
      */
     @Transactional
     void save(List<OptionParam> optionParams, @NonNull OptionSource source);
+
+    /**
+     * Saves a property.
+     *
+     * @param property must not be null
+     * @param value    could be null
+     * @param source   must not be null
+     */
+    @Transactional
+    void saveProperty(@NonNull PropertyEnum property, String value, @NonNull OptionSource source);
 
     /**
      * Saves blog properties.
@@ -276,4 +279,13 @@ public interface OptionService extends CrudService<Option, Integer> {
      */
     @NonNull
     Locale getLocale();
+
+    /**
+     * Gets current active theme.
+     *
+     * @return current active theme
+     */
+    @NonNull
+    String getTheme();
+
 }

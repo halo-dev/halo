@@ -1,16 +1,5 @@
 package run.halo.app.listener;
 
-import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.model.entity.User;
-import run.halo.app.model.params.UserParam;
-import run.halo.app.model.properties.BlogProperties;
-import run.halo.app.model.properties.PrimaryProperties;
-import run.halo.app.model.support.HaloConst;
-import run.halo.app.model.support.Theme;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.ThemeService;
-import run.halo.app.service.UserService;
-import run.halo.app.utils.HaloUtils;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,12 +11,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ResourceUtils;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.PrimaryProperties;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.UserService;
 import run.halo.app.utils.HaloUtils;
 
 import java.io.File;
@@ -35,9 +28,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static run.halo.app.model.support.HaloConst.ACTIVATED_THEME_NAME;
-import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_NAME;
 
 /**
  * The method executed after the application is started.
@@ -75,7 +65,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // save halo version to database
         this.cacheThemes();
         this.cacheOwo();
-        this.getActiveTheme();
+        this.cacheActiveTheme();
         this.printStartInfo();
         this.initThemes();
 
@@ -119,13 +109,11 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     /**
      * Get active theme
      */
-    private void getActiveTheme() {
-        ACTIVATED_THEME_NAME = optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
-
+    private void cacheActiveTheme() {
         try {
-            configuration.setSharedVariable("themeName", ACTIVATED_THEME_NAME);
+            configuration.setSharedVariable("themeName", optionService.getTheme());
         } catch (TemplateModelException e) {
-            e.printStackTrace();
+            log.error("", e);
         }
     }
 

@@ -1,11 +1,5 @@
 package run.halo.app.web.controller.content;
 
-import run.halo.app.model.entity.Tag;
-import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
-import run.halo.app.service.TagService;
-import run.halo.app.web.controller.content.base.BaseContentController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.TagService;
-import run.halo.app.web.controller.content.base.BaseContentController;
+import run.halo.app.service.ThemeService;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -32,7 +27,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  */
 @Controller
 @RequestMapping(value = "/tags")
-public class ContentTagController extends BaseContentController {
+public class ContentTagController {
 
     private final TagService tagService;
 
@@ -40,12 +35,16 @@ public class ContentTagController extends BaseContentController {
 
     private final OptionService optionService;
 
+    private final ThemeService themeService;
+
     public ContentTagController(TagService tagService,
                                 PostService postService,
-                                OptionService optionService) {
+                                OptionService optionService,
+                                ThemeService themeService) {
         this.tagService = tagService;
         this.postService = postService;
         this.optionService = optionService;
+        this.themeService = themeService;
     }
 
     /**
@@ -55,7 +54,7 @@ public class ContentTagController extends BaseContentController {
      */
     @GetMapping
     public String tags() {
-        return this.render("tags");
+        return themeService.render("tags");
     }
 
     /**
@@ -84,20 +83,18 @@ public class ContentTagController extends BaseContentController {
                        @PathVariable("slugName") String slugName,
                        @PathVariable("page") Integer page,
                        @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
-        final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
-        if (null == tag) {
-            return this.renderNotFound();
-        }
-        int size = optionService.getPostPageSize();
-        final Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
+        int size = optionService.getPostPageSize();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<PostListVO> posts;
         // TODO get posts by tag
-        final Page<PostListVO> posts;
         //final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 //        model.addAttribute("is_tags", true);
 //        model.addAttribute("posts", posts);
 //        model.addAttribute("rainbow", rainbow);
 //        model.addAttribute("tag", tag);
-        return this.render("tag");
+        return themeService.render("tag");
     }
 }
