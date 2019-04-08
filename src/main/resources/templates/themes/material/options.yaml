@@ -1,0 +1,150 @@
+general:
+  name: 基础设置
+  items:
+    theme_material_scheme:
+      id: materialScheme
+      name: Scheme
+      type: select
+      defaultValue: Paradox
+      options:
+        - value: Paradox
+          label: Paradox
+        - value: Isolation
+          label: Isolation
+
+    theme_material_favicon:
+      id: materialFavicon
+      name: Favicon
+      type: text
+
+    theme_material_high_res_favicon:
+      id: materialHighFavicon
+      name: 高清 Favicon
+      type: text
+
+    theme_material_apple_touch_icon:
+      id: materialAppleFavicon
+      name: IOS 主屏按钮图标
+      type: text
+
+    theme_material_daily_pic:
+      id: materialDialyPic
+      name: daily_pic
+      type: text
+
+    theme_material_sidebar_header:
+      id: materialSidebarHeader
+      name: Sidebar 顶部图片
+      type: text
+
+    theme_material_footer_image:
+      id: materialFooterImage
+      name: Sidebar 底部图片
+      type: text
+
+    theme_material_copyright_since:
+      id: materialCopyrightSince
+      name: 站点成立时间
+      type: text
+
+style:
+  name: 样式设置
+  items:
+    theme_material_uiux_slogan:
+      id: materialUiuxSlogan
+      name: Slogan
+      type: text
+      defaultValue: Hi, nice to meet you
+
+    theme_material_uiux_card_elevation:
+      id: materialUiuxCardElevation
+      name: 卡片深度
+      type: text
+      defaultValue: 2
+
+    theme_material_uiux_theme_color:
+      id: materialUiuxThemeColor
+      name: 主题颜色
+      type: text
+      defaultValue: #0097A7
+
+    theme_material_uiux_theme_sub_color:
+      id: materialUiuxThemeSubColor
+      name: 辅助颜色
+      type: text
+      defaultValue: #00838F
+
+    theme_material_uiux_hyperlink_color:
+      id: materialHyperLinkColor
+      name: 超链接颜色
+      type: text
+      defaultValue: #00838F
+
+    theme_material_uiux_button_color:
+      id: materialButtonColor
+      name: 按钮颜色
+      type: text
+      defaultValue: #757575
+
+    theme_material_footer_uiux_android_chrome_color:
+      id: materialGoogleColor
+      name: 安卓 Chrome 颜色
+      type: text
+      defaultValue: #0097A7
+
+    theme_material_uiux_nprogress_color:
+      id: materialNprogressColor
+      name: NProgress 颜色
+      type: text
+      defaultValue: #29d
+
+    theme_material_uiux_nprogress_buffer:
+      id: materialNProgressBuffer
+      name: NProgressBuffer
+      type: text
+      defaultValue: 800
+
+    theme_material_background_purecolor:
+      id: materialBackgroundColor
+      name: 背景颜色
+      type: text
+      defaultValue: #F5F5F5
+
+    theme_material_background_bgimg:
+      id: materialBackgroundImage
+      name: 背景图片
+      type: text
+
+    theme_material_background_bing:
+      id: materialBackgroundBing
+      name: Bing 背景
+      type: select
+      defaultValue: false
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+
+    material_code_pretty:
+      id: materialCodePretty
+      name: 代码高亮
+      type: select
+      defaultValue: false
+      options:
+        - value: Default
+          label: Default
+        - value: Coy
+          label: Coy
+        - value: Dark
+          label: Dark
+        - value: Okaidia
+          label: Okaidia
+        - value: Solarized Light
+          label: Solarized Light
+        - value: Tomorrow Night
+          label: Tomorrow Night
+        - value: Twilight
+          label: Twilight
+
+
