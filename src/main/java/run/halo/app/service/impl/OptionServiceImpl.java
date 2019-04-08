@@ -290,9 +290,4 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             }
         }).orElseGet(Locale::getDefault);
     }
-
-    @Override
-    public String getTheme() {
-        return getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
-    }
 }
