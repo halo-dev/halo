@@ -2,9 +2,8 @@ package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
-import run.halo.app.model.support.ThemeProperties;
+import run.halo.app.model.support.ThemeProperty;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -21,7 +20,7 @@ public interface ThemeService {
      *
      * @return list of themes
      */
-    List<Theme> getThemes();
+    List<ThemeProperty> getThemes();
 
     /**
      * Lists theme folder by absolute path.
@@ -79,14 +78,6 @@ public interface ThemeService {
     Path getBasePath();
 
     /**
-     * Get theme Properties.
-     *
-     * @param path path
-     * @return ThemeProperties
-     */
-    ThemeProperties getProperties(@NonNull File path);
-
-    /**
      * Get template content by template absolute path.
      *
      * @param absolutePath absolute path
@@ -130,11 +121,17 @@ public interface ThemeService {
     String render(@NonNull String pageName);
 
     /**
-     * Gets current theme name.
+     * Gets current theme id.
      *
-     * @return current theme name
+     * @return current theme id
      */
     @NonNull
-    String getTheme();
+    String getActivatedTheme();
 
+    /**
+     * Actives a theme.
+     *
+     * @param themeId theme id must not be blank
+     */
+    void activeTheme(@NonNull String themeId);
 }

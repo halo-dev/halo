@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.BaseResponse;
-import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
+import run.halo.app.model.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 
@@ -44,7 +44,7 @@ public class ThemeController {
      */
     @GetMapping
     @ApiOperation("List all themes")
-    public List<Theme> listAll() {
+    public List<ThemeProperty> listAll() {
         return themeService.getThemes();
     }
 
@@ -55,7 +55,7 @@ public class ThemeController {
      */
     @GetMapping("files")
     public List<ThemeFile> listFiles() {
-        return themeService.listThemeFolderBy(themeService.getTheme());
+        return themeService.listThemeFolderBy(themeService.getActivatedTheme());
     }
 
     @GetMapping("files/content")
@@ -71,19 +71,21 @@ public class ThemeController {
 
     @GetMapping("files/custom")
     public List<String> customTemplate() {
-        return themeService.getCustomTpl(themeService.getTheme());
+        return themeService.getCustomTpl(themeService.getActivatedTheme());
     }
 
-    @PostMapping("active")
+    @PostMapping("{themeId}/activate")
     @ApiOperation("Active a theme")
-    public void active(String theme) throws TemplateModelException {
+    public void active(@RequestParam("themeId") String themeId) throws TemplateModelException {
+        themeService.activeTheme(themeId);
+
         // TODO Check existence of the theme
-        optionService.saveProperty(PrimaryProperties.THEME, theme);
-        configuration.setSharedVariable("themeName", theme);
+        optionService.saveProperty(PrimaryProperties.THEME, themeId);
+        configuration.setSharedVariable("themeName", themeId);
         configuration.setSharedVariable("options", optionService.listOptions());
     }
 
-    @DeleteMapping("{key}")
+    @DeleteMapping("key/{key}")
     @ApiOperation("Deletes a theme")
     public void deleteBy(@PathVariable("key") String key) {
         themeService.deleteTheme(key);
@@ -92,6 +94,6 @@ public class ThemeController {
     @GetMapping("configurations")
     @ApiOperation("Fetches theme configuration")
     public BaseResponse<Object> fetchConfig() {
-        return BaseResponse.ok(themeService.fetchConfig(themeService.getTheme()));
+        return BaseResponse.ok(themeService.fetchConfig(themeService.getActivatedTheme()));
     }
 }

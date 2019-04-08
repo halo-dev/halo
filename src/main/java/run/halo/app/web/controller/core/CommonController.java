@@ -114,7 +114,7 @@ public class CommonController implements ErrorController {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");
-        path.append(themeService.getTheme());
+        path.append(themeService.getActivatedTheme());
         path.append("/404");
         return path.toString();
     }
@@ -130,7 +130,7 @@ public class CommonController implements ErrorController {
             return "common/error/500";
         }
         StrBuilder path = new StrBuilder("themes/");
-        path.append(themeService.getTheme());
+        path.append(themeService.getActivatedTheme());
         path.append("/500");
         return path.toString();
     }

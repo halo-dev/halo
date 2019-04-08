@@ -11,6 +11,7 @@ import java.io.Serializable;
  * @date : 2018/1/3
  */
 @Data
+@Deprecated
 public class Theme implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,5 +29,5 @@ public class Theme implements Serializable {
     /**
      * Theme properties
      */
-    private ThemeProperties properties;
+    private ThemeProperty properties;
 }
