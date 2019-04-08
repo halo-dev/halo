@@ -229,13 +229,20 @@
             <version>${httpclient.version}</version>
         </dependency>
 
+        <!-- Jackson yaml -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
         <!--<testResources>-->
-            <!--<testResource>-->
-                <!--<directory>${basedir}/src/main/resources</directory>-->
-            <!--</testResource>-->
+        <!--<testResource>-->
+        <!--<directory>${basedir}/src/main/resources</directory>-->
+        <!--</testResource>-->
         <!--</testResources>-->
         <plugins>
             <!-- Spring Boot plugin -->
@@ -244,15 +251,15 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-jar-plugin</artifactId>-->
-                <!--<version>3.0.2</version>-->
-                <!--<configuration>-->
-                    <!--<excludes>-->
-                        <!--<exclude>/**/application-dev.yaml</exclude>-->
-                        <!--<exclude>/**/application-test.yaml</exclude>-->
-                    <!--</excludes>-->
-                <!--</configuration>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-jar-plugin</artifactId>-->
+            <!--<version>3.0.2</version>-->
+            <!--<configuration>-->
+            <!--<excludes>-->
+            <!--<exclude>/**/application-dev.yaml</exclude>-->
+            <!--<exclude>/**/application-test.yaml</exclude>-->
+            <!--</excludes>-->
+            <!--</configuration>-->
             <!--</plugin>-->
         </plugins>
     </build>
