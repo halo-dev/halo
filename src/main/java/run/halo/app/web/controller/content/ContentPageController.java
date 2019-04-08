@@ -1,19 +1,11 @@
 package run.halo.app.web.controller.content;
 
-import run.halo.app.model.entity.Comment;
-import run.halo.app.model.entity.Gallery;
-import run.halo.app.model.entity.Post;
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.enums.PostType;
-import run.halo.app.service.CommentService;
-import run.halo.app.service.GalleryService;
-import run.halo.app.service.PostService;
-import run.halo.app.web.controller.content.base.BaseContentController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.Gallery;
 import run.halo.app.model.entity.Post;
@@ -21,7 +13,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.CommentService;
 import run.halo.app.service.GalleryService;
 import run.halo.app.service.PostService;
-import run.halo.app.web.controller.content.base.BaseContentController;
+import run.halo.app.service.ThemeService;
 
 import java.util.List;
 
@@ -30,7 +22,7 @@ import java.util.List;
  * @date : 2019-03-21
  */
 @Controller
-public class ContentPageController extends BaseContentController {
+public class ContentPageController {
 
     private final GalleryService galleryService;
 
@@ -38,10 +30,16 @@ public class ContentPageController extends BaseContentController {
 
     private final CommentService commentService;
 
-    public ContentPageController(GalleryService galleryService, PostService postService, CommentService commentService) {
+    private final ThemeService themeService;
+
+    public ContentPageController(GalleryService galleryService,
+                                 PostService postService,
+                                 CommentService commentService,
+                                 ThemeService themeService) {
         this.galleryService = galleryService;
         this.postService = postService;
         this.commentService = commentService;
+        this.themeService = themeService;
     }
 
     /**
@@ -53,7 +51,7 @@ public class ContentPageController extends BaseContentController {
     public String gallery(Model model) {
         final List<Gallery> galleries = galleryService.listAll();
         model.addAttribute("galleries", galleries);
-        return this.render("gallery");
+        return themeService.render("gallery");
     }
 
     /**
@@ -63,7 +61,7 @@ public class ContentPageController extends BaseContentController {
      */
     @GetMapping(value = "/links")
     public String links() {
-        return this.render("links");
+        return themeService.render("links");
     }
 
     /**
@@ -78,10 +76,15 @@ public class ContentPageController extends BaseContentController {
                           @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
         final Post post = postService.getByUrl(url);
-        if (null == post || !post.getStatus().equals(PostStatus.PUBLISHED)) {
-            return this.renderNotFound();
+
+        if (!post.getStatus().equals(PostStatus.PUBLISHED)) {
+            throw new NotFoundException("The post isn't published").setErrorData(url);
         }
+
         List<Comment> comments;
+
+        // TODO Complete this api
+
 //        if (StrUtil.equals(OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getValue()), "true") || OPTIONS.get(BlogProperties.NEW_COMMENT_NEED_CHECK.getValue()) == null) {
 //            comments = commentService.findCommentsByPostAndCommentStatus(post, CommentStatus.PUBLISHED.getValue());
 //        } else {
@@ -106,6 +109,6 @@ public class ContentPageController extends BaseContentController {
 //        if (StrUtil.isNotEmpty(post.getCustomTpl())) {
 //            return this.render(post.getCustomTpl());
 //        }
-        return this.render("page");
+        return themeService.render("page");
     }
 }

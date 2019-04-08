@@ -1,9 +1,5 @@
 package run.halo.app.web.controller.content.base;
 
-import cn.hutool.core.text.StrBuilder;
-
-import static run.halo.app.model.support.HaloConst.ACTIVATED_THEME_NAME;
-
 /**
  * Content base Controller
  *
@@ -12,26 +8,4 @@ import static run.halo.app.model.support.HaloConst.ACTIVATED_THEME_NAME;
  */
 public abstract class BaseContentController {
 
-    /**
-     * Render page by template name
-     *
-     * @param pageName pageName
-     * @return template path
-     */
-    public String render(String pageName) {
-        final StrBuilder themeStr = new StrBuilder("themes/");
-        themeStr.append(ACTIVATED_THEME_NAME);
-        themeStr.append("/");
-        themeStr.append(pageName);
-        return themeStr.toString();
-    }
-
-    /**
-     * Redirect to 404
-     *
-     * @return redirect:/404
-     */
-    public String renderNotFound() {
-        return "redirect:/404";
-    }
 }

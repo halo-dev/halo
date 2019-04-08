@@ -1,9 +1,8 @@
 package run.halo.app.service;
 
+import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.TagOutputDTO;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.service.base.CrudService;
-import org.springframework.lang.NonNull;
 import run.halo.app.service.base.CrudService;
 
 import java.util.List;

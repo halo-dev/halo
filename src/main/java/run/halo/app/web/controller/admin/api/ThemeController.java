@@ -6,17 +6,13 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.enums.OptionSource;
 import run.halo.app.model.properties.PrimaryProperties;
-import run.halo.app.model.properties.PropertyEnum;
 import run.halo.app.model.support.BaseResponse;
-import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Theme;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Theme controller.
@@ -60,7 +56,7 @@ public class ThemeController {
      */
     @GetMapping("files")
     public List<ThemeFile> listFiles() {
-        return themeService.listThemeFolderBy(HaloConst.ACTIVATED_THEME_NAME);
+        return themeService.listThemeFolderBy(optionService.getTheme());
     }
 
     @GetMapping("files/content")
@@ -76,7 +72,7 @@ public class ThemeController {
 
     @GetMapping("files/custom")
     public List<String> customTemplate() {
-        return themeService.getCustomTpl(HaloConst.ACTIVATED_THEME_NAME);
+        return themeService.getCustomTpl(optionService.getTheme());
     }
 
     /**
@@ -86,13 +82,10 @@ public class ThemeController {
      * @throws TemplateModelException TemplateModelException
      */
     @GetMapping(value = "active")
-    @ApiOperation("Active theme")
-    public void active(@RequestParam(name = "theme", defaultValue = "anatole") String theme) throws TemplateModelException {
-        Map<PropertyEnum, String> properties = new HashMap<>(1);
-        properties.put(PrimaryProperties.THEME, theme);
-        // TODO Refactor: saveProperties => saveProperty
-        optionService.saveProperties(properties, OptionSource.SYSTEM);
-        HaloConst.ACTIVATED_THEME_NAME = theme;
+    @ApiOperation("Active a theme")
+    public void active(String theme) throws TemplateModelException {
+        // TODO Check existence of the theme
+        optionService.saveProperty(PrimaryProperties.THEME, theme, OptionSource.SYSTEM);
         configuration.setSharedVariable("themeName", theme);
         configuration.setSharedVariable("options", optionService.listOptions());
     }

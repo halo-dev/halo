@@ -119,4 +119,14 @@ public interface ThemeService {
      */
     @Nullable
     Object fetchConfig(@NonNull String themeName);
+
+    /**
+     * Render a theme page.
+     *
+     * @param pageName must not be blank
+     * @return full path of the theme page
+     */
+    @NonNull
+    String render(@NonNull String pageName);
+
 }

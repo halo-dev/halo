@@ -1,10 +1,5 @@
 package run.halo.app.config;
 
-import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.factory.StringToEnumConverterFactory;
-import run.halo.app.model.support.HaloConst;
-import run.halo.app.security.resolver.AuthenticationArgumentResolver;
-import run.halo.app.web.controller.support.PageJacksonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +20,11 @@ import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.factory.StringToEnumConverterFactory;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
+import run.halo.app.web.controller.support.PageJacksonSerializer;
 
 import java.util.List;
 
@@ -42,6 +40,8 @@ import java.util.List;
 @ComponentScan(basePackages = "run.halo.app.web.controller")
 @PropertySource(value = "classpath:application.yaml", ignoreResourceNotFound = true, encoding = "UTF-8")
 public class WebMvcAutoConfiguration implements WebMvcConfigurer {
+
+    private static final String FILE_PROTOCOL = "file:///";
 
     @Autowired
     private HaloProperties haloProperties;
@@ -76,13 +76,13 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/");
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/templates/themes/")
-                .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/templates/themes/");
+                .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/themes/");
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/upload/");
+                .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "upload/");
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations("classpath:/static/halo-admin/images/favicon.ico");
         registry.addResourceHandler("/backup/**")
-                .addResourceLocations("file:///" + System.getProperties().getProperty("user.home") + "/halo/backup/");
+                .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "backup/");
         registry.addResourceHandler("/admin/**")
                 .addResourceLocations("classpath:/static/admin/");
 
@@ -108,7 +108,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Bean
     public FreeMarkerConfigurer freemarkerConfig() {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setTemplateLoaderPaths("file:///" + System.getProperties().getProperty("user.home") + "/halo/templates/", "classpath:/templates/");
+        configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
         return configurer;
     }

@@ -25,11 +25,6 @@ public class HaloConst {
     public final static String DEFAULT_THEME_NAME = "anatole";
 
     /**
-     * Activated theme name.
-     */
-    public static String ACTIVATED_THEME_NAME = "anatole";
-
-    /**
      * version constant
      */
     public static final String HALO_VERSION = "1.0.0";
