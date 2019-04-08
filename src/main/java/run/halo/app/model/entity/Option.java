@@ -20,7 +20,7 @@ import javax.persistence.*;
 @SQLDelete(sql = "update options set deleted = true where id = ?")
 @Where(clause = "deleted = false")
 @Data
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class Option extends BaseEntity {
@@ -33,13 +33,13 @@ public class Option extends BaseEntity {
      * option key
      */
     @Column(name = "option_key", columnDefinition = "varchar(100) not null")
-    private String optionKey;
+    private String key;
 
     /**
      * option value
      */
     @Column(name = "option_value", columnDefinition = "varchar(1023) not null")
-    private String optionValue;
+    private String value;
 
     /**
      * source,default is system
@@ -47,9 +47,9 @@ public class Option extends BaseEntity {
     @Column(name = "option_source", columnDefinition = "int default 0")
     private OptionSource source;
 
-    public Option(String optionKey, String optionValue) {
-        this.optionKey = optionKey;
-        this.optionValue = optionValue;
+    public Option(String key, String value) {
+        this.key = key;
+        this.value = value;
     }
 
     @Override

@@ -61,16 +61,16 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         // TODO Consider cache options with map
         Option option = optionRepository.findByOptionKey(key).map(anOption -> {
-            log.debug("Updating option key: [{}], value: from [{}] to [{}]", key, anOption.getOptionValue(), value);
+            log.debug("Updating option key: [{}], value: from [{}] to [{}]", key, anOption.getValue(), value);
             // Exist
-            anOption.setOptionValue(value);
+            anOption.setValue(value);
             return anOption;
         }).orElseGet(() -> {
             log.debug("Creating option key: [{}], value: [{}]", key, value);
             // Not exist
             Option anOption = new Option();
-            anOption.setOptionKey(key);
-            anOption.setOptionValue(value);
+            anOption.setKey(key);
+            anOption.setValue(value);
             anOption.setSource(source);
             return anOption;
         });
@@ -131,7 +131,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
      */
     @Override
     public Map<String, String> listOptions() {
-        return ServiceUtils.convertToMap(listAll(), Option::getOptionKey, Option::getOptionValue);
+        return ServiceUtils.convertToMap(listAll(), Option::getKey, Option::getValue);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     public Optional<String> getByKey(String key) {
         Assert.hasText(key, "Option key must not be blank");
 
-        return optionRepository.findByOptionKey(key).map(Option::getOptionValue);
+        return optionRepository.findByOptionKey(key).map(Option::getValue);
     }
 
     @Override
