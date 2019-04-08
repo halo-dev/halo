@@ -11,4 +11,19 @@ categoryApi.listAll = () => {
   })
 }
 
+categoryApi.create = (category) => {
+  return service({
+    url: baseUrl,
+    data: category,
+    method: 'post'
+  })
+}
+
+categoryApi.delete = categoryId => {
+  return service({
+    url: `${baseUrl}/${categoryId}`,
+    method: 'delete'
+  })
+}
+
 export default categoryApi
