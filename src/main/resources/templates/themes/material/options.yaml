@@ -1,136 +1,136 @@
 general:
-  name: 基础设置
+  label: 基础设置
   items:
-    theme_material_scheme:
-      id: materialScheme
-      name: Scheme
+    scheme:
+      name: scheme
+      label: Scheme
       type: select
-      defaultValue: Paradox
+      default: Paradox
       options:
         - value: Paradox
           label: Paradox
         - value: Isolation
           label: Isolation
 
-    theme_material_favicon:
-      id: materialFavicon
-      name: Favicon
+    favicon:
+      name: favicon
+      label: Favicon
       type: text
 
-    theme_material_high_res_favicon:
-      id: materialHighFavicon
-      name: 高清 Favicon
+    high_res_favicon:
+      name: high_res_favicon
+      label: 高清 Favicon
       type: text
 
-    theme_material_apple_touch_icon:
-      id: materialAppleFavicon
-      name: IOS 主屏按钮图标
+    apple_touch_icon:
+      name: apple_touch_icon
+      label: IOS 主屏按钮图标
       type: text
 
-    theme_material_daily_pic:
-      id: materialDialyPic
+    daily_pic:
       name: daily_pic
+      label: daily_pic
       type: text
 
-    theme_material_sidebar_header:
-      id: materialSidebarHeader
-      name: Sidebar 顶部图片
+    sidebar_header:
+      name: sidebar_header
+      label: Sidebar 顶部图片
       type: text
 
-    theme_material_footer_image:
-      id: materialFooterImage
-      name: Sidebar 底部图片
+    footer_image:
+      name: footer_image
+      label: Sidebar 底部图片
       type: text
 
-    theme_material_copyright_since:
-      id: materialCopyrightSince
-      name: 站点成立时间
+    copyright_since:
+      name: copyright_since
+      label: 站点成立时间
       type: text
 
 style:
-  name: 样式设置
+  label: 样式设置
   items:
-    theme_material_uiux_slogan:
-      id: materialUiuxSlogan
-      name: Slogan
+    uiux_slogan:
+      name: uiux_slogan
+      label: Slogan
       type: text
-      defaultValue: Hi, nice to meet you
+      default: Hi, nice to meet you
 
-    theme_material_uiux_card_elevation:
-      id: materialUiuxCardElevation
-      name: 卡片深度
+    uiux_card_elevation:
+      name: uiux_card_elevation
+      label: 卡片深度
       type: text
-      defaultValue: 2
+      default: 2
 
-    theme_material_uiux_theme_color:
-      id: materialUiuxThemeColor
-      name: 主题颜色
+    uiux_theme_color:
+      name: uiux_theme_color
+      label: 主题颜色
       type: text
-      defaultValue: #0097A7
+      default: #0097A7
 
-    theme_material_uiux_theme_sub_color:
-      id: materialUiuxThemeSubColor
-      name: 辅助颜色
+    uiux_theme_sub_color:
+      name: uiux_theme_sub_color
+      label: 辅助颜色
       type: text
-      defaultValue: #00838F
+      default: #00838F
 
-    theme_material_uiux_hyperlink_color:
-      id: materialHyperLinkColor
-      name: 超链接颜色
+    uiux_hyperlink_color:
+      name: uiux_hyperlink_color
+      label: 超链接颜色
       type: text
-      defaultValue: #00838F
+      default: #00838F
 
-    theme_material_uiux_button_color:
-      id: materialButtonColor
-      name: 按钮颜色
+    uiux_button_color:
+      name: uiux_button_color
+      label: 按钮颜色
       type: text
-      defaultValue: #757575
+      default: #757575
 
-    theme_material_footer_uiux_android_chrome_color:
-      id: materialGoogleColor
-      name: 安卓 Chrome 颜色
+    footer_uiux_android_chrome_color:
+      name: footer_uiux_android_chrome_color
+      label: 安卓 Chrome 颜色
       type: text
-      defaultValue: #0097A7
+      default: #0097A7
 
-    theme_material_uiux_nprogress_color:
-      id: materialNprogressColor
-      name: NProgress 颜色
+    uiux_nprogress_color:
+      name: uiux_nprogress_color
+      label: NProgress 颜色
       type: text
-      defaultValue: #29d
+      default: #29d
 
-    theme_material_uiux_nprogress_buffer:
-      id: materialNProgressBuffer
-      name: NProgressBuffer
+    uiux_nprogress_buffer:
+      name: uiux_nprogress_buffer
+      label: NProgressBuffer
       type: text
-      defaultValue: 800
+      default: 800
 
-    theme_material_background_purecolor:
-      id: materialBackgroundColor
-      name: 背景颜色
+    background_purecolor:
+      name: background_purecolor
+      label: 背景颜色
       type: text
-      defaultValue: #F5F5F5
+      default: #F5F5F5
 
-    theme_material_background_bgimg:
-      id: materialBackgroundImage
-      name: 背景图片
+    background_bgimg:
+      name: background_bgimg
+      label: 背景图片
       type: text
 
-    theme_material_background_bing:
-      id: materialBackgroundBing
-      name: Bing 背景
+    background_bing:
+      name: background_bing
+      label: Bing 背景
       type: select
-      defaultValue: false
+      default: false
       options:
         - value: true
           label: 开启
         - value: false
           label: 关闭
 
-    material_code_pretty:
-      id: materialCodePretty
-      name: 代码高亮
+    code_pretty:
+      name: code_pretty
+      label: 代码高亮
       type: select
-      defaultValue: false
+      default: false
       options:
         - value: Default
           label: Default
