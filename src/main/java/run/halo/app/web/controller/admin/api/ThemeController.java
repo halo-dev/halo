@@ -1,14 +1,10 @@
 package run.halo.app.web.controller.admin.api;
 
-import freemarker.template.Configuration;
-import freemarker.template.TemplateModelException;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperty;
-import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 
 import java.util.List;
@@ -23,17 +19,9 @@ import java.util.List;
 @RequestMapping("/admin/api/themes")
 public class ThemeController {
 
-    private final OptionService optionService;
-
-    private final Configuration configuration;
-
     private final ThemeService themeService;
 
-    public ThemeController(OptionService optionService,
-                           Configuration configuration,
-                           ThemeService themeService) {
-        this.optionService = optionService;
-        this.configuration = configuration;
+    public ThemeController(ThemeService themeService) {
         this.themeService = themeService;
     }
 
@@ -61,7 +49,7 @@ public class ThemeController {
      */
     @GetMapping("files")
     public List<ThemeFile> listFiles() {
-        return themeService.listThemeFolderBy(themeService.getActivatedTheme());
+        return themeService.listThemeFolderBy(themeService.getActivatedThemeId());
     }
 
     @GetMapping("files/content")
@@ -72,34 +60,38 @@ public class ThemeController {
     @PutMapping("files/content")
     public void updateContentBy(@RequestParam(name = "path") String path,
                                 @RequestParam(name = "content") String content) {
+        // TODO Refactor the params to body
         themeService.saveTemplateContent(path, content);
     }
 
     @GetMapping("files/custom")
     public List<String> customTemplate() {
-        return themeService.getCustomTpl(themeService.getActivatedTheme());
+        return themeService.getCustomTpl(themeService.getActivatedThemeId());
     }
 
     @PostMapping("{themeId}/activate")
-    @ApiOperation("Active a theme")
-    public void active(@RequestParam("themeId") String themeId) throws TemplateModelException {
-        themeService.activeTheme(themeId);
-
-        // TODO Check existence of the theme
-        optionService.saveProperty(PrimaryProperties.THEME, themeId);
-        configuration.setSharedVariable("themeName", themeId);
-        configuration.setSharedVariable("options", optionService.listOptions());
+    @ApiOperation("Activates a theme")
+    public ThemeProperty active(@RequestParam("themeId") String themeId) {
+        return themeService.activeTheme(themeId);
     }
 
-    @DeleteMapping("key/{key}")
-    @ApiOperation("Deletes a theme")
-    public void deleteBy(@PathVariable("key") String key) {
-        themeService.deleteTheme(key);
+    @GetMapping("activate")
+    @ApiOperation("Gets activate theme")
+    public ThemeProperty getActivateTheme() {
+        return themeService.getThemeOfNonNullBy(themeService.getActivatedThemeId());
     }
 
-    @GetMapping("configurations")
+    @GetMapping("activate/configurations")
     @ApiOperation("Fetches theme configuration")
     public BaseResponse<Object> fetchConfig() {
-        return BaseResponse.ok(themeService.fetchConfig(themeService.getActivatedTheme()));
+        return BaseResponse.ok(themeService.fetchConfig(themeService.getActivatedThemeId()));
     }
+
+    @DeleteMapping("{themeId}")
+    @ApiOperation("Deletes a theme")
+    public void deleteBy(@PathVariable("themeId") String themeId) {
+        themeService.deleteTheme(themeId);
+    }
+
+
 }
