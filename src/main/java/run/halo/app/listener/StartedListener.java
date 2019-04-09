@@ -1,6 +1,5 @@
 package run.halo.app.listener;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateModelException;
@@ -20,10 +19,12 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.HaloUtils;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -158,21 +159,40 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     private void initThemes() {
         // Whether the blog has initialized
         Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+
+        if (isInstalled) {
+            // Skip
+            return;
+        }
+
         try {
-            if (isInstalled) {
-                // Skip
-                return;
+            String themeClassPath = ResourceUtils.CLASSPATH_URL_PREFIX + ThemeService.THEME_FOLDER;
+
+            URI themeUri = ResourceUtils.getURL(themeClassPath).toURI();
+
+            Path source;
+
+            if (themeUri.getScheme().equalsIgnoreCase("jar")) {
+                // Create new file system for jar
+                FileSystem fileSystem = FileSystems.newFileSystem(themeUri, Collections.emptyMap());
+                source = fileSystem.getPath("/BOOT-INF/classes/" + ThemeService.THEME_FOLDER);
+            } else {
+                source = Paths.get(themeUri);
             }
 
-            File internalThemePath = new File(ResourceUtils.getURL(ResourceUtils.CLASSPATH_URL_PREFIX).getPath(), "templates/themes");
-            File[] internalThemes = internalThemePath.listFiles();
-            if (null != internalThemes) {
-                for (File theme : internalThemes) {
-                    FileUtil.copy(theme, themeService.getThemeBasePath(), true);
-                }
+            // Create theme folder
+            Path themePath = themeService.getBasePath();
+
+            if (Files.notExists(themePath)) {
+                log.info("Copying theme folder from [{}] to [{}]", source, themePath);
+
+                FileUtils.copyFolder(source, themePath);
+            } else {
+                log.info("Skip copying theme folder due to existence of theme folder");
             }
         } catch (Exception e) {
             throw new RuntimeException("Init internal theme to user path error", e);
         }
     }
+
 }

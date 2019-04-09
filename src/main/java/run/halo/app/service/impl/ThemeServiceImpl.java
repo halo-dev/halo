@@ -48,43 +48,6 @@ import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_NAME;
 public class ThemeServiceImpl implements ThemeService {
 
     /**
-     * Theme property file name.
-     */
-    private final static String THEME_PROPERTY_FILE_NAME = "theme.properties";
-
-
-    /**
-     * Configuration file name.
-     */
-    private final static String[] OPTIONS_NAMES = {"options.yaml", "options.yml"};
-
-    /**
-     * The type of file that can be modified.
-     */
-    private static String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
-
-    /**
-     * These file names cannot be displayed.
-     */
-    private static String[] FILTER_FILES = {".git", ".DS_Store", THEME_PROPERTY_FILE_NAME, "options.yaml", "option.yml"};
-
-    /**
-     * Theme folder location.
-     */
-    private final static String THEME_FOLDER = "templates/themes";
-
-
-    /**
-     * Render template.
-     */
-    private final static String RENDER_TEMPLATE = "themes/%s/%s";
-
-    /**
-     * Theme cache key.
-     */
-    private final static String THEMES_CACHE_KEY = "themes";
-
-    /**
      * Theme work directory.
      */
     private final Path workDir;
