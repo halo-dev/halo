@@ -47,24 +47,23 @@ public interface ThemeService {
      * @param absolutePath absolutePath
      * @return List<ThemeFile>
      */
-    @Deprecated
     List<ThemeFile> listThemeFolder(@NonNull String absolutePath);
 
     /**
      * Lists theme folder by theme name.
      *
-     * @param theme theme
+     * @param themeId theme id
      * @return List<ThemeFile>
      */
-    List<ThemeFile> listThemeFolderBy(@NonNull String theme);
+    List<ThemeFile> listThemeFolderBy(@NonNull String themeId);
 
     /**
      * Gets custom template, such as page_xxx.ftl, and xxx will be template name
      *
-     * @param theme theme name
+     * @param themeId theme id
      * @return List
      */
-    List<String> getCustomTpl(@NonNull String theme);
+    List<String> getCustomTpl(@NonNull String themeId);
 
     /**
      * Judging whether template exists under the specified theme
@@ -75,7 +74,7 @@ public interface ThemeService {
     boolean isTemplateExist(@NonNull String template);
 
     /**
-     * Judging whether theme exists under template path
+     * Checks whether theme exists under template path
      *
      * @param themeId theme name
      * @return boolean
@@ -97,7 +96,7 @@ public interface ThemeService {
     Path getBasePath();
 
     /**
-     * Get template content by template absolute path.
+     * Gets template content by template absolute path.
      *
      * @param absolutePath absolute path
      * @return template content
@@ -105,32 +104,31 @@ public interface ThemeService {
     String getTemplateContent(@NonNull String absolutePath);
 
     /**
-     * Save template content by template absolute path.
+     * Saves template content by template absolute path.
      *
      * @param absolutePath absolute path
      * @param content      new content
      */
-    @Deprecated
     void saveTemplateContent(@NonNull String absolutePath, @NonNull String content);
 
     /**
-     * Delete a theme by key.
+     * Deletes a theme by key.
      *
-     * @param key theme key
+     * @param themeId theme id must not be blank
      */
-    void deleteTheme(@NonNull String key);
+    void deleteTheme(@NonNull String themeId);
 
     /**
-     * Fetchs theme configuration.
+     * Fetches theme configuration.
      *
-     * @param themeName theme name must not be blank
+     * @param themeId must not be blank
      * @return theme configuration or null if not found
      */
     @Nullable
-    Object fetchConfig(@NonNull String themeName);
+    Object fetchConfig(@NonNull String themeId);
 
     /**
-     * Render a theme page.
+     * Renders a theme page.
      *
      * @param pageName must not be blank
      * @return full path of the theme page
@@ -144,12 +142,14 @@ public interface ThemeService {
      * @return current theme id
      */
     @NonNull
-    String getActivatedTheme();
+    String getActivatedThemeId();
 
     /**
      * Actives a theme.
      *
      * @param themeId theme id must not be blank
+     * @return theme property
      */
-    void activeTheme(@NonNull String themeId);
+    @NonNull
+    ThemeProperty activeTheme(@NonNull String themeId);
 }

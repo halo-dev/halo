@@ -99,7 +99,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void cacheActiveTheme() {
         try {
-            configuration.setSharedVariable("themeName", themeService.getActivatedTheme());
+            configuration.setSharedVariable("themeName", themeService.getActivatedThemeId());
         } catch (TemplateModelException e) {
             log.error("", e);
         }

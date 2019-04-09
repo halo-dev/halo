@@ -1,14 +1,16 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -23,7 +25,6 @@ import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.JsonUtils;
 
 import java.io.File;
@@ -78,6 +79,9 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private final static String RENDER_TEMPLATE = "themes/%s/%s";
 
+    /**
+     * Theme cache key.
+     */
     private final static String THEMES_CACHE_KEY = "themes";
 
     /**
@@ -91,11 +95,15 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final StringCacheStore cacheStore;
 
+    private final Configuration configuration;
+
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
-                            StringCacheStore cacheStore) {
+                            StringCacheStore cacheStore,
+                            Configuration configuration) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.configuration = configuration;
         yamlMapper = new ObjectMapper(new YAMLFactory());
         workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
     }
@@ -117,11 +125,6 @@ public class ThemeServiceImpl implements ThemeService {
         return themes.stream().filter(themeProperty -> themeProperty.getId().equals(themeId)).findFirst();
     }
 
-    /**
-     * Gets all themes
-     *
-     * @return list of themes
-     */
     @Override
     public List<ThemeProperty> getThemes() {
         // Fetch themes from cache
@@ -155,80 +158,25 @@ public class ThemeServiceImpl implements ThemeService {
         });
     }
 
-    /**
-     * Lists theme folder by absolute path.
-     *
-     * @param absolutePath absolutePath
-     * @return List<ThemeFile>
-     */
     @Override
     public List<ThemeFile> listThemeFolder(String absolutePath) {
-        // Check this path
-        checkDirectory(absolutePath);
-
-        final List<ThemeFile> templates = new ArrayList<>();
-        try {
-            File absolutePathFile = new File(absolutePath);
-            File[] baseFiles = absolutePathFile.listFiles();
-            if (null != baseFiles) {
-                baseFileFor:
-                for (File base : baseFiles) {
-                    for (String filterFile : FILTER_FILES) {
-                        if (filterFile.equals(base.getName())) {
-                            continue baseFileFor;
-                        }
-                    }
-                    ThemeFile file = new ThemeFile();
-                    if (base.isDirectory()) {
-                        file.setName(base.getName());
-                        file.setPath(base.getAbsolutePath());
-                        file.setIsFile(false);
-                        file.setNode(listThemeFolder(base.getAbsolutePath()));
-                    } else {
-                        file.setName(base.getName());
-                        file.setPath(base.getAbsolutePath());
-                        file.setIsFile(true);
-                        for (String suffix : CAN_EDIT_SUFFIX) {
-                            if (FilenameUtils.getExtension(file.getName()).equals(suffix)) {
-                                file.setCanEdit(true);
-                                break;
-                            } else {
-                                file.setCanEdit(false);
-                            }
-                        }
-                    }
-                    templates.add(file);
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get theme template", e);
-        }
-        templates.sort(Comparator.comparing(ThemeFile::getIsFile));
-        return templates;
+        return listThemeFileTree(Paths.get(absolutePath));
     }
 
-    /**
-     * Lists theme folder by theme name.
-     *
-     * @param theme theme
-     * @return List<ThemeFile>
-     */
     @Override
-    public List<ThemeFile> listThemeFolderBy(String theme) {
-        File themePath = new File(getThemeBasePath(), theme);
-        return listThemeFolder(themePath.getAbsolutePath());
+    public List<ThemeFile> listThemeFolderBy(String themeId) {
+        // Get the theme property
+        ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
+
+        // List theme file as tree view
+        return listThemeFolder(themeProperty.getThemePath());
     }
 
-    /**
-     * Gets custom template, such as page_xxx.ftl, and xxx will be template name
-     *
-     * @param theme theme name
-     * @return List
-     */
     @Override
-    public List<String> getCustomTpl(String theme) {
+    public List<String> getCustomTpl(String themeId) {
+        // TODO 这里的参数是有问题的，等待修复。
         final List<String> templates = new ArrayList<>();
-        final File themePath = new File(getThemeBasePath(), theme);
+        final File themePath = new File(getThemeBasePath(), themeId);
         final File[] themeFiles = themePath.listFiles();
         if (null != themeFiles && themeFiles.length > 0) {
             for (File file : themeFiles) {
@@ -241,39 +189,20 @@ public class ThemeServiceImpl implements ThemeService {
         return templates;
     }
 
-    /**
-     * Judging whether template exists under the specified theme
-     *
-     * @param template template
-     * @return boolean
-     */
     @Override
     public boolean isTemplateExist(String template) {
-        StrBuilder templatePath = new StrBuilder(getActivatedTheme());
+        StrBuilder templatePath = new StrBuilder(getActivatedThemeId());
         templatePath.append("/");
         templatePath.append(template);
         File file = new File(getThemeBasePath(), templatePath.toString());
         return file.exists();
     }
 
-    /**
-     * Judging whether theme exists under template path
-     *
-     * @param themeId theme name
-     * @return boolean
-     */
     @Override
     public boolean isThemeExist(String themeId) {
-        // TODO Get theme folder name by theme id
-        File file = new File(getThemeBasePath(), themeId);
-        return file.exists();
+        return getThemeBy(themeId).isPresent();
     }
 
-    /**
-     * Gets theme base path.
-     *
-     * @return File
-     */
     @Override
     public File getThemeBasePath() {
         return getBasePath().toFile();
@@ -284,56 +213,56 @@ public class ThemeServiceImpl implements ThemeService {
         return workDir;
     }
 
-    /**
-     * Get template content by template absolute path.
-     *
-     * @param absolutePath absolute path
-     * @return template content
-     */
     @Override
     public String getTemplateContent(String absolutePath) {
         // Check the path
         checkDirectory(absolutePath);
 
+        // Read file
         return new FileReader(absolutePath).readString();
     }
 
-    /**
-     * Save template content by template absolute path.
-     *
-     * @param absolutePath absolute path
-     * @param content      new content
-     */
     @Override
     public void saveTemplateContent(String absolutePath, String content) {
-        final FileWriter fileWriter = new FileWriter(absolutePath);
-        fileWriter.write(content);
+        // Check the path
+        checkDirectory(absolutePath);
+
+        // Write file
+        new FileWriter(absolutePath).write(content);
     }
 
-    /**
-     * Delete a theme by key.
-     *
-     * @param key theme key
-     */
     @Override
-    public void deleteTheme(String key) {
-        if (!isThemeExist(key)) {
-            throw new NotFoundException("该主题不存在！").setErrorData(key);
+    public void deleteTheme(String themeId) {
+        // Get the theme property
+        ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
+
+        try {
+            // Delete the folder
+            Files.deleteIfExists(Paths.get(themeProperty.getThemePath()));
+
+            // Delete theme cache
+            cacheStore.delete(THEMES_CACHE_KEY);
+        } catch (IOException e) {
+            throw new ServiceException("Failed to delete theme folder", e).setErrorData(themeId);
         }
-        File file = new File(this.getThemeBasePath(), key);
-        FileUtil.del(file);
-
-        cacheStore.delete(THEMES_CACHE_KEY);
     }
 
     @Override
-    public Object fetchConfig(String themeName) {
-        Assert.hasText(themeName, "Theme name must not be blank");
+    public Object fetchConfig(String themeId) {
+        Assert.hasText(themeId, "Theme name must not be blank");
+
+        // Get theme property
+        ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
+
+        if (!themeProperty.getHasOptions()) {
+            // If this theme dose not has an option, then return null
+            return null;
+        }
 
         try {
             for (String optionsName : OPTIONS_NAMES) {
                 // Resolve the options path
-                Path optionsPath = workDir.resolve(themeName).resolve(optionsName);
+                Path optionsPath = Paths.get(themeProperty.getThemePath(), optionsName);
 
                 log.debug("Finding options in: [{}]", optionsPath.toString());
 
@@ -355,17 +284,99 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public String render(String pageName) {
-        return String.format(RENDER_TEMPLATE, getActivatedTheme(), pageName);
+        return String.format(RENDER_TEMPLATE, getActivatedThemeId(), pageName);
     }
 
     @Override
-    public String getActivatedTheme() {
+    public String getActivatedThemeId() {
         return optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
     }
 
     @Override
-    public void activeTheme(String themeId) {
-        // TODO Check existence of the theme
+    public ThemeProperty activeTheme(String themeId) {
+        // Check existence of the theme
+        ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
+
+        // Save the theme to database
+        optionService.saveProperty(PrimaryProperties.THEME, themeId);
+
+        try {
+            // TODO Refactor here in the future
+            configuration.setSharedVariable("themeName", themeId);
+            configuration.setSharedVariable("options", optionService.listOptions());
+        } catch (TemplateModelException e) {
+            throw new ServiceException("Failed to set shared variable", e).setErrorData(themeId);
+        }
+
+        return themeProperty;
+    }
+
+    /**
+     * Lists theme files as tree view.
+     *
+     * @param topPath must not be null
+     * @return theme file tree view or null only if the top path is not a directory
+     */
+    @Nullable
+    private List<ThemeFile> listThemeFileTree(@NonNull Path topPath) {
+        Assert.notNull(topPath, "Top path must not be null");
+
+        // Check file type
+        if (!Files.isDirectory(topPath)) {
+            return null;
+        }
+
+        try {
+            List<ThemeFile> themeFiles = new LinkedList<>();
+
+            Files.list(topPath).forEach(path -> {
+                // Build theme file
+                ThemeFile themeFile = new ThemeFile();
+                themeFile.setName(path.getFileName().toString());
+                themeFile.setPath(path.toString());
+                themeFile.setIsFile(Files.isRegularFile(path));
+                themeFile.setEditable(isEditable(path));
+
+                if (Files.isDirectory(path)) {
+                    themeFile.setNode(listThemeFileTree(path));
+                }
+
+                // Add to theme files
+                themeFiles.add(themeFile);
+            });
+
+            // Sort with name
+            themeFiles.sort(Comparator.comparing(ThemeFile::getName));
+
+            return themeFiles;
+        } catch (IOException e) {
+            throw new ServiceException("Failed to list sub files", e);
+        }
+    }
+
+    /**
+     * Check if the given path is editable.
+     *
+     * @param path must not be null
+     * @return true if the given path is editable; false otherwise
+     */
+    private boolean isEditable(@NonNull Path path) {
+        Assert.notNull(path, "Path must not be null");
+
+        boolean isEditable = Files.isReadable(path) && Files.isWritable(path);
+
+        if (!isEditable) {
+            return false;
+        }
+
+        // Check suffix
+        for (String suffix : CAN_EDIT_SUFFIX) {
+            if (path.endsWith(suffix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -377,7 +388,9 @@ public class ThemeServiceImpl implements ThemeService {
     private void checkDirectory(@NonNull String absoluteName) {
         Assert.hasText(absoluteName, "Absolute name must not be blank");
 
-        boolean valid = Paths.get(absoluteName).startsWith(workDir);
+        ThemeProperty activeThemeProperty = getThemeOfNonNullBy(getActivatedThemeId());
+
+        boolean valid = Paths.get(absoluteName).startsWith(activeThemeProperty.getThemePath());
 
         if (!valid) {
             throw new ForbiddenException("You cannot access " + absoluteName).setErrorData(absoluteName);

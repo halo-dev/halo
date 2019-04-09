@@ -21,7 +21,7 @@ public class ThemeFile {
 
     private Boolean isFile;
 
-    private Boolean canEdit;
+    private Boolean editable;
 
     private List<ThemeFile> node;
 }
