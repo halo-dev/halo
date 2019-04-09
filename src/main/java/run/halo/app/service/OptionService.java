@@ -274,4 +274,12 @@ public interface OptionService extends CrudService<Option, Integer> {
     @NonNull
     Locale getLocale();
 
+    /**
+     * Gets blog base url. (Without /)
+     *
+     * @return blog base url (If blog url isn't present, current machine IP address will be default)
+     */
+    @NonNull
+    String getBlogBaseUrl();
+
 }

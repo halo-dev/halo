@@ -1,8 +1,10 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.qiniu.common.Zone;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +17,7 @@ import run.halo.app.model.properties.*;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.List;
@@ -35,9 +38,13 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     private final OptionRepository optionRepository;
 
-    public OptionServiceImpl(OptionRepository optionRepository) {
+    private final ApplicationContext applicationContext;
+
+    public OptionServiceImpl(OptionRepository optionRepository,
+                             ApplicationContext applicationContext) {
         super(optionRepository);
         this.optionRepository = optionRepository;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -265,5 +272,21 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
                 return Locale.getDefault();
             }
         }).orElseGet(Locale::getDefault);
+    }
+
+    @Override
+    public String getBlogBaseUrl() {
+        // Get server port
+        String serverPort = applicationContext.getEnvironment().getProperty("server.port", "8080");
+
+        String blogUrl = getByPropertyOfNullable(BlogProperties.BLOG_URL);
+
+        if (StrUtil.isNotBlank(blogUrl)) {
+            blogUrl = StrUtil.removeSuffix(blogUrl, "/");
+        } else {
+            blogUrl = String.format("http://%s:%s", HaloUtils.getMachineIP(), serverPort);
+        }
+
+        return blogUrl;
     }
 }

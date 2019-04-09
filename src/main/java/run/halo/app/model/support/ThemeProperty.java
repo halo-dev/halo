@@ -3,6 +3,8 @@ package run.halo.app.model.support;
 import lombok.Data;
 
 /**
+ * Theme property.
+ *
  * @author : RYAN0UP
  * @date : 2019-03-22
  */
@@ -57,5 +59,15 @@ public class ThemeProperty {
     /**
      * Has options.
      */
-    private Boolean hasOptions;
+    private boolean hasOptions;
+
+    /**
+     * Is activated.
+     */
+    private boolean isActivated;
+
+    /**
+     * Screenshots url.
+     */
+    private String screenshots;
 }
