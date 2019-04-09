@@ -19,12 +19,12 @@ public interface OptionRepository extends BaseRepository<Option, Integer> {
      * @param key key
      * @return Option
      */
-    Optional<Option> findByOptionKey(String key);
+    Optional<Option> findByKey(String key);
 
     /**
      * Delete option by key
      *
      * @param key key
      */
-    void removeByOptionKey(String key);
+    void removeByKey(String key);
 }

@@ -15,7 +15,7 @@ import javax.persistence.*;
  * @date 4/8/19
  */
 @Entity
-@Table(name = "theme_settings", indexes = {@Index(columnList = "theme"), @Index(columnList = "setting_key")})
+@Table(name = "theme_settings", indexes = {@Index(columnList = "setting_key")})
 @SQLDelete(sql = "update theme_settings set deleted = true where id = ?")
 @Where(clause = "deleted = false")
 @Data

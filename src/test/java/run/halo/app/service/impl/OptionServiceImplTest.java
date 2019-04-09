@@ -76,13 +76,13 @@ public class OptionServiceImplTest {
         QnYunProperties zoneProperty = QnYunProperties.ZONE;
 
         // Given
-        given(optionRepository.findByOptionKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
+        given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
 
         // When
         Zone zone = optionService.getQnYunZone();
 
         // Then
-        then(optionRepository).should().findByOptionKey(zoneProperty.getValue());
+        then(optionRepository).should().findByKey(zoneProperty.getValue());
 
         assertNotNull(zone);
         assertThat(zone.getRegion(), equalTo(actualZone.getRegion()));

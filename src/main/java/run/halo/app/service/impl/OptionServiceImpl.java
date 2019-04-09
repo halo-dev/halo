@@ -46,13 +46,13 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         if (StringUtils.isBlank(value)) {
             // If the value is blank, remove the key
-            optionRepository.removeByOptionKey(key);
+            optionRepository.removeByKey(key);
             log.debug("Removed option key: [{}]", key);
             return;
         }
 
         // TODO Consider cache options with map
-        Option option = optionRepository.findByOptionKey(key).map(anOption -> {
+        Option option = optionRepository.findByKey(key).map(anOption -> {
             log.debug("Updating option key: [{}], value: from [{}] to [{}]", key, anOption.getValue(), value);
             // Exist
             anOption.setValue(value);
@@ -143,7 +143,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     public Optional<String> getByKey(String key) {
         Assert.hasText(key, "Option key must not be blank");
 
-        return optionRepository.findByOptionKey(key).map(Option::getValue);
+        return optionRepository.findByKey(key).map(Option::getValue);
     }
 
     @Override
