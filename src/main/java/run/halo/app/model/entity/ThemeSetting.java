@@ -23,13 +23,9 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 public class ThemeSetting extends BaseEntity {
 
-    /**
-     * Theme id as id.
-     */
     @Id
-    @Column(name = "id", columnDefinition = "varchar(255) not null")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Integer id;
 
     /**
      * Setting key.
@@ -42,5 +38,11 @@ public class ThemeSetting extends BaseEntity {
      */
     @Column(name = "setting_value", columnDefinition = "varchar(10239) not null")
     private String value;
+
+    /**
+     * Theme id.
+     */
+    @Column(name = "theme_id", columnDefinition = "varchar(255) not null")
+    private String themeId;
 
 }
