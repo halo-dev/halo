@@ -17,6 +17,43 @@ import java.util.Optional;
 public interface ThemeService {
 
     /**
+     * Theme property file name.
+     */
+    String THEME_PROPERTY_FILE_NAME = "theme.properties";
+
+
+    /**
+     * Configuration file name.
+     */
+    String[] OPTIONS_NAMES = {"options.yaml", "options.yml"};
+
+    /**
+     * The type of file that can be modified.
+     */
+    String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
+
+    /**
+     * These file names cannot be displayed.
+     */
+    String[] FILTER_FILES = {".git", ".DS_Store", THEME_PROPERTY_FILE_NAME, "options.yaml", "option.yml"};
+
+    /**
+     * Theme folder location.
+     */
+    String THEME_FOLDER = "templates/themes";
+
+
+    /**
+     * Render template.
+     */
+    String RENDER_TEMPLATE = "themes/%s/%s";
+
+    /**
+     * Theme cache key.
+     */
+    String THEMES_CACHE_KEY = "themes";
+
+    /**
      * Get theme property by theme id.
      *
      * @param themeId must not be blank
