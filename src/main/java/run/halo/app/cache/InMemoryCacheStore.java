@@ -3,6 +3,7 @@ package run.halo.app.cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
+import javax.annotation.PreDestroy;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,6 +29,8 @@ public class InMemoryCacheStore extends StringCacheStore {
      */
     private final static ConcurrentHashMap<String, CacheWrapper<String>> cacheContainer = new ConcurrentHashMap<>();
 
+    private final Timer timer;
+
     /**
      * Lock.
      */
@@ -35,7 +38,8 @@ public class InMemoryCacheStore extends StringCacheStore {
 
     public InMemoryCacheStore() {
         // Run a cache store cleaner
-        new Timer().scheduleAtFixedRate(new CacheExpiryCleaner(), 0, PERIOD);
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new CacheExpiryCleaner(), 0, PERIOD);
     }
 
     @Override
@@ -105,5 +109,11 @@ public class InMemoryCacheStore extends StringCacheStore {
                 }
             });
         }
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        log.debug("Cancelling all timer tasks");
+        timer.cancel();
     }
 }
