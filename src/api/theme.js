@@ -27,7 +27,14 @@ themeApi.customTpls = () => {
 
 themeApi.active = theme => {
   return service({
-    url: `${baseUrl}/active?theme=${theme}`,
+    url: `${baseUrl}/${theme}/activation`,
+    method: 'post'
+  })
+}
+
+themeApi.getActivatedTheme = () => {
+  return service({
+    url: `${baseUrl}/activation`,
     method: 'get'
   })
 }
@@ -39,9 +46,25 @@ themeApi.delete = key => {
   })
 }
 
-themeApi.listOptions = theme => {
+themeApi.fetchConfiguration = () => {
   return service({
-    url: `${baseUrl}/configurations?name=${theme}`
+    url: `${baseUrl}/activation/configurations`,
+    method: 'get'
+  })
+}
+
+themeApi.fetchSettings = () => {
+  return service({
+    url: `${baseUrl}/activation/settings`,
+    method: 'get'
+  })
+}
+
+themeApi.saveSettings = settings => {
+  return service({
+    url: `${baseUrl}/activation/settings`,
+    data: settings,
+    method: 'post'
   })
 }
 

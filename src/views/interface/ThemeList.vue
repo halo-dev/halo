@@ -1,6 +1,10 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row :gutter="12" type="flex" align="middle">
+    <a-row
+      :gutter="12"
+      type="flex"
+      align="middle"
+    >
       <a-col
         class="theme-item"
         :xl="6"
@@ -13,23 +17,34 @@
       >
         <a-card :bodyStyle="{ padding: '14px' }">
           <img
-            :alt="theme.properties.name"
-            :src="'http://localhost:8090/' + theme.key + '/screenshot.png'"
+            :alt="theme.name"
+            :src="theme.screenshots"
             slot="cover"
           />
           <a-divider></a-divider>
           <div class="theme-control">
-            <span class="theme-title">{{ theme.properties.name }}</span>
+            <span class="theme-title">{{ theme.name }}</span>
             <a-button-group class="theme-button">
-              <a-button type="primary" v-if="activatedTheme == theme.key" disabled>已启用</a-button>
-              <a-button type="primary" @click="activeTheme(theme.key)" v-else>启用</a-button>
-              <a-button @click="optionDrawer(theme.key)" v-if="activatedTheme == theme.key && theme.hasOptions">设置</a-button>
+              <a-button
+                type="primary"
+                v-if="theme.activated"
+                disabled
+              >已启用</a-button>
+              <a-button
+                type="primary"
+                @click="activeTheme(theme.id)"
+                v-else
+              >启用</a-button>
+              <a-button
+                @click="settingDrawer(theme.id)"
+                v-if="activatedTheme.id === theme.id && theme.hasOptions"
+              >设置</a-button>
               <a-popconfirm
-                :title="'确定删除【' + theme.properties.name + '】主题？'"
-                @confirm="deleteTheme(theme.key)"
+                :title="'确定删除【' + theme.name + '】主题？'"
+                @confirm="deleteTheme(theme.id)"
                 okText="确定"
                 cancelText="取消"
-                v-else-if="activatedTheme != theme.key"
+                v-else-if="activatedTheme != theme.id"
               >
                 <a-button type="dashed">删除</a-button>
               </a-popconfirm>
@@ -38,18 +53,45 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-drawer :title="optionTheme + ' 主题设置'" width="100%" :closable="true" @close="onClose" :visible="visible">
-      <a-row :gutter="12" type="flex">
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+    <a-drawer
+      v-if="activatedTheme"
+      :title="activatedTheme.name + ' 主题设置'"
+      width="100%"
+      :closable="true"
+      @close="onClose"
+      :visible="visible"
+    >
+      <a-row
+        :gutter="12"
+        type="flex"
+      >
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
           <img
-            :alt="activatedTheme"
-            :src="'http://localhost:8090/' + activatedTheme + '/screenshot.png'"
+            v-if="activatedTheme"
+            :alt="activatedTheme.name"
+            :src="activatedTheme.screenshots"
             width="100%"
           />
         </a-col>
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
           <a-tabs>
-            <a-tab-pane v-for="(group, index) in themeConfiguration" :key="index" :tab="group.label">
+            <a-tab-pane
+              v-for="(group, index) in themeConfiguration"
+              :key="index"
+              :tab="group.label"
+            >
               <a-form layout="vertical">
                 <a-form-item
                   v-for="(item, index1) in group.items"
@@ -57,31 +99,44 @@
                   :key="index1"
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="themeOptions[item.name]" v-if="item.type == 'text'" />
+                  <a-input
+                    v-model="themeSettings[item.name]"
+                    v-if="item.type == 'text'"
+                  />
                   <a-input
                     type="textarea"
                     :autosize="{ minRows: 5 }"
-                    v-model="themeOptions[item.name]"
+                    v-model="themeSettings[item.name]"
                     v-else-if="item.type == 'textarea'"
                   />
                   <a-radio-group
                     v-decorator="['radio-group']"
                     defaultValue="false"
-                    v-model="themeOptions[item.name]"
+                    v-model="themeSettings[item.name]"
                     v-else-if="item.type == 'radio'"
                   >
-                    <a-radio v-for="(option, index2) in item.options" :key="index2" :value="option.value">{{
-                      option.label
-                    }}</a-radio>
+                    <a-radio
+                      v-for="(option, index2) in item.options"
+                      :key="index2"
+                      :value="option.value"
+                    >{{ option.label }}</a-radio>
                   </a-radio-group>
-                  <a-select v-model="themeOptions[item.name]" v-else-if="item.type == 'select'">
-                    <a-select-option v-for="(option, index3) in item.options" :key="index3" :value="option.value">{{
-                      option.label
-                    }}</a-select-option>
+                  <a-select
+                    v-model="themeSettings[item.name]"
+                    v-else-if="item.type == 'select'"
+                  >
+                    <a-select-option
+                      v-for="(option, index3) in item.options"
+                      :key="index3"
+                      :value="option.value"
+                    >{{ option.label }}</a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item>
-                  <a-button type="primary" @click="saveOptions">保存</a-button>
+                  <a-button
+                    type="primary"
+                    @click="saveSettings"
+                  >保存</a-button>
                 </a-form-item>
               </a-form>
             </a-tab-pane>
@@ -94,7 +149,7 @@
 
 <script>
 import themeApi from '@/api/theme'
-import optionApi from '@/api/option'
+
 export default {
   data() {
     return {
@@ -106,13 +161,15 @@ export default {
       },
       themes: [],
       visible: false,
-      optionTheme: '',
       optionUrl: 'https://ryanc.cc',
       // TODO 从api获取当前使用的主题
-      activatedTheme: 'anatole',
-      themeConfiguration: [],
-      options: {},
-      themeOptions: {}
+      themeConfiguration: {},
+      themeSettings: {}
+    }
+  },
+  computed: {
+    activatedTheme() {
+      return this.themes.find(theme => theme.activated)
     }
   },
   created() {
@@ -124,17 +181,15 @@ export default {
         this.themes = response.data.data
       })
     },
-    optionDrawer(theme) {
-      themeApi.listOptions(theme).then(response => {
+    settingDrawer() {
+      themeApi.fetchConfiguration().then(response => {
         this.visible = true
         this.themeConfiguration = response.data.data
-        this.optionTheme = theme
-        this.loadOptions()
+        this.loadSettings()
       })
     },
     activeTheme(theme) {
       themeApi.active(theme).then(response => {
-        this.activatedTheme = theme
         this.$message.success('设置成功！')
         this.loadThemes()
       })
@@ -145,15 +200,14 @@ export default {
         this.loadThemes()
       })
     },
-    saveOptions() {
-      optionApi.save(this.options).then(response => {
-        this.loadOptions()
+    saveSettings() {
+      themeApi.saveSettings(this.themeSettings).then(response => {
         this.$message.success('保存成功！')
       })
     },
-    loadOptions() {
-      optionApi.listAll().then(response => {
-        this.options = response.data.data
+    loadSettings() {
+      themeApi.fetchSettings().then(response => {
+        this.themeSettings = response.data.data
       })
     },
     onClose() {
