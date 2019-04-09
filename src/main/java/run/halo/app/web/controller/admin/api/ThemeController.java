@@ -87,11 +87,16 @@ public class ThemeController {
         return BaseResponse.ok(themeService.fetchConfig(themeService.getActivatedThemeId()));
     }
 
+    @GetMapping("{themeId}/configurations")
+    @ApiOperation("Fetches theme configuration by theme id")
+    public BaseResponse<Object> fetchConfig(@PathVariable("themeId") String themeId) {
+        return BaseResponse.ok(themeService.fetchConfig(themeId));
+    }
+
     @DeleteMapping("{themeId}")
     @ApiOperation("Deletes a theme")
     public void deleteBy(@PathVariable("themeId") String themeId) {
         themeService.deleteTheme(themeId);
     }
-
 
 }
