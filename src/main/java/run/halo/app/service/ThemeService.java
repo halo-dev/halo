@@ -42,6 +42,11 @@ public interface ThemeService {
      */
     String THEME_FOLDER = "templates/themes";
 
+    /**
+     * Theme screenshots name.
+     */
+    String THEME_SCREENSHOTS_NAME = "screenshot";
+
 
     /**
      * Render template.

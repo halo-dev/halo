@@ -9,6 +9,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
@@ -25,6 +27,7 @@ import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.JsonUtils;
 
 import java.io.File;
@@ -51,6 +54,11 @@ public class ThemeServiceImpl implements ThemeService {
      * Theme work directory.
      */
     private final Path workDir;
+
+    /**
+     * Activated theme id.
+     */
+    private String activatedThemeId;
 
     private final ObjectMapper yamlMapper;
 
@@ -199,6 +207,11 @@ public class ThemeServiceImpl implements ThemeService {
         // Get the theme property
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
 
+        if (themeId.equals(getActivatedThemeId())) {
+            // Prevent to delete the activated theme
+            throw new BadRequestException("You can't delete the activated theme").setErrorData(themeId);
+        }
+
         try {
             // Delete the folder
             Files.deleteIfExists(Paths.get(themeProperty.getThemePath()));
@@ -217,7 +230,7 @@ public class ThemeServiceImpl implements ThemeService {
         // Get theme property
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
 
-        if (!themeProperty.getHasOptions()) {
+        if (!themeProperty.isHasOptions()) {
             // If this theme dose not has an option, then return null
             return null;
         }
@@ -252,7 +265,24 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public String getActivatedThemeId() {
-        return optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
+        if (StringUtils.isBlank(activatedThemeId)) {
+            synchronized (this) {
+                if (StringUtils.isBlank(activatedThemeId)) {
+                    return optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
+                }
+            }
+        }
+
+        return activatedThemeId;
+    }
+
+    /**
+     * Set activated theme id.
+     *
+     * @param themeId theme id
+     */
+    private void setActivatedThemeId(@Nullable String themeId) {
+        this.activatedThemeId = themeId;
     }
 
     @Override
@@ -262,6 +292,10 @@ public class ThemeServiceImpl implements ThemeService {
 
         // Save the theme to database
         optionService.saveProperty(PrimaryProperties.THEME, themeId);
+
+
+        // Set the activated theme id
+        setActivatedThemeId(themeId);
 
         try {
             // TODO Refactor here in the future
@@ -388,14 +422,47 @@ public class ThemeServiceImpl implements ThemeService {
             themeProperty.setVersion(properties.getProperty("theme.version"));
             themeProperty.setAuthor(properties.getProperty("theme.author"));
             themeProperty.setAuthorWebsite(properties.getProperty("theme.author.website"));
+
             themeProperty.setThemePath(themePath.toString());
             themeProperty.setHasOptions(hasOptions(themePath));
+            themeProperty.setActivated(false);
+
+            // Set screenshots
+            getScreenshotsFileName(themePath).ifPresent(screenshotsName ->
+                    themeProperty.setScreenshots(StringUtils.join(optionService.getBlogBaseUrl(),
+                            "/",
+                            FilenameUtils.getBasename(themeProperty.getThemePath()),
+                            "/",
+                            screenshotsName)));
+
+            if (themeProperty.getId().equals(getActivatedThemeId())) {
+                // Set activation
+                themeProperty.setActivated(true);
+            }
 
             return themeProperty;
         } catch (IOException e) {
             // TODO Consider to ignore this error, then return null
             throw new ServiceException("Failed to load: " + themePath.toString(), e);
         }
+    }
+
+    /**
+     * Gets screenshots file name.
+     *
+     * @param themePath theme path must not be null
+     * @return screenshots file name or null if the given theme path has not screenshots
+     * @throws IOException throws when listing files
+     */
+    private Optional<String> getScreenshotsFileName(@NonNull Path themePath) throws IOException {
+        Assert.notNull(themePath, "Theme path must not be null");
+
+        return Files.list(themePath)
+                .filter(path -> Files.isRegularFile(path)
+                        && Files.isReadable(path)
+                        && FilenameUtils.getBasename(path.toString()).equalsIgnoreCase(THEME_SCREENSHOTS_NAME))
+                .findFirst()
+                .map(path -> path.getFileName().toString());
     }
 
     /**

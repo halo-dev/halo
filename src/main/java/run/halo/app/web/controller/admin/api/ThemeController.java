@@ -67,7 +67,7 @@ public class ThemeController {
 
     @PostMapping("{themeId}/activation")
     @ApiOperation("Activates a theme")
-    public ThemeProperty active(@RequestParam("themeId") String themeId) {
+    public ThemeProperty active(@PathVariable("themeId") String themeId) {
         return themeService.activeTheme(themeId);
     }
 
