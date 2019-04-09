@@ -89,7 +89,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         }
 
         // TODO Optimize the query
-        optionParams.forEach(optionParam -> save(optionParam.getOptionKey(), optionParam.getOptionValue()));
+        optionParams.forEach(optionParam -> save(optionParam.getKey(), optionParam.getValue()));
     }
 
     @Override
@@ -108,11 +108,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         properties.forEach((property, value) -> save(property.getValue(), value));
     }
 
-    /**
-     * Gets all options
-     *
-     * @return Map
-     */
     @Override
     public Map<String, String> listOptions() {
         return ServiceUtils.convertToMap(listAll(), Option::getKey, Option::getValue);
@@ -123,12 +118,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         return listAll().stream().map(option -> new OptionOutputDTO().<OptionOutputDTO>convertFrom(option)).collect(Collectors.toList());
     }
 
-    /**
-     * Gets option by key
-     *
-     * @param key key
-     * @return String
-     */
     @Override
     public String getByKeyOfNullable(String key) {
         return getByKey(key).orElse(null);
