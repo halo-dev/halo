@@ -6,8 +6,10 @@ import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperty;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.ThemeSettingService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Theme controller.
@@ -21,8 +23,12 @@ public class ThemeController {
 
     private final ThemeService themeService;
 
-    public ThemeController(ThemeService themeService) {
+    private final ThemeSettingService themeSettingService;
+
+    public ThemeController(ThemeService themeService,
+                           ThemeSettingService themeSettingService) {
         this.themeService = themeService;
+        this.themeSettingService = themeSettingService;
     }
 
     @GetMapping("{themeId}")
@@ -31,22 +37,12 @@ public class ThemeController {
         return themeService.getThemeOfNonNullBy(themeId);
     }
 
-    /**
-     * List all themes
-     *
-     * @return themes
-     */
     @GetMapping
     @ApiOperation("List all themes")
     public List<ThemeProperty> listAll() {
         return themeService.getThemes();
     }
 
-    /**
-     * List all of theme files.
-     *
-     * @return List<ThemeFile>
-     */
     @GetMapping("files")
     public List<ThemeFile> listFiles() {
         return themeService.listThemeFolderBy(themeService.getActivatedThemeId());
@@ -69,28 +65,47 @@ public class ThemeController {
         return themeService.getCustomTpl(themeService.getActivatedThemeId());
     }
 
-    @PostMapping("{themeId}/activate")
+    @PostMapping("{themeId}/activation")
     @ApiOperation("Activates a theme")
     public ThemeProperty active(@RequestParam("themeId") String themeId) {
         return themeService.activeTheme(themeId);
     }
 
-    @GetMapping("activate")
+    @GetMapping("activation")
     @ApiOperation("Gets activate theme")
     public ThemeProperty getActivateTheme() {
         return themeService.getThemeOfNonNullBy(themeService.getActivatedThemeId());
     }
 
-    @GetMapping("activate/configurations")
-    @ApiOperation("Fetches theme configuration")
+    @GetMapping("activation/configurations")
+    @ApiOperation("Fetches activated theme configuration")
     public BaseResponse<Object> fetchConfig() {
         return BaseResponse.ok(themeService.fetchConfig(themeService.getActivatedThemeId()));
+    }
+
+    @GetMapping("activation/settings")
+    @ApiOperation("Lists activated theme settings")
+    public Map<String, String> listSettingsBy() {
+        return themeSettingService.listAsMapBy(themeService.getActivatedThemeId());
+    }
+
+    @PostMapping("activation/settings")
+    @ApiOperation("Saves theme settings")
+    public void saveSettingsBy(@RequestBody Map<String, String> settings) {
+        themeSettingService.save(settings, themeService.getActivatedThemeId());
     }
 
     @GetMapping("{themeId}/configurations")
     @ApiOperation("Fetches theme configuration by theme id")
     public BaseResponse<Object> fetchConfig(@PathVariable("themeId") String themeId) {
         return BaseResponse.ok(themeService.fetchConfig(themeId));
+    }
+
+    @PostMapping("{themeId}/settings")
+    @ApiOperation("Saves theme settings")
+    public void saveSettingsBy(@PathVariable("themeId") String themeId,
+                               @RequestBody Map<String, String> settings) {
+        themeSettingService.save(settings, themeId);
     }
 
     @DeleteMapping("{themeId}")
