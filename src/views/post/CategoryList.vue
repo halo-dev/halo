@@ -22,7 +22,7 @@
               </a-select>
             </a-form-item>
             <a-form-item label="描述：" help="*分类描述，部分主题可显示">
-              <a-input type="textarea" v-model="categoryToCreate.description"  :autosize="{ minRows: 3 }" />
+              <a-input type="textarea" v-model="categoryToCreate.description" :autosize="{ minRows: 3 }" />
             </a-form-item>
             <a-form-item>
               <a-button type="primary" @click="createCategory">保存</a-button>
@@ -46,14 +46,14 @@
               <a href="javascript:;" @click="editCategory(record.id)">编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
-                :title="'你确定要删除【' + record.name + '】菜单？'"
+                :title="'你确定要删除【' + record.name + '】分类？'"
                 @confirm="deleteCategory(record.id)"
                 okText="确定"
                 cancelText="取消"
               >
                 <a href="javascript:;">删除</a>
               </a-popconfirm>
-            </span> 
+            </span>
           </a-table>
         </a-card>
       </a-col>
