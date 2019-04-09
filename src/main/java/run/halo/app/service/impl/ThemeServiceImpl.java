@@ -412,8 +412,8 @@ public class ThemeServiceImpl implements ThemeService {
             themeProperty.setVersion(properties.getProperty("theme.version"));
             themeProperty.setAuthor(properties.getProperty("theme.author"));
             themeProperty.setAuthorWebsite(properties.getProperty("theme.author.website"));
-            themeProperty.setFolderName(themePath.getFileName().toString());
-            themeProperty.setHasOptions(hasOptions(propertyPath));
+            themeProperty.setThemePath(themePath.toString());
+            themeProperty.setHasOptions(hasOptions(themePath));
 
             return themeProperty;
         } catch (IOException e) {
@@ -434,6 +434,8 @@ public class ThemeServiceImpl implements ThemeService {
         for (String optionsName : OPTIONS_NAMES) {
             // Resolve the options path
             Path optionsPath = themePath.resolve(optionsName);
+
+            log.debug("Check options file for path: [{}]", optionsPath);
 
             if (Files.exists(optionsPath)) {
                 return true;
