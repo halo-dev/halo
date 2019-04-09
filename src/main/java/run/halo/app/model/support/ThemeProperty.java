@@ -52,7 +52,7 @@ public class ThemeProperty {
     /**
      * Folder name.
      */
-    private String folderName;
+    private String themePath;
 
     /**
      * Has options.
