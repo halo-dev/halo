@@ -26,5 +26,5 @@ public interface OptionRepository extends BaseRepository<Option, Integer> {
      *
      * @param key key
      */
-    void removeByKey(String key);
+    void deleteByKey(String key);
 }

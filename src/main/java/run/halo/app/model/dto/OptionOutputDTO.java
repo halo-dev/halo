@@ -13,8 +13,8 @@ import run.halo.app.model.entity.Option;
 @Data
 public class OptionOutputDTO implements OutputConverter<OptionOutputDTO, Option> {
 
-    private String optionKey;
+    private String key;
 
-    private String optionValue;
+    private String value;
 
 }
