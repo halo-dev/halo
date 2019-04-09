@@ -5,7 +5,6 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.setting.dialect.Props;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +14,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.properties.PrimaryProperties;
@@ -28,6 +28,8 @@ import run.halo.app.utils.JsonUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,6 +80,9 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final static String THEMES_CACHE_KEY = "themes";
 
+    /**
+     * Theme work directory.
+     */
     private final Path workDir;
 
     private final ObjectMapper yamlMapper;
@@ -95,6 +100,23 @@ public class ThemeServiceImpl implements ThemeService {
         workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
     }
 
+    @Override
+    public ThemeProperty getThemeOfNonNullBy(String themeId) {
+        return getThemeBy(themeId).orElseThrow(() -> new NotFoundException("Theme with id: " + themeId + " was not found").setErrorData(themeId));
+    }
+
+    @Override
+    public Optional<ThemeProperty> getThemeBy(String themeId) {
+        Assert.hasText(themeId, "Theme id must not be blank");
+
+        List<ThemeProperty> themes = getThemes();
+
+        log.debug("Themes type: [{}]", themes.getClass());
+        log.debug("Themes: [{}]", themes);
+
+        return themes.stream().filter(themeProperty -> themeProperty.getId().equals(themeId)).findFirst();
+    }
+
     /**
      * Gets all themes
      *
@@ -105,15 +127,14 @@ public class ThemeServiceImpl implements ThemeService {
         // Fetch themes from cache
         return cacheStore.get(THEMES_CACHE_KEY).map(themesCache -> {
             try {
-                @SuppressWarnings("unchecked")
-                List<ThemeProperty> themes = JsonUtils.jsonToObject(themesCache, LinkedList.class);
-                return themes;
+                // Convert to theme properties
+                ThemeProperty[] themeProperties = JsonUtils.jsonToObject(themesCache, ThemeProperty[].class);
+                return Arrays.asList(themeProperties);
             } catch (IOException e) {
                 throw new ServiceException("Failed to parse json", e);
             }
         }).orElseGet(() -> {
             try {
-
                 // List and filter sub folders
                 List<Path> themePaths = Files.list(getBasePath()).filter(path -> Files.isDirectory(path)).collect(Collectors.toList());
 
@@ -142,6 +163,9 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public List<ThemeFile> listThemeFolder(String absolutePath) {
+        // Check this path
+        checkDirectory(absolutePath);
+
         final List<ThemeFile> templates = new ArrayList<>();
         try {
             File absolutePathFile = new File(absolutePath);
@@ -235,12 +259,13 @@ public class ThemeServiceImpl implements ThemeService {
     /**
      * Judging whether theme exists under template path
      *
-     * @param theme theme name
+     * @param themeId theme name
      * @return boolean
      */
     @Override
-    public boolean isThemeExist(String theme) {
-        File file = new File(getThemeBasePath(), theme);
+    public boolean isThemeExist(String themeId) {
+        // TODO Get theme folder name by theme id
+        File file = new File(getThemeBasePath(), themeId);
         return file.exists();
     }
 
@@ -267,8 +292,10 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @Override
     public String getTemplateContent(String absolutePath) {
-        final FileReader fileReader = new FileReader(absolutePath);
-        return fileReader.readString();
+        // Check the path
+        checkDirectory(absolutePath);
+
+        return new FileReader(absolutePath).readString();
     }
 
     /**
@@ -342,6 +369,22 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     /**
+     * Check if directory is valid or not.
+     *
+     * @param absoluteName must not be blank
+     * @throws ForbiddenException throws when the given absolute directory name is invalid
+     */
+    private void checkDirectory(@NonNull String absoluteName) {
+        Assert.hasText(absoluteName, "Absolute name must not be blank");
+
+        boolean valid = Paths.get(absoluteName).startsWith(workDir);
+
+        if (!valid) {
+            throw new ForbiddenException("You cannot access " + absoluteName).setErrorData(absoluteName);
+        }
+    }
+
+    /**
      * Gets theme property.
      *
      * @param themePath must not be null
@@ -355,11 +398,10 @@ public class ThemeServiceImpl implements ThemeService {
             return null;
         }
 
-        File propertyFile = propertyPath.toFile();
-
         try {
             Properties properties = new Properties();
-            properties.load(new java.io.FileReader(propertyFile));
+            // Load properties
+            properties.load(new InputStreamReader(Files.newInputStream(propertyPath), StandardCharsets.UTF_8));
 
             ThemeProperty themeProperty = new ThemeProperty();
             themeProperty.setId(properties.getProperty("theme.id"));
@@ -370,38 +412,14 @@ public class ThemeServiceImpl implements ThemeService {
             themeProperty.setVersion(properties.getProperty("theme.version"));
             themeProperty.setAuthor(properties.getProperty("theme.author"));
             themeProperty.setAuthorWebsite(properties.getProperty("theme.author.website"));
-            themeProperty.setFolderName(propertyFile.getName());
+            themeProperty.setFolderName(themePath.getFileName().toString());
             themeProperty.setHasOptions(hasOptions(propertyPath));
 
             return themeProperty;
         } catch (IOException e) {
-            // TODO Consider Ignore this error, then return null
+            // TODO Consider to ignore this error, then return null
             throw new ServiceException("Failed to load: " + themePath.toString(), e);
         }
-    }
-
-    /**
-     * Gets theme Properties.
-     *
-     * @param path path
-     * @return ThemeProperty
-     */
-    private ThemeProperty getProperties(File path) {
-        File propertiesFile = new File(path, "theme.properties");
-        ThemeProperty properties = new ThemeProperty();
-        if (propertiesFile.exists()) {
-            Props props = new Props(propertiesFile);
-            properties.setId(props.getStr("theme.id"));
-            properties.setName(props.getStr("theme.name"));
-            properties.setWebsite(props.getStr("theme.website"));
-            properties.setDescription(props.getStr("theme.description"));
-            properties.setLogo(props.getStr("theme.logo"));
-            properties.setVersion(props.getStr("theme.version"));
-            properties.setAuthor(props.getStr("theme.author"));
-            properties.setAuthorWebsite(props.getStr("theme.author.website"));
-            properties.setFolderName(path.getName());
-        }
-        return properties;
     }
 
     /**
@@ -421,6 +439,7 @@ public class ThemeServiceImpl implements ThemeService {
                 return true;
             }
         }
+
         return false;
     }
 }

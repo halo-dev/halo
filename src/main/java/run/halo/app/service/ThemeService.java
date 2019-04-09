@@ -8,12 +8,31 @@ import run.halo.app.model.support.ThemeProperty;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : RYAN0UP
  * @date : 2019/3/26
  */
 public interface ThemeService {
+
+    /**
+     * Get theme property by theme id.
+     *
+     * @param themeId must not be blank
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty getThemeOfNonNullBy(@NonNull String themeId);
+
+    /**
+     * Get theme property by theme id.
+     *
+     * @param themeId must not be blank
+     * @return a optional theme property
+     */
+    @NonNull
+    Optional<ThemeProperty> getThemeBy(@NonNull String themeId);
 
     /**
      * Gets all themes
@@ -58,10 +77,10 @@ public interface ThemeService {
     /**
      * Judging whether theme exists under template path
      *
-     * @param theme theme name
+     * @param themeId theme name
      * @return boolean
      */
-    boolean isThemeExist(@NonNull String theme);
+    boolean isThemeExist(@NonNull String themeId);
 
     /**
      * Gets theme base path.
@@ -83,7 +102,6 @@ public interface ThemeService {
      * @param absolutePath absolute path
      * @return template content
      */
-    @Deprecated
     String getTemplateContent(@NonNull String absolutePath);
 
     /**

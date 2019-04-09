@@ -37,6 +37,12 @@ public class ThemeController {
         this.themeService = themeService;
     }
 
+    @GetMapping("{themeId}")
+    @ApiOperation("Gets theme property by theme id")
+    public ThemeProperty getBy(@PathVariable("themeId") String themeId) {
+        return themeService.getThemeOfNonNullBy(themeId);
+    }
+
     /**
      * List all themes
      *
