@@ -46,7 +46,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         if (StringUtils.isBlank(value)) {
             // If the value is blank, remove the key
-            optionRepository.removeByKey(key);
+            optionRepository.deleteByKey(key);
             log.debug("Removed option key: [{}]", key);
             return;
         }
