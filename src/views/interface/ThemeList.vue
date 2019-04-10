@@ -126,8 +126,8 @@
                     v-else-if="item.type == 'select'"
                   >
                     <a-select-option
-                      v-for="(option, index3) in item.options"
-                      :key="index3"
+                      v-for="option in item.options"
+                      :key="option.value"
                       :value="option.value"
                     >{{ option.label }}</a-select-option>
                   </a-select>
