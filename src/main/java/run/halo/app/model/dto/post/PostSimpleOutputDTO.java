@@ -24,15 +24,15 @@ public class PostSimpleOutputDTO extends PostMinimalOutputDTO {
 
     private String thumbnail;
 
-    private Long visits;
+    private Long visits = 0L;
 
     private Boolean disallowComment;
 
     private String template;
 
-    private Integer topPriority;
+    private Integer topPriority = 0;
 
     private PostCreateFrom createFrom;
 
-    private Long likes;
+    private Long likes = 0L;
 }
