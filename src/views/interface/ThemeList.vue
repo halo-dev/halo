@@ -119,6 +119,7 @@
 <script>
 import { PageView } from '@/layouts'
 import themeApi from '@/api/theme'
+import { setTimeout } from 'timers'
 
 export default {
   components: {
@@ -154,12 +155,15 @@ export default {
       })
     },
     settingDrawer(themeId) {
-      themeApi.fetchConfiguration(themeId).then(response => {
-        this.visible = true
-        this.themeConfiguration = response.data.data
-        this.loadSettings()
-        this.getThemeProperty(themeId)
-      })
+      this.visible = true
+      var that = this
+      setTimeout(function() {
+        themeApi.fetchConfiguration(themeId).then(response => {
+          that.themeConfiguration = response.data.data
+          that.loadSettings()
+          that.getThemeProperty(themeId)
+        })
+      }, 500)
     },
     activeTheme(theme) {
       themeApi.active(theme).then(response => {
@@ -190,6 +194,8 @@ export default {
     },
     onClose() {
       this.visible = false
+      this.themeConfiguration = {}
+      this.themeProperty = {}
     }
   }
 }
