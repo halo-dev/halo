@@ -9,10 +9,7 @@
               :sm="24"
             >
               <a-form-item label="关键词">
-                <a-input
-                  v-model="queryParam.id"
-                  placeholder
-                />
+                <a-input v-model="queryParam.keyword" />
               </a-form-item>
             </a-col>
             <a-col
@@ -25,9 +22,13 @@
                   placeholder="请选择文章状态"
                   defaultValue="0"
                 >
-                  <a-select-option value="0">已发布</a-select-option>
-                  <a-select-option value="1">草稿箱</a-select-option>
-                  <a-select-option value="2">回收站</a-select-option>
+                  <a-select-option
+                    v-for="status in Object.keys(postStatus)"
+                    :key="status"
+                    :value="status"
+                  >
+                    {{ postStatus[status].text }}
+                  </a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -55,7 +56,7 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
-                  @click="$refs.table.refresh(true)"
+                  @click="loadPosts"
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
@@ -76,15 +77,9 @@
         </router-link>
         <a-dropdown>
           <a-menu slot="overlay">
-            <a-menu-item
-              key="1"
-              v-if="postStatus==0 || postStatus==1"
-            >
+            <a-menu-item key="1">
               <a-icon type="delete" />移到回收站 </a-menu-item>
-            <a-menu-item
-              key="1"
-              v-else-if="postStatus==2"
-            >
+            <a-menu-item key="2">
               <a-icon type="delete" />永久删除 </a-menu-item>
           </a-menu>
           <a-button style="margin-left: 8px;">
@@ -182,7 +177,7 @@ export default {
   components: {},
   data() {
     return {
-      mdl: {},
+      postStatus: postApi.postStatus,
       // 查询参数
       pagination: {},
       queryParam: {
@@ -248,16 +243,14 @@ export default {
       options: {},
       optionAlertShow: false,
       categories: [],
-      postStatus: 0,
       posts: [],
       postsLoading: false
     }
   },
   computed: {
     formattedPosts() {
-      const postStatus = postApi.postStatus
       return this.posts.map(post => {
-        post.statusProperty = postStatus[post.status]
+        post.statusProperty = this.postStatus[post.status]
         return post
       })
     }
