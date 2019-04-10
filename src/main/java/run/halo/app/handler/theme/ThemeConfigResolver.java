@@ -14,12 +14,12 @@ import java.util.List;
 public interface ThemeConfigResolver {
 
     /**
-     * Resolves content as tab.
+     * Resolves content as group list.
      *
      * @param content content must not be blank
-     * @return a list of tab
+     * @return a list of group
      * @throws IOException throws when content conversion fails
      */
     @NonNull
-    List<Tab> resolve(@NonNull String content) throws IOException;
+    List<Group> resolve(@NonNull String content) throws IOException;
 }

@@ -1,7 +1,7 @@
 package run.halo.app.utils;
 
 import org.junit.Test;
-import run.halo.app.handler.theme.Tab;
+import run.halo.app.handler.theme.Group;
 import run.halo.app.handler.theme.impl.YamlThemeConfigResolverImpl;
 
 import java.io.IOException;
@@ -62,11 +62,11 @@ public class YamlTest {
                 "        - value: false\n" +
                 "          label: 关闭";
 
-        List<Tab> tabs = resolver.resolve(yaml);
+        List<Group> groups = resolver.resolve(yaml);
 
-        assertThat(tabs.size(), equalTo(2));
-        assertThat(tabs.get(0).getItems().size(), equalTo(3));
-        assertThat(tabs.get(1).getItems().size(), equalTo(2));
+        assertThat(groups.size(), equalTo(2));
+        assertThat(groups.get(0).getItems().size(), equalTo(3));
+        assertThat(groups.get(1).getItems().size(), equalTo(2));
     }
 
     @Test
@@ -119,11 +119,11 @@ public class YamlTest {
                 "          label: 关闭\n";
 
 
-        List<Tab> tabs = resolver.resolve(yaml);
+        List<Group> groups = resolver.resolve(yaml);
 
-        assertThat(tabs.size(), equalTo(2));
-        assertThat(tabs.get(0).getItems().size(), equalTo(4));
-        assertThat(tabs.get(1).getItems().size(), equalTo(3));
+        assertThat(groups.size(), equalTo(2));
+        assertThat(groups.get(0).getItems().size(), equalTo(4));
+        assertThat(groups.get(1).getItems().size(), equalTo(3));
     }
 
     @Test
@@ -174,12 +174,12 @@ public class YamlTest {
                 "        - value: false\n" +
                 "          label: 关闭";
 
-        List<Tab> tabs = resolver.resolve(yaml);
+        List<Group> groups = resolver.resolve(yaml);
 
-        assertThat(tabs.size(), equalTo(2));
-        assertThat(tabs.get(0).getItems().size(), equalTo(4));
-        assertThat(tabs.get(1).getItems().size(), equalTo(3));
-        assertThat(tabs.get(0).getItems().get(0).getOptions().size(), equalTo(2));
+        assertThat(groups.size(), equalTo(2));
+        assertThat(groups.get(0).getItems().size(), equalTo(4));
+        assertThat(groups.get(1).getItems().size(), equalTo(3));
+        assertThat(groups.get(0).getItems().get(0).getOptions().size(), equalTo(2));
     }
 
 }

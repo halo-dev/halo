@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import run.halo.app.handler.theme.Group;
 import run.halo.app.handler.theme.Item;
 import run.halo.app.handler.theme.Option;
-import run.halo.app.handler.theme.Tab;
 import run.halo.app.handler.theme.ThemeConfigResolver;
 import run.halo.app.model.enums.DataType;
 import run.halo.app.model.enums.InputType;
@@ -29,13 +29,13 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     @Override
-    public List<Tab> resolve(String content) throws IOException {
+    public List<Group> resolve(String content) throws IOException {
         return handleTabs(yamlMapper.readValue(content, Object.class));
     }
 
     @SuppressWarnings("unchecked")
-    private List<Tab> handleTabs(@Nullable Object config) {
-        List<Tab> tabs = new LinkedList<>();
+    private List<Group> handleTabs(@Nullable Object config) {
+        List<Group> groups = new LinkedList<>();
 
         if (config instanceof List) {
             List configList = (List) config;
@@ -49,15 +49,15 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
                 Map tabMap = ((Map) tabYaml);
 
-                Tab tab = new Tab();
+                Group group = new Group();
 
-                tab.setName(tabMap.get("name").toString());
-                tab.setLabel(tabMap.get("label").toString());
+                group.setName(tabMap.get("name").toString());
+                group.setLabel(tabMap.get("label").toString());
 
                 // Handle items
-                tab.setItems(handleItems(tabMap.get("items")));
+                group.setItems(handleItems(tabMap.get("items")));
 
-                tabs.add(tab);
+                groups.add(group);
             });
 
         } else if (config instanceof Map) {
@@ -71,19 +71,19 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
                 Map tabMap = (Map) value;
 
-                Tab tab = new Tab();
+                Group group = new Group();
 
-                tab.setName(key.toString());
-                tab.setLabel(tabMap.get("label").toString());
+                group.setName(key.toString());
+                group.setLabel(tabMap.get("label").toString());
 
                 // Handle items
-                tab.setItems(handleItems(tabMap.get("items")));
+                group.setItems(handleItems(tabMap.get("items")));
 
-                tabs.add(tab);
+                groups.add(group);
             });
         }
 
-        return tabs;
+        return groups;
     }
 
     @SuppressWarnings("unchecked")
