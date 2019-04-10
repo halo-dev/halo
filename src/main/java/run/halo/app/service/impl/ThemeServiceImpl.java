@@ -21,6 +21,8 @@ import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
+import run.halo.app.handler.theme.Group;
+import run.halo.app.handler.theme.ThemeConfigResolvers;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
@@ -60,22 +62,23 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private String activatedThemeId;
 
-    private final ObjectMapper yamlMapper;
-
     private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
 
     private final Configuration configuration;
 
+    private final ThemeConfigResolvers resolvers;
+
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
                             StringCacheStore cacheStore,
-                            Configuration configuration) {
+                            Configuration configuration,
+                            ThemeConfigResolvers resolvers) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.configuration = configuration;
-        yamlMapper = new ObjectMapper(new YAMLFactory());
+        this.resolvers = resolvers;
         workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
     }
 
@@ -224,15 +227,15 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public Object fetchConfig(String themeId) {
+    public List<Group> fetchConfig(String themeId) {
         Assert.hasText(themeId, "Theme name must not be blank");
 
         // Get theme property
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
 
         if (!themeProperty.isHasOptions()) {
-            // If this theme dose not has an option, then return null
-            return null;
+            // If this theme dose not has an option, then return empty list
+            return Collections.emptyList();
         }
 
         try {
@@ -247,14 +250,15 @@ public class ThemeServiceImpl implements ThemeService {
                     continue;
                 }
 
-                // Read the yaml file and return the object value
-                return yamlMapper.readValue(optionsPath.toFile(), Object.class);
+                // Read the yaml file
+                String optionContent = new String(Files.readAllBytes(optionsPath));
+                // Resolve it
+                return resolvers.resolve(optionContent);
             }
 
-            return null;
+            return Collections.emptyList();
         } catch (IOException e) {
-            log.error("Failed to read options.yaml", e);
-            return null;
+            throw new ServiceException("Failed to read options file", e);
         }
     }
 

@@ -2,6 +2,7 @@ package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import run.halo.app.handler.theme.Group;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperty;
 
@@ -164,10 +165,10 @@ public interface ThemeService {
      * Fetches theme configuration.
      *
      * @param themeId must not be blank
-     * @return theme configuration or null if not found
+     * @return theme configuration
      */
-    @Nullable
-    Object fetchConfig(@NonNull String themeId);
+    @NonNull
+    List<Group> fetchConfig(@NonNull String themeId);
 
     /**
      * Renders a theme page.
