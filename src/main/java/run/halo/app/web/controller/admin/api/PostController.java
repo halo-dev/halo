@@ -12,6 +12,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 
 import javax.validation.Valid;
@@ -53,10 +54,10 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<PostSimpleOutputDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-                                            PostQuery postQuery) {
+    public Page<PostListVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                   PostQuery postQuery) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
-        return postService.convertTo(postPage);
+        return postService.convertToListVo(postPage);
     }
 
     @GetMapping("latest")

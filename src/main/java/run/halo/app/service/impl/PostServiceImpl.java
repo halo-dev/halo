@@ -116,6 +116,13 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
     }
 
+    /**
+     * Build specification by post query.
+     *
+     * @param postQuery post query must not be null
+     * @return a post specification
+     */
+    @NonNull
     private Specification<Post> buildSpecByQuery(@NonNull PostQuery postQuery) {
         Assert.notNull(postQuery, "Post query must not be null");
 
@@ -167,44 +174,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     public Page<PostListVO> pageListVoBy(PostStatus status, Pageable pageable) {
         Page<Post> postPage = pageBy(status, pageable);
 
-        List<Post> posts = postPage.getContent();
-
-        Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
-
-        // Get tag list map
-        Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
-
-        // Get category list map
-        Map<Integer, List<Category>> categoryListMap = postCategoryService.listCategoryListMap(postIds);
-
-        // Get comment count
-        Map<Integer, Long> commentCountMap = commentService.countByPostIds(postIds);
-
-
-        return postPage.map(post -> {
-            PostListVO postListVO = new PostListVO().convertFrom(post);
-
-            Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
-
-            // Set tags
-            postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
-                    .orElseGet(LinkedList::new)
-                    .stream()
-                    .map(tag -> new TagOutputDTO().<TagOutputDTO>convertFrom(tag))
-                    .collect(Collectors.toList()));
-
-            // Set categories
-            postListVO.setCategories(Optional.ofNullable(categoryListMap.get(post.getId()))
-                    .orElseGet(LinkedList::new)
-                    .stream()
-                    .map(category -> new CategoryOutputDTO().<CategoryOutputDTO>convertFrom(category))
-                    .collect(Collectors.toList()));
-
-            // Set comment count
-            postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
-
-            return postListVO;
-        });
+        return convertToListVo(postPage);
     }
 
     /**
@@ -393,6 +363,58 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return super.removeById(postId);
     }
 
+
+    @Override
+    public Page<PostSimpleOutputDTO> convertToSimpleDto(@NonNull Page<Post> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+
+        return postPage.map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    }
+
+    @Override
+    public Page<PostListVO> convertToListVo(Page<Post> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+
+        List<Post> posts = postPage.getContent();
+
+        Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
+
+        // Get tag list map
+        Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
+
+        // Get category list map
+        Map<Integer, List<Category>> categoryListMap = postCategoryService.listCategoryListMap(postIds);
+
+        // Get comment count
+        Map<Integer, Long> commentCountMap = commentService.countByPostIds(postIds);
+
+
+        return postPage.map(post -> {
+            PostListVO postListVO = new PostListVO().convertFrom(post);
+
+            Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
+
+            // Set tags
+            postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
+                    .orElseGet(LinkedList::new)
+                    .stream()
+                    .map(tag -> new TagOutputDTO().<TagOutputDTO>convertFrom(tag))
+                    .collect(Collectors.toList()));
+
+            // Set categories
+            postListVO.setCategories(Optional.ofNullable(categoryListMap.get(post.getId()))
+                    .orElseGet(LinkedList::new)
+                    .stream()
+                    .map(category -> new CategoryOutputDTO().<CategoryOutputDTO>convertFrom(category))
+                    .collect(Collectors.toList()));
+
+            // Set comment count
+            postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
+
+            return postListVO;
+        });
+    }
+
     /**
      * Converts to post minimal output dto.
      *
@@ -409,13 +431,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return posts.stream()
                 .map(post -> new PostMinimalOutputDTO().<PostMinimalOutputDTO>convertFrom(post))
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<PostSimpleOutputDTO> convertTo(@NonNull Page<Post> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(post -> new PostSimpleOutputDTO().convertFrom(post));
     }
 
     /**

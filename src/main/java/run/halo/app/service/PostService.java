@@ -183,5 +183,14 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return a page of post simple output dto
      */
     @NonNull
-    Page<PostSimpleOutputDTO> convertTo(@NonNull Page<Post> postPage);
+    Page<PostSimpleOutputDTO> convertToSimpleDto(@NonNull Page<Post> postPage);
+
+    /**
+     * Converts to a page of post list vo.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post list vo
+     */
+    @NonNull
+    Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
 }
