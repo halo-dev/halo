@@ -60,7 +60,7 @@
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
-                  @click="() => (queryParam = {})"
+                  @click="resetParam"
                 >重置</a-button>
               </span>
             </a-col>
@@ -97,8 +97,8 @@
           }"
           :columns="columns"
           :dataSource="formattedPosts"
-          :pagination="pagination"
           :loading="postsLoading"
+          :pagination="false"
         >
 
           <span
@@ -163,6 +163,20 @@
             >删除</a>
           </span>
         </a-table>
+        <a-row
+          type="flex"
+          justify="end"
+          align="middle"
+        >
+          <a-pagination
+            class="pagination"
+            :total="pagination.total"
+            :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
+            showSizeChanger
+            @showSizeChange="onPaginationChange"
+            @change="onPaginationChange"
+          />
+        </a-row>
       </div>
     </a-card>
   </div>
@@ -179,7 +193,11 @@ export default {
     return {
       postStatus: postApi.postStatus,
       // 查询参数
-      pagination: {},
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        sort: null
+      },
       queryParam: {
         page: 0,
         size: 10,
@@ -263,8 +281,9 @@ export default {
     loadPosts() {
       this.postsLoading = true
       // Set from pagination
-      this.queryParam.page = this.pagination.current
+      this.queryParam.page = this.pagination.current - 1
       this.queryParam.size = this.pagination.pageSize
+      this.queryParam.sort = this.pagination.sort
       postApi.query(this.queryParam).then(response => {
         this.posts = response.data.data.content
         this.pagination.total = response.data.data.total
@@ -292,7 +311,24 @@ export default {
           name: post.title
         }
       }
+    },
+    onPaginationChange(page, pageSize) {
+      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
+      this.pagination.current = page
+      this.pagination.pageSize = pageSize
+      this.loadPosts()
+    },
+    resetParam() {
+      this.queryParam.keyword = null
+      this.queryParam.categoryId = null
+      this.queryParam.status = null
     }
   }
 }
 </script>
+
+<style scoped>
+.pagination {
+  margin-top: 1rem;
+}
+</style>
