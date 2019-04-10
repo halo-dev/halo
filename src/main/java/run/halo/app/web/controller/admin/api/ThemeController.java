@@ -2,6 +2,7 @@ package run.halo.app.web.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.handler.theme.Group;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.model.support.ThemeProperty;
@@ -97,8 +98,8 @@ public class ThemeController {
 
     @GetMapping("{themeId}/configurations")
     @ApiOperation("Fetches theme configuration by theme id")
-    public BaseResponse<Object> fetchConfig(@PathVariable("themeId") String themeId) {
-        return BaseResponse.ok(themeService.fetchConfig(themeId));
+    public List<Group> fetchConfig(@PathVariable("themeId") String themeId) {
+        return themeService.fetchConfig(themeId);
     }
 
     @PostMapping("{themeId}/settings")

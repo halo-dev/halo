@@ -3,7 +3,6 @@ package run.halo.app.handler.theme.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import run.halo.app.handler.theme.Group;
 import run.halo.app.handler.theme.Item;
 import run.halo.app.handler.theme.Option;
@@ -23,7 +22,6 @@ import java.util.Map;
  * @author johnniang
  * @date 4/10/19
  */
-@Component
 public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
