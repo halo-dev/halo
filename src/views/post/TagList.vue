@@ -34,7 +34,7 @@
             <template slot="title">
               <span>{{ tag.postCount }} 篇文章</span>
             </template>
-            <a-tag color="green">{{ tag.name }}</a-tag>
+            <a-tag closable @close="deleteTag(tag.id)" color="green">{{ tag.name }}</a-tag>
           </a-tooltip>
         </a-card>
       </a-col>
@@ -44,6 +44,7 @@
 
 <script>
 import tagApi from '@/api/tag'
+import { closeSync } from 'fs';
 export default {
   data() {
     return {
@@ -71,8 +72,9 @@ export default {
         this.loadTags()
       })
     },
-    deleteTag(index) {
-      tagApi.delete(this.tags[index]).then(response => {
+    deleteTag(tagId) {
+      tagApi.delete(tagId).then(response => {
+        this.$message.success('删除成功！')
         this.loadTags()
       })
     }
