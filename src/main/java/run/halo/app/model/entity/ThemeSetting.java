@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import run.halo.app.model.enums.DataType;
 
 import javax.persistence.*;
 
@@ -45,4 +46,17 @@ public class ThemeSetting extends BaseEntity {
     @Column(name = "theme_id", columnDefinition = "varchar(255) not null")
     private String themeId;
 
+    @Column(name = "data_type", columnDefinition = "int default 0")
+    private DataType type;
+
+    @Override
+    protected void prePersist() {
+        super.prePersist();
+
+        id = null;
+
+        if (type == null) {
+            type = DataType.STRING;
+        }
+    }
 }
