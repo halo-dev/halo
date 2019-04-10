@@ -2,9 +2,11 @@ package run.halo.app.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import lombok.Data;
 import org.junit.Test;
 import org.springframework.lang.Nullable;
+import run.halo.app.handler.theme.Item;
+import run.halo.app.handler.theme.Option;
+import run.halo.app.handler.theme.Tab;
 import run.halo.app.model.enums.DataType;
 import run.halo.app.model.enums.InputType;
 
@@ -357,27 +359,4 @@ public class YamlTest {
         return result;
     }
 
-    @Data
-    private class Tab {
-        private String name;
-        private String label;
-        private List<Item> items;
-    }
-
-    @Data
-    private class Item {
-        private String name;
-        private String label;
-        private InputType type;
-        private DataType dataType;
-        private Object defaultValue;
-
-        private List<Option> options;
-    }
-
-    @Data
-    private class Option {
-        private String label;
-        private Object value;
-    }
 }
