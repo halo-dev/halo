@@ -46,9 +46,9 @@ themeApi.delete = key => {
   })
 }
 
-themeApi.fetchConfiguration = () => {
+themeApi.fetchConfiguration = themeId => {
   return service({
-    url: `${baseUrl}/activation/configurations`,
+    url: `${baseUrl}/${themeId}/configurations`,
     method: 'get'
   })
 }
@@ -65,6 +65,13 @@ themeApi.saveSettings = settings => {
     url: `${baseUrl}/activation/settings`,
     data: settings,
     method: 'post'
+  })
+}
+
+themeApi.getProperty = themeId => {
+  return service({
+    url: `${baseUrl}/${themeId}`,
+    method: 'get'
   })
 }
 

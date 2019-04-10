@@ -1,10 +1,6 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
+    <a-row :gutter="12" type="flex" align="middle">
       <a-col
         class="theme-item"
         :xl="6"
@@ -16,77 +12,39 @@
         :key="index"
       >
         <a-card :bodyStyle="{ padding: '14px' }">
-          <img
-            :alt="theme.name"
-            :src="theme.screenshots"
-            slot="cover"
-          />
+          <img :alt="theme.name" :src="theme.screenshots" slot="cover">
           <a-divider></a-divider>
           <div class="theme-control">
             <span class="theme-title">{{ theme.name }}</span>
             <a-button-group class="theme-button">
-              <a-button
-                type="primary"
-                v-if="theme.activated"
-                disabled
-              >已启用</a-button>
-              <a-button
-                type="primary"
-                @click="activeTheme(theme.id)"
-                v-else
-              >启用</a-button>
-              <a-button
-                @click="settingDrawer(theme.id)"
-                v-if="activatedTheme.id === theme.id && theme.hasOptions"
-              >设置</a-button>
-              <a-popconfirm
-                :title="'确定删除【' + theme.name + '】主题？'"
-                @confirm="deleteTheme(theme.id)"
-                okText="确定"
-                cancelText="取消"
-                v-else-if="activatedTheme != theme.id"
-              >
-                <a-button type="dashed">删除</a-button>
-              </a-popconfirm>
+              <a-button type="primary" v-if="theme.activated" disabled>已启用</a-button>
+              <a-button type="primary" @click="activeTheme(theme.id)" v-else>启用</a-button>
+              <a-button @click="settingDrawer(theme.id)" v-if="theme.hasOptions">设置</a-button>
             </a-button-group>
           </div>
         </a-card>
       </a-col>
     </a-row>
     <a-drawer
-      v-if="activatedTheme"
-      :title="activatedTheme.name + ' 主题设置'"
+      v-if="themeProperty"
+      :title="themeProperty.name + ' 主题设置'"
       width="100%"
-      :closable="true"
+      closable
       @close="onClose"
       :visible="visible"
+      destroyOnClose
     >
-      <a-row
-        :gutter="12"
-        type="flex"
-      >
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-        >
+      <a-row :gutter="12" type="flex">
+        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
           <img
-            v-if="activatedTheme"
-            :alt="activatedTheme.name"
-            :src="activatedTheme.screenshots"
+            v-if="themeProperty"
+            :alt="themeProperty.name"
+            :src="themeProperty.screenshots"
             width="100%"
-          />
+          >
         </a-col>
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-        >
-          <a-tabs>
+        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+          <a-tabs defaultActiveKey="0">
             <a-tab-pane
               v-for="(group, index) in themeConfiguration"
               :key="index"
@@ -101,19 +59,20 @@
                 >
                   <a-input
                     v-model="themeSettings[item.name]"
-                    v-if="item.type == 'text'"
+                    :defaultValue="item.defaultValue"
+                    v-if="item.type == 'TEXT'"
                   />
                   <a-input
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="themeSettings[item.name]"
-                    v-else-if="item.type == 'textarea'"
+                    v-else-if="item.type == 'TEXTAREA'"
                   />
                   <a-radio-group
                     v-decorator="['radio-group']"
-                    defaultValue="false"
+                    :defaultValue="item.defaultValue"
                     v-model="themeSettings[item.name]"
-                    v-else-if="item.type == 'radio'"
+                    v-else-if="item.type == 'RADIO'"
                   >
                     <a-radio
                       v-for="(option, index2) in item.options"
@@ -123,7 +82,8 @@
                   </a-radio-group>
                   <a-select
                     v-model="themeSettings[item.name]"
-                    v-else-if="item.type == 'select'"
+                    :defaultValue="item.defaultValue"
+                    v-else-if="item.type == 'SELECT'"
                   >
                     <a-select-option
                       v-for="option in item.options"
@@ -133,12 +93,21 @@
                   </a-select>
                 </a-form-item>
                 <a-form-item>
-                  <a-button
-                    type="primary"
-                    @click="saveSettings"
-                  >保存</a-button>
+                  <a-button type="primary" @click="saveSettings">保存</a-button>
                 </a-form-item>
               </a-form>
+            </a-tab-pane>
+            <a-tab-pane key="about" tab="关于">
+              <a-form-item>
+                <a-popconfirm
+                  :title="'确定删除【' + themeProperty.name + '】主题？'"
+                  @confirm="deleteTheme(themeProperty.id)"
+                  okText="确定"
+                  cancelText="取消"
+                >
+                  <a-button type="danger">删除该主题</a-button>
+                </a-popconfirm>
+              </a-form-item>
             </a-tab-pane>
           </a-tabs>
         </a-col>
@@ -161,10 +130,9 @@ export default {
       },
       themes: [],
       visible: false,
-      optionUrl: 'https://ryanc.cc',
-      // TODO 从api获取当前使用的主题
       themeConfiguration: {},
-      themeSettings: {}
+      themeSettings: {},
+      themeProperty: {}
     }
   },
   computed: {
@@ -181,11 +149,12 @@ export default {
         this.themes = response.data.data
       })
     },
-    settingDrawer() {
-      themeApi.fetchConfiguration().then(response => {
+    settingDrawer(themeId) {
+      themeApi.fetchConfiguration(themeId).then(response => {
         this.visible = true
         this.themeConfiguration = response.data.data
         this.loadSettings()
+        this.getThemeProperty(themeId)
       })
     },
     activeTheme(theme) {
@@ -208,6 +177,11 @@ export default {
     loadSettings() {
       themeApi.fetchSettings().then(response => {
         this.themeSettings = response.data.data
+      })
+    },
+    getThemeProperty(themeId) {
+      themeApi.getProperty(themeId).then(response => {
+        this.themeProperty = response.data.data
       })
     },
     onClose() {
