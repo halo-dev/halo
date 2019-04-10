@@ -297,6 +297,9 @@ public class ThemeServiceImpl implements ThemeService {
         // Set the activated theme id
         setActivatedThemeId(themeId);
 
+        // Clear the cache
+        cacheStore.delete(THEMES_CACHE_KEY);
+
         try {
             // TODO Refactor here in the future
             configuration.setSharedVariable("themeName", themeId);
