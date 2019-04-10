@@ -5,13 +5,13 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Theme configuration: Tab entity.
+ * Theme configuration: group entity.
  *
  * @author johnniang
  * @date 4/10/19
  */
 @Data
-public class Tab {
+public class Group {
 
     /**
      * Tab name.

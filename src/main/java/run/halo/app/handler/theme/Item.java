@@ -7,7 +7,7 @@ import run.halo.app.model.enums.InputType;
 import java.util.List;
 
 /**
- * Theme configuration: Item entity
+ * Theme configuration: item entity
  *
  * @author johnniang
  * @date 4/10/19
