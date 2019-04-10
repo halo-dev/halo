@@ -15,6 +15,7 @@
           :bodyStyle="{ padding: '0px' }"
         >
           <a-table
+            :rowKey="post => post.id"
             :columns="postColumns"
             :dataSource="formattedPostData"
             :pagination="false"
@@ -23,7 +24,7 @@
               slot="status"
               slot-scope="status"
             >
-              <a-badge :status="status.status" />{{ status.statusText }}
+              <a-badge :status="status.status" />{{ status.text }}
             </span>
 
             <span
@@ -49,6 +50,7 @@
           :bodyStyle="{ padding: '0px' }"
         >
           <a-table
+            :rowKey="comment => comment.id"
             :columns="commentColumns"
             :dataSource="commentData"
             :pagination="false"
@@ -107,13 +109,6 @@ const commentColumns = [
   }
 ]
 
-const postStatus = {
-  PUBLISHED: {
-    status: 'success',
-    statusText: '已发布'
-  }
-}
-
 export default {
   name: 'Dashboard',
   components: {},
@@ -141,7 +136,7 @@ export default {
     formattedPostData() {
       return Object.assign([], this.postData).map(post => {
         // Format the status
-        post.status = postStatus[post.status]
+        post.status = postApi.postStatus[post.status]
         return post
       })
     }
