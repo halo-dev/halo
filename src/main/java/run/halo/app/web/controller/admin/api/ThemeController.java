@@ -85,13 +85,13 @@ public class ThemeController {
 
     @GetMapping("activation/settings")
     @ApiOperation("Lists activated theme settings")
-    public Map<String, String> listSettingsBy() {
+    public Map<String, Object> listSettingsBy() {
         return themeSettingService.listAsMapBy(themeService.getActivatedThemeId());
     }
 
     @PostMapping("activation/settings")
     @ApiOperation("Saves theme settings")
-    public void saveSettingsBy(@RequestBody Map<String, String> settings) {
+    public void saveSettingsBy(@RequestBody Map<String, Object> settings) {
         themeSettingService.save(settings, themeService.getActivatedThemeId());
     }
 
@@ -104,7 +104,7 @@ public class ThemeController {
     @PostMapping("{themeId}/settings")
     @ApiOperation("Saves theme settings")
     public void saveSettingsBy(@PathVariable("themeId") String themeId,
-                               @RequestBody Map<String, String> settings) {
+                               @RequestBody Map<String, Object> settings) {
         themeSettingService.save(settings, themeId);
     }
 
