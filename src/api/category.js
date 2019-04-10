@@ -11,6 +11,13 @@ categoryApi.listAll = () => {
   })
 }
 
+categoryApi.listTree = () => {
+  return service({
+    url: `${baseUrl}/tree_view`,
+    method: 'get'
+  })
+}
+
 categoryApi.create = (category) => {
   return service({
     url: baseUrl,

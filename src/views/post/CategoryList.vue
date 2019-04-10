@@ -17,9 +17,15 @@
               <a-input v-model="categoryToCreate.slugNames" />
             </a-form-item>
             <a-form-item label="上级目录：">
-              <a-select>
-                <a-select-option value="1">上级目录</a-select-option>
-              </a-select>
+              <a-tree-select
+                :treeData="categoriesTree"
+                placeholder="请选择上级目录，默认为顶级目录"
+                treeDefaultExpandAll
+                v-model="categoryToCreate.parentId"
+                :treeDataSimpleMode="true"
+                :allowClear="true"
+              >
+              </a-tree-select>
             </a-form-item>
             <a-form-item label="描述：" help="*分类描述，部分主题可显示">
               <a-input type="textarea" v-model="categoryToCreate.description" :autosize="{ minRows: 3 }" />
@@ -99,6 +105,18 @@ export default {
   created() {
     this.loadCategories()
   },
+  computed: {
+    categoriesTree() {
+      return this.categories.map(category => {
+        return {
+          id: category.id,
+          title: category.name,
+          value: category.id.toString(),
+          pId: category.parentId
+        }
+      })
+    }
+  },
   methods: {
     loadCategories() {
       categoryApi.listAll().then(response => {
@@ -107,7 +125,9 @@ export default {
     },
     createCategory() {
       categoryApi.create(this.categoryToCreate).then(response => {
+        this.$message.success('添加成功！')
         this.loadCategories()
+        this.categoryToCreate = {}
       })
     },
     editCategory(id) {
