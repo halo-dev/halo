@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <page-view>
     <a-card :bordered="false">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
@@ -50,10 +50,11 @@
         </a-table>
       </div>
     </a-card>
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 const columns = [
   {
     title: '#',
@@ -84,7 +85,9 @@ const columns = [
 ]
 export default {
   name: 'CommentList',
-  components: {},
+  components: {
+    PageView
+  },
   data() {
     return {
       // 查询参数

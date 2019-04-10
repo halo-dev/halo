@@ -1,13 +1,7 @@
 <template>
-  <div class="page-header-index-wide">
+  <page-view>
     <a-row :gutter="12">
-      <a-col
-        :xl="12"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
+      <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
         <a-card
           :loading="postLoading"
           :bordered="false"
@@ -20,29 +14,16 @@
             :dataSource="formattedPostData"
             :pagination="false"
           >
-            <span
-              slot="status"
-              slot-scope="status"
-            >
-              <a-badge :status="status.status" />{{ status.text }}
+            <span slot="status" slot-scope="status">
+              <a-badge :status="status.status"/>
+              {{ status.text }}
             </span>
 
-            <span
-              slot="editTime"
-              slot-scope="editTime"
-            >
-              {{ editTime | timeAgo }}
-            </span>
+            <span slot="editTime" slot-scope="editTime">{{ editTime | timeAgo }}</span>
           </a-table>
         </a-card>
       </a-col>
-      <a-col
-        :xl="12"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
+      <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
         <a-card
           :loading="commentLoading"
           :bordered="false"
@@ -54,15 +35,16 @@
             :columns="commentColumns"
             :dataSource="commentData"
             :pagination="false"
-          >
-          </a-table>
+          ></a-table>
         </a-card>
       </a-col>
     </a-row>
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
+
 import postApi from '@/api/post'
 import commentApi from '@/api/comment'
 import logApi from '@/api/log'
@@ -111,7 +93,9 @@ const commentColumns = [
 
 export default {
   name: 'Dashboard',
-  components: {},
+  components: {
+    PageView
+  },
   data() {
     return {
       postLoading: true,
