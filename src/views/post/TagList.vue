@@ -44,7 +44,7 @@
 
 <script>
 import tagApi from '@/api/tag'
-import { closeSync } from 'fs';
+
 export default {
   data() {
     return {
