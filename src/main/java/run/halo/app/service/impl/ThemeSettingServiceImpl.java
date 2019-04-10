@@ -62,7 +62,7 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
     }
 
     @Override
-    public void save(Map<String, String> settings, String themeId) {
+    public void save(Map<String, Object> settings, String themeId) {
         assertThemeIdHasText(themeId);
 
         if (CollectionUtils.isEmpty(settings)) {
@@ -70,7 +70,7 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         }
 
         // Save the settings
-        settings.forEach((key, value) -> save(key, value, themeId));
+        settings.forEach((key, value) -> save(key, value.toString(), themeId));
     }
 
     @Override
@@ -81,7 +81,9 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
     }
 
     @Override
-    public Map<String, String> listAsMapBy(String themeId) {
+    public Map<String, Object> listAsMapBy(String themeId) {
+
+        // TODO Convert to corresponding data type
         return ServiceUtils.convertToMap(listBy(themeId), ThemeSetting::getKey, ThemeSetting::getValue);
     }
 

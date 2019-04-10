@@ -36,7 +36,7 @@ public interface ThemeSettingService {
      * @param themeId  theme id must not be blank
      */
     @Transactional
-    void save(@Nullable Map<String, String> settings, @NonNull String themeId);
+    void save(@Nullable Map<String, Object> settings, @NonNull String themeId);
 
     /**
      * Lists theme settings by theme id.
@@ -54,5 +54,5 @@ public interface ThemeSettingService {
      * @return theme setting map
      */
     @NonNull
-    Map<String, String> listAsMapBy(@NonNull String themeId);
+    Map<String, Object> listAsMapBy(@NonNull String themeId);
 }
