@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <page-view>
     <a-row :gutter="12">
       <a-col
         :xl="10"
@@ -67,10 +67,11 @@
         </a-card>
       </a-col>
     </a-row>
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 import { Ellipsis } from '@/components'
 import menuApi from '@/api/menu'
 const columns = [
@@ -99,6 +100,7 @@ const columns = [
 ]
 export default {
   components: {
+    PageView,
     Ellipsis
   },
   data() {

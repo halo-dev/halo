@@ -97,7 +97,7 @@ export const asyncRouterMap = [
       {
         path: '/interface',
         name: 'Interface',
-        component: PageView,
+        component: RouteView,
         redirect: '/interface/themes',
         meta: { title: '外观', icon: 'skin' },
         children: [

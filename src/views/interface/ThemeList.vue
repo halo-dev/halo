@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <page-view>
     <a-row :gutter="12" type="flex" align="middle">
       <a-col
         class="theme-item"
@@ -113,13 +113,17 @@
         </a-col>
       </a-row>
     </a-drawer>
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 import themeApi from '@/api/theme'
 
 export default {
+  components: {
+    PageView
+  },
   data() {
     return {
       wrapperCol: {

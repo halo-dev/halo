@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <page-view>
     <a-row :gutter="12">
       <a-col
         :xl="18"
@@ -31,15 +31,17 @@
         </a-card>
       </a-col>
     </a-row>
-  </div>
+  </page-view>
 </template>
 
 <script>
 import themeApi from '@/api/theme'
 import ThemeFile from './components/ThemeFile'
 import { codemirror } from 'vue-codemirror-lite'
+import { PageView } from '@/layouts'
 export default {
   components: {
+    PageView,
     codemirror,
     ThemeFile
   },
