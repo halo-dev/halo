@@ -10,6 +10,7 @@ import run.halo.app.model.dto.post.PostSimpleOutputDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
+import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.*;
 
@@ -48,6 +49,14 @@ public class PostController {
         this.postTagService = postTagService;
         this.commentService = commentService;
         this.optionService = optionService;
+    }
+
+    @GetMapping
+    @ApiOperation("Lists posts")
+    public Page<PostSimpleOutputDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                            PostQuery postQuery) {
+        Page<Post> postPage = postService.pageBy(postQuery, pageable);
+        return postService.convertTo(postPage);
     }
 
     @GetMapping("latest")
