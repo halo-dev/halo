@@ -1,10 +1,12 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import run.halo.app.model.dto.post.PostMinimalOutputDTO;
 import run.halo.app.model.dto.post.PostSimpleOutputDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
@@ -30,6 +33,9 @@ import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -99,6 +105,50 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         Assert.notNull(pageable, "Page info must not be null");
 
         return postRepository.findAllByStatus(status, pageable);
+    }
+
+    @Override
+    public Page<Post> pageBy(PostQuery postQuery, Pageable pageable) {
+        Assert.notNull(postQuery, "Post query must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Build specification and find all
+        return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
+    }
+
+    private Specification<Post> buildSpecByQuery(@NonNull PostQuery postQuery) {
+        Assert.notNull(postQuery, "Post query must not be null");
+
+        return (Specification<Post>) (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (postQuery.getStatus() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), postQuery.getStatus()));
+            }
+
+            if (postQuery.getCategoryId() != null) {
+                Subquery<Post> postSubquery = query.subquery(Post.class);
+                Root<PostCategory> postCategoryRoot = postSubquery.from(PostCategory.class);
+                postSubquery.select(postCategoryRoot.get("postId"));
+                postSubquery.where(
+                        criteriaBuilder.equal(root.get("id"), postCategoryRoot.get("postId")),
+                        criteriaBuilder.equal(postCategoryRoot.get("categoryId"), postQuery.getCategoryId()));
+                predicates.add(criteriaBuilder.exists(postSubquery));
+            }
+
+            if (postQuery.getKeyword() != null) {
+                // Format like condition
+                String likeCondition = String.format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
+
+                // Build like predicate
+                Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
+                Predicate originalContentLike = criteriaBuilder.like(root.get("originalContent"), likeCondition);
+
+                predicates.add(criteriaBuilder.or(titleLike, originalContentLike));
+            }
+
+            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
     }
 
     /**
@@ -359,6 +409,13 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return posts.stream()
                 .map(post -> new PostMinimalOutputDTO().<PostMinimalOutputDTO>convertFrom(post))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<PostSimpleOutputDTO> convertTo(@NonNull Page<Post> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+
+        return postPage.map(post -> new PostSimpleOutputDTO().convertFrom(post));
     }
 
     /**

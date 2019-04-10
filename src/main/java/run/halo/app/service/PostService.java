@@ -1,18 +1,18 @@
 package run.halo.app.service;
 
-import run.halo.app.model.dto.post.PostMinimalOutputDTO;
-import run.halo.app.model.dto.post.PostSimpleOutputDTO;
-import run.halo.app.model.entity.Post;
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.vo.ArchiveMonthVO;
-import run.halo.app.model.vo.ArchiveYearVO;
-import run.halo.app.model.vo.PostDetailVO;
-import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
+import run.halo.app.model.dto.post.PostMinimalOutputDTO;
+import run.halo.app.model.dto.post.PostSimpleOutputDTO;
+import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.vo.ArchiveMonthVO;
+import run.halo.app.model.vo.ArchiveYearVO;
+import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.base.CrudService;
 
 import java.util.List;
@@ -56,18 +56,28 @@ public interface PostService extends CrudService<Post, Integer> {
     Page<Post> pageLatest(int top);
 
     /**
-     * List by status and type
+     * Lists by status and type
      *
      * @param status   post status must not be null
      * @param pageable page info must not be null
-     * @return Page<PostSimpleOutputDTO>
+     * @return a page of post
      */
     @NonNull
     Page<Post> pageBy(@NonNull PostStatus status, @NonNull Pageable pageable);
 
+    /**
+     * Pages posts.
+     *
+     * @param postQuery post query must not be null
+     * @param pageable  page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<Post> pageBy(@NonNull PostQuery postQuery, @NonNull Pageable pageable);
+
 
     /**
-     * List simple output dto by status and type
+     * Lists simple output dto by status and type
      *
      * @param status   post status must not be null
      * @param pageable page info must not be null
@@ -165,4 +175,13 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     List<ArchiveMonthVO> listMonthArchives();
+
+    /**
+     * Converts to a page of post simple output dto.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post simple output dto
+     */
+    @NonNull
+    Page<PostSimpleOutputDTO> convertTo(@NonNull Page<Post> postPage);
 }
