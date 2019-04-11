@@ -4,8 +4,6 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
@@ -56,19 +54,14 @@ public class ThemeServiceImpl implements ThemeService {
      * Theme work directory.
      */
     private final Path workDir;
-
+    private final OptionService optionService;
+    private final StringCacheStore cacheStore;
+    private final Configuration configuration;
+    private final ThemeConfigResolvers resolvers;
     /**
      * Activated theme id.
      */
     private String activatedThemeId;
-
-    private final OptionService optionService;
-
-    private final StringCacheStore cacheStore;
-
-    private final Configuration configuration;
-
-    private final ThemeConfigResolvers resolvers;
 
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
