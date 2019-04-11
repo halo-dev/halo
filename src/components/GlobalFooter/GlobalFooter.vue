@@ -1,7 +1,7 @@
 <template>
   <div class="footer">
     <div class="copyright">
-      Proudly power by <a href="https://github.com/halo-dev/halo">Halo</a>
+      Proudly power by <a target="_blank" href="https://github.com/halo-dev/halo">Halo</a>
     </div>
   </div>
 </template>
