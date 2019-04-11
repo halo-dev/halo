@@ -3,6 +3,7 @@ package run.halo.app.model.support;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
  */
 @Data
 @ToString
-public class ThemeFile {
+public class ThemeFile implements Comparator<ThemeFile> {
 
     private String name;
 
@@ -24,4 +25,17 @@ public class ThemeFile {
     private Boolean editable;
 
     private List<ThemeFile> node;
+
+    @Override
+    public int compare(ThemeFile leftFile, ThemeFile rightFile) {
+        if (leftFile.isFile && !rightFile.isFile) {
+            return 1;
+        }
+
+        if (!leftFile.isFile && rightFile.isFile) {
+            return -1;
+        }
+
+        return leftFile.getName().compareTo(rightFile.getName());
+    }
 }
