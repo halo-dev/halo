@@ -405,6 +405,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
             postListVO.setCategories(Optional.ofNullable(categoryListMap.get(post.getId()))
                     .orElseGet(LinkedList::new)
                     .stream()
+                    .filter(Objects::nonNull)
                     .map(category -> new CategoryOutputDTO().<CategoryOutputDTO>convertFrom(category))
                     .collect(Collectors.toList()));
 
