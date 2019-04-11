@@ -3,10 +3,11 @@ package run.halo.app.handler.theme.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.lang.Nullable;
-import run.halo.app.handler.theme.Group;
-import run.halo.app.handler.theme.Item;
-import run.halo.app.handler.theme.Option;
+import org.springframework.stereotype.Service;
 import run.halo.app.handler.theme.ThemeConfigResolver;
+import run.halo.app.handler.theme.support.Group;
+import run.halo.app.handler.theme.support.Item;
+import run.halo.app.handler.theme.support.Option;
 import run.halo.app.model.enums.DataType;
 import run.halo.app.model.enums.InputType;
 
@@ -22,6 +23,7 @@ import java.util.Map;
  * @author johnniang
  * @date 4/10/19
  */
+@Service
 public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());

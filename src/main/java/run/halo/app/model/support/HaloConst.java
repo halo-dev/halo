@@ -45,11 +45,6 @@ public class HaloConst {
     public static Map<String, String> OWO_MAP = Collections.emptyMap();
 
     /**
-     * All of the themes
-     */
-    public static List<Theme> THEMES;
-
-    /**
      * user_session
      */
     public static String USER_SESSION_KEY = "user_session";

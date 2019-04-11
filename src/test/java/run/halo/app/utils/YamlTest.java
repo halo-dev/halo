@@ -1,7 +1,7 @@
 package run.halo.app.utils;
 
 import org.junit.Test;
-import run.halo.app.handler.theme.Group;
+import run.halo.app.handler.theme.support.Group;
 import run.halo.app.handler.theme.impl.YamlThemeConfigResolverImpl;
 
 import java.io.IOException;
@@ -70,7 +70,6 @@ public class YamlTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void readAnotherYamlTest() throws IOException {
         String yaml = "sns:\n" +
                 "  label: 社交资料设置\n" +
