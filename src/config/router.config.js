@@ -73,6 +73,20 @@ export const asyncRouterMap = [
             name: 'PageEdit',
             component: () => import('@/views/page/PageEdit'),
             meta: { title: '新建页面', hiddenHeaderContent: false }
+          },
+          {
+            path: '/pages/links',
+            name: 'LinkList',
+            hidden: true,
+            component: () => import('@/views/page/internal/LinkList'),
+            meta: { title: '友情链接', hiddenHeaderContent: false }
+          },
+          {
+            path: '/pages/galleries',
+            name: 'GalleryList',
+            hidden: true,
+            component: () => import('@/views/page/internal/GalleryList'),
+            meta: { title: '图库', hiddenHeaderContent: false }
           }
         ]
       },
