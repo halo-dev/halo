@@ -38,7 +38,6 @@ dependencies {
     implementation 'cn.hutool:hutool-core:4.5.0'
     implementation 'cn.hutool:hutool-crypto:4.5.0'
     implementation 'cn.hutool:hutool-extra:4.5.0'
-    implementation 'cn.hutool:hutool-setting:4.5.0'
     implementation 'com.upyun:java-sdk:4.0.1'
     implementation 'com.qiniu:qiniu-java-sdk:7.2.18'
     implementation 'com.aliyun.oss:aliyun-sdk-oss:3.4.2'
