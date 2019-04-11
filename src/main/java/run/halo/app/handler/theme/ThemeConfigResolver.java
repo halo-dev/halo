@@ -1,6 +1,7 @@
 package run.halo.app.handler.theme;
 
 import org.springframework.lang.NonNull;
+import run.halo.app.handler.theme.support.Group;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,4 +23,5 @@ public interface ThemeConfigResolver {
      */
     @NonNull
     List<Group> resolve(@NonNull String content) throws IOException;
+
 }

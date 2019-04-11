@@ -1,4 +1,4 @@
-package run.halo.app.handler.theme;
+package run.halo.app.handler.theme.support;
 
 import lombok.Data;
 import run.halo.app.model.enums.DataType;

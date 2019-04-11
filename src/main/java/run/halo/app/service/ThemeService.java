@@ -1,10 +1,9 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-import run.halo.app.handler.theme.Group;
+import run.halo.app.handler.theme.support.Group;
+import run.halo.app.handler.theme.support.ThemeProperty;
 import run.halo.app.model.support.ThemeFile;
-import run.halo.app.model.support.ThemeProperty;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -20,7 +19,12 @@ public interface ThemeService {
     /**
      * Theme property file name.
      */
-    String THEME_PROPERTY_FILE_NAME = "theme.properties";
+    String THEME_PROPERTY_FILE_NAME = "theme.yaml";
+
+    /**
+     * Theme property file name.
+     */
+    String[] THEME_PROPERTY_FILE_NAMES = {"theme.yaml", "theme.yml"};
 
 
     /**
@@ -36,7 +40,7 @@ public interface ThemeService {
     /**
      * These file names cannot be displayed.
      */
-    String[] FILTER_FILES = {".git", ".DS_Store", THEME_PROPERTY_FILE_NAME, "options.yaml", "option.yml"};
+    String[] FILTER_FILES = {".git", ".DS_Store", "theme.yaml", "theme.yml", "options.yaml", "option.yml"};
 
     /**
      * Theme folder location.
@@ -82,6 +86,7 @@ public interface ThemeService {
      *
      * @return list of themes
      */
+    @NonNull
     List<ThemeProperty> getThemes();
 
     /**

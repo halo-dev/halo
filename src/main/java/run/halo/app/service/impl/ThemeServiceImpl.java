@@ -15,16 +15,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.exception.BadRequestException;
-import run.halo.app.exception.ForbiddenException;
-import run.halo.app.exception.NotFoundException;
-import run.halo.app.exception.ServiceException;
-import run.halo.app.handler.theme.Group;
-import run.halo.app.handler.theme.ThemeConfigResolvers;
+import run.halo.app.exception.*;
+import run.halo.app.handler.theme.ThemeConfigResolver;
+import run.halo.app.handler.theme.ThemePropertyResolver;
+import run.halo.app.handler.theme.support.Group;
+import run.halo.app.handler.theme.support.ThemeProperty;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
-import run.halo.app.model.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FilenameUtils;
@@ -32,8 +30,6 @@ import run.halo.app.utils.JsonUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,10 +50,16 @@ public class ThemeServiceImpl implements ThemeService {
      * Theme work directory.
      */
     private final Path workDir;
+
     private final OptionService optionService;
+
     private final StringCacheStore cacheStore;
+
     private final Configuration configuration;
-    private final ThemeConfigResolvers resolvers;
+
+    private final ThemeConfigResolver themeConfigResolver;
+
+    private final ThemePropertyResolver themePropertyResolver;
     /**
      * Activated theme id.
      */
@@ -67,12 +69,14 @@ public class ThemeServiceImpl implements ThemeService {
                             OptionService optionService,
                             StringCacheStore cacheStore,
                             Configuration configuration,
-                            ThemeConfigResolvers resolvers) {
+                            ThemeConfigResolver themeConfigResolver,
+                            ThemePropertyResolver themePropertyResolver) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.configuration = configuration;
-        this.resolvers = resolvers;
+        this.themeConfigResolver = themeConfigResolver;
         workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
+        this.themePropertyResolver = themePropertyResolver;
     }
 
     @Override
@@ -89,13 +93,13 @@ public class ThemeServiceImpl implements ThemeService {
         log.debug("Themes type: [{}]", themes.getClass());
         log.debug("Themes: [{}]", themes);
 
-        return themes.stream().filter(themeProperty -> themeProperty.getId().equals(themeId)).findFirst();
+        return themes.stream().filter(themeProperty -> StringUtils.equals(themeProperty.getId(), themeId)).findFirst();
     }
 
     @Override
     public List<ThemeProperty> getThemes() {
         // Fetch themes from cache
-        return cacheStore.get(THEMES_CACHE_KEY).map(themesCache -> {
+        List<ThemeProperty> result = cacheStore.get(THEMES_CACHE_KEY).map(themesCache -> {
             try {
                 // Convert to theme properties
                 ThemeProperty[] themeProperties = JsonUtils.jsonToObject(themesCache, ThemeProperty[].class);
@@ -123,6 +127,8 @@ public class ThemeServiceImpl implements ThemeService {
                 throw new ServiceException("Themes scan failed", e);
             }
         });
+
+        return CollectionUtils.isEmpty(result) ? Collections.emptyList() : result;
     }
 
     @Override
@@ -141,10 +147,9 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public List<String> getCustomTpl(String themeId) {
-        // TODO 这里的参数是有问题的，等待修复。
-        final List<String> templates = new ArrayList<>();
-        final File themePath = new File(getThemeBasePath(), themeId);
-        final File[] themeFiles = themePath.listFiles();
+        List<String> templates = new ArrayList<>();
+        File themePath = new File(getThemeBasePath(), themeId);
+        File[] themeFiles = themePath.listFiles();
         if (null != themeFiles && themeFiles.length > 0) {
             for (File file : themeFiles) {
                 String[] split = StrUtil.removeSuffix(file.getName(), HaloConst.SUFFIX_FTL).split("_");
@@ -245,8 +250,9 @@ public class ThemeServiceImpl implements ThemeService {
 
                 // Read the yaml file
                 String optionContent = new String(Files.readAllBytes(optionsPath));
+
                 // Resolve it
-                return resolvers.resolve(optionContent);
+                return themeConfigResolver.resolve(optionContent);
             }
 
             return Collections.emptyList();
@@ -394,35 +400,47 @@ public class ThemeServiceImpl implements ThemeService {
         }
     }
 
+    @Nullable
+    private Path getPropertyPath(@NonNull Path themePath) {
+        Assert.notNull(themePath, "Theme path must not be null");
+
+        for (String propertyPathName : THEME_PROPERTY_FILE_NAMES) {
+            Path propertyPath = themePath.resolve(propertyPathName);
+
+            log.debug("Attempting to find property file: [{}]", propertyPath);
+            if (Files.exists(propertyPath) && Files.isReadable(propertyPath)) {
+                log.debug("Found property file: [{}]", propertyPath);
+                return propertyPath;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Gets theme property.
      *
      * @param themePath must not be null
      * @return theme property
      */
+    @NonNull
     private ThemeProperty getProperty(@NonNull Path themePath) {
         Assert.notNull(themePath, "Theme path must not be null");
 
-        Path propertyPath = themePath.resolve(THEME_PROPERTY_FILE_NAME);
-        if (!Files.exists(propertyPath)) {
-            return null;
+        Path propertyPath = getPropertyPath(themePath);
+
+        if (propertyPath == null) {
+            throw new ThemePropertyMissingException(themePath + " dose not exist any theme property file").setErrorData(themePath);
         }
 
         try {
-            Properties properties = new Properties();
-            // Load properties
-            properties.load(new InputStreamReader(Files.newInputStream(propertyPath), StandardCharsets.UTF_8));
+            // Get property content
+            String propertyContent = new String(Files.readAllBytes(propertyPath));
 
-            ThemeProperty themeProperty = new ThemeProperty();
-            themeProperty.setId(properties.getProperty("theme.id"));
-            themeProperty.setName(properties.getProperty("theme.name"));
-            themeProperty.setWebsite(properties.getProperty("theme.website"));
-            themeProperty.setDescription(properties.getProperty("theme.description"));
-            themeProperty.setLogo(properties.getProperty("theme.logo"));
-            themeProperty.setVersion(properties.getProperty("theme.version"));
-            themeProperty.setAuthor(properties.getProperty("theme.author"));
-            themeProperty.setAuthorWebsite(properties.getProperty("theme.author.website"));
+            // Resolve the base properties
+            ThemeProperty themeProperty = themePropertyResolver.resolve(propertyContent);
 
+            // Resolve additional properties
             themeProperty.setThemePath(themePath.toString());
             themeProperty.setHasOptions(hasOptions(themePath));
             themeProperty.setActivated(false);
@@ -435,15 +453,14 @@ public class ThemeServiceImpl implements ThemeService {
                             "/",
                             screenshotsName)));
 
-            if (themeProperty.getId().equals(getActivatedThemeId())) {
+            if (StringUtils.equals(themeProperty.getId(), getActivatedThemeId())) {
                 // Set activation
                 themeProperty.setActivated(true);
             }
 
             return themeProperty;
         } catch (IOException e) {
-            // TODO Consider to ignore this error, then return null
-            throw new ServiceException("Failed to load: " + themePath.toString(), e);
+            throw new ThemePropertyMissingException("Cannot resolve theme property", e).setErrorData(propertyPath.toString());
         }
     }
 

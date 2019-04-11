@@ -1,4 +1,4 @@
-package run.halo.app.model.support;
+package run.halo.app.handler.theme.support;
 
 import lombok.Data;
 
@@ -44,12 +44,7 @@ public class ThemeProperty {
     /**
      * Theme author.
      */
-    private String author;
-
-    /**
-     * Theme author website.
-     */
-    private String authorWebsite;
+    private Author author;
 
     /**
      * Folder name.
@@ -70,4 +65,18 @@ public class ThemeProperty {
      * Screenshots url.
      */
     private String screenshots;
+
+    @Data
+    public static class Author {
+
+        /**
+         * Author name.
+         */
+        private String name;
+
+        /**
+         * Author website.
+         */
+        private String website;
+    }
 }
