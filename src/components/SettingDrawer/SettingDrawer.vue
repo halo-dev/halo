@@ -2,13 +2,9 @@
   <div class="setting-drawer" ref="settingDrawer">
     <a-drawer
       width="300"
-      placement="right"
-      :closable="true"
+      closable
       @close="onClose"
       :visible="visible"
-      :getContainer="() => $refs.settingDrawer"
-      :style="{}"
-      :mask="false"
       :zIndex="9999"
     >
       <div class="setting-drawer-index-content">
@@ -168,17 +164,13 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      visible: true,
+      visible: false,
       colorList,
       baseConfig: Object.assign({}, config)
     }
   },
   watch: {},
   mounted() {
-    const vm = this
-    setTimeout(() => {
-      vm.visible = false
-    }, 16)
     // 当主题色不是默认色时，才进行主题编译
     if (this.primaryColor !== config.primaryColor) {
       updateTheme(this.primaryColor)

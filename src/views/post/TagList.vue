@@ -10,10 +10,10 @@
         :style="{ 'padding-bottom': '12px' }">
         <a-card title="添加标签">
           <a-form layout="horizontal">
-            <a-form-item label="名称：" help="*页面上所显示的名称">
+            <a-form-item label="名称：" help="* 页面上所显示的名称">
               <a-input v-model="tagToCreate.name" />
             </a-form-item>
-            <a-form-item label="路径名称：" help="*这是文章路径上显示的名称，最好为英文">
+            <a-form-item label="路径名称：" help="* 这是文章路径上显示的名称，最好为英文">
               <a-input v-model="tagToCreate.slugName" />
             </a-form-item>
             <a-form-item>

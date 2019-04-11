@@ -10,10 +10,10 @@
         :style="{ 'padding-bottom': '12px' }">
         <a-card title="添加菜单">
           <a-form layout="horizontal">
-            <a-form-item label="名称：" help="*页面上所显示的名称">
+            <a-form-item label="名称：" help="* 页面上所显示的名称">
               <a-input v-model="menuToCreate.name" />
             </a-form-item>
-            <a-form-item label="路径：" help="*菜单的路径">
+            <a-form-item label="路径：" help="* 菜单的路径">
               <a-input v-model="menuToCreate.url" />
             </a-form-item>
             <a-form-item label="上级菜单：">
@@ -24,7 +24,7 @@
             <a-form-item label="排序编号：">
               <a-input type="number" v-model="menuToCreate.sort" />
             </a-form-item>
-            <a-form-item label="图标：" help="*请根据主题的支持选填">
+            <a-form-item label="图标：" help="* 请根据主题的支持选填">
               <a-input v-model="menuToCreate.icon" />
             </a-form-item>
             <a-form-item label="打开方式：">

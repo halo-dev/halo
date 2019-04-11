@@ -5,11 +5,20 @@
         <div class="card-container">
           <a-tabs type="card">
             <a-tab-pane tab="内置页面" key="internal">
-              内置页面
+              <a-table :columns="internalColumns" :dataSource="internalPages" :pagination="false">
+                <span slot="action" slot-scope="text, record">
+                  <a href="javascript:;" @click="viewPage(record.id)">查看</a>
+                  <a-divider type="vertical"/>
+                  <router-link :to="{name:'LinkList'}" v-if="record.id==1">
+                    <a href="javascript:void(0);">编辑</a>
+                  </router-link>
+                  <router-link :to="{name:'GalleryList'}" v-if="record.id==2">
+                    <a href="javascript:void(0);">编辑</a>
+                  </router-link>
+                </span>
+              </a-table>
             </a-tab-pane>
-            <a-tab-pane tab="自定义页面" key="custom">
-              自定义页面
-            </a-tab-pane>
+            <a-tab-pane tab="自定义页面" key="custom">自定义页面</a-tab-pane>
           </a-tabs>
         </div>
       </a-col>
@@ -18,7 +27,50 @@
 </template>
 
 <script>
-export default {}
+const internalColumns = [
+  {
+    title: '页面名称',
+    dataIndex: 'name'
+  },
+  {
+    title: '访问路径',
+    dataIndex: 'url'
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    width: '150px',
+    scopedSlots: { customRender: 'action' }
+  }
+]
+const internalPages = [
+  {
+    id: '1',
+    name: '友情链接',
+    url: '/links'
+  },
+  {
+    id: '2',
+    name: '图库页面',
+    url: '/galleries'
+  }
+]
+export default {
+  data() {
+    return {
+      internalColumns,
+      internalPages
+    }
+  },
+  methods: {
+    editPage(id) {
+      this.$message.success('编辑' + id)
+    },
+    viewPage(id) {
+      this.$message.success('查看' + id)
+    }
+  }
+}
 </script>
 
 <style>
