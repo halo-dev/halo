@@ -1,7 +1,13 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+      <a-col
+        :xl="24"
+        :lg="24"
+        :md="24"
+        :sm="24"
+        :xs="24"
+      >
         <a-card>
           <div style="margin-bottom: 16px">
             <a-input
@@ -10,24 +16,47 @@
               placeholder="请输入文章标题"
             />
           </div>
-          <a-button type="primary" @click="showDrawer">发布</a-button>
+          <a-button
+            type="primary"
+            @click="showDrawer"
+          >发布</a-button>
         </a-card>
 
         <a-card>
           <div id="editor">
-            <mavon-editor :toolbars="markdownOption" v-model="value" :boxShadow="false" :ishljs="true"/>
+            <mavon-editor
+              :toolbars="markdownOption"
+              v-model="value"
+              :boxShadow="false"
+              :ishljs="true"
+            />
           </div>
         </a-card>
       </a-col>
 
-      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-drawer title="文章设置" :width="drawerWidth" :closable="true" @close="onClose" :visible="visible">
+      <a-col
+        :xl="24"
+        :lg="24"
+        :md="24"
+        :sm="24"
+        :xs="24"
+      >
+        <a-drawer
+          title="文章设置"
+          :width="drawerWidth"
+          :closable="true"
+          @close="onClose"
+          :visible="visible"
+        >
           <div class="post-setting-drawer-content">
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">基本设置</h3>
               <div class="post-setting-drawer-item">
                 <a-form layout="vertical">
-                  <a-form-item label="文章路径：" :help="'https://localhost:8090/archives/' + postUrl">
+                  <a-form-item
+                    label="文章路径："
+                    :help="'https://localhost:8090/archives/' + postUrl"
+                  >
                     <a-input v-model="postUrl" />
                   </a-form-item>
                   <a-form-item label="文章密码：">
@@ -47,9 +76,7 @@
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">分类目录</h3>
               <div class="post-setting-drawer-item">
-                <a-tree checkable :treeData="treeData" :defaultExpandAll="true">
-                  <span slot="title0010" style="color: #1890ff">sss</span>
-                </a-tree>
+                <category-tree :categories="categories" />
               </div>
             </div>
             <a-divider />
@@ -59,10 +86,15 @@
               <div class="post-setting-drawer-item">
                 <a-form layout="vertical">
                   <a-form-item>
-                    <a-select mode="tags" placeholder="选择或输入标签">
-                      <a-select-option v-for="tag in tags" :key="tag.id" :value="tag.id.toString()">{{
-                        tag.name
-                      }}</a-select-option>
+                    <a-select
+                      mode="tags"
+                      placeholder="选择或输入标签"
+                    >
+                      <a-select-option
+                        v-for="tag in tags"
+                        :key="tag.id"
+                        :value="tag.id.toString()"
+                      >{{ tag.name }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-form>
@@ -74,15 +106,24 @@
               <h3 class="post-setting-drawer-title">缩略图</h3>
               <div class="post-setting-drawer-item">
                 <div class="post-thum">
-                  <img class="img" src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png" />
+                  <img
+                    class="img"
+                    src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+                  />
                 </div>
               </div>
             </div>
             <a-divider />
           </div>
           <div class="postControl">
-            <a-button style="marginRight: 8px" @click="onClose">保存草稿</a-button>
-            <a-button @click="onClose" type="primary">发布</a-button>
+            <a-button
+              style="marginRight: 8px"
+              @click="onClose"
+            >保存草稿</a-button>
+            <a-button
+              @click="onClose"
+              type="primary"
+            >发布</a-button>
           </div>
         </a-drawer>
       </a-col>
@@ -91,10 +132,13 @@
 </template>
 
 <script>
+import CategoryTree from './components/CategoryTree'
 import { mavonEditor } from 'mavon-editor'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
+import categoryApi from '@/api/category'
+
 const toolbars = {
   bold: true, // 粗体
   italic: true, // 斜体
@@ -115,32 +159,11 @@ const toolbars = {
   subfield: true, // 单双栏模式
   preview: true // 预览
 }
-const treeData = [
-  {
-    title: '学习记录',
-    key: '0-0',
-    children: [
-      {
-        title: 'Java 学习',
-        key: '0-0-0',
-        children: [{ title: 'JVM', key: '0-0-0-0' }, { title: 'Spring', key: '0-0-0-1' }]
-      },
-      {
-        title: 'PHP 学习',
-        key: '0-0-1',
-        children: [{ key: '0-0-1-0', title: 'Composer' }, { key: '0-0-1-1', title: 'MySQL' }]
-      }
-    ]
-  },
-  {
-    title: '生活记录',
-    key: '1-0'
-  }
-]
 export default {
   name: 'Editor',
   components: {
-    mavonEditor
+    mavonEditor,
+    CategoryTree
   },
 
   mixins: [mixin, mixinDevice],
@@ -156,7 +179,7 @@ export default {
       drawerWidth: '460',
       postUrl: 'hello-world',
       tags: [],
-      treeData,
+      categories: [],
       markdownOption: toolbars
     }
   },
@@ -169,11 +192,17 @@ export default {
   },
   created() {
     this.loadTags()
+    this.loadCategories()
   },
   methods: {
     loadTags() {
       tagApi.listAll(true).then(response => {
         this.tags = response.data.data
+      })
+    },
+    loadCategories() {
+      categoryApi.listAll().then(response => {
+        this.categories = response.data.data
       })
     },
     showDrawer() {

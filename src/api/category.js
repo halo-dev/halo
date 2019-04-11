@@ -18,7 +18,7 @@ categoryApi.listTree = () => {
   })
 }
 
-categoryApi.create = (category) => {
+categoryApi.create = category => {
   return service({
     url: baseUrl,
     data: category,
@@ -31,6 +31,34 @@ categoryApi.delete = categoryId => {
     url: `${baseUrl}/${categoryId}`,
     method: 'delete'
   })
+}
+
+function concreteTree(parentCategory, categories) {
+  categories.forEach(category => {
+    if (parentCategory.key === category.parentId) {
+      if (!parentCategory.children) {
+        parentCategory.children = []
+      }
+      parentCategory.children.push({
+        key: category.id,
+        title: category.name
+      })
+    }
+  })
+
+  if (parentCategory.children) {
+    parentCategory.children.forEach(category => concreteTree(category, categories))
+  }
+}
+
+categoryApi.concreteTree = categories => {
+  const topCategoryNode = {
+    key: 0,
+    title: 'top',
+    children: []
+  }
+  concreteTree(topCategoryNode, categories)
+  return topCategoryNode.children
 }
 
 export default categoryApi
