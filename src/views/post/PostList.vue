@@ -20,7 +20,6 @@
                 <a-select
                   v-model="queryParam.status"
                   placeholder="请选择文章状态"
-                  defaultValue="0"
                 >
                   <a-select-option
                     v-for="status in Object.keys(postStatus)"

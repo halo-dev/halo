@@ -1,8 +1,16 @@
 const path = require('path')
 const webpack = require('webpack')
+const GenerateAssetPlugin = require('generate-asset-webpack-plugin')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
+}
+
+var createServerConfig = function(compilation) {
+  const configJson = {
+    apiUrl: 'http://localhost:8090'
+  }
+  return JSON.stringify(configJson)
 }
 
 // vue.config.js
@@ -24,7 +32,14 @@ module.exports = {
   configureWebpack: {
     plugins: [
       // Ignore all locale files of moment.js
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+      new GenerateAssetPlugin({
+        filename: 'config.json',
+        fn: (compilation, cb) => {
+          cb(null, createServerConfig(compilation))
+        },
+        extraFiles: []
+      })
     ]
   },
 

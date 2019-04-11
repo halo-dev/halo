@@ -1,7 +1,13 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col :xl="10" :lg="10" :md="10" :sm="24" :xs="24" :style="{ 'padding-bottom': '12px' }">
+      <a-col
+        :xl="10"
+        :lg="10"
+        :md="10"
+        :sm="24"
+        :xs="24"
+        :style="{ 'padding-bottom': '12px' }">
         <a-card :title="title">
           <a-form layout="horizontal">
             <a-form-item label="网站名称：">
@@ -33,7 +39,13 @@
           </a-form>
         </a-card>
       </a-col>
-      <a-col :xl="14" :lg="14" :md="14" :sm="24" :xs="24" :style="{ 'padding-bottom': '12px' }">
+      <a-col
+        :xl="14"
+        :lg="14"
+        :md="14"
+        :sm="24"
+        :xs="24"
+        :style="{ 'padding-bottom': '12px' }">
         <a-card title="所有友情链接">
           <a-table :columns="columns" :dataSource="links" :loading="loading">
             <template slot="url" slot-scope="text">
@@ -119,7 +131,7 @@ export default {
       })
     },
     updateLink() {
-      this.$message.success('编辑' + id)
+      this.$message.success('编辑')
     },
     addLink() {
       this.title = '添加友情链接'
