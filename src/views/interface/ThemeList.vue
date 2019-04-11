@@ -36,81 +36,85 @@
     >
       <a-row :gutter="12" type="flex">
         <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <img
-            v-if="themeProperty"
-            :alt="themeProperty.name"
-            :src="themeProperty.screenshots"
-            width="100%"
-          >
+          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 10}">
+            <img
+              v-if="themeProperty"
+              :alt="themeProperty.name"
+              :src="themeProperty.screenshots"
+              width="100%"
+            >
+          </a-skeleton>
         </a-col>
         <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-tabs defaultActiveKey="0">
-            <a-tab-pane
-              v-for="(group, index) in themeConfiguration"
-              :key="index"
-              :tab="group.label"
-            >
-              <a-form layout="vertical">
-                <a-form-item
-                  v-for="(item, index1) in group.items"
-                  :label="item.label + '：'"
-                  :key="index1"
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-input
-                    v-model="themeSettings[item.name]"
-                    :defaultValue="item.defaultValue"
-                    v-if="item.type == 'TEXT'"
-                  />
-                  <a-input
-                    type="textarea"
-                    :autosize="{ minRows: 5 }"
-                    v-model="themeSettings[item.name]"
-                    v-else-if="item.type == 'TEXTAREA'"
-                  />
-                  <a-radio-group
-                    v-decorator="['radio-group']"
-                    :defaultValue="item.defaultValue"
-                    v-model="themeSettings[item.name]"
-                    v-else-if="item.type == 'RADIO'"
+          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 20}">
+            <a-tabs defaultActiveKey="0">
+              <a-tab-pane
+                v-for="(group, index) in themeConfiguration"
+                :key="index"
+                :tab="group.label"
+              >
+                <a-form layout="vertical">
+                  <a-form-item
+                    v-for="(item, index1) in group.items"
+                    :label="item.label + '：'"
+                    :key="index1"
+                    :wrapper-col="wrapperCol"
                   >
-                    <a-radio
-                      v-for="(option, index2) in item.options"
-                      :key="index2"
-                      :value="option.value"
-                    >{{ option.label }}</a-radio>
-                  </a-radio-group>
-                  <a-select
-                    v-model="themeSettings[item.name]"
-                    :defaultValue="item.defaultValue"
-                    v-else-if="item.type == 'SELECT'"
-                  >
-                    <a-select-option
-                      v-for="option in item.options"
-                      :key="option.value"
-                      :value="option.value"
-                    >{{ option.label }}</a-select-option>
-                  </a-select>
-                </a-form-item>
+                    <a-input
+                      v-model="themeSettings[item.name]"
+                      :defaultValue="item.defaultValue"
+                      v-if="item.type == 'TEXT'"
+                    />
+                    <a-input
+                      type="textarea"
+                      :autosize="{ minRows: 5 }"
+                      v-model="themeSettings[item.name]"
+                      v-else-if="item.type == 'TEXTAREA'"
+                    />
+                    <a-radio-group
+                      v-decorator="['radio-group']"
+                      :defaultValue="item.defaultValue"
+                      v-model="themeSettings[item.name]"
+                      v-else-if="item.type == 'RADIO'"
+                    >
+                      <a-radio
+                        v-for="(option, index2) in item.options"
+                        :key="index2"
+                        :value="option.value"
+                      >{{ option.label }}</a-radio>
+                    </a-radio-group>
+                    <a-select
+                      v-model="themeSettings[item.name]"
+                      :defaultValue="item.defaultValue"
+                      v-else-if="item.type == 'SELECT'"
+                    >
+                      <a-select-option
+                        v-for="option in item.options"
+                        :key="option.value"
+                        :value="option.value"
+                      >{{ option.label }}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item>
+                    <a-button type="primary" @click="saveSettings">保存</a-button>
+                  </a-form-item>
+                </a-form>
+              </a-tab-pane>
+              <a-tab-pane key="about" tab="关于">
                 <a-form-item>
-                  <a-button type="primary" @click="saveSettings">保存</a-button>
+                  <a-popconfirm
+                    :title="'确定删除【' + themeProperty.name + '】主题？'"
+                    @confirm="deleteTheme(themeProperty.id)"
+                    okText="确定"
+                    cancelText="取消"
+                  >
+                    <a-button type="danger">删除该主题</a-button>
+                  </a-popconfirm>
                 </a-form-item>
-              </a-form>
-            </a-tab-pane>
-            <a-tab-pane key="about" tab="关于">
-              <a-form-item>
-                <a-popconfirm
-                  :title="'确定删除【' + themeProperty.name + '】主题？'"
-                  @confirm="deleteTheme(themeProperty.id)"
-                  okText="确定"
-                  cancelText="取消"
-                >
-                  <a-button type="danger">删除该主题</a-button>
-                </a-popconfirm>
-              </a-form-item>
-            </a-tab-pane>
-          </a-tabs>
-        </a-col>
+              </a-tab-pane>
+            </a-tabs>
+            <a-skeleton :loading="optionLoading">
+            </a-skeleton></a-skeleton></a-col>
       </a-row>
     </a-drawer>
   </page-view>
@@ -127,6 +131,7 @@ export default {
   },
   data() {
     return {
+      optionLoading: true,
       wrapperCol: {
         xl: { span: 12 },
         lg: { span: 12 },
@@ -163,6 +168,7 @@ export default {
           that.loadSettings()
           that.getThemeProperty(themeId)
         })
+        that.optionLoading = false
       }, 500)
     },
     activeTheme(theme) {
@@ -196,6 +202,7 @@ export default {
       this.visible = false
       this.themeConfiguration = {}
       this.themeProperty = {}
+      this.optionLoading = true
     }
   }
 }
