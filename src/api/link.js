@@ -19,6 +19,14 @@ linkApi.create = (link) => {
   })
 }
 
+linkApi.update = (linkId, link) => {
+  return service({
+    url: `${baseUrl}/${linkId}`,
+    data: link,
+    method: 'put'
+  })
+}
+
 linkApi.delete = linkId => {
   return service({
     url: `${baseUrl}/${linkId}`,

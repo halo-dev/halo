@@ -2,29 +2,33 @@
   <div class="page-header-index-wide">
     <a-row :gutter="12">
       <a-col :xl="10" :lg="10" :md="10" :sm="24" :xs="24" :style="{ 'padding-bottom': '12px' }">
-        <a-card title="添加友情链接">
+        <a-card :title="title">
           <a-form layout="horizontal">
             <a-form-item label="网站名称：">
-              <a-input v-model="linkToCreate.name"/>
+              <a-input v-model="link.name"/>
             </a-form-item>
             <a-form-item label="网站地址：" help="* 需要加上 http://">
-              <a-input v-model="linkToCreate.url"/>
+              <a-input v-model="link.url"/>
             </a-form-item>
             <a-form-item label="Logo：">
-              <a-input v-model="linkToCreate.logo"/>
+              <a-input v-model="link.logo"/>
             </a-form-item>
             <a-form-item label="分组：" help="* 非必填">
-              <a-input v-model="linkToCreate.team"/>
+              <a-input v-model="link.team"/>
             </a-form-item>
             <a-form-item label="描述：">
               <a-input
                 type="textarea"
                 :autosize="{ minRows: 5 }"
-                v-model="linkToCreate.description"
+                v-model="link.description"
               />
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" @click="createLink">保存</a-button>
+              <a-button type="primary" @click="createLink" v-if="formType==='create'">保存</a-button>
+              <a-button-group v-else>
+                <a-button type="primary" @click="updateLink">更新</a-button>
+                <a-button type="dashed" @click="addLink" v-if="formType==='update'">返回添加</a-button>
+              </a-button-group>
             </a-form-item>
           </a-form>
         </a-card>
@@ -89,11 +93,13 @@ export default {
   },
   data() {
     return {
+      title: '添加友情链接',
+      formType: 'create',
       data: [],
       loading: true,
       columns,
       links: [],
-      linkToCreate: {}
+      link: {}
     }
   },
   created() {
@@ -107,13 +113,21 @@ export default {
       })
     },
     createLink() {
-      linkApi.create(this.linkToCreate).then(response => {
+      linkApi.create(this.link).then(response => {
         this.loadLinks()
-        this.linkToCreate = {}
+        this.link = {}
       })
     },
-    editLink(id) {
+    updateLink() {
       this.$message.success('编辑' + id)
+    },
+    addLink() {
+      this.title = '添加友情链接'
+      this.formType = 'create'
+    },
+    editLink(id) {
+      this.title = '编辑友情链接'
+      this.formType = 'update'
     },
     deleteLink(id) {
       linkApi.delete(id).then(response => {
