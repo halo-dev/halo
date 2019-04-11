@@ -14,14 +14,14 @@
 export default {
   name: 'CategorySelectTree',
   model: {
-    prop: 'value',
+    prop: 'categoryId',
     event: 'change'
   },
   props: {
     /**
      * Category id.
      */
-    value: {
+    categoryId: {
       type: Number,
       required: true,
       default: 0
