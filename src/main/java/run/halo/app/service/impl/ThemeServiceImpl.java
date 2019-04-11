@@ -349,8 +349,8 @@ public class ThemeServiceImpl implements ThemeService {
                 themeFiles.add(themeFile);
             });
 
-            // Sort with name
-            themeFiles.sort(Comparator.comparing(ThemeFile::getName));
+            // Sort with isFile param
+            themeFiles.sort(Comparator.comparing(ThemeFile::getIsFile));
 
             return themeFiles;
         } catch (IOException e) {
