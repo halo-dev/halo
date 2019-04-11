@@ -6,6 +6,7 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.service.CategoryService;
+import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -13,10 +14,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.AlreadyExistsException;
-import run.halo.app.exception.NotFoundException;
-import run.halo.app.repository.CategoryRepository;
-import run.halo.app.service.base.AbstractCrudService;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -34,9 +31,13 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     private final CategoryRepository categoryRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    private final PostCategoryService postCategoryService;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository,
+                               PostCategoryService postCategoryService) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
+        this.postCategoryService = postCategoryService;
     }
 
     /**
@@ -161,5 +162,13 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     public Category getBySlugName(String slugName) {
         return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("The Category does not exist").setErrorData(slugName));
+    }
+
+    @Override
+    public void removeCategoryAndPostCategoryBy(Integer categoryId) {
+        // Remove category
+        removeById(categoryId);
+        // Remove post categories
+        postCategoryService.removeByCategoryId(categoryId);
     }
 }

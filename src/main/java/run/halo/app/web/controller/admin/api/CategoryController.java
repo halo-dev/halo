@@ -9,7 +9,6 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.params.CategoryParam;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.service.CategoryService;
-import run.halo.app.service.PostCategoryService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,11 +27,8 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    private final PostCategoryService postCategoryService;
-
-    public CategoryController(CategoryService categoryService, PostCategoryService postCategoryService) {
+    public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
-        this.postCategoryService = postCategoryService;
     }
 
     @GetMapping
@@ -76,7 +72,6 @@ public class CategoryController {
     @DeleteMapping("{id:\\d+}")
     @ApiOperation("Delete category by id")
     public void deletePermanently(@PathVariable("id") Integer id) {
-        categoryService.removeById(id);
-        postCategoryService.removeByCategoryId(id);
+        categoryService.removeCategoryAndPostCategoryBy(id);
     }
 }

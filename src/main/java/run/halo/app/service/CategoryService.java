@@ -1,10 +1,10 @@
 package run.halo.app.service;
 
-import run.halo.app.model.entity.Category;
-import run.halo.app.model.vo.CategoryVO;
-import run.halo.app.service.base.CrudService;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
+import run.halo.app.model.entity.Category;
+import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.service.base.CrudService;
 
 import java.util.List;
@@ -40,4 +40,12 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * @return Category
      */
     Category getBySlugName(@NonNull String slugName);
+
+    /**
+     * Removes category and post categories.
+     *
+     * @param categoryId category id must not be null
+     */
+    @Transactional
+    void removeCategoryAndPostCategoryBy(Integer categoryId);
 }

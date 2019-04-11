@@ -15,7 +15,7 @@ import java.util.*;
  * Object validation utilities.
  *
  * @author johnniang
- * @data 03/29/19
+ * @date 03/29/19
  */
 public class ValidationUtils {
 
