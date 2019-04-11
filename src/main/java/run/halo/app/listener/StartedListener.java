@@ -1,6 +1,5 @@
 package run.halo.app.listener;
 
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +12,12 @@ import org.springframework.util.ResourceUtils;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.UserParam;
-import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.FileUtils;
-import run.halo.app.utils.HaloUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -163,7 +160,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             // Create theme folder
             Path themePath = themeService.getBasePath();
 
-            if (Files.notExists(themePath)) {
+            if (!haloProperties.getProductionEnv() || Files.notExists(themePath)) {
                 log.info("Copying theme folder from [{}] to [{}]", source, themePath);
 
                 FileUtils.copyFolder(source, themePath);
