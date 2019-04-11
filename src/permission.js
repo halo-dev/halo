@@ -17,7 +17,7 @@ router.beforeEach((to, from, next) => {
   if (Vue.ls.get(ACCESS_TOKEN)) {
     /* has token */
     if (to.path === '/user/login') {
-      next({ path: '/Dashboard' })
+      next({ name: 'Dashboard' })
       NProgress.done()
     } else {
       if (store.getters.roles.length === 0) {
@@ -85,18 +85,16 @@ const action = Vue.directive('action', {
     const actionName = binding.arg
     const roles = store.getters.roles
     const elVal = vnode.context.$route.meta.permission
-    const permissionId = elVal instanceof String && [elVal] || elVal
+    const permissionId = (elVal instanceof String && [elVal]) || elVal
     roles.permissions.forEach(p => {
       if (!permissionId.includes(p.permissionId)) {
         return
       }
       if (p.actionList && !p.actionList.includes(actionName)) {
-        el.parentNode && el.parentNode.removeChild(el) || (el.style.display = 'none')
+        ;(el.parentNode && el.parentNode.removeChild(el)) || (el.style.display = 'none')
       }
     })
   }
 })
 
-export {
-  action
-}
+export { action }
