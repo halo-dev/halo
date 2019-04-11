@@ -7,31 +7,43 @@
         :md="10"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }">
+        :style="{ 'padding-bottom': '12px' }"
+      >
         <a-card title="添加分类目录">
           <a-form layout="horizontal">
-            <a-form-item label="名称：" help="*页面上所显示的名称">
+            <a-form-item
+              label="名称："
+              help="*页面上所显示的名称"
+            >
               <a-input v-model="categoryToCreate.name" />
             </a-form-item>
-            <a-form-item label="路径名称：" help="*这是文章路径上显示的名称，最好为英文">
+            <a-form-item
+              label="路径名称："
+              help="*这是文章路径上显示的名称，最好为英文"
+            >
               <a-input v-model="categoryToCreate.slugNames" />
             </a-form-item>
             <a-form-item label="上级目录：">
-              <a-tree-select
-                :treeData="categoriesTree"
-                placeholder="请选择上级目录，默认为顶级目录"
-                treeDefaultExpandAll
+              <category-select-tree
+                :categories="categories"
                 v-model="categoryToCreate.parentId"
-                :treeDataSimpleMode="true"
-                :allowClear="true"
-              >
-              </a-tree-select>
+              />
             </a-form-item>
-            <a-form-item label="描述：" help="*分类描述，部分主题可显示">
-              <a-input type="textarea" v-model="categoryToCreate.description" :autosize="{ minRows: 3 }" />
+            <a-form-item
+              label="描述："
+              help="*分类描述，部分主题可显示"
+            >
+              <a-input
+                type="textarea"
+                v-model="categoryToCreate.description"
+                :autosize="{ minRows: 3 }"
+              />
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" @click="createCategory">保存</a-button>
+              <a-button
+                type="primary"
+                @click="createCategory"
+              >保存</a-button>
             </a-form-item>
           </a-form>
         </a-card>
@@ -42,14 +54,31 @@
         :md="14"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }">
+        :style="{ 'padding-bottom': '12px' }"
+      >
         <a-card title="所有分类">
-          <a-table :columns="columns" :dataSource="categories" :rowKey="record => record.id" :loading="loading">
-            <ellipsis :length="30" tooltip slot="name" slot-scope="text">
+          <a-table
+            :columns="columns"
+            :dataSource="categories"
+            :rowKey="record => record.id"
+            :loading="loading"
+          >
+            <ellipsis
+              :length="30"
+              tooltip
+              slot="name"
+              slot-scope="text"
+            >
               {{ text }}
             </ellipsis>
-            <span slot="action" slot-scope="text, record">
-              <a href="javascript:;" @click="editCategory(record.id)">编辑</a>
+            <span
+              slot="action"
+              slot-scope="text, record"
+            >
+              <a
+                href="javascript:;"
+                @click="editCategory(record.id)"
+              >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 :title="'你确定要删除【' + record.name + '】分类？'"
@@ -68,6 +97,7 @@
 </template>
 
 <script>
+import CategorySelectTree from './components/CategorySelectTree'
 import categoryApi from '@/api/category'
 
 const columns = [
@@ -94,6 +124,7 @@ const columns = [
   }
 ]
 export default {
+  components: { CategorySelectTree },
   data() {
     return {
       categories: [],
@@ -104,18 +135,6 @@ export default {
   },
   created() {
     this.loadCategories()
-  },
-  computed: {
-    categoriesTree() {
-      return this.categories.map(category => {
-        return {
-          id: category.id,
-          title: category.name,
-          value: category.id.toString(),
-          pId: category.parentId
-        }
-      })
-    }
   },
   methods: {
     loadCategories() {

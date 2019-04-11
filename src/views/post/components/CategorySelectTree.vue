@@ -1,0 +1,59 @@
+<template>
+  <a-tree-select
+    :treeData="categoryTreeData"
+    placeholder="请选择上级目录，默认为顶级目录"
+    treeDefaultExpandAll
+    :treeDataSimpleMode="true"
+    :allowClear="true"
+    @change="handleSelectionChange"
+  >
+  </a-tree-select>
+</template>
+
+<script>
+export default {
+  name: 'CategorySelectTree',
+  model: {
+    prop: 'value',
+    event: 'change'
+  },
+  props: {
+    /**
+     * Category id.
+     */
+    value: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    categories: {
+      type: Array,
+      required: false,
+      default: () => []
+    }
+  },
+  computed: {
+    categoryTreeData() {
+      return this.categories.map(category => {
+        return {
+          id: category.id,
+          title: category.name,
+          value: category.id.toString(),
+          pId: category.parentId
+        }
+      })
+    }
+  },
+  methods: {
+    handleSelectionChange(value, label, extra) {
+      this.$log.debug('value: ', value)
+      this.$log.debug('label: ', label)
+      this.$log.debug('extra: ', extra)
+      this.$emit('change', value ? parseInt(value) : 0)
+    }
+  }
+}
+</script>
+
+<style>
+</style>
