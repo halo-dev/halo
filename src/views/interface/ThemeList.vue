@@ -30,24 +30,21 @@
           >
             <div v-if="theme.activated">
               <a-icon
-                type="check-circle"
+                type="unlock"
                 theme="twoTone"
               />
               激活中
             </div>
-            <div v-else>
-              <a-icon
-                type="setting"
-                @click="handleActivateClick(theme)"
-              />
-              设置
+            <div
+              v-else
+              @click="handleActivateClick(theme)"
+            >
+              <a-icon type="lock" />
+              激活
             </div>
-            <div>
-              <a-icon
-                type="edit"
-                @click="handleEditClick(theme)"
-              />
-              编辑
+            <div @click="handleEditClick(theme)">
+              <a-icon type="setting" />
+              设置
             </div>
             <a-dropdown placement="topCenter">
               <a
@@ -62,13 +59,19 @@
                   :disabled="theme.activated"
                 >
                   <a-popconfirm
+                    v-if="!theme.activated"
                     :title="'确定删除【' + theme.name + '】主题？'"
                     @confirm="deleteTheme(theme.id)"
                     okText="确定"
                     cancelText="取消"
                   >
+                    <a-icon type="delete" />
                     删除
                   </a-popconfirm>
+                  <span v-else>
+                    <a-icon type="delete" />
+                    删除
+                  </span>
                 </a-menu-item>
               </a-menu>
             </a-dropdown>
