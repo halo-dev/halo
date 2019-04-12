@@ -198,7 +198,7 @@ export default {
   computed: {
     publishText() {
       if (this.postToStage.id) {
-        return '更新'
+        return '更新并发布'
       }
       return '创建并发布'
     }
