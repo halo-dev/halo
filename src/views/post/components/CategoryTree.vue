@@ -3,6 +3,7 @@
     checkable
     :treeData="categoryTree"
     :defaultExpandAll="true"
+    :checkedKeys="categoryIds"
     @check="onCheck"
   >
     <span

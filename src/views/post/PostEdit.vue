@@ -221,7 +221,10 @@ export default {
     next(vm => {
       if (postId) {
         postApi.get(postId).then(response => {
-          vm.postToStage = response.data.data
+          const post = response.data.data
+          vm.postToStage = post
+          vm.selectedTagIds = post.tagIds
+          vm.selectedCategoryIds = post.categoryIds
         })
       }
     })
