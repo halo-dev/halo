@@ -74,6 +74,7 @@
           :columns="columns"
           :dataSource="menus"
           :loading="loading"
+          :rowKey="menu => menu.id"
         >
           <ellipsis
             :length="30"
