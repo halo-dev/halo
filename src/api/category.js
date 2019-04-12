@@ -41,13 +41,16 @@ function concreteTree(parentCategory, categories) {
       }
       parentCategory.children.push({
         key: category.id,
-        title: category.name
+        title: category.name,
+        isLeaf: false
       })
     }
   })
 
   if (parentCategory.children) {
     parentCategory.children.forEach(category => concreteTree(category, categories))
+  } else {
+    parentCategory.isLeaf = true
   }
 }
 

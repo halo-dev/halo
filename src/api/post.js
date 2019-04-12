@@ -19,6 +19,22 @@ postApi.query = params => {
   })
 }
 
+postApi.create = postToCreate => {
+  return service({
+    url: baseUrl,
+    method: 'post',
+    data: postToCreate
+  })
+}
+
+postApi.update = (postId, postToUpdate) => {
+  return service({
+    url: `${baseUrl}/${postId}`,
+    method: 'put',
+    data: postToUpdate
+  })
+}
+
 postApi.postStatus = {
   PUBLISHED: {
     color: 'green',

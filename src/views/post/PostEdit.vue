@@ -11,6 +11,7 @@
         <a-card>
           <div style="margin-bottom: 16px">
             <a-input
+              v-model="postToStage.title"
               v-decorator="['title', { rules: [{ required: true, message: '请输入文章标题' }] }]"
               size="large"
               placeholder="请输入文章标题"
@@ -26,7 +27,7 @@
           <div id="editor">
             <mavon-editor
               :toolbars="markdownOption"
-              v-model="value"
+              v-model="postToStage.originalContent"
               :boxShadow="false"
               :ishljs="true"
             />
@@ -55,18 +56,21 @@
                 <a-form layout="vertical">
                   <a-form-item
                     label="文章路径："
-                    :help="'https://localhost:8090/archives/' + postUrl"
+                    :help="'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
                   >
-                    <a-input v-model="postUrl" />
+                    <a-input v-model="postToStage.url" />
                   </a-form-item>
                   <a-form-item label="文章密码：">
                     <a-input type="password" />
                   </a-form-item>
-                  <a-form-item label="是否开启评论：">
-                    <a-select defaultValue="1">
-                      <a-select-option value="1">是</a-select-option>
-                      <a-select-option value="0">否</a-select-option>
-                    </a-select>
+                  <a-form-item label="是否关闭评论：">
+                    <a-radio-group
+                      v-model="postToStage.disallowComment"
+                      :defaultValue="false"
+                    >
+                      <a-radio :value="false">开启</a-radio>
+                      <a-radio :value="true">关闭</a-radio>
+                    </a-radio-group>
                   </a-form-item>
                 </a-form>
               </div>
@@ -76,7 +80,10 @@
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">分类目录</h3>
               <div class="post-setting-drawer-item">
-                <category-tree :categories="categories" />
+                <category-tree
+                  v-model="selectedCategoryIds"
+                  :categories="categories"
+                />
               </div>
             </div>
             <a-divider />
@@ -87,13 +94,15 @@
                 <a-form layout="vertical">
                   <a-form-item>
                     <a-select
-                      mode="tags"
+                      v-model="selectedTagIds"
+                      allowClear
+                      mode="multiple"
                       placeholder="选择或输入标签"
                     >
                       <a-select-option
                         v-for="tag in tags"
                         :key="tag.id"
-                        :value="tag.id.toString()"
+                        :value="tag.id"
                       >{{ tag.name }}</a-select-option>
                     </a-select>
                   </a-form-item>
@@ -118,12 +127,12 @@
           <div class="postControl">
             <a-button
               style="marginRight: 8px"
-              @click="onClose"
+              @click="handleDraftClick"
             >保存草稿</a-button>
             <a-button
-              @click="onClose"
+              @click="handlePublishClick"
               type="primary"
-            >发布</a-button>
+            >{{ publishText }}</a-button>
           </div>
         </a-drawer>
       </a-col>
@@ -138,6 +147,7 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
+import postApi from '@/api/post'
 
 const toolbars = {
   bold: true, // 粗体
@@ -177,10 +187,20 @@ export default {
       value: 'Hello World',
       visible: false,
       drawerWidth: '460',
-      postUrl: 'hello-world',
       tags: [],
       categories: [],
-      markdownOption: toolbars
+      selectedCategoryIds: [],
+      selectedTagIds: [],
+      markdownOption: toolbars,
+      postToStage: {}
+    }
+  },
+  computed: {
+    publishText() {
+      if (this.postToStage.id) {
+        return '更新'
+      }
+      return '创建并发布'
     }
   },
   mounted() {
@@ -205,8 +225,37 @@ export default {
         this.categories = response.data.data
       })
     },
+    createOrUpdatePost() {
+      // Set category ids
+      this.postToStage.categoryIds = this.selectedCategoryIds
+      // Set tag ids
+      this.postToStage.tagIds = this.selectedTagIds
+
+      if (this.postToStage.id) {
+        // Update the post
+        postApi.update(this.postToStage.id, this.postToStage).then(response => {
+          this.$log.debug('Updated post', response.data.data)
+          this.$message.success('文章更新成功')
+        })
+      } else {
+        // Create the post
+        postApi.create(this.postToStage).then(response => {
+          this.$log.debug('Created post', response.data.data)
+          this.$message.success('文章创建成功')
+          this.postToStage.id = response.data.data.id
+        })
+      }
+    },
     showDrawer() {
       this.visible = true
+    },
+    handlePublishClick() {
+      this.postToStage.status = 'PUBLISHED'
+      this.createOrUpdatePost()
+    },
+    handleDraftClick() {
+      this.postToStage.status = 'DRAFT'
+      this.createOrUpdatePost()
     },
     onClose() {
       this.visible = false
