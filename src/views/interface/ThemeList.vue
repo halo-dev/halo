@@ -1,5 +1,6 @@
 <template>
-  <page-view>
+  <div>
+
     <a-row
       :gutter="12"
       type="flex"
@@ -165,15 +166,13 @@
         </a-col>
       </a-row>
     </a-drawer>
-  </page-view>
+  </div>
 </template>
 
 <script>
-import { PageView } from '@/layouts'
 import themeApi from '@/api/theme'
 
 export default {
-  components: { PageView },
   data() {
     return {
       optionLoading: true,

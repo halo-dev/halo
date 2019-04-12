@@ -2,7 +2,6 @@
 import { BasicLayout, RouteView, BlankLayout, PageView } from '@/layouts'
 
 export const asyncRouterMap = [
-
   {
     path: '/',
     name: 'index',
@@ -10,7 +9,6 @@ export const asyncRouterMap = [
     meta: { title: '首页' },
     redirect: '/dashboard',
     children: [
-
       // dashboard
       {
         path: '/dashboard',
@@ -111,7 +109,7 @@ export const asyncRouterMap = [
       {
         path: '/interface',
         name: 'Interface',
-        component: RouteView,
+        component: PageView,
         redirect: '/interface/themes',
         meta: { title: '外观', icon: 'skin' },
         children: [
@@ -184,7 +182,9 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '*', redirect: '/404', hidden: true
+    path: '*',
+    redirect: '/404',
+    hidden: true
   }
 ]
 
