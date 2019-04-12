@@ -78,5 +78,10 @@ public class ThemeProperty {
          * Author website.
          */
         private String website;
+
+        /**
+         * Author avatar.
+         */
+        private String avatar;
     }
 }
