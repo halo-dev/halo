@@ -214,6 +214,18 @@ export default {
     this.loadTags()
     this.loadCategories()
   },
+  beforeRouteEnter(to, from, next) {
+    // Get post id from query
+    const postId = to.query.postId
+
+    next(vm => {
+      if (postId) {
+        postApi.get(postId).then(response => {
+          vm.postToStage = response.data.data
+        })
+      }
+    })
+  },
   methods: {
     loadTags() {
       tagApi.listAll(true).then(response => {
@@ -242,7 +254,7 @@ export default {
         postApi.create(this.postToStage).then(response => {
           this.$log.debug('Created post', response.data.data)
           this.$message.success('文章创建成功')
-          this.postToStage.id = response.data.data.id
+          this.postToStage = response.data.data
         })
       }
     },

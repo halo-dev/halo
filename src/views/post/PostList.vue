@@ -149,16 +149,16 @@
 
           <span
             slot="action"
-            slot-scope="text, record"
+            slot-scope="text, post"
           >
             <a
               href="javascript:;"
-              @click="editPost(record.id)"
+              @click="onEditClick(post)"
             >编辑</a>
             <a-divider type="vertical" />
             <a
               href="javascript:;"
-              @click="deletePost(record.id)"
+              @click="deletePost(post.id)"
             >删除</a>
           </span>
         </a-table>
@@ -294,8 +294,8 @@ export default {
         this.categories = response.data.data
       })
     },
-    editPost(id) {
-      this.$message.success('编辑')
+    onEditClick(post) {
+      this.$router.push({ name: 'PostEdit', query: { postId: post.id } })
     },
     deletePost(id) {
       this.$message.success('删除')

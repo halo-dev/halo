@@ -19,6 +19,13 @@ postApi.query = params => {
   })
 }
 
+postApi.get = postId => {
+  return service({
+    url: `${baseUrl}/${postId}`,
+    method: 'get'
+  })
+}
+
 postApi.create = postToCreate => {
   return service({
     url: baseUrl,
