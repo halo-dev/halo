@@ -1,6 +1,10 @@
 <template>
   <page-view>
-    <a-row :gutter="12" type="flex" align="middle">
+    <a-row
+      :gutter="12"
+      type="flex"
+      align="middle"
+    >
       <a-col
         class="theme-item"
         :xl="6"
@@ -12,14 +16,29 @@
         :key="index"
       >
         <a-card :bodyStyle="{ padding: '14px' }">
-          <img :alt="theme.name" :src="theme.screenshots" slot="cover">
+          <img
+            :alt="theme.name"
+            :src="theme.screenshots"
+            slot="cover"
+          >
           <a-divider></a-divider>
           <div class="theme-control">
             <span class="theme-title">{{ theme.name }}</span>
             <a-button-group class="theme-button">
-              <a-button type="primary" v-if="theme.activated" disabled>已启用</a-button>
-              <a-button type="primary" @click="activeTheme(theme.id)" v-else>启用</a-button>
-              <a-button @click="settingDrawer(theme.id)" v-if="theme.hasOptions">设置</a-button>
+              <a-button
+                type="primary"
+                v-if="theme.activated"
+                disabled
+              >已启用</a-button>
+              <a-button
+                type="primary"
+                @click="activeTheme(theme.id)"
+                v-else
+              >启用</a-button>
+              <a-button
+                @click="settingDrawer(theme)"
+                v-if="theme.hasOptions"
+              >设置</a-button>
             </a-button-group>
           </div>
         </a-card>
@@ -34,9 +53,22 @@
       :visible="visible"
       destroyOnClose
     >
-      <a-row :gutter="12" type="flex">
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 10}">
+      <a-row
+        :gutter="12"
+        type="flex"
+      >
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 10}"
+          >
             <img
               v-if="themeProperty"
               :alt="themeProperty.name"
@@ -45,12 +77,22 @@
             >
           </a-skeleton>
         </a-col>
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 20}">
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 20}"
+          >
             <a-tabs defaultActiveKey="0">
               <a-tab-pane
                 v-for="(group, index) in themeConfiguration"
-                :key="index"
+                :key="index.toString()"
                 :tab="group.label"
               >
                 <a-form layout="vertical">
@@ -96,11 +138,17 @@
                     </a-select>
                   </a-form-item>
                   <a-form-item>
-                    <a-button type="primary" @click="saveSettings">保存</a-button>
+                    <a-button
+                      type="primary"
+                      @click="saveSettings"
+                    >保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
-              <a-tab-pane key="about" tab="关于">
+              <a-tab-pane
+                key="about"
+                tab="关于"
+              >
                 <a-form-item>
                   <a-popconfirm
                     :title="'确定删除【' + themeProperty.name + '】主题？'"
@@ -113,8 +161,8 @@
                 </a-form-item>
               </a-tab-pane>
             </a-tabs>
-            <a-skeleton :loading="optionLoading">
-            </a-skeleton></a-skeleton></a-col>
+          </a-skeleton>
+        </a-col>
       </a-row>
     </a-drawer>
   </page-view>
@@ -123,12 +171,9 @@
 <script>
 import { PageView } from '@/layouts'
 import themeApi from '@/api/theme'
-import { setTimeout } from 'timers'
 
 export default {
-  components: {
-    PageView
-  },
+  components: { PageView },
   data() {
     return {
       optionLoading: true,
@@ -140,9 +185,9 @@ export default {
       },
       themes: [],
       visible: false,
-      themeConfiguration: {},
-      themeSettings: {},
-      themeProperty: {}
+      themeConfiguration: null,
+      themeSettings: [],
+      themeProperty: null
     }
   },
   computed: {
@@ -159,17 +204,21 @@ export default {
         this.themes = response.data.data
       })
     },
-    settingDrawer(themeId) {
+    settingDrawer(theme) {
       this.visible = true
-      var that = this
-      setTimeout(function() {
-        themeApi.fetchConfiguration(themeId).then(response => {
-          that.themeConfiguration = response.data.data
-          that.loadSettings()
-          that.getThemeProperty(themeId)
+      this.optionLoading = true
+      this.themeProperty = theme
+
+      setTimeout(() => {
+        themeApi.fetchConfiguration(theme.id).then(response => {
+          this.themeConfiguration = response.data.data
+          themeApi.fetchSettings().then(response => {
+            this.themeSettings = response.data.data
+            this.visible = true
+            this.optionLoading = false
+          })
         })
-        that.optionLoading = false
-      }, 500)
+      }, 300)
     },
     activeTheme(theme) {
       themeApi.active(theme).then(response => {
@@ -188,11 +237,6 @@ export default {
         this.$message.success('保存成功！')
       })
     },
-    loadSettings() {
-      themeApi.fetchSettings().then(response => {
-        this.themeSettings = response.data.data
-      })
-    },
     getThemeProperty(themeId) {
       themeApi.getProperty(themeId).then(response => {
         this.themeProperty = response.data.data
@@ -200,9 +244,9 @@ export default {
     },
     onClose() {
       this.visible = false
-      this.themeConfiguration = {}
-      this.themeProperty = {}
-      this.optionLoading = true
+      this.optionLoading = false
+      this.themeConfiguration = null
+      this.themeProperty = null
     }
   }
 }
