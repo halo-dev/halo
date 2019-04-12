@@ -169,7 +169,7 @@ export default {
 }
 </script>
 
-<sty\le scoped>
+<style scoped>
 .category-tree {
   margin-top: 1rem;
 }
