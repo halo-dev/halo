@@ -1,13 +1,12 @@
 package run.halo.app.service;
 
-import run.halo.app.exception.FileOperationException;
-import run.halo.app.model.dto.AttachmentOutputDTO;
-import run.halo.app.model.entity.Attachment;
-import run.halo.app.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.exception.FileOperationException;
+import run.halo.app.model.dto.AttachmentOutputDTO;
+import run.halo.app.model.entity.Attachment;
 import run.halo.app.service.base.CrudService;
 
 
@@ -45,4 +44,13 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      */
     @NonNull
     Attachment removePermanently(@NonNull Integer id);
+
+    /**
+     * Converts to attachment output dto.
+     *
+     * @param attachment attachment must not be null
+     * @return an attachment output dto
+     */
+    @NonNull
+    AttachmentOutputDTO convertToDto(@NonNull Attachment attachment);
 }
