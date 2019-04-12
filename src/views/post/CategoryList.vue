@@ -54,9 +54,9 @@
         :md="14"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        :style="{ 'padding-bottom': '1rem' }"
       >
-        <a-card title="所有分类">
+        <a-card title="分类列表">
           <a-table
             :columns="columns"
             :dataSource="categories"
@@ -91,6 +91,12 @@
             </span>
           </a-table>
         </a-card>
+        <a-card
+          title="分类树"
+          class="category-tree"
+        >
+          <category-tree :categories="categories" />
+        </a-card>
       </a-col>
     </a-row>
   </div>
@@ -98,6 +104,7 @@
 
 <script>
 import CategorySelectTree from './components/CategorySelectTree'
+import CategoryTree from './components/CategoryTree'
 import categoryApi from '@/api/category'
 
 const columns = [
@@ -124,7 +131,7 @@ const columns = [
   }
 ]
 export default {
-  components: { CategorySelectTree },
+  components: { CategorySelectTree, CategoryTree },
   data() {
     return {
       categories: [],
@@ -162,5 +169,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<sty\le scoped>
+.category-tree {
+  margin-top: 1rem;
+}
 </style>
