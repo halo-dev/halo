@@ -1,10 +1,6 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
+    <a-row :gutter="12" type="flex" align="middle">
       <a-col
         class="theme-item"
         :xl="6"
@@ -16,29 +12,14 @@
         :key="index"
       >
         <a-card :bodyStyle="{ padding: '14px' }">
-          <img
-            :alt="theme.name"
-            :src="theme.screenshots"
-            slot="cover"
-          >
+          <img :alt="theme.name" :src="theme.screenshots" slot="cover">
           <a-divider></a-divider>
           <div class="theme-control">
             <span class="theme-title">{{ theme.name }}</span>
             <a-button-group class="theme-button">
-              <a-button
-                type="primary"
-                v-if="theme.activated"
-                disabled
-              >已启用</a-button>
-              <a-button
-                type="primary"
-                @click="activeTheme(theme.id)"
-                v-else
-              >启用</a-button>
-              <a-button
-                @click="settingDrawer(theme)"
-                v-if="theme.hasOptions"
-              >设置</a-button>
+              <a-button type="primary" v-if="theme.activated" disabled>已启用</a-button>
+              <a-button type="primary" @click="activeTheme(theme.id)" v-else>启用</a-button>
+              <a-button @click="settingDrawer(theme)" v-if="theme.hasOptions">设置</a-button>
             </a-button-group>
           </div>
         </a-card>
@@ -53,22 +34,9 @@
       :visible="visible"
       destroyOnClose
     >
-      <a-row
-        :gutter="12"
-        type="flex"
-      >
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-        >
-          <a-skeleton
-            active
-            :loading="optionLoading"
-            :paragraph="{rows: 10}"
-          >
+      <a-row :gutter="12" type="flex">
+        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 10}">
             <img
               v-if="themeProperty"
               :alt="themeProperty.name"
@@ -77,18 +45,8 @@
             >
           </a-skeleton>
         </a-col>
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-        >
-          <a-skeleton
-            active
-            :loading="optionLoading"
-            :paragraph="{rows: 20}"
-          >
+        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 20}">
             <a-tabs defaultActiveKey="0">
               <a-tab-pane
                 v-for="(group, index) in themeConfiguration"
@@ -138,17 +96,11 @@
                     </a-select>
                   </a-form-item>
                   <a-form-item>
-                    <a-button
-                      type="primary"
-                      @click="saveSettings"
-                    >保存</a-button>
+                    <a-button type="primary" @click="saveSettings">保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
-              <a-tab-pane
-                key="about"
-                tab="关于"
-              >
+              <a-tab-pane key="about" tab="关于">
                 <a-form-item>
                   <a-popconfirm
                     :title="'确定删除【' + themeProperty.name + '】主题？'"
@@ -165,6 +117,26 @@
         </a-col>
       </a-row>
     </a-drawer>
+    <div class="upload-button">
+      <a-button type="primary" shape="circle" icon="plus" size="large" @click="showUploadModal"></a-button>
+    </div>
+    <a-modal title="上传主题" v-model="uploadVisible" :footer="null">
+      <a-upload-dragger
+        name="file"
+        :multiple="true"
+        action="http://localhost:8090/admin/api/attachments/uploads"
+        @change="handleChange"
+        accept=".zip"
+      >
+        <p class="ant-upload-drag-icon">
+          <a-icon type="inbox"/>
+        </p>
+        <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
+        <p
+          class="ant-upload-hint"
+        >支持单个或批量上传，仅支持 ZIP 格式的文件</p>
+      </a-upload-dragger>
+    </a-modal>
   </div>
 </template>
 
@@ -175,6 +147,7 @@ export default {
   data() {
     return {
       optionLoading: true,
+      uploadVisible: false,
       wrapperCol: {
         xl: { span: 12 },
         lg: { span: 12 },
@@ -245,6 +218,20 @@ export default {
       this.optionLoading = false
       this.themeConfiguration = null
       this.themeProperty = null
+    },
+    showUploadModal() {
+      this.uploadVisible = true
+    },
+    handleChange(info) {
+      const status = info.file.status
+      if (status !== 'uploading') {
+        console.log(info.file, info.fileList)
+      }
+      if (status === 'done') {
+        this.$message.success(`${info.file.name} file uploaded successfully.`)
+      } else if (status === 'error') {
+        this.$message.error(`${info.file.name} file upload failed.`)
+      }
     }
   }
 }
@@ -265,5 +252,11 @@ export default {
 
 .theme-item .theme-control .theme-button {
   float: right;
+}
+
+.upload-button {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
 }
 </style>
