@@ -1,5 +1,13 @@
 package run.halo.app.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.file.FileHandlers;
 import run.halo.app.model.dto.AttachmentOutputDTO;
 import run.halo.app.model.entity.Attachment;
@@ -10,15 +18,8 @@ import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
-import run.halo.app.handler.file.FileHandlers;
-import run.halo.app.service.base.AbstractCrudService;
+
+import java.util.Objects;
 
 /**
  * AttachmentService implementation class
@@ -53,7 +54,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         Page<Attachment> attachmentPage = listAll(pageable);
 
         // Convert and return
-        return attachmentPage.map(attachment -> new AttachmentOutputDTO().convertFrom(attachment));
+        return attachmentPage.map(this::convertToDto);
     }
 
     @Override
@@ -100,6 +101,29 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         log.debug("Deleted attachment: [{}]", deletedAttachment);
 
         return deletedAttachment;
+    }
+
+    @Override
+    public AttachmentOutputDTO convertToDto(Attachment attachment) {
+        Assert.notNull(attachment, "Attachment must not be null");
+
+        // Get blog base url
+        String blogBaseUrl = optionService.getBlogBaseUrl();
+
+        // Convert to output dto
+        AttachmentOutputDTO attachmentOutputDTO = new AttachmentOutputDTO().convertFrom(attachment);
+
+        if (Objects.equals(attachmentOutputDTO.getType(), AttachmentType.LOCAL)) {
+            // Append blog base url to path and thumbnail
+            String fullPath = StringUtils.join(blogBaseUrl, "/", attachmentOutputDTO.getPath());
+            String fullThumbPath = StringUtils.join(blogBaseUrl, "/", attachmentOutputDTO.getThumbPath());
+
+            // Set full path and full thumb path
+            attachmentOutputDTO.setPath(fullPath);
+            attachmentOutputDTO.setThumbPath(fullThumbPath);
+        }
+
+        return attachmentOutputDTO;
     }
 
     /**

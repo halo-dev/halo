@@ -1,5 +1,7 @@
 package run.halo.app.model.dto.base;
 
+import org.springframework.lang.NonNull;
+
 import static run.halo.app.utils.BeanUtils.updateProperties;
 
 /**
@@ -20,6 +22,7 @@ public interface OutputConverter<DTO extends OutputConverter<DTO, DOMAIN>, DOMAI
      * @return converted dto data
      */
     @SuppressWarnings("unchecked")
+    @NonNull
     default <T extends DTO> T convertFrom(DOMAIN domain) {
 
         updateProperties(domain, this);
