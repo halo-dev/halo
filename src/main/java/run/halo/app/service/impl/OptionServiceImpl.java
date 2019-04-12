@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionOutputDTO;
 import run.halo.app.model.entity.Option;
@@ -16,6 +17,7 @@ import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.properties.*;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.ThemeService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
@@ -40,11 +42,15 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     private final ApplicationContext applicationContext;
 
+    private final StringCacheStore cacheStore;
+
     public OptionServiceImpl(OptionRepository optionRepository,
-                             ApplicationContext applicationContext) {
+                             ApplicationContext applicationContext,
+                             StringCacheStore cacheStore) {
         super(optionRepository);
         this.optionRepository = optionRepository;
         this.applicationContext = applicationContext;
+        this.cacheStore = cacheStore;
     }
 
     @Override
@@ -77,6 +83,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         Option savedOption = optionRepository.save(option);
 
         log.debug("Saved option: [{}]", savedOption);
+
+        cacheStore.delete(ThemeService.THEMES_CACHE_KEY);
     }
 
     @Override
