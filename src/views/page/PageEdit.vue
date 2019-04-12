@@ -5,6 +5,7 @@
         <a-card>
           <div style="margin-bottom: 16px">
             <a-input
+              v-model="postToStage.title"
               v-decorator="['title', { rules: [{ required: true, message: '请输入页面标题' }] }]"
               size="large"
               placeholder="请输入页面标题"
@@ -15,7 +16,7 @@
 
         <a-card>
           <div id="editor">
-            <mavon-editor v-model="value"/>
+            <mavon-editor v-model="postToStage.originalContent"/>
           </div>
         </a-card>
       </a-col>
@@ -33,20 +34,23 @@
               <h3 class="post-setting-drawer-title">基本设置</h3>
               <div class="post-setting-drawer-item">
                 <a-form layout="vertical">
-                  <a-form-item label="页面路径：" :help="'https://localhost:8090/p/'+postUrl">
-                    <a-input v-model="postUrl"/>
+                  <a-form-item label="页面路径：" :help="'https://localhost:8090/p/'+ (postToStage.url ? postToStage.url : '{auto_generate}')">
+                    <a-input v-model="postToStage.url"/>
                   </a-form-item>
                   <a-form-item label="页面密码：">
-                    <a-input type="password"/>
+                    <a-input type="password" v-model="postToStage.password"/>
                   </a-form-item>
-                  <a-form-item label="是否开启评论：">
-                    <a-select defaultValue="1">
-                      <a-select-option value="1">是</a-select-option>
-                      <a-select-option value="0">否</a-select-option>
-                    </a-select>
+                  <a-form-item label="是否关闭评论：">
+                    <a-radio-group
+                      v-model="postToStage.disallowComment"
+                      :defaultValue="false"
+                    >
+                      <a-radio :value="false">开启</a-radio>
+                      <a-radio :value="true">关闭</a-radio>
+                    </a-radio-group>
                   </a-form-item>
                   <a-form-item label="自定义模板：">
-                    <a-select>
+                    <a-select v-model="postToStage.template">
                       <a-select-option v-for="tpl in customTpls" :key="tpl" :value="tpl">{{ tpl }}</a-select-option>
                     </a-select>
                   </a-form-item>
@@ -66,8 +70,8 @@
             <a-divider/>
           </div>
           <div class="postControl">
-            <a-button style="marginRight: 8px" @click="onClose">保存草稿</a-button>
-            <a-button @click="onClose" type="primary">发布</a-button>
+            <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
+            <a-button type="primary" @click="handlePublishClick">{{ publishText }}</a-button>
           </div>
         </a-drawer>
       </a-col>
@@ -79,7 +83,8 @@
 import { mavonEditor } from 'mavon-editor'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
-import tagApi from '@/api/theme'
+import postApi from '@/api/post'
+import themeApi from '@/api/theme'
 export default {
   name: 'Editor',
   components: {
@@ -94,11 +99,19 @@ export default {
         sm: { span: 24 },
         xs: { span: 24 }
       },
-      value: 'Hello World',
       visible: false,
       drawerWidth: '460',
       postUrl: 'hello-world',
-      customTpls: []
+      customTpls: [],
+      postToStage: {}
+    }
+  },
+  computed: {
+    publishText() {
+      if (this.postToStage.id) {
+        return '更新并发布'
+      }
+      return '创建并发布'
     }
   },
   mounted() {
@@ -111,14 +124,53 @@ export default {
   created() {
     this.loadCustomTpls()
   },
+  beforeRouteEnter(to, from, next) {
+    // Get post id from query
+    const postId = to.query.postId
+
+    next(vm => {
+      if (postId) {
+        postApi.get(postId).then(response => {
+          const post = response.data.data
+          vm.postToStage = post
+          vm.selectedTagIds = post.tagIds
+          vm.selectedCategoryIds = post.categoryIds
+        })
+      }
+    })
+  },
   methods: {
     loadCustomTpls() {
-      tagApi.customTpls().then(response => {
+      themeApi.customTpls().then(response => {
         this.customTpls = response.data.data
       })
     },
     showDrawer() {
       this.visible = true
+    },
+    handlePublishClick() {
+      this.postToStage.status = 'PUBLISHED'
+      this.createOrUpdatePost()
+    },
+    handleDraftClick() {
+      this.postToStage.status = 'DRAFT'
+      this.createOrUpdatePost()
+    },
+    createOrUpdatePost() {
+      if (this.postToStage.id) {
+        // Update the post
+        postApi.update(this.postToStage.id, this.postToStage).then(response => {
+          this.$log.debug('Updated post', response.data.data)
+          this.$message.success('页面更新成功')
+        })
+      } else {
+        // Create the post
+        postApi.create(this.postToStage).then(response => {
+          this.$log.debug('Created post', response.data.data)
+          this.$message.success('页面创建成功')
+          this.postToStage = response.data.data
+        })
+      }
     },
     onClose() {
       this.visible = false
