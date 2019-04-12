@@ -1,6 +1,10 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row :gutter="12" type="flex" align="middle">
+    <a-row
+      :gutter="12"
+      type="flex"
+      align="middle"
+    >
       <a-col
         class="theme-item"
         :xl="6"
@@ -11,19 +15,67 @@
         v-for="(theme, index) in themes"
         :key="index"
       >
-        <a-card :bodyStyle="{ padding: '14px' }">
-          <img :alt="theme.name" :src="theme.screenshots" slot="cover">
-          <a-divider></a-divider>
-          <div class="theme-control">
-            <span class="theme-title">{{ theme.name }}</span>
-            <a-button-group class="theme-button">
-              <a-button type="primary" v-if="theme.activated" disabled>已启用</a-button>
-              <a-button type="primary" @click="activeTheme(theme.id)" v-else>启用</a-button>
-              <a-button @click="settingDrawer(theme)" v-if="theme.hasOptions">设置</a-button>
-            </a-button-group>
-          </div>
+        <a-card
+          hoverable
+          :title="theme.name"
+        >
+          <img
+            :alt="theme.name"
+            :src="theme.screenshots"
+            slot="cover"
+          />
+          <template
+            class="ant-card-actions"
+            slot="actions"
+          >
+            <div v-if="theme.activated">
+              <a-icon
+                type="check-circle"
+                theme="twoTone"
+              />
+              激活中
+            </div>
+            <div v-else>
+              <a-icon
+                type="setting"
+                @click="handleActivateClick(theme)"
+              />
+              设置
+            </div>
+            <div>
+              <a-icon
+                type="edit"
+                @click="handleEditClick(theme)"
+              />
+              编辑
+            </div>
+            <a-dropdown placement="topCenter">
+              <a
+                class="ant-dropdown-link"
+                href="#"
+              >
+                <a-icon type="ellipsis" /> 更多
+              </a>
+              <a-menu slot="overlay">
+                <a-menu-item
+                  :key="1"
+                  :disabled="theme.activated"
+                >
+                  <a-popconfirm
+                    :title="'确定删除【' + theme.name + '】主题？'"
+                    @confirm="deleteTheme(theme.id)"
+                    okText="确定"
+                    cancelText="取消"
+                  >
+                    删除
+                  </a-popconfirm>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </template>
         </a-card>
       </a-col>
+
     </a-row>
     <a-drawer
       v-if="themeProperty"
@@ -34,19 +86,59 @@
       :visible="visible"
       destroyOnClose
     >
-      <a-row :gutter="12" type="flex">
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 10}">
-            <img
-              v-if="themeProperty"
-              :alt="themeProperty.name"
-              :src="themeProperty.screenshots"
-              width="100%"
-            >
+      <a-row
+        :gutter="12"
+        type="flex"
+      >
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 10}"
+          >
+            <a-card hoverable>
+              <img
+                :alt="themeProperty.name"
+                :src="themeProperty.screenshots"
+                slot="cover"
+              />
+              <a-card-meta
+                :title="themeProperty.name"
+                :description="themeProperty.description"
+              >
+                <a-avatar
+                  v-if="themeProperty.author.avatar"
+                  :src="themeProperty.author.avatar"
+                  size="large"
+                  slot="avatar"
+                />
+                <a-avatar
+                  v-else
+                  size="large"
+                  slot="avatar"
+                >{{ themeProperty.author.name }}</a-avatar>
+              </a-card-meta>
+            </a-card>
           </a-skeleton>
         </a-col>
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 20}">
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 20}"
+          >
             <a-tabs defaultActiveKey="0">
               <a-tab-pane
                 v-for="(group, index) in themeConfiguration"
@@ -96,11 +188,17 @@
                     </a-select>
                   </a-form-item>
                   <a-form-item>
-                    <a-button type="primary" @click="saveSettings">保存</a-button>
+                    <a-button
+                      type="primary"
+                      @click="saveSettings"
+                    >保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
-              <a-tab-pane key="about" tab="关于">
+              <a-tab-pane
+                key="about"
+                tab="关于"
+              >
                 <a-form-item>
                   <a-popconfirm
                     :title="'确定删除【' + themeProperty.name + '】主题？'"
@@ -118,9 +216,19 @@
       </a-row>
     </a-drawer>
     <div class="upload-button">
-      <a-button type="primary" shape="circle" icon="plus" size="large" @click="showUploadModal"></a-button>
+      <a-button
+        type="primary"
+        shape="circle"
+        icon="plus"
+        size="large"
+        @click="showUploadModal"
+      ></a-button>
     </div>
-    <a-modal title="上传主题" v-model="uploadVisible" :footer="null">
+    <a-modal
+      title="上传主题"
+      v-model="uploadVisible"
+      :footer="null"
+    >
       <a-upload-dragger
         name="file"
         :multiple="true"
@@ -129,12 +237,10 @@
         accept=".zip"
       >
         <p class="ant-upload-drag-icon">
-          <a-icon type="inbox"/>
+          <a-icon type="inbox" />
         </p>
         <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
-        <p
-          class="ant-upload-hint"
-        >支持单个或批量上传，仅支持 ZIP 格式的文件</p>
+        <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
       </a-upload-dragger>
     </a-modal>
   </div>
@@ -191,8 +297,8 @@ export default {
         })
       }, 300)
     },
-    activeTheme(theme) {
-      themeApi.active(theme).then(response => {
+    activeTheme(themeId) {
+      themeApi.active(themeId).then(response => {
         this.$message.success('设置成功！')
         this.loadThemes()
       })
@@ -232,6 +338,15 @@ export default {
       } else if (status === 'error') {
         this.$message.error(`${info.file.name} file upload failed.`)
       }
+    },
+    handleEllipsisClick(theme) {
+      this.$log.debug('Ellipsis clicked', theme)
+    },
+    handleEditClick(theme) {
+      this.settingDrawer(theme)
+    },
+    handleActivateClick(theme) {
+      this.activeTheme(theme.id)
     }
   }
 }
