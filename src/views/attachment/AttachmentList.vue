@@ -11,13 +11,12 @@
         :sm="12"
         :xs="24"
       >
-        <a-card :bodyStyle="{ padding: 0}" hoverable>
-          <!-- <img :src="attachment.thumbPath" :alt="attachment.name" slot="cover"> -->
-          <div class="box">
-            <img :src="attachment.thumbPath"/>
+        <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer">
+          <div class="attach-thumb">
+            <img :src="attachment.thumbPath">
           </div>
           <a-card-meta>
-            <template slot="description">{{ attachment.name }}</template>
+            <template slot="description">{{ attachment.mediaType }}</template>
           </a-card-meta>
         </a-card>
       </a-col>
@@ -43,24 +42,34 @@
           <a-icon type="inbox"/>
         </p>
         <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
-        <p
-          class="ant-upload-hint"
-        >支持单个或批量上传</p>
+        <p class="ant-upload-hint">支持单个或批量上传</p>
       </a-upload-dragger>
     </a-modal>
+    <a-drawer
+      title="图片详情"
+      :width="drawerWidth"
+      closable
+      :visible="drawerVisible"
+      destroyOnClose
+    >图片详情</a-drawer>
   </page-view>
 </template>
 
 <script>
 import { PageView } from '@/layouts'
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 import attachmentApi from '@/api/attachment'
 export default {
   components: {
     PageView
   },
+  mixins: [mixin, mixinDevice],
   data() {
     return {
       uploadVisible: false,
+      drawerVisible: false,
+      selectAttachment: null,
+      drawerWidth: '560',
       attachments: [],
       pagination: {
         page: 1,
@@ -72,6 +81,13 @@ export default {
   created() {
     this.loadAttachments()
   },
+  mounted() {
+    if (this.isMobile()) {
+      this.drawerWidth = '100%'
+    } else {
+      this.drawerWidth = '460'
+    }
+  },
   methods: {
     loadAttachments() {
       const pagination = Object.assign({}, this.pagination)
@@ -80,6 +96,9 @@ export default {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
       })
+    },
+    showDetailDrawer() {
+      this.drawerVisible = true
     },
     showUploadModal() {
       this.uploadVisible = true
@@ -110,19 +129,22 @@ export default {
   right: 20px;
 }
 
-.box{
-    width: 100%;
-    margin: 0 auto;
-    background: skyblue;
-    position: relative;
-    padding-bottom: 56%;
-    overflow: hidden;
+.attach-thumb {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 56%;
+  overflow: hidden;
 }
-.box>img{
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+.attach-thumb > img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.ant-card-meta {
+  padding: 0.8rem;
 }
 </style>

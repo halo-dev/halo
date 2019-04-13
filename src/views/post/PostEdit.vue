@@ -30,7 +30,7 @@
         <a-drawer
           title="文章设置"
           :width="drawerWidth"
-          :closable="true"
+          closable
           @close="onClose"
           :visible="visible"
         >
@@ -152,7 +152,6 @@ export default {
     mavonEditor,
     CategoryTree
   },
-
   mixins: [mixin, mixinDevice],
   data() {
     return {
