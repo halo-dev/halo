@@ -103,8 +103,9 @@
           <a-drawer
             title="选择图片"
             width="320"
-            :closable="true"
-            :visible="childrenDrawer"
+            closable
+            :visible="childDrawerVisible"
+            @close="onChildClose"
           >
           </a-drawer>
           <div class="postControl">
@@ -161,7 +162,7 @@ export default {
         xs: { span: 24 }
       },
       visible: false,
-      childrenDrawer: false,
+      childDrawerVisible: false,
       drawerWidth: '460',
       tags: [],
       categories: [],
@@ -241,7 +242,7 @@ export default {
       this.visible = true
     },
     showAttachDrawer() {
-      this.childrenDrawer = true
+      this.childDrawerVisible = true
     },
     handlePublishClick() {
       this.postToStage.status = 'PUBLISHED'
@@ -253,6 +254,9 @@ export default {
     },
     onClose() {
       this.visible = false
+    },
+    onChildClose() {
+      this.childDrawerVisible = false
     }
   }
 }

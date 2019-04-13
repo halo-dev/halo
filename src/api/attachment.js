@@ -12,4 +12,11 @@ attachmentApi.list = pagination => {
   })
 }
 
+attachmentApi.get = attachmentId => {
+  return service({
+    url: `${baseUrl}/${attachmentId}`,
+    method: 'get'
+  })
+}
+
 export default attachmentApi

@@ -11,7 +11,7 @@
         :sm="12"
         :xs="24"
       >
-        <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer">
+        <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer(attachment)">
           <div class="attach-thumb">
             <img :src="attachment.thumbPath">
           </div>
@@ -46,12 +46,24 @@
       </a-upload-dragger>
     </a-modal>
     <a-drawer
+      v-if="selectAttachment"
       title="图片详情"
       :width="drawerWidth"
       closable
       :visible="drawerVisible"
       destroyOnClose
-    >图片详情</a-drawer>
+      @close="onChildClose"
+    >
+      <a-row type="flex" align="middle">
+        <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+          <a-skeleton active :loading="detailImgLoading" :paragraph="{rows: 8}">
+            <div class="attach-detail-img">
+              <img :src="selectAttachment.path">
+            </div>
+          </a-skeleton>
+        </a-col>
+      </a-row>
+    </a-drawer>
   </page-view>
 </template>
 
@@ -68,6 +80,7 @@ export default {
     return {
       uploadVisible: false,
       drawerVisible: false,
+      detailImgLoading: false,
       selectAttachment: null,
       drawerWidth: '560',
       attachments: [],
@@ -97,8 +110,13 @@ export default {
         this.pagination.total = response.data.data.total
       })
     },
-    showDetailDrawer() {
+    showDetailDrawer(attachment) {
       this.drawerVisible = true
+      this.detailImgLoading = true
+      this.selectAttachment = attachment
+      setTimeout(() => {
+        this.detailImgLoading = false
+      }, 500)
     },
     showUploadModal() {
       this.uploadVisible = true
@@ -113,6 +131,9 @@ export default {
       } else if (status === 'error') {
         this.$message.error(`${info.file.name} file upload failed.`)
       }
+    },
+    onChildClose() {
+      this.drawerVisible = false
     }
   }
 }
@@ -146,5 +167,9 @@ export default {
 
 .ant-card-meta {
   padding: 0.8rem;
+}
+
+.attach-detail-img img {
+  width: 100%;
 }
 </style>
