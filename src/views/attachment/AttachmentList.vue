@@ -11,8 +11,11 @@
         :sm="12"
         :xs="24"
       >
-        <a-card :bodyStyle="{ padding: '1rem' , width: '240px' }" hoverable>
-          <img :src="attachment.thumbPath" :alt="attachment.name" slot="cover">
+        <a-card :bodyStyle="{ padding: 0}" hoverable>
+          <!-- <img :src="attachment.thumbPath" :alt="attachment.name" slot="cover"> -->
+          <div class="box">
+            <img :src="attachment.thumbPath"/>
+          </div>
           <a-card-meta>
             <template slot="description">{{ attachment.name }}</template>
           </a-card-meta>
@@ -105,5 +108,21 @@ export default {
   position: fixed;
   bottom: 80px;
   right: 20px;
+}
+
+.box{
+    width: 100%;
+    margin: 0 auto;
+    background: skyblue;
+    position: relative;
+    padding-bottom: 56%;
+    overflow: hidden;
+}
+.box>img{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 </style>
