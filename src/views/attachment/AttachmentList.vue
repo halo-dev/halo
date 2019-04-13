@@ -81,7 +81,7 @@
               {{ selectAttachment.path }}
             </a-tab-pane>
             <a-tab-pane tab="Markdown 格式" key="3">
-              ![{{ selectAttachment.name }}]({{selectAttachment.path}})
+              ![{{ selectAttachment.name }}]({{ selectAttachment.path }})
             </a-tab-pane>
           </a-tabs>
         </a-col>
