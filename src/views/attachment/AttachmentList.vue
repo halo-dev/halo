@@ -47,7 +47,7 @@
     </a-modal>
     <a-drawer
       v-if="selectAttachment"
-      title="图片详情"
+      title="附件详情"
       :width="drawerWidth"
       closable
       :visible="drawerVisible"
@@ -55,14 +55,40 @@
       @close="onChildClose"
     >
       <a-row type="flex" align="middle">
-        <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+        <a-col :span="24">
           <a-skeleton active :loading="detailImgLoading" :paragraph="{rows: 8}">
             <div class="attach-detail-img">
               <img :src="selectAttachment.path">
             </div>
           </a-skeleton>
         </a-col>
+        <a-divider/>
+        <a-col :span="24">
+          <a-list itemLayout="horizontal">
+            <a-list-item>
+              <a-list-item-meta :description="selectAttachment.name">
+                <span slot="title">附件名：</span>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-list-item-meta :description="selectAttachment.mediaType">
+                <span slot="title">附件类型：</span>
+              </a-list-item-meta>
+            </a-list-item>
+          </a-list>
+          <a-tabs defaultActiveKey="1">
+            <a-tab-pane tab="普通链接" key="1">
+              {{ selectAttachment.path }}
+            </a-tab-pane>
+            <a-tab-pane tab="Markdown 格式" key="3">
+              ![{{ selectAttachment.name }}]({{selectAttachment.path}})
+            </a-tab-pane>
+          </a-tabs>
+        </a-col>
       </a-row>
+      <div class="attachment-control">
+        <a-button type="danger">删除</a-button>
+      </div>
     </a-drawer>
   </page-view>
 </template>
@@ -140,6 +166,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.ant-divider-horizontal{
+  margin: 24px 0 12px 0;
+}
+
 .attachment-item {
   padding-bottom: 12px;
 }
@@ -171,5 +201,17 @@ export default {
 
 .attach-detail-img img {
   width: 100%;
+}
+
+.attachment-control {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  border-top: 1px solid rgb(232, 232, 232);
+  padding: 10px 16px;
+  text-align: right;
+  left: 0px;
+  background: rgb(255, 255, 255);
+  border-radius: 0px 0px 4px 4px;
 }
 </style>

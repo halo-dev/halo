@@ -108,7 +108,7 @@
             @close="onChildClose"
           >
           </a-drawer>
-          <div class="postControl">
+          <div class="post-control">
             <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
             <a-button @click="handlePublishClick" type="primary">{{ publishText }}</a-button>
           </div>
@@ -279,7 +279,7 @@ export default {
   padding-bottom: 0;
 }
 
-.postControl {
+.post-control {
   position: absolute;
   bottom: 0px;
   width: 100%;
