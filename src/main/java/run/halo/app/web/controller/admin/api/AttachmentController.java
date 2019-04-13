@@ -52,7 +52,8 @@ public class AttachmentController {
     @GetMapping("{id:\\d+}")
     @ApiOperation("Get attachment detail by id")
     public AttachmentOutputDTO getBy(@PathVariable("id") Integer id) {
-        return new AttachmentOutputDTO().convertFrom(attachmentService.getById(id));
+        Attachment attachment = attachmentService.getById(id);
+        return attachmentService.convertToDto(attachment);
     }
 
     /**
