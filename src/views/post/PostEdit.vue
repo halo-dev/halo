@@ -94,12 +94,19 @@
               <h3 class="post-setting-drawer-title">缩略图</h3>
               <div class="post-setting-drawer-item">
                 <div class="post-thum">
-                  <img class="img" src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png">
+                  <img class="img" src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png" @click="showAttachDrawer">
                 </div>
               </div>
             </div>
             <a-divider/>
           </div>
+          <a-drawer
+            title="选择图片"
+            width="320"
+            :closable="true"
+            :visible="childrenDrawer"
+          >
+          </a-drawer>
           <div class="postControl">
             <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
             <a-button @click="handlePublishClick" type="primary">{{ publishText }}</a-button>
@@ -155,6 +162,7 @@ export default {
         xs: { span: 24 }
       },
       visible: false,
+      childrenDrawer: false,
       drawerWidth: '460',
       tags: [],
       categories: [],
@@ -233,6 +241,9 @@ export default {
     showDrawer() {
       this.visible = true
     },
+    showAttachDrawer() {
+      this.childrenDrawer = true
+    },
     handlePublishClick() {
       this.postToStage.status = 'PUBLISHED'
       this.createOrUpdatePost()
@@ -283,6 +294,7 @@ export default {
 
 .post-thum .img {
   width: 100%;
+  cursor: pointer;
 }
 
 .mavonEditor {
