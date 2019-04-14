@@ -19,4 +19,11 @@ attachmentApi.get = attachmentId => {
   })
 }
 
+attachmentApi.delete = attachmentId => {
+  return service({
+    url: `${baseUrl}/${attachmentId}`,
+    method: 'delete'
+  })
+}
+
 export default attachmentApi

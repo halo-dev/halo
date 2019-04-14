@@ -56,7 +56,7 @@
     >
       <a-row type="flex" align="middle">
         <a-col :span="24">
-          <a-skeleton active :loading="detailImgLoading" :paragraph="{rows: 8}">
+          <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
             <div class="attach-detail-img">
               <img :src="selectAttachment.path">
             </div>
@@ -64,30 +64,59 @@
         </a-col>
         <a-divider/>
         <a-col :span="24">
-          <a-list itemLayout="horizontal">
-            <a-list-item>
-              <a-list-item-meta :description="selectAttachment.name">
-                <span slot="title">附件名：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta :description="selectAttachment.mediaType">
-                <span slot="title">附件类型：</span>
-              </a-list-item-meta>
-            </a-list-item>
-          </a-list>
-          <a-tabs defaultActiveKey="1">
-            <a-tab-pane tab="普通链接" key="1">
-              {{ selectAttachment.path }}
-            </a-tab-pane>
-            <a-tab-pane tab="Markdown 格式" key="3">
-              ![{{ selectAttachment.name }}]({{ selectAttachment.path }})
-            </a-tab-pane>
-          </a-tabs>
+          <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
+            <a-list itemLayout="horizontal">
+              <a-list-item>
+                <a-list-item-meta :description="selectAttachment.name">
+                  <span slot="title">附件名：</span>
+                </a-list-item-meta>
+              </a-list-item>
+              <a-list-item>
+                <a-list-item-meta :description="selectAttachment.mediaType">
+                  <span slot="title">附件类型：</span>
+                </a-list-item-meta>
+              </a-list-item>
+              <a-list-item>
+                <a-list-item-meta :description="selectAttachment.size">
+                  <span slot="title">附件大小：</span>
+                </a-list-item-meta>
+              </a-list-item>
+              <a-list-item>
+                <a-list-item-meta :description="selectAttachment.height+'x'+selectAttachment.width">
+                  <span slot="title">图片尺寸：</span>
+                </a-list-item-meta>
+              </a-list-item>
+              <a-list-item>
+                <a-list-item-meta :description="selectAttachment.path">
+                  <span slot="title">
+                    普通链接：
+                    <a-icon type="copy" @click="doCopyNormalLink"/>
+                  </span>
+                </a-list-item-meta>
+              </a-list-item>
+              <a-list-item>
+                <a-list-item-meta
+                  :description="'!['+selectAttachment.name+']('+selectAttachment.path+')'"
+                >
+                  <span slot="title">
+                    Markdown 格式：
+                    <a-icon type="copy" @click="doCopyMarkdownLink"/>
+                  </span>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </a-skeleton>
         </a-col>
       </a-row>
       <div class="attachment-control">
-        <a-button type="danger">删除</a-button>
+        <a-popconfirm
+          title="你确定要删除该附件？"
+          @confirm="deleteAttachment(selectAttachment.id)"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a-button type="danger">删除</a-button>
+        </a-popconfirm>
       </div>
     </a-drawer>
   </page-view>
@@ -106,7 +135,7 @@ export default {
     return {
       uploadVisible: false,
       drawerVisible: false,
-      detailImgLoading: false,
+      detailLoading: false,
       selectAttachment: null,
       drawerWidth: '560',
       attachments: [],
@@ -138,10 +167,10 @@ export default {
     },
     showDetailDrawer(attachment) {
       this.drawerVisible = true
-      this.detailImgLoading = true
+      this.detailLoading = true
       this.selectAttachment = attachment
       setTimeout(() => {
-        this.detailImgLoading = false
+        this.detailLoading = false
       }, 500)
     },
     showUploadModal() {
@@ -158,6 +187,41 @@ export default {
         this.$message.error(`${info.file.name} file upload failed.`)
       }
     },
+    deleteAttachment(id) {
+      attachmentApi.delete(id).then(response => {
+        this.$message.success('删除成功！')
+        this.drawerVisible = false
+        this.loadAttachments()
+      })
+    },
+    doCopyNormalLink() {
+      const text = `
+        ${this.selectAttachment.path}
+      `
+      this.$copyText(text)
+        .then(message => {
+          console.log('copy', message)
+          this.$message.success('复制完毕')
+        })
+        .catch(err => {
+          console.log('copy.err', err)
+          this.$message.error('复制失败')
+        })
+    },
+    doCopyMarkdownLink() {
+      const text = `
+        ![${this.selectAttachment.name}](${this.selectAttachment.path})
+      `
+      this.$copyText(text)
+        .then(message => {
+          console.log('copy', message)
+          this.$message.success('复制完毕')
+        })
+        .catch(err => {
+          console.log('copy.err', err)
+          this.$message.error('复制失败')
+        })
+    },
     onChildClose() {
       this.drawerVisible = false
     }
@@ -166,7 +230,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.ant-divider-horizontal{
+.ant-divider-horizontal {
   margin: 24px 0 12px 0;
 }
 
