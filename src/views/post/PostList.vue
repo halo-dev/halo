@@ -317,6 +317,7 @@ export default {
       this.queryParam.keyword = null
       this.queryParam.categoryId = null
       this.queryParam.status = null
+      this.loadPosts()
     }
   }
 }
