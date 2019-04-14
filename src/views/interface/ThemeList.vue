@@ -198,21 +198,6 @@
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
-              <a-tab-pane
-                key="about"
-                tab="关于"
-              >
-                <a-form-item>
-                  <a-popconfirm
-                    :title="'确定删除【' + themeProperty.name + '】主题？'"
-                    @confirm="deleteTheme(themeProperty.id)"
-                    okText="确定"
-                    cancelText="取消"
-                  >
-                    <a-button type="danger">删除该主题</a-button>
-                  </a-popconfirm>
-                </a-form-item>
-              </a-tab-pane>
             </a-tabs>
           </a-skeleton>
         </a-col>
