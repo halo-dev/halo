@@ -105,19 +105,19 @@
             :loading="optionLoading"
             :paragraph="{rows: 10}"
           >
-            <a-card hoverable>
+            <a-card :bordered="false">
               <img
                 :alt="themeProperty.name"
                 :src="themeProperty.screenshots"
                 slot="cover"
               />
               <a-card-meta
-                :title="themeProperty.name"
+                :title="themeProperty.author.name"
                 :description="themeProperty.description"
               >
                 <a-avatar
-                  v-if="themeProperty.author.avatar"
-                  :src="themeProperty.author.avatar"
+                  v-if="themeProperty.logo"
+                  :src="themeProperty.logo"
                   size="large"
                   slot="avatar"
                 />

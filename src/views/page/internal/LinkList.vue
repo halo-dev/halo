@@ -82,7 +82,7 @@
               >{{ text }}</a>
             </template>
             <ellipsis
-              :length="30"
+              :length="15"
               tooltip
               slot="name"
               slot-scope="text"
@@ -129,10 +129,6 @@ const columns = [
   {
     title: '分组',
     dataIndex: 'team'
-  },
-  {
-    title: '描述',
-    dataIndex: 'description'
   },
   {
     title: '操作',
