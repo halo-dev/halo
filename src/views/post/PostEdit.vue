@@ -12,6 +12,7 @@
             />
           </div>
           <a-button type="primary" @click="showDrawer">发布</a-button>
+          <a-button type="primary" @click="showAttachDrawer">附件库</a-button>
         </a-card>
 
         <a-card>
@@ -27,13 +28,7 @@
       </a-col>
 
       <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-drawer
-          title="文章设置"
-          :width="drawerWidth"
-          closable
-          @close="onClose"
-          :visible="visible"
-        >
+        <a-drawer title="文章设置" :width="drawerWidth" closable @close="onClose" :visible="visible">
           <div class="post-setting-drawer-content">
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">基本设置</h3>
@@ -94,7 +89,11 @@
               <h3 class="post-setting-drawer-title">缩略图</h3>
               <div class="post-setting-drawer-item">
                 <div class="post-thum">
-                  <img class="img" src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png" @click="showAttachDrawer">
+                  <img
+                    class="img"
+                    src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+                    @click="showThumbDrawer"
+                  >
                 </div>
               </div>
             </div>
@@ -106,8 +105,7 @@
             closable
             :visible="childDrawerVisible"
             @close="onChildClose"
-          >
-          </a-drawer>
+          ></a-drawer>
           <div class="post-control">
             <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
             <a-button @click="handlePublishClick" type="primary">{{ publishText }}</a-button>
@@ -115,6 +113,89 @@
         </a-drawer>
       </a-col>
     </a-row>
+
+    <a-drawer
+      title="附件库"
+      :width="attachmentDrawerWidth"
+      closable
+      :visible="attachmentDrawerVisible"
+      destroyOnClose
+      @close="onAttachmentClose"
+    >
+      <a-row type="flex" align="middle">
+        <a-col :span="24">
+          <div class="attach-item" v-for="(item, index) in attachments" :key="index" @click="showDetailDrawer(item)">
+            <img :src="item.thumbPath">
+          </div>
+        </a-col>
+      </a-row>
+
+      <a-drawer
+        title="附件详情"
+        :width="selectAttachmentDrawerWidth"
+        closable
+        :visible="selectAttachmentDrawerVisible"
+        destroyOnClose
+        @close="onSelectAttachmentClose"
+      >
+        <a-row type="flex" align="middle">
+          <a-col :span="24">
+            <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
+              <div class="attach-detail-img">
+                <img :src="selectAttachment.path">
+              </div>
+            </a-skeleton>
+          </a-col>
+          <a-divider/>
+          <a-col :span="24">
+            <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
+              <a-list itemLayout="horizontal">
+                <a-list-item>
+                  <a-list-item-meta :description="selectAttachment.name">
+                    <span slot="title">附件名：</span>
+                  </a-list-item-meta>
+                </a-list-item>
+                <a-list-item>
+                  <a-list-item-meta :description="selectAttachment.mediaType">
+                    <span slot="title">附件类型：</span>
+                  </a-list-item-meta>
+                </a-list-item>
+                <a-list-item>
+                  <a-list-item-meta :description="selectAttachment.size">
+                    <span slot="title">附件大小：</span>
+                  </a-list-item-meta>
+                </a-list-item>
+                <a-list-item>
+                  <a-list-item-meta
+                    :description="selectAttachment.height+'x'+selectAttachment.width"
+                  >
+                    <span slot="title">图片尺寸：</span>
+                  </a-list-item-meta>
+                </a-list-item>
+                <a-list-item>
+                  <a-list-item-meta :description="selectAttachment.path">
+                    <span slot="title">
+                      普通链接：
+                      <a-icon type="copy" @click="doCopyNormalLink"/>
+                    </span>
+                  </a-list-item-meta>
+                </a-list-item>
+                <a-list-item>
+                  <a-list-item-meta
+                    :description="'!['+selectAttachment.name+']('+selectAttachment.path+')'"
+                  >
+                    <span slot="title">
+                      Markdown 格式：
+                      <a-icon type="copy" @click="doCopyMarkdownLink"/>
+                    </span>
+                  </a-list-item-meta>
+                </a-list-item>
+              </a-list>
+            </a-skeleton>
+          </a-col>
+        </a-row>
+      </a-drawer>
+    </a-drawer>
   </div>
 </template>
 
@@ -126,6 +207,7 @@ import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
+import attachmentApi from '@/api/attachment'
 
 const toolbars = {
   bold: true, // 粗体
@@ -161,6 +243,10 @@ export default {
         sm: { span: 24 },
         xs: { span: 24 }
       },
+      attachmentDrawerWidth: '580',
+      selectAttachmentDrawerWidth: '460',
+      attachmentDrawerVisible: false,
+      selectAttachmentDrawerVisible: false,
       visible: false,
       childDrawerVisible: false,
       drawerWidth: '460',
@@ -169,7 +255,15 @@ export default {
       selectedCategoryIds: [],
       selectedTagIds: [],
       markdownOption: toolbars,
-      postToStage: {}
+      postToStage: {},
+      attachments: [],
+      selectAttachment: {},
+      detailLoading: false,
+      pagination: {
+        page: 1,
+        size: 10,
+        sort: ''
+      }
     }
   },
   computed: {
@@ -183,8 +277,10 @@ export default {
   mounted() {
     if (this.isMobile()) {
       this.drawerWidth = '100%'
+      this.attachmentDrawerWidth = '100%'
     } else {
       this.drawerWidth = '460'
+      this.attachmentDrawerWidth = '580'
     }
   },
   created() {
@@ -217,6 +313,14 @@ export default {
         this.categories = response.data.data
       })
     },
+    loadAttachments() {
+      const pagination = Object.assign({}, this.pagination)
+      pagination.page--
+      attachmentApi.list(pagination).then(response => {
+        this.attachments = response.data.data.content
+        this.pagination.total = response.data.data.total
+      })
+    },
     createOrUpdatePost() {
       // Set category ids
       this.postToStage.categoryIds = this.selectedCategoryIds
@@ -242,6 +346,18 @@ export default {
       this.visible = true
     },
     showAttachDrawer() {
+      this.attachmentDrawerVisible = true
+      this.loadAttachments()
+    },
+    showDetailDrawer(attachment) {
+      this.selectAttachmentDrawerVisible = true
+      this.detailLoading = true
+      this.selectAttachment = attachment
+      setTimeout(() => {
+        this.detailLoading = false
+      }, 500)
+    },
+    showThumbDrawer() {
       this.childDrawerVisible = true
     },
     handlePublishClick() {
@@ -257,6 +373,36 @@ export default {
     },
     onChildClose() {
       this.childDrawerVisible = false
+    },
+    onAttachmentClose() {
+      this.attachmentDrawerVisible = false
+    },
+    onSelectAttachmentClose() {
+      this.selectAttachmentDrawerVisible = false
+    },
+    doCopyNormalLink() {
+      const text = `${this.selectAttachment.path}`
+      this.$copyText(text)
+        .then(message => {
+          console.log('copy', message)
+          this.$message.success('复制成功')
+        })
+        .catch(err => {
+          console.log('copy.err', err)
+          this.$message.error('复制失败')
+        })
+    },
+    doCopyMarkdownLink() {
+      const text = `![${this.selectAttachment.name}](${this.selectAttachment.path})`
+      this.$copyText(text)
+        .then(message => {
+          console.log('copy', message)
+          this.$message.success('复制成功')
+        })
+        .catch(err => {
+          console.log('copy.err', err)
+          this.$message.error('复制失败')
+        })
     }
   }
 }
@@ -303,5 +449,26 @@ export default {
 .mavonEditor {
   width: 100%;
   height: 560px;
+}
+
+.attach-item {
+  width: 50%;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 28%;
+  overflow: hidden;
+  float: left;
+}
+
+.attach-item > img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.attach-detail-img img {
+  width: 100%;
 }
 </style>

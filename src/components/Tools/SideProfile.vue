@@ -1,7 +1,7 @@
 <template>
   <div class="side-profile">
     <router-link :to="{ name:'Dashboard' }">
-        <a-avatar class="avatar" size="large" src="https://gravatar.loli.net/avatar/?s=256&d=mm"/>
+      <a-avatar class="avatar" size="large" src="https://gravatar.loli.net/avatar/?s=256&d=mm"/>
     </router-link>
   </div>
 </template>

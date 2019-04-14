@@ -1,7 +1,7 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
+      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24">
         <a-card
           :loading="postLoading"
           :bordered="false"
@@ -23,11 +23,26 @@
           </a-table>
         </a-card>
       </a-col>
-      <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
+      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24">
         <a-card
           :loading="commentLoading"
           :bordered="false"
           title="最新评论"
+          :bodyStyle="{ padding: '0px' }"
+        >
+          <a-table
+            :rowKey="comment => comment.id"
+            :columns="commentColumns"
+            :dataSource="commentData"
+            :pagination="false"
+          ></a-table>
+        </a-card>
+      </a-col>
+      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24">
+        <a-card
+          :loading="commentLoading"
+          :bordered="false"
+          title="最新日志"
           :bodyStyle="{ padding: '0px' }"
         >
           <a-table

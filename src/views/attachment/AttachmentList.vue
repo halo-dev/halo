@@ -192,9 +192,7 @@ export default {
       })
     },
     doCopyNormalLink() {
-      const text = `
-        ${this.selectAttachment.path}
-      `
+      const text = `${this.selectAttachment.path}`
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
@@ -206,9 +204,7 @@ export default {
         })
     },
     doCopyMarkdownLink() {
-      const text = `
-        ![${this.selectAttachment.name}](${this.selectAttachment.path})
-      `
+      const text = `![${this.selectAttachment.name}](${this.selectAttachment.path})`
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
