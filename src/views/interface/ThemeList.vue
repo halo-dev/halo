@@ -1,10 +1,6 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
+    <a-row :gutter="12" type="flex" align="middle">
       <a-col
         class="theme-item"
         :xl="6"
@@ -15,49 +11,24 @@
         v-for="(theme, index) in themes"
         :key="index"
       >
-        <a-card
-          hoverable
-          :title="theme.name"
-        >
-          <img
-            :alt="theme.name"
-            :src="theme.screenshots"
-            slot="cover"
-          />
-          <template
-            class="ant-card-actions"
-            slot="actions"
-          >
+        <a-card hoverable :title="theme.name">
+          <img :alt="theme.name" :src="theme.screenshots" slot="cover">
+          <template class="ant-card-actions" slot="actions">
             <div v-if="theme.activated">
-              <a-icon
-                type="unlock"
-                theme="twoTone"
-              />
-              激活中
+              <a-icon type="unlock" theme="twoTone"/> 激活中
             </div>
-            <div
-              v-else
-              @click="handleActivateClick(theme)"
-            >
-              <a-icon type="lock" />
-              激活
+            <div v-else @click="handleActivateClick(theme)">
+              <a-icon type="lock"/> 激活
             </div>
             <div @click="handleEditClick(theme)">
-              <a-icon type="setting" />
-              设置
+              <a-icon type="setting"/> 设置
             </div>
             <a-dropdown placement="topCenter">
-              <a
-                class="ant-dropdown-link"
-                href="#"
-              >
-                <a-icon type="ellipsis" /> 更多
+              <a class="ant-dropdown-link" href="#">
+                <a-icon type="ellipsis"/> 更多
               </a>
               <a-menu slot="overlay">
-                <a-menu-item
-                  :key="1"
-                  :disabled="theme.activated"
-                >
+                <a-menu-item :key="1" :disabled="theme.activated">
                   <a-popconfirm
                     v-if="!theme.activated"
                     :title="'确定删除【' + theme.name + '】主题？'"
@@ -65,12 +36,10 @@
                     okText="确定"
                     cancelText="取消"
                   >
-                    <a-icon type="delete" />
-                    删除
+                    <a-icon type="delete"/> 删除
                   </a-popconfirm>
                   <span v-else>
-                    <a-icon type="delete" />
-                    删除
+                    <a-icon type="delete"/> 删除
                   </span>
                 </a-menu-item>
               </a-menu>
@@ -78,7 +47,6 @@
           </template>
         </a-card>
       </a-col>
-
     </a-row>
     <a-drawer
       v-if="themeProperty"
@@ -89,28 +57,11 @@
       :visible="visible"
       destroyOnClose
     >
-      <a-row
-        :gutter="12"
-        type="flex"
-      >
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-        >
-          <a-skeleton
-            active
-            :loading="optionLoading"
-            :paragraph="{rows: 10}"
-          >
+      <a-row :gutter="12" type="flex">
+        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 10}">
             <a-card :bordered="false">
-              <img
-                :alt="themeProperty.name"
-                :src="themeProperty.screenshots"
-                slot="cover"
-              />
+              <img :alt="themeProperty.name" :src="themeProperty.screenshots" slot="cover">
               <a-card-meta
                 :title="themeProperty.author.name"
                 :description="themeProperty.description"
@@ -121,102 +72,77 @@
                   size="large"
                   slot="avatar"
                 />
-                <a-avatar
-                  v-else
-                  size="large"
-                  slot="avatar"
-                >{{ themeProperty.author.name }}</a-avatar>
+                <a-avatar v-else size="large" slot="avatar">{{ themeProperty.author.name }}</a-avatar>
               </a-card-meta>
             </a-card>
           </a-skeleton>
         </a-col>
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-        >
-          <a-skeleton
-            active
-            :loading="optionLoading"
-            :paragraph="{rows: 20}"
-          >
-            <a-tabs defaultActiveKey="0">
-              <a-tab-pane
-                v-for="(group, index) in themeConfiguration"
-                :key="index.toString()"
-                :tab="group.label"
-              >
-                <a-form layout="vertical">
-                  <a-form-item
-                    v-for="(item, index1) in group.items"
-                    :label="item.label + '：'"
-                    :key="index1"
-                    :wrapper-col="wrapperCol"
-                  >
-                    <a-input
-                      v-model="themeSettings[item.name]"
-                      :defaultValue="item.defaultValue"
-                      v-if="item.type == 'TEXT'"
-                    />
-                    <a-input
-                      type="textarea"
-                      :autosize="{ minRows: 5 }"
-                      v-model="themeSettings[item.name]"
-                      v-else-if="item.type == 'TEXTAREA'"
-                    />
-                    <a-radio-group
-                      v-decorator="['radio-group']"
-                      :defaultValue="item.defaultValue"
-                      v-model="themeSettings[item.name]"
-                      v-else-if="item.type == 'RADIO'"
+        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 20}">
+            <div class="card-container">
+              <a-tabs type="card" defaultActiveKey="0">
+                <a-tab-pane
+                  v-for="(group, index) in themeConfiguration"
+                  :key="index.toString()"
+                  :tab="group.label"
+                >
+                  <a-form layout="vertical">
+                    <a-form-item
+                      v-for="(item, index1) in group.items"
+                      :label="item.label + '：'"
+                      :key="index1"
+                      :wrapper-col="wrapperCol"
                     >
-                      <a-radio
-                        v-for="(option, index2) in item.options"
-                        :key="index2"
-                        :value="option.value"
-                      >{{ option.label }}</a-radio>
-                    </a-radio-group>
-                    <a-select
-                      v-model="themeSettings[item.name]"
-                      :defaultValue="item.defaultValue"
-                      v-else-if="item.type == 'SELECT'"
-                    >
-                      <a-select-option
-                        v-for="option in item.options"
-                        :key="option.value"
-                        :value="option.value"
-                      >{{ option.label }}</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                  <a-form-item>
-                    <a-button
-                      type="primary"
-                      @click="saveSettings"
-                    >保存</a-button>
-                  </a-form-item>
-                </a-form>
-              </a-tab-pane>
-            </a-tabs>
+                      <a-input
+                        v-model="themeSettings[item.name]"
+                        :defaultValue="item.defaultValue"
+                        v-if="item.type == 'TEXT'"
+                      />
+                      <a-input
+                        type="textarea"
+                        :autosize="{ minRows: 5 }"
+                        v-model="themeSettings[item.name]"
+                        v-else-if="item.type == 'TEXTAREA'"
+                      />
+                      <a-radio-group
+                        v-decorator="['radio-group']"
+                        :defaultValue="item.defaultValue"
+                        v-model="themeSettings[item.name]"
+                        v-else-if="item.type == 'RADIO'"
+                      >
+                        <a-radio
+                          v-for="(option, index2) in item.options"
+                          :key="index2"
+                          :value="option.value"
+                        >{{ option.label }}</a-radio>
+                      </a-radio-group>
+                      <a-select
+                        v-model="themeSettings[item.name]"
+                        :defaultValue="item.defaultValue"
+                        v-else-if="item.type == 'SELECT'"
+                      >
+                        <a-select-option
+                          v-for="option in item.options"
+                          :key="option.value"
+                          :value="option.value"
+                        >{{ option.label }}</a-select-option>
+                      </a-select>
+                    </a-form-item>
+                    <a-form-item>
+                      <a-button type="primary" @click="saveSettings">保存</a-button>
+                    </a-form-item>
+                  </a-form>
+                </a-tab-pane>
+              </a-tabs>
+            </div>
           </a-skeleton>
         </a-col>
       </a-row>
     </a-drawer>
     <div class="upload-button">
-      <a-button
-        type="primary"
-        shape="circle"
-        icon="plus"
-        size="large"
-        @click="showUploadModal"
-      ></a-button>
+      <a-button type="primary" shape="circle" icon="plus" size="large" @click="showUploadModal"></a-button>
     </div>
-    <a-modal
-      title="上传主题"
-      v-model="uploadVisible"
-      :footer="null"
-    >
+    <a-modal title="上传主题" v-model="uploadVisible" :footer="null">
       <a-upload-dragger
         name="file"
         :multiple="true"
@@ -225,7 +151,7 @@
         accept=".zip"
       >
         <p class="ant-upload-drag-icon">
-          <a-icon type="inbox" />
+          <a-icon type="inbox"/>
         </p>
         <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
         <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
@@ -318,13 +244,10 @@ export default {
     },
     handleChange(info) {
       const status = info.file.status
-      if (status !== 'uploading') {
-        console.log(info.file, info.fileList)
-      }
       if (status === 'done') {
-        this.$message.success(`${info.file.name} file uploaded successfully.`)
+        this.$message.success(`${info.file.name} 主题上传成功`)
       } else if (status === 'error') {
-        this.$message.error(`${info.file.name} file upload failed.`)
+        this.$message.error(`${info.file.name} 主题上传失败`)
       }
     },
     handleEllipsisClick(theme) {
@@ -361,5 +284,34 @@ export default {
   position: fixed;
   bottom: 80px;
   right: 20px;
+}
+
+.card-container {
+  background: #f5f5f5;
+}
+.card-container > .ant-tabs-card > .ant-tabs-content {
+  margin-top: -16px;
+}
+
+.card-container > .ant-tabs-card > .ant-tabs-content > .ant-tabs-tabpane {
+  background: #fff;
+  padding: 16px;
+}
+
+.card-container > .ant-tabs-card > .ant-tabs-bar {
+  border-color: #fff;
+}
+
+.card-container > .ant-tabs-card > .ant-tabs-bar .ant-tabs-tab {
+  border-color: transparent;
+  background: transparent;
+}
+
+.card-container > .ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
+  border-color: #fff;
+  background: #fff;
+}
+.ant-form-vertical .ant-form-item {
+  padding-bottom: 0;
 }
 </style>

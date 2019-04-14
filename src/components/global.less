@@ -1,9 +1,7 @@
 @import './index.less';
 
 body {
-  // 打开滚动条固定显示
-  overflow-y: scroll;
-
+  overflow-y: none;
   &.colorWeak {
     filter: invert(80%);
   }
@@ -497,11 +495,17 @@ body {
 
 .ant-card{
   .ant-card-head{
-    padding: 0 16px;
+    padding: 0 16px!important;
     .ant-card-head-wrapper{
       .ant-card-head-title{
-        padding: 12px 0;
+        padding: 12px 0!important;
       }
     }
+  }
+}
+
+.ant-card-wider-padding{
+  .ant-card-body{
+    padding: 24px!important;
   }
 }

@@ -178,13 +178,10 @@ export default {
     },
     handleChange(info) {
       const status = info.file.status
-      if (status !== 'uploading') {
-        console.log(info.file, info.fileList)
-      }
       if (status === 'done') {
-        this.$message.success(`${info.file.name} file uploaded successfully.`)
+        this.$message.success(`${info.file.name} 文件上传成功`)
       } else if (status === 'error') {
-        this.$message.error(`${info.file.name} file upload failed.`)
+        this.$message.error(`${info.file.name} 文件上传失败`)
       }
     },
     deleteAttachment(id) {
@@ -201,7 +198,7 @@ export default {
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
-          this.$message.success('复制完毕')
+          this.$message.success('复制成功')
         })
         .catch(err => {
           console.log('copy.err', err)
@@ -215,7 +212,7 @@ export default {
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
-          this.$message.success('复制完毕')
+          this.$message.success('复制成功')
         })
         .catch(err => {
           console.log('copy.err', err)
