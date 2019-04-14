@@ -208,10 +208,6 @@ export default {
       // 表头
       columns: [
         {
-          title: 'ID',
-          dataIndex: 'id'
-        },
-        {
           title: '标题',
           dataIndex: 'title'
         },
