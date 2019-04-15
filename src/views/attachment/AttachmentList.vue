@@ -232,7 +232,17 @@ export default {
       const data = new FormData()
       data.append('file', option.file)
       attachmentApi
-        .upload(data, source.token, option.onProgress)
+        .upload(
+          data,
+          progressEvent => {
+            if (progressEvent.total > 0) {
+              progressEvent.percent = (progressEvent.loaded / progressEvent.total) * 100
+            }
+            this.$log.debug('Uploading percent: ', progressEvent.percent)
+            option.onProgress(progressEvent)
+          },
+          source.token
+        )
         .then(response => {
           option.onSuccess(response, option.file)
           this.loadAttachments()
