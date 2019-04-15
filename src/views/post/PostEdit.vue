@@ -116,6 +116,10 @@
       @close="onAttachmentClose"
     >
       <a-row type="flex" align="middle">
+        <a-input-search placeholder="搜索附件" enterButton size="large"/>
+      </a-row>
+      <a-divider></a-divider>
+      <a-row type="flex" align="middle">
         <a-col :span="24">
           <div
             class="attach-item"
@@ -126,6 +130,14 @@
             <img :src="item.thumbPath">
           </div>
         </a-col>
+      </a-row>
+      <a-divider></a-divider>
+      <a-row type="flex" justify="end">
+        <a-pagination
+          :defaultPageSize="pagination.size"
+          :total="pagination.total"
+          @change="handlePaginationChange"
+        ></a-pagination>
       </a-row>
 
       <a-drawer
@@ -259,7 +271,7 @@ export default {
       detailLoading: false,
       pagination: {
         page: 1,
-        size: 10,
+        size: 8,
         sort: ''
       }
     }
@@ -401,6 +413,11 @@ export default {
           console.log('copy.err', err)
           this.$message.error('复制失败')
         })
+    },
+    handlePaginationChange(page, pageSize) {
+      this.pagination.page = page
+      this.pagination.size = pageSize
+      this.loadAttachments()
     }
   }
 }
