@@ -23,9 +23,9 @@
     </a-row>
     <a-row type="flex" justify="end" :gutter="12">
       <a-pagination
-        v-model="pagination.page"
         :defaultPageSize="pagination.size"
         :total="pagination.total"
+        @change="handlePaginationChange"
       ></a-pagination>
     </a-row>
     <div class="upload-button">
@@ -218,6 +218,11 @@ export default {
     },
     onChildClose() {
       this.drawerVisible = false
+    },
+    handlePaginationChange(page, pageSize) {
+      this.pagination.page = page
+      this.pagination.size = pageSize
+      this.loadAttachments()
     },
     handleUpload(option) {
       this.$log.debug('Uploading option', option)
