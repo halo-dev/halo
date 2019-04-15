@@ -142,7 +142,7 @@ export default {
       attachments: [],
       pagination: {
         page: 1,
-        size: 16,
+        size: 12,
         sort: ''
       }
     }
@@ -230,6 +230,7 @@ export default {
         .upload(data, source.token, option.onProgress)
         .then(response => {
           option.onSuccess(response, option.file)
+          this.loadAttachments()
         })
         .catch(error => {
           option.onError(error, error.response)
