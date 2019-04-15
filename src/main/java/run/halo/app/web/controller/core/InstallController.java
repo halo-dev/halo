@@ -21,7 +21,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
-import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_NAME;
+import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
 /**
  * Installation controller.
@@ -166,7 +166,7 @@ public class InstallController {
         properties.put(BlogProperties.BLOG_LOCALE, installParam.getLocale());
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
         properties.put(BlogProperties.BLOG_URL, installParam.getUrl());
-        properties.put(PrimaryProperties.THEME, DEFAULT_THEME_NAME);
+        properties.put(PrimaryProperties.THEME, DEFAULT_THEME_ID);
         properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
         properties.put(EmailProperties.ENABLED, Boolean.FALSE.toString());
         properties.put(CommentProperties.NEW_NOTICE, Boolean.FALSE.toString());

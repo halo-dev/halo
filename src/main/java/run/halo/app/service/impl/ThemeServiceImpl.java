@@ -44,7 +44,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_NAME;
+import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
 /**
  * @author : RYAN0UP
@@ -279,7 +279,7 @@ public class ThemeServiceImpl implements ThemeService {
         if (StringUtils.isBlank(activatedThemeId)) {
             synchronized (this) {
                 if (StringUtils.isBlank(activatedThemeId)) {
-                    return optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_NAME);
+                    return optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_ID);
                 }
             }
         }
