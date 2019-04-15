@@ -15,16 +15,9 @@
           <a-button type="primary" @click="showAttachDrawer">附件库</a-button>
         </a-card>
 
-        <a-card>
-          <div id="editor">
-            <mavon-editor
-              :toolbars="markdownOption"
-              v-model="postToStage.originalContent"
-              :boxShadow="false"
-              :ishljs="true"
-            />
-          </div>
-        </a-card>
+        <div id="editor">
+          <mavon-editor v-model="postToStage.originalContent" :boxShadow="false" :ishljs="true"/>
+        </div>
       </a-col>
 
       <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
@@ -412,12 +405,8 @@ export default {
   }
 }
 </script>
-<style scoped>
-#editor {
-  margin: auto;
-  width: 100%;
-}
 
+<style scoped>
 .v-note-wrapper {
   z-index: 1000;
 }
@@ -449,11 +438,6 @@ export default {
 .post-thum .img {
   width: 100%;
   cursor: pointer;
-}
-
-.mavonEditor {
-  width: 100%;
-  height: 560px;
 }
 
 .attach-item {
