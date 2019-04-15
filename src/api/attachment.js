@@ -1,3 +1,4 @@
+import axios from 'axios'
 import service from '@/utils/service'
 
 const baseUrl = '/admin/api/attachments'
@@ -24,6 +25,24 @@ attachmentApi.delete = attachmentId => {
     url: `${baseUrl}/${attachmentId}`,
     method: 'delete'
   })
+}
+
+attachmentApi.CancelToken = axios.CancelToken
+attachmentApi.isCancel = axios.isCancel
+
+attachmentApi.upload = (formData, uploadProgress, cancelToken) => {
+  return service(
+    {
+      url: `${baseUrl}/upload`,
+      timeout: 8640000, // 24 hours
+      data: formData, // form data
+      onUploadProgress: uploadProgress,
+      method: 'post'
+    },
+    {
+      cancelToken: cancelToken
+    }
+  )
 }
 
 export default attachmentApi

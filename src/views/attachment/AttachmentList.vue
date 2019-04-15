@@ -35,7 +35,8 @@
       <a-upload-dragger
         name="file"
         :multiple="true"
-        action="http://localhost:8090/admin/api/attachments/upload"
+        accept="image/*"
+        :customRequest="handleUpload"
         @change="handleChange"
       >
         <p class="ant-upload-drag-icon">
@@ -217,6 +218,28 @@ export default {
     },
     onChildClose() {
       this.drawerVisible = false
+    },
+    handleUpload(option) {
+      this.$log.debug('Uploading option', option)
+      const CancelToken = attachmentApi.CancelToken
+      const source = CancelToken.source()
+
+      const data = new FormData()
+      data.append('file', option.file)
+      attachmentApi
+        .upload(data, source.token, option.onProgress)
+        .then(response => {
+          option.onSuccess(response, option.file)
+        })
+        .catch(error => {
+          option.onError(error, error.response)
+        })
+
+      return {
+        abort: () => {
+          source.cancel('Upload operation canceled by the user.')
+        }
+      }
     }
   }
 }

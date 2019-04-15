@@ -124,7 +124,12 @@
     >
       <a-row type="flex" align="middle">
         <a-col :span="24">
-          <div class="attach-item" v-for="(item, index) in attachments" :key="index" @click="showDetailDrawer(item)">
+          <div
+            class="attach-item"
+            v-for="(item, index) in attachments"
+            :key="index"
+            @click="showDetailDrawer(item)"
+          >
             <img :src="item.thumbPath">
           </div>
         </a-col>
