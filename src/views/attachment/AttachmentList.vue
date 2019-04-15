@@ -21,6 +21,13 @@
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
+                  <a-form-item label="类型">
+                    <a-select placeholder="请选择类型">
+                      <a-select-option value="image/png">image/png</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
                     <a-button type="primary">查询</a-button>
                     <a-button style="margin-left: 8px;">重置</a-button>
