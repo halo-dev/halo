@@ -76,14 +76,14 @@ export default {
     }
   },
   created() {
-    ResourcesData = function() {}
+    this.ResourcesData = function() {}
   },
   methods: {
     // 下载
     downResources(type, id) {
-      if (type == 'ResourcesData') {
+      if (type === 'ResourcesData') {
         alert('资源文件下载' + id)
-      } else if (type == 'DataBaseData') {
+      } else if (type === 'DataBaseData') {
         alert('数据库文件下载' + id)
       } else {
         alert('文件下载' + id)
@@ -91,9 +91,9 @@ export default {
     },
     // 发送到邮箱
     sendResources(type, id) {
-      if (type == 'ResourcesData') {
+      if (type === 'ResourcesData') {
         alert('资源文件发送到邮箱' + id)
-      } else if (type == 'DataBaseData') {
+      } else if (type === 'DataBaseData') {
         alert('数据库文件发送到邮箱' + id)
       } else {
         alert('文件发送到邮箱' + id)
@@ -101,9 +101,9 @@ export default {
     },
     // 删除
     deleteResources(type, id) {
-      if (type == 'ResourcesData') {
+      if (type === 'ResourcesData') {
         alert('资源文件删除' + id)
-      } else if (type == 'DataBaseData') {
+      } else if (type === 'DataBaseData') {
         alert('数据库文件删除' + id)
       } else {
         alert('文件删除' + id)
@@ -111,9 +111,9 @@ export default {
     },
     // 备份
     backupData(type) {
-      if (type == 'ResourcesData') {
+      if (type === 'ResourcesData') {
         alert('资源文件备份')
-      } else if (type == 'DataBaseData') {
+      } else if (type === 'DataBaseData') {
         alert('数据库文件备份')
       } else {
         alert('文件备份')
