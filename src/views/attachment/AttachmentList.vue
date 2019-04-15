@@ -1,6 +1,39 @@
 <template>
   <page-view>
     <a-row :gutter="12" type="flex" align="middle">
+      <a-col :span="24" class="search-box">
+        <a-card :bordered="false">
+          <div class="table-page-search-wrapper">
+            <a-form layout="inline">
+              <a-row :gutter="48">
+                <a-col :md="6" :sm="24">
+                  <a-form-item label="关键词">
+                    <a-input/>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="6" :sm="24">
+                  <a-form-item label="年月份">
+                    <a-select placeholder="请选择年月">
+                      <a-select-option value="2019-01">2019-01</a-select-option>
+                      <a-select-option value="2019-02">2019-02</a-select-option>
+                      <a-select-option value="2019-03">2019-03</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :md="6" :sm="24">
+                  <span class="table-page-search-submitButtons">
+                    <a-button type="primary">查询</a-button>
+                    <a-button style="margin-left: 8px;">重置</a-button>
+                  </span>
+                </a-col>
+              </a-row>
+            </a-form>
+          </div>
+          <div class="table-operator">
+            <a-button type="primary" icon="plus" @click="showUploadModal">上传</a-button>
+          </div>
+        </a-card>
+      </a-col>
       <a-col
         class="attachment-item"
         v-for="attachment in attachments"
@@ -21,16 +54,13 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-row type="flex" justify="end" :gutter="12">
+    <a-row type="flex" justify="end">
       <a-pagination
         :defaultPageSize="pagination.size"
         :total="pagination.total"
         @change="handlePaginationChange"
       ></a-pagination>
     </a-row>
-    <div class="upload-button">
-      <a-button type="primary" shape="circle" icon="plus" size="large" @click="showUploadModal"></a-button>
-    </div>
     <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
       <a-upload-dragger
         name="file"
@@ -68,8 +98,15 @@
           <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
             <a-list itemLayout="horizontal">
               <a-list-item>
-                <a-list-item-meta :description="selectAttachment.name">
-                  <span slot="title">附件名：</span>
+                <a-list-item-meta>
+                  <template slot="description" v-if="editable">
+                    <a-input v-model="selectAttachment.name" @blur="updateAttachment"/>
+                  </template>
+                  <template slot="description" v-else>{{ selectAttachment.name }}</template>
+                  <span slot="title">
+                    附件名：
+                    <a-icon type="edit" @click="handleEditName"/>
+                  </span>
                 </a-list-item-meta>
               </a-list-item>
               <a-list-item>
@@ -85,6 +122,11 @@
               <a-list-item>
                 <a-list-item-meta :description="selectAttachment.height+'x'+selectAttachment.width">
                   <span slot="title">图片尺寸：</span>
+                </a-list-item-meta>
+              </a-list-item>
+              <a-list-item>
+                <a-list-item-meta :description="selectAttachment.createTime">
+                  <span slot="title">上传日期：</span>
                 </a-list-item-meta>
               </a-list-item>
               <a-list-item>
@@ -141,9 +183,10 @@ export default {
       selectAttachment: null,
       drawerWidth: '560',
       attachments: [],
+      editable: false,
       pagination: {
         page: 1,
-        size: 12,
+        size: 18,
         sort: ''
       }
     }
@@ -257,6 +300,13 @@ export default {
           source.cancel('Upload operation canceled by the user.')
         }
       }
+    },
+    handleEditName() {
+      this.editable = !this.editable
+    },
+    updateAttachment() {
+      this.$message.success('修改')
+      this.editable = false
     }
   }
 }
@@ -267,14 +317,9 @@ export default {
   margin: 24px 0 12px 0;
 }
 
-.attachment-item {
+.attachment-item,
+.search-box {
   padding-bottom: 12px;
-}
-
-.upload-button {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
 }
 
 .attach-thumb {
@@ -310,5 +355,9 @@ export default {
   left: 0px;
   background: rgb(255, 255, 255);
   border-radius: 0px 0px 4px 4px;
+}
+
+.table-operator {
+  margin-bottom: 0;
 }
 </style>
