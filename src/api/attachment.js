@@ -31,18 +31,14 @@ attachmentApi.CancelToken = axios.CancelToken
 attachmentApi.isCancel = axios.isCancel
 
 attachmentApi.upload = (formData, uploadProgress, cancelToken) => {
-  return service(
-    {
-      url: `${baseUrl}/upload`,
-      timeout: 8640000, // 24 hours
-      data: formData, // form data
-      onUploadProgress: uploadProgress,
-      method: 'post'
-    },
-    {
-      cancelToken: cancelToken
-    }
-  )
+  return service({
+    url: `${baseUrl}/upload`,
+    timeout: 8640000, // 24 hours
+    data: formData, // form data
+    onUploadProgress: uploadProgress,
+    cancelToken: cancelToken,
+    method: 'post'
+  })
 }
 
 export default attachmentApi

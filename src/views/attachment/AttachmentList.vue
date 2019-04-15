@@ -127,6 +127,7 @@
 import { PageView } from '@/layouts'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import attachmentApi from '@/api/attachment'
+import axios from 'axios'
 export default {
   components: {
     PageView
@@ -226,7 +227,7 @@ export default {
     },
     handleUpload(option) {
       this.$log.debug('Uploading option', option)
-      const CancelToken = attachmentApi.CancelToken
+      const CancelToken = axios.CancelToken
       const source = CancelToken.source()
 
       const data = new FormData()

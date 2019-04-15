@@ -29,6 +29,12 @@ service.interceptors.response.use(
   },
   error => {
     NProgress.done()
+
+    if (axios.isCancel(error)) {
+      Vue.$log.debug('Cancelled uploading by user.')
+      return Promise.reject(error)
+    }
+
     Vue.$log.error('Response failed', error)
 
     const response = error.response
