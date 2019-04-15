@@ -5,6 +5,8 @@ import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * Attachment output dto.
  *
@@ -35,4 +37,6 @@ public class AttachmentOutputDTO implements OutputConverter<AttachmentOutputDTO,
     private Long size;
 
     private AttachmentType type;
+
+    private Date createTime;
 }
