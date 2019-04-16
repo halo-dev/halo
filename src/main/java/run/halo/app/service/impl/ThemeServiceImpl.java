@@ -223,11 +223,11 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // Delete the folder
-            Files.deleteIfExists(Paths.get(themeProperty.getThemePath()));
+            FileUtil.del(Paths.get(themeProperty.getThemePath()));
 
             // Delete theme cache
             cacheStore.delete(THEMES_CACHE_KEY);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new ServiceException("Failed to delete theme folder", e).setErrorData(themeId);
         }
     }
@@ -350,6 +350,8 @@ public class ThemeServiceImpl implements ThemeService {
 
             // Delete theme package
             FileUtil.del(uploadPath.toFile());
+
+            cacheStore.delete(THEMES_CACHE_KEY);
 
             return getProperty(Paths.get(workDir.toString(), originalBasename));
         } catch (IOException e) {
