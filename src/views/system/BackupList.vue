@@ -2,7 +2,10 @@
   <div class="page-header-index-wide">
     <div class="card-container">
       <a-tabs type="card">
-        <a-tab-pane tab="资源文件备份" key="1">
+        <a-tab-pane key="1">
+          <span slot="tab">
+            <a-icon type="folder" />资源文件备份
+          </span>
           <a-table :columns="columns" :dataSource="ResourcesData">
             <span slot="action" slot-scope="text, record">
               <a href="javascript:;" @click="downResources('ResourcesData',record.id)">下载</a>
@@ -14,7 +17,10 @@
           </a-table>
           <a-button type="primary" @click="backupData('ResourcesData')">备份</a-button>
         </a-tab-pane>
-        <a-tab-pane tab="数据库备份" key="2">
+        <a-tab-pane key="2">
+          <span slot="tab">
+            <a-icon type="database" />资源文件备份
+          </span>
           <a-table :columns="columns" :dataSource="DataBaseData">
             <span slot="action" slot-scope="text, record">
               <a href="javascript:;" @click="downResources('DataBaseData',record.id)">下载</a>
@@ -26,7 +32,10 @@
           </a-table>
           <a-button type="primary" @click="backupData('DataBaseData')">备份</a-button>
         </a-tab-pane>
-        <a-tab-pane tab="文章备份" key="3">
+        <a-tab-pane key="3">
+          <span slot="tab">
+            <a-icon type="read" />文章备份
+          </span>
           <a-table :columns="columns" :dataSource="FileData">
             <span slot="action" slot-scope="text, record">
               <a href="javascript:;" @click="downResources('FileData',record.id)">下载</a>
@@ -125,11 +134,8 @@ export default {
 <style>
 .card-container {
   background: #f5f5f5;
-  overflow: hidden;
-  padding: 24px;
 }
 .card-container > .ant-tabs-card > .ant-tabs-content {
-  /* height: 120px; */
   margin-top: -16px;
 }
 
@@ -150,5 +156,8 @@ export default {
 .card-container > .ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
   border-color: #fff;
   background: #fff;
+}
+.ant-form-vertical .ant-form-item {
+  padding-bottom: 0;
 }
 </style>

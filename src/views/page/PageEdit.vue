@@ -2,23 +2,17 @@
   <div class="page-header-index-wide">
     <a-row :gutter="12">
       <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-card>
-          <div style="margin-bottom: 16px">
-            <a-input
-              v-model="postToStage.title"
-              v-decorator="['title', { rules: [{ required: true, message: '请输入页面标题' }] }]"
-              size="large"
-              placeholder="请输入页面标题"
-            />
-          </div>
-          <a-button type="primary" @click="showDrawer">发布</a-button>
-        </a-card>
-
-        <a-card>
-          <div id="editor">
-            <mavon-editor v-model="postToStage.originalContent"/>
-          </div>
-        </a-card>
+        <div style="margin-bottom: 16px">
+          <a-input
+            v-model="postToStage.title"
+            v-decorator="['title', { rules: [{ required: true, message: '请输入页面标题' }] }]"
+            size="large"
+            placeholder="请输入页面标题"
+          />
+        </div>
+        <div id="editor">
+          <mavon-editor v-model="postToStage.originalContent" :boxShadow="false" :ishljs="true"/>
+        </div>
       </a-col>
 
       <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
@@ -34,17 +28,17 @@
               <h3 class="post-setting-drawer-title">基本设置</h3>
               <div class="post-setting-drawer-item">
                 <a-form layout="vertical">
-                  <a-form-item label="页面路径：" :help="'https://localhost:8090/p/'+ (postToStage.url ? postToStage.url : '{auto_generate}')">
+                  <a-form-item
+                    label="页面路径："
+                    :help="'https://localhost:8090/p/'+ (postToStage.url ? postToStage.url : '{auto_generate}')"
+                  >
                     <a-input v-model="postToStage.url"/>
                   </a-form-item>
                   <a-form-item label="页面密码：">
                     <a-input type="password" v-model="postToStage.password"/>
                   </a-form-item>
                   <a-form-item label="是否关闭评论：">
-                    <a-radio-group
-                      v-model="postToStage.disallowComment"
-                      :defaultValue="false"
-                    >
+                    <a-radio-group v-model="postToStage.disallowComment" :defaultValue="false">
                       <a-radio :value="false">开启</a-radio>
                       <a-radio :value="true">关闭</a-radio>
                     </a-radio-group>
@@ -76,11 +70,19 @@
         </a-drawer>
       </a-col>
     </a-row>
+
+    <footer-tool-bar
+      :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
+    >
+      <a-button type="primary" @click="showDrawer">发布</a-button>
+      <a-button type="dashed" style="margin-left: 8px;">附件库</a-button>
+    </footer-tool-bar>
   </div>
 </template>
 
 <script>
 import { mavonEditor } from 'mavon-editor'
+import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
 import postApi from '@/api/post'
@@ -88,9 +90,9 @@ import themeApi from '@/api/theme'
 export default {
   name: 'Editor',
   components: {
-    mavonEditor
+    mavonEditor,
+    FooterToolBar
   },
-
   mixins: [mixin, mixinDevice],
   data() {
     return {
@@ -179,17 +181,9 @@ export default {
 }
 </script>
 <style scoped>
-#editor {
-  margin: auto;
-  width: 100%;
-}
-
 .v-note-wrapper {
   z-index: 1000;
-}
-
-.ant-card {
-  margin-bottom: 16px;
+  min-height: 540px;
 }
 
 .ant-form-vertical .ant-form-item {

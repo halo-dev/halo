@@ -176,6 +176,13 @@ export const asyncRouterMap = [
             name: 'ToolList',
             component: () => import('@/views/system/ToolList'),
             meta: { title: '小工具', hiddenHeaderContent: false }
+          },
+          {
+            path: '/system/about',
+            name: 'About',
+            component: () => import('@/views/system/About'),
+            hidden: true,
+            meta: { title: '关于 Halo', hiddenHeaderContent: false }
           }
         ]
       }

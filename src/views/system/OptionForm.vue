@@ -35,7 +35,7 @@
             </a-tab-pane>
             <a-tab-pane key="seo">
               <span slot="tab">
-                <a-icon type="read" />SEO设置
+                <a-icon type="global" />SEO设置
               </span>
               <a-form layout="vertical">
                 <a-form-item label="关键词： " :wrapper-col="wrapperCol">

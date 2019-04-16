@@ -11,9 +11,11 @@
         <div class="card-container">
           <a-tabs type="card">
             <a-tab-pane
-              tab="内置页面"
               key="internal"
             >
+            <span slot="tab">
+              <a-icon type="pushpin" />内置页面
+            </span>
               <a-table
                 :columns="internalColumns"
                 :dataSource="internalPages"
@@ -45,9 +47,12 @@
               </a-table>
             </a-tab-pane>
             <a-tab-pane
-              tab="自定义页面"
               key="custom"
-            >自定义页面</a-tab-pane>
+            >
+            <span slot="tab">
+              <a-icon type="fork" />内置页面
+            </span>
+            自定义页面</a-tab-pane>
           </a-tabs>
         </div>
       </a-col>

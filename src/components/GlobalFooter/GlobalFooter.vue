@@ -1,7 +1,10 @@
 <template>
   <div class="footer">
     <div class="copyright">
-      Proudly power by <a target="_blank" href="https://github.com/halo-dev/halo">Halo</a>
+      Proudly power by 
+      <router-link :to="{ name:'About' }">
+        <a href="javascript:void(0);">Halo</a>
+      </router-link>
     </div>
   </div>
 </template>

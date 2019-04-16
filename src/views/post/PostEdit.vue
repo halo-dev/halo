@@ -497,10 +497,6 @@ export default {
   min-height: 540px;
 }
 
-.ant-card {
-  margin-bottom: 16px;
-}
-
 .ant-form-vertical .ant-form-item {
   padding-bottom: 0;
 }
