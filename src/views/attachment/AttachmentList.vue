@@ -72,7 +72,6 @@
       <a-upload-dragger
         name="file"
         :multiple="true"
-        accept="image/*"
         :customRequest="handleUpload"
         @change="handleChange"
       >
