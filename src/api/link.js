@@ -19,6 +19,14 @@ linkApi.create = (link) => {
   })
 }
 
+
+linkApi.get = linkId => {
+  return service({
+    url: `${baseUrl}/${linkId}`,
+    method: 'get'
+  })
+}
+
 linkApi.update = (linkId, link) => {
   return service({
     url: `${baseUrl}/${linkId}`,
