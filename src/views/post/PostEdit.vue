@@ -2,18 +2,15 @@
   <div class="page-header-index-wide">
     <a-row :gutter="12">
       <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-card>
-          <div style="margin-bottom: 16px">
-            <a-input
-              v-model="postToStage.title"
-              v-decorator="['title', { rules: [{ required: true, message: '请输入文章标题' }] }]"
-              size="large"
-              placeholder="请输入文章标题"
-            />
-          </div>
-          <a-button type="primary" @click="showDrawer">发布</a-button>
-          <a-button type="primary" @click="showAttachDrawer">附件库</a-button>
-        </a-card>
+
+        <div style="margin-bottom: 16px">
+          <a-input
+            v-model="postToStage.title"
+            v-decorator="['title', { rules: [{ required: true, message: '请输入文章标题' }] }]"
+            size="large"
+            placeholder="请输入文章标题"
+          />
+        </div>
 
         <div id="editor">
           <mavon-editor v-model="postToStage.originalContent" :boxShadow="false" :ishljs="true"/>
@@ -116,7 +113,7 @@
       @close="onAttachmentClose"
     >
       <a-row type="flex" align="middle">
-        <a-input-search placeholder="搜索附件" enterButton size="large"/>
+        <a-input-search placeholder="搜索附件" enterButton/>
       </a-row>
       <a-divider></a-divider>
       <a-row type="flex" align="middle">
@@ -205,13 +202,38 @@
           </a-col>
         </a-row>
       </a-drawer>
+      <div class="attachment-control">
+        <a-button @click="showUploadModal" type="primary">上传附件</a-button>
+      </div>
     </a-drawer>
+
+    <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
+      <a-upload-dragger
+        name="file"
+        :multiple="true"
+        accept="image/*"
+        :customRequest="handleUpload"
+        @change="handleChange"
+      >
+        <p class="ant-upload-drag-icon">
+          <a-icon type="inbox"/>
+        </p>
+        <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
+        <p class="ant-upload-hint">支持单个或批量上传</p>
+      </a-upload-dragger>
+    </a-modal>
+
+    <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
+      <a-button type="primary" @click="showDrawer">发布</a-button>
+      <a-button type="dashed" @click="showAttachDrawer" style="margin-left: 8px;">附件库</a-button>
+    </footer-tool-bar>
   </div>
 </template>
 
 <script>
 import CategoryTree from './components/CategoryTree'
 import { mavonEditor } from 'mavon-editor'
+import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
@@ -243,7 +265,8 @@ export default {
   name: 'Editor',
   components: {
     mavonEditor,
-    CategoryTree
+    CategoryTree,
+    FooterToolBar
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -257,6 +280,7 @@ export default {
       selectAttachmentDrawerWidth: '460',
       attachmentDrawerVisible: false,
       selectAttachmentDrawerVisible: false,
+      uploadVisible: false,
       visible: false,
       childDrawerVisible: false,
       drawerWidth: '460',
@@ -418,6 +442,50 @@ export default {
       this.pagination.page = page
       this.pagination.size = pageSize
       this.loadAttachments()
+    },
+    handleChange(info) {
+      const status = info.file.status
+      if (status === 'done') {
+        this.$message.success(`${info.file.name} 文件上传成功`)
+      } else if (status === 'error') {
+        this.$message.error(`${info.file.name} 文件上传失败`)
+      }
+    },
+    handleUpload(option) {
+      this.$log.debug('Uploading option', option)
+      const CancelToken = attachmentApi.CancelToken
+      const source = CancelToken.source()
+
+      const data = new FormData()
+      data.append('file', option.file)
+      attachmentApi
+        .upload(
+          data,
+          progressEvent => {
+            if (progressEvent.total > 0) {
+              progressEvent.percent = (progressEvent.loaded / progressEvent.total) * 100
+            }
+            this.$log.debug('Uploading percent: ', progressEvent.percent)
+            option.onProgress(progressEvent)
+          },
+          source.token
+        )
+        .then(response => {
+          option.onSuccess(response, option.file)
+          this.loadAttachments()
+        })
+        .catch(error => {
+          option.onError(error, error.response)
+        })
+
+      return {
+        abort: () => {
+          source.cancel('Upload operation canceled by the user.')
+        }
+      }
+    },
+    showUploadModal() {
+      this.uploadVisible = true
     }
   }
 }
@@ -426,6 +494,7 @@ export default {
 <style scoped>
 .v-note-wrapper {
   z-index: 1000;
+  min-height: 540px;
 }
 
 .ant-card {
@@ -436,7 +505,8 @@ export default {
   padding-bottom: 0;
 }
 
-.post-control {
+.post-control,
+.attachment-control {
   position: absolute;
   bottom: 0px;
   width: 100%;
