@@ -13,9 +13,9 @@
             <a-tab-pane
               key="internal"
             >
-            <span slot="tab">
-              <a-icon type="pushpin" />内置页面
-            </span>
+              <span slot="tab">
+                <a-icon type="pushpin" />内置页面
+              </span>
               <a-table
                 :columns="internalColumns"
                 :dataSource="internalPages"
@@ -49,10 +49,10 @@
             <a-tab-pane
               key="custom"
             >
-            <span slot="tab">
-              <a-icon type="fork" />内置页面
-            </span>
-            自定义页面</a-tab-pane>
+              <span slot="tab">
+                <a-icon type="fork" />内置页面
+              </span>
+              自定义页面</a-tab-pane>
           </a-tabs>
         </div>
       </a-col>

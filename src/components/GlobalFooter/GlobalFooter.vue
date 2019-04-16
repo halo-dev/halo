@@ -1,7 +1,7 @@
 <template>
   <div class="footer">
     <div class="copyright">
-      Proudly power by 
+      Proudly power by
       <router-link :to="{ name:'About' }">
         <a href="javascript:void(0);">Halo</a>
       </router-link>
