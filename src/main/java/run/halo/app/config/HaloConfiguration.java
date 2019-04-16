@@ -76,7 +76,7 @@ public class HaloConfiguration {
 
         corsFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 10);
         corsFilter.setFilter(new CorsFilter());
-        corsFilter.addUrlPatterns("/api/*", "/admin/api/*");
+        corsFilter.addUrlPatterns("/api/*");
 
         return corsFilter;
     }
@@ -92,7 +92,7 @@ public class HaloConfiguration {
 
         logFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 9);
         logFilter.setFilter(new LogFilter());
-        logFilter.addUrlPatterns("/api/*", "/admin/*");
+        logFilter.addUrlPatterns("/api/*");
 
         return logFilter;
     }
@@ -127,15 +127,15 @@ public class HaloConfiguration {
         failureHandler.setObjectMapper(objectMapper);
 
         // Config the admin filter
-        adminAuthenticationFilter.addExcludeUrlPatterns("/admin/api/login");
-        adminAuthenticationFilter.addTryAuthUrlMethodPattern("/admin/api/comments", HttpMethod.POST.name());
+        adminAuthenticationFilter.addExcludeUrlPatterns("/api/admin/login");
+        adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/admin/comments", HttpMethod.POST.name());
         adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/comments", HttpMethod.POST.name());
         adminAuthenticationFilter.setFailureHandler(
                 failureHandler);
 
         FilterRegistrationBean<AdminAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(adminAuthenticationFilter);
-        authenticationFilter.addUrlPatterns("/admin/*", "/api/comments");
+        authenticationFilter.addUrlPatterns("/api/admin/*", "/api/comments");
         authenticationFilter.setOrder(1);
         return authenticationFilter;
     }

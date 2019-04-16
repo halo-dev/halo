@@ -18,7 +18,7 @@ import java.util.List;
  * @date : 2019/3/21
  */
 @RestController
-@RequestMapping("/admin/api/galleries")
+@RequestMapping("/api/admin/galleries")
 public class GalleryController {
 
     private final GalleryService galleryService;

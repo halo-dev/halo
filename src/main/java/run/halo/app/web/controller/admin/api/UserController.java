@@ -20,7 +20,7 @@ import javax.validation.Valid;
  * @date 3/19/19
  */
 @RestController
-@RequestMapping("/admin/api/users")
+@RequestMapping("/api/admin/users")
 public class UserController {
 
     private final UserService userService;

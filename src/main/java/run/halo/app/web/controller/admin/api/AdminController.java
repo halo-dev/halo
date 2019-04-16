@@ -25,7 +25,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@RequestMapping("/admin/api")
+@RequestMapping("/api/admin")
 public class AdminController {
 
     private final PostService postService;

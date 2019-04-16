@@ -17,7 +17,7 @@ import java.util.Map;
  * @date 3/20/19
  */
 @RestController
-@RequestMapping("/admin/api/options")
+@RequestMapping("/api/admin/options")
 public class OptionController {
 
     private final OptionService optionService;
