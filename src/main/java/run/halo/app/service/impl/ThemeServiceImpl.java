@@ -1,21 +1,26 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.*;
+import run.halo.app.handler.file.FileHandler;
 import run.halo.app.handler.theme.ThemeConfigResolver;
 import run.halo.app.handler.theme.ThemePropertyResolver;
 import run.halo.app.handler.theme.support.Group;
@@ -23,11 +28,14 @@ import run.halo.app.handler.theme.support.ThemeProperty;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
+import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.JsonUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -312,6 +320,42 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         return themeProperty;
+    }
+
+    /**
+     * Upload theme.
+     *
+     * @param file multipart file must not be null
+     * @return theme info
+     */
+    @Override
+    public ThemeProperty upload(MultipartFile file) {
+        Assert.notNull(file, "Multipart file must not be null");
+
+        // Get upload path
+        Path uploadPath = Paths.get(workDir.toString(), file.getOriginalFilename());
+
+        final String originalBasename = FilenameUtils.getBasename(file.getOriginalFilename());
+
+        log.info("Uploading theme to directory: [{}]", uploadPath.toString());
+
+        try {
+            // Create directory
+            Files.createDirectories(uploadPath.getParent());
+            Files.createFile(uploadPath);
+            file.transferTo(uploadPath);
+
+            // Unzip theme package
+            ZipUtil.unzip(uploadPath.toFile(),uploadPath.getParent().toFile());
+
+            // Delete theme package
+            FileUtil.del(uploadPath.toFile());
+
+            return getProperty(Paths.get(workDir.toString(), originalBasename));
+        } catch (IOException e) {
+            log.error("Failed to upload theme to local: " + uploadPath, e);
+            throw new ServiceException("Failed to upload theme to local").setErrorData(uploadPath);
+        }
     }
 
     /**
