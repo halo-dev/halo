@@ -1,6 +1,6 @@
 import service from '@/utils/service'
 
-const baseUrl = '/admin/api/categories'
+const baseUrl = '/api/admin/categories'
 
 const categoryApi = {}
 

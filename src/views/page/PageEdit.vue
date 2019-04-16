@@ -87,6 +87,7 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
 import postApi from '@/api/post'
 import themeApi from '@/api/theme'
+
 export default {
   name: 'Editor',
   components: {

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import service from '@/utils/service'
 
-const baseUrl = '/admin/api/themes'
+const baseUrl = '/api/admin/themes'
 
 const themeApi = {}
 
