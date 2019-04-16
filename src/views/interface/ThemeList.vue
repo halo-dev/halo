@@ -15,10 +15,10 @@
           <img :alt="theme.name" :src="theme.screenshots" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <div v-if="theme.activated">
-              <a-icon type="unlock" theme="twoTone"/> 激活中
+              <a-icon type="unlock" theme="twoTone"/> 已启用
             </div>
             <div v-else @click="handleActivateClick(theme)">
-              <a-icon type="lock"/> 激活
+              <a-icon type="lock"/> 启用
             </div>
             <div @click="handleEditClick(theme)">
               <a-icon type="setting"/> 设置
