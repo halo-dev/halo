@@ -1,16 +1,5 @@
 package run.halo.app.config;
 
-import run.halo.app.cache.InMemoryCacheStore;
-import run.halo.app.cache.StringCacheStore;
-import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.filter.CorsFilter;
-import run.halo.app.filter.LogFilter;
-import run.halo.app.security.filter.AdminAuthenticationFilter;
-import run.halo.app.security.filter.ApiAuthenticationFilter;
-import run.halo.app.security.handler.AdminAuthenticationFailureHandler;
-import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
-import run.halo.app.service.UserService;
-import run.halo.app.utils.HttpClientUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -23,12 +12,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.RestTemplate;
+import run.halo.app.cache.InMemoryCacheStore;
+import run.halo.app.cache.StringCacheStore;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.filter.CorsFilter;
 import run.halo.app.filter.LogFilter;
 import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.handler.AdminAuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.service.UserService;
 import run.halo.app.utils.HttpClientUtils;
 
 import java.security.KeyManagementException;
@@ -99,7 +92,7 @@ public class HaloConfiguration {
 
     @Bean
     public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties, ObjectMapper objectMapper) {
-        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter();
+        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties);
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.getProductionEnv());
@@ -107,6 +100,7 @@ public class HaloConfiguration {
 
         // Set failure handler
         apiFilter.setFailureHandler(failureHandler);
+        apiFilter.addExcludeUrlPatterns("/api/admin/*");
 
         FilterRegistrationBean<ApiAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(apiFilter);
