@@ -146,9 +146,9 @@
       <a-upload-dragger
         name="file"
         :multiple="true"
-        action="http://localhost:8090/admin/api/attachments/uploads"
+        accept="application/zip"
+        :customRequest="handleUpload"
         @change="handleChange"
-        accept=".zip"
       >
         <p class="ant-upload-drag-icon">
           <a-icon type="inbox"/>
@@ -258,6 +258,39 @@ export default {
     },
     handleActivateClick(theme) {
       this.activeTheme(theme.id)
+    },
+    handleUpload(option) {
+      this.$log.debug('Uploading option', option)
+      const CancelToken = themeApi.CancelToken
+      const source = CancelToken.source()
+
+      const data = new FormData()
+      data.append('file', option.file)
+      themeApi
+        .upload(
+          data,
+          progressEvent => {
+            if (progressEvent.total > 0) {
+              progressEvent.percent = (progressEvent.loaded / progressEvent.total) * 100
+            }
+            this.$log.debug('Uploading percent: ', progressEvent.percent)
+            option.onProgress(progressEvent)
+          },
+          source.token
+        )
+        .then(response => {
+          option.onSuccess(response, option.file)
+          this.loadThemes()
+        })
+        .catch(error => {
+          option.onError(error, error.response)
+        })
+
+      return {
+        abort: () => {
+          source.cancel('Upload operation canceled by the user.')
+        }
+      }
     }
   }
 }

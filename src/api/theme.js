@@ -1,3 +1,4 @@
+import axios from 'axios'
 import service from '@/utils/service'
 
 const baseUrl = '/admin/api/themes'
@@ -72,6 +73,20 @@ themeApi.getProperty = themeId => {
   return service({
     url: `${baseUrl}/${themeId}`,
     method: 'get'
+  })
+}
+
+themeApi.CancelToken = axios.CancelToken
+themeApi.isCancel = axios.isCancel
+
+themeApi.upload = (formData, uploadProgress, cancelToken) => {
+  return service({
+    url: `${baseUrl}/upload`,
+    timeout: 8640000, // 24 hours
+    data: formData, // form data
+    onUploadProgress: uploadProgress,
+    cancelToken: cancelToken,
+    method: 'post'
   })
 }
 
