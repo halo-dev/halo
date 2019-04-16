@@ -1,6 +1,7 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.support.Group;
 import run.halo.app.handler.theme.support.ThemeProperty;
 import run.halo.app.model.support.ThemeFile;
@@ -200,4 +201,12 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty activeTheme(@NonNull String themeId);
+
+    /**
+     * Upload theme.
+     * @param file multipart file must not be null
+     * @return theme info
+     */
+    @NonNull
+    ThemeProperty upload(@NonNull MultipartFile file);
 }
