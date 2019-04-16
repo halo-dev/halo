@@ -110,6 +110,7 @@ public class AdminAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.isNotBlank(token)) {
 
             // Valid the token
+            // TODO Add key prefix
             Optional<String> userDetailOptional = cacheStore.get(token);
 
             if (!userDetailOptional.isPresent()) {
