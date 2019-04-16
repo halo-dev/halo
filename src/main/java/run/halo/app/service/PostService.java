@@ -56,7 +56,7 @@ public interface PostService extends CrudService<Post, Integer> {
     Page<Post> pageLatest(int top);
 
     /**
-     * Lists by status and type
+     * Lists by status.
      *
      * @param status   post status must not be null
      * @param pageable page info must not be null
@@ -77,7 +77,7 @@ public interface PostService extends CrudService<Post, Integer> {
 
 
     /**
-     * Lists simple output dto by status and type
+     * Lists simple output dto by status.
      *
      * @param status   post status must not be null
      * @param pageable page info must not be null
@@ -87,7 +87,7 @@ public interface PostService extends CrudService<Post, Integer> {
     Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
-     * Lists page list vo by status, type and pageable.
+     * Lists page list vo by status and pageable.
      *
      * @param status   post status must not be null
      * @param pageable page info must not be null
@@ -97,7 +97,7 @@ public interface PostService extends CrudService<Post, Integer> {
     Page<PostListVO> pageListVoBy(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
-     * Count posts by status and type
+     * Count posts by status.
      *
      * @param status status
      * @return posts count

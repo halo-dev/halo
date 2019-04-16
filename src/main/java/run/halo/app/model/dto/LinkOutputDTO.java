@@ -21,6 +21,8 @@ public class LinkOutputDTO implements OutputConverter<LinkOutputDTO, Link> {
 
     private String url;
 
+    private String logo;
+
     private String description;
 
     private String team;
