@@ -22,7 +22,7 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
  * @date 3/21/19
  */
 @RestController
-@RequestMapping("/admin/api/categories")
+@RequestMapping("/api/admin/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;

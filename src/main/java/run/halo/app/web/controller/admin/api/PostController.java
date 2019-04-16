@@ -27,7 +27,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @date 3/19/19
  */
 @RestController
-@RequestMapping("/admin/api/posts")
+@RequestMapping("/api/admin/posts")
 public class PostController {
 
     private final PostService postService;

@@ -23,7 +23,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @date 3/21/19
  */
 @RestController
-@RequestMapping("/admin/api/attachments")
+@RequestMapping("/api/admin/attachments")
 public class AttachmentController {
 
     private final AttachmentService attachmentService;

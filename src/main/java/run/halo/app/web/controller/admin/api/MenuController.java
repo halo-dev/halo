@@ -23,7 +23,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @date 4/3/19
  */
 @RestController
-@RequestMapping("/admin/api/menus")
+@RequestMapping("/api/admin/menus")
 public class MenuController {
 
     private final MenuService menuService;

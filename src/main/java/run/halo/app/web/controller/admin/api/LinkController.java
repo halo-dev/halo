@@ -19,7 +19,7 @@ import java.util.List;
  * @date : 2019/3/21
  */
 @RestController
-@RequestMapping("/admin/api/links")
+@RequestMapping("/api/admin/links")
 public class LinkController {
 
     private final LinkService linkService;

@@ -20,7 +20,7 @@ import java.util.Map;
  * @date : 2019/3/20
  */
 @RestController
-@RequestMapping("/admin/api/themes")
+@RequestMapping("/api/admin/themes")
 public class ThemeController {
 
     private final ThemeService themeService;

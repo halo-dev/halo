@@ -19,7 +19,7 @@ import java.util.List;
  * @date 3/19/19
  */
 @RestController
-@RequestMapping("/admin/api/logs")
+@RequestMapping("/api/admin/logs")
 public class LogController {
 
     private final LogService logService;

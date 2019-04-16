@@ -75,7 +75,7 @@ public class SwaggerConfiguration {
         // TODO Build with different security configuration
         return buildApiDocket("run.halo.app.admin",
                 "run.halo.app.web.controller.admin",
-                "/admin/api/**")
+                "/api/admin/**")
                 .enable(!haloProperties.getDocDisabled());
     }
 
@@ -121,7 +121,7 @@ public class SwaggerConfiguration {
     private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())
-                .forPaths(PathSelectors.regex("/admin/api/.*"))
+                .forPaths(PathSelectors.regex("/api/admin/.*"))
                 .build();
     }
 
