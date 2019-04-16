@@ -1,15 +1,12 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.LinkOutputDTO;
-import run.halo.app.model.entity.Link;
-import run.halo.app.model.params.LinkParam;
-import run.halo.app.service.LinkService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.LinkOutputDTO;
 import run.halo.app.model.entity.Link;
+import run.halo.app.model.params.LinkParam;
 import run.halo.app.service.LinkService;
 
 import javax.validation.Valid;
@@ -58,6 +55,15 @@ public class LinkController {
     public LinkOutputDTO createBy(@RequestBody @Valid LinkParam linkParam) {
         Link link = linkService.createBy(linkParam);
         return new LinkOutputDTO().convertFrom(link);
+    }
+
+    @PutMapping("{id:\\d+}")
+    @ApiOperation("Updates a link")
+    public LinkOutputDTO updateBy(@PathVariable("id") Integer id,
+                                  @RequestBody @Valid LinkParam linkParam) {
+        Link link = linkService.getById(id);
+        linkParam.update(link);
+        return new LinkOutputDTO().convertFrom(linkService.update(link));
     }
 
     /**

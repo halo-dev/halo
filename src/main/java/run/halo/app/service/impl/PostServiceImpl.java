@@ -159,7 +159,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     /**
-     * List by status and type
+     * List by status.
      *
      * @param status   status
      * @param pageable pageable
@@ -178,7 +178,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     /**
-     * Counts posts by status and type
+     * Counts posts by status.
      *
      * @param status status
      * @return posts count
