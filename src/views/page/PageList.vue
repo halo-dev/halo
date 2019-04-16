@@ -1,58 +1,37 @@
 <template>
   <div class="page-header-index-wide">
     <a-row>
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
+      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
         <div class="card-container">
           <a-tabs type="card">
-            <a-tab-pane
-              key="internal"
-            >
-            <span slot="tab">
-              <a-icon type="pushpin" />内置页面
-            </span>
+            <a-tab-pane key="internal">
+              <span slot="tab">
+                <a-icon type="pushpin"/>内置页面
+              </span>
               <a-table
                 :columns="internalColumns"
                 :dataSource="internalPages"
                 :pagination="false"
                 :rowKey="page => page.id"
               >
-                <span
-                  slot="action"
-                  slot-scope="text, record"
-                >
-                  <a
-                    href="javascript:;"
-                    @click="viewPage(record.id)"
-                  >查看</a>
-                  <a-divider type="vertical" />
-                  <router-link
-                    :to="{name:'LinkList'}"
-                    v-if="record.id==1"
-                  >
+                <span slot="action" slot-scope="text, record">
+                  <a href="javascript:;" @click="viewPage(record.id)">查看</a>
+                  <a-divider type="vertical"/>
+                  <router-link :to="{name:'LinkList'}" v-if="record.id==1">
                     <a href="javascript:void(0);">编辑</a>
                   </router-link>
-                  <router-link
-                    :to="{name:'GalleryList'}"
-                    v-if="record.id==2"
-                  >
+                  <router-link :to="{name:'GalleryList'}" v-if="record.id==2">
                     <a href="javascript:void(0);">编辑</a>
                   </router-link>
                 </span>
               </a-table>
             </a-tab-pane>
-            <a-tab-pane
-              key="custom"
-            >
-            <span slot="tab">
-              <a-icon type="fork" />内置页面
-            </span>
-            自定义页面</a-tab-pane>
+            <a-tab-pane key="custom">
+              <span slot="tab">
+                <a-icon type="fork"/>内置页面
+              </span>
+              自定义页面
+            </a-tab-pane>
           </a-tabs>
         </div>
       </a-col>
