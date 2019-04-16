@@ -62,6 +62,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket haloDefaultApi() {
         log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
+        // TODO Build with different security configuration
         return buildApiDocket("run.halo.app.portal.api",
                 "run.halo.app.web.controller.portal.api",
                 "/api/**")
@@ -71,6 +72,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket haloAdminApi() {
         log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
+        // TODO Build with different security configuration
         return buildApiDocket("run.halo.app.admin",
                 "run.halo.app.web.controller.admin",
                 "/admin/api/**")
@@ -119,7 +121,7 @@ public class SwaggerConfiguration {
     private SecurityContext securityContext() {
         return SecurityContext.builder()
                 .securityReferences(defaultAuth())
-                .forPaths(PathSelectors.regex("/api/.*"))
+                .forPaths(PathSelectors.regex("/admin/api/.*"))
                 .build();
     }
 
