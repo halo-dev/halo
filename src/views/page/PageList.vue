@@ -11,8 +11,12 @@
 
               <!-- TODO 移动端展示 -->
               <a-collapse :bordered="false" v-if="isMobile()">
-                <a-collapse-panel :header="item.name" v-for="(item,index) in internalPages" :key="index">
-                  <p>12332112323</p>
+                <a-collapse-panel v-for="(item,index) in internalPages" :key="index">
+                  <a href="javascript:void(0);" slot="header"> {{ item.name }} </a>
+                  <div>
+                    访问路径：{{ item.url }}
+                    操作：{{ item.url }}
+                  </div>
                 </a-collapse-panel>
               </a-collapse>
 
