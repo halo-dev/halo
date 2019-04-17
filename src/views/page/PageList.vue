@@ -8,11 +8,20 @@
               <span slot="tab">
                 <a-icon type="pushpin"/>内置页面
               </span>
+
+              <!-- TODO 移动端展示 -->
+              <a-collapse :bordered="false" v-if="isMobile()">
+                <a-collapse-panel :header="item.name" v-for="(item,index) in internalPages" :key="index">
+                  <p>12332112323</p>
+                </a-collapse-panel>
+              </a-collapse>
+
               <a-table
                 :columns="internalColumns"
                 :dataSource="internalPages"
                 :pagination="false"
                 :rowKey="page => page.id"
+                v-else
               >
                 <span slot="action" slot-scope="text, record">
                   <a href="javascript:;" @click="viewPage(record.id)">查看</a>
@@ -28,13 +37,6 @@
                   </router-link>
                 </span>
               </a-table>
-
-              <!-- TODO 移动端展示 -->
-              <a-collapse :bordered="false">
-                <a-collapse-panel :header="item.name" v-for="(item,index) in internalPages" :key="index">
-                  <p>12332112323</p>
-                </a-collapse-panel>
-              </a-collapse>
             </a-tab-pane>
             <a-tab-pane key="custom">
               <span slot="tab">
@@ -50,6 +52,7 @@
 </template>
 
 <script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 const internalColumns = [
   {
     title: '页面名称',
@@ -84,6 +87,7 @@ const internalPages = [
   }
 ]
 export default {
+  mixins: [mixin, mixinDevice],
   data() {
     return {
       internalColumns,

@@ -85,7 +85,7 @@
     <a-drawer
       v-if="selectAttachment"
       title="附件详情"
-      :width="drawerWidth"
+      :width="isMobile()?'100%':'560'"
       closable
       :visible="drawerVisible"
       destroyOnClose
@@ -187,7 +187,6 @@ export default {
       drawerVisible: false,
       detailLoading: false,
       selectAttachment: null,
-      drawerWidth: '560',
       attachments: [],
       editable: false,
       pagination: {
@@ -199,13 +198,6 @@ export default {
   },
   created() {
     this.loadAttachments()
-  },
-  mounted() {
-    if (this.isMobile()) {
-      this.drawerWidth = '100%'
-    } else {
-      this.drawerWidth = '460'
-    }
   },
   methods: {
     loadAttachments() {

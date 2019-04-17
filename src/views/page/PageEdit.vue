@@ -18,7 +18,7 @@
       <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
         <a-drawer
           title="页面设置"
-          :width="drawerWidth"
+          :width="isMobile()?'100%':'460'"
           :closable="true"
           @close="onClose"
           :visible="visible"
@@ -103,7 +103,6 @@ export default {
         xs: { span: 24 }
       },
       visible: false,
-      drawerWidth: '460',
       postUrl: 'hello-world',
       customTpls: [],
       postToStage: {}
@@ -115,13 +114,6 @@ export default {
         return '更新并发布'
       }
       return '创建并发布'
-    }
-  },
-  mounted() {
-    if (this.isMobile()) {
-      this.drawerWidth = '100%'
-    } else {
-      this.drawerWidth = '460'
     }
   },
   created() {

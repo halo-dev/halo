@@ -18,7 +18,7 @@
       </a-col>
 
       <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-drawer title="文章设置" :width="drawerWidth" closable @close="onClose" :visible="visible">
+        <a-drawer title="文章设置" :width="isMobile()?'100%':'460'" closable @close="onClose" :visible="visible">
           <div class="post-setting-drawer-content">
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">基本设置</h3>
@@ -106,7 +106,7 @@
 
     <a-drawer
       title="附件库"
-      :width="attachmentDrawerWidth"
+      :width="isMobile()?'100%':'580'"
       closable
       :visible="attachmentDrawerVisible"
       destroyOnClose
@@ -139,7 +139,7 @@
 
       <a-drawer
         title="附件详情"
-        :width="selectAttachmentDrawerWidth"
+        :width="isMobile()?'100%':'460'"
         closable
         :visible="selectAttachmentDrawerVisible"
         destroyOnClose
@@ -276,14 +276,11 @@ export default {
         sm: { span: 24 },
         xs: { span: 24 }
       },
-      attachmentDrawerWidth: '580',
-      selectAttachmentDrawerWidth: '460',
       attachmentDrawerVisible: false,
       selectAttachmentDrawerVisible: false,
       uploadVisible: false,
       visible: false,
       childDrawerVisible: false,
-      drawerWidth: '460',
       tags: [],
       categories: [],
       selectedCategoryIds: [],
@@ -306,15 +303,6 @@ export default {
         return '更新并发布'
       }
       return '创建并发布'
-    }
-  },
-  mounted() {
-    if (this.isMobile()) {
-      this.drawerWidth = '100%'
-      this.attachmentDrawerWidth = '100%'
-    } else {
-      this.drawerWidth = '460'
-      this.attachmentDrawerWidth = '580'
     }
   },
   created() {
