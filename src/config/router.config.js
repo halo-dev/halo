@@ -85,6 +85,13 @@ export const asyncRouterMap = [
             hidden: true,
             component: () => import('@/views/page/internal/GalleryList'),
             meta: { title: '图库', hiddenHeaderContent: false }
+          },
+          {
+            path: '/pages/journals',
+            name: 'JournalList',
+            hidden: true,
+            component: () => import('@/views/page/internal/JournalList'),
+            meta: { title: '日志', hiddenHeaderContent: false }
           }
         ]
       },

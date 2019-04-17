@@ -23,6 +23,9 @@
                   <router-link :to="{name:'GalleryList'}" v-if="record.id==2">
                     <a href="javascript:void(0);">编辑</a>
                   </router-link>
+                  <router-link :to="{name:'JournalList'}" v-if="record.id==3">
+                    <a href="javascript:void(0);">编辑</a>
+                  </router-link>
                 </span>
               </a-table>
             </a-tab-pane>
@@ -66,6 +69,11 @@ const internalPages = [
     id: '2',
     name: '图库页面',
     url: '/galleries'
+  },
+  {
+    id: '3',
+    name: '日志页面',
+    url: '/journals'
   }
 ]
 export default {
