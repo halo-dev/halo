@@ -28,6 +28,13 @@
                   </router-link>
                 </span>
               </a-table>
+
+              <!-- TODO 移动端展示 -->
+              <a-collapse :bordered="false">
+                <a-collapse-panel :header="item.name" v-for="(item,index) in internalPages" :key="index">
+                  <p>12332112323</p>
+                </a-collapse-panel>
+              </a-collapse>
             </a-tab-pane>
             <a-tab-pane key="custom">
               <span slot="tab">
