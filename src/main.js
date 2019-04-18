@@ -5,9 +5,8 @@ import router from './router'
 import store from './store/'
 import './logger'
 
-import './core/use'
+import './core/lazy_use'
 import bootstrap from './core/bootstrap'
-// import '@/permission' // permission control
 import '@/utils/filter' // global filter
 import animated from 'animate.css'
 
