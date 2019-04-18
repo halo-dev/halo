@@ -64,6 +64,7 @@
     <a-row type="flex" justify="end">
       <a-pagination
         :total="pagination.total"
+        :defaultPageSize="pagination.size"
         :pageSizeOptions="['18', '36', '54']"
         showSizeChanger
         @change="handlePaginationChange"
@@ -191,8 +192,8 @@ export default {
       attachments: [],
       editable: false,
       pagination: {
-        current: 1,
-        pageSize: 18,
+        page: 1,
+        size: 18,
         sort: null
       },
       queryParam: {
@@ -208,8 +209,8 @@ export default {
   },
   methods: {
     loadAttachments() {
-      this.queryParam.page = this.pagination.current - 1
-      this.queryParam.size = this.pagination.pageSize
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
       attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
@@ -269,10 +270,10 @@ export default {
     onChildClose() {
       this.drawerVisible = false
     },
-    handlePaginationChange(page, pageSize) {
-      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.pagination.current = page
-      this.pagination.pageSize = pageSize
+    handlePaginationChange(page, size) {
+      this.$log.debug(`Current: ${page}, PageSize: ${size}`)
+      this.pagination.page = page
+      this.pagination.size = size
       this.loadAttachments()
     },
     handleUpload(option) {
