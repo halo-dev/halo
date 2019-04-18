@@ -1,23 +1,21 @@
 <template>
   <div class="page-header-index-wide">
-    <div class="card-container">
-      <a-row :gutter="8">
-        <a-col :sm="24" :md="12" :lg="8">
-          <a-card title="Markdown 导入" :bordered="false">
-            <span style="font-size:22px">Markdown 文档导入</span>
-            <a-button type="primary" style="float:right" @click="importMarkDown">导入</a-button>
-            <p>支持 Hexo/Jekyll 导入并解析元数据</p>
-          </a-card>
-        </a-col>
-        <a-col :sm="24" :md="12" :lg="8">
-          <a-card title="WordPress 导入" :bordered="false">
-            <span style="font-size:22px">WordPress 数据导入</span>
-            <a-button type="primary" style="float:right" @click="importWordPress">导入</a-button>
-            <p>尽请期待</p>
-          </a-card>
-        </a-col>
-      </a-row>
-    </div>
+    <a-row :gutter="12">
+      <a-col :sm="24" :md="12" :lg="8">
+        <a-card title="Markdown 导入" :bordered="false">
+          <span style="font-size:18px">Markdown 文档导入</span>
+          <a-button type="primary" style="float:right" @click="importMarkDown">导入</a-button>
+          <p>支持 Hexo/Jekyll 导入并解析元数据</p>
+        </a-card>
+      </a-col>
+      <a-col :sm="24" :md="12" :lg="8">
+        <a-card title="WordPress 导入" :bordered="false">
+          <span style="font-size:18px">WordPress 数据导入</span>
+          <a-button type="primary" style="float:right" @click="importWordPress">导入</a-button>
+          <p>尽请期待</p>
+        </a-card>
+      </a-col>
+    </a-row>
     <a-modal title="Markdown 文档导入" v-model="ishow" @ok="sure">
       <a-upload-dragger
         name="file"
@@ -67,7 +65,4 @@ export default {
 </script>
 
 <style scoped>
-.card-container {
-  padding: 16px;
-}
 </style>
