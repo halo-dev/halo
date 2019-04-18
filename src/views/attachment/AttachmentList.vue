@@ -68,6 +68,7 @@
         :pageSizeOptions="['18', '36', '54']"
         showSizeChanger
         @change="handlePaginationChange"
+        @showSizeChange="handlePaginationChange"
       />
     </a-row>
     <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
