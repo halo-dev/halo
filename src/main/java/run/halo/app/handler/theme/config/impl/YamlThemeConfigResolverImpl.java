@@ -1,13 +1,13 @@
-package run.halo.app.handler.theme.impl;
+package run.halo.app.handler.theme.config.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import run.halo.app.handler.theme.ThemeConfigResolver;
-import run.halo.app.handler.theme.support.Group;
-import run.halo.app.handler.theme.support.Item;
-import run.halo.app.handler.theme.support.Option;
+import run.halo.app.handler.theme.config.ThemeConfigResolver;
+import run.halo.app.handler.theme.config.support.Group;
+import run.halo.app.handler.theme.config.support.Item;
+import run.halo.app.handler.theme.config.support.Option;
 import run.halo.app.model.enums.DataType;
 import run.halo.app.model.enums.InputType;
 

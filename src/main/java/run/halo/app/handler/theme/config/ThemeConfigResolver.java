@@ -1,7 +1,7 @@
-package run.halo.app.handler.theme;
+package run.halo.app.handler.theme.config;
 
 import org.springframework.lang.NonNull;
-import run.halo.app.handler.theme.support.Group;
+import run.halo.app.handler.theme.config.support.Group;
 
 import java.io.IOException;
 import java.util.List;

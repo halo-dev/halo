@@ -1,8 +1,8 @@
 package run.halo.app.utils;
 
 import org.junit.Test;
-import run.halo.app.handler.theme.support.Group;
-import run.halo.app.handler.theme.impl.YamlThemeConfigResolverImpl;
+import run.halo.app.handler.theme.config.support.Group;
+import run.halo.app.handler.theme.config.impl.YamlThemeConfigResolverImpl;
 
 import java.io.IOException;
 import java.util.List;
