@@ -191,7 +191,6 @@ export default {
   data() {
     return {
       postStatus: postApi.postStatus,
-      // 查询参数
       pagination: {
         current: 1,
         pageSize: 10,
@@ -253,8 +252,6 @@ export default {
       ],
       selectedRowKeys: [],
       selectedRows: [],
-      options: {},
-      optionAlertShow: false,
       categories: [],
       posts: [],
       postsLoading: false

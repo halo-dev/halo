@@ -1,6 +1,6 @@
 <template>
   <div class="page-header-index-wide page-header-wrapper-grid-content-main">
-    <a-row :gutter="24">
+    <a-row :gutter="12">
       <a-col :lg="10" :md="24" :style="{ 'padding-bottom': '12px' }">
         <a-card :bodyStyle="{ padding: '16' }" :bordered="false">
           <div class="profile-center-avatarHolder">
