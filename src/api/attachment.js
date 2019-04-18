@@ -5,11 +5,11 @@ const baseUrl = '/api/admin/attachments'
 
 const attachmentApi = {}
 
-attachmentApi.list = pagination => {
+attachmentApi.query = params => {
   return service({
     url: baseUrl,
-    method: 'get',
-    params: pagination
+    params: params,
+    method: 'get'
   })
 }
 

@@ -8,7 +8,7 @@
               <a-row :gutter="48">
                 <a-col :md="6" :sm="24">
                   <a-form-item label="关键词">
-                    <a-input/>
+                    <a-input v-model="queryParam.keyword"/>
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
@@ -29,7 +29,7 @@
                 </a-col>
                 <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
-                    <a-button type="primary">查询</a-button>
+                    <a-button type="primary" @click="loadAttachments">查询</a-button>
                     <a-button style="margin-left: 8px;">重置</a-button>
                   </span>
                 </a-col>
@@ -63,10 +63,11 @@
     </a-row>
     <a-row type="flex" justify="end">
       <a-pagination
-        :defaultPageSize="pagination.size"
         :total="pagination.total"
+        :pageSizeOptions="['18', '36', '54']"
+        showSizeChanger
         @change="handlePaginationChange"
-      ></a-pagination>
+      />
     </a-row>
     <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
       <a-upload-dragger
@@ -190,9 +191,15 @@ export default {
       attachments: [],
       editable: false,
       pagination: {
-        page: 1,
+        current: 1,
+        pageSize: 18,
+        sort: null
+      },
+      queryParam: {
+        page: 0,
         size: 18,
-        sort: ''
+        sort: null,
+        keyword: null
       }
     }
   },
@@ -201,9 +208,10 @@ export default {
   },
   methods: {
     loadAttachments() {
-      const pagination = Object.assign({}, this.pagination)
-      pagination.page--
-      attachmentApi.list(pagination).then(response => {
+      this.queryParam.page = this.pagination.current - 1
+      this.queryParam.size = this.pagination.pageSize
+      this.queryParam.sort = this.pagination.sort
+      attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
       })
@@ -262,8 +270,9 @@ export default {
       this.drawerVisible = false
     },
     handlePaginationChange(page, pageSize) {
-      this.pagination.page = page
-      this.pagination.size = pageSize
+      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
+      this.pagination.current = page
+      this.pagination.pageSize = pageSize
       this.loadAttachments()
     },
     handleUpload(option) {

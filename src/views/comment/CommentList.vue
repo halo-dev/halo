@@ -132,7 +132,6 @@ export default {
         size: 10,
         sort: null,
         keyword: null,
-        categoryId: null,
         status: null
       },
       selectedRowKeys: [],
