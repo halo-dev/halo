@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.dto.AttachmentOutputDTO;
 import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.base.CrudService;
 
 
@@ -24,7 +25,7 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return a page of attachment output dto
      */
     @NonNull
-    Page<AttachmentOutputDTO> pageDtosBy(@NonNull Pageable pageable);
+    Page<AttachmentOutputDTO> pageDtosBy(@NonNull Pageable pageable, AttachmentQuery attachmentQuery);
 
     /**
      * Uploads file.
