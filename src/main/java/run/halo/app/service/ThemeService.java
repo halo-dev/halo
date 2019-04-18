@@ -7,6 +7,7 @@ import run.halo.app.handler.theme.support.ThemeProperty;
 import run.halo.app.model.support.ThemeFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -204,9 +205,19 @@ public interface ThemeService {
 
     /**
      * Upload theme.
+     *
      * @param file multipart file must not be null
      * @return theme info
      */
     @NonNull
     ThemeProperty upload(@NonNull MultipartFile file);
+
+    /**
+     * Adds a new theme.
+     *
+     * @param themeTmpPath theme temporary path must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
 }

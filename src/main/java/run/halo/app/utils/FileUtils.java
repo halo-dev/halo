@@ -3,9 +3,11 @@ package run.halo.app.utils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Comparator;
 
 /**
  * File utilities.
@@ -45,5 +47,19 @@ public class FileUtils {
                 return FileVisitResult.CONTINUE;
             }
         });
+    }
+
+    /**
+     * Deletes folder recursively.
+     *
+     * @param deletingPath deleting path must not be null
+     */
+    public static void deleteFolder(Path deletingPath) throws IOException {
+        Assert.notNull(deletingPath, "Deleting path must not be null");
+
+        Files.walk(deletingPath)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
     }
 }
