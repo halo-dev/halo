@@ -3,10 +3,10 @@ package run.halo.app.web.controller.admin.api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import run.halo.app.handler.theme.support.Group;
+import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
-import run.halo.app.handler.theme.support.ThemeProperty;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
 
