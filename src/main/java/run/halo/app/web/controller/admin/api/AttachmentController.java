@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.dto.AttachmentOutputDTO;
 import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.AttachmentService;
 
 import java.util.LinkedList;
@@ -39,8 +40,9 @@ public class AttachmentController {
      * @return Page<AttachmentOutputDTO>
      */
     @GetMapping
-    public Page<AttachmentOutputDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
-        return attachmentService.pageDtosBy(pageable);
+    public Page<AttachmentOutputDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                            AttachmentQuery attachmentQuery) {
+        return attachmentService.pageDtosBy(pageable, attachmentQuery);
     }
 
     /**

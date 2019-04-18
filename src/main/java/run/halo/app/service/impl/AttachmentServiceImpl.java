@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -12,6 +13,7 @@ import run.halo.app.handler.file.FileHandlers;
 import run.halo.app.model.dto.AttachmentOutputDTO;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
@@ -19,6 +21,9 @@ import run.halo.app.service.AttachmentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 
+import javax.persistence.criteria.Predicate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -47,14 +52,34 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     }
 
     @Override
-    public Page<AttachmentOutputDTO> pageDtosBy(Pageable pageable) {
+    public Page<AttachmentOutputDTO> pageDtosBy(@NonNull Pageable pageable, AttachmentQuery attachmentQuery) {
         Assert.notNull(pageable, "Page info must not be null");
 
         // List all
-        Page<Attachment> attachmentPage = listAll(pageable);
+        Page<Attachment> attachmentPage = attachmentRepository.findAll(buildSpecByQuery(attachmentQuery), pageable);
 
         // Convert and return
         return attachmentPage.map(this::convertToDto);
+    }
+
+    @NonNull
+    private Specification<Attachment> buildSpecByQuery(@NonNull AttachmentQuery attachmentQuery) {
+        Assert.notNull(attachmentQuery, "Attachment query must not be null");
+
+        return (Specification<Attachment>) (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (attachmentQuery.getKeyword() != null) {
+
+                String likeCondition = String.format("%%%s%%", StringUtils.strip(attachmentQuery.getKeyword()));
+
+                Predicate nameLike = criteriaBuilder.like(root.get("name"), likeCondition);
+
+                predicates.add(criteriaBuilder.or(nameLike));
+            }
+
+            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
     }
 
     @Override
