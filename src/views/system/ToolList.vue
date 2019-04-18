@@ -59,8 +59,8 @@ export default {
         this.$message.error(`${info.file.name} file upload failed.`)
       }
     },
-    importWordPress(){
-      this.$message.info('程序猿正在努力开发呢！');
+    importWordPress() {
+      this.$message.info('程序猿正在努力开发呢！')
     }
   }
 }
