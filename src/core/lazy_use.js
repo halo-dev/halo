@@ -7,7 +7,6 @@ import '@/core/lazy_lib/components_use'
 import Viser from 'viser-vue'
 import VueCropper from 'vue-cropper'
 import 'ant-design-vue/dist/antd.less'
-import '../style/main.less'
 
 // ext library
 import VueClipboard from 'vue-clipboard2'
