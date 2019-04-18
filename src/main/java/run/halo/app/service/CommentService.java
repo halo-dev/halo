@@ -2,6 +2,7 @@ package run.halo.app.service;
 
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.vo.CommentWithParentVO;
 import run.halo.app.model.vo.CommentWithPostVO;
 import run.halo.app.model.vo.CommentVO;
@@ -10,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import run.halo.app.service.base.CrudService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -49,6 +49,16 @@ public interface CommentService extends CrudService<Comment, Long> {
      */
     @NonNull
     Page<CommentWithPostVO> pageBy(@NonNull CommentStatus status, @NonNull Pageable pageable);
+
+    /**
+     * Pages comments.
+     *
+     * @param commentQuery comment query must not be null
+     * @param pageable  page info must not be null
+     * @return a page of comment
+     */
+    @NonNull
+    Page<CommentWithPostVO> pageBy(@NonNull CommentQuery commentQuery, @NonNull Pageable pageable);
 
     /**
      * Lists comments by post id.

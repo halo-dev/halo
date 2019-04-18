@@ -1,5 +1,6 @@
 package run.halo.app.repository;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.projection.CommentCountProjection;
@@ -9,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import run.halo.app.repository.base.BaseRepository;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import java.util.List;
  * @author johnniang
  * @date 3/21/19
  */
-public interface CommentRepository extends BaseRepository<Comment, Long> {
+public interface CommentRepository extends BaseRepository<Comment, Long>, JpaSpecificationExecutor<Comment> {
 
     /**
      * Finds all comments by status.

@@ -1,16 +1,5 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.CommentOutputDTO;
-import run.halo.app.model.entity.Comment;
-import run.halo.app.model.entity.User;
-import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.params.CommentParam;
-import run.halo.app.model.properties.BlogProperties;
-import run.halo.app.model.vo.CommentWithPostVO;
-import run.halo.app.service.CommentService;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
-import run.halo.app.utils.ValidationUtils;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -22,9 +11,11 @@ import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentParam;
+import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.vo.CommentWithPostVO;
 import run.halo.app.service.CommentService;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.utils.ValidationUtils;
 
@@ -55,6 +46,13 @@ public class CommentController {
         this.commentService = commentService;
         this.postService = postService;
         this.optionService = optionService;
+    }
+
+    @GetMapping
+    @ApiOperation("Lists comments")
+    public Page<CommentWithPostVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                          CommentQuery commentQuery) {
+        return commentService.pageBy(commentQuery, pageable);
     }
 
     @GetMapping("latest")

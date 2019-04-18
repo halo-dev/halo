@@ -1,9 +1,25 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.servlet.ServletUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.util.HtmlUtils;
 import run.halo.app.model.dto.post.PostMinimalOutputDTO;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.projection.CommentCountProjection;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.CommentPage;
@@ -19,26 +35,8 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.OwoUtil;
 import run.halo.app.utils.ServiceUtils;
-import cn.hutool.core.util.URLUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.extra.servlet.ServletUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.*;
-import org.springframework.data.domain.Sort.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.util.HtmlUtils;
-import run.halo.app.repository.CommentRepository;
-import run.halo.app.repository.PostRepository;
-import run.halo.app.security.authentication.Authentication;
-import run.halo.app.security.context.SecurityContextHolder;
-import run.halo.app.service.base.AbstractCrudService;
 
+import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -87,6 +85,40 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         Page<Comment> commentPage = commentRepository.findAllByStatus(status, pageable);
 
         return convertBy(commentPage);
+    }
+
+    @Override
+    public Page<CommentWithPostVO> pageBy(CommentQuery commentQuery, Pageable pageable) {
+        Assert.notNull(commentQuery, "Comment query must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+        Page<Comment> commentPage =  commentRepository.findAll(buildSpecByQuery(commentQuery), pageable);
+        return convertBy(commentPage);
+    }
+
+    @NonNull
+    private Specification<Comment> buildSpecByQuery(@NonNull CommentQuery commentQuery) {
+        Assert.notNull(commentQuery, "Comment query must not be null");
+
+        return (Specification<Comment>) (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (commentQuery.getStatus() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), commentQuery.getStatus()));
+            }
+
+            if (commentQuery.getKeyword() != null) {
+
+                String likeCondition = String.format("%%%s%%", StringUtils.strip(commentQuery.getKeyword()));
+
+                Predicate authorLike = criteriaBuilder.like(root.get("author"), likeCondition);
+                Predicate contentLike = criteriaBuilder.like(root.get("content"), likeCondition);
+                Predicate emailLike = criteriaBuilder.like(root.get("email"), likeCondition);
+
+                predicates.add(criteriaBuilder.or(authorLike, contentLike, emailLike));
+            }
+
+            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
     }
 
     @Override
