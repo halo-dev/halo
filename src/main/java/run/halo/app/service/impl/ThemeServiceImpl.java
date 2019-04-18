@@ -10,7 +10,6 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -20,22 +19,19 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.*;
-import run.halo.app.handler.file.FileHandler;
-import run.halo.app.handler.theme.ThemeConfigResolver;
-import run.halo.app.handler.theme.ThemePropertyResolver;
-import run.halo.app.handler.theme.support.Group;
-import run.halo.app.handler.theme.support.ThemeProperty;
+import run.halo.app.handler.theme.config.ThemeConfigResolver;
+import run.halo.app.handler.theme.config.ThemePropertyResolver;
+import run.halo.app.handler.theme.config.support.Group;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
-import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.JsonUtils;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -287,15 +283,6 @@ public class ThemeServiceImpl implements ThemeService {
         return activatedThemeId;
     }
 
-    /**
-     * Set activated theme id.
-     *
-     * @param themeId theme id
-     */
-    private void setActivatedThemeId(@Nullable String themeId) {
-        this.activatedThemeId = themeId;
-    }
-
     @Override
     public ThemeProperty activeTheme(String themeId) {
         // Check existence of the theme
@@ -322,12 +309,6 @@ public class ThemeServiceImpl implements ThemeService {
         return themeProperty;
     }
 
-    /**
-     * Upload theme.
-     *
-     * @param file multipart file must not be null
-     * @return theme info
-     */
     @Override
     public ThemeProperty upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
@@ -346,7 +327,7 @@ public class ThemeServiceImpl implements ThemeService {
             file.transferTo(uploadPath);
 
             // Unzip theme package
-            ZipUtil.unzip(uploadPath.toFile(),uploadPath.getParent().toFile());
+            ZipUtil.unzip(uploadPath.toFile(), uploadPath.getParent().toFile());
 
             // Delete theme package
             FileUtil.del(uploadPath.toFile());
@@ -358,6 +339,36 @@ public class ThemeServiceImpl implements ThemeService {
             log.error("Failed to upload theme to local: " + uploadPath, e);
             throw new ServiceException("Failed to upload theme to local").setErrorData(uploadPath);
         }
+    }
+
+    @Override
+    public ThemeProperty add(Path themeTmpPath) throws IOException {
+        Assert.notNull(themeTmpPath, "Theme temporary path must not be null");
+        Assert.isTrue(Files.isDirectory(themeTmpPath), "Theme temporary path must be a directory");
+
+        // Check property config
+        Path configPath = getThemePropertyPathOfNullable(themeTmpPath).orElseThrow(() -> new ThemePropertyMissingException("Theme property file is dismiss").setErrorData(themeTmpPath));
+
+        ThemeProperty tmpThemeProperty = getProperty(configPath);
+
+        // Copy the temporary path to current theme folder
+        Path targetThemePath = workDir.resolve(tmpThemeProperty.getId());
+        FileUtils.copyFolder(themeTmpPath, targetThemePath);
+
+        // Delete temp theme folder
+        FileUtils.deleteFolder(themeTmpPath);
+
+        // Get property again
+        return getProperty(targetThemePath);
+    }
+
+    /**
+     * Set activated theme id.
+     *
+     * @param themeId theme id
+     */
+    private void setActivatedThemeId(@Nullable String themeId) {
+        this.activatedThemeId = themeId;
     }
 
     /**
@@ -446,8 +457,14 @@ public class ThemeServiceImpl implements ThemeService {
         }
     }
 
-    @Nullable
-    private Path getPropertyPath(@NonNull Path themePath) {
+    /**
+     * Gets property path of nullable.
+     *
+     * @param themePath theme path.
+     * @return an optional property path
+     */
+    @NonNull
+    private Optional<Path> getThemePropertyPathOfNullable(@NonNull Path themePath) {
         Assert.notNull(themePath, "Theme path must not be null");
 
         for (String propertyPathName : THEME_PROPERTY_FILE_NAMES) {
@@ -456,28 +473,28 @@ public class ThemeServiceImpl implements ThemeService {
             log.debug("Attempting to find property file: [{}]", propertyPath);
             if (Files.exists(propertyPath) && Files.isReadable(propertyPath)) {
                 log.debug("Found property file: [{}]", propertyPath);
-                return propertyPath;
+                return Optional.of(propertyPath);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
-     * Gets theme property.
+     * Gets property path of non null.
      *
-     * @param themePath must not be null
-     * @return theme property
+     * @param themePath theme path.
+     * @return property path won't be null
      */
     @NonNull
-    private ThemeProperty getProperty(@NonNull Path themePath) {
+    private Path getThemePropertyPath(@NonNull Path themePath) {
+        return getThemePropertyPathOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException(themePath + " dose not exist any theme property file").setErrorData(themePath));
+    }
+
+    private Optional<ThemeProperty> getPropertyOfNullable(Path themePath) {
         Assert.notNull(themePath, "Theme path must not be null");
 
-        Path propertyPath = getPropertyPath(themePath);
-
-        if (propertyPath == null) {
-            throw new ThemePropertyMissingException(themePath + " dose not exist any theme property file").setErrorData(themePath);
-        }
+        Path propertyPath = getThemePropertyPath(themePath);
 
         try {
             // Get property content
@@ -504,10 +521,24 @@ public class ThemeServiceImpl implements ThemeService {
                 themeProperty.setActivated(true);
             }
 
-            return themeProperty;
+            return Optional.of(themeProperty);
+
         } catch (IOException e) {
-            throw new ThemePropertyMissingException("Cannot resolve theme property", e).setErrorData(propertyPath.toString());
+            log.error("Failed to load theme property file", e);
         }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Gets theme property.
+     *
+     * @param themePath must not be null
+     * @return theme property
+     */
+    @NonNull
+    private ThemeProperty getProperty(@NonNull Path themePath) {
+        return getPropertyOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException("Cannot resolve theme property").setErrorData(themePath));
     }
 
     /**
@@ -517,6 +548,7 @@ public class ThemeServiceImpl implements ThemeService {
      * @return screenshots file name or null if the given theme path has not screenshots
      * @throws IOException throws when listing files
      */
+    @NonNull
     private Optional<String> getScreenshotsFileName(@NonNull Path themePath) throws IOException {
         Assert.notNull(themePath, "Theme path must not be null");
 

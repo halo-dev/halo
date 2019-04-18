@@ -1,9 +1,9 @@
-package run.halo.app.handler.theme.impl;
+package run.halo.app.handler.theme.config.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.junit.Test;
-import run.halo.app.handler.theme.support.ThemeProperty;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
 
 import java.io.IOException;
 
