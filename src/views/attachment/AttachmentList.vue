@@ -125,137 +125,30 @@
         <p class="ant-upload-hint">支持单个或批量上传</p>
       </upload>
     </a-modal>
-    <a-drawer
+    <AttachmentDetailDrawer
+      v-model="drawerVisiable"
       v-if="selectAttachment"
-      title="附件详情"
-      :width="isMobile()?'100%':'560'"
-      closable
-      :visible="drawerVisible"
-      destroyOnClose
-      @close="onChildClose"
-    >
-      <a-row
-        type="flex"
-        align="middle"
-      >
-        <a-col :span="24">
-          <a-skeleton
-            active
-            :loading="detailLoading"
-            :paragraph="{rows: 8}"
-          >
-            <div class="attach-detail-img">
-              <img :src="selectAttachment.path">
-            </div>
-          </a-skeleton>
-        </a-col>
-        <a-divider />
-        <a-col :span="24">
-          <a-skeleton
-            active
-            :loading="detailLoading"
-            :paragraph="{rows: 8}"
-          >
-            <a-list itemLayout="horizontal">
-              <a-list-item>
-                <a-list-item-meta>
-                  <template
-                    slot="description"
-                    v-if="editable"
-                  >
-                    <a-input
-                      v-model="selectAttachment.name"
-                      @blur="updateAttachment"
-                    />
-                  </template>
-                  <template
-                    slot="description"
-                    v-else
-                  >{{ selectAttachment.name }}</template>
-                  <span slot="title">
-                    附件名：
-                    <a-icon
-                      type="edit"
-                      @click="handleEditName"
-                    />
-                  </span>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-list-item-meta :description="selectAttachment.mediaType">
-                  <span slot="title">附件类型：</span>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-list-item-meta :description="selectAttachment.size">
-                  <span slot="title">附件大小：</span>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-list-item-meta :description="selectAttachment.height+'x'+selectAttachment.width">
-                  <span slot="title">图片尺寸：</span>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-list-item-meta :description="selectAttachment.createTime">
-                  <span slot="title">上传日期：</span>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-list-item-meta :description="selectAttachment.path">
-                  <span slot="title">
-                    普通链接：
-                    <a-icon
-                      type="copy"
-                      @click="doCopyNormalLink"
-                    />
-                  </span>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-list-item-meta :description="'!['+selectAttachment.name+']('+selectAttachment.path+')'">
-                  <span slot="title">
-                    Markdown 格式：
-                    <a-icon
-                      type="copy"
-                      @click="doCopyMarkdownLink"
-                    />
-                  </span>
-                </a-list-item-meta>
-              </a-list-item>
-            </a-list>
-          </a-skeleton>
-        </a-col>
-      </a-row>
-      <div class="attachment-control">
-        <a-popconfirm
-          title="你确定要删除该附件？"
-          @confirm="deleteAttachment(selectAttachment.id)"
-          okText="确定"
-          cancelText="取消"
-        >
-          <a-button type="danger">删除</a-button>
-        </a-popconfirm>
-      </div>
-    </a-drawer>
+      :attachment="selectAttachment"
+      @delete="handleDelete"
+    />
   </page-view>
 </template>
 
 <script>
 import { PageView } from '@/layouts'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import AttachmentDetailDrawer from './components/AttachmentDetailDrawer'
 import attachmentApi from '@/api/attachment'
 
 export default {
   components: {
-    PageView
+    PageView,
+    AttachmentDetailDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
     return {
       uploadVisible: false,
-      drawerVisible: false,
-      detailLoading: false,
       selectAttachment: null,
       attachments: [],
       editable: false,
@@ -270,7 +163,8 @@ export default {
         sort: null,
         keyword: null
       },
-      uploadHandler: attachmentApi.upload
+      uploadHandler: attachmentApi.upload,
+      drawerVisiable: false
     }
   },
   created() {
@@ -287,12 +181,8 @@ export default {
       })
     },
     showDetailDrawer(attachment) {
-      this.drawerVisible = true
-      this.detailLoading = true
       this.selectAttachment = attachment
-      setTimeout(() => {
-        this.detailLoading = false
-      }, 500)
+      this.drawerVisiable = true
     },
     showUploadModal() {
       this.uploadVisible = true
@@ -308,55 +198,17 @@ export default {
     handleUploadSuccess() {
       this.loadAttachments()
     },
-    deleteAttachment(id) {
-      attachmentApi.delete(id).then(response => {
-        this.$message.success('删除成功！')
-        this.drawerVisible = false
-        this.loadAttachments()
-      })
-    },
-    doCopyNormalLink() {
-      const text = `${this.selectAttachment.path}`
-      this.$copyText(text)
-        .then(message => {
-          console.log('copy', message)
-          this.$message.success('复制成功')
-        })
-        .catch(err => {
-          console.log('copy.err', err)
-          this.$message.error('复制失败')
-        })
-    },
-    doCopyMarkdownLink() {
-      const text = `![${this.selectAttachment.name}](${this.selectAttachment.path})`
-      this.$copyText(text)
-        .then(message => {
-          console.log('copy', message)
-          this.$message.success('复制成功')
-        })
-        .catch(err => {
-          console.log('copy.err', err)
-          this.$message.error('复制失败')
-        })
-    },
-    onChildClose() {
-      this.drawerVisible = false
-    },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
       this.pagination.page = page
       this.pagination.size = size
       this.loadAttachments()
     },
-    handleEditName() {
-      this.editable = !this.editable
-    },
-    updateAttachment() {
-      this.$message.success('修改')
-      this.editable = false
-    },
     resetParam() {
       this.queryParam.keyword = null
+      this.loadAttachments()
+    },
+    handleDelete(attachment) {
       this.loadAttachments()
     }
   }
