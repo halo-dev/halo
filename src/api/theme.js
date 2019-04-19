@@ -1,4 +1,3 @@
-import axios from 'axios'
 import service from '@/utils/service'
 
 const baseUrl = '/api/admin/themes'
@@ -75,9 +74,6 @@ themeApi.getProperty = themeId => {
     method: 'get'
   })
 }
-
-themeApi.CancelToken = axios.CancelToken
-themeApi.isCancel = axios.isCancel
 
 themeApi.upload = (formData, uploadProgress, cancelToken) => {
   return service({
