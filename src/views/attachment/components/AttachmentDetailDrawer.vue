@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     title="附件详情"
-    :width="isMobile()?'100%':'560'"
+    :width="isMobile()?'100%':'460'"
     closable
     :visible="visiable"
     destroyOnClose
@@ -86,7 +86,8 @@
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-list-item-meta :description="'!['+attachment.name+']('+attachment.path+')'">
+              <a-list-item-meta>
+                <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
                 <span slot="title">
                   Markdown 格式：
                   <a-icon
@@ -195,5 +196,16 @@ export default {
 <style>
 .attach-detail-img img {
   width: 100%;
+}
+.attachment-control {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  border-top: 1px solid rgb(232, 232, 232);
+  padding: 10px 16px;
+  text-align: right;
+  left: 0px;
+  background: rgb(255, 255, 255);
+  border-radius: 0px 0px 4px 4px;
 }
 </style>

@@ -158,7 +158,6 @@ export default {
 </script>
 
 <style>
-.post-control,
 .attachment-control {
   position: absolute;
   bottom: 0px;

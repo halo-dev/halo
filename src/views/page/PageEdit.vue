@@ -70,18 +70,19 @@
         </a-drawer>
       </a-col>
     </a-row>
-
+    <AttachmentDrawer v-model="attachmentDrawerVisible"/>
     <footer-tool-bar
       :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
     >
       <a-button type="primary" @click="showDrawer">发布</a-button>
-      <a-button type="dashed" style="margin-left: 8px;">附件库</a-button>
+      <a-button type="dashed" style="margin-left: 8px;" @click="showAttachDrawer">附件库</a-button>
     </footer-tool-bar>
   </div>
 </template>
 
 <script>
 import { mavonEditor } from 'mavon-editor'
+import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
@@ -92,7 +93,8 @@ export default {
   name: 'Editor',
   components: {
     mavonEditor,
-    FooterToolBar
+    FooterToolBar,
+    AttachmentDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -102,6 +104,7 @@ export default {
         sm: { span: 24 },
         xs: { span: 24 }
       },
+      attachmentDrawerVisible: false,
       visible: false,
       postUrl: 'hello-world',
       customTpls: [],
@@ -139,6 +142,9 @@ export default {
       themeApi.customTpls().then(response => {
         this.customTpls = response.data.data
       })
+    },
+    showAttachDrawer() {
+      this.attachmentDrawerVisible = true
     },
     showDrawer() {
       this.visible = true

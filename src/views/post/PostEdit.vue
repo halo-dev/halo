@@ -166,7 +166,6 @@ import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
-import attachmentApi from '@/api/attachment'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 
 const toolbars = {
@@ -206,8 +205,6 @@ export default {
         xs: { span: 24 }
       },
       attachmentDrawerVisible: false,
-      selectAttachmentDrawerVisible: false,
-      uploadVisible: false,
       visible: false,
       childDrawerVisible: false,
       tags: [],
@@ -215,16 +212,7 @@ export default {
       selectedCategoryIds: [],
       selectedTagIds: [],
       markdownOption: toolbars,
-      postToStage: {},
-      attachments: [],
-      selectAttachment: {},
-      detailLoading: false,
-      pagination: {
-        page: 1,
-        size: 8,
-        sort: ''
-      },
-      attachmentUploadHandler: attachmentApi.upload
+      postToStage: {}
     }
   },
   computed: {
@@ -265,14 +253,6 @@ export default {
         this.categories = response.data.data
       })
     },
-    loadAttachments() {
-      const pagination = Object.assign({}, this.pagination)
-      pagination.page--
-      attachmentApi.query(pagination).then(response => {
-        this.attachments = response.data.data.content
-        this.pagination.total = response.data.data.total
-      })
-    },
     createOrUpdatePost() {
       // Set category ids
       this.postToStage.categoryIds = this.selectedCategoryIds
@@ -299,15 +279,6 @@ export default {
     },
     showAttachDrawer() {
       this.attachmentDrawerVisible = true
-      this.loadAttachments()
-    },
-    showDetailDrawer(attachment) {
-      this.selectAttachmentDrawerVisible = true
-      this.detailLoading = true
-      this.selectAttachment = attachment
-      setTimeout(() => {
-        this.detailLoading = false
-      }, 500)
     },
     showThumbDrawer() {
       this.childDrawerVisible = true
@@ -325,55 +296,6 @@ export default {
     },
     onChildClose() {
       this.childDrawerVisible = false
-    },
-    onAttachmentClose() {
-      this.attachmentDrawerVisible = false
-    },
-    onSelectAttachmentClose() {
-      this.selectAttachmentDrawerVisible = false
-    },
-    doCopyNormalLink() {
-      const text = `${this.selectAttachment.path}`
-      this.$copyText(text)
-        .then(message => {
-          console.log('copy', message)
-          this.$message.success('复制成功')
-        })
-        .catch(err => {
-          console.log('copy.err', err)
-          this.$message.error('复制失败')
-        })
-    },
-    doCopyMarkdownLink() {
-      const text = `![${this.selectAttachment.name}](${this.selectAttachment.path})`
-      this.$copyText(text)
-        .then(message => {
-          console.log('copy', message)
-          this.$message.success('复制成功')
-        })
-        .catch(err => {
-          console.log('copy.err', err)
-          this.$message.error('复制失败')
-        })
-    },
-    handlePaginationChange(page, pageSize) {
-      this.pagination.page = page
-      this.pagination.size = pageSize
-      this.loadAttachments()
-    },
-    handleChange(info) {
-      const status = info.file.status
-      if (status === 'done') {
-        this.$message.success(`${info.file.name} 文件上传成功`)
-      } else if (status === 'error') {
-        this.$message.error(`${info.file.name} 文件上传失败`)
-      }
-    },
-    handleAttachmentUploadSuccess() {
-      this.$message.success('上传成功')
-    },
-    showUploadModal() {
-      this.uploadVisible = true
     }
   }
 }
@@ -389,19 +311,6 @@ export default {
   padding-bottom: 0;
 }
 
-.post-control,
-.attachment-control {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
-  border-top: 1px solid rgb(232, 232, 232);
-  padding: 10px 16px;
-  text-align: right;
-  left: 0px;
-  background: rgb(255, 255, 255);
-  border-radius: 0px 0px 4px 4px;
-}
-
 .ant-form-vertical .ant-form-item {
   padding-bottom: 0;
 }
@@ -409,26 +318,5 @@ export default {
 .post-thum .img {
   width: 100%;
   cursor: pointer;
-}
-
-.attach-item {
-  width: 50%;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 28%;
-  overflow: hidden;
-  float: left;
-}
-
-.attach-item > img {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.attach-detail-img img {
-  width: 100%;
 }
 </style>
