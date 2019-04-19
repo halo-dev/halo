@@ -93,7 +93,7 @@ public class ThemeServiceImpl implements ThemeService {
     public Optional<ThemeProperty> getThemeBy(String themeId) {
         Assert.hasText(themeId, "Theme id must not be blank");
 
-        List<ThemeProperty> themes = getThemes();
+        Set<ThemeProperty> themes = getThemes();
 
         log.debug("Themes type: [{}]", themes.getClass());
         log.debug("Themes: [{}]", themes);
@@ -102,38 +102,33 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public List<ThemeProperty> getThemes() {
-        // Fetch themes from cache
-        List<ThemeProperty> result = cacheStore.get(THEMES_CACHE_KEY).map(themesCache -> {
-            try {
+    public Set<ThemeProperty> getThemes() {
+        Optional<String> themeCacheString = cacheStore.get(THEMES_CACHE_KEY);
+
+        try {
+            if (themeCacheString.isPresent()) {
                 // Convert to theme properties
-                ThemeProperty[] themeProperties = JsonUtils.jsonToObject(themesCache, ThemeProperty[].class);
-                return Arrays.asList(themeProperties);
-            } catch (IOException e) {
-                throw new ServiceException("Failed to parse json", e);
+                ThemeProperty[] themeProperties = JsonUtils.jsonToObject(themeCacheString.get(), ThemeProperty[].class);
+                return new HashSet<>(Arrays.asList(themeProperties));
             }
-        }).orElseGet(() -> {
-            try {
-                // List and filter sub folders
-                List<Path> themePaths = Files.list(getBasePath()).filter(path -> Files.isDirectory(path)).collect(Collectors.toList());
 
-                if (CollectionUtils.isEmpty(themePaths)) {
-                    return Collections.emptyList();
-                }
+            // List and filter sub folders
+            List<Path> themePaths = Files.list(getBasePath()).filter(path -> Files.isDirectory(path)).collect(Collectors.toList());
 
-                // Get theme properties
-                List<ThemeProperty> themes = themePaths.stream().map(this::getProperty).collect(Collectors.toList());
-
-                // Cache the themes
-                cacheStore.put(THEMES_CACHE_KEY, JsonUtils.objectToJson(themes));
-
-                return themes;
-            } catch (Exception e) {
-                throw new ServiceException("Themes scan failed", e);
+            if (CollectionUtils.isEmpty(themePaths)) {
+                return Collections.emptySet();
             }
-        });
 
-        return CollectionUtils.isEmpty(result) ? Collections.emptyList() : result;
+            // Get theme properties
+            Set<ThemeProperty> themes = themePaths.stream().map(this::getProperty).collect(Collectors.toSet());
+
+            // Cache the themes
+            cacheStore.put(THEMES_CACHE_KEY, JsonUtils.objectToJson(themes));
+
+            return themes;
+        } catch (IOException e) {
+            throw new ServiceException("Failed to get themes", e);
+        }
     }
 
     @Override

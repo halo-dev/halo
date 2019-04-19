@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author : RYAN0UP
@@ -86,10 +87,10 @@ public interface ThemeService {
     /**
      * Gets all themes
      *
-     * @return list of themes
+     * @return set of themes
      */
     @NonNull
-    List<ThemeProperty> getThemes();
+    Set<ThemeProperty> getThemes();
 
     /**
      * Lists theme folder by absolute path.
