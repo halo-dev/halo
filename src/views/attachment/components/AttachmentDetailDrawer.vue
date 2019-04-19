@@ -143,11 +143,24 @@ export default {
     }
   },
   created() {
-    setTimeout(() => {
-      this.detailLoading = false
-    }, 300)
+    this.loadSkeleton()
+  },
+  watch: {
+    visiable: function(newValue, oldValue) {
+      this.$log.debug('old value', oldValue)
+      this.$log.debug('new value', newValue)
+      if (newValue) {
+        this.loadSkeleton()
+      }
+    }
   },
   methods: {
+    loadSkeleton() {
+      this.detailLoading = true
+      setTimeout(() => {
+        this.detailLoading = false
+      }, 500)
+    },
     deleteAttachment() {
       attachmentApi.delete(this.attachment.id).then(response => {
         this.$message.success('删除成功！')

@@ -17,23 +17,29 @@
           enterButton
         />
       </a-row>
-      <a-divider></a-divider>
+      <a-divider />
       <a-row
         type="flex"
         align="middle"
       >
-        <a-col :span="24">
-          <div
-            class="attach-item"
-            v-for="(item, index) in attachments"
-            :key="index"
-            @click="showDetailDrawer(item)"
-          >
-            <img :src="item.thumbPath">
-          </div>
-        </a-col>
+        <a-skeleton
+          active
+          :loading="skeletonLoading"
+          :paragraph="{ rows: 8 }"
+        >
+          <a-col :span="24">
+            <div
+              class="attach-item"
+              v-for="(item, index) in attachments"
+              :key="index"
+              @click="showDetailDrawer(item)"
+            >
+              <img :src="item.thumbPath">
+            </div>
+          </a-col>
+        </a-skeleton>
       </a-row>
-      <a-divider></a-divider>
+      <a-divider />
       <a-row
         type="flex"
         justify="end"
@@ -108,9 +114,10 @@ export default {
       detailVisiable: false,
       attachmentDrawerVisible: false,
       uploadVisible: false,
+      skeletonLoading: true,
       pagination: {
         page: 1,
-        size: 8,
+        size: 14,
         sort: ''
       },
       attachments: [],
@@ -119,9 +126,23 @@ export default {
     }
   },
   created() {
+    this.loadSkeleton()
     this.loadAttachments()
   },
+  watch: {
+    visiable: function(newValue, oldValue) {
+      if (newValue) {
+        this.loadSkeleton()
+      }
+    }
+  },
   methods: {
+    loadSkeleton() {
+      this.skeletonLoading = true
+      setTimeout(() => {
+        this.skeletonLoading = false
+      }, 500)
+    },
     showUploadModal() {
       this.uploadVisible = true
     },
