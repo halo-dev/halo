@@ -12,6 +12,7 @@ import run.halo.app.service.ThemeSettingService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Theme controller.
@@ -41,7 +42,7 @@ public class ThemeController {
 
     @GetMapping
     @ApiOperation("List all themes")
-    public List<ThemeProperty> listAll() {
+    public Set<ThemeProperty> listAll() {
         return themeService.getThemes();
     }
 
@@ -118,7 +119,7 @@ public class ThemeController {
 
     @PostMapping("upload")
     @ApiOperation("Upload theme")
-    public ThemeProperty uploadTheme(@RequestPart("file") MultipartFile file){
+    public ThemeProperty uploadTheme(@RequestPart("file") MultipartFile file) {
         return themeService.upload(file);
     }
 }
