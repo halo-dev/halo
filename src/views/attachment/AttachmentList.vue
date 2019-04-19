@@ -30,7 +30,7 @@
                 <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
                     <a-button type="primary" @click="loadAttachments">查询</a-button>
-                    <a-button style="margin-left: 8px;">重置</a-button>
+                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
                   </span>
                 </a-col>
               </a-row>
@@ -65,7 +65,7 @@
       <a-pagination
         :total="pagination.total"
         :defaultPageSize="pagination.size"
-        :pageSizeOptions="['18', '36', '54']"
+        :pageSizeOptions="['18', '36', '54','72','90','108']"
         showSizeChanger
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
@@ -316,6 +316,10 @@ export default {
     updateAttachment() {
       this.$message.success('修改')
       this.editable = false
+    },
+    resetParam() {
+      this.queryParam.keyword = null
+      this.loadAttachments()
     }
   }
 }

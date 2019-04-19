@@ -15,17 +15,17 @@
           <img :alt="theme.name" :src="theme.screenshots" slot="cover">
           <template class="ant-card-actions" slot="actions">
             <div v-if="theme.activated">
-              <a-icon type="unlock" theme="twoTone"/> 已启用
+              <a-icon type="unlock" theme="twoTone"/>已启用
             </div>
             <div v-else @click="handleActivateClick(theme)">
-              <a-icon type="lock"/> 启用
+              <a-icon type="lock"/>启用
             </div>
             <div @click="handleEditClick(theme)">
-              <a-icon type="setting"/> 设置
+              <a-icon type="setting"/>设置
             </div>
             <a-dropdown placement="topCenter">
               <a class="ant-dropdown-link" href="#">
-                <a-icon type="ellipsis"/> 更多
+                <a-icon type="ellipsis"/>更多
               </a>
               <a-menu slot="overlay">
                 <a-menu-item :key="1" :disabled="theme.activated">
@@ -36,10 +36,10 @@
                     okText="确定"
                     cancelText="取消"
                   >
-                    <a-icon type="delete"/> 删除
+                    <a-icon type="delete"/>删除
                   </a-popconfirm>
                   <span v-else>
-                    <a-icon type="delete"/> 删除
+                    <a-icon type="delete"/>删除
                   </span>
                 </a-menu-item>
               </a-menu>
@@ -142,20 +142,34 @@
     <div class="upload-button">
       <a-button type="primary" shape="circle" icon="plus" size="large" @click="showUploadModal"></a-button>
     </div>
-    <a-modal title="上传主题" v-model="uploadVisible" :footer="null">
-      <a-upload-dragger
-        name="file"
-        :multiple="true"
-        accept="application/zip"
-        :customRequest="handleUpload"
-        @change="handleChange"
-      >
-        <p class="ant-upload-drag-icon">
-          <a-icon type="inbox"/>
-        </p>
-        <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
-        <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
-      </a-upload-dragger>
+    <a-modal title="安装主题" v-model="uploadVisible" :footer="null" :bodyStyle="{ padding: '0 24px 24px' }">
+      <a-tabs defaultActiveKey="1">
+        <a-tab-pane tab="本地上传" key="1">
+          <a-upload-dragger
+            name="file"
+            :multiple="true"
+            accept="application/zip"
+            :customRequest="handleUpload"
+            @change="handleChange"
+          >
+            <p class="ant-upload-drag-icon">
+              <a-icon type="inbox"/>
+            </p>
+            <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
+            <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
+          </a-upload-dragger>
+        </a-tab-pane>
+        <a-tab-pane tab="远程拉取" key="2">
+          <a-form layout="vertical">
+            <a-form-item label="远程地址：" >
+              <a-input />
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary">确定</a-button>
+            </a-form-item>
+          </a-form>
+        </a-tab-pane>
+      </a-tabs>
     </a-modal>
   </div>
 </template>
