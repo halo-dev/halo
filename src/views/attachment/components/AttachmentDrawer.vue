@@ -121,7 +121,7 @@ export default {
         sort: ''
       },
       attachments: [],
-      selectedAttachment: null,
+      selectedAttachment: {},
       attachmentUploadHandler: attachmentApi.upload
     }
   },

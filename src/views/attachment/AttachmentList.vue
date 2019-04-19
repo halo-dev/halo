@@ -149,7 +149,7 @@ export default {
   data() {
     return {
       uploadVisible: false,
-      selectAttachment: null,
+      selectAttachment: {},
       attachments: [],
       editable: false,
       pagination: {
