@@ -1,0 +1,199 @@
+<template>
+  <div>
+    <a-drawer
+      title="附件库"
+      :width="isMobile()?'100%':'580'"
+      closable
+      :visible="visiable"
+      destroyOnClose
+      @close="onClose"
+    >
+      <a-row
+        type="flex"
+        align="middle"
+      >
+        <a-input-search
+          placeholder="搜索附件"
+          enterButton
+        />
+      </a-row>
+      <a-divider></a-divider>
+      <a-row
+        type="flex"
+        align="middle"
+      >
+        <a-col :span="24">
+          <div
+            class="attach-item"
+            v-for="(item, index) in attachments"
+            :key="index"
+            @click="showDetailDrawer(item)"
+          >
+            <img :src="item.thumbPath">
+          </div>
+        </a-col>
+      </a-row>
+      <a-divider></a-divider>
+      <a-row
+        type="flex"
+        justify="end"
+      >
+        <a-pagination
+          :defaultPageSize="pagination.size"
+          :total="pagination.total"
+          @change="handlePaginationChange"
+        ></a-pagination>
+      </a-row>
+
+      <AttachmentDetailDrawer
+        v-model="detailVisiable"
+        v-if="selectedAttachment"
+        :attachment="selectedAttachment"
+        @delete="handleDelete"
+      />
+      <div class="attachment-control">
+        <a-button
+          @click="showUploadModal"
+          type="primary"
+        >上传附件</a-button>
+      </div>
+    </a-drawer>
+
+    <a-modal
+      title="上传附件"
+      v-model="uploadVisible"
+      :footer="null"
+    >
+      <upload
+        name="file"
+        multiple
+        accept="image/*"
+        :uploadHandler="attachmentUploadHandler"
+        @success="handleAttachmentUploadSuccess"
+      >
+        <p class="ant-upload-drag-icon">
+          <a-icon type="inbox" />
+        </p>
+        <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
+        <p class="ant-upload-hint">支持单个或批量上传</p>
+      </upload>
+    </a-modal>
+  </div>
+</template>
+
+<script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
+import attachmentApi from '@/api/attachment'
+import AttachmentDetailDrawer from './AttachmentDetailDrawer'
+
+export default {
+  name: 'AttachmentDrawer',
+  mixins: [mixin, mixinDevice],
+  components: {
+    AttachmentDetailDrawer
+  },
+  model: {
+    prop: 'visiable',
+    event: 'close'
+  },
+  props: {
+    visiable: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+  data() {
+    return {
+      detailVisiable: false,
+      attachmentDrawerVisible: false,
+      uploadVisible: false,
+      pagination: {
+        page: 1,
+        size: 8,
+        sort: ''
+      },
+      attachments: [],
+      selectedAttachment: null,
+      attachmentUploadHandler: attachmentApi.upload
+    }
+  },
+  created() {
+    this.loadAttachments()
+  },
+  methods: {
+    showUploadModal() {
+      this.uploadVisible = true
+    },
+    showDetailDrawer(attachment) {
+      this.selectedAttachment = attachment
+      this.$log.debug('Show detail of', attachment)
+      this.detailVisiable = true
+    },
+    loadAttachments() {
+      const pagination = Object.assign({}, this.pagination)
+      pagination.page--
+      attachmentApi.query(pagination).then(response => {
+        this.attachments = response.data.data.content
+        this.pagination.total = response.data.data.total
+      })
+    },
+    handlePaginationChange(page, pageSize) {
+      this.pagination.page = page
+      this.pagination.size = pageSize
+      this.loadAttachments()
+    },
+    handleAttachmentUploadSuccess() {
+      this.$message.success('上传成功')
+      this.loadAttachments()
+    },
+    handleDelete() {
+      this.loadAttachments()
+    },
+    onClose() {
+      this.$emit('close', false)
+    }
+  }
+}
+</script>
+
+<style>
+.post-control,
+.attachment-control {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  border-top: 1px solid rgb(232, 232, 232);
+  padding: 10px 16px;
+  text-align: right;
+  left: 0px;
+  background: rgb(255, 255, 255);
+  border-radius: 0px 0px 4px 4px;
+}
+
+.ant-form-vertical .ant-form-item {
+  padding-bottom: 0;
+}
+
+.post-thum .img {
+  width: 100%;
+  cursor: pointer;
+}
+
+.attach-item {
+  width: 50%;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 28%;
+  overflow: hidden;
+  float: left;
+}
+
+.attach-item > img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+</style>

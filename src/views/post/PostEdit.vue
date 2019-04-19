@@ -1,7 +1,13 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+      <a-col
+        :xl="24"
+        :lg="24"
+        :md="24"
+        :sm="24"
+        :xs="24"
+      >
 
         <div style="margin-bottom: 16px">
           <a-input
@@ -13,12 +19,28 @@
         </div>
 
         <div id="editor">
-          <mavon-editor v-model="postToStage.originalContent" :boxShadow="false" :ishljs="true"/>
+          <mavon-editor
+            v-model="postToStage.originalContent"
+            :boxShadow="false"
+            :ishljs="true"
+          />
         </div>
       </a-col>
 
-      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-drawer title="文章设置" :width="isMobile()?'100%':'460'" closable @close="onClose" :visible="visible">
+      <a-col
+        :xl="24"
+        :lg="24"
+        :md="24"
+        :sm="24"
+        :xs="24"
+      >
+        <a-drawer
+          title="文章设置"
+          :width="isMobile()?'100%':'460'"
+          closable
+          @close="onClose"
+          :visible="visible"
+        >
           <div class="post-setting-drawer-content">
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">基本设置</h3>
@@ -28,13 +50,19 @@
                     label="文章路径："
                     :help="'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
                   >
-                    <a-input v-model="postToStage.url"/>
+                    <a-input v-model="postToStage.url" />
                   </a-form-item>
                   <a-form-item label="文章密码：">
-                    <a-input type="password" v-model="postToStage.password"/>
+                    <a-input
+                      type="password"
+                      v-model="postToStage.password"
+                    />
                   </a-form-item>
                   <a-form-item label="是否关闭评论：">
-                    <a-radio-group v-model="postToStage.disallowComment" :defaultValue="false">
+                    <a-radio-group
+                      v-model="postToStage.disallowComment"
+                      :defaultValue="false"
+                    >
                       <a-radio :value="false">开启</a-radio>
                       <a-radio :value="true">关闭</a-radio>
                     </a-radio-group>
@@ -42,15 +70,18 @@
                 </a-form>
               </div>
             </div>
-            <a-divider/>
+            <a-divider />
 
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">分类目录</h3>
               <div class="post-setting-drawer-item">
-                <category-tree v-model="selectedCategoryIds" :categories="categories"/>
+                <category-tree
+                  v-model="selectedCategoryIds"
+                  :categories="categories"
+                />
               </div>
             </div>
-            <a-divider/>
+            <a-divider />
 
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">标签</h3>
@@ -73,7 +104,7 @@
                 </a-form>
               </div>
             </div>
-            <a-divider/>
+            <a-divider />
 
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">缩略图</h3>
@@ -87,7 +118,7 @@
                 </div>
               </div>
             </div>
-            <a-divider/>
+            <a-divider />
           </div>
           <a-drawer
             title="选择图片"
@@ -97,135 +128,31 @@
             @close="onChildClose"
           ></a-drawer>
           <div class="post-control">
-            <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
-            <a-button @click="handlePublishClick" type="primary">{{ publishText }}</a-button>
+            <a-button
+              style="marginRight: 8px"
+              @click="handleDraftClick"
+            >保存草稿</a-button>
+            <a-button
+              @click="handlePublishClick"
+              type="primary"
+            >{{ publishText }}</a-button>
           </div>
         </a-drawer>
       </a-col>
     </a-row>
 
-    <a-drawer
-      title="附件库"
-      :width="isMobile()?'100%':'580'"
-      closable
-      :visible="attachmentDrawerVisible"
-      destroyOnClose
-      @close="onAttachmentClose"
-    >
-      <a-row type="flex" align="middle">
-        <a-input-search placeholder="搜索附件" enterButton/>
-      </a-row>
-      <a-divider></a-divider>
-      <a-row type="flex" align="middle">
-        <a-col :span="24">
-          <div
-            class="attach-item"
-            v-for="(item, index) in attachments"
-            :key="index"
-            @click="showDetailDrawer(item)"
-          >
-            <img :src="item.thumbPath">
-          </div>
-        </a-col>
-      </a-row>
-      <a-divider></a-divider>
-      <a-row type="flex" justify="end">
-        <a-pagination
-          :defaultPageSize="pagination.size"
-          :total="pagination.total"
-          @change="handlePaginationChange"
-        ></a-pagination>
-      </a-row>
-
-      <a-drawer
-        title="附件详情"
-        :width="isMobile()?'100%':'460'"
-        closable
-        :visible="selectAttachmentDrawerVisible"
-        destroyOnClose
-        @close="onSelectAttachmentClose"
-      >
-        <a-row type="flex" align="middle">
-          <a-col :span="24">
-            <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
-              <div class="attach-detail-img">
-                <img :src="selectAttachment.path">
-              </div>
-            </a-skeleton>
-          </a-col>
-          <a-divider/>
-          <a-col :span="24">
-            <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
-              <a-list itemLayout="horizontal">
-                <a-list-item>
-                  <a-list-item-meta :description="selectAttachment.name">
-                    <span slot="title">附件名：</span>
-                  </a-list-item-meta>
-                </a-list-item>
-                <a-list-item>
-                  <a-list-item-meta :description="selectAttachment.mediaType">
-                    <span slot="title">附件类型：</span>
-                  </a-list-item-meta>
-                </a-list-item>
-                <a-list-item>
-                  <a-list-item-meta :description="selectAttachment.size">
-                    <span slot="title">附件大小：</span>
-                  </a-list-item-meta>
-                </a-list-item>
-                <a-list-item>
-                  <a-list-item-meta
-                    :description="selectAttachment.height+'x'+selectAttachment.width"
-                  >
-                    <span slot="title">图片尺寸：</span>
-                  </a-list-item-meta>
-                </a-list-item>
-                <a-list-item>
-                  <a-list-item-meta :description="selectAttachment.path">
-                    <span slot="title">
-                      普通链接：
-                      <a-icon type="copy" @click="doCopyNormalLink"/>
-                    </span>
-                  </a-list-item-meta>
-                </a-list-item>
-                <a-list-item>
-                  <a-list-item-meta
-                    :description="'!['+selectAttachment.name+']('+selectAttachment.path+')'"
-                  >
-                    <span slot="title">
-                      Markdown 格式：
-                      <a-icon type="copy" @click="doCopyMarkdownLink"/>
-                    </span>
-                  </a-list-item-meta>
-                </a-list-item>
-              </a-list>
-            </a-skeleton>
-          </a-col>
-        </a-row>
-      </a-drawer>
-      <div class="attachment-control">
-        <a-button @click="showUploadModal" type="primary">上传附件</a-button>
-      </div>
-    </a-drawer>
-
-    <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
-      <a-upload-dragger
-        name="file"
-        :multiple="true"
-        accept="image/*"
-        :customRequest="handleUpload"
-        @change="handleChange"
-      >
-        <p class="ant-upload-drag-icon">
-          <a-icon type="inbox"/>
-        </p>
-        <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
-        <p class="ant-upload-hint">支持单个或批量上传</p>
-      </a-upload-dragger>
-    </a-modal>
+    <AttachmentDrawer v-model="attachmentDrawerVisible" />
 
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
-      <a-button type="primary" @click="showDrawer">发布</a-button>
-      <a-button type="dashed" @click="showAttachDrawer" style="margin-left: 8px;">附件库</a-button>
+      <a-button
+        type="primary"
+        @click="showDrawer"
+      >发布</a-button>
+      <a-button
+        type="dashed"
+        @click="showAttachDrawer"
+        style="margin-left: 8px;"
+      >附件库</a-button>
     </footer-tool-bar>
   </div>
 </template>
@@ -240,6 +167,7 @@ import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import attachmentApi from '@/api/attachment'
+import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 
 const toolbars = {
   bold: true, // 粗体
@@ -266,7 +194,8 @@ export default {
   components: {
     mavonEditor,
     CategoryTree,
-    FooterToolBar
+    FooterToolBar,
+    AttachmentDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -294,7 +223,8 @@ export default {
         page: 1,
         size: 8,
         sort: ''
-      }
+      },
+      attachmentUploadHandler: attachmentApi.upload
     }
   },
   computed: {
@@ -338,7 +268,7 @@ export default {
     loadAttachments() {
       const pagination = Object.assign({}, this.pagination)
       pagination.page--
-      attachmentApi.list(pagination).then(response => {
+      attachmentApi.query(pagination).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
       })
@@ -439,38 +369,8 @@ export default {
         this.$message.error(`${info.file.name} 文件上传失败`)
       }
     },
-    handleUpload(option) {
-      this.$log.debug('Uploading option', option)
-      const CancelToken = attachmentApi.CancelToken
-      const source = CancelToken.source()
-
-      const data = new FormData()
-      data.append('file', option.file)
-      attachmentApi
-        .upload(
-          data,
-          progressEvent => {
-            if (progressEvent.total > 0) {
-              progressEvent.percent = (progressEvent.loaded / progressEvent.total) * 100
-            }
-            this.$log.debug('Uploading percent: ', progressEvent.percent)
-            option.onProgress(progressEvent)
-          },
-          source.token
-        )
-        .then(response => {
-          option.onSuccess(response, option.file)
-          this.loadAttachments()
-        })
-        .catch(error => {
-          option.onError(error, error.response)
-        })
-
-      return {
-        abort: () => {
-          source.cancel('Upload operation canceled by the user.')
-        }
-      }
+    handleAttachmentUploadSuccess() {
+      this.$message.success('上传成功')
     },
     showUploadModal() {
       this.uploadVisible = true
