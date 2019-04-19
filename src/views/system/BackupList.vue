@@ -156,7 +156,4 @@ export default {
   border-color: #fff;
   background: #fff;
 }
-.ant-form-vertical .ant-form-item {
-  padding-bottom: 0;
-}
 </style>

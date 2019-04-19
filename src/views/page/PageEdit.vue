@@ -182,11 +182,7 @@ export default {
 <style scoped>
 .v-note-wrapper {
   z-index: 1000;
-  min-height: 540px;
-}
-
-.ant-form-vertical .ant-form-item {
-  padding-bottom: 0;
+  min-height: 580px;
 }
 
 .postControl {
@@ -199,10 +195,6 @@ export default {
   left: 0px;
   background: rgb(255, 255, 255);
   border-radius: 0px 0px 4px 4px;
-}
-
-.ant-form-vertical .ant-form-item {
-  padding-bottom: 0;
 }
 
 .post-thum .img {

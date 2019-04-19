@@ -1,7 +1,7 @@
 @import './index.less';
 
 body {
-  overflow-y: none;
+  overflow-y: scroll;
   &.colorWeak {
     filter: invert(80%);
   }
@@ -453,7 +453,7 @@ body {
 
     .ant-form-item {
       display: flex;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       margin-right: 0;
 
       .ant-form-item-control-wrapper {
@@ -507,5 +507,12 @@ body {
 .ant-card-wider-padding{
   .ant-card-body{
     padding: 24px!important;
+  }
+}
+
+.ant-form{
+  .ant-form-item{
+    padding-bottom: 0!important;
+    margin-bottom: 20px;
   }
 }

@@ -304,15 +304,7 @@ export default {
 <style scoped>
 .v-note-wrapper {
   z-index: 1000;
-  min-height: 540px;
-}
-
-.ant-form-vertical .ant-form-item {
-  padding-bottom: 0;
-}
-
-.ant-form-vertical .ant-form-item {
-  padding-bottom: 0;
+  min-height: 580px;
 }
 
 .post-thum .img {

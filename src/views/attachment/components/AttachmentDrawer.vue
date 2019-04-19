@@ -191,10 +191,6 @@ export default {
   border-radius: 0px 0px 4px 4px;
 }
 
-.ant-form-vertical .ant-form-item {
-  padding-bottom: 0;
-}
-
 .post-thum .img {
   width: 100%;
   cursor: pointer;
@@ -207,6 +203,7 @@ export default {
   padding-bottom: 28%;
   overflow: hidden;
   float: left;
+  cursor: pointer;
 }
 
 .attach-item > img {
