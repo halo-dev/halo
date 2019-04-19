@@ -1,5 +1,6 @@
 package run.halo.app.service.support;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
@@ -12,6 +13,7 @@ import java.util.Map;
  * @author johnniang
  * @date 19-4-18
  */
+@Slf4j
 public class HaloMediaType extends MediaType {
 
     /**
@@ -24,9 +26,14 @@ public class HaloMediaType extends MediaType {
      */
     public static final String APPLICATION_ZIP_VALUE = "application/zip";
 
+    public static final MediaType APPLICATION_GIT;
+
+    public static final String APPLICATION_GIT_VALUE = "application/git";
+
 
     static {
         APPLICATION_ZIP = valueOf(APPLICATION_ZIP_VALUE);
+        APPLICATION_GIT = valueOf(APPLICATION_GIT_VALUE);
     }
 
     public HaloMediaType(String type) {

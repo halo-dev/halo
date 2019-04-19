@@ -9,11 +9,15 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
@@ -30,8 +34,10 @@ import run.halo.app.service.ThemeService;
 import run.halo.app.service.support.HaloMediaType;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.FilenameUtils;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.JsonUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,6 +71,9 @@ public class ThemeServiceImpl implements ThemeService {
     private final ThemeConfigResolver themeConfigResolver;
 
     private final ThemePropertyResolver themePropertyResolver;
+
+    private final RestTemplate restTemplate;
+
     /**
      * Activated theme id.
      */
@@ -75,13 +84,16 @@ public class ThemeServiceImpl implements ThemeService {
                             StringCacheStore cacheStore,
                             Configuration configuration,
                             ThemeConfigResolver themeConfigResolver,
-                            ThemePropertyResolver themePropertyResolver) {
+                            ThemePropertyResolver themePropertyResolver,
+                            RestTemplate restTemplate) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.configuration = configuration;
         this.themeConfigResolver = themeConfigResolver;
-        workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
         this.themePropertyResolver = themePropertyResolver;
+        this.restTemplate = restTemplate;
+
+        workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
     }
 
     @Override
@@ -318,7 +330,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // Create temp directory
-            tempPath = Files.createTempDirectory("halo");
+            tempPath = createTempPath();
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             Path themeTempPath = tempPath.resolve(basename);
 
@@ -331,9 +343,7 @@ public class ThemeServiceImpl implements ThemeService {
             // Unzip to temp path
             FileUtils.unzip(zis, themeTempPath);
 
-            // Go to the base folder
-
-            // Add the theme to system
+            // Go to the base folder and add the theme into system
             return add(FileUtils.skipZipParentFolder(themeTempPath));
         } catch (IOException e) {
             throw new ServiceException("Failed to upload theme file: " + file.getOriginalFilename(), e);
@@ -349,6 +359,9 @@ public class ThemeServiceImpl implements ThemeService {
     public ThemeProperty add(Path themeTmpPath) throws IOException {
         Assert.notNull(themeTmpPath, "Theme temporary path must not be null");
         Assert.isTrue(Files.isDirectory(themeTmpPath), "Theme temporary path must be a directory");
+
+        log.debug("Children path of [{}]:", themeTmpPath);
+        Files.list(themeTmpPath).forEach(path -> log.debug(path.toString()));
 
         // Check property config
         ThemeProperty tmpThemeProperty = getProperty(themeTmpPath);
@@ -373,6 +386,96 @@ public class ThemeServiceImpl implements ThemeService {
 
         // Delete cache
         return property;
+    }
+
+    @Override
+    public ThemeProperty fetch(String uri) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        Path tmpPath = null;
+
+        try {
+            // Create temp path
+            tmpPath = createTempPath();
+            // Create temp path
+            Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
+
+            if (StringUtils.endsWithIgnoreCase(uri, ".git")) {
+                cloneFromGit(uri, themeTmpPath);
+            } else {
+                downloadZipAndUnzip(uri, themeTmpPath);
+//            } else {
+//                throw new UnsupportedMediaTypeException("Unsupported download type: " + uri);
+            }
+
+            return add(themeTmpPath);
+        } catch (IOException | GitAPIException e) {
+            throw new ServiceException("Failed to fetch theme from remote " + uri, e);
+        } finally {
+            FileUtils.deleteFolderQuietly(tmpPath);
+        }
+    }
+
+    /**
+     * Clones theme from git.
+     *
+     * @param gitUrl     git url must not be blank
+     * @param targetPath target path must not be null
+     * @throws GitAPIException
+     */
+    private void cloneFromGit(@NonNull String gitUrl, @NonNull Path targetPath) throws GitAPIException {
+        Assert.hasText(gitUrl, "Git url must not be blank");
+        Assert.notNull(targetPath, "Target path must not be null");
+
+        log.debug("Cloning git repo [{}] to [{}]", gitUrl, targetPath);
+
+        // Clone it
+        Git.cloneRepository()
+                .setURI(gitUrl)
+                .setDirectory(targetPath.toFile())
+                .call();
+
+        log.debug("Cloned git repo [{}]", gitUrl);
+    }
+
+    /**
+     * Downloads zip file and unzip it into specified path.
+     *
+     * @param zipUrl     zip url must not be null
+     * @param targetPath target path must not be null
+     * @throws IOException
+     */
+    private void downloadZipAndUnzip(@NonNull String zipUrl, @NonNull Path targetPath) throws IOException {
+        Assert.hasText(zipUrl, "Zip url must not be blank");
+
+        log.debug("Downloading [{}]", zipUrl);
+        // Download it
+        ResponseEntity<byte[]> downloadResponse = restTemplate.getForEntity(zipUrl, byte[].class);
+
+        log.debug("Download response: [{}]", downloadResponse.getStatusCode());
+
+        if (downloadResponse.getStatusCode().isError() || downloadResponse.getBody() == null) {
+            throw new ServiceException("Failed to download " + zipUrl + ", status: " + downloadResponse.getStatusCode());
+        }
+
+        log.debug("Downloaded [{}]", zipUrl);
+
+        // New zip input stream
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(downloadResponse.getBody()));
+
+        // Unzip it
+        FileUtils.unzip(zis, targetPath);
+    }
+
+    /**
+     * Creates temporary path.
+     *
+     * @return temporary path
+     * @throws IOException
+     */
+    @NonNull
+    private Path createTempPath() throws IOException {
+        return Files.createTempDirectory("halo");
     }
 
     /**
@@ -489,6 +592,8 @@ public class ThemeServiceImpl implements ThemeService {
                 return Optional.of(propertyPath);
             }
         }
+
+        log.warn("Property file was not found in [{}]", themePath);
 
         return Optional.empty();
     }

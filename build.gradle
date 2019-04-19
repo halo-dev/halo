@@ -22,9 +22,9 @@ configurations {
     }
 
     developmentOnly
-	runtimeClasspath {
-		extendsFrom developmentOnly
-	}
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
 }
 
 dependencies {
@@ -50,6 +50,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.8.1'
     implementation 'org.apache.httpcomponents:httpclient:4.5.7'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.2'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.3.0.201903130848-r'
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'

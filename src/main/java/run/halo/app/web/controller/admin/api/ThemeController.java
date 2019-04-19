@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.config.support.Group;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
-import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
 
@@ -121,5 +121,11 @@ public class ThemeController {
     @ApiOperation("Upload theme")
     public ThemeProperty uploadTheme(@RequestPart("file") MultipartFile file) {
         return themeService.upload(file);
+    }
+
+    @PostMapping("fetching")
+    @ApiOperation("Fetches a new theme")
+    public ThemeProperty fetchTheme(@RequestParam("uri") String uri) {
+        return themeService.fetch(uri);
     }
 }

@@ -66,10 +66,14 @@ public class FileUtils {
     public static void deleteFolder(Path deletingPath) throws IOException {
         Assert.notNull(deletingPath, "Deleting path must not be null");
 
+        log.debug("Deleting [{}]", deletingPath);
+
         Files.walk(deletingPath)
                 .sorted(Comparator.reverseOrder())
                 .map(Path::toFile)
                 .forEach(File::delete);
+
+        log.debug("Deleted [{}] successfully", deletingPath);
     }
 
     /**

@@ -221,4 +221,13 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
+
+    /**
+     * Fetches a new theme.
+     *
+     * @param uri theme remote uri must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty fetch(@NonNull String uri);
 }
