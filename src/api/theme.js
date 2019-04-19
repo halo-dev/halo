@@ -90,4 +90,14 @@ themeApi.upload = (formData, uploadProgress, cancelToken) => {
   })
 }
 
+themeApi.fetching = url => {
+  return service({
+    url: `${baseUrl}/fetching`,
+    params: {
+      uri: url
+    },
+    method: 'post'
+  })
+}
+
 export default themeApi

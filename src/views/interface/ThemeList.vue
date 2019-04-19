@@ -142,7 +142,12 @@
     <div class="upload-button">
       <a-button type="primary" shape="circle" icon="plus" size="large" @click="showUploadModal"></a-button>
     </div>
-    <a-modal title="安装主题" v-model="uploadVisible" :footer="null" :bodyStyle="{ padding: '0 24px 24px' }">
+    <a-modal
+      title="安装主题"
+      v-model="uploadVisible"
+      :footer="null"
+      :bodyStyle="{ padding: '0 24px 24px' }"
+    >
       <a-tabs defaultActiveKey="1">
         <a-tab-pane tab="本地上传" key="1">
           <a-upload-dragger
@@ -161,11 +166,11 @@
         </a-tab-pane>
         <a-tab-pane tab="远程拉取" key="2">
           <a-form layout="vertical">
-            <a-form-item label="远程地址：" >
-              <a-input />
+            <a-form-item label="远程地址：">
+              <a-input v-model="fetchingUrl"/>
             </a-form-item>
             <a-form-item>
-              <a-button type="primary">确定</a-button>
+              <a-button type="primary" @click="handleFetching">确定</a-button>
             </a-form-item>
           </a-form>
         </a-tab-pane>
@@ -192,7 +197,8 @@ export default {
       visible: false,
       themeConfiguration: null,
       themeSettings: [],
-      themeProperty: null
+      themeProperty: null,
+      fetchingUrl: null
     }
   },
   computed: {
@@ -305,6 +311,12 @@ export default {
           source.cancel('Upload operation canceled by the user.')
         }
       }
+    },
+    handleFetching() {
+      themeApi.fetching(this.fetchingUrl).then(response => {
+        this.$message.success('上传成功')
+        this.loadThemes()
+      })
     }
   }
 }
