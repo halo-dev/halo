@@ -7,29 +7,51 @@
         :md="10"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }">
+        :style="{ 'padding-bottom': '12px' }"
+      >
         <a-card :title="title">
           <a-form layout="horizontal">
             <a-form-item label="网站名称：">
-              <a-input v-model="link.name"/>
+              <a-input v-model="link.name" />
             </a-form-item>
-            <a-form-item label="网站地址：" help="* 需要加上 http://">
-              <a-input v-model="link.url"/>
+            <a-form-item
+              label="网站地址："
+              help="* 需要加上 http://"
+            >
+              <a-input v-model="link.url" />
             </a-form-item>
             <a-form-item label="Logo：">
-              <a-input v-model="link.logo"/>
+              <a-input v-model="link.logo" />
             </a-form-item>
-            <a-form-item label="分组：" help="* 非必填">
-              <a-input v-model="link.team"/>
+            <a-form-item
+              label="分组："
+              help="* 非必填"
+            >
+              <a-input v-model="link.team" />
             </a-form-item>
             <a-form-item label="描述：">
-              <a-input type="textarea" :autosize="{ minRows: 5 }" v-model="link.description"/>
+              <a-input
+                type="textarea"
+                :autosize="{ minRows: 5 }"
+                v-model="link.description"
+              />
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" @click="handleSaveClick" v-if="formType==='create'">保存</a-button>
+              <a-button
+                type="primary"
+                @click="handleSaveClick"
+                v-if="formType==='create'"
+              >保存</a-button>
               <a-button-group v-else>
-                <a-button type="primary" @click="handleSaveClick">更新</a-button>
-                <a-button type="dashed" @click="addLink" v-if="formType==='update'">返回添加</a-button>
+                <a-button
+                  type="primary"
+                  @click="handleSaveClick"
+                >更新</a-button>
+                <a-button
+                  type="dashed"
+                  @click="addLink"
+                  v-if="formType==='update'"
+                >返回添加</a-button>
               </a-button-group>
             </a-form-item>
           </a-form>
@@ -41,7 +63,8 @@
         :md="14"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }">
+        :style="{ 'padding-bottom': '12px' }"
+      >
         <a-card title="所有友情链接">
           <a-table
             :columns="columns"
@@ -49,13 +72,30 @@
             :loading="loading"
             :rowKey="link => link.id"
           >
-            <template slot="url" slot-scope="text">
-              <a target="_blank" :href="text">{{ text }}</a>
+            <template
+              slot="url"
+              slot-scope="text"
+            >
+              <a
+                target="_blank"
+                :href="text"
+              >{{ text }}</a>
             </template>
-            <ellipsis :length="15" tooltip slot="name" slot-scope="text">{{ text }}</ellipsis>
-            <span slot="action" slot-scope="text, record">
-              <a href="javascript:;" @click="editLink(record.id)">编辑</a>
-              <a-divider type="vertical"/>
+            <ellipsis
+              :length="15"
+              tooltip
+              slot="name"
+              slot-scope="text"
+            >{{ text }}</ellipsis>
+            <span
+              slot="action"
+              slot-scope="text, record"
+            >
+              <a
+                href="javascript:;"
+                @click="editLink(record.id)"
+              >编辑</a>
+              <a-divider type="vertical" />
               <a-popconfirm
                 :title="'你确定要删除【' + record.name + '】链接？'"
                 @confirm="deleteLink(record.id)"
@@ -73,7 +113,6 @@
 </template>
 
 <script>
-import { Ellipsis } from '@/components'
 import linkApi from '@/api/link'
 const columns = [
   {
@@ -97,9 +136,6 @@ const columns = [
   }
 ]
 export default {
-  components: {
-    Ellipsis
-  },
   data() {
     return {
       title: '添加友情链接',

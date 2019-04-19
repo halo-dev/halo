@@ -8,6 +8,7 @@ import './logger'
 import './core/lazy_use'
 import bootstrap from './core/bootstrap'
 import '@/utils/filter' // global filter
+import './components'
 import animated from 'animate.css'
 
 Vue.config.productionTip = false

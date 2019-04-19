@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 // pro components
 import AvatarList from '@/components/AvatarList'
 import Ellipsis from '@/components/Ellipsis'
@@ -9,17 +11,26 @@ import Trend from '@/components/Trend'
 import MultiTab from '@/components/MultiTab'
 import Result from '@/components/Result'
 import ExceptionPage from '@/components/Exception'
+import Upload from '@/components/Upload/Upload'
 
-export {
+const _components = {
   AvatarList,
   Trend,
   Ellipsis,
   FooterToolbar,
   NumberInfo,
   DescriptionList,
-  DescriptionList as DetailList,
   Tree,
   MultiTab,
   Result,
-  ExceptionPage
+  ExceptionPage,
+  Upload
 }
+
+const components = {}
+
+Object.keys(_components).forEach(key => {
+  components[key] = Vue.component(key, _components[key])
+})
+
+export default components

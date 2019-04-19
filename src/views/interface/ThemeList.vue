@@ -150,6 +150,7 @@
     >
       <a-tabs defaultActiveKey="1">
         <a-tab-pane tab="本地上传" key="1">
+          <upload />
           <a-upload-dragger
             name="file"
             :multiple="true"

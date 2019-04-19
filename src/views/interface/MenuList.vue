@@ -111,7 +111,6 @@
 </template>
 
 <script>
-import { Ellipsis } from '@/components'
 import menuApi from '@/api/menu'
 const columns = [
   {
@@ -138,9 +137,6 @@ const columns = [
   }
 ]
 export default {
-  components: {
-    Ellipsis
-  },
   data() {
     return {
       data: [],
