@@ -4,7 +4,7 @@
       <a-tabs type="card">
         <a-tab-pane key="1">
           <span slot="tab">
-            <a-icon type="folder" />资源文件备份
+            <a-icon type="folder"/>资源文件备份
           </span>
           <a-table :columns="columns" :dataSource="ResourcesData">
             <span slot="action" slot-scope="text, record">
@@ -19,7 +19,7 @@
         </a-tab-pane>
         <a-tab-pane key="2">
           <span slot="tab">
-            <a-icon type="database" />资源文件备份
+            <a-icon type="database"/>资源文件备份
           </span>
           <a-table :columns="columns" :dataSource="DataBaseData">
             <span slot="action" slot-scope="text, record">
@@ -34,7 +34,7 @@
         </a-tab-pane>
         <a-tab-pane key="3">
           <span slot="tab">
-            <a-icon type="read" />文章备份
+            <a-icon type="read"/>文章备份
           </span>
           <a-table :columns="columns" :dataSource="FileData">
             <span slot="action" slot-scope="text, record">
@@ -81,12 +81,11 @@ export default {
         }
       ],
       ResourcesData: [],
+      DataBaseData: [],
       FileData: []
     }
   },
-  created() {
-    this.ResourcesData = function() {}
-  },
+  created() {},
   methods: {
     // 下载
     downResources(type, id) {
