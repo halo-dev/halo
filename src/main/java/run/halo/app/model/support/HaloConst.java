@@ -1,7 +1,6 @@
 package run.halo.app.model.support;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**

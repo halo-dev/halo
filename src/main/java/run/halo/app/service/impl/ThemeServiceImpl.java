@@ -5,7 +5,6 @@ import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.ZipUtil;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +27,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.support.HaloMediaType;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.JsonUtils;
@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipInputStream;
 
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
@@ -222,7 +223,7 @@ public class ThemeServiceImpl implements ThemeService {
             FileUtil.del(Paths.get(themeProperty.getThemePath()));
 
             // Delete theme cache
-            cacheStore.delete(THEMES_CACHE_KEY);
+            clearThemeCache();
         } catch (Exception e) {
             throw new ServiceException("Failed to delete theme folder", e).setErrorData(themeId);
         }
@@ -296,7 +297,7 @@ public class ThemeServiceImpl implements ThemeService {
         setActivatedThemeId(themeId);
 
         // Clear the cache
-        cacheStore.delete(THEMES_CACHE_KEY);
+        clearThemeCache();
 
         try {
             // TODO Refactor here in the future
@@ -313,31 +314,39 @@ public class ThemeServiceImpl implements ThemeService {
     public ThemeProperty upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
-        // Get upload path
-        Path uploadPath = Paths.get(workDir.toString(), file.getOriginalFilename());
+        if (!HaloMediaType.isZipType(file.getContentType())) {
+            throw new UnsupportedMediaTypeException("Unsupported theme media type: " + file.getContentType()).setErrorData(file.getOriginalFilename());
+        }
 
-        final String originalBasename = FilenameUtils.getBasename(file.getOriginalFilename());
-
-        log.info("Uploading theme to directory: [{}]", uploadPath.toString());
+        ZipInputStream zis = null;
+        Path tempPath = null;
 
         try {
-            // Create directory
-            Files.createDirectories(uploadPath.getParent());
-            Files.createFile(uploadPath);
-            file.transferTo(uploadPath);
+            // Create temp directory
+            tempPath = Files.createTempDirectory("halo");
+            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            Path themeTempPath = tempPath.resolve(basename);
 
-            // Unzip theme package
-            ZipUtil.unzip(uploadPath.toFile(), uploadPath.getParent().toFile());
+            // Check directory traversal
+            FileUtils.checkDirectoryTraversal(tempPath, themeTempPath);
 
-            // Delete theme package
-            FileUtil.del(uploadPath.toFile());
+            // New zip input stream
+            zis = new ZipInputStream(file.getInputStream());
 
-            cacheStore.delete(THEMES_CACHE_KEY);
+            // Unzip to temp path
+            FileUtils.unzip(zis, themeTempPath);
 
-            return getProperty(Paths.get(workDir.toString(), originalBasename));
+            // Go to the base folder
+
+            // Add the theme to system
+            return add(FileUtils.skipZipParentFolder(themeTempPath));
         } catch (IOException e) {
-            log.error("Failed to upload theme to local: " + uploadPath, e);
-            throw new ServiceException("Failed to upload theme to local").setErrorData(uploadPath);
+            throw new ServiceException("Failed to upload theme file: " + file.getOriginalFilename(), e);
+        } finally {
+            // Close zip input stream
+            FileUtils.closeQuietly(zis);
+            // Delete folder after testing
+            FileUtils.deleteFolderQuietly(tempPath);
         }
     }
 
@@ -347,19 +356,35 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.isTrue(Files.isDirectory(themeTmpPath), "Theme temporary path must be a directory");
 
         // Check property config
-        Path configPath = getThemePropertyPathOfNullable(themeTmpPath).orElseThrow(() -> new ThemePropertyMissingException("Theme property file is dismiss").setErrorData(themeTmpPath));
+        ThemeProperty tmpThemeProperty = getProperty(themeTmpPath);
 
-        ThemeProperty tmpThemeProperty = getProperty(configPath);
+        // Check theme existence
+        boolean isExist = getThemes().stream()
+                .anyMatch(themeProperty -> themeProperty.getId().equalsIgnoreCase(tmpThemeProperty.getId()));
+
+        if (isExist) {
+            throw new AlreadyExistsException("The theme with id " + tmpThemeProperty.getId() + " has already existed");
+        }
 
         // Copy the temporary path to current theme folder
         Path targetThemePath = workDir.resolve(tmpThemeProperty.getId());
         FileUtils.copyFolder(themeTmpPath, targetThemePath);
 
-        // Delete temp theme folder
-        FileUtils.deleteFolder(themeTmpPath);
-
         // Get property again
-        return getProperty(targetThemePath);
+        ThemeProperty property = getProperty(targetThemePath);
+
+        // Clear theme cache
+        clearThemeCache();
+
+        // Delete cache
+        return property;
+    }
+
+    /**
+     * Clears theme cache.
+     */
+    private void clearThemeCache() {
+        cacheStore.delete(THEMES_CACHE_KEY);
     }
 
     /**
@@ -446,15 +471,8 @@ public class ThemeServiceImpl implements ThemeService {
      * @throws ForbiddenException throws when the given absolute directory name is invalid
      */
     private void checkDirectory(@NonNull String absoluteName) {
-        Assert.hasText(absoluteName, "Absolute name must not be blank");
-
         ThemeProperty activeThemeProperty = getThemeOfNonNullBy(getActivatedThemeId());
-
-        boolean valid = Paths.get(absoluteName).startsWith(activeThemeProperty.getThemePath());
-
-        if (!valid) {
-            throw new ForbiddenException("You cannot access " + absoluteName).setErrorData(absoluteName);
-        }
+        FileUtils.checkDirectoryTraversal(activeThemeProperty.getThemePath(), absoluteName);
     }
 
     /**
