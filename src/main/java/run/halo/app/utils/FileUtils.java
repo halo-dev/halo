@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -106,6 +108,25 @@ public class FileUtils {
 
             zipEntry = zis.getNextEntry();
         }
+    }
+
+    /**
+     * Skips zip parent folder. (Go into base folder)
+     *
+     * @param unzippedPath unzipped path must not be null
+     * @return path containing base files
+     * @throws IOException
+     */
+    public static Path skipZipParentFolder(@NonNull Path unzippedPath) throws IOException {
+        Assert.notNull(unzippedPath, "Unzipped folder must not be  null");
+
+        List<Path> childrenPath = Files.list(unzippedPath).collect(Collectors.toList());
+
+        if (childrenPath.size() == 1 && Files.isDirectory(childrenPath.get(0))) {
+            return childrenPath.get(0);
+        }
+
+        return unzippedPath;
     }
 
     /**
