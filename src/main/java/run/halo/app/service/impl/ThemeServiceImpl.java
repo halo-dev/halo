@@ -245,7 +245,9 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public List<Group> fetchConfig(String themeId) {
-        Assert.hasText(themeId, "Theme name must not be blank");
+        Assert.hasText(themeId, "Theme id must not be blank");
+
+        // TODO Cache the config
 
         // Get theme property
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);

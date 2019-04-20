@@ -1,7 +1,10 @@
 package run.halo.app.model.enums;
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 /**
  * Data type enum.
@@ -9,6 +12,7 @@ import org.springframework.lang.Nullable;
  * @author johnniang
  * @date 4/9/19
  */
+@Slf4j
 public enum DataType implements ValueEnum<Integer> {
 
     STRING(0),
@@ -48,4 +52,34 @@ public enum DataType implements ValueEnum<Integer> {
 
         return STRING;
     }
+
+    /**
+     * Converts data to corresponding type.
+     *
+     * @param data data to be converted must not be null
+     * @return data with corresponding type
+     */
+    @NonNull
+    public Object convertTo(@NonNull Object data) {
+        Assert.notNull(data, "Data must not be null");
+
+        try {
+            switch (this) {
+                case STRING:
+                    return data.toString();
+                case BOOL:
+                    return Boolean.valueOf(data.toString());
+                case LONG:
+                    return Long.valueOf(data.toString());
+                case DOUBLE:
+                    return Double.valueOf(data.toString());
+                default:
+                    return data;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to convert " + data + " to corresponding type: " + this.name(), e);
+            return data;
+        }
+    }
+
 }
