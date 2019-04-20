@@ -69,7 +69,7 @@
      */
     function updateTheme(theme, e) {
         $(e).button('loading');
-        $.get('/admin/themes/pull',{'themeName': theme},function (data) {
+        $.get('/admin/themes/pull',{'themeId': theme},function (data) {
             if (data.code === 1) {
                 halo.showMsgAndParentRedirect(data.msg, 'success', 1000, '/admin/themes');
             } else {

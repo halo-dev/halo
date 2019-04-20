@@ -331,7 +331,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // TODO Refactor here in the future
-            configuration.setSharedVariable("themeName", themeId);
+            configuration.setSharedVariable("themeId", themeId);
             configuration.setSharedVariable("options", optionService.listOptions());
         } catch (TemplateModelException e) {
             throw new ServiceException("Failed to set shared variable", e).setErrorData(themeId);
