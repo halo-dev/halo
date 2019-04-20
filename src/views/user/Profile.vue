@@ -9,7 +9,7 @@
                 <span>prompt text</span>
               </template>
               <div class="avatar">
-                <img :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'">
+                <img :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'" @click="showAttachDrawer">
               </div>
             </a-tooltip>
             <div class="username">{{ user.nickname }}</div>
@@ -96,18 +96,24 @@
         </a-card>
       </a-col>
     </a-row>
+
+    <AttachmentDrawer v-model="attachmentDrawerVisible"/>
   </div>
 </template>
 
 <script>
+import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import userApi from '@/api/user'
 import adminApi from '@/api/admin'
 
 export default {
-  components: {},
+  components: {
+    AttachmentDrawer
+  },
   data() {
     return {
       countsLoading: true,
+      attachmentDrawerVisible: false,
       user: {},
       counts: {},
       passwordParam: {
@@ -127,6 +133,9 @@ export default {
     this.getCounts()
   },
   methods: {
+    showAttachDrawer() {
+      this.attachmentDrawerVisible = true
+    },
     loadUser() {
       userApi.getProfile().then(response => {
         this.user = response.data.data
