@@ -1,5 +1,6 @@
 package run.halo.app;
 
+import org.springframework.scheduling.annotation.EnableAsync;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableScheduling
+@EnableAsync
 @EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application {
 

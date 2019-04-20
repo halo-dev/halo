@@ -61,7 +61,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
         this.cacheOwo();
-        this.cacheActiveTheme();
+//        this.cacheActiveTheme();
         this.printStartInfo();
         this.initThemes();
 
@@ -97,7 +97,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
      */
     private void cacheActiveTheme() {
         try {
-            configuration.setSharedVariable("themeId", themeService.getActivatedThemeId());
+            configuration.setSharedVariable("theme", themeService.getActivatedTheme());
         } catch (TemplateModelException e) {
             log.error("", e);
         }
