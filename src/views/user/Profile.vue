@@ -169,6 +169,7 @@ export default {
     },
     selectAvatar(data) {
       this.user.avatar = data.path
+      this.attachmentDrawerVisible = false
     }
   }
 }

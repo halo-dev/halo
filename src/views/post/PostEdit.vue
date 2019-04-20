@@ -94,7 +94,7 @@
             </div>
             <a-divider/>
           </div>
-          <AttachmentSelectDrawer v-model="childDrawerVisible" @listenToSelect="selectPostThumb"/>
+          <AttachmentSelectDrawer v-model="childDrawerVisible" @listenToSelect="selectPostThumb" :drawerWidth="460"/>
           <div class="post-control">
             <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
             <a-button @click="handlePublishClick" type="primary">{{ publishText }}</a-button>
@@ -258,6 +258,7 @@ export default {
     },
     selectPostThumb(data) {
       this.postToStage.thumbnail = data.path
+      this.childDrawerVisible = false
     }
   }
 }

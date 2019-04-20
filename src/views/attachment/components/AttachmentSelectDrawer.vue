@@ -2,7 +2,7 @@
   <div>
     <a-drawer
       title="选择附件"
-      :width="isMobile()?'100%':'580'"
+      :width="isMobile()?'100%':drawerWidth"
       closable
       :visible="visiable"
       destroyOnClose
@@ -68,6 +68,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    drawerWidth: {
+      type: Number,
+      required: false,
+      default: 580
     }
   },
   data() {
