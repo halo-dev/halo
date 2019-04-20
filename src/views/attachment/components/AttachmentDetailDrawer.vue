@@ -37,7 +37,10 @@
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-list-item-meta :description="attachment.size">
+              <a-list-item-meta>
+                <template slot="description">
+                  {{ attachment.size | fileSizeFormat }}
+                </template>
                 <span slot="title">附件大小：</span>
               </a-list-item-meta>
             </a-list-item>
@@ -47,7 +50,10 @@
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-list-item-meta :description="attachment.createTime">
+              <a-list-item-meta>
+                <template slot="description">
+                  {{ attachment.createTime | moment }}
+                </template>
                 <span slot="title">上传日期：</span>
               </a-list-item-meta>
             </a-list-item>
