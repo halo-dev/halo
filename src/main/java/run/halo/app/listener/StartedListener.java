@@ -1,11 +1,9 @@
 package run.halo.app.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ResourceUtils;
@@ -37,12 +35,6 @@ import java.util.Map;
 public class StartedListener implements ApplicationListener<ApplicationStartedEvent> {
 
     @Autowired
-    private freemarker.template.Configuration configuration;
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
     private HaloProperties haloProperties;
 
     @Autowired
@@ -61,7 +53,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
         this.cacheOwo();
-//        this.cacheActiveTheme();
         this.printStartInfo();
         this.initThemes();
 
@@ -89,17 +80,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             User testUser = userService.createBy(userParam, "opentest");
 
             log.debug("Initialized a test user: [{}]", testUser);
-        }
-    }
-
-    /**
-     * Get active theme
-     */
-    private void cacheActiveTheme() {
-        try {
-            configuration.setSharedVariable("theme", themeService.getActivatedTheme());
-        } catch (TemplateModelException e) {
-            log.error("", e);
         }
     }
 

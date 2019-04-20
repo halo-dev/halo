@@ -14,7 +14,7 @@ import run.halo.app.service.ThemeService;
 import java.util.Map;
 
 /**
- * Theme activated listener.
+ * Freemarker config aware listener.
  *
  * @author johnniang
  * @date 19-4-20
