@@ -79,6 +79,11 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private String activatedThemeId;
 
+    /**
+     * Activated theme property.
+     */
+    private ThemeProperty activatedTheme;
+
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
                             StringCacheStore cacheStore,
@@ -275,20 +280,39 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public String render(String pageName) {
-        return String.format(RENDER_TEMPLATE, getActivatedThemeId(), pageName);
+        // Get activated theme
+        ThemeProperty activatedTheme = getActivatedTheme();
+        // Get theme folder name
+        String themeFolderName = Paths.get(activatedTheme.getThemePath()).getFileName().toString();
+        // Build render url
+        return String.format(RENDER_TEMPLATE, themeFolderName, pageName);
     }
 
     @Override
     public String getActivatedThemeId() {
-        if (StringUtils.isBlank(activatedThemeId)) {
+        if (activatedThemeId == null) {
             synchronized (this) {
-                if (StringUtils.isBlank(activatedThemeId)) {
-                    return optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_ID);
+                if (activatedThemeId == null) {
+                    activatedThemeId = optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_ID);
                 }
             }
         }
 
         return activatedThemeId;
+    }
+
+    @Override
+    public ThemeProperty getActivatedTheme() {
+        if (activatedTheme == null) {
+            synchronized (this) {
+                if (activatedTheme == null) {
+                    // Get theme property
+                    activatedTheme = getThemeOfNonNullBy(getActivatedThemeId());
+                }
+            }
+        }
+
+        return activatedTheme;
     }
 
     @Override
@@ -299,9 +323,8 @@ public class ThemeServiceImpl implements ThemeService {
         // Save the theme to database
         optionService.saveProperty(PrimaryProperties.THEME, themeId);
 
-
-        // Set the activated theme id
-        setActivatedThemeId(themeId);
+        // Set activated theme
+        setActivatedTheme(themeProperty);
 
         // Clear the cache
         clearThemeCache();
@@ -404,8 +427,6 @@ public class ThemeServiceImpl implements ThemeService {
                 cloneFromGit(uri, themeTmpPath);
             } else {
                 downloadZipAndUnzip(uri, themeTmpPath);
-//            } else {
-//                throw new UnsupportedMediaTypeException("Unsupported download type: " + uri);
             }
 
             return add(themeTmpPath);
@@ -486,12 +507,12 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     /**
-     * Set activated theme id.
+     * Sets activated theme.
      *
-     * @param themeId theme id
+     * @param activatedTheme activated theme
      */
-    private void setActivatedThemeId(@Nullable String themeId) {
-        this.activatedThemeId = themeId;
+    private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
+        this.activatedTheme = activatedTheme;
     }
 
     /**
