@@ -49,9 +49,14 @@ public class ThemeProperty {
     private Author author;
 
     /**
-     * Folder name.
+     * Theme path.
      */
     private String themePath;
+
+    /**
+     * Theme folder name.
+     */
+    private String folderName;
 
     /**
      * Has options.

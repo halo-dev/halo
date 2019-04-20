@@ -282,10 +282,8 @@ public class ThemeServiceImpl implements ThemeService {
     public String render(String pageName) {
         // Get activated theme
         ThemeProperty activatedTheme = getActivatedTheme();
-        // Get theme folder name
-        String themeFolderName = Paths.get(activatedTheme.getThemePath()).getFileName().toString();
         // Build render url
-        return String.format(RENDER_TEMPLATE, themeFolderName, pageName);
+        return String.format(RENDER_TEMPLATE, activatedTheme.getFolderName(), pageName);
     }
 
     @Override
@@ -331,7 +329,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // TODO Refactor here in the future
-            configuration.setSharedVariable("themeName", themeId);
+            configuration.setSharedVariable("themeId", themeId);
             configuration.setSharedVariable("options", optionService.listOptions());
         } catch (TemplateModelException e) {
             throw new ServiceException("Failed to set shared variable", e).setErrorData(themeId);
@@ -644,6 +642,7 @@ public class ThemeServiceImpl implements ThemeService {
 
             // Resolve additional properties
             themeProperty.setThemePath(themePath.toString());
+            themeProperty.setFolderName(themePath.getFileName().toString());
             themeProperty.setHasOptions(hasOptions(themePath));
             themeProperty.setActivated(false);
 
