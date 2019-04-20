@@ -95,7 +95,7 @@ public class HaloConfiguration {
         ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties);
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
-        failureHandler.setProductionEnv(haloProperties.getProductionEnv());
+        failureHandler.setProductionEnv(haloProperties.isProductionEnv());
         failureHandler.setObjectMapper(objectMapper);
 
         // Set failure handler
@@ -117,7 +117,7 @@ public class HaloConfiguration {
         AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties);
 
         AdminAuthenticationFailureHandler failureHandler = new AdminAuthenticationFailureHandler();
-        failureHandler.setProductionEnv(haloProperties.getProductionEnv());
+        failureHandler.setProductionEnv(haloProperties.isProductionEnv());
         failureHandler.setObjectMapper(objectMapper);
 
         // Config the admin filter

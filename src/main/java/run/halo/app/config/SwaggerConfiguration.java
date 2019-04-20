@@ -61,22 +61,22 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket haloDefaultApi() {
-        log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
+        log.debug("Doc disabled: [{}]", haloProperties.isDocDisabled());
         // TODO Build with different security configuration
         return buildApiDocket("run.halo.app.portal.api",
                 "run.halo.app.web.controller.portal.api",
                 "/api/**")
-                .enable(!haloProperties.getDocDisabled());
+                .enable(!haloProperties.isDocDisabled());
     }
 
     @Bean
     public Docket haloAdminApi() {
-        log.debug("Doc disabled: [{}]", haloProperties.getDocDisabled());
+        log.debug("Doc disabled: [{}]", haloProperties.isDocDisabled());
         // TODO Build with different security configuration
         return buildApiDocket("run.halo.app.admin",
                 "run.halo.app.web.controller.admin",
                 "/api/admin/**")
-                .enable(!haloProperties.getDocDisabled());
+                .enable(!haloProperties.isDocDisabled());
     }
 
     @Bean

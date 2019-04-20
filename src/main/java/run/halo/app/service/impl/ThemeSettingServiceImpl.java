@@ -83,8 +83,10 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
     @Override
     public Map<String, Object> listAsMapBy(String themeId) {
 
+        List<ThemeSetting> themeSettings = listBy(themeId);
+
         // TODO Convert to corresponding data type
-        return ServiceUtils.convertToMap(listBy(themeId), ThemeSetting::getKey, ThemeSetting::getValue);
+        return ServiceUtils.convertToMap(themeSettings, ThemeSetting::getKey, ThemeSetting::getValue);
     }
 
     /**

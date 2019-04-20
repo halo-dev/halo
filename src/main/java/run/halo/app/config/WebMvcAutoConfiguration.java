@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonComponentModule;
@@ -86,7 +87,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/admin/**")
                 .addResourceLocations("classpath:/static/admin/");
 
-        if (!haloProperties.getDocDisabled()) {
+        if (!haloProperties.isDocDisabled()) {
             // If doc is enable
             registry.addResourceHandler("swagger-ui.html")
                     .addResourceLocations("classpath:/META-INF/resources/");
@@ -106,10 +107,13 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      * @return new FreeMarkerConfigurer
      */
     @Bean
-    public FreeMarkerConfigurer freemarkerConfig() {
+    public FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties) {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
         configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
+        if (haloProperties.isProductionEnv()) {
+            configurer.getConfiguration().setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        }
         return configurer;
     }
 

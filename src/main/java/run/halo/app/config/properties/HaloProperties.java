@@ -16,17 +16,17 @@ public class HaloProperties {
     /**
      * Doc api disabled. (Default is true)
      */
-    private Boolean docDisabled = true;
+    private boolean docDisabled = true;
 
     /**
      * Production env. (Default is true)
      */
-    private Boolean productionEnv = true;
+    private boolean productionEnv = true;
 
     /**
      * Authentication enabled
      */
-    private Boolean authEnabled = true;
+    private boolean authEnabled = true;
 
     /**
      * Work directory.

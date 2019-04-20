@@ -57,7 +57,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         this.initThemes();
 
         // Init user in development environment
-        if (!haloProperties.getProductionEnv()) {
+        if (!haloProperties.isProductionEnv()) {
             initAnTestUserIfAbsent();
         }
     }
@@ -89,7 +89,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         log.info("Halo started at         {}", blogUrl);
         // TODO admin may be changeable
         log.info("Halo admin started at   {}/admin", blogUrl);
-        if (!haloProperties.getDocDisabled()) {
+        if (!haloProperties.isDocDisabled()) {
             log.debug("Halo doc was enable at  {}/swagger-ui.html", blogUrl);
         }
     }
@@ -140,7 +140,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             // Create theme folder
             Path themePath = themeService.getBasePath();
 
-            if (!haloProperties.getProductionEnv() || Files.notExists(themePath)) {
+            if (!haloProperties.isProductionEnv() || Files.notExists(themePath)) {
                 log.info("Copying theme folder from [{}] to [{}]", source, themePath);
 
                 FileUtils.copyFolder(source, themePath);
