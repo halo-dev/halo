@@ -66,7 +66,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (!haloProperties.getAuthEnabled()) {
+        if (!haloProperties.isProductionEnv()) {
             List<User> users = userService.listAll();
             if (!users.isEmpty()) {
                 // Set security context

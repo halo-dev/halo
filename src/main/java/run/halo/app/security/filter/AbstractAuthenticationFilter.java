@@ -125,7 +125,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
                 if (failureHandler == null) {
                     // Create default authentication failure handler
                     DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
-                    failureHandler.setProductionEnv(haloProperties.getProductionEnv());
+                    failureHandler.setProductionEnv(haloProperties.isProductionEnv());
 
                     this.failureHandler = failureHandler;
                 }
