@@ -9,6 +9,7 @@ import run.halo.app.model.freemarker.method.RecentCommentsMethod;
 import run.halo.app.model.freemarker.method.RecentPostsMethod;
 import run.halo.app.model.freemarker.tag.*;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.UserService;
 
 import javax.annotation.PostConstruct;
 
@@ -27,6 +28,9 @@ public class FreeMarkerAutoConfiguration {
 
     @Autowired
     private OptionService optionsService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private PostTagDirective postTagDirective;
@@ -59,6 +63,7 @@ public class FreeMarkerAutoConfiguration {
     public void setSharedVariable() {
         try {
             configuration.setSharedVariable("options", optionsService.listOptions());
+            configuration.setSharedVariable("user",userService.getCurrentUser().orElse(null));
             //Freemarker custom tags
             configuration.setSharedVariable("categoryTag", categoryTagDirective);
             configuration.setSharedVariable("commentTag", commentTagDirective);

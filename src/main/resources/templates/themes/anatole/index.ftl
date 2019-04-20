@@ -6,24 +6,24 @@
     <div class="autopagerize_page_element">
         <div class="content">
             <#include "module/post_entry.ftl">
-            <#if posts.pages gt 1>
+            <#if posts.totalPages gt 1>
                 <div class="pagination">
                     <ul class="clearfix">
                         <#if posts.hasPrevious()>
-                            <#if posts.page == 1>
+                            <#if posts.number == 1>
                                 <li class="pre pagbuttons">
                                     <a class="btn" role="navigation" href="${options.blog_url!}/">上一页</a>
                                 </li>
                             <#else >
                                 <li class="pre pagbuttons">
-                                    <a class="btn" role="navigation" href="${options.blog_url!}/page/${posts.page}">上一页</a>
+                                    <a class="btn" role="navigation" href="${options.blog_url!}/page/${posts.number}">上一页</a>
                                 </li>
                             </#if>
                         </#if>
                         <#if posts.hasNext()>
-                        <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="${options.blog_url!}/page/${posts.page+2}">下一页</a>
-                        </li>
+                            <li class="next pagbuttons">
+                                <a class="btn" role="navigation" href="${options.blog_url!}/page/${posts.number+2}">下一页</a>
+                            </li>
                         </#if>
                     </ul>
                 </div>
