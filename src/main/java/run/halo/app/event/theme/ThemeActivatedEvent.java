@@ -16,7 +16,7 @@ public class ThemeActivatedEvent extends ApplicationEvent {
     private final ThemeProperty themeProperty;
 
     /**
-     * Create a new ApplicationEvent.
+     * Creates a new ApplicationEvent.
      *
      * @param source        the object on which the event initially occurred (never {@code null})
      * @param themeProperty theme property must not be null
