@@ -282,10 +282,8 @@ public class ThemeServiceImpl implements ThemeService {
     public String render(String pageName) {
         // Get activated theme
         ThemeProperty activatedTheme = getActivatedTheme();
-        // Get theme folder name
-        String themeFolderName = Paths.get(activatedTheme.getThemePath()).getFileName().toString();
         // Build render url
-        return String.format(RENDER_TEMPLATE, themeFolderName, pageName);
+        return String.format(RENDER_TEMPLATE, activatedTheme.getFolderName(), pageName);
     }
 
     @Override
@@ -644,6 +642,7 @@ public class ThemeServiceImpl implements ThemeService {
 
             // Resolve additional properties
             themeProperty.setThemePath(themePath.toString());
+            themeProperty.setFolderName(themePath.getFileName().toString());
             themeProperty.setHasOptions(hasOptions(themePath));
             themeProperty.setActivated(false);
 
