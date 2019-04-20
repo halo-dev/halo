@@ -1,9 +1,8 @@
 package run.halo.app.repository;
 
-import run.halo.app.model.entity.Post;
-import run.halo.app.repository.base.BasePostRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import run.halo.app.model.entity.Post;
 import run.halo.app.repository.base.BasePostRepository;
 
 

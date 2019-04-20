@@ -10,6 +10,8 @@ import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.base.CrudService;
 
+import java.util.List;
+
 
 /**
  * Attachment service.
@@ -54,4 +56,10 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      */
     @NonNull
     AttachmentOutputDTO convertToDto(@NonNull Attachment attachment);
+
+    /**
+     * List all media type.
+     * @return list of media type
+     */
+    List<String> listAllMediaType();
 }
