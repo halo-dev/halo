@@ -516,3 +516,32 @@ body {
     margin-bottom: 20px;
   }
 }
+
+.ant-list-item{
+  word-break: break-all;
+}
+
+.card-container {
+  background: #f5f5f5;
+  & > .ant-tabs-card {
+    & > .ant-tabs-content {
+      margin-top: -16px;
+      & > .ant-tabs-tabpane {
+        background: #fff;
+        padding: 16px;
+      }
+    }
+    & > .ant-tabs-bar {
+      border-color: #fff;
+      .ant-tabs-tab {
+        border: none!important;
+        margin-right: 0!important;
+        background: transparent;
+      }
+      .ant-tabs-tab-active {
+        border-color: #fff;
+        background: #fff;
+      }
+    }
+  }
+}

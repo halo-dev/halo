@@ -1,30 +1,17 @@
 <template>
   <page-view>
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
-      <a-col
-        :span="24"
-        class="search-box"
-      >
+    <a-row :gutter="12" type="flex" align="middle">
+      <a-col :span="24" class="search-box">
         <a-card :bordered="false">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword" />
+                    <a-input v-model="queryParam.keyword"/>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="年月份">
                     <a-select placeholder="请选择年月">
                       <a-select-option value="2019-01">2019-01</a-select-option>
@@ -33,40 +20,24 @@
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="类型">
                     <a-select placeholder="请选择类型">
                       <a-select-option value="image/png">image/png</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
-                    <a-button
-                      type="primary"
-                      @click="loadAttachments"
-                    >查询</a-button>
-                    <a-button
-                      style="margin-left: 8px;"
-                      @click="resetParam"
-                    >重置</a-button>
+                    <a-button type="primary" @click="loadAttachments(true)">查询</a-button>
+                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
           <div class="table-operator">
-            <a-button
-              type="primary"
-              icon="plus"
-              @click="showUploadModal"
-            >上传</a-button>
+            <a-button type="primary" icon="plus" @click="showUploadModal">上传</a-button>
           </div>
         </a-card>
       </a-col>
@@ -80,11 +51,7 @@
         :sm="12"
         :xs="24"
       >
-        <a-card
-          :bodyStyle="{ padding: 0 }"
-          hoverable
-          @click="showDetailDrawer(attachment)"
-        >
+        <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer(attachment)">
           <div class="attach-thumb">
             <img :src="attachment.thumbPath">
           </div>
@@ -94,10 +61,7 @@
         </a-card>
       </a-col>
     </a-row>
-    <a-row
-      type="flex"
-      justify="end"
-    >
+    <a-row type="flex" justify="end">
       <a-pagination
         :total="pagination.total"
         :defaultPageSize="pagination.size"
@@ -107,19 +71,10 @@
         @showSizeChange="handlePaginationChange"
       />
     </a-row>
-    <a-modal
-      title="上传附件"
-      v-model="uploadVisible"
-      :footer="null"
-    >
-      <upload
-        name="file"
-        multiple
-        :uploadHandler="uploadHandler"
-        @success="handleUploadSuccess"
-      >
+    <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
+      <upload name="file" multiple :uploadHandler="uploadHandler" @success="handleUploadSuccess">
         <p class="ant-upload-drag-icon">
-          <a-icon type="inbox" />
+          <a-icon type="inbox"/>
         </p>
         <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
         <p class="ant-upload-hint">支持单个或批量上传</p>
@@ -171,10 +126,13 @@ export default {
     this.loadAttachments()
   },
   methods: {
-    loadAttachments() {
+    loadAttachments(isSearch) {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
+      if(isSearch){
+        this.queryParam.page = 0
+      }
       attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total

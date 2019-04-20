@@ -117,7 +117,7 @@ export default {
       skeletonLoading: true,
       pagination: {
         page: 1,
-        size: 14,
+        size: 20,
         sort: ''
       },
       attachments: [],
@@ -178,7 +178,7 @@ export default {
 }
 </script>
 
-<style>
+<style scope>
 .attachment-control {
   position: absolute;
   bottom: 0px;

@@ -206,7 +206,7 @@ export default {
 }
 </script>
 
-<style>
+<style scope>
 .attach-detail-img img {
   width: 100%;
 }
