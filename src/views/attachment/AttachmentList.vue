@@ -22,8 +22,8 @@
                 </a-col>
                 <a-col :md="6" :sm="24">
                   <a-form-item label="类型">
-                    <a-select placeholder="请选择类型">
-                      <a-select-option value="image/png">image/png</a-select-option>
+                    <a-select placeholder="请选择类型" v-model="queryParam.mediaType">
+                      <a-select-option v-for="(item,index) in mediaTypes" :key="index" :value="item">{{ item }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -38,6 +38,7 @@
           </div>
           <div class="table-operator">
             <a-button type="primary" icon="plus" @click="showUploadModal">上传</a-button>
+            <a-button style="margin-left: 8px;" icon="delete">回收站</a-button>
           </div>
         </a-card>
       </a-col>
@@ -104,6 +105,7 @@ export default {
       uploadVisible: false,
       selectAttachment: {},
       attachments: [],
+      mediaTypes: [],
       editable: false,
       pagination: {
         page: 1,
@@ -114,7 +116,8 @@ export default {
         page: 0,
         size: 18,
         sort: null,
-        keyword: null
+        keyword: null,
+        mediaType: null
       },
       uploadHandler: attachmentApi.upload,
       drawerVisiable: false
@@ -122,6 +125,7 @@ export default {
   },
   created() {
     this.loadAttachments()
+    this.loadMediaTypes()
   },
   methods: {
     loadAttachments(isSearch) {
@@ -134,6 +138,11 @@ export default {
       attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
+      })
+    },
+    loadMediaTypes() {
+      attachmentApi.getMediaTypes().then(response => {
+        this.mediaTypes = response.data.data
       })
     },
     showDetailDrawer(attachment) {
@@ -153,6 +162,7 @@ export default {
     },
     handleUploadSuccess() {
       this.loadAttachments()
+      this.loadMediaTypes()
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
@@ -162,6 +172,7 @@ export default {
     },
     resetParam() {
       this.queryParam.keyword = null
+      this.queryParam.mediaType = null
       this.loadAttachments()
     },
     handleDelete(attachment) {

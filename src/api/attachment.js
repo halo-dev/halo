@@ -35,6 +35,13 @@ attachmentApi.update = (attachmentId, attachment) => {
   })
 }
 
+attachmentApi.getMediaTypes = () => {
+  return service({
+    url: `${baseUrl}/mediaTypes`,
+    method: 'get'
+  })
+}
+
 attachmentApi.CancelToken = axios.CancelToken
 attachmentApi.isCancel = axios.isCancel
 
