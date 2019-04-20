@@ -9,7 +9,10 @@
                 <span>prompt text</span>
               </template>
               <div class="avatar">
-                <img :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'" @click="showAttachDrawer">
+                <img
+                  :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'"
+                  @click="showAttachDrawer"
+                >
               </div>
             </a-tooltip>
             <div class="username">{{ user.nickname }}</div>

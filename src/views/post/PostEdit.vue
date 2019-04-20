@@ -1,14 +1,7 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
-
+      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
         <div style="margin-bottom: 16px">
           <a-input
             v-model="postToStage.title"
@@ -19,21 +12,11 @@
         </div>
 
         <div id="editor">
-          <mavon-editor
-            v-model="postToStage.originalContent"
-            :boxShadow="false"
-            :ishljs="true"
-          />
+          <mavon-editor v-model="postToStage.originalContent" :boxShadow="false" :ishljs="true"/>
         </div>
       </a-col>
 
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
+      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
         <a-drawer
           title="文章设置"
           :width="isMobile()?'100%':'460'"
@@ -50,19 +33,13 @@
                     label="文章路径："
                     :help="'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
                   >
-                    <a-input v-model="postToStage.url" />
+                    <a-input v-model="postToStage.url"/>
                   </a-form-item>
                   <a-form-item label="文章密码：">
-                    <a-input
-                      type="password"
-                      v-model="postToStage.password"
-                    />
+                    <a-input type="password" v-model="postToStage.password"/>
                   </a-form-item>
                   <a-form-item label="是否关闭评论：">
-                    <a-radio-group
-                      v-model="postToStage.disallowComment"
-                      :defaultValue="false"
-                    >
+                    <a-radio-group v-model="postToStage.disallowComment" :defaultValue="false">
                       <a-radio :value="false">开启</a-radio>
                       <a-radio :value="true">关闭</a-radio>
                     </a-radio-group>
@@ -70,18 +47,15 @@
                 </a-form>
               </div>
             </div>
-            <a-divider />
+            <a-divider/>
 
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">分类目录</h3>
               <div class="post-setting-drawer-item">
-                <category-tree
-                  v-model="selectedCategoryIds"
-                  :categories="categories"
-                />
+                <category-tree v-model="selectedCategoryIds" :categories="categories"/>
               </div>
             </div>
-            <a-divider />
+            <a-divider/>
 
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">标签</h3>
@@ -104,7 +78,7 @@
                 </a-form>
               </div>
             </div>
-            <a-divider />
+            <a-divider/>
 
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">缩略图</h3>
@@ -112,47 +86,30 @@
                 <div class="post-thum">
                   <img
                     class="img"
-                    src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+                    :src="postToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
                     @click="showThumbDrawer"
                   >
                 </div>
               </div>
             </div>
-            <a-divider />
+            <a-divider/>
           </div>
-          <a-drawer
-            title="选择图片"
-            width="320"
-            closable
-            :visible="childDrawerVisible"
-            @close="onChildClose"
-          ></a-drawer>
+          <AttachmentSelectDrawer v-model="childDrawerVisible" @listenToSelect="selectPostThumb"/>
           <div class="post-control">
-            <a-button
-              style="marginRight: 8px"
-              @click="handleDraftClick"
-            >保存草稿</a-button>
-            <a-button
-              @click="handlePublishClick"
-              type="primary"
-            >{{ publishText }}</a-button>
+            <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
+            <a-button @click="handlePublishClick" type="primary">{{ publishText }}</a-button>
           </div>
         </a-drawer>
       </a-col>
     </a-row>
 
-    <AttachmentDrawer v-model="attachmentDrawerVisible" />
+    <AttachmentDrawer v-model="attachmentDrawerVisible"/>
 
-    <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
-      <a-button
-        type="primary"
-        @click="showDrawer"
-      >发布</a-button>
-      <a-button
-        type="dashed"
-        @click="showAttachDrawer"
-        style="margin-left: 8px;"
-      >附件库</a-button>
+    <footer-tool-bar
+      :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
+    >
+      <a-button type="primary" @click="showDrawer">发布</a-button>
+      <a-button type="dashed" @click="showAttachDrawer" style="margin-left: 8px;">附件库</a-button>
     </footer-tool-bar>
   </div>
 </template>
@@ -167,6 +124,7 @@ import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
+import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 
 const toolbars = {
   bold: true, // 粗体
@@ -194,7 +152,8 @@ export default {
     mavonEditor,
     CategoryTree,
     FooterToolBar,
-    AttachmentDrawer
+    AttachmentDrawer,
+    AttachmentSelectDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -296,6 +255,9 @@ export default {
     },
     onChildClose() {
       this.childDrawerVisible = false
+    },
+    selectPostThumb(data) {
+      this.postToStage.thumbnail = data.path
     }
   }
 }
