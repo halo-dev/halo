@@ -9,7 +9,7 @@
                 <#if (options.anatole_style_hitokoto!'false')=="true">
                     <p id="yiyan">获取中...</p>
                 <#else >
-                    <p>${user.userDesc!'A other Halo theme'}</p>
+                    <p>${user.description!'A other Halo theme'}</p>
                 </#if>
             </div>
         </div>
