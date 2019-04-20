@@ -41,6 +41,7 @@
           </div>
         </a-card>
       </a-col>
+
       <a-col
         class="attachment-item"
         v-for="attachment in attachments"
@@ -130,7 +131,7 @@ export default {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      if(isSearch){
+      if (isSearch) {
         this.queryParam.page = 0
       }
       attachmentApi.query(this.queryParam).then(response => {

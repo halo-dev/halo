@@ -27,6 +27,14 @@ attachmentApi.delete = attachmentId => {
   })
 }
 
+attachmentApi.update = (attachmentId, attachment) => {
+  return service({
+    url: `${baseUrl}/${attachmentId}`,
+    method: 'put',
+    data: attachment
+  })
+}
+
 attachmentApi.CancelToken = axios.CancelToken
 attachmentApi.isCancel = axios.isCancel
 
