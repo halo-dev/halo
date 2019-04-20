@@ -15,4 +15,6 @@ public class AttachmentQuery {
      * Keyword.
      */
     private String keyword;
+
+    private String mediaType;
 }

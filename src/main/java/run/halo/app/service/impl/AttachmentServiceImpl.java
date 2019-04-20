@@ -69,6 +69,10 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         return (Specification<Attachment>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
+            if (attachmentQuery.getMediaType() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("mediaType"), attachmentQuery.getMediaType()));
+            }
+
             if (attachmentQuery.getKeyword() != null) {
 
                 String likeCondition = String.format("%%%s%%", StringUtils.strip(attachmentQuery.getKeyword()));
@@ -149,6 +153,11 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         }
 
         return attachmentOutputDTO;
+    }
+
+    @Override
+    public List<String> listAllMediaType() {
+        return attachmentRepository.findAllMediaType();
     }
 
     /**
