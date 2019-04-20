@@ -6,11 +6,11 @@ import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Configuration;
-import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.exception.*;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
 import run.halo.app.handler.theme.config.ThemePropertyResolver;
@@ -74,6 +75,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final RestTemplate restTemplate;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     /**
      * Activated theme id.
      */
@@ -90,7 +93,8 @@ public class ThemeServiceImpl implements ThemeService {
                             Configuration configuration,
                             ThemeConfigResolver themeConfigResolver,
                             ThemePropertyResolver themePropertyResolver,
-                            RestTemplate restTemplate) {
+                            RestTemplate restTemplate,
+                            ApplicationEventPublisher eventPublisher) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.configuration = configuration;
@@ -99,6 +103,7 @@ public class ThemeServiceImpl implements ThemeService {
         this.restTemplate = restTemplate;
 
         workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -111,9 +116,6 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.hasText(themeId, "Theme id must not be blank");
 
         Set<ThemeProperty> themes = getThemes();
-
-        log.debug("Themes type: [{}]", themes.getClass());
-        log.debug("Themes: [{}]", themes);
 
         return themes.stream().filter(themeProperty -> StringUtils.equals(themeProperty.getId(), themeId)).findFirst();
     }
@@ -327,13 +329,8 @@ public class ThemeServiceImpl implements ThemeService {
         // Clear the cache
         clearThemeCache();
 
-        try {
-            // TODO Refactor here in the future
-            configuration.setSharedVariable("themeId", themeId);
-            configuration.setSharedVariable("options", optionService.listOptions());
-        } catch (TemplateModelException e) {
-            throw new ServiceException("Failed to set shared variable", e).setErrorData(themeId);
-        }
+        // Publish a theme activated event
+        eventPublisher.publishEvent(new ThemeActivatedEvent(this, themeProperty));
 
         return themeProperty;
     }
