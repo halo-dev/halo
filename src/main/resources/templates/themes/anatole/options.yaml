@@ -5,6 +5,7 @@ sns:
       name: rss
       label: RSS
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -58,6 +59,7 @@ style:
       name: post_title_uppper
       label: 文章标题大写
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -68,6 +70,7 @@ style:
       name: blog_title_uppper
       label: 博客标题大写
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -78,6 +81,7 @@ style:
       name: avatar_circle
       label: 圆形头像
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -88,6 +92,7 @@ style:
       name: hitokoto
       label: 博客描述开启一言
       type: radio
+      data-type: bool
       default: false
       options:
         - value: true

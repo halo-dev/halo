@@ -119,6 +119,7 @@ style:
       name: background_bing
       label: Bing 背景
       type: radio
+      data-type: bool
       default: false
       options:
         - value: true
@@ -130,7 +131,7 @@ style:
       name: code_pretty
       label: 代码高亮
       type: select
-      default: false
+      default: Default
       options:
         - value: Default
           label: Default
@@ -222,6 +223,7 @@ sns-share:
       name: sns_share_twitter
       label: 分享到 Twitter
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -233,6 +235,7 @@ sns-share:
       name: sns_share_facebook
       label: 分享到 Facebook
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -244,6 +247,7 @@ sns-share:
       name: sns_share_googleplus
       label: 分享到 Google +
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -255,6 +259,7 @@ sns-share:
       name: sns_share_weibo
       label: 分享到微博
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -266,6 +271,7 @@ sns-share:
       name: sns_share_linkedin
       label: 分享到 Linkedin
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -277,6 +283,7 @@ sns-share:
       name: sns_share_qq
       label: 分享到 QQ
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -288,6 +295,7 @@ sns-share:
       name: sns_share_telegram
       label: 分享到 Telegram
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -302,6 +310,7 @@ other:
       name: other_js_fade
       label: 渐显效果
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -313,6 +322,7 @@ other:
       name: other_js_smoothscroll
       label: 平滑滚动效果
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -324,6 +334,7 @@ other:
       name: other_sidebar_archives
       label: 侧边栏归档
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -335,6 +346,7 @@ other:
       name: other_sidebar_cates
       label: 侧边栏分类
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -346,6 +358,7 @@ other:
       name: other_sidebar_postcount
       label: 侧边栏文章总数
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true
@@ -357,6 +370,7 @@ other:
       name: other_mathjax
       label: MathJax 插件
       type: radio
+      data-type: bool
       default: true
       options:
         - value: true

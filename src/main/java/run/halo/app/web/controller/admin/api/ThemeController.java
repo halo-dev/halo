@@ -86,22 +86,28 @@ public class ThemeController {
         return BaseResponse.ok(themeService.fetchConfig(themeService.getActivatedThemeId()));
     }
 
+    @GetMapping("{themeId}/configurations")
+    @ApiOperation("Fetches theme configuration by theme id")
+    public List<Group> fetchConfig(@PathVariable("themeId") String themeId) {
+        return themeService.fetchConfig(themeId);
+    }
+
     @GetMapping("activation/settings")
     @ApiOperation("Lists activated theme settings")
     public Map<String, Object> listSettingsBy() {
         return themeSettingService.listAsMapBy(themeService.getActivatedThemeId());
     }
 
+    @GetMapping("{themeId}/settings")
+    @ApiOperation("Lists theme settings by theme id")
+    public Map<String, Object> listSettingsBy(@PathVariable("themeId") String themeId) {
+        return themeSettingService.listAsMapBy(themeId);
+    }
+
     @PostMapping("activation/settings")
     @ApiOperation("Saves theme settings")
     public void saveSettingsBy(@RequestBody Map<String, Object> settings) {
         themeSettingService.save(settings, themeService.getActivatedThemeId());
-    }
-
-    @GetMapping("{themeId}/configurations")
-    @ApiOperation("Fetches theme configuration by theme id")
-    public List<Group> fetchConfig(@PathVariable("themeId") String themeId) {
-        return themeService.fetchConfig(themeId);
     }
 
     @PostMapping("{themeId}/settings")

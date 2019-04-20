@@ -2,6 +2,7 @@ package run.halo.app.handler.theme.config.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
@@ -23,6 +24,7 @@ import java.util.Map;
  * @author johnniang
  * @date 4/10/19
  */
+@Slf4j
 @Service
 public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
@@ -109,7 +111,8 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
                 item.setName(itemMap.get("name").toString());
                 item.setLabel(itemMap.getOrDefault("label", item.getName()).toString());
-                item.setDataType(DataType.typeOf(itemMap.get("data_type")));
+                Object dataType = itemMap.getOrDefault("data-type", itemMap.get("dataType"));
+                item.setDataType(DataType.typeOf(dataType));
                 item.setType(InputType.typeOf(itemMap.get("type")));
                 item.setDefaultValue(itemMap.get("default"));
 
@@ -133,7 +136,8 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 Item item = new Item();
                 item.setName(key.toString());
                 item.setLabel(itemMap.getOrDefault("label", item.getName()).toString());
-                item.setDataType(DataType.typeOf(itemMap.get("data_type")));
+                Object dataType = itemMap.getOrDefault("data-type", itemMap.get("dataType"));
+                item.setDataType(DataType.typeOf(dataType));
                 item.setType(InputType.typeOf(itemMap.get("type")));
                 item.setDefaultValue(itemMap.get("default"));
 
