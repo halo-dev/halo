@@ -214,18 +214,6 @@ export default {
   width: 100%;
 }
 
-.attachment-control {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
-  border-top: 1px solid rgb(232, 232, 232);
-  padding: 10px 16px;
-  text-align: right;
-  left: 0px;
-  background: rgb(255, 255, 255);
-  border-radius: 0px 0px 4px 4px;
-}
-
 .table-operator {
   margin-bottom: 0;
 }

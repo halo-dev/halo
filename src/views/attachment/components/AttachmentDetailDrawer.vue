@@ -78,7 +78,8 @@
         </a-skeleton>
       </a-col>
     </a-row>
-    <div class="attachment-control">
+    <a-divider/>
+    <div class="bottom-control">
       <a-popconfirm title="你确定要删除该附件？" @confirm="deleteAttachment" okText="确定" cancelText="取消">
         <a-button type="danger">删除</a-button>
       </a-popconfirm>
@@ -184,16 +185,5 @@ export default {
 <style scope>
 .attach-detail-img img {
   width: 100%;
-}
-.attachment-control {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
-  border-top: 1px solid rgb(232, 232, 232);
-  padding: 10px 16px;
-  text-align: right;
-  left: 0px;
-  background: rgb(255, 255, 255);
-  border-radius: 0px 0px 4px 4px;
 }
 </style>

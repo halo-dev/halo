@@ -25,7 +25,7 @@
         <a-skeleton
           active
           :loading="skeletonLoading"
-          :paragraph="{ rows: 8 }"
+          :paragraph="{ rows: 18 }"
         >
           <a-col :span="24">
             <div
@@ -57,7 +57,8 @@
         :attachment="selectedAttachment"
         @delete="handleDelete"
       />
-      <div class="attachment-control">
+      <a-divider/>
+      <div class="bottom-control">
         <a-button
           @click="showUploadModal"
           type="primary"
@@ -117,7 +118,7 @@ export default {
       skeletonLoading: true,
       pagination: {
         page: 1,
-        size: 20,
+        size: 10,
         sort: ''
       },
       attachments: [],
@@ -179,18 +180,6 @@ export default {
 </script>
 
 <style scope>
-.attachment-control {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
-  border-top: 1px solid rgb(232, 232, 232);
-  padding: 10px 16px;
-  text-align: right;
-  left: 0px;
-  background: rgb(255, 255, 255);
-  border-radius: 0px 0px 4px 4px;
-}
-
 .post-thum .img {
   width: 100%;
   cursor: pointer;

@@ -95,7 +95,8 @@
             <a-divider/>
           </div>
           <AttachmentSelectDrawer v-model="childDrawerVisible" @listenToSelect="selectPostThumb" :drawerWidth="460"/>
-          <div class="post-control">
+          <a-divider />
+          <div class="bottom-control">
             <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
             <a-button @click="handlePublishClick" type="primary">{{ publishText }}</a-button>
           </div>
