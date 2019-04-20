@@ -7,17 +7,25 @@
     :arrowPointAtCenter="true"
     overlayClassName="header-comment-wrapper"
     :overlayStyle="{ width: '300px', top: '50px' }"
+    title="待审核评论"
   >
     <template slot="content">
       <a-spin :spinning="loadding">
         <a-list :dataSource="comments">
           <a-list-item slot="renderItem" slot-scope="item">
-            <a-list-item-meta :title="item.content" :description="item.createTime">
+            <a-list-item-meta>
               <a-avatar
                 style="background-color: white"
                 slot="avatar"
                 :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
+                size="large"
               />
+              <template slot="title">
+                <a :href="item.authorUrl" target="_blank">{{ item.author }}</a>：{{ item.content }}
+              </template>
+              <template slot="description">
+                {{ item.createTime | timeAgo }}
+              </template>
             </a-list-item-meta>
           </a-list-item>
         </a-list>
