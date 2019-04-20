@@ -210,7 +210,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
-    ThemeProperty activeTheme(@NonNull String themeId);
+    ThemeProperty activateTheme(@NonNull String themeId);
 
     /**
      * Upload theme.

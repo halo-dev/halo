@@ -19,8 +19,8 @@ import java.util.Map;
  * @author johnniang
  * @date 19-4-20
  */
-@Component
 @Slf4j
+@Component
 public class FreemarkerConfigAwareListener {
 
     private final OptionService optionService;

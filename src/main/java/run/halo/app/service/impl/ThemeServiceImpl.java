@@ -316,7 +316,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public ThemeProperty activeTheme(String themeId) {
+    public ThemeProperty activateTheme(String themeId) {
         // Check existence of the theme
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
 
@@ -508,6 +508,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
         this.activatedTheme = activatedTheme;
+        this.activatedThemeId = activatedTheme.getId();
     }
 
     /**
