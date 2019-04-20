@@ -97,7 +97,7 @@
       </a-col>
     </a-row>
 
-    <AttachmentSelectDrawer v-model="attachmentDrawerVisible"/>
+    <AttachmentSelectDrawer v-model="attachmentDrawerVisible" @listenToSelect="selectAvatar"/>
   </div>
 </template>
 
@@ -120,7 +120,8 @@ export default {
         oldPassword: null,
         newPassword: null,
         confirmPassword: null
-      }
+      },
+      attachment: {}
     }
   },
   computed: {
@@ -162,6 +163,9 @@ export default {
         this.user = response.data.data
         this.$message.success('资料更新成功！')
       })
+    },
+    selectAvatar(data) {
+      this.user.avatar = data.path
     }
   }
 }

@@ -15,7 +15,7 @@
       <a-row type="flex" align="middle">
         <a-skeleton active :loading="skeletonLoading" :paragraph="{ rows: 8 }">
           <a-col :span="24">
-            <div class="attach-item" v-for="(item, index) in attachments" :key="index">
+            <div class="attach-item" v-for="(item, index) in attachments" :key="index" @click="selectAttachment(item)">
               <img :src="item.thumbPath">
             </div>
           </a-col>
@@ -72,8 +72,6 @@ export default {
   },
   data() {
     return {
-      detailVisiable: false,
-      attachmentDrawerVisible: false,
       uploadVisible: false,
       skeletonLoading: true,
       pagination: {
@@ -82,7 +80,6 @@ export default {
         sort: ''
       },
       attachments: [],
-      selectedAttachment: {},
       attachmentUploadHandler: attachmentApi.upload
     }
   },
@@ -114,6 +111,9 @@ export default {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
       })
+    },
+    selectAttachment(item) {
+      this.$emit('listenToSelect', item)
     },
     handlePaginationChange(page, pageSize) {
       this.pagination.page = page
