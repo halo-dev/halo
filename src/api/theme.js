@@ -53,16 +53,16 @@ themeApi.fetchConfiguration = themeId => {
   })
 }
 
-themeApi.fetchSettings = () => {
+themeApi.fetchSettings = themeId => {
   return service({
-    url: `${baseUrl}/activation/settings`,
+    url: `${baseUrl}/${themeId}/settings`,
     method: 'get'
   })
 }
 
-themeApi.saveSettings = settings => {
+themeApi.saveSettings = (themeId, settings) => {
   return service({
-    url: `${baseUrl}/activation/settings`,
+    url: `${baseUrl}/${themeId}/settings`,
     data: settings,
     method: 'post'
   })

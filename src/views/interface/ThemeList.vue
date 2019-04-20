@@ -1,30 +1,60 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row :gutter="12" type="flex" align="middle">
+    <a-row
+      :gutter="12"
+      type="flex"
+      align="middle"
+    >
       <a-col :span="24">
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
           :dataSource="themes"
         >
-          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-            <a-card hoverable :title="item.name">
-              <img :alt="item.name" :src="item.screenshots" slot="cover">
-              <template class="ant-card-actions" slot="actions">
+          <a-list-item
+            slot="renderItem"
+            slot-scope="item, index"
+            :key="index"
+          >
+            <a-card
+              hoverable
+              :title="item.name"
+            >
+              <img
+                :alt="item.name"
+                :src="item.screenshots"
+                slot="cover"
+              >
+              <template
+                class="ant-card-actions"
+                slot="actions"
+              >
                 <div v-if="item.activated">
-                  <a-icon type="unlock" theme="twoTone"/>已启用
+                  <a-icon
+                    type="unlock"
+                    theme="twoTone"
+                  />已启用
                 </div>
-                <div v-else @click="handleActivateClick(item)">
-                  <a-icon type="lock"/>启用
+                <div
+                  v-else
+                  @click="handleActivateClick(item)"
+                >
+                  <a-icon type="lock" />启用
                 </div>
                 <div @click="handleEditClick(item)">
-                  <a-icon type="setting"/>设置
+                  <a-icon type="setting" />设置
                 </div>
                 <a-dropdown placement="topCenter">
-                  <a class="ant-dropdown-link" href="#">
-                    <a-icon type="ellipsis"/>更多
+                  <a
+                    class="ant-dropdown-link"
+                    href="#"
+                  >
+                    <a-icon type="ellipsis" />更多
                   </a>
                   <a-menu slot="overlay">
-                    <a-menu-item :key="1" :disabled="item.activated">
+                    <a-menu-item
+                      :key="1"
+                      :disabled="item.activated"
+                    >
                       <a-popconfirm
                         v-if="!item.activated"
                         :title="'确定删除【' + item.name + '】主题？'"
@@ -32,10 +62,10 @@
                         okText="确定"
                         cancelText="取消"
                       >
-                        <a-icon type="delete"/>删除
+                        <a-icon type="delete" />删除
                       </a-popconfirm>
                       <span v-else>
-                        <a-icon type="delete"/>删除
+                        <a-icon type="delete" />删除
                       </span>
                     </a-menu-item>
                   </a-menu>
@@ -55,11 +85,28 @@
       :visible="visible"
       destroyOnClose
     >
-      <a-row :gutter="12" type="flex">
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 10}">
+      <a-row
+        :gutter="12"
+        type="flex"
+      >
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 10}"
+          >
             <a-card :bordered="false">
-              <img :alt="themeProperty.name" :src="themeProperty.screenshots" slot="cover">
+              <img
+                :alt="themeProperty.name"
+                :src="themeProperty.screenshots"
+                slot="cover"
+              >
               <a-card-meta
                 :title="themeProperty.author.name"
                 :description="themeProperty.description"
@@ -70,15 +117,32 @@
                   size="large"
                   slot="avatar"
                 />
-                <a-avatar v-else size="large" slot="avatar">{{ themeProperty.author.name }}</a-avatar>
+                <a-avatar
+                  v-else
+                  size="large"
+                  slot="avatar"
+                >{{ themeProperty.author.name }}</a-avatar>
               </a-card-meta>
             </a-card>
           </a-skeleton>
         </a-col>
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 20}">
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 20}"
+          >
             <div class="card-container">
-              <a-tabs type="card" defaultActiveKey="0">
+              <a-tabs
+                type="card"
+                defaultActiveKey="0"
+              >
                 <a-tab-pane
                   v-for="(group, index) in themeConfiguration"
                   :key="index.toString()"
@@ -127,7 +191,10 @@
                       </a-select>
                     </a-form-item>
                     <a-form-item>
-                      <a-button type="primary" @click="saveSettings">保存</a-button>
+                      <a-button
+                        type="primary"
+                        @click="saveSettings"
+                      >保存</a-button>
                     </a-form-item>
                   </a-form>
                 </a-tab-pane>
@@ -138,7 +205,13 @@
       </a-row>
     </a-drawer>
     <div class="upload-button">
-      <a-button type="primary" shape="circle" icon="plus" size="large" @click="showUploadModal"></a-button>
+      <a-button
+        type="primary"
+        shape="circle"
+        icon="plus"
+        size="large"
+        @click="showUploadModal"
+      ></a-button>
     </div>
     <a-modal
       title="安装主题"
@@ -147,7 +220,10 @@
       :bodyStyle="{ padding: '0 24px 24px' }"
     >
       <a-tabs defaultActiveKey="1">
-        <a-tab-pane tab="本地上传" key="1">
+        <a-tab-pane
+          tab="本地上传"
+          key="1"
+        >
           <upload
             name="file"
             multiple
@@ -157,19 +233,25 @@
             @success="handleUploadSuccess"
           >
             <p class="ant-upload-drag-icon">
-              <a-icon type="inbox"/>
+              <a-icon type="inbox" />
             </p>
             <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
             <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
           </upload>
         </a-tab-pane>
-        <a-tab-pane tab="远程拉取" key="2">
+        <a-tab-pane
+          tab="远程拉取"
+          key="2"
+        >
           <a-form layout="vertical">
             <a-form-item label="远程地址：">
-              <a-input v-model="fetchingUrl"/>
+              <a-input v-model="fetchingUrl" />
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" @click="handleFetching">确定</a-button>
+              <a-button
+                type="primary"
+                @click="handleFetching"
+              >确定</a-button>
             </a-form-item>
           </a-form>
         </a-tab-pane>
@@ -220,16 +302,17 @@ export default {
       this.optionLoading = true
       this.themeProperty = theme
 
-      setTimeout(() => {
-        themeApi.fetchConfiguration(theme.id).then(response => {
-          this.themeConfiguration = response.data.data
-          themeApi.fetchSettings().then(response => {
-            this.themeSettings = response.data.data
+      themeApi.fetchConfiguration(theme.id).then(response => {
+        this.themeConfiguration = response.data.data
+        themeApi.fetchSettings(theme.id).then(response => {
+          this.themeSettings = response.data.data
+
+          setTimeout(() => {
             this.visible = true
             this.optionLoading = false
-          })
+          }, 300)
         })
-      }, 300)
+      })
     },
     activeTheme(themeId) {
       themeApi.active(themeId).then(response => {
@@ -244,7 +327,7 @@ export default {
       })
     },
     saveSettings() {
-      themeApi.saveSettings(this.themeSettings).then(response => {
+      themeApi.saveSettings(this.themeProperty.id, this.themeSettings).then(response => {
         this.$message.success('保存成功！')
       })
     },
