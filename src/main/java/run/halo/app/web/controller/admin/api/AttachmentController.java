@@ -101,9 +101,9 @@ public class AttachmentController {
         return result;
     }
 
-    @GetMapping("mediaTypes")
-    @ApiOperation("List all of media types")
-    public List<String> mediaTypes(){
+    @GetMapping("media_types")
+    @ApiOperation("Lists all of media types")
+    public List<String> listMediaTypes() {
         return attachmentService.listAllMediaType();
     }
 }
