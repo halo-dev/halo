@@ -196,6 +196,14 @@ public interface ThemeService {
     String getActivatedThemeId();
 
     /**
+     * Gets activated theme property.
+     *
+     * @return activated theme property
+     */
+    @NonNull
+    ThemeProperty getActivatedTheme();
+
+    /**
      * Actives a theme.
      *
      * @param themeId theme id must not be blank
