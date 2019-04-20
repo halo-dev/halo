@@ -97,18 +97,18 @@
       </a-col>
     </a-row>
 
-    <AttachmentDrawer v-model="attachmentDrawerVisible"/>
+    <AttachmentSelectDrawer v-model="attachmentDrawerVisible"/>
   </div>
 </template>
 
 <script>
-import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
+import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import userApi from '@/api/user'
 import adminApi from '@/api/admin'
 
 export default {
   components: {
-    AttachmentDrawer
+    AttachmentSelectDrawer
   },
   data() {
     return {
