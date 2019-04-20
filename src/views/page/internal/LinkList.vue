@@ -191,6 +191,7 @@ export default {
         })
       }
       this.loadLinks()
+      this.addLink()
       this.link = {}
     }
   }

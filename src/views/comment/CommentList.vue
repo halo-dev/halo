@@ -92,6 +92,12 @@ const columns = [
     dataIndex: 'content'
   },
   {
+    title: '状态',
+    className: 'status',
+    dataIndex: 'statusProperty',
+    scopedSlots: { customRender: 'status' }
+  },
+  {
     title: '评论页面',
     dataIndex: 'post',
     scopedSlots: { customRender: 'post' }
@@ -100,12 +106,6 @@ const columns = [
     title: '日期',
     dataIndex: 'createTime',
     scopedSlots: { customRender: 'createTime' }
-  },
-  {
-    title: '状态',
-    className: 'status',
-    dataIndex: 'statusProperty',
-    scopedSlots: { customRender: 'status' }
   },
   {
     title: '操作',

@@ -41,25 +41,22 @@
           </div>
         </a-card>
       </a-col>
-
-      <a-col
-        class="attachment-item"
-        v-for="attachment in attachments"
-        :key="attachment.id"
-        :xl="4"
-        :lg="4"
-        :md="12"
-        :sm="12"
-        :xs="24"
-      >
-        <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer(attachment)">
-          <div class="attach-thumb">
-            <img :src="attachment.thumbPath">
-          </div>
-          <a-card-meta>
-            <template slot="description">{{ attachment.mediaType }}</template>
-          </a-card-meta>
-        </a-card>
+      <a-col :span="24">
+        <a-list
+          :grid="{ gutter: 12, xs: 1, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
+          :dataSource="attachments"
+        >
+          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+            <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer(item)">
+              <div class="attach-thumb">
+                <img :src="item.thumbPath">
+              </div>
+              <a-card-meta>
+                <template slot="description">{{ item.mediaType }}</template>
+              </a-card-meta>
+            </a-card>
+          </a-list-item>
+        </a-list>
       </a-col>
     </a-row>
     <a-row type="flex" justify="end">
@@ -179,7 +176,6 @@ export default {
   margin: 24px 0 12px 0;
 }
 
-.attachment-item,
 .search-box {
   padding-bottom: 12px;
 }

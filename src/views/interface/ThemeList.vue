@@ -1,51 +1,49 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12" type="flex" align="middle">
-      <a-col
-        class="theme-item"
-        :xl="6"
-        :lg="6"
-        :md="12"
-        :sm="12"
-        :xs="24"
-        v-for="(theme, index) in themes"
-        :key="index"
-      >
-        <a-card hoverable :title="theme.name">
-          <img :alt="theme.name" :src="theme.screenshots" slot="cover">
-          <template class="ant-card-actions" slot="actions">
-            <div v-if="theme.activated">
-              <a-icon type="unlock" theme="twoTone"/>已启用
-            </div>
-            <div v-else @click="handleActivateClick(theme)">
-              <a-icon type="lock"/>启用
-            </div>
-            <div @click="handleEditClick(theme)">
-              <a-icon type="setting"/>设置
-            </div>
-            <a-dropdown placement="topCenter">
-              <a class="ant-dropdown-link" href="#">
-                <a-icon type="ellipsis"/>更多
-              </a>
-              <a-menu slot="overlay">
-                <a-menu-item :key="1" :disabled="theme.activated">
-                  <a-popconfirm
-                    v-if="!theme.activated"
-                    :title="'确定删除【' + theme.name + '】主题？'"
-                    @confirm="deleteTheme(theme.id)"
-                    okText="确定"
-                    cancelText="取消"
-                  >
-                    <a-icon type="delete"/>删除
-                  </a-popconfirm>
-                  <span v-else>
-                    <a-icon type="delete"/>删除
-                  </span>
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
-          </template>
-        </a-card>
+      <a-col :span="24">
+        <a-list
+          :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
+          :dataSource="themes"
+        >
+          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+            <a-card hoverable :title="item.name">
+              <img :alt="item.name" :src="item.screenshots" slot="cover">
+              <template class="ant-card-actions" slot="actions">
+                <div v-if="item.activated">
+                  <a-icon type="unlock" theme="twoTone"/>已启用
+                </div>
+                <div v-else @click="handleActivateClick(item)">
+                  <a-icon type="lock"/>启用
+                </div>
+                <div @click="handleEditClick(item)">
+                  <a-icon type="setting"/>设置
+                </div>
+                <a-dropdown placement="topCenter">
+                  <a class="ant-dropdown-link" href="#">
+                    <a-icon type="ellipsis"/>更多
+                  </a>
+                  <a-menu slot="overlay">
+                    <a-menu-item :key="1" :disabled="item.activated">
+                      <a-popconfirm
+                        v-if="!item.activated"
+                        :title="'确定删除【' + item.name + '】主题？'"
+                        @confirm="deleteTheme(item.id)"
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <a-icon type="delete"/>删除
+                      </a-popconfirm>
+                      <span v-else>
+                        <a-icon type="delete"/>删除
+                      </span>
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
+              </template>
+            </a-card>
+          </a-list-item>
+        </a-list>
       </a-col>
     </a-row>
     <a-drawer
@@ -297,10 +295,6 @@ export default {
 <style scoped>
 .ant-divider-horizontal {
   margin: 14px 0;
-}
-
-.theme-item {
-  padding-bottom: 12px;
 }
 
 .theme-item .theme-control .theme-title {
