@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.dto.AttachmentOutputDTO;
 import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.params.AttachmentParam;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.AttachmentService;
 
+import javax.validation.Valid;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,6 +58,15 @@ public class AttachmentController {
     public AttachmentOutputDTO getBy(@PathVariable("id") Integer id) {
         Attachment attachment = attachmentService.getById(id);
         return attachmentService.convertToDto(attachment);
+    }
+
+    @PutMapping("{attachmentId:\\d+}")
+    @ApiOperation("Updates a attachment")
+    public AttachmentOutputDTO updateBy(@PathVariable("attachmentId") Integer attachmentId,
+                                        @RequestBody @Valid AttachmentParam attachmentParam) {
+        Attachment attachment = attachmentService.getById(attachmentId);
+        attachmentParam.update(attachment);
+        return new AttachmentOutputDTO().convertFrom(attachmentService.update(attachment));
     }
 
     /**
