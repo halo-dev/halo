@@ -37,7 +37,7 @@ attachmentApi.update = (attachmentId, attachment) => {
 
 attachmentApi.getMediaTypes = () => {
   return service({
-    url: `${baseUrl}/mediaTypes`,
+    url: `${baseUrl}/media_types`,
     method: 'get'
   })
 }
