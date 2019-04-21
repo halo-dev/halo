@@ -3,7 +3,6 @@ package run.halo.app.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,8 +43,11 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
     private static final String FILE_PROTOCOL = "file:///";
 
-    @Autowired
-    private HaloProperties haloProperties;
+    private final HaloProperties haloProperties;
+
+    public WebMvcAutoConfiguration(HaloProperties haloProperties) {
+        this.haloProperties = haloProperties;
+    }
 
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
