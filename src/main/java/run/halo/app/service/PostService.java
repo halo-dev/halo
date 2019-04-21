@@ -140,6 +140,16 @@ public interface PostService extends CrudService<Post, Integer> {
     Post getByUrl(@NonNull String url);
 
     /**
+     * Gets post by post status and url.
+     *
+     * @param status post status must not be null
+     * @param url    post url must not be blank
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull PostStatus status, @NonNull String url);
+
+    /**
      * Get post detail vo by post id.
      *
      * @param postId post id must not be null
@@ -195,22 +205,6 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
-
-    /**
-     * Get pre post by current post date.
-     * @param date date
-     * @return post
-     */
-    @NonNull
-    Post getPrePostOfNullable(@NonNull Date date);
-
-    /**
-     * Get next post by current post date.
-     * @param date date
-     * @return post
-     */
-    @NonNull
-    Post getNextPostOfNullable(@NonNull Date date);
 
     /**
      * Lists all posts by post status.
