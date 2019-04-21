@@ -1,4 +1,4 @@
-package run.halo.app.web.controller.portal.api;
+package run.halo.app.web.controller.content.api;
 
 import run.halo.app.model.dto.TagOutputDTO;
 import run.halo.app.model.dto.post.PostSimpleOutputDTO;
