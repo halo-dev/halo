@@ -12,17 +12,19 @@
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
-                  <a-form-item label="年月份">
-                    <a-select placeholder="请选择年月">
-                      <a-select-option value="2019-01">2019-01</a-select-option>
-                      <a-select-option value="2019-02">2019-02</a-select-option>
-                      <a-select-option value="2019-03">2019-03</a-select-option>
+                  <a-form-item label="存储位置">
+                    <a-select v-model="queryParam.attachmentType">
+                      <a-select-option value="local">本地</a-select-option>
+                      <a-select-option value="smms">SM.MS</a-select-option>
+                      <a-select-option value="upyun">又拍云</a-select-option>
+                      <a-select-option value="qnyun">七牛云</a-select-option>
+                      <a-select-option value="aliyun">阿里云</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
-                  <a-form-item label="类型">
-                    <a-select placeholder="请选择类型" v-model="queryParam.mediaType">
+                  <a-form-item label="文件类型">
+                    <a-select v-model="queryParam.mediaType">
                       <a-select-option v-for="(item,index) in mediaTypes" :key="index" :value="item">{{ item }}</a-select-option>
                     </a-select>
                   </a-form-item>
@@ -116,7 +118,8 @@ export default {
         size: 18,
         sort: null,
         keyword: null,
-        mediaType: null
+        mediaType: null,
+        attachmentType: null
       },
       uploadHandler: attachmentApi.upload,
       drawerVisiable: false
@@ -172,6 +175,7 @@ export default {
     resetParam() {
       this.queryParam.keyword = null
       this.queryParam.mediaType = null
+      this.queryParam.attachmentType = null
       this.loadAttachments()
     },
     handleDelete(attachment) {

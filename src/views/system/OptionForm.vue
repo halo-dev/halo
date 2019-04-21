@@ -182,7 +182,7 @@
                   >
                     <a-select-option value="local">本地</a-select-option>
                     <a-select-option value="smms">SM.MS</a-select-option>
-                    <a-select-option value="ypyun">又拍云</a-select-option>
+                    <a-select-option value="upyun">又拍云</a-select-option>
                     <a-select-option value="qnyun">七牛云</a-select-option>
                     <a-select-option value="aliyun">阿里云</a-select-option>
                   </a-select>
@@ -407,7 +407,7 @@ export default {
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
           break
-        case 'ypyun':
+        case 'upyun':
           this.upyunFormHidden = true
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
