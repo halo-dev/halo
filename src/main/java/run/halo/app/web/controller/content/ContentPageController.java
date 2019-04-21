@@ -10,7 +10,6 @@ import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.CommentService;
-import run.halo.app.service.GalleryService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.ThemeService;
 
@@ -23,7 +22,6 @@ import java.util.List;
 @Controller
 public class ContentPageController {
 
-    private final GalleryService galleryService;
 
     private final PostService postService;
 
@@ -31,11 +29,9 @@ public class ContentPageController {
 
     private final ThemeService themeService;
 
-    public ContentPageController(GalleryService galleryService,
-                                 PostService postService,
+    public ContentPageController(PostService postService,
                                  CommentService commentService,
                                  ThemeService themeService) {
-        this.galleryService = galleryService;
         this.postService = postService;
         this.commentService = commentService;
         this.themeService = themeService;
