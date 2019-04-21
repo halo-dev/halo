@@ -1,4 +1,4 @@
-package run.halo.app.web.controller.portal.api;
+package run.halo.app.web.controller.content.api;
 
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;

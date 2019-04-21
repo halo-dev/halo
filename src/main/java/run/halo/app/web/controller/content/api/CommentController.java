@@ -1,4 +1,4 @@
-package run.halo.app.web.controller.portal.api;
+package run.halo.app.web.controller.content.api;
 
 import run.halo.app.model.dto.CommentOutputDTO;
 import run.halo.app.model.entity.User;
