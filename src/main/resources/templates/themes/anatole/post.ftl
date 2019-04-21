@@ -92,7 +92,7 @@
                     </ul>
                 </div>
                 <div id="comment_widget">
-<#--                    <#include "module/comment.ftl">-->
+                    <#include "module/comment.ftl">
                 </div>
             </div>
         </div>

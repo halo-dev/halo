@@ -73,7 +73,7 @@ public class ContentIndexController {
                         }) Sort sort) {
         log.debug("Requested index page, sort info: [{}]", sort);
         int pageSize = optionService.getPostPageSize();
-        Pageable pageable = PageRequest.of(page - 1, pageSize, sort);
+        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, sort);
 
         Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, pageable);
         int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
