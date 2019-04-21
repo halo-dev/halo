@@ -193,4 +193,22 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
+
+    /**
+     * Lists all posts by post status.
+     *
+     * @param status post status must not be null
+     * @return a list of post
+     */
+    @NonNull
+    List<Post> listAllBy(@NonNull PostStatus status);
+
+    /**
+     * Filters post content if the password is not blank.
+     *
+     * @param post original post must not be null
+     * @return filtered post
+     */
+    @NonNull
+    Post filterIfEncrypt(@NonNull Post post);
 }
