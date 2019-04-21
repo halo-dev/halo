@@ -23,7 +23,7 @@
                     <#if post.tags?size gt 0>
                         <i class="fa fa-tag"></i>
                         <#list post.tags as tag>
-                            <a href="${options.blog_url!}/tags/${tag.url}" class="tag">&nbsp;${tag.name}</a>
+                            <a href="${options.blog_url!}/tags/${tag.slugName}" class="tag">&nbsp;${tag.name}</a>
                         </#list>
                     </#if>
                 </div>
