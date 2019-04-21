@@ -1,5 +1,6 @@
 package run.halo.app.web.controller.content;
 
+import cn.hutool.core.util.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
+import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.ThemeService;
 
@@ -31,18 +32,15 @@ public class ContentTagController {
 
     private final TagService tagService;
 
-    private final PostService postService;
+    private final PostTagService postTagService;
 
     private final OptionService optionService;
 
     private final ThemeService themeService;
 
-    public ContentTagController(TagService tagService,
-                                PostService postService,
-                                OptionService optionService,
-                                ThemeService themeService) {
+    public ContentTagController(TagService tagService, PostTagService postTagService, OptionService optionService, ThemeService themeService) {
         this.tagService = tagService;
-        this.postService = postService;
+        this.postTagService = postTagService;
         this.optionService = optionService;
         this.themeService = themeService;
     }
@@ -67,7 +65,7 @@ public class ContentTagController {
     @GetMapping(value = "{slugName}")
     public String tags(Model model,
                        @PathVariable("slugName") String slugName) {
-        return this.tags(model, slugName, 1, Sort.by(DESC, "postDate"));
+        return this.tags(model, slugName, 1, Sort.by(DESC, "createTime"));
     }
 
     /**
@@ -82,19 +80,17 @@ public class ContentTagController {
     public String tags(Model model,
                        @PathVariable("slugName") String slugName,
                        @PathVariable("page") Integer page,
-                       @SortDefault(sort = "postDate", direction = DESC) Sort sort) {
+                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
-        int size = optionService.getPostPageSize();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
+        Page<Post> posts = postTagService.pagePostsBy(tag.getId(), pageable);
+        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
-        Page<PostListVO> posts;
-        // TODO get posts by tag
-        //final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-//        model.addAttribute("is_tags", true);
-//        model.addAttribute("posts", posts);
-//        model.addAttribute("rainbow", rainbow);
-//        model.addAttribute("tag", tag);
+        model.addAttribute("is_tags", true);
+        model.addAttribute("posts", posts);
+        model.addAttribute("rainbow", rainbow);
+        model.addAttribute("tag", tag);
         return themeService.render("tag");
     }
 }

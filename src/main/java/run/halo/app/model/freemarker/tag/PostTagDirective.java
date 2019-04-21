@@ -1,11 +1,10 @@
 package run.halo.app.model.freemarker.tag;
 
 import freemarker.core.Environment;
-import freemarker.template.TemplateDirectiveBody;
-import freemarker.template.TemplateDirectiveModel;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateModel;
+import freemarker.template.*;
 import org.springframework.stereotype.Component;
+import run.halo.app.model.support.HaloConst;
+import run.halo.app.service.PostService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -19,9 +18,26 @@ import java.util.Map;
 @Component
 public class PostTagDirective implements TemplateDirectiveModel {
 
+    private final PostService postService;
+
+    public PostTagDirective(PostService postService) {
+        this.postService = postService;
+    }
+
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-        // TODO Complete article tag directive.
+        final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
+        if (params.containsKey(HaloConst.METHOD_KEY)) {
+            String method = params.get(HaloConst.METHOD_KEY).toString();
+            switch (method) {
+                case "count":
+                    env.setVariable("count", builder.build().wrap(postService.count()));
+                    break;
+                default:
+                    break;
+            }
+        }
+        body.render(env.getOut());
     }
 
 }

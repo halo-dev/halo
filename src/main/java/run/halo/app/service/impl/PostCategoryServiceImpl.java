@@ -1,5 +1,10 @@
 package run.halo.app.service.impl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
@@ -9,9 +14,6 @@ import run.halo.app.repository.PostRepository;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -86,6 +88,17 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId);
 
         return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public Page<Post> pagePostBy(Integer categoryId, Pageable pageable) {
+        Assert.notNull(categoryId, "Category id must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postCategoryRepository.findAllCategoryIdsByPostId(categoryId);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
     }
 
     @Override
