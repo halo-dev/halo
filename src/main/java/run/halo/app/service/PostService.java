@@ -77,6 +77,15 @@ public interface PostService extends CrudService<Post, Integer> {
     @NonNull
     Page<Post> pageBy(@NonNull PostQuery postQuery, @NonNull Pageable pageable);
 
+    /**
+     * Pages post by keyword
+     *
+     * @param keyword  keyword
+     * @param pageable pageable
+     * @return a page of post
+     */
+    @NonNull
+    Page<Post> pageBy(@NonNull String keyword, @NonNull Pageable pageable);
 
     /**
      * Lists simple output dto by status.

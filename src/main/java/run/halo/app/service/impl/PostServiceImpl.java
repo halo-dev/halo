@@ -117,6 +117,18 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
     }
 
+    @Override
+    public Page<Post> pageBy(String keyword, Pageable pageable) {
+        Assert.notNull(keyword, "keyword must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        PostQuery postQuery = new PostQuery();
+        postQuery.setKeyword(keyword);
+
+        // Build specification and find all
+        return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
+    }
+
     /**
      * Build specification by post query.
      *
