@@ -1,5 +1,6 @@
 package run.halo.app.model.freemarker.tag;
 
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.TagService;
 import freemarker.core.Environment;
 import freemarker.template.*;
@@ -17,8 +18,6 @@ import java.util.Map;
 @Component
 public class TagTagDirective implements TemplateDirectiveModel {
 
-    private static final String METHOD_KEY = "method";
-
     private final TagService tagService;
 
     public TagTagDirective(TagService tagService) {
@@ -29,8 +28,8 @@ public class TagTagDirective implements TemplateDirectiveModel {
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
         final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
 
-        if (params.containsKey(METHOD_KEY)) {
-            String method = params.get(METHOD_KEY).toString();
+        if (params.containsKey(HaloConst.METHOD_KEY)) {
+            String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
                     env.setVariable("tags", builder.build().wrap(tagService.listAll()));

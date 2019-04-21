@@ -19,8 +19,6 @@ import java.util.Map;
 @Component
 public class PostTagDirective implements TemplateDirectiveModel {
 
-    private static final String METHOD_KEY = "method";
-
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
         // TODO Complete article tag directive.
