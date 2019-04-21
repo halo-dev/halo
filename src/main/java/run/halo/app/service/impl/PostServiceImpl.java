@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.event.ApplicationEventQueuePublisher;
+import run.halo.app.event.LogEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryOutputDTO;
@@ -20,6 +22,7 @@ import run.halo.app.model.dto.TagOutputDTO;
 import run.halo.app.model.dto.post.PostMinimalOutputDTO;
 import run.halo.app.model.dto.post.PostSimpleOutputDTO;
 import run.halo.app.model.entity.*;
+import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.ArchiveMonthVO;
@@ -66,12 +69,15 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
     private final CommentService commentService;
 
+    private final ApplicationEventQueuePublisher eventQueuePublisher;
+
     public PostServiceImpl(PostRepository postRepository,
                            TagService tagService,
                            CategoryService categoryService,
                            PostTagService postTagService,
                            PostCategoryService postCategoryService,
-                           CommentService commentService) {
+                           CommentService commentService,
+                           ApplicationEventQueuePublisher eventQueuePublisher) {
         super(postRepository);
         this.postRepository = postRepository;
         this.tagService = tagService;
@@ -79,6 +85,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         this.postTagService = postTagService;
         this.postCategoryService = postCategoryService;
         this.commentService = commentService;
+        this.eventQueuePublisher = eventQueuePublisher;
     }
 
     @Override
@@ -214,13 +221,36 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return createOrUpdate(postToUpdate, tagIds, categoryIds, this::update);
     }
 
+    @Override
+    public Post create(Post post) {
+        Post createdPost = super.create(post);
+
+        // Log the creation
+        LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
+        eventQueuePublisher.publishEvent(logEvent);
+
+        return createdPost;
+    }
+
+    @Override
+    public Post update(Post post) {
+        Post updatedPost = super.update(post);
+
+        // Log the creation
+        LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(), LogType.POST_EDITED, updatedPost.getTitle());
+        eventQueuePublisher.publishEvent(logEvent);
+
+        return updatedPost;
+    }
+
     private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, @NonNull Function<Post, Post> postOperation) {
         Assert.notNull(post, "Post param must not be null");
         Assert.notNull(postOperation, "Post operation must not be null");
 
         // Check url
         long count;
-        if (post.getId() != null) {
+        boolean isUpdating = post.getId() != null;
+        if (isUpdating) {
             // For updating
             count = postRepository.countByIdNotAndUrl(post.getId(), post.getUrl());
         } else {

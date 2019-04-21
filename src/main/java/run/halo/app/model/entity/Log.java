@@ -1,12 +1,13 @@
 package run.halo.app.model.entity;
 
 
-import run.halo.app.model.enums.LogType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import run.halo.app.model.enums.LogType;
+import run.halo.app.utils.ServletUtils;
 
 import javax.persistence.*;
 
@@ -57,5 +58,16 @@ public class Log extends BaseEntity {
     public void prePersist() {
         super.prePersist();
         id = null;
+
+        if (logKey == null) {
+            logKey = "";
+        }
+
+        // Get ip address
+        ipAddress = ServletUtils.getRequestIp();
+
+        if (ipAddress == null) {
+            logKey = "";
+        }
     }
 }

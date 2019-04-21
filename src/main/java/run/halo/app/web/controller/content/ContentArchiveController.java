@@ -99,7 +99,6 @@ public class ContentArchiveController {
      *
      * @param url     post slug url.
      * @param cp      comment page number
-     * @param request request
      * @param model   model
      * @return template path: theme/{theme}/post.ftl
      */
@@ -110,14 +109,8 @@ public class ContentArchiveController {
                        Model model) {
         Post post = postService.getBy(PostStatus.PUBLISHED, url);
 
-        postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> {
-            log.debug("Next post: [{}]", nextPost);
-            model.addAttribute("nextPost", nextPost);
-        });
-        postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> {
-            log.debug("Pre post: [{}]", prePost);
-            model.addAttribute("prePost", prePost);
-        });
+        postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
+        postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
 
 
         List<Category> categories = postCategoryService.listCategoryBy(post.getId());
