@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.base.BasePostRepository;
 
 import java.util.Date;
@@ -26,8 +27,8 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
     Long countLike();
 
     @NonNull
-    Page<Post> findAllByStatusAndCreateTimeBefore(Date createTime, @NonNull Pageable pageable);
+    Page<Post> findAllByStatusAndCreateTimeBefore(PostStatus status, Date createTime, @NonNull Pageable pageable);
 
     @NonNull
-    Page<Post> findAllByStatusAndCreateTimeAfter(Date createTime, @NonNull Pageable pageable);
+    Page<Post> findAllByStatusAndCreateTimeAfter(PostStatus status, Date createTime, @NonNull Pageable pageable);
 }
