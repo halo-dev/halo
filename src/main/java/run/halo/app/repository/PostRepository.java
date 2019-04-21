@@ -10,6 +10,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.base.BasePostRepository;
 
 import java.util.Date;
+import java.util.Optional;
 
 
 /**
@@ -27,8 +28,11 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
     Long countLike();
 
     @NonNull
-    Page<Post> findAllByStatusAndCreateTimeBefore(PostStatus status, Date createTime, @NonNull Pageable pageable);
+    Page<Post> findAllByStatusAndCreateTimeBefore(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
 
     @NonNull
-    Page<Post> findAllByStatusAndCreateTimeAfter(PostStatus status, Date createTime, @NonNull Pageable pageable);
+    Page<Post> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
+
+    @NonNull
+    Optional<Post> getByUrlAndStatus(@NonNull String url, @NonNull PostStatus status);
 }

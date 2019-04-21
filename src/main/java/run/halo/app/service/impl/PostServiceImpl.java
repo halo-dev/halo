@@ -259,6 +259,16 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
+    public Post getBy(PostStatus status, String url) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.hasText(url, "Post url must not be blank");
+
+        Optional<Post> postOptional = postRepository.getByUrlAndStatus(url, status);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("The post with status " + status + " and url " + url + "was not existed").setErrorData(url));
+    }
+
+    @Override
     public PostDetailVO getDetailVoBy(Integer postId) {
         Assert.notNull(postId, "post id must not be null");
 
@@ -364,16 +374,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Post getPrePostOfNullable(Date date) {
-        return getPrePost(date).orElse(null);
-    }
-
-    @Override
-    public Post getNextPostOfNullable(Date date) {
-        return getNextPost(date).orElse(null);
-    }
-
-    @Override
     public Page<PostSimpleOutputDTO> convertToSimpleDto(@NonNull Page<Post> postPage) {
         Assert.notNull(postPage, "Post page must not be null");
 
@@ -469,7 +469,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
             return Optional.empty();
         }
 
-        return Optional.of(nextPostPage.getContent().get(nextPostPage.getContent().size()-1));
+        return Optional.of(nextPostPage.getContent().get(0));
     }
 
     /**

@@ -23,7 +23,7 @@ import java.util.List;
  * @date : 2019-03-17
  */
 @Controller
-@RequestMapping(value = "/archives")
+@RequestMapping(value = "archives")
 public class ContentArchiveController {
 
     private final PostService postService;
@@ -57,33 +57,21 @@ public class ContentArchiveController {
      * @param model   model
      * @return template path: theme/{theme}/post.ftl
      */
-    @GetMapping(value = "{url}")
-    public String post(@PathVariable String url,
+    @GetMapping("{url}")
+    public String post(@PathVariable("url") String url,
                        @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                        HttpServletRequest request,
                        Model model) {
-        final Post post = postService.getByUrl(url);
-        if (null == post || !post.getStatus().equals(PostStatus.PUBLISHED)) {
-            return "redirect:/404";
-        }
+        Post post = postService.getBy(PostStatus.PUBLISHED, url);
 
-        final Date publishTime = post.getCreateTime();
-        final Post nextPost = postService.getNextPostOfNullable(publishTime);
-        final Post prePost = postService.getPrePostOfNullable(publishTime);
-
-        if (null != prePost) {
-            model.addAttribute("prePost", prePost);
-        }
-        if (null != nextPost) {
-            model.addAttribute("nextPost", nextPost);
-        }
-
+        postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
+        postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
 
         List<Category> categories = postCategoryService.listCategoryBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
 
         model.addAttribute("is_post", true);
-        model.addAttribute("post",post);
+        model.addAttribute("post", post);
         model.addAttribute("categories", categories);
         model.addAttribute("tags", tags);
         return themeService.render("post");
