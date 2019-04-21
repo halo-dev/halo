@@ -115,18 +115,16 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
 
         // Build settings from user-defined
         themeSettings.forEach(themeSetting -> {
-            Item item = itemMap.get(themeSetting.getKey());
-
-
-            // Convert data to corresponding data type
             String key = themeSetting.getKey();
 
-            Object convertedValue = themeSetting.getValue();
+            Item item = itemMap.get(key);
 
-            if (item != null) {
-                convertedValue = item.getDataType().convertTo(themeSetting.getValue());
-                log.debug("Converted user-defined data from [{}] to [{}], type: [{}]", themeSetting.getValue(), convertedValue, item.getDataType());
+            if (item == null) {
+                return;
             }
+
+            Object convertedValue = item.getDataType().convertTo(themeSetting.getValue());
+            log.debug("Converted user-defined data from [{}] to [{}], type: [{}]", themeSetting.getValue(), convertedValue, item.getDataType());
 
             result.put(key, convertedValue);
         });
