@@ -15,7 +15,9 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.base.CrudService;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -211,4 +213,10 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     Post filterIfEncrypt(@NonNull Post post);
+
+    @NonNull
+    Optional<Post> getPrePost(@NonNull Date createTime);
+
+    @NonNull
+    Optional<Post> getNextPost(@NonNull Date createTime);
 }
