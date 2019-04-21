@@ -1,11 +1,12 @@
 package run.halo.app.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
-import run.halo.app.service.base.CrudService;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import run.halo.app.service.base.CrudService;
 
 import java.util.Collection;
@@ -47,6 +48,16 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     List<Post> listPostBy(@NonNull Integer categoryId);
+
+    /**
+     * Pages post by category slug name.
+     *
+     * @param categoryId category id must not be null
+     * @param pageable   pageable
+     * @return page of post
+     */
+    @NonNull
+    Page<Post> pagePostBy(@NonNull Integer categoryId, Pageable pageable);
 
     /**
      * Merges or creates post categories by post id and category id set if absent.
