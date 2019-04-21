@@ -82,9 +82,9 @@ $('.comment-cancel-reply').click(function () {
 function loadAvatar() {
     var avatar = $(".comment-author-avatar");
     var email = $('input[name=commentAuthorEmail]');
-    avatar.attr("src", "//gravatar.loli.net/avatar/" + md5(localStorage.getItem("email")) + "?s=256&d=" + avatarType);
+    avatar.attr("src", "//gravatar.loli.net/avatar/" + md5(localStorage.getItem("email")) + "?s=256&d=" + gavatarDefault);
     if (email.val() !== '' && email.val() !== null) {
-        avatar.attr("src", "//gravatar.loli.net/avatar/" + md5(email.val()) + "?s=256&d=" + avatarType);
+        avatar.attr("src", "//gravatar.loli.net/avatar/" + md5(email.val()) + "?s=256&d=" + gavatarDefault);
     }
 }
 
