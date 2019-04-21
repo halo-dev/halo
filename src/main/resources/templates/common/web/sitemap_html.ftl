@@ -20,8 +20,8 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 
         #myTable {
             list-style: none;
-            margin: 10px 0px 10px 0px;
-            padding: 0px;
+            margin: 10px 0 10px 0;
+            padding: 0;
             width: 100%;
             min-width: 804px;
         }
@@ -80,7 +80,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 
         #footer {
             padding: 2px;
-            margin: 0px;
+            margin: 0;
             font-size: 8pt;
             color: gray;
             min-width: 900px;
@@ -103,7 +103,6 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             margin-top: 10px;
         }
 
-        /* 窗口缩小到768px以下时 */
         @media (max-width: 768px) {
             .T2-h, .T3-h, .T4-h, .T2, .T3, .T4 {
                 display: none;
@@ -118,7 +117,6 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             }
         }
 
-        /* 窗口放大到768px以上时 */
         @media (min-width: 768px) {
 
         }
