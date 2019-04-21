@@ -41,6 +41,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
@@ -466,7 +467,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         return postRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
                 date,
-                PageRequest.of(0, size, Sort.by(DESC, "createTime")))
+                PageRequest.of(0, size, Sort.by(ASC, "createTime")))
                 .getContent();
     }
 

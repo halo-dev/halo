@@ -1,5 +1,6 @@
 package run.halo.app.web.controller.content;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import java.util.List;
  * @author : RYAN0UP
  * @date : 2019-03-17
  */
+@Slf4j
 @Controller
 @RequestMapping(value = "archives")
 public class ContentArchiveController {
@@ -64,8 +66,14 @@ public class ContentArchiveController {
                        Model model) {
         Post post = postService.getBy(PostStatus.PUBLISHED, url);
 
-        postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
-        postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
+        postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> {
+            log.debug("Next post: [{}]", nextPost);
+            model.addAttribute("nextPost", nextPost);
+        });
+        postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> {
+            log.debug("Pre post: [{}]", prePost);
+            model.addAttribute("prePost", prePost);
+        });
 
         List<Category> categories = postCategoryService.listCategoryBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
