@@ -80,14 +80,14 @@
                 <div class="pagination">
                     <ul class="clearfix">
                         <#if nextPost??>
-                        <li class="pre pagbuttons">
-                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${nextPost.url}" title="${nextPost.title}">下一篇</a>
-                        </li>
+                            <li class="next pagbuttons">
+                                <a class="btn" role="navigation" href="${options.blog_url!}/archives/${nextPost.url}" title="${nextPost.title}">下一篇</a>
+                            </li>
                         </#if>
                         <#if prePost??>
-                        <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="${options.blog_url!}/archives/${prePost.url}" title="${prePost.title}">上一篇</a>
-                        </li>
+                            <li class="pre pagbuttons">
+                                <a class="btn" role="navigation" href="${options.blog_url!}/archives/${prePost.url}" title="${prePost.title}">上一篇</a>
+                            </li>
                         </#if>
                     </ul>
                 </div>
