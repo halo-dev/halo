@@ -113,9 +113,9 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
         configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
-        if (haloProperties.isProductionEnv()) {
-            configurer.getConfiguration().setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        }
+//        if (haloProperties.isProductionEnv()) {
+//            configurer.getConfiguration().setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+//        }
         return configurer;
     }
 
