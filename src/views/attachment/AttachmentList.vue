@@ -38,7 +38,6 @@
           </div>
           <div class="table-operator">
             <a-button type="primary" icon="plus" @click="showUploadModal">上传</a-button>
-            <a-button style="margin-left: 8px;" icon="delete">回收站</a-button>
           </div>
         </a-card>
       </a-col>
@@ -53,7 +52,7 @@
                 <img :src="item.thumbPath">
               </div>
               <a-card-meta>
-                <template slot="description">{{ item.mediaType }}</template>
+                <ellipsis :length="isMobile()?36:18" tooltip slot="description">{{ item.name }}</ellipsis>
               </a-card-meta>
             </a-card>
           </a-list-item>
