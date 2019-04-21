@@ -53,9 +53,9 @@
                                 <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
                                 <a href="${options.blog_url!}/archives/${post.url}#comment_widget">Comments</a>
-                                <#if post.tags?size gt 0>
+                                <#if tags?size gt 0>
                                     <i class="fa fa-tag"></i>
-                                    <#list post.tags as tag>
+                                    <#list tags as tag>
                                         <a href="${options.blog_url!}/tags/${tag.slugName}" class="tag">&nbsp;${tag.name}</a>
                                     </#list>
                                 </#if>
@@ -92,7 +92,7 @@
                     </ul>
                 </div>
                 <div id="comment_widget">
-                    <#include "module/comment.ftl">
+<#--                    <#include "module/comment.ftl">-->
                 </div>
             </div>
         </div>

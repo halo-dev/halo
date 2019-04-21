@@ -11,7 +11,7 @@
                         <h3><a>links</a></h3>
                     </div>
                     <div class="post-content">
-                        <@commonTag method="links">
+                        <@linkTag method="list">
                             <#if links?? && links?size gt 0>
                                 <#list links as link>
                                 <p>
@@ -22,7 +22,7 @@
                                 </p>
                                 </#list>
                             </#if>
-                        </@commonTag>
+                        </@linkTag>
                     </div>
                 </div>
             </div>
