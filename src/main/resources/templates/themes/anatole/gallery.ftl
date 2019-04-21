@@ -23,15 +23,17 @@
         </ul>
     </header>
     <section id="thumbnails">
-        <#if galleries?size gt 0>
-        <#list galleries as gallery>
-            <article>
-                <a class="thumbnail" href="${gallery.url}" data-position="left center"><img src="${gallery.thumbnail}" alt="${gallery.description}" /></a>
-                <h2>${gallery.name}</h2>
-                <p>${gallery.takeTime!}</p>
-            </article>
-        </#list>
-        </#if>
+        <@galleryTag method="list">
+            <#if galleries?size gt 0>
+                <#list galleries as gallery>
+                    <article>
+                        <a class="thumbnail" href="${gallery.url}" data-position="left center"><img src="${gallery.thumbnail}" alt="${gallery.description}" /></a>
+                        <h2>${gallery.name}</h2>
+                        <p>${gallery.takeTime!}</p>
+                    </article>
+                </#list>
+            </#if>
+        </@galleryTag>
     </section>
     <footer id="footer">
         <ul class="copyright">

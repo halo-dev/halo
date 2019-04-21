@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Comment;
-import run.halo.app.model.entity.Gallery;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.CommentService;
@@ -48,9 +47,7 @@ public class ContentPageController {
      * @return template path: themes/{theme}/gallery
      */
     @GetMapping(value = "/gallery")
-    public String gallery(Model model) {
-        final List<Gallery> galleries = galleryService.listAll();
-        model.addAttribute("galleries", galleries);
+    public String gallery() {
         return themeService.render("gallery");
     }
 

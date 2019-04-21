@@ -39,6 +39,11 @@ public class HaloConst {
     public static final String SUFFIX_FTL = ".ftl";
 
     /**
+     * Custom freemarker tag method key.
+     */
+    public static final String METHOD_KEY = "method";
+
+    /**
      * Owo map. (Unmodified map)
      */
     public static Map<String, String> OWO_MAP = Collections.emptyMap();
