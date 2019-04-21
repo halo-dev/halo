@@ -416,6 +416,27 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         });
     }
 
+    @Override
+    public List<Post> listAllBy(PostStatus status) {
+        Assert.notNull(status, "Post status must not be null");
+
+        return postRepository.findAllByStatus(status);
+    }
+
+    @Override
+    public Post filterIfEncrypt(Post post) {
+        Assert.notNull(post, "Post must not be null");
+
+        if (StringUtils.isNotBlank(post.getPassword())) {
+            String tip = "The post is encrypted by author";
+            post.setSummary(tip);
+            post.setOriginalContent(tip);
+            post.setFormatContent(tip);
+        }
+
+        return post;
+    }
+
     /**
      * Converts to post minimal output dto.
      *

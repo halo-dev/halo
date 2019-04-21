@@ -1,17 +1,12 @@
 package run.halo.app.web.controller.content;
 
-import run.halo.app.model.entity.Post;
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.enums.PostType;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
-import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -20,10 +15,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * @author : RYAN0UP
@@ -37,6 +35,10 @@ public class ContentFeedController {
     private final OptionService optionService;
 
     private final FreeMarkerConfigurer freeMarker;
+
+    private final static String UTF_8_SUFFIX = ";charset=UTF-8";
+
+    private final static String XML_MEDIA_TYPE = MediaType.APPLICATION_XML_VALUE + UTF_8_SUFFIX;
 
     public ContentFeedController(PostService postService,
                                  OptionService optionService,
@@ -54,14 +56,11 @@ public class ContentFeedController {
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
-    @GetMapping(value = {"feed", "feed.xml", "rss", "rss.xml"}, produces = "application/xml;charset=UTF-8")
+    @GetMapping(value = {"feed", "feed.xml", "rss", "rss.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
     public String feed(Model model) throws IOException, TemplateException {
-        int rssPageSize = optionService.getRssPageSize();
-        final Sort sort = new Sort(Sort.Direction.DESC, "postDate");
-        final Pageable pageable = PageRequest.of(0, rssPageSize, sort);
-        model.addAttribute("posts", buildPosts(pageable));
-        final Template template = freeMarker.getConfiguration().getTemplate("common/web/rss.ftl");
+        model.addAttribute("posts", buildPosts(buildPostPageable(optionService.getRssPageSize())));
+        Template template = freeMarker.getConfiguration().getTemplate("common/web/rss.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
 
@@ -73,14 +72,11 @@ public class ContentFeedController {
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
-    @GetMapping(value = {"atom", "atom.xml"}, produces = "application/xml;charset=UTF-8")
+    @GetMapping(value = {"atom", "atom.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
     public String atom(Model model) throws IOException, TemplateException {
-        int pageSize = optionService.getPostPageSize();
-        final Sort sort = new Sort(Sort.Direction.DESC, "createTime");
-        final Pageable pageable = PageRequest.of(0, pageSize, sort);
-        model.addAttribute("posts", buildPosts(pageable));
-        final Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
+        model.addAttribute("posts", buildPosts(buildPostPageable(optionService.getPostPageSize())));
+        Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
 
@@ -92,11 +88,11 @@ public class ContentFeedController {
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
-    @GetMapping(value = {"sitemap", "sitemap.xml"}, produces = "application/xml;charset=UTF-8")
+    @GetMapping(value = {"sitemap", "sitemap.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
     public String sitemapXml(Model model) throws IOException, TemplateException {
         model.addAttribute("posts", buildPosts(null));
-        final Template template = freeMarker.getConfiguration().getTemplate("common/web/sitemap_xml.ftl");
+        Template template = freeMarker.getConfiguration().getTemplate("common/web/sitemap_xml.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
 
@@ -106,7 +102,7 @@ public class ContentFeedController {
      * @param model model
      * @return String
      */
-    @GetMapping(value = "sitemap.html", produces = {"text/html"})
+    @GetMapping(value = "sitemap.html", produces = MediaType.TEXT_PLAIN_VALUE)
     public String sitemapHtml(Model model) {
         model.addAttribute("posts", buildPosts(null));
         return "common/web/sitemap_html";
@@ -120,11 +116,22 @@ public class ContentFeedController {
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
-    @GetMapping(value = "robots.txt", produces = {"text/plain"})
+    @GetMapping(value = "robots.txt", produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String robots(Model model) throws IOException, TemplateException {
-        final Template template = freeMarker.getConfiguration().getTemplate("common/web/robots.ftl");
+        Template template = freeMarker.getConfiguration().getTemplate("common/web/robots.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+    }
+
+    /**
+     * Builds page info for post.
+     *
+     * @param size page size
+     * @return page info
+     */
+    @NonNull
+    private Pageable buildPostPageable(int size) {
+        return PageRequest.of(0, size, Sort.by(DESC, "createTime"));
     }
 
     /**
@@ -134,13 +141,10 @@ public class ContentFeedController {
      * @return List<Post>
      */
     private List<Post> buildPosts(Pageable pageable) {
-        final Page<Post> postsPage = postService.pageBy(PostStatus.PUBLISHED, pageable).map(post -> {
-            if (StrUtil.isNotEmpty(post.getPassword())) {
-                post.setFormatContent("该文章为加密文章");
-                post.setSummary("该文章为加密文章");
-            }
-            return post;
-        });
-        return postsPage.getContent();
+        if (pageable == null) {
+            return postService.listAllBy(PostStatus.PUBLISHED);
+        }
+
+        return postService.pageBy(PostStatus.PUBLISHED, pageable).map(postService::filterIfEncrypt).getContent();
     }
 }
