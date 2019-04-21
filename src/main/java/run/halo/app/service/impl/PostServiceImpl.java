@@ -437,6 +437,32 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return post;
     }
 
+    @Override
+    public Optional<Post> getPrePost(Date createTime) {
+        Assert.notNull(createTime, "Create time must not be null");
+
+        Page<Post> prePostPage = postRepository.findAllByStatusAndCreateTimeAfter(createTime, PageRequest.of(0, 1));
+
+        if (prePostPage.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(prePostPage.getContent().get(0));
+    }
+
+    @Override
+    public Optional<Post> getNextPost(Date createTime) {
+        Assert.notNull(createTime, "Create time must not be null");
+
+        Page<Post> prePostPage = postRepository.findAllByStatusAndCreateTimeBefore(createTime, PageRequest.of(0, 1));
+
+        if (prePostPage.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(prePostPage.getContent().get(0));
+    }
+
     /**
      * Converts to post minimal output dto.
      *
