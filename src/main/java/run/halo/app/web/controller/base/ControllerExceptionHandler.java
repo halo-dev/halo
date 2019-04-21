@@ -1,5 +1,6 @@
 package run.halo.app.web.controller.base;
 
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import run.halo.app.exception.HaloException;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.utils.ExceptionUtils;
@@ -79,6 +80,14 @@ public class ControllerExceptionHandler {
     public BaseResponse handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        return baseResponse;
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public BaseResponse handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
+        baseResponse.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
         return baseResponse;
     }
 
