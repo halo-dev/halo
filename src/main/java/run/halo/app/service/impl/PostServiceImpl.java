@@ -363,6 +363,15 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return super.removeById(postId);
     }
 
+    @Override
+    public Post getPrePostOfNullable(Date date) {
+        return getPrePost(date).orElse(null);
+    }
+
+    @Override
+    public Post getNextPostOfNullable(Date date) {
+        return getNextPost(date).orElse(null);
+    }
 
     @Override
     public Page<PostSimpleOutputDTO> convertToSimpleDto(@NonNull Page<Post> postPage) {
@@ -441,7 +450,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     public Optional<Post> getPrePost(Date createTime) {
         Assert.notNull(createTime, "Create time must not be null");
 
-        Page<Post> prePostPage = postRepository.findAllByStatusAndCreateTimeAfter(createTime, PageRequest.of(0, 1));
+        Page<Post> prePostPage = postRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED, createTime, PageRequest.of(0, 1));
 
         if (prePostPage.isEmpty()) {
             return Optional.empty();
@@ -454,13 +463,13 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     public Optional<Post> getNextPost(Date createTime) {
         Assert.notNull(createTime, "Create time must not be null");
 
-        Page<Post> prePostPage = postRepository.findAllByStatusAndCreateTimeBefore(createTime, PageRequest.of(0, 1));
+        Page<Post> nextPostPage = postRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED, createTime, PageRequest.of(0, 1));
 
-        if (prePostPage.isEmpty()) {
+        if (nextPostPage.isEmpty()) {
             return Optional.empty();
         }
 
-        return Optional.of(prePostPage.getContent().get(0));
+        return Optional.of(nextPostPage.getContent().get(nextPostPage.getContent().size()-1));
     }
 
     /**

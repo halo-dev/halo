@@ -197,6 +197,22 @@ public interface PostService extends CrudService<Post, Integer> {
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
 
     /**
+     * Get pre post by current post date.
+     * @param date date
+     * @return post
+     */
+    @NonNull
+    Post getPrePostOfNullable(@NonNull Date date);
+
+    /**
+     * Get next post by current post date.
+     * @param date date
+     * @return post
+     */
+    @NonNull
+    Post getNextPostOfNullable(@NonNull Date date);
+
+    /**
      * Lists all posts by post status.
      *
      * @param status post status must not be null

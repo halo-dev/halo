@@ -1,6 +1,5 @@
 package run.halo.app.model.entity;
 
-import run.halo.app.model.enums.AttachmentType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
