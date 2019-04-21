@@ -1,12 +1,6 @@
 <template>
   <div class="setting-drawer" ref="settingDrawer">
-    <a-drawer
-      width="300"
-      closable
-      @close="onClose"
-      :visible="visible"
-      :zIndex="9999"
-    >
+    <a-drawer width="300" closable @close="onClose" :visible="visible" :zIndex="9999">
       <div class="setting-drawer-index-content">
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">整体风格设置</h3>
@@ -80,68 +74,55 @@
               </div>
             </div>
           </div>
-          <div :style="{ marginTop: '24px' }">
-            <a-list :split="false">
-              <a-list-item>
-                <a-tooltip slot="actions">
-                  <template slot="title">该设定仅 [顶部栏导航] 时有效</template>
-                  <a-select
-                    size="small"
-                    style="width: 80px;"
-                    :defaultValue="contentWidth"
-                    @change="handleContentWidthChange"
-                  >
-                    <a-select-option value="Fixed">固定</a-select-option>
-                    <a-select-option value="Fluid" v-if="layoutMode !== 'sidemenu'">流式</a-select-option>
-                  </a-select>
-                </a-tooltip>
-                <a-list-item-meta>
-                  <div slot="title">内容区域宽度</div>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-switch
-                  slot="actions"
-                  size="small"
-                  :defaultChecked="fixedHeader"
-                  @change="handleFixedHeader"
-                />
-                <a-list-item-meta>
-                  <div slot="title">固定 Header</div>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-switch
-                  slot="actions"
-                  size="small"
-                  :disabled="!fixedHeader"
-                  :defaultChecked="autoHideHeader"
-                  @change="handleFixedHeaderHidden"
-                />
-                <a-list-item-meta>
-                  <div
-                    slot="title"
-                    :style="{ textDecoration: !fixedHeader ? 'line-through' : 'unset' }"
-                  >下滑时隐藏 Header</div>
-                </a-list-item-meta>
-              </a-list-item>
-              <a-list-item>
-                <a-switch
-                  slot="actions"
-                  size="small"
-                  :disabled="layoutMode === 'topmenu'"
-                  :defaultChecked="fixSiderbar"
-                  @change="handleFixSiderbar"
-                />
-                <a-list-item-meta>
-                  <div
-                    slot="title"
-                    :style="{ textDecoration: layoutMode === 'topmenu' ? 'line-through' : 'unset' }"
-                  >固定侧边菜单</div>
-                </a-list-item-meta>
-              </a-list-item>
-            </a-list>
-          </div>
+        </div>
+        <a-divider/>
+
+        <div :style="{ marginBottom: '24px' }">
+          <h3 class="setting-drawer-index-title">仪表盘</h3>
+          <a-list :split="false">
+            <a-list-item>
+              <a-switch slot="actions" size="small"/>
+              <a-list-item-meta>
+                <div slot="title">文章总数</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch slot="actions" size="small"/>
+              <a-list-item-meta>
+                <div slot="title">评论总数</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch slot="actions" size="small"/>
+              <a-list-item-meta>
+                <div slot="title">附件总数</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch slot="actions" size="small"/>
+              <a-list-item-meta>
+                <div slot="title">成立天数</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch slot="actions" size="small"/>
+              <a-list-item-meta>
+                <div slot="title">最新文章</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch slot="actions" size="small"/>
+              <a-list-item-meta>
+                <div slot="title">最新日志</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch slot="actions" size="small"/>
+              <a-list-item-meta>
+                <div slot="title">最新评论</div>
+              </a-list-item-meta>
+            </a-list-item>
+          </a-list>
         </div>
         <a-divider/>
       </div>
