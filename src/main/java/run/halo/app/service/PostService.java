@@ -224,9 +224,41 @@ public interface PostService extends CrudService<Post, Integer> {
     @NonNull
     Post filterIfEncrypt(@NonNull Post post);
 
+    /**
+     * Gets previous post.
+     *
+     * @param date date must not be null
+     * @return an optional post
+     */
     @NonNull
-    Optional<Post> getPrePost(@NonNull Date createTime);
+    Optional<Post> getPrePost(@NonNull Date date);
 
+    /**
+     * Gets next post.
+     *
+     * @param date date must not be null
+     * @return an optional post
+     */
     @NonNull
-    Optional<Post> getNextPost(@NonNull Date createTime);
+    Optional<Post> getNextPost(@NonNull Date date);
+
+    /**
+     * Lists previous posts.
+     *
+     * @param date date must not be null
+     * @param size previous max post size
+     * @return a list of previous post
+     */
+    @NonNull
+    List<Post> listPrePosts(@NonNull Date date, int size);
+
+    /**
+     * Lits next posts.
+     *
+     * @param date date must not be null
+     * @param size next max post size
+     * @return a list of next post
+     */
+    @NonNull
+    List<Post> listNextPosts(@NonNull Date date, int size);
 }

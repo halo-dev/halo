@@ -447,29 +447,37 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Optional<Post> getPrePost(Date createTime) {
-        Assert.notNull(createTime, "Create time must not be null");
+    public Optional<Post> getPrePost(Date date) {
+        List<Post> posts = listPrePosts(date, 1);
 
-        Page<Post> prePostPage = postRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED, createTime, PageRequest.of(0, 1));
-
-        if (prePostPage.isEmpty()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(prePostPage.getContent().get(0));
+        return CollectionUtils.isEmpty(posts) ? Optional.empty() : Optional.of(posts.get(0));
     }
 
     @Override
-    public Optional<Post> getNextPost(Date createTime) {
-        Assert.notNull(createTime, "Create time must not be null");
+    public Optional<Post> getNextPost(Date date) {
+        List<Post> posts = listNextPosts(date, 1);
 
-        Page<Post> nextPostPage = postRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED, createTime, PageRequest.of(0, 1));
+        return CollectionUtils.isEmpty(posts) ? Optional.empty() : Optional.of(posts.get(0));
+    }
 
-        if (nextPostPage.isEmpty()) {
-            return Optional.empty();
-        }
+    @Override
+    public List<Post> listPrePosts(Date date, int size) {
+        Assert.notNull(date, "Date must not be null");
 
-        return Optional.of(nextPostPage.getContent().get(0));
+        return postRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
+                date,
+                PageRequest.of(0, size, Sort.by(DESC, "createTime")))
+                .getContent();
+    }
+
+    @Override
+    public List<Post> listNextPosts(Date date, int size) {
+        Assert.notNull(date, "Date must not be null");
+
+        return postRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED,
+                date,
+                PageRequest.of(0, size, Sort.by(DESC, "createTime")))
+                .getContent();
     }
 
     /**
