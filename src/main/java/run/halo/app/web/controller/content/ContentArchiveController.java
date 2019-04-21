@@ -4,6 +4,7 @@ import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.CommentVO;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 
 import java.util.List;
@@ -58,6 +60,38 @@ public class ContentArchiveController {
         this.postCategoryService = postCategoryService;
         this.postTagService = postTagService;
         this.optionService = optionService;
+    }
+
+    /**
+     * Render post archives page.
+     *
+     * @param model model
+     * @return template path : theme/{theme}/archives.ftl
+     */
+    @GetMapping
+    public String archives(Model model) {
+        return this.archives(model, 1, Sort.by(DESC, "createTime"));
+    }
+
+    /**
+     * Render post archives page.
+     *
+     * @param model model
+     * @return template path : theme/{theme}/archives.ftl
+     */
+    @GetMapping(value = "page/{page}")
+    public String archives(Model model,
+                           @PathVariable(value = "page") Integer page,
+                           @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
+
+        Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, pageable);
+        int[] pageRainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        model.addAttribute("is_archives", true);
+        model.addAttribute("pageRainbow", pageRainbow);
+        model.addAttribute("posts", posts);
+        return themeService.render("archives");
     }
 
     /**

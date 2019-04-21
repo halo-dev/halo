@@ -74,8 +74,10 @@ public class ContentIndexController {
         log.debug("Requested index page, sort info: [{}]", sort);
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest.of(page - 1, pageSize, sort);
+
         Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, pageable);
         int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
