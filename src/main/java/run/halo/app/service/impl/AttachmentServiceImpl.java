@@ -13,8 +13,10 @@ import run.halo.app.handler.file.FileHandlers;
 import run.halo.app.model.dto.AttachmentOutputDTO;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.enums.converter.AttachmentTypeConverter;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.model.properties.AttachmentProperties;
+import run.halo.app.model.properties.PropertyEnum;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.AttachmentService;
@@ -71,6 +73,10 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
             if (attachmentQuery.getMediaType() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("mediaType"), attachmentQuery.getMediaType()));
+            }
+
+            if(attachmentQuery.getAttachmentType() != null){
+                predicates.add(criteriaBuilder.equal(root.get("type"), PropertyEnum.convertToEnum(attachmentQuery.getAttachmentType(),AttachmentType.class)));
             }
 
             if (attachmentQuery.getKeyword() != null) {
