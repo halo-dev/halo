@@ -3,7 +3,6 @@ package run.halo.app.event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
 import java.util.EventListener;
@@ -20,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @date 19-4-20
  */
 @Slf4j
-@Component
+@Deprecated
 public class ApplicationEventQueuePublisher {
 
     private final BlockingQueue<Object> events = new LinkedBlockingQueue<>();

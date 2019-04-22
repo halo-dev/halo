@@ -1,6 +1,7 @@
 package run.halo.app.event;
 
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.entity.Log;
 import run.halo.app.service.LogService;
@@ -12,7 +13,7 @@ import run.halo.app.service.LogService;
  * @date 19-4-21
  */
 @Component
-public class LogEventListener implements ApplicationListener<LogEvent> {
+public class LogEventListener {
 
     private final LogService logService;
 
@@ -20,7 +21,8 @@ public class LogEventListener implements ApplicationListener<LogEvent> {
         this.logService = logService;
     }
 
-    @Override
+    @EventListener
+    @Async
     public void onApplicationEvent(LogEvent event) {
         // Convert to log
         Log logToCreate = event.getLogParam().convertTo();
