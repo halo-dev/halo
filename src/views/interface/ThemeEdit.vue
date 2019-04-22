@@ -1,13 +1,7 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col
-        :xl="18"
-        :lg="18"
-        :md="18"
-        :sm="24"
-        :xs="24"
-        :style="{'padding-bottom':'12px'}">
+      <a-col :xl="18" :lg="18" :md="18" :sm="24" :xs="24" :style="{'padding-bottom':'12px'}">
         <a-card>
           <a-form layout="vertical">
             <a-form-item>
@@ -19,13 +13,7 @@
           </a-form>
         </a-card>
       </a-col>
-      <a-col
-        :xl="6"
-        :lg="6"
-        :md="6"
-        :sm="24"
-        :xs="24"
-        :style="{'padding-bottom':'12px'}">
+      <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24" :style="{'padding-bottom':'12px'}">
         <a-card title="Anatole 主题">
           <theme-file :files="files" @listenToSelect="catchSelectFile"/>
         </a-card>
@@ -77,6 +65,9 @@ export default {
       const _this = this
       if (!file.editable) {
         this.$message.info('该文件不支持修改')
+        this.content = ''
+        this.file = {}
+        this.buttonDisabled = true
         return
       }
       if (file.name === 'options.yaml' || file.name === 'options.yml') {
