@@ -7,13 +7,15 @@ package run.halo.app.model.enums;
  */
 public enum LogType implements ValueEnum<Integer> {
 
-    POST_PUBLISHED(0),
-    POST_EDITED(1),
-    POST_DELETED(5),
-    LOGGED_IN(2),
-    LOGGED_OUT(3),
-    LOGIN_FAILED(4),
-    ;
+    BLOG_INITIALIZED(0),
+    POST_PUBLISHED(5),
+    POST_EDITED(15),
+    POST_DELETED(20),
+    LOGGED_IN(25),
+    LOGGED_OUT(30),
+    LOGIN_FAILED(35),
+    PASSWORD_UPDATED(40),
+    PROFILE_UPDATED(45);
 
     private final Integer value;
 

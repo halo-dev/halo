@@ -3,15 +3,18 @@ package run.halo.app.web.controller.core;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import run.halo.app.event.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.enums.LogType;
 import run.halo.app.model.params.InstallParam;
 import run.halo.app.model.properties.*;
 import run.halo.app.model.support.BaseResponse;
@@ -48,13 +51,16 @@ public class InstallController {
 
     private final Configuration configuration;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     public InstallController(UserService userService,
                              CategoryService categoryService,
                              PostService postService,
                              CommentService commentService,
                              OptionService optionService,
                              MenuService menuService,
-                             Configuration configuration) {
+                             Configuration configuration,
+                             ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
         this.categoryService = categoryService;
         this.postService = postService;
@@ -62,6 +68,7 @@ public class InstallController {
         this.optionService = optionService;
         this.menuService = menuService;
         this.configuration = configuration;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -92,6 +99,7 @@ public class InstallController {
         boolean isInstalled = Boolean.parseBoolean(optionService.getByProperty(PrimaryProperties.IS_INSTALLED).orElse(Boolean.FALSE.toString()));
 
         if (isInstalled) {
+            // TODO i18n
             throw new BadRequestException("该博客已初始化，不能再次安装！");
         }
 
@@ -115,6 +123,12 @@ public class InstallController {
 
         // TODO Handle option cache
 
+        // TODO i18n
+        eventPublisher.publishEvent(
+                new LogEvent(this, user.getId().toString(), LogType.BLOG_INITIALIZED, "博客已成功初始化")
+        );
+
+        // TODO i18n
         return BaseResponse.ok("安装完成！");
     }
 
@@ -127,6 +141,7 @@ public class InstallController {
         menuService.create(menuIndex);
 
         Menu menuArchive = new Menu();
+        // TODO i18n
         menuArchive.setName("归档");
         menuArchive.setUrl("/archives");
         menuArchive.setSort(2);
@@ -148,7 +163,6 @@ public class InstallController {
         Category category = new Category();
 
         // TODO Multi level category
-
         category.setName("未分类");
         category.setSlugName("default");
         category.setDescription("未分类");

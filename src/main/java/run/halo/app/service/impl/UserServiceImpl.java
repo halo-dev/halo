@@ -1,9 +1,18 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.lang.Validator;
+import cn.hutool.crypto.digest.BCrypt;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.event.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.User;
+import run.halo.app.model.enums.LogType;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.repository.UserRepository;
 import run.halo.app.security.context.SecurityContextHolder;
@@ -13,18 +22,6 @@ import run.halo.app.service.UserService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
-import cn.hutool.core.lang.Validator;
-import cn.hutool.crypto.digest.BCrypt;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.BadRequestException;
-import run.halo.app.exception.NotFoundException;
-import run.halo.app.repository.UserRepository;
-import run.halo.app.security.context.SecurityContextHolder;
-import run.halo.app.security.support.UserDetail;
-import run.halo.app.service.base.AbstractCrudService;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -45,11 +42,15 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     private final StringCacheStore stringCacheStore;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     public UserServiceImpl(UserRepository userRepository,
-                           StringCacheStore stringCacheStore) {
+                           StringCacheStore stringCacheStore,
+                           ApplicationEventPublisher eventPublisher) {
         super(userRepository);
         this.userRepository = userRepository;
         this.stringCacheStore = stringCacheStore;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -142,6 +143,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
             String errorMessage = String.format("Username or password incorrect, you%shave %s", remainder <= 0 ? "" : " still ", HaloUtils.pluralize(remainder, "chance", "chances"));
 
+            // Lot it
+            eventPublisher.publishEvent(new LogEvent(this, key, LogType.LOGIN_FAILED, password));
+
             throw new BadRequestException(errorMessage);
         }
 
@@ -150,6 +154,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
         // Set session
         httpSession.setAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY, new UserDetail(user));
+
+        // Log it
+        eventPublisher.publishEvent(new LogEvent(this, user.getId().toString(), LogType.LOGGED_IN, user.getUsername()));
 
         return user;
     }
@@ -176,7 +183,12 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         setPassword(newPassword, user);
 
         // Update this user
-        return update(user);
+        User updatedUser = update(user);
+
+        // Log it
+        eventPublisher.publishEvent(new LogEvent(this, updatedUser.getId().toString(), LogType.PASSWORD_UPDATED, oldPassword));
+
+        return updatedUser;
     }
 
     @Override
@@ -189,6 +201,16 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         setPassword(password, user);
 
         return create(user);
+    }
+
+    @Override
+    public User update(User user) {
+        User updatedUser = super.update(user);
+
+        // Log it
+        eventPublisher.publishEvent(new LogEvent(this, user.getId().toString(), LogType.PROFILE_UPDATED, user.getUsername()));
+
+        return updatedUser;
     }
 
     private void setPassword(@NonNull String plainPassword, @NonNull User user) {
