@@ -1,5 +1,6 @@
 package run.halo.app.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.dto.TagWithCountOutputDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
@@ -113,6 +114,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      * @return a list of post tag
      */
     @NonNull
+    @Transactional
     List<PostTag> removeByPostId(@NonNull Integer postId);
 
     /**
@@ -122,5 +124,6 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      * @return a list of post tag
      */
     @NonNull
+    @Transactional
     List<PostTag> removeByTagId(@NonNull Integer tagId);
 }

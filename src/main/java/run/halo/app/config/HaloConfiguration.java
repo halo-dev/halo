@@ -85,7 +85,7 @@ public class HaloConfiguration {
 
         logFilter.setOrder(Ordered.HIGHEST_PRECEDENCE + 9);
         logFilter.setFilter(new LogFilter());
-        logFilter.addUrlPatterns("/api/*");
+        logFilter.addUrlPatterns("/*");
 
         return logFilter;
     }
