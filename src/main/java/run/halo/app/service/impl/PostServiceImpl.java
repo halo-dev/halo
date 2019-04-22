@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.LogEvent;
+import run.halo.app.event.VisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.CategoryOutputDTO;
 import run.halo.app.model.dto.TagOutputDTO;
 import run.halo.app.model.dto.post.PostMinimalOutputDTO;
@@ -308,7 +310,14 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         Optional<Post> postOptional = postRepository.getByUrlAndStatus(url, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("The post with status " + status + " and url " + url + "was not existed").setErrorData(url));
+        Post post = postOptional.orElseThrow(() -> new NotFoundException("The post with status " + status + " and url " + url + "was not existed").setErrorData(url));
+
+        if (PostStatus.PUBLISHED.equals(status)) {
+            // Log it
+            eventPublisher.publishEvent(new VisitEvent(this, post.getId()));
+        }
+
+        return post;
     }
 
     @Override
@@ -329,6 +338,40 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     @Override
     public long countLike() {
         return Optional.ofNullable(postRepository.countLike()).orElse(0L);
+    }
+
+    @Override
+    public void increaseVisit(long visits, Integer postId) {
+        Assert.isTrue(visits > 0, "Visits to increase must not be less than 1");
+        Assert.notNull(postId, "Goods id must not be null");
+
+        long affectedRows = postRepository.updateVisit(visits, postId);
+
+        if (affectedRows != 1) {
+            throw new ServiceException("Failed to increase visits " + visits + " for post with id " + postId);
+        }
+    }
+
+    @Override
+    public void increaseLike(long likes, Integer postId) {
+        Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
+        Assert.notNull(postId, "Goods id must not be null");
+
+        long affectedRows = postRepository.updateLikes(likes, postId);
+
+        if (affectedRows != 1) {
+            throw new ServiceException("Failed to increase likes " + likes + " for post with id " + postId);
+        }
+    }
+
+    @Override
+    public void increaseVisit(Integer postId) {
+        increaseVisit(1L, postId);
+    }
+
+    @Override
+    public void increaseLike(Integer postId) {
+        increaseLike(1L, postId);
     }
 
     @Override
