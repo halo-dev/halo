@@ -443,7 +443,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    @Transactional
     public Post removeById(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
@@ -501,6 +500,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
             postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
                     .orElseGet(LinkedList::new)
                     .stream()
+                    .filter(Objects::nonNull)
                     .map(tag -> new TagOutputDTO().<TagOutputDTO>convertFrom(tag))
                     .collect(Collectors.toList()));
 
