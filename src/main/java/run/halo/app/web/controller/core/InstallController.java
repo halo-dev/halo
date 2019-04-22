@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import run.halo.app.event.LogEvent;
+import run.halo.app.event.log.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.AttachmentType;

@@ -14,9 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.event.LogEvent;
-import run.halo.app.event.VisitEvent;
+import run.halo.app.event.log.LogEvent;
+import run.halo.app.event.post.VisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.CategoryOutputDTO;
@@ -348,7 +349,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         long affectedRows = postRepository.updateVisit(visits, postId);
 
         if (affectedRows != 1) {
-            throw new ServiceException("Failed to increase visits " + visits + " for post with id " + postId);
+            log.error("Post with id: [{}] may not be found", postId);
+            throw new BadRequestException("Failed to increase visits " + visits + " for post with id " + postId);
         }
     }
 
@@ -360,7 +362,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         long affectedRows = postRepository.updateLikes(likes, postId);
 
         if (affectedRows != 1) {
-            throw new ServiceException("Failed to increase likes " + likes + " for post with id " + postId);
+            log.error("Post with id: [{}] may not be found", postId);
+            throw new BadRequestException("Failed to increase likes " + likes + " for post with id " + postId);
         }
     }
 
