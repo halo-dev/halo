@@ -1,6 +1,7 @@
 package run.halo.app.web.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.config.support.Group;
@@ -52,8 +53,8 @@ public class ThemeController {
     }
 
     @GetMapping("files/content")
-    public String getContentBy(@RequestParam(name = "path") String path) {
-        return themeService.getTemplateContent(path);
+    public BaseResponse<String> getContentBy(@RequestParam(name = "path") String path) {
+        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(path));
     }
 
     @PutMapping("files/content")
