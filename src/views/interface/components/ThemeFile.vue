@@ -9,10 +9,11 @@ export default {
     }
   },
   methods: {
-    handlerSelectFile() {
-      this.$log.debug('加载文件')
+    handleSelectFile(file) {
+      this.$log.debug('加载文件', file)
     },
     renderNode(h, file) {
+      const _this = this
       if (file.node && file.node.length) {
         return h(
           'a-tree-node',
@@ -35,7 +36,9 @@ export default {
           isLeaf: file.isFile
         },
         nativeOn: {
-          click: this.handlerSelectFile
+          click: function() {
+            _this.handleSelectFile(file)
+          }
         }
       })
     }
