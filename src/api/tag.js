@@ -14,6 +14,16 @@ tagApi.listAll = (more = false) => {
   })
 }
 
+tagApi.createWithName = name => {
+  return service({
+    url: baseUrl,
+    data: {
+      name: name
+    },
+    method: 'post'
+  })
+}
+
 tagApi.create = tag => {
   return service({
     url: baseUrl,
