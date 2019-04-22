@@ -182,6 +182,40 @@ public interface PostService extends CrudService<Post, Integer> {
     long countLike();
 
     /**
+     * Increases post visits.
+     *
+     * @param visits visits must not be less than 1
+     * @param postId post id must not be null
+     */
+    @Transactional
+    void increaseVisit(long visits, @NonNull Integer postId);
+
+    /**
+     * Increase post likes.
+     *
+     * @param likes  likes must not be less than 1
+     * @param postId post id must not be null
+     */
+    @Transactional
+    void increaseLike(long likes, @NonNull Integer postId);
+
+    /**
+     * Increases post visits (1).
+     *
+     * @param postId post id must not be null
+     */
+    @Transactional
+    void increaseVisit(@NonNull Integer postId);
+
+    /**
+     * Increase post likes(1).
+     *
+     * @param postId post id must not be null
+     */
+    @Transactional
+    void increaseLike(@NonNull Integer postId);
+
+    /**
      * Lists year archives.
      *
      * @return a list of year archive

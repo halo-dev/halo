@@ -97,9 +97,9 @@ public class ContentArchiveController {
     /**
      * Render post page.
      *
-     * @param url     post slug url.
-     * @param cp      comment page number
-     * @param model   model
+     * @param url   post slug url.
+     * @param cp    comment page number
+     * @param model model
      * @return template path: theme/{theme}/post.ftl
      */
     @GetMapping("{url}")
@@ -125,6 +125,8 @@ public class ContentArchiveController {
         model.addAttribute("tags", tags);
         model.addAttribute("comments", comments);
         model.addAttribute("pageRainbow", pageRainbow);
+
+        // Log it
         return themeService.render("post");
     }
 }
