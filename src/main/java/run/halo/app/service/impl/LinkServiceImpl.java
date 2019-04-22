@@ -52,17 +52,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         return convertTo(listAll(sort));
     }
 
-    /**
-     * List link by group
-     *
-     * @return List<LinkTeamVO>
-     */
-    @Override
-    public List<LinkTeamVO> listTeamVos() {
-        // TODO list team
-        return null;
-    }
-
     @Override
     public List<LinkTeamVO> listTeamVos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");

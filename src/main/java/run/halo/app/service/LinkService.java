@@ -28,14 +28,6 @@ public interface LinkService extends CrudService<Link, Integer> {
     List<LinkOutputDTO> listDtos(@NonNull Sort sort);
 
     /**
-     * List link by group
-     *
-     * @return a list of link team vo
-     */
-    @NonNull
-    List<LinkTeamVO> listTeamVos();
-
-    /**
      * Lists link team vos.
      *
      * @param sort must not be null

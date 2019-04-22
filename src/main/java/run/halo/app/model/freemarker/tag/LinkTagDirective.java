@@ -2,12 +2,15 @@ package run.halo.app.model.freemarker.tag;
 
 import freemarker.core.Environment;
 import freemarker.template.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.LinkService;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Freemarker custom tag of link.
@@ -34,8 +37,8 @@ public class LinkTagDirective implements TemplateDirectiveModel {
                 case "list":
                     env.setVariable("links", builder.build().wrap(linkService.listAll()));
                     break;
-                case "listTeamVos":
-                    env.setVariable("links", builder.build().wrap(null));
+                case "listTeams":
+                    env.setVariable("teams", builder.build().wrap(linkService.listTeamVos(Sort.by(DESC, "createTime"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(linkService.count()));

@@ -53,7 +53,7 @@ public class Link extends BaseEntity {
     private String description;
 
     /**
-     * Link group name.
+     * Link team name.
      */
     @Column(name = "team", columnDefinition = "varchar(255) default ''")
     private String team;
