@@ -413,7 +413,12 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         log.debug("Removed post categories: [{}]", postCategories);
 
-        return super.removeById(postId);
+        Post deletedPost = super.removeById(postId);
+
+        // Log it
+        eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED, deletedPost.getTitle()));
+
+        return deletedPost;
     }
 
     @Override
