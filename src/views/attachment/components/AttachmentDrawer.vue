@@ -30,7 +30,7 @@
           <a-col :span="24">
             <div
               class="attach-item"
-              v-for="(item, index) in attachments"
+              v-for="(item, index) in formattedDatas"
               :key="index"
               @click="showDetailDrawer(item)"
             >
@@ -112,6 +112,7 @@ export default {
   },
   data() {
     return {
+      attachmentType: attachmentApi.type,
       detailVisiable: false,
       attachmentDrawerVisible: false,
       uploadVisible: false,
@@ -124,6 +125,14 @@ export default {
       attachments: [],
       selectedAttachment: {},
       attachmentUploadHandler: attachmentApi.upload
+    }
+  },
+  computed: {
+    formattedDatas() {
+      return this.attachments.map(attachment => {
+        attachment.typeProperty = this.attachmentType[attachment.type]
+        return attachment
+      })
     }
   },
   created() {

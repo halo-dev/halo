@@ -14,18 +14,22 @@
                 <a-col :md="6" :sm="24">
                   <a-form-item label="存储位置">
                     <a-select v-model="queryParam.attachmentType">
-                      <a-select-option value="local">本地</a-select-option>
-                      <a-select-option value="smms">SM.MS</a-select-option>
-                      <a-select-option value="upyun">又拍云</a-select-option>
-                      <a-select-option value="qnyun">七牛云</a-select-option>
-                      <a-select-option value="aliyun">阿里云</a-select-option>
+                      <a-select-option
+                        v-for="item in Object.keys(attachmentType)"
+                        :key="item"
+                        :value="item"
+                      >{{ attachmentType[item].text }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
                   <a-form-item label="文件类型">
                     <a-select v-model="queryParam.mediaType">
-                      <a-select-option v-for="(item,index) in mediaTypes" :key="index" :value="item">{{ item }}</a-select-option>
+                      <a-select-option
+                        v-for="(item,index) in mediaTypes"
+                        :key="index"
+                        :value="item"
+                      >{{ item }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -46,7 +50,7 @@
       <a-col :span="24">
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
-          :dataSource="attachments"
+          :dataSource="formattedDatas"
         >
           <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
             <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer(item)">
@@ -103,6 +107,7 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
+      attachmentType: attachmentApi.type,
       uploadVisible: false,
       selectAttachment: {},
       attachments: [],
@@ -123,6 +128,14 @@ export default {
       },
       uploadHandler: attachmentApi.upload,
       drawerVisiable: false
+    }
+  },
+  computed: {
+    formattedDatas() {
+      return this.attachments.map(attachment => {
+        attachment.typeProperty = this.attachmentType[attachment.type]
+        return attachment
+      })
     }
   },
   created() {

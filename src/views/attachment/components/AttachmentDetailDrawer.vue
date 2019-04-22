@@ -37,6 +37,11 @@
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
+              <a-list-item-meta :description="attachment.typeProperty">
+                <span slot="title">存储位置：</span>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
               <a-list-item-meta>
                 <template slot="description">
                   {{ attachment.size | fileSizeFormat }}
