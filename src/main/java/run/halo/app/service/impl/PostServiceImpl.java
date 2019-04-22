@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.event.ApplicationEventQueuePublisher;
 import run.halo.app.event.LogEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
@@ -69,7 +69,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
     private final CommentService commentService;
 
-    private final ApplicationEventQueuePublisher eventQueuePublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PostServiceImpl(PostRepository postRepository,
                            TagService tagService,
@@ -77,7 +77,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
                            PostTagService postTagService,
                            PostCategoryService postCategoryService,
                            CommentService commentService,
-                           ApplicationEventQueuePublisher eventQueuePublisher) {
+                           ApplicationEventPublisher eventPublisher) {
         super(postRepository);
         this.postRepository = postRepository;
         this.tagService = tagService;
@@ -85,7 +85,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         this.postTagService = postTagService;
         this.postCategoryService = postCategoryService;
         this.commentService = commentService;
-        this.eventQueuePublisher = eventQueuePublisher;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -227,7 +227,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         // Log the creation
         LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
-        eventQueuePublisher.publishEvent(logEvent);
+        eventPublisher.publishEvent(logEvent);
 
         return createdPost;
     }
@@ -238,7 +238,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         // Log the creation
         LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(), LogType.POST_EDITED, updatedPost.getTitle());
-        eventQueuePublisher.publishEvent(logEvent);
+        eventPublisher.publishEvent(logEvent);
 
         return updatedPost;
     }

@@ -6,7 +6,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import run.halo.app.utils.ReflectionUtils;
 
 import java.lang.reflect.ParameterizedType;
@@ -21,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 19-4-21
  */
 @Slf4j
-@Component
+@Deprecated
 public class ApplicationListenerManager {
 
     /**
