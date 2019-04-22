@@ -1,4 +1,4 @@
-package run.halo.app.event;
+package run.halo.app.event.post;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
