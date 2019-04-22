@@ -9,6 +9,9 @@ export default {
     }
   },
   methods: {
+    handlerSelectFile() {
+      this.$log.debug('加载文件')
+    },
     renderNode(h, file) {
       if (file.node && file.node.length) {
         return h(
@@ -30,6 +33,9 @@ export default {
           key: file.path,
           title: file.name,
           isLeaf: file.isFile
+        },
+        nativeOn: {
+          click: this.handlerSelectFile
         }
       })
     }
