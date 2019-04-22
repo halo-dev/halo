@@ -34,7 +34,7 @@
             <template slot="title">
               <span>{{ tag.postCount }} 篇文章</span>
             </template>
-            <a-tag closable @close="deleteTag(tag.id)" color="green">{{ tag.name }}</a-tag>
+            <a-tag closable @close="deleteTag(tag.id)" color="blue">{{ tag.name }}</a-tag>
           </a-tooltip>
         </a-card>
       </a-col>

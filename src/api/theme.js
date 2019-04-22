@@ -96,4 +96,25 @@ themeApi.fetching = url => {
   })
 }
 
+themeApi.getContent = path => {
+  return service({
+    url: `${baseUrl}/files/content`,
+    params: {
+      path: path
+    },
+    method: 'get'
+  })
+}
+
+themeApi.saveContent = (path, content) => {
+  return service({
+    url: `${baseUrl}/files/content`,
+    params: {
+      path: path,
+      content: content
+    },
+    method: 'put'
+  })
+}
+
 export default themeApi

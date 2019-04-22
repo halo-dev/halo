@@ -10,7 +10,7 @@ export default {
   },
   methods: {
     handleSelectFile(file) {
-      this.$log.debug('加载文件', file)
+      this.$emit('listenToSelect', file)
     },
     renderNode(h, file) {
       const _this = this
