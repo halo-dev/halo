@@ -20,4 +20,6 @@ public class GalleryOutputDTO implements OutputConverter<GalleryOutputDTO, Galle
     private String thumbnail;
 
     private String url;
+
+    private String team;
 }

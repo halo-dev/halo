@@ -66,6 +66,12 @@ public class Gallery extends BaseEntity {
     @Column(name = "url", columnDefinition = "varchar(1023) not null")
     private String url;
 
+    /**
+     * Gallery team name.
+     */
+    @Column(name = "team", columnDefinition = "varchar(255) default ''")
+    private String team;
+
     @Override
     public void prePersist() {
         super.prePersist();
