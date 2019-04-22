@@ -38,7 +38,7 @@ public interface ThemeService {
     /**
      * The type of file that can be modified.
      */
-    String[] CAN_EDIT_SUFFIX = {"ftl", "css", "js"};
+    String[] CAN_EDIT_SUFFIX = {".ftl", ".css", ".js", ".yaml", ".yml", ".properties"};
 
     /**
      * These file names cannot be displayed.

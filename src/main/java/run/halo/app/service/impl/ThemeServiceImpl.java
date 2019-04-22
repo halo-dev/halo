@@ -573,7 +573,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         // Check suffix
         for (String suffix : CAN_EDIT_SUFFIX) {
-            if (path.endsWith(suffix)) {
+            if (path.toString().endsWith(suffix)) {
                 return true;
             }
         }
