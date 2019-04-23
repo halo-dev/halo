@@ -5,14 +5,14 @@
                 您的博客有新的评论！
             </h1>
             <div class="emailtext" style="background:#fff;padding:20px 32px 40px;">
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">${author}, 您好!</p>
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">有访客在《${pageName}》留言:</p>
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">${user.nickName!}, 您好!</p>
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">有访客在《${page!}》留言:</p>
                     <br />
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;padding:10px 20px;background:#f8f8f8;margin:0px">
-                ${visitor}：${commentContent}
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;padding:10px 20px;background:#f8f8f8;margin:0">
+                ${content!}：${commentContent!}
                 </p>
                 <br />
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">你可以点击<a href="${pageUrl}">查看完整内容</a></p>
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">你可以点击<a href="${url!}">查看完整内容</a></p>
             </div>
         </div>
     </div>

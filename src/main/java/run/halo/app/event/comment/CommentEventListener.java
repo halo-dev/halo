@@ -1,14 +1,21 @@
 package run.halo.app.event.comment;
 
+import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.Comment;
+import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.User;
+import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.CommentProperties;
-import run.halo.app.service.CommentService;
-import run.halo.app.service.MailService;
-import run.halo.app.service.OptionService;
+import run.halo.app.service.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Comment event listener.
@@ -26,12 +33,20 @@ public class CommentEventListener {
 
     private final CommentService commentService;
 
+    private final PostService postService;
+
+    private final UserService userService;
+
     public CommentEventListener(MailService mailService,
                                 OptionService optionService,
-                                CommentService commentService) {
+                                CommentService commentService,
+                                PostService postService,
+                                UserService userService) {
         this.mailService = mailService;
         this.optionService = optionService;
         this.commentService = commentService;
+        this.postService = postService;
+        this.userService = userService;
     }
 
     @Async
@@ -44,10 +59,23 @@ public class CommentEventListener {
             return;
         }
 
+        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("Can not find blog owner"));
+
         // Get comment id
         Comment comment = commentService.getById(newEvent.getCommentId());
 
-        // TODO Complete mail sending
+        Post post = postService.getById(comment.getPostId());
+
+        Map<String, Object> data = new HashMap<>();
+
+        StrBuilder url = new StrBuilder(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL))
+                .append("/archives/")
+                .append(post.getUrl());
+        data.put("url", url.toString());
+        data.put("page", post.getTitle());
+        data.put("author", comment.getAuthor());
+        data.put("content",comment.getContent());
+        mailService.sendTemplateMail(user.getEmail(), "您的博客有新的评论", data, "common/mail_template/mail_notice.ftl");
     }
 
     @Async
