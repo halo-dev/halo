@@ -1,6 +1,6 @@
 package run.halo.app.web.controller.content.api;
 
-import run.halo.app.model.dto.TagOutputDTO;
+import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.PostSimpleOutputDTO;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.service.PostTagService;
@@ -13,11 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.TagOutputDTO;
-import run.halo.app.model.dto.post.PostSimpleOutputDTO;
-import run.halo.app.model.entity.Tag;
-import run.halo.app.service.PostTagService;
-import run.halo.app.service.TagService;
 
 import java.util.List;
 
@@ -44,8 +39,8 @@ public class TagController {
 
     @GetMapping
     @ApiOperation("Lists tags")
-    public List<? extends TagOutputDTO> listTags(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
-                                                 @ApiParam("If the param is true, post count of tag will be returned")
+    public List<? extends TagDTO> listTags(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
+                                           @ApiParam("If the param is true, post count of tag will be returned")
                                                  @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);

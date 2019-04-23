@@ -14,7 +14,7 @@ import java.util.Date;
  * @date 3/21/19
  */
 @Data
-public class AttachmentOutputDTO implements OutputConverter<AttachmentOutputDTO, Attachment> {
+public class AttachmentDTO implements OutputConverter<AttachmentDTO, Attachment> {
 
     private Integer id;
 

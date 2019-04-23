@@ -1,6 +1,6 @@
 package run.halo.app.web.controller.content.api;
 
-import run.halo.app.model.dto.OptionOutputDTO;
+import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.service.OptionService;
 import io.swagger.annotations.ApiOperation;
@@ -31,7 +31,7 @@ public class OptionController {
 
     @GetMapping("list_view")
     @ApiOperation("Lists all options with list view")
-    public List<OptionOutputDTO> listAll() {
+    public List<OptionDTO> listAll() {
         return optionService.listDtos();
     }
 

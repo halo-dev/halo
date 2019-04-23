@@ -2,7 +2,7 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.MenuOutputDTO;
+import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
 import run.halo.app.model.vo.MenuVO;
@@ -25,7 +25,7 @@ public interface MenuService extends CrudService<Menu, Integer> {
      * @return a list of menu output dto
      */
     @NonNull
-    List<MenuOutputDTO> listDtos(@NonNull Sort sort);
+    List<MenuDTO> listDtos(@NonNull Sort sort);
 
     /**
      * Creates a menu.

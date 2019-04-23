@@ -1,7 +1,7 @@
 package run.halo.app.service.impl;
 
 import run.halo.app.exception.AlreadyExistsException;
-import run.halo.app.model.dto.LinkOutputDTO;
+import run.halo.app.model.dto.LinkDTO;
 import run.halo.app.model.entity.Link;
 import run.halo.app.model.params.LinkParam;
 import run.halo.app.model.vo.LinkTeamVO;
@@ -16,9 +16,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.AlreadyExistsException;
-import run.halo.app.repository.LinkRepository;
-import run.halo.app.service.base.AbstractCrudService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +43,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
      * @return all links
      */
     @Override
-    public List<LinkOutputDTO> listDtos(Sort sort) {
+    public List<LinkDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
@@ -57,13 +54,13 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all links
-        List<LinkOutputDTO> links = listDtos(sort);
+        List<LinkDTO> links = listDtos(sort);
 
         // Get teams
-        Set<String> teams = ServiceUtils.fetchProperty(links, LinkOutputDTO::getTeam);
+        Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
 
         // Convert to team link list map (Key: team, value: link list)
-        Map<String, List<LinkOutputDTO>> teamLinkListMap = ServiceUtils.convertToListMap(teams, links, LinkOutputDTO::getTeam);
+        Map<String, List<LinkDTO>> teamLinkListMap = ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
 
         List<LinkTeamVO> result = new LinkedList<>();
 
@@ -105,12 +102,12 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @NonNull
-    private List<LinkOutputDTO> convertTo(@Nullable List<Link> links) {
+    private List<LinkDTO> convertTo(@Nullable List<Link> links) {
         if (CollectionUtils.isEmpty(links)) {
             return Collections.emptyList();
         }
 
-        return links.stream().map(link -> new LinkOutputDTO().<LinkOutputDTO>convertFrom(link))
+        return links.stream().map(link -> new LinkDTO().<LinkDTO>convertFrom(link))
                 .collect(Collectors.toList());
     }
 }

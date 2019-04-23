@@ -2,7 +2,7 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.GalleryOutputDTO;
+import run.halo.app.model.dto.GalleryDTO;
 import run.halo.app.model.entity.Gallery;
 import run.halo.app.model.vo.GalleryTeamVO;
 import run.halo.app.service.base.CrudService;
@@ -22,7 +22,7 @@ public interface GalleryService extends CrudService<Gallery, Integer> {
      * @param sort sort
      * @return all galleries
      */
-    List<GalleryOutputDTO> listDtos(@NonNull Sort sort);
+    List<GalleryDTO> listDtos(@NonNull Sort sort);
 
     /**
      * Lists gallery team vos.
@@ -39,5 +39,5 @@ public interface GalleryService extends CrudService<Gallery, Integer> {
      * @param sort sort
      * @return list of galleries
      */
-    List<GalleryOutputDTO> listByTeam(@NonNull String team, Sort sort);
+    List<GalleryDTO> listByTeam(@NonNull String team, Sort sort);
 }

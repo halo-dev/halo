@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 3/19/19
  */
 @Data
-public class CountOutputDTO {
+public class CountDTO {
 
     private long postCount;
 

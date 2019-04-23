@@ -9,7 +9,7 @@ import lombok.Data;
  * @date 3/20/19
  */
 @Data
-public class TagWithCountOutputDTO extends TagOutputDTO {
+public class TagWithPostCountDTO extends TagDTO {
 
     private Long postCount;
 

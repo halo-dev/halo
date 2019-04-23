@@ -3,8 +3,6 @@ package run.halo.app.model.dto;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Menu;
 import lombok.Data;
-import run.halo.app.model.dto.base.OutputConverter;
-import run.halo.app.model.entity.Menu;
 
 /**
  * Menu output dto.
@@ -13,7 +11,7 @@ import run.halo.app.model.entity.Menu;
  * @date 4/3/19
  */
 @Data
-public class MenuOutputDTO implements OutputConverter<MenuOutputDTO, Menu> {
+public class MenuDTO implements OutputConverter<MenuDTO, Menu> {
 
     private Integer id;
 

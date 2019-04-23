@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.CommentOutputDTO;
+import run.halo.app.model.dto.CommentDTO;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
@@ -68,7 +68,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public CommentOutputDTO createBy(@RequestBody CommentParam commentParam, HttpServletRequest request, User user) {
+    public CommentDTO createBy(@RequestBody CommentParam commentParam, HttpServletRequest request, User user) {
         // Set some default info
         commentParam.setAuthor(StringUtils.isEmpty(user.getNickname()) ? user.getUsername() : user.getNickname());
         commentParam.setEmail(user.getEmail());
@@ -85,28 +85,28 @@ public class CommentController {
             commentService.mustExistById(commentParam.getParentId());
         }
 
-        return new CommentOutputDTO().convertFrom(commentService.createBy(commentParam.convertTo(), request));
+        return new CommentDTO().convertFrom(commentService.createBy(commentParam.convertTo(), request));
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
     @ApiOperation("Updates comment status")
-    public CommentOutputDTO updateStatusBy(@PathVariable("commentId") Long commentId,
-                                           @PathVariable("status") CommentStatus status) {
+    public CommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
+                                     @PathVariable("status") CommentStatus status) {
         // Update comment status
         Comment updatedComment = commentService.updateStatus(commentId, status);
 
-        return new CommentOutputDTO().convertFrom(updatedComment);
+        return new CommentDTO().convertFrom(updatedComment);
     }
 
     @DeleteMapping("{commentId:\\d+}")
     @ApiOperation("Deletes comment permanently and recursively")
-    public CommentOutputDTO deleteBy(@PathVariable("commentId") Long commentId) {
+    public CommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
         // Get comment by id
         Comment comment = commentService.getById(commentId);
 
         // Remove it
         commentService.remove(comment);
 
-        return new CommentOutputDTO().convertFrom(comment);
+        return new CommentDTO().convertFrom(comment);
     }
 }

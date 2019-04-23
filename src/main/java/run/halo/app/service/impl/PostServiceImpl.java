@@ -18,8 +18,8 @@ import run.halo.app.event.post.VisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.dto.CategoryOutputDTO;
-import run.halo.app.model.dto.TagOutputDTO;
+import run.halo.app.model.dto.CategoryDTO;
+import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.PostMinimalOutputDTO;
 import run.halo.app.model.dto.post.PostSimpleOutputDTO;
 import run.halo.app.model.entity.*;
@@ -499,7 +499,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
                     .orElseGet(LinkedList::new)
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(tag -> new TagOutputDTO().<TagOutputDTO>convertFrom(tag))
+                    .map(tag -> new TagDTO().<TagDTO>convertFrom(tag))
                     .collect(Collectors.toList()));
 
             // Set categories
@@ -507,7 +507,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
                     .orElseGet(LinkedList::new)
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(category -> new CategoryOutputDTO().<CategoryOutputDTO>convertFrom(category))
+                    .map(category -> new CategoryDTO().<CategoryDTO>convertFrom(category))
                     .collect(Collectors.toList()));
 
             // Set comment count

@@ -1,15 +1,11 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.UserOutputDTO;
+import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.PasswordParam;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.service.UserService;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.UserOutputDTO;
-import run.halo.app.model.entity.User;
-import run.halo.app.model.params.PasswordParam;
-import run.halo.app.model.params.UserParam;
 
 import javax.validation.Valid;
 
@@ -30,17 +26,17 @@ public class UserController {
     }
 
     @GetMapping("profile")
-    public UserOutputDTO getProfile(User user) {
-        return new UserOutputDTO().convertFrom(user);
+    public UserDTO getProfile(User user) {
+        return new UserDTO().convertFrom(user);
     }
 
     @PutMapping("profile")
-    public UserOutputDTO updateProfile(@Valid @RequestBody UserParam userParam, User user) {
+    public UserDTO updateProfile(@Valid @RequestBody UserParam userParam, User user) {
         // Update properties
         userParam.update(user);
 
         // Update user and convert to dto
-        return new UserOutputDTO().convertFrom(userService.update(user));
+        return new UserDTO().convertFrom(userService.update(user));
     }
 
     @PutMapping("profile/password")

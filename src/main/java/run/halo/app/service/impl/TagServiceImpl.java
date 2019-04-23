@@ -2,7 +2,7 @@ package run.halo.app.service.impl;
 
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.dto.TagOutputDTO;
+import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.repository.TagRepository;
 import run.halo.app.service.TagService;
@@ -10,10 +10,6 @@ import run.halo.app.service.base.AbstractCrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.AlreadyExistsException;
-import run.halo.app.exception.NotFoundException;
-import run.halo.app.repository.TagRepository;
-import run.halo.app.service.base.AbstractCrudService;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,11 +60,11 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     }
 
     @Override
-    public List<TagOutputDTO> convertTo(List<Tag> tags) {
+    public List<TagDTO> convertTo(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ?
                 Collections.emptyList() :
                 tags.stream()
-                        .map(tag -> (TagOutputDTO) new TagOutputDTO().convertFrom(tag))
+                        .map(tag -> (TagDTO) new TagDTO().convertFrom(tag))
                         .collect(Collectors.toList());
     }
 }

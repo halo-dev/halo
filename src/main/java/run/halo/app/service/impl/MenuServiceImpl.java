@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
-import run.halo.app.model.dto.MenuOutputDTO;
+import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
 import run.halo.app.model.vo.MenuVO;
@@ -36,7 +36,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<MenuOutputDTO> listDtos(Sort sort) {
+    public List<MenuDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
@@ -139,13 +139,13 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         return topMenu;
     }
 
-    private List<MenuOutputDTO> convertTo(List<Menu> menus) {
+    private List<MenuDTO> convertTo(List<Menu> menus) {
         if (CollectionUtils.isEmpty(menus)) {
             return Collections.emptyList();
         }
 
         return menus.stream()
-                .map(menu -> new MenuOutputDTO().<MenuOutputDTO>convertFrom(menu))
+                .map(menu -> new MenuDTO().<MenuDTO>convertFrom(menu))
                 .collect(Collectors.toList());
     }
 }

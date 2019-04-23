@@ -5,7 +5,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.exception.MissingPropertyException;
-import run.halo.app.model.dto.OptionOutputDTO;
+import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
@@ -86,7 +86,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return a list of option dto
      */
     @NonNull
-    List<OptionOutputDTO> listDtos();
+    List<OptionDTO> listDtos();
 
     /**
      * Get option by key

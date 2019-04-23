@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.MissingPropertyException;
-import run.halo.app.model.dto.OptionOutputDTO;
+import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
@@ -129,8 +129,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public List<OptionOutputDTO> listDtos() {
-        return listAll().stream().map(option -> new OptionOutputDTO().<OptionOutputDTO>convertFrom(option)).collect(Collectors.toList());
+    public List<OptionDTO> listDtos() {
+        return listAll().stream().map(option -> new OptionDTO().<OptionDTO>convertFrom(option)).collect(Collectors.toList());
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import run.halo.app.model.dto.AttachmentOutputDTO;
+import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.params.AttachmentParam;
 import run.halo.app.model.params.AttachmentQuery;
@@ -39,11 +39,11 @@ public class AttachmentController {
      * List of attachment.
      *
      * @param pageable pageable
-     * @return Page<AttachmentOutputDTO>
+     * @return Page<AttachmentDTO>
      */
     @GetMapping
-    public Page<AttachmentOutputDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-                                            AttachmentQuery attachmentQuery) {
+    public Page<AttachmentDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                      AttachmentQuery attachmentQuery) {
         return attachmentService.pageDtosBy(pageable, attachmentQuery);
     }
 
@@ -51,22 +51,22 @@ public class AttachmentController {
      * Get attachment by id.
      *
      * @param id attachment id
-     * @return AttachmentOutputDTO
+     * @return AttachmentDTO
      */
     @GetMapping("{id:\\d+}")
     @ApiOperation("Get attachment detail by id")
-    public AttachmentOutputDTO getBy(@PathVariable("id") Integer id) {
+    public AttachmentDTO getBy(@PathVariable("id") Integer id) {
         Attachment attachment = attachmentService.getById(id);
         return attachmentService.convertToDto(attachment);
     }
 
     @PutMapping("{attachmentId:\\d+}")
     @ApiOperation("Updates a attachment")
-    public AttachmentOutputDTO updateBy(@PathVariable("attachmentId") Integer attachmentId,
-                                        @RequestBody @Valid AttachmentParam attachmentParam) {
+    public AttachmentDTO updateBy(@PathVariable("attachmentId") Integer attachmentId,
+                                  @RequestBody @Valid AttachmentParam attachmentParam) {
         Attachment attachment = attachmentService.getById(attachmentId);
         attachmentParam.update(attachment);
-        return new AttachmentOutputDTO().convertFrom(attachmentService.update(attachment));
+        return new AttachmentDTO().convertFrom(attachmentService.update(attachment));
     }
 
     /**
@@ -76,20 +76,20 @@ public class AttachmentController {
      */
     @DeleteMapping("{id:\\d+}")
     @ApiOperation("Delete attachment by id")
-    public AttachmentOutputDTO deletePermanently(@PathVariable("id") Integer id) {
+    public AttachmentDTO deletePermanently(@PathVariable("id") Integer id) {
         return attachmentService.convertToDto(attachmentService.removePermanently(id));
     }
 
     @PostMapping("upload")
     @ApiOperation("Uploads single file")
-    public AttachmentOutputDTO uploadAttachment(@RequestPart("file") MultipartFile file) {
+    public AttachmentDTO uploadAttachment(@RequestPart("file") MultipartFile file) {
         return attachmentService.convertToDto(attachmentService.upload(file));
     }
 
     @PostMapping(value = "uploads", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation("Uploads multi files (Invalid in Swagger UI)")
-    public List<AttachmentOutputDTO> uploadAttachments(@RequestPart("files") MultipartFile[] files) {
-        List<AttachmentOutputDTO> result = new LinkedList<>();
+    public List<AttachmentDTO> uploadAttachments(@RequestPart("files") MultipartFile[] files) {
+        List<AttachmentDTO> result = new LinkedList<>();
 
         for (MultipartFile file : files) {
             // Upload single file
