@@ -1,9 +1,5 @@
 package run.halo.app.service.impl;
 
-import run.halo.app.exception.ServiceException;
-import run.halo.app.model.properties.EmailProperties;
-import run.halo.app.service.MailService;
-import run.halo.app.service.OptionService;
 import cn.hutool.core.text.StrBuilder;
 import freemarker.template.Template;
 import io.github.biezhi.ome.OhMyEmail;
@@ -11,7 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-import run.halo.app.exception.ServiceException;
+import run.halo.app.exception.EmailException;
+import run.halo.app.model.properties.EmailProperties;
+import run.halo.app.service.MailService;
+import run.halo.app.service.OptionService;
 
 import java.io.File;
 import java.util.Map;
@@ -74,7 +73,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], content: [{}]",
                     to, fromUsername, subject, content);
-            throw new ServiceException("Failed to send email to " + to, e);
+            throw new EmailException("Failed to send email to " + to, e);
         }
     }
 
@@ -104,7 +103,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], template name: [{}], content: [{}]",
                     to, fromUsername, subject, templateName, content);
-            throw new ServiceException("Failed to send template email to " + to, e).setErrorData(templateName);
+            throw new EmailException("Failed to send template email to " + to, e).setErrorData(templateName);
         }
     }
 
@@ -135,7 +134,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], template name: [{}], attachment: [{}], content: [{}]",
                     to, fromUsername, subject, templateName, attachFilename, content);
-            throw new ServiceException("Failed to send attachment email to " + to, e);
+            throw new EmailException("Failed to send attachment email to " + to, e);
         }
     }
 
