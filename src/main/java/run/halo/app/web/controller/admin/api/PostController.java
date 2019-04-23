@@ -82,6 +82,12 @@ public class PostController {
         return postService.getDetailVoBy(postId);
     }
 
+    @PostMapping("{postId:\\d+}/likes")
+    @ApiOperation("Likes a post")
+    public void like(@PathVariable("postId") Integer postId) {
+        postService.increaseLike(postId);
+    }
+
     @PostMapping
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam) {
         // Convert to

@@ -1,4 +1,4 @@
-package run.halo.app.event;
+package run.halo.app.event.post;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.NonNull;

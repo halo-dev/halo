@@ -1,4 +1,4 @@
-package run.halo.app.event;
+package run.halo.app.event.logger;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
