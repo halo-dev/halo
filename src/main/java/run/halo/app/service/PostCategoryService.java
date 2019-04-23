@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
@@ -103,6 +104,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a list of post category deleted
      */
     @NonNull
+    @Transactional
     List<PostCategory> removeByPostId(@NonNull Integer postId);
 
     /**
@@ -112,5 +114,6 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a list of post category deleted
      */
     @NonNull
+    @Transactional
     List<PostCategory> removeByCategoryId(@NonNull Integer categoryId);
 }

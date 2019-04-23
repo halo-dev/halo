@@ -3,6 +3,8 @@ package run.halo.app.event;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.context.ApplicationListener;
+import run.halo.app.event.logger.LogEvent;
+import run.halo.app.event.logger.LogEventListener;
 import run.halo.app.utils.ReflectionUtils;
 
 import java.lang.reflect.ParameterizedType;

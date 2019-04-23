@@ -1,5 +1,6 @@
 package run.halo.app.web.controller.content.api;
 
+import io.swagger.annotations.ApiOperation;
 import run.halo.app.model.dto.CommentOutputDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.CommentParam;
@@ -43,6 +44,7 @@ public class CommentController {
     }
 
     @PostMapping
+    @ApiOperation("Comments a post")
     public CommentOutputDTO comment(@RequestBody CommentParam commentParam, HttpServletRequest request) {
         // Get authentication
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

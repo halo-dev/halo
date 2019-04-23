@@ -126,7 +126,6 @@ public class ContentArchiveController {
         model.addAttribute("comments", comments);
         model.addAttribute("pageRainbow", pageRainbow);
 
-        // Log it
         return themeService.render("post");
     }
 }

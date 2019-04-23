@@ -11,14 +11,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.event.LogEvent;
-import run.halo.app.event.VisitEvent;
+import run.halo.app.event.logger.LogEvent;
+import run.halo.app.event.post.VisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.CategoryOutputDTO;
 import run.halo.app.model.dto.TagOutputDTO;
 import run.halo.app.model.dto.post.PostMinimalOutputDTO;
@@ -348,7 +347,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         long affectedRows = postRepository.updateVisit(visits, postId);
 
         if (affectedRows != 1) {
-            throw new ServiceException("Failed to increase visits " + visits + " for post with id " + postId);
+            log.error("Post with id: [{}] may not be found", postId);
+            throw new BadRequestException("Failed to increase visits " + visits + " for post with id " + postId);
         }
     }
 
@@ -360,7 +360,8 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         long affectedRows = postRepository.updateLikes(likes, postId);
 
         if (affectedRows != 1) {
-            throw new ServiceException("Failed to increase likes " + likes + " for post with id " + postId);
+            log.error("Post with id: [{}] may not be found", postId);
+            throw new BadRequestException("Failed to increase likes " + likes + " for post with id " + postId);
         }
     }
 
@@ -440,7 +441,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    @Transactional
     public Post removeById(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
@@ -498,6 +498,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
             postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
                     .orElseGet(LinkedList::new)
                     .stream()
+                    .filter(Objects::nonNull)
                     .map(tag -> new TagOutputDTO().<TagOutputDTO>convertFrom(tag))
                     .collect(Collectors.toList()));
 

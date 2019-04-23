@@ -92,4 +92,10 @@ public class PostController {
                                                   @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return commentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
+
+    @PostMapping("{postId:\\d+}/likes")
+    @ApiOperation("Likes a post")
+    public void like(@PathVariable("postId") Integer postId) {
+        postService.increaseLike(postId);
+    }
 }
