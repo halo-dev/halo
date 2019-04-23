@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.MenuOutputDTO;
+import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
 import run.halo.app.model.vo.MenuVO;
@@ -34,7 +34,7 @@ public class MenuController {
 
     @GetMapping
     @ApiOperation("Lists all menus")
-    public List<MenuOutputDTO> listAll(@SortDefault(sort = "sort", direction = DESC) Sort sort) {
+    public List<MenuDTO> listAll(@SortDefault(sort = "sort", direction = DESC) Sort sort) {
         return menuService.listDtos(sort);
     }
 
@@ -46,14 +46,14 @@ public class MenuController {
 
     @PostMapping
     @ApiOperation("Creates a menu")
-    public MenuOutputDTO createBy(@RequestBody @Valid MenuParam menuParam) {
-        return new MenuOutputDTO().convertFrom(menuService.createBy(menuParam));
+    public MenuDTO createBy(@RequestBody @Valid MenuParam menuParam) {
+        return new MenuDTO().convertFrom(menuService.createBy(menuParam));
     }
 
     @PutMapping("{menuId:\\d+}")
     @ApiOperation("Updates a menu")
-    public MenuOutputDTO updateBy(@PathVariable("menuId") Integer menuId,
-                                  @RequestBody @Valid MenuParam menuParam) {
+    public MenuDTO updateBy(@PathVariable("menuId") Integer menuId,
+                            @RequestBody @Valid MenuParam menuParam) {
         // Get the menu
         Menu menu = menuService.getById(menuId);
 
@@ -61,12 +61,12 @@ public class MenuController {
         menuParam.update(menu);
 
         // Update menu in database
-        return new MenuOutputDTO().convertFrom(menuService.update(menu));
+        return new MenuDTO().convertFrom(menuService.update(menu));
     }
 
     @DeleteMapping("{menuId:\\d+}")
     @ApiOperation("Deletes a menu")
-    public MenuOutputDTO deleteBy(@PathVariable("menuId") Integer menuId) {
-        return new MenuOutputDTO().convertFrom(menuService.removeById(menuId));
+    public MenuDTO deleteBy(@PathVariable("menuId") Integer menuId) {
+        return new MenuDTO().convertFrom(menuService.removeById(menuId));
     }
 }

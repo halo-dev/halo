@@ -1,7 +1,7 @@
 package run.halo.app.model.vo;
 
-import run.halo.app.model.dto.CategoryOutputDTO;
-import run.halo.app.model.dto.TagOutputDTO;
+import run.halo.app.model.dto.CategoryDTO;
+import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.PostSimpleOutputDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,8 +20,8 @@ public class PostListVO extends PostSimpleOutputDTO {
 
     private Long commentCount;
 
-    private List<TagOutputDTO> tags;
+    private List<TagDTO> tags;
 
-    private List<CategoryOutputDTO> categories;
+    private List<CategoryDTO> categories;
 
 }

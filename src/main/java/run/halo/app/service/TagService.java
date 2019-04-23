@@ -1,7 +1,7 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.TagOutputDTO;
+import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.service.base.CrudService;
 
@@ -31,5 +31,5 @@ public interface TagService extends CrudService<Tag, Integer> {
      * @return a list of tag output dto
      */
     @NonNull
-    List<TagOutputDTO> convertTo(List<Tag> tags);
+    List<TagDTO> convertTo(List<Tag> tags);
 }

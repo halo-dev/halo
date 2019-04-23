@@ -1,7 +1,7 @@
 package run.halo.app.service;
 
 import org.springframework.transaction.annotation.Transactional;
-import run.halo.app.model.dto.TagWithCountOutputDTO;
+import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
@@ -41,7 +41,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      * @return a list of tag with post count output dto
      */
     @NonNull
-    List<TagWithCountOutputDTO> listTagWithCountDtos(@NonNull Sort sort);
+    List<TagWithPostCountDTO> listTagWithCountDtos(@NonNull Sort sort);
 
     /**
      * Lists tags list map by post id.

@@ -3,15 +3,13 @@ package run.halo.app.model.dto;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Gallery;
 import lombok.Data;
-import run.halo.app.model.dto.base.OutputConverter;
-import run.halo.app.model.entity.Gallery;
 
 /**
  * @author : RYAN0UP
  * @date : 2019/3/21
  */
 @Data
-public class GalleryOutputDTO implements OutputConverter<GalleryOutputDTO, Gallery> {
+public class GalleryDTO implements OutputConverter<GalleryDTO, Gallery> {
 
     private Integer id;
 

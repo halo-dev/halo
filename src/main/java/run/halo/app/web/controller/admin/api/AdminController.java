@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.dto.CountOutputDTO;
-import run.halo.app.model.dto.UserOutputDTO;
+import run.halo.app.model.dto.CountDTO;
+import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.properties.PrimaryProperties;
@@ -61,11 +61,11 @@ public class AdminController {
      */
     @GetMapping("counts")
     @ApiOperation("Gets count info")
-    public CountOutputDTO getCount() {
-        CountOutputDTO countOutputDTO = new CountOutputDTO();
-        countOutputDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
-        countOutputDTO.setAttachmentCount(attachmentService.count());
-        countOutputDTO.setCommentCount(commentService.count());
+    public CountDTO getCount() {
+        CountDTO countDTO = new CountDTO();
+        countDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
+        countDTO.setAttachmentCount(attachmentService.count());
+        countDTO.setCommentCount(commentService.count());
 
         long currentTimeMillis = System.currentTimeMillis();
 
@@ -73,19 +73,19 @@ public class AdminController {
         // TODO Initialize the birthday if absent
         Long birthday = optionService.getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, Long.class, currentTimeMillis);
         long days = (currentTimeMillis - birthday) / (1000 * 24 * 3600);
-        countOutputDTO.setEstablishDays(days);
+        countDTO.setEstablishDays(days);
 
-        countOutputDTO.setLinkCount(linkService.count());
-        countOutputDTO.setVisitCount(postService.countVisit());
-        countOutputDTO.setLikeCount(postService.countLike());
-        return countOutputDTO;
+        countDTO.setLinkCount(linkService.count());
+        countDTO.setVisitCount(postService.countVisit());
+        countDTO.setLikeCount(postService.countLike());
+        return countDTO;
     }
 
     @PostMapping("login")
     @ApiOperation("Login with session")
     @CacheLock(autoDelete = false, traceRequest = true)
-    public UserOutputDTO login(@Valid @RequestBody LoginParam loginParam, HttpServletRequest request) {
-        return new UserOutputDTO().convertFrom(userService.login(loginParam.getUsername(), loginParam.getPassword(), request.getSession()));
+    public UserDTO login(@Valid @RequestBody LoginParam loginParam, HttpServletRequest request) {
+        return new UserDTO().convertFrom(userService.login(loginParam.getUsername(), loginParam.getPassword(), request.getSession()));
     }
 
     @PostMapping("logout")

@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.CategoryOutputDTO;
+import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.params.CategoryParam;
 import run.halo.app.model.vo.CategoryVO;
@@ -44,24 +44,24 @@ public class CategoryController {
     }
 
     @PostMapping
-    public CategoryOutputDTO createBy(@Valid @RequestBody CategoryParam categoryParam) {
+    public CategoryDTO createBy(@Valid @RequestBody CategoryParam categoryParam) {
         // Convert to category
         Category category = categoryParam.convertTo();
 
         // Save it
-        return new CategoryOutputDTO().convertFrom(categoryService.create(category));
+        return new CategoryDTO().convertFrom(categoryService.create(category));
     }
 
     /**
      * Get Category by id
      *
      * @param id id
-     * @return CategoryOutputDTO
+     * @return CategoryDTO
      */
     @GetMapping("{id:\\d+}")
     @ApiOperation("Get category detail by id")
-    public CategoryOutputDTO getBy(@PathVariable("id") Integer id) {
-        return new CategoryOutputDTO().convertFrom(categoryService.getById(id));
+    public CategoryDTO getBy(@PathVariable("id") Integer id) {
+        return new CategoryDTO().convertFrom(categoryService.getById(id));
     }
 
     /**

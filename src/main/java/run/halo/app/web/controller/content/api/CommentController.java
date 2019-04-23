@@ -1,7 +1,7 @@
 package run.halo.app.web.controller.content.api;
 
 import io.swagger.annotations.ApiOperation;
-import run.halo.app.model.dto.CommentOutputDTO;
+import run.halo.app.model.dto.CommentDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.CommentParam;
 import run.halo.app.model.properties.BlogProperties;
@@ -45,7 +45,7 @@ public class CommentController {
 
     @PostMapping
     @ApiOperation("Comments a post")
-    public CommentOutputDTO comment(@RequestBody CommentParam commentParam, HttpServletRequest request) {
+    public CommentDTO comment(@RequestBody CommentParam commentParam, HttpServletRequest request) {
         // Get authentication
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
@@ -67,6 +67,6 @@ public class CommentController {
             commentService.mustExistById(commentParam.getParentId());
         }
 
-        return new CommentOutputDTO().convertFrom(commentService.createBy(commentParam.convertTo(), request));
+        return new CommentDTO().convertFrom(commentService.createBy(commentParam.convertTo(), request));
     }
 }

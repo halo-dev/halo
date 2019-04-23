@@ -1,9 +1,8 @@
 package run.halo.app.model.vo;
 
-import run.halo.app.model.dto.LinkOutputDTO;
+import run.halo.app.model.dto.LinkDTO;
 import lombok.Data;
 import lombok.ToString;
-import run.halo.app.model.dto.LinkOutputDTO;
 
 import java.util.List;
 
@@ -19,5 +18,5 @@ public class LinkTeamVO {
 
     private String team;
 
-    private List<LinkOutputDTO> links;
+    private List<LinkDTO> links;
 }

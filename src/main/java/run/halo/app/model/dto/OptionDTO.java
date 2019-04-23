@@ -11,7 +11,7 @@ import run.halo.app.model.entity.Option;
  * @date 3/20/19
  */
 @Data
-public class OptionOutputDTO implements OutputConverter<OptionOutputDTO, Option> {
+public class OptionDTO implements OutputConverter<OptionDTO, Option> {
 
     private String key;
 

@@ -1,6 +1,6 @@
 package run.halo.app.service.impl;
 
-import run.halo.app.model.dto.TagWithCountOutputDTO;
+import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
@@ -17,10 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.repository.PostRepository;
-import run.halo.app.repository.PostTagRepository;
-import run.halo.app.repository.TagRepository;
-import run.halo.app.service.base.AbstractCrudService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,7 +56,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     }
 
     @Override
-    public List<TagWithCountOutputDTO> listTagWithCountDtos(Sort sort) {
+    public List<TagWithPostCountDTO> listTagWithCountDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // Find all tags
@@ -72,7 +68,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         // Find post count
         return tags.stream().map(
                 tag -> {
-                    TagWithCountOutputDTO tagWithCountOutputDTO = new TagWithCountOutputDTO().convertFrom(tag);
+                    TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
                     tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
                     return tagWithCountOutputDTO;
                 }

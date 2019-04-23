@@ -1,10 +1,9 @@
 package run.halo.app.service;
 
-import run.halo.app.model.dto.LogOutputDTO;
+import run.halo.app.model.dto.LogDTO;
 import run.halo.app.model.entity.Log;
 import run.halo.app.service.base.CrudService;
 import org.springframework.data.domain.Page;
-import run.halo.app.service.base.CrudService;
 
 /**
  * Log service.
@@ -19,5 +18,5 @@ public interface LogService extends CrudService<Log, Long> {
      * @param top top number must not be less than 0
      * @return a page of latest logs
      */
-    Page<LogOutputDTO> pageLatest(int top);
+    Page<LogDTO> pageLatest(int top);
 }

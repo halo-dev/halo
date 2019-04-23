@@ -1,8 +1,7 @@
 package run.halo.app.model.vo;
 
-import run.halo.app.model.dto.CategoryOutputDTO;
+import run.halo.app.model.dto.CategoryDTO;
 import lombok.Data;
-import run.halo.app.model.dto.CategoryOutputDTO;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ import java.util.List;
  * @date 3/21/19
  */
 @Data
-public class CategoryVO extends CategoryOutputDTO {
+public class CategoryVO extends CategoryDTO {
 
     private List<CategoryVO> children;
 }

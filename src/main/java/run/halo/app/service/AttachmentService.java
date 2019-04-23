@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
-import run.halo.app.model.dto.AttachmentOutputDTO;
+import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.base.CrudService;
@@ -27,7 +27,7 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return a page of attachment output dto
      */
     @NonNull
-    Page<AttachmentOutputDTO> pageDtosBy(@NonNull Pageable pageable, AttachmentQuery attachmentQuery);
+    Page<AttachmentDTO> pageDtosBy(@NonNull Pageable pageable, AttachmentQuery attachmentQuery);
 
     /**
      * Uploads file.
@@ -55,7 +55,7 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return an attachment output dto
      */
     @NonNull
-    AttachmentOutputDTO convertToDto(@NonNull Attachment attachment);
+    AttachmentDTO convertToDto(@NonNull Attachment attachment);
 
     /**
      * List all media type.

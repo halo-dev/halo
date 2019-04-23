@@ -1,13 +1,11 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.GalleryOutputDTO;
+import run.halo.app.model.dto.GalleryDTO;
 import run.halo.app.service.GalleryService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.GalleryOutputDTO;
-import run.halo.app.service.GalleryService;
 
 import java.util.List;
 
@@ -34,7 +32,7 @@ public class GalleryController {
      * @return all of galleries
      */
     @GetMapping
-    public List<GalleryOutputDTO> listGalleries(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
+    public List<GalleryDTO> listGalleries(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
         return galleryService.listDtos(sort);
     }
 
@@ -42,12 +40,12 @@ public class GalleryController {
      * Get gallery by id.
      *
      * @param galleryId gallery id
-     * @return GalleryOutputDTO
+     * @return GalleryDTO
      */
     @GetMapping("{galleryId:\\d+}")
     @ApiOperation("Get gallery detail by id")
-    public GalleryOutputDTO getBy(@PathVariable("galleryId") Integer galleryId) {
-        return new GalleryOutputDTO().convertFrom(galleryService.getById(galleryId));
+    public GalleryDTO getBy(@PathVariable("galleryId") Integer galleryId) {
+        return new GalleryDTO().convertFrom(galleryService.getById(galleryId));
     }
 
     /**

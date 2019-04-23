@@ -6,9 +6,6 @@ import run.halo.app.model.enums.CommentStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import run.halo.app.model.dto.base.OutputConverter;
-import run.halo.app.model.entity.Comment;
-import run.halo.app.model.enums.CommentStatus;
 
 import java.util.Date;
 
@@ -20,7 +17,7 @@ import java.util.Date;
 @Data
 @ToString
 @EqualsAndHashCode
-public class CommentOutputDTO implements OutputConverter<CommentOutputDTO, Comment> {
+public class CommentDTO implements OutputConverter<CommentDTO, Comment> {
 
     private Long id;
 

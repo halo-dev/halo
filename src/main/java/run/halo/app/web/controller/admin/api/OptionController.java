@@ -1,6 +1,6 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.OptionOutputDTO;
+import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.service.OptionService;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +27,7 @@ public class OptionController {
     }
 
     @GetMapping
-    public List<OptionOutputDTO> listAll() {
+    public List<OptionDTO> listAll() {
         return optionService.listDtos();
     }
 

@@ -1,14 +1,12 @@
 package run.halo.app.web.controller.admin.api;
 
-import run.halo.app.model.dto.LogOutputDTO;
+import run.halo.app.model.dto.LogDTO;
 import run.halo.app.service.LogService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import run.halo.app.model.dto.LogOutputDTO;
-import run.halo.app.service.LogService;
 
 import java.util.List;
 
@@ -36,7 +34,7 @@ public class LogController {
      */
     @GetMapping("latest")
     @ApiOperation("Pages latest logs")
-    public List<LogOutputDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+    public List<LogDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         return logService.pageLatest(top).getContent();
     }
 

@@ -3,7 +3,7 @@ package run.halo.app.service.impl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import run.halo.app.model.dto.GalleryOutputDTO;
+import run.halo.app.model.dto.GalleryDTO;
 import run.halo.app.model.entity.Gallery;
 import run.halo.app.model.vo.GalleryTeamVO;
 import run.halo.app.repository.GalleryRepository;
@@ -40,10 +40,10 @@ public class GalleryServiceImpl extends AbstractCrudService<Gallery, Integer> im
      * @return all galleries
      */
     @Override
-    public List<GalleryOutputDTO> listDtos(Sort sort) {
+    public List<GalleryDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
-        return listAll(sort).stream().map(gallery -> (GalleryOutputDTO) new GalleryOutputDTO().convertFrom(gallery)).collect(Collectors.toList());
+        return listAll(sort).stream().map(gallery -> (GalleryDTO) new GalleryDTO().convertFrom(gallery)).collect(Collectors.toList());
     }
 
     /**
@@ -57,12 +57,12 @@ public class GalleryServiceImpl extends AbstractCrudService<Gallery, Integer> im
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all galleries
-        List<GalleryOutputDTO> galleries = listDtos(sort);
+        List<GalleryDTO> galleries = listDtos(sort);
 
         // Get teams
-        Set<String> teams = ServiceUtils.fetchProperty(galleries, GalleryOutputDTO::getTeam);
+        Set<String> teams = ServiceUtils.fetchProperty(galleries, GalleryDTO::getTeam);
 
-        Map<String, List<GalleryOutputDTO>> teamGalleryListMap = ServiceUtils.convertToListMap(teams, galleries, GalleryOutputDTO::getTeam);
+        Map<String, List<GalleryDTO>> teamGalleryListMap = ServiceUtils.convertToListMap(teams, galleries, GalleryDTO::getTeam);
 
         List<GalleryTeamVO> result = new LinkedList<>();
 
@@ -88,8 +88,8 @@ public class GalleryServiceImpl extends AbstractCrudService<Gallery, Integer> im
      * @return list of galleries
      */
     @Override
-    public List<GalleryOutputDTO> listByTeam(String team, Sort sort) {
+    public List<GalleryDTO> listByTeam(String team, Sort sort) {
         List<Gallery> galleries = galleryRepository.findByTeam(team, sort);
-        return galleries.stream().map(gallery -> (GalleryOutputDTO) new GalleryOutputDTO().convertFrom(gallery)).collect(Collectors.toList());
+        return galleries.stream().map(gallery -> (GalleryDTO) new GalleryDTO().convertFrom(gallery)).collect(Collectors.toList());
     }
 }

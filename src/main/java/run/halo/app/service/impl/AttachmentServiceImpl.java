@@ -10,10 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.file.FileHandlers;
-import run.halo.app.model.dto.AttachmentOutputDTO;
+import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.enums.converter.AttachmentTypeConverter;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.properties.PropertyEnum;
@@ -54,7 +53,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     }
 
     @Override
-    public Page<AttachmentOutputDTO> pageDtosBy(@NonNull Pageable pageable, AttachmentQuery attachmentQuery) {
+    public Page<AttachmentDTO> pageDtosBy(@NonNull Pageable pageable, AttachmentQuery attachmentQuery) {
         Assert.notNull(pageable, "Page info must not be null");
 
         // List all
@@ -139,26 +138,26 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     }
 
     @Override
-    public AttachmentOutputDTO convertToDto(Attachment attachment) {
+    public AttachmentDTO convertToDto(Attachment attachment) {
         Assert.notNull(attachment, "Attachment must not be null");
 
         // Get blog base url
         String blogBaseUrl = optionService.getBlogBaseUrl();
 
         // Convert to output dto
-        AttachmentOutputDTO attachmentOutputDTO = new AttachmentOutputDTO().convertFrom(attachment);
+        AttachmentDTO attachmentDTO = new AttachmentDTO().convertFrom(attachment);
 
-        if (Objects.equals(attachmentOutputDTO.getType(), AttachmentType.LOCAL)) {
+        if (Objects.equals(attachmentDTO.getType(), AttachmentType.LOCAL)) {
             // Append blog base url to path and thumbnail
-            String fullPath = StringUtils.join(blogBaseUrl, "/", attachmentOutputDTO.getPath());
-            String fullThumbPath = StringUtils.join(blogBaseUrl, "/", attachmentOutputDTO.getThumbPath());
+            String fullPath = StringUtils.join(blogBaseUrl, "/", attachmentDTO.getPath());
+            String fullThumbPath = StringUtils.join(blogBaseUrl, "/", attachmentDTO.getThumbPath());
 
             // Set full path and full thumb path
-            attachmentOutputDTO.setPath(fullPath);
-            attachmentOutputDTO.setThumbPath(fullThumbPath);
+            attachmentDTO.setPath(fullPath);
+            attachmentDTO.setThumbPath(fullThumbPath);
         }
 
-        return attachmentOutputDTO;
+        return attachmentDTO;
     }
 
     @Override

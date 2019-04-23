@@ -1,6 +1,6 @@
 package run.halo.app.web.controller.content.api;
 
-import run.halo.app.model.dto.UserOutputDTO;
+import run.halo.app.model.dto.UserDTO;
 import run.halo.app.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +25,7 @@ public class UserController {
 
     @GetMapping("profile")
     @ApiOperation("Gets blogger profile")
-    public UserOutputDTO getProfile() {
-        return userService.getCurrentUser().map(user -> new UserOutputDTO().<UserOutputDTO>convertFrom(user)).get();
+    public UserDTO getProfile() {
+        return userService.getCurrentUser().map(user -> new UserDTO().<UserDTO>convertFrom(user)).get();
     }
 }

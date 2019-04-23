@@ -1,11 +1,10 @@
 package run.halo.app.model.vo;
 
-import run.halo.app.model.dto.CommentOutputDTO;
+import run.halo.app.model.dto.CommentDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import run.halo.app.model.dto.CommentOutputDTO;
 
 /**
  * Comment list with parent comment vo.
@@ -17,7 +16,7 @@ import run.halo.app.model.dto.CommentOutputDTO;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
-public class CommentWithParentVO extends CommentOutputDTO implements Cloneable {
+public class CommentWithParentVO extends CommentDTO implements Cloneable {
 
     /**
      * Parent comment.
