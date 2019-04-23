@@ -74,18 +74,21 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        String workDir = FILE_PROTOCOL + haloProperties.getWorkDir();
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/admin/")
-                .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/themes/");
+                .addResourceLocations(workDir + "templates/themes/")
+                .addResourceLocations(workDir + "templates/admin/")
+                .addResourceLocations("classpath:/admin/");
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "upload/");
+                .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations("classpath:/static/halo-admin/images/favicon.ico");
         registry.addResourceHandler("/backup/**")
-                .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "backup/");
+                .addResourceLocations(workDir + "backup/");
         registry.addResourceHandler("/admin/**")
+                .addResourceLocations(workDir + "templates/admin/")
                 .addResourceLocations("classpath:/admin/");
 
         if (!haloProperties.isDocDisabled()) {
