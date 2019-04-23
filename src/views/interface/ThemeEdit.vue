@@ -1,21 +1,45 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col :xl="18" :lg="18" :md="18" :sm="24" :xs="24" :style="{'padding-bottom':'12px'}">
+      <a-col
+        :xl="18"
+        :lg="18"
+        :md="18"
+        :sm="24"
+        :xs="24"
+        :style="{'padding-bottom':'12px'}"
+      >
         <a-card>
           <a-form layout="vertical">
             <a-form-item>
-              <codemirror v-model="content" :options="options"></codemirror>
+              <codemirror
+                v-model="content"
+                :options="options"
+              ></codemirror>
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" @click="handlerSaveContent" :disabled="buttonDisabled">保存</a-button>
+              <a-button
+                type="primary"
+                @click="handlerSaveContent"
+                :disabled="buttonDisabled"
+              >保存</a-button>
             </a-form-item>
           </a-form>
         </a-card>
       </a-col>
-      <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24" :style="{'padding-bottom':'12px'}">
+      <a-col
+        :xl="6"
+        :lg="6"
+        :md="6"
+        :sm="24"
+        :xs="24"
+        :style="{'padding-bottom':'12px'}"
+      >
         <a-card title="Anatole 主题">
-          <theme-file :files="files" @listenToSelect="catchSelectFile"/>
+          <theme-file
+            :files="files"
+            @listenToSelect="catchSelectFile"
+          />
         </a-card>
       </a-col>
     </a-row>

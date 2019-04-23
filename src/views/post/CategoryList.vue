@@ -122,7 +122,7 @@ const columns = [
   },
   {
     title: '文章数',
-    dataIndex: 'posts.count'
+    dataIndex: 'postCount'
   },
   {
     title: '操作',
@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     loadCategories() {
-      categoryApi.listAll().then(response => {
+      categoryApi.listAll(true).then(response => {
         this.categories = response.data.data
       })
     },
