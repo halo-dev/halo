@@ -39,8 +39,8 @@ public class VisitEventListener {
             initCapacity = (int) count;
         }
 
-        postVisitQueueMap = new ConcurrentHashMap<>(initCapacity);
-        postVisitTaskMap = new ConcurrentHashMap<>(initCapacity);
+        postVisitQueueMap = new ConcurrentHashMap<>(initCapacity << 1);
+        postVisitTaskMap = new ConcurrentHashMap<>(initCapacity << 1);
 
         this.executor = Executors.newCachedThreadPool();
     }
@@ -109,7 +109,7 @@ public class VisitEventListener {
 
                     log.debug("Increased visits for post id: [{}]", postId);
                 } catch (InterruptedException e) {
-                    log.warn("Post visit task: " + Thread.currentThread().getName() + " was interrupted", e);
+                    log.debug("Post visit task: " + Thread.currentThread().getName() + " was interrupted", e);
                     // Ignore this exception
                 }
             }
