@@ -33,7 +33,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  */
 @Slf4j
 @Controller
-@RequestMapping(value = "archives")
+@RequestMapping(value = "/archives")
 public class ContentArchiveController {
 
     private final PostService postService;

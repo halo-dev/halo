@@ -83,9 +83,4 @@ public class ContentIndexController {
         model.addAttribute("rainbow", rainbow);
         return themeService.render("index");
     }
-
-    @GetMapping("/admin")
-    public String admin() {
-        return "redirect:/admin/index.html";
-    }
 }
