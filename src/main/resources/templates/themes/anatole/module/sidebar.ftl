@@ -1,12 +1,12 @@
 <div class="sidebar animated fadeInDown">
     <div class="logo-title">
         <div class="title">
-            <img src="${options.blog_logo!'/anatole/source/images/logo@2x.png'}" style="width:127px;<#if (options.anatole_style_avatar_circle!'false')=='true'>border-radius:50%</#if>" />
+            <img src="${options.blog_logo!'/anatole/source/images/logo@2x.png'}" style="width:127px;<#if settings.avatar_circle!false>border-radius:50%</#if>" />
             <h3 title="">
-                <a href="${options.blog_url!}">${options.blog_title!'ANATOLE'}</a>
+                <a href="${options.blog_url!}">${options.blog_title!'Anatole'}</a>
             </h3>
             <div class="description">
-                <#if (options.anatole_style_hitokoto!'false')=="true">
+                <#if settings.hitokoto!false>
                     <p id="yiyan">获取中...</p>
                 <#else >
                     <p>${user.description!'A other Halo theme'}</p>

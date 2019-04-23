@@ -9,6 +9,8 @@ import run.halo.app.model.freemarker.method.RecentCommentsMethod;
 import run.halo.app.model.freemarker.method.RecentPostsMethod;
 import run.halo.app.model.freemarker.tag.*;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.ThemeService;
+import run.halo.app.service.ThemeSettingService;
 import run.halo.app.service.UserService;
 
 import javax.annotation.PostConstruct;
@@ -31,6 +33,12 @@ public class FreeMarkerAutoConfiguration {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ThemeService themeService;
+
+    @Autowired
+    private ThemeSettingService themeSettingService;
 
     @Autowired
     private PostTagDirective postTagDirective;
@@ -66,7 +74,8 @@ public class FreeMarkerAutoConfiguration {
     public void setSharedVariable() {
         try {
             configuration.setSharedVariable("options", optionsService.listOptions());
-            configuration.setSharedVariable("user",userService.getCurrentUser().orElse(null));
+            configuration.setSharedVariable("user", userService.getCurrentUser().orElse(null));
+            configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
             //Freemarker custom tags
             configuration.setSharedVariable("categoryTag", categoryTagDirective);
             configuration.setSharedVariable("commentTag", commentTagDirective);
@@ -74,7 +83,7 @@ public class FreeMarkerAutoConfiguration {
             configuration.setSharedVariable("menuTag", menuTagDirective);
             configuration.setSharedVariable("tagTag", tagTagDirective);
             configuration.setSharedVariable("postTag", postTagDirective);
-            configuration.setSharedVariable("galleryTag",galleryTagDirective);
+            configuration.setSharedVariable("galleryTag", galleryTagDirective);
             configuration.setSharedVariable("randomMethod", randomMethod);
             configuration.setSharedVariable("recentPostsMethod", recentPostsMethod);
             configuration.setSharedVariable("recentCommentsMethod", recentCommentsMethod);
