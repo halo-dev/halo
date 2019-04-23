@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagPostCountProjection {
+public class TagPostPostCountProjection {
 
     /**
      * Post count.
      */
-    private Long count;
+    private Long postCount;
 
     /**
      * Tag id

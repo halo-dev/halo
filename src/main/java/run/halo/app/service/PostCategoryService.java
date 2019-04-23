@@ -2,9 +2,11 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
+import run.halo.app.model.dto.CategoryWithPostCountDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
@@ -116,4 +118,13 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     @NonNull
     @Transactional
     List<PostCategory> removeByCategoryId(@NonNull Integer categoryId);
+
+    /**
+     * Lists category with post count.
+     *
+     * @param sort sort info
+     * @return a list of category dto
+     */
+    @NonNull
+    List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort);
 }

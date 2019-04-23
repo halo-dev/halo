@@ -9,11 +9,13 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.params.CategoryParam;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.service.CategoryService;
+import run.halo.app.service.PostCategoryService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Category controller.
@@ -27,14 +29,24 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
+    private final PostCategoryService postCategoryService;
+
+    public CategoryController(CategoryService categoryService,
+                              PostCategoryService postCategoryService) {
         this.categoryService = categoryService;
+        this.postCategoryService = postCategoryService;
     }
 
     @GetMapping
     @ApiOperation("List all categories")
-    public List<Category> listAll() {
-        return categoryService.listAll();
+    public List<? extends CategoryDTO> listAll(
+            @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
+            @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
+        if (more) {
+            return postCategoryService.listCategoryWithPostCountDto(sort);
+        }
+
+        return categoryService.convertTo(categoryService.listAll(sort));
     }
 
     @GetMapping("tree_view")
