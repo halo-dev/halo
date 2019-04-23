@@ -1,6 +1,6 @@
 <ul class="social-links">
 
-    <#if (options.theme_anatole_sns_rss!'true')=='true'>
+    <#if settings.rss!true>
     <li>
         <a target="_blank" href="${options.blog_url!}/atom.xml">
             <i class="fa fa-rss"></i>
@@ -8,73 +8,73 @@
     </li>
     </#if>
 
-    <#if options.theme_anatole_sns_twitter??>
+    <#if settings.twitter??>
     <li>
-        <a target="_blank" href="https://twitter.com/${options.theme_anatole_sns_twitter}">
+        <a target="_blank" href="https://twitter.com/${settings.twitter}">
             <i class="fa fa-twitter"></i>
         </a>
     </li>
     </#if>
 
-    <#if options.theme_anatole_sns_facebook??>
+    <#if settings.facebook??>
     <li>
-        <a target="_blank" href="https://www.facebook.com/${options.theme_anatole_sns_facebook}">
+        <a target="_blank" href="https://www.facebook.com/${settings.facebook}">
             <i class="fa fa-facebook"></i>
         </a>
     </li>
     </#if>
 
-    <#if options.theme_anatole_sns_instagram??>
+    <#if settings.instagram??>
     <li>
-        <a target="_blank" href="https://www.instagram.com/${options.theme_anatole_sns_instagram}">
+        <a target="_blank" href="https://www.instagram.com/${settings.instagram}">
             <i class="fa fa-instagram"></i>
         </a>
     </li>
     </#if>
 
-    <#if options.theme_anatole_sns_dribbble??>
+    <#if settings.dribbble??>
     <li>
-        <a target="_blank" href="https://dribbble.com/${options.theme_anatole_sns_dribbble}">
+        <a target="_blank" href="https://dribbble.com/${settings.dribbble}">
             <i class="fa fa-dribbble"></i>
         </a>
     </li>
     </#if>
 
-    <#if options.theme_anatole_sns_weibo??>
+    <#if settings.weibo??>
     <li>
-        <a target="_blank" href="https://weibo.com/${options.theme_anatole_sns_weibo}">
+        <a target="_blank" href="https://weibo.com/${settings.weibo}">
             <i class="fa fa-weibo"></i>
         </a>
     </li>
     </#if>
 
-    <#if options.theme_anatole_sns_qq??>
+    <#if settings.qq??>
         <li>
-            <a target="_blank" href="tencent://message/?uin=${options.theme_anatole_sns_qq}&Site=&Menu=yes">
+            <a target="_blank" href="tencent://message/?uin=${settings.qq}&Site=&Menu=yes">
                 <i class="fa fa-qq"></i>
             </a>
         </li>
     </#if>
 
-    <#if options.theme_anatole_sns_telegram??>
+    <#if settings.telegram??>
         <li>
-            <a target="_blank" href="https://t.me/${options.theme_anatole_sns_telegram}">
+            <a target="_blank" href="https://t.me/${settings.telegram}">
                 <i class="fa fa-telegram"></i>
             </a>
         </li>
     </#if>
 
-    <#if options.theme_anatole_sns_email??>
+    <#if settings.email??>
         <li>
-            <a target="_blank" href="mailto:${options.theme_anatole_sns_email}">
+            <a target="_blank" href="mailto:${settings.email}">
                 <i class="fa fa-envelope"></i>
             </a>
         </li>
     </#if>
 
-    <#if options.theme_anatole_sns_github??>
+    <#if settings.github??>
         <li>
-            <a target="_blank" href="https://github.com/${options.theme_anatole_sns_github}">
+            <a target="_blank" href="https://github.com/${settings.github}">
                 <i class="fa fa-github"></i>
             </a>
         </li>

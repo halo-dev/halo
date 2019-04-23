@@ -21,12 +21,12 @@
     <link href="/anatole/source/css/style.min.css" type="text/css" rel="stylesheet" />
     <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/feed.xml">
     <style>
-        <#if (options.anatole_style_post_title_lower!'true') == "false">
+        <#if !(settings.post_title_uppper!true)>
         .post .post-title h3 {
             text-transform: none;
         }
         </#if>
-        <#if (options.anatole_style_blog_title_lower!'true') == "false">
+        <#if !(settings.blog_title_uppper!true)>
         .sidebar .logo-title .title h3 {
             text-transform: none;
         }
@@ -37,12 +37,12 @@
             background-color: #eee;
         }
         ::-webkit-scrollbar-thumb {
-            background-color: ${options.anatole_style_scrollbar!'#3798e8'};
+            background-color: ${settings.scrollbar!'#3798e8'};
         }
         ::-webkit-scrollbar-track {
             background-color: #eee;
         }
-        ${options.anatole_style_self!}
+        ${settings.custom!}
     </style>
 </head>
 <body>

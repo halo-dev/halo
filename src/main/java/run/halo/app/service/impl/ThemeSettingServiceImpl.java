@@ -1,11 +1,14 @@
 package run.halo.app.service.impl;
 
+import freemarker.template.Configuration;
+import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.Item;
 import run.halo.app.model.entity.ThemeSetting;
@@ -31,11 +34,15 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
 
     private final ThemeService themeService;
 
+    private final Configuration configuration;
+
     public ThemeSettingServiceImpl(ThemeSettingRepository themeSettingRepository,
-                                   ThemeService themeService) {
+                                   ThemeService themeService,
+                                   Configuration configuration) {
         super(themeSettingRepository);
         this.themeSettingRepository = themeSettingRepository;
         this.themeService = themeService;
+        this.configuration = configuration;
     }
 
     @Override
@@ -94,6 +101,12 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
 
         // Save the settings
         settings.forEach((key, value) -> save(key, value.toString(), themeId));
+
+        try {
+            configuration.setSharedVariable("settings", listAsMapBy(themeService.getActivatedThemeId()));
+        } catch (TemplateModelException e) {
+            throw new ServiceException("Save theme settings error", e);
+        }
     }
 
     @Override

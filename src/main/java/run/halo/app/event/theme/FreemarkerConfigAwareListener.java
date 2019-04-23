@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.ThemeSettingService;
 
 import java.util.Map;
 
@@ -29,12 +30,16 @@ public class FreemarkerConfigAwareListener {
 
     private final ThemeService themeService;
 
+    private final ThemeSettingService themeSettingService;
+
     public FreemarkerConfigAwareListener(OptionService optionService,
                                          Configuration configuration,
-                                         ThemeService themeService) {
+                                         ThemeService themeService,
+                                         ThemeSettingService themeSettingService) {
         this.optionService = optionService;
         this.configuration = configuration;
         this.themeService = themeService;
+        this.themeSettingService = themeSettingService;
     }
 
     @Async
@@ -59,6 +64,8 @@ public class FreemarkerConfigAwareListener {
             Map<String, String> options = optionService.listOptions();
             log.debug("Set shared variable options: [{}]", options);
             configuration.setSharedVariable("options", options);
+            log.debug("Set shared variable theme settings: [{}]", options);
+            configuration.setSharedVariable("setting",themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         } catch (TemplateModelException e) {
             log.warn("Failed to configure freemarker", e);
         }
