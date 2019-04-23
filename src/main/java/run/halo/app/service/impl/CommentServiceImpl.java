@@ -5,6 +5,7 @@ import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.util.HtmlUtils;
+import run.halo.app.event.comment.CommentNewEvent;
+import run.halo.app.event.comment.CommentPassEvent;
+import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.model.dto.post.PostMinimalOutputDTO;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.Post;
@@ -57,13 +61,17 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
 
     private final OptionService optionService;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     public CommentServiceImpl(CommentRepository commentRepository,
                               PostRepository postRepository,
-                              OptionService optionService) {
+                              OptionService optionService,
+                              ApplicationEventPublisher eventPublisher) {
         super(commentRepository);
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.optionService = optionService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -91,7 +99,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     public Page<CommentWithPostVO> pageBy(CommentQuery commentQuery, Pageable pageable) {
         Assert.notNull(commentQuery, "Comment query must not be null");
         Assert.notNull(pageable, "Page info must not be null");
-        Page<Comment> commentPage =  commentRepository.findAll(buildSpecByQuery(commentQuery), pageable);
+        Page<Comment> commentPage = commentRepository.findAll(buildSpecByQuery(commentQuery), pageable);
         return convertBy(commentPage);
     }
 
@@ -178,6 +186,15 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         Comment createdComment = create(comment);
 
         // TODO Handle email sending
+
+        if (createdComment.getParentId() == null || createdComment.getParentId() == 0) {
+            // New comment
+            eventPublisher.publishEvent(new CommentNewEvent(this, createdComment.getId()));
+        } else {
+            // Reply comment
+            eventPublisher.publishEvent(new CommentReplyEvent(this, createdComment.getId()));
+        }
+
 
         return createdComment;
     }
@@ -287,7 +304,14 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
         comment.setStatus(status);
 
         // Update comment
-        return update(comment);
+        Comment updatedComment = update(comment);
+
+        if (CommentStatus.PUBLISHED.equals(status)) {
+            // Pass a comment
+            eventPublisher.publishEvent(new CommentPassEvent(this, commentId));
+        }
+
+        return updatedComment;
     }
 
     /**
