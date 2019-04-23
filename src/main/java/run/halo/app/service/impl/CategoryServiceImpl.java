@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.CategoryRepository;
@@ -18,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CategoryService implementation class
@@ -170,5 +172,17 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         removeById(categoryId);
         // Remove post categories
         postCategoryService.removeByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<CategoryDTO> convertTo(List<Category> categories) {
+        if (CollectionUtils.isEmpty(categories)) {
+            return Collections.emptyList();
+        }
+
+        return categories
+                .stream()
+                .map(category -> new CategoryDTO().<CategoryDTO>convertFrom(category))
+                .collect(Collectors.toList());
     }
 }

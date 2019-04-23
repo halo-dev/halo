@@ -4,7 +4,7 @@ import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.model.projection.TagPostCountProjection;
+import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.PostTagRepository;
 import run.halo.app.repository.TagRepository;
@@ -63,7 +63,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         List<Tag> tags = tagRepository.findAll(sort);
 
         // Find all post count
-        Map<Integer, Long> tagPostCountMap = ServiceUtils.convertToMap(postTagRepository.findPostCount(), TagPostCountProjection::getTagId, TagPostCountProjection::getCount);
+        Map<Integer, Long> tagPostCountMap = ServiceUtils.convertToMap(postTagRepository.findPostCount(), TagPostPostCountProjection::getTagId, TagPostPostCountProjection::getPostCount);
 
         // Find post count
         return tags.stream().map(

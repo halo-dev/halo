@@ -2,7 +2,9 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
+import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.service.base.CrudService;
@@ -49,4 +51,13 @@ public interface CategoryService extends CrudService<Category, Integer> {
      */
     @Transactional
     void removeCategoryAndPostCategoryBy(Integer categoryId);
+
+    /**
+     * Converts to category dto.
+     *
+     * @param categories category list
+     * @return a list of category dto
+     */
+    @NonNull
+    List<CategoryDTO> convertTo(@Nullable List<Category> categories);
 }

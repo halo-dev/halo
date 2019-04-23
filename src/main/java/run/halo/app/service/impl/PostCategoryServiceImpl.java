@@ -2,12 +2,16 @@ package run.halo.app.service.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.model.dto.CategoryDTO;
+import run.halo.app.model.dto.CategoryWithPostCountDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
+import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.repository.PostCategoryRepository;
 import run.halo.app.repository.PostRepository;
@@ -181,5 +185,26 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(categoryId, "Category id must not be null");
 
         return postCategoryRepository.deleteByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+
+        List<Category> categories = categoryRepository.findAll(sort);
+
+        // Query category post count
+        Map<Integer, Long> categoryPostCountMap = ServiceUtils.convertToMap(postCategoryRepository.findPostCount(), CategoryPostCountProjection::getCategoryId, CategoryPostCountProjection::getPostCount);
+
+        // Convert and return
+        return categories.stream()
+                .map(category -> {
+                    // Create category post count dto
+                    CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
+                    // Set post count
+                    categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+                    return categoryWithPostCountDTO;
+                })
+                .collect(Collectors.toList());
     }
 }
