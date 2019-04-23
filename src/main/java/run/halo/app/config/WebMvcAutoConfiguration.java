@@ -1,7 +1,6 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
@@ -78,7 +77,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/templates/themes/")
+                .addResourceLocations("classpath:/admin/")
                 .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/themes/");
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "upload/");
@@ -87,7 +86,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/backup/**")
                 .addResourceLocations(FILE_PROTOCOL + haloProperties.getWorkDir() + "backup/");
         registry.addResourceHandler("/admin/**")
-                .addResourceLocations("classpath:/static/admin/");
+                .addResourceLocations("classpath:/admin/");
 
         if (!haloProperties.isDocDisabled()) {
             // If doc is enable
