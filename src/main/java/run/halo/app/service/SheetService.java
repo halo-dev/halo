@@ -1,13 +1,12 @@
 package run.halo.app.service;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.post.SheetDetailDTO;
 import run.halo.app.model.dto.post.SheetListDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.service.base.CrudService;
+import run.halo.app.service.base.BasePostService;
 
 /**
  * Sheet service interface.
@@ -15,7 +14,7 @@ import run.halo.app.service.base.CrudService;
  * @author johnniang
  * @date 19-4-24
  */
-public interface SheetService extends CrudService<Sheet, Integer> {
+public interface SheetService extends BasePostService<Sheet> {
 
     /**
      * Creates a sheet.
@@ -35,25 +34,8 @@ public interface SheetService extends CrudService<Sheet, Integer> {
     @NonNull
     Sheet updateBy(@NonNull Sheet sheet);
 
-    /**
-     * Gets a page of sheet.
-     *
-     * @param pageable page info must not be null
-     * @return a page of sheet
-     */
-    @NonNull
-    Page<Sheet> pageBy(@NonNull Pageable pageable);
-
-    /**
-     * Gets sheet by post status and url.
-     *
-     * @param status post status must not be null
-     * @param url    sheet url must not be blank
-     * @return sheet info
-     */
-    @NonNull
-    Sheet getBy(@NonNull PostStatus status, @NonNull String url);
-
+    @Override
+    Sheet getBy(PostStatus status, String url);
 
     /**
      * Converts to detail dto.

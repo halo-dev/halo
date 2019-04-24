@@ -21,7 +21,6 @@ import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.service.CommentService;
 import run.halo.app.service.OptionService;
-import run.halo.app.service.base.BaseCommentServiceImpl;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ValidationUtils;
 
