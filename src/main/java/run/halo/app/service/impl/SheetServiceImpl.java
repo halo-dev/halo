@@ -11,7 +11,6 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.SheetDetailDTO;
 import run.halo.app.model.dto.post.SheetListDTO;
-import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.SheetRepository;
@@ -22,9 +21,8 @@ import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -37,13 +35,13 @@ import java.util.Set;
 public class SheetServiceImpl extends AbstractCrudService<Sheet, Integer> implements SheetService {
 
     private final SheetRepository sheetRepository;
+
     private final ApplicationEventPublisher eventPublisher;
 
-    public SheetServiceImpl(SheetRepository sheetRepository,
-                            ApplicationEventPublisher eventPublisher) {
     private final SheetCommentService sheetCommentService;
 
     public SheetServiceImpl(SheetRepository sheetRepository,
+                            ApplicationEventPublisher eventPublisher,
                             SheetCommentService sheetCommentService) {
         super(sheetRepository);
         this.sheetRepository = sheetRepository;
