@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.model.dto.post.SheetDetailDTO;
 import run.halo.app.model.dto.post.SheetListDTO;
 import run.halo.app.model.entity.Sheet;
@@ -72,8 +73,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         if (PostStatus.PUBLISHED.equals(status)) {
             // Log it
-            // TODO Fatal bug here
-//            eventPublisher.publishEvent(new PostVisitEvent(this, sheet.getId()));
+            eventPublisher.publishEvent(new SheetVisitEvent(this, sheet.getId()));
         }
 
         return sheet;
