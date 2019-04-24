@@ -141,11 +141,23 @@
             <a
               href="javascript:;"
               @click="onEditClick(post)"
+              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
             >编辑</a>
+            <a
+              href="javascript:;"
+              @click="onEditClick(post)"
+              v-if="post.status === 'RECYCLE'"
+            >还原</a>
             <a-divider type="vertical" />
             <a
               href="javascript:;"
               @click="deletePost(post.id)"
+              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
+            >回收站</a>
+            <a
+              href="javascript:;"
+              @click="deletePost(post.id)"
+              v-else-if="post.status === 'RECYCLE'"
             >删除</a>
           </span>
         </a-table>

@@ -99,9 +99,25 @@
                   slot="action"
                   slot-scope="text, sheet"
                 >
-                  <a href="javascript:;" @click="onEditClick(sheet)">编辑</a>
+                  <a
+                    href="javascript:;"
+                    @click="onEditClick(sheet)"
+                    v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
+                  >编辑</a>
+                  <a
+                    href="javascript:;"
+                    @click="onEditClick(sheet)"
+                    v-if="sheet.status === 'RECYCLE'"
+                  >还原</a>
                   <a-divider type="vertical" />
-                  <a href="javascript:;">删除</a>
+                  <a
+                    href="javascript:;"
+                    v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
+                  >回收站</a>
+                  <a
+                    href="javascript:;"
+                    v-else-if="sheet.status === 'RECYCLE'"
+                  >删除</a>
                 </span>
               </a-table>
             </a-tab-pane>
