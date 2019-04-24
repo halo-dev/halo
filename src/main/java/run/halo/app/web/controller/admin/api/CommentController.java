@@ -1,25 +1,18 @@
 package run.halo.app.web.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.CommentDTO;
 import run.halo.app.model.entity.Comment;
-import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentParam;
 import run.halo.app.model.params.CommentQuery;
-import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.vo.CommentWithPostVO;
 import run.halo.app.service.CommentService;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
-import run.halo.app.utils.ValidationUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -36,16 +29,8 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    private final PostService postService;
-
-    private final OptionService optionService;
-
-    public CommentController(CommentService commentService,
-                             PostService postService,
-                             OptionService optionService) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
-        this.postService = postService;
-        this.optionService = optionService;
     }
 
     @GetMapping
@@ -68,24 +53,9 @@ public class CommentController {
     }
 
     @PostMapping
-    public CommentDTO createBy(@RequestBody CommentParam commentParam, HttpServletRequest request, User user) {
-        // Set some default info
-        commentParam.setAuthor(StringUtils.isEmpty(user.getNickname()) ? user.getUsername() : user.getNickname());
-        commentParam.setEmail(user.getEmail());
-        commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
-
-        // Validate the comment param manually
-        ValidationUtils.validate(commentParam);
-
-        // Check post id
-        postService.mustExistById(commentParam.getPostId());
-
-        // Check parent id
-        if (commentParam.getParentId() != null && commentParam.getParentId() > 0) {
-            commentService.mustExistById(commentParam.getParentId());
-        }
-
-        return new CommentDTO().convertFrom(commentService.createBy(commentParam.convertTo(), request));
+    @ApiOperation("Creates a comment (new or reply)")
+    public CommentDTO createBy(@RequestBody CommentParam commentParam) {
+        return new CommentDTO().convertFrom(commentService.createBy(commentParam));
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")

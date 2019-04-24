@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -104,5 +105,15 @@ public class ServiceUtils {
         list.forEach(data -> resultMap.putIfAbsent(keyFunction.apply(data), valueFunction.apply(data)));
 
         return resultMap;
+    }
+
+    /**
+     * Checks if the given number id is empty id.
+     *
+     * @param id the given number id
+     * @return true if the given number id is empty id; false otherwise
+     */
+    public static boolean isEmptyId(@Nullable Number id) {
+        return id == null || id.longValue() <= 0;
     }
 }
