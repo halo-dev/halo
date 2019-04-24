@@ -20,7 +20,7 @@ import java.util.List;
  * @date : 2019-03-21
  */
 @Controller
-public class ContentPageController {
+public class ContentSheetController {
 
 
     private final PostService postService;
@@ -29,9 +29,9 @@ public class ContentPageController {
 
     private final ThemeService themeService;
 
-    public ContentPageController(PostService postService,
-                                 CommentService commentService,
-                                 ThemeService themeService) {
+    public ContentSheetController(PostService postService,
+                                  CommentService commentService,
+                                  ThemeService themeService) {
         this.postService = postService;
         this.commentService = commentService;
         this.themeService = themeService;
@@ -64,8 +64,8 @@ public class ContentPageController {
      * @param model model
      * @return template path: themes/{theme}/post
      */
-    @GetMapping(value = "/p/{url}")
-    public String getPage(@PathVariable(value = "url") String url,
+    @GetMapping(value = "/s/{url}")
+    public String sheet(@PathVariable(value = "url") String url,
                           @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                           Model model) {
         final Post post = postService.getByUrl(url);
@@ -102,6 +102,6 @@ public class ContentPageController {
 //        if (StrUtil.isNotEmpty(post.getCustomTpl())) {
 //            return this.render(post.getCustomTpl());
 //        }
-        return themeService.render("page");
+        return themeService.render("sheet");
     }
 }
