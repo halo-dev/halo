@@ -137,6 +137,7 @@ public class SheetServiceImpl extends AbstractCrudService<Sheet, Integer> implem
         // The sheet will be updated
         // Set edit time
         sheet.setEditTime(DateUtils.now());
+
         // Update it
         return update(sheet);
     }
