@@ -61,11 +61,11 @@ public class FreemarkerConfigAwareListener {
             ThemeProperty activatedTheme = themeActivatedEvent.getThemeProperty();
             log.debug("Set shared variable theme: [{}]", activatedTheme);
             configuration.setSharedVariable("theme", activatedTheme);
-            Map<String, String> options = optionService.listOptions();
+            Map<String, Object> options = optionService.listOptions();
             log.debug("Set shared variable options: [{}]", options);
             configuration.setSharedVariable("options", options);
             log.debug("Set shared variable theme settings: [{}]", options);
-            configuration.setSharedVariable("setting",themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
+            configuration.setSharedVariable("settings",themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         } catch (TemplateModelException e) {
             log.warn("Failed to configure freemarker", e);
         }

@@ -15,7 +15,7 @@ import run.halo.app.service.CommentService;
  * @author johnniang
  * @date 4/3/19
  */
-@RestController("PortalCommentController")
+@RestController("ApiContentCommentController")
 @RequestMapping("/api/comments")
 public class CommentController {
 

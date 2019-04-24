@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author johnniang
  * @date 4/3/19
  */
-@RestController("PortalUserController")
+@RestController("ApiContentUserController")
 @RequestMapping("/api/users")
 public class UserController {
 

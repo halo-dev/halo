@@ -44,7 +44,7 @@ public class Gallery extends BaseEntity {
     /**
      * Shooting time / creation time.
      */
-    @Column(name = "take_time", columnDefinition = "timestamp not null")
+    @Column(name = "take_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date takeTime;
 

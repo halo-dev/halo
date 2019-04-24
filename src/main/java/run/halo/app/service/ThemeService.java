@@ -33,7 +33,7 @@ public interface ThemeService {
     /**
      * Configuration file name.
      */
-    String[] OPTIONS_NAMES = {"options.yaml", "options.yml"};
+    String[] SETTINGS_NAMES = {"settings.yaml", "settings.yml"};
 
     /**
      * The type of file that can be modified.
@@ -43,7 +43,7 @@ public interface ThemeService {
     /**
      * These file names cannot be displayed.
      */
-    String[] FILTER_FILES = {".git", ".DS_Store", "theme.yaml", "theme.yml", "options.yaml", "option.yml"};
+    String[] FILTER_FILES = {".git", ".DS_Store", "theme.yaml", "theme.yml", "settings.yaml", "settings.yml"};
 
     /**
      * Theme folder location.

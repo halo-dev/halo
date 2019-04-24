@@ -124,7 +124,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public Map<String, String> listOptions() {
+    public Map<String, Object> listOptions() {
         return ServiceUtils.convertToMap(listAll(), Option::getKey, Option::getValue);
     }
 

@@ -15,7 +15,7 @@
             </li>
         </div>
         <div class="avatar">
-            <img src="${settings.icon!'/anatole/source/images/logo.png'}" />
+            <img src="${settings.icon!'/${theme.folderName}/source/images/logo.png'}" />
         </div>
     </div>
 </div>
