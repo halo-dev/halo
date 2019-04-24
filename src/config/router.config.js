@@ -52,45 +52,45 @@ export const asyncRouterMap = [
         ]
       },
 
-      // pages
+      // sheets
       {
-        path: '/pages',
-        name: 'Pages',
+        path: '/sheets',
+        name: 'Sheets',
         component: PageView,
-        redirect: '/pages/list',
+        redirect: '/sheets/list',
         meta: { title: '页面', icon: 'read' },
         children: [
           {
-            path: '/pages/list',
-            name: 'PageList',
-            component: () => import('@/views/page/PageList'),
+            path: '/sheets/list',
+            name: 'SheetList',
+            component: () => import('@/views/sheet/SheetList'),
             meta: { title: '所有页面', hiddenHeaderContent: false }
           },
           {
-            path: '/pages/write',
-            name: 'PageEdit',
-            component: () => import('@/views/page/PageEdit'),
+            path: '/sheets/write',
+            name: 'SheetEdit',
+            component: () => import('@/views/sheet/SheetEdit'),
             meta: { title: '新建页面', hiddenHeaderContent: false }
           },
           {
-            path: '/pages/links',
+            path: '/sheets/links',
             name: 'LinkList',
             hidden: true,
-            component: () => import('@/views/page/internal/LinkList'),
+            component: () => import('@/views/sheet/internal/LinkList'),
             meta: { title: '友情链接', hiddenHeaderContent: false }
           },
           {
-            path: '/pages/galleries',
+            path: '/sheets/galleries',
             name: 'GalleryList',
             hidden: true,
-            component: () => import('@/views/page/internal/GalleryList'),
+            component: () => import('@/views/sheet/internal/GalleryList'),
             meta: { title: '图库', hiddenHeaderContent: false }
           },
           {
-            path: '/pages/journals',
+            path: '/sheets/journals',
             name: 'JournalList',
             hidden: true,
-            component: () => import('@/views/page/internal/JournalList'),
+            component: () => import('@/views/sheet/internal/JournalList'),
             meta: { title: '日志', hiddenHeaderContent: false }
           }
         ]

@@ -21,6 +21,7 @@
           <mavon-editor
             v-model="postToStage.originalContent"
             :boxShadow="false"
+            :toolbars="toolbars"
             :ishljs="true"
           />
         </div>
@@ -168,7 +169,6 @@ import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
-
 const toolbars = {
   bold: true, // 粗体
   italic: true, // 斜体
@@ -182,9 +182,12 @@ const toolbars = {
   imagelink: true, // 图片链接
   code: true, // code
   table: true, // 表格
+  fullscreen: true, // 全屏编辑
   readmodel: true, // 沉浸式阅读
+  htmlcode: true, // 展示html源码
   undo: true, // 上一步
   redo: true, // 下一步
+  trash: true, // 清空
   navigation: true, // 导航目录
   subfield: true, // 单双栏模式
   preview: true // 预览
@@ -214,7 +217,7 @@ export default {
       categories: [],
       selectedCategoryIds: [],
       selectedTagIds: [],
-      markdownOption: toolbars,
+      toolbars: toolbars,
       postToStage: {}
     }
   },
