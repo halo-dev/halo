@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.post.SheetDetailDTO;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.base.CrudService;
 
 /**
@@ -50,4 +51,14 @@ public interface SheetService extends CrudService<Sheet, Integer> {
      */
     @NonNull
     SheetDetailDTO convertToDetailDto(@NonNull Sheet sheet);
+
+    /**
+     * Gets sheet by post status and url.
+     *
+     * @param status post status must not be null
+     * @param url    sheet url must not be blank
+     * @return sheet info
+     */
+    @NonNull
+    Sheet getBy(@NonNull PostStatus status, @NonNull String url);
 }
