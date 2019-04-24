@@ -8,20 +8,23 @@ package run.halo.app.model.properties;
  */
 public enum PrimaryProperties implements PropertyEnum {
 
-    IS_INSTALLED("is_installed", Boolean.class),
+    IS_INSTALLED("is_installed", Boolean.class, ""),
 
-    THEME("theme", String.class),
+    THEME("theme", String.class, ""),
 
-    BIRTHDAY("birthday", Long.class),
+    BIRTHDAY("birthday", Long.class, ""),
     ;
 
     private final String value;
 
     private final Class<?> type;
 
-    PrimaryProperties(String value, Class<?> type) {
+    private final String defaultValue;
+
+    PrimaryProperties(String value, Class<?> type, String defaultValue) {
         this.value = value;
         this.type = type;
+        this.defaultValue = defaultValue;
     }
 
     @Override
@@ -30,6 +33,12 @@ public enum PrimaryProperties implements PropertyEnum {
     }
 
     @Override
+    public String defaultValue() {
+        return defaultValue;
+    }
+
+    @Override
     public String getValue() {
         return value;
-    }}
+    }
+}

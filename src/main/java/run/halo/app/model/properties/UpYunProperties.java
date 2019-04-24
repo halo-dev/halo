@@ -8,23 +8,26 @@ package run.halo.app.model.properties;
  */
 public enum UpYunProperties implements PropertyEnum {
 
-    OSS_SOURCE("oss_upyun_source", String.class),
+    OSS_SOURCE("oss_upyun_source", String.class, ""),
 
-    OSS_PASSWORD("oss_upyun_password", String.class),
+    OSS_PASSWORD("oss_upyun_password", String.class, ""),
 
-    OSS_BUCKET("oss_upyun_bucket", String.class),
+    OSS_BUCKET("oss_upyun_bucket", String.class, ""),
 
-    OSS_DOMAIN("oss_upyun_domain", String.class),
+    OSS_DOMAIN("oss_upyun_domain", String.class, ""),
 
-    OSS_OPERATOR("oss_upyun_operator", String.class),
+    OSS_OPERATOR("oss_upyun_operator", String.class, ""),
 
-    OSS_SMALL_URL("oss_upyun_small_url", String.class);
+    OSS_SMALL_URL("oss_upyun_small_url", String.class, "");
 
     private String value;
 
     private Class<?> type;
 
-    UpYunProperties(String value, Class<?> type) {
+    private final String defaultValue;
+
+    UpYunProperties(String value, Class<?> type, String defaultValue) {
+        this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);
         }
@@ -33,10 +36,14 @@ public enum UpYunProperties implements PropertyEnum {
         this.type = type;
     }
 
-
     @Override
     public Class<?> getType() {
         return type;
+    }
+
+    @Override
+    public String defaultValue() {
+        return defaultValue;
     }
 
     @Override

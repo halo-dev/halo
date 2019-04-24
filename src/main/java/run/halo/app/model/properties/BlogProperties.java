@@ -9,38 +9,41 @@ public enum BlogProperties implements PropertyEnum {
     /**
      * Blog locale.
      */
-    BLOG_LOCALE("blog_locale", String.class),
+    BLOG_LOCALE("blog_locale", String.class, ""),
 
     /**
      * Blog title.
      */
-    BLOG_TITLE("blog_title", String.class),
+    BLOG_TITLE("blog_title", String.class, ""),
 
     /**
      * Blog logo.
      */
-    BLOG_LOGO("blog_logo", String.class),
+    BLOG_LOGO("blog_logo", String.class, ""),
 
     /**
      * Blog url.
      */
-    BLOG_URL("blog_url", String.class),
+    BLOG_URL("blog_url", String.class, ""),
 
     /**
      * Blog favicon.
      */
-    BLOG_FAVICON("blog_favicon", String.class),
+    BLOG_FAVICON("blog_favicon", String.class, ""),
 
     /**
      * Blog footer info.
      */
-    BLOG_FOOTER_INFO("blog_footer_info", String.class);
+    BLOG_FOOTER_INFO("blog_footer_info", String.class, "");
 
-    private String value;
+    private final String value;
 
-    private Class<?> type;
+    private final Class<?> type;
 
-    BlogProperties(String value, Class<?> type) {
+    private final String defaultValue;
+
+    BlogProperties(String value, Class<?> type, String defaultValue) {
+        this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);
         }
@@ -62,6 +65,11 @@ public enum BlogProperties implements PropertyEnum {
     @Override
     public Class<?> getType() {
         return type;
+    }
+
+    @Override
+    public String defaultValue() {
+        return defaultValue;
     }
 
 }

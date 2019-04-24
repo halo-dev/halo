@@ -1,9 +1,16 @@
 package run.halo.app.model.properties;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.model.enums.ValueEnum;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Property enum.
@@ -16,18 +23,15 @@ public interface PropertyEnum extends ValueEnum<String> {
     /**
      * Converts to value with corresponding type
      *
-     * @param value string value must not be null
+     * @param value string value must not be blank
      * @param type  property value type must not be null
      * @param <T>   property value type
      * @return property value
      */
     @SuppressWarnings("unchecked")
     static <T> T convertTo(@NonNull String value, @NonNull Class<T> type) {
-        Assert.hasText(value, "Property value must not be blank");
-
-        if (!isSupportedType(type)) {
-            throw new IllegalArgumentException("Unsupported blog property type: " + type);
-        }
+        Assert.hasText(value, "Value must not be null");
+        Assert.notNull(type, "Type must not be null");
 
         if (type.isAssignableFrom(String.class)) {
             return (T) value;
@@ -63,6 +67,36 @@ public interface PropertyEnum extends ValueEnum<String> {
 
         // Should never happen
         throw new UnsupportedOperationException("Unsupported convention for blog property type:" + type.getName() + " provided");
+    }
+
+    /**
+     * Converts to value with corresponding type
+     *
+     * @param value        value
+     * @param propertyEnum property enum must not be null
+     * @return property value
+     */
+    @SuppressWarnings("unchecked")
+    static Object convertTo(@Nullable String value, @NonNull PropertyEnum propertyEnum) {
+        Assert.notNull(propertyEnum, "Property enum must not be null");
+
+        if (StringUtils.isBlank(value)) {
+            // Set default value
+            value = propertyEnum.defaultValue();
+        }
+
+        try {
+            if (propertyEnum.getType().isAssignableFrom(Enum.class)) {
+                Class<Enum> type = (Class<Enum>) propertyEnum.getType();
+                Enum result = convertToEnum(value, type);
+                return result != null ? result : value;
+            }
+
+            return convertTo(value, propertyEnum.getType());
+        } catch (Exception e) {
+            // Return value
+            return value;
+        }
     }
 
     /**
@@ -107,10 +141,45 @@ public interface PropertyEnum extends ValueEnum<String> {
         );
     }
 
+    static Map<String, PropertyEnum> getValuePropertyEnumMap() {
+        // Get all properties
+        List<Class<? extends PropertyEnum>> propertyEnumClasses = new LinkedList<>();
+        propertyEnumClasses.add(AliYunProperties.class);
+        propertyEnumClasses.add(AttachmentProperties.class);
+        propertyEnumClasses.add(BlogProperties.class);
+        propertyEnumClasses.add(CommentProperties.class);
+        propertyEnumClasses.add(EmailProperties.class);
+        propertyEnumClasses.add(OtherProperties.class);
+        propertyEnumClasses.add(PostProperties.class);
+        propertyEnumClasses.add(PrimaryProperties.class);
+        propertyEnumClasses.add(QnYunProperties.class);
+        propertyEnumClasses.add(SeoProperties.class);
+        propertyEnumClasses.add(UpYunProperties.class);
+
+        Map<String, PropertyEnum> result = new HashMap<>();
+
+        propertyEnumClasses.forEach(propertyEnumClass -> {
+            PropertyEnum[] propertyEnums = propertyEnumClass.getEnumConstants();
+
+            for (PropertyEnum propertyEnum : propertyEnums) {
+                result.put(propertyEnum.getValue(), propertyEnum);
+            }
+        });
+
+        return result;
+    }
+
     /**
      * Get property type.
      *
      * @return property type
      */
     Class<?> getType();
+
+    /**
+     * Default value.
+     *
+     * @return default value
+     */
+    String defaultValue();
 }

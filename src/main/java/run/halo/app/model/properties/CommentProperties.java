@@ -8,36 +8,44 @@ package run.halo.app.model.properties;
  */
 public enum CommentProperties implements PropertyEnum {
 
-    GAVATAR_DEFAULT("comment_gavatar_default", String.class),
+    GAVATAR_DEFAULT("comment_gavatar_default", String.class, ""),
 
-    NEW_NEED_CHECK("comment_new_need_check", Boolean.class),
+    NEW_NEED_CHECK("comment_new_need_check", Boolean.class, ""),
 
-    NEW_NOTICE("comment_new_notice", Boolean.class),
+    NEW_NOTICE("comment_new_notice", Boolean.class, ""),
 
-    PASS_NOTICE("comment_pass_notice", Boolean.class),
+    PASS_NOTICE("comment_pass_notice", Boolean.class, ""),
 
-    REPLY_NOTICE("comment_reply_notice", Boolean.class),
+    REPLY_NOTICE("comment_reply_notice", Boolean.class, ""),
 
-    API_ENABLED("comment_api_enabled", Boolean.class),
+    API_ENABLED("comment_api_enabled", Boolean.class, ""),
 
-    PAGE_SIZE("comment_page_size", Integer.class),
+    PAGE_SIZE("comment_page_size", Integer.class, ""),
 
-    CONTENT_PLACEHOLDER("comment_content_placeholder", String.class),
+    CONTENT_PLACEHOLDER("comment_content_placeholder", String.class, ""),
 
-    CUSTOM_STYLE("comment_custom_style", String.class);
+    CUSTOM_STYLE("comment_custom_style", String.class, "");
 
     private final String value;
 
     private final Class<?> type;
+    
+    private final String defaultValue;
 
-    CommentProperties(String value, Class<?> type) {
+    CommentProperties(String value, Class<?> type, String defaultValue) {
         this.value = value;
         this.type = type;
+        this.defaultValue = defaultValue;
     }
 
     @Override
     public Class<?> getType() {
         return type;
+    }
+
+    @Override
+    public String defaultValue() {
+        return defaultValue;
     }
 
     @Override

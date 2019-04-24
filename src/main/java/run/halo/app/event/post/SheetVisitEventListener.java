@@ -18,7 +18,6 @@ public class SheetVisitEventListener extends AbstractVisitEventListener {
 
     @Async
     @EventListener
-
     public void onSheetVisitEvent(SheetVisitEvent event) throws InterruptedException {
         handleVisitEvent(event);
     }

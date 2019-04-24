@@ -2,35 +2,40 @@ package run.halo.app.model.properties;
 
 /**
  * AliYun properties.
+ *
  * @author MyFaith
  * @date 2019-04-04 00:00:56
  */
-public enum  AliYunProperties implements PropertyEnum {
+public enum AliYunProperties implements PropertyEnum {
 
     /**
      * Aliyun oss endpoint.
      */
-    OSS_ENDPOINT("oss_aliyun_endpoint", String.class),
+    OSS_ENDPOINT("oss_aliyun_endpoint", String.class, ""),
 
     /**
      * Aliyun oss bucket name.
      */
-    OSS_BUCKET_NAME("oss_aliyun_bucket_name", String.class),
+    OSS_BUCKET_NAME("oss_aliyun_bucket_name", String.class, ""),
 
     /**
      * Aliyun oss access key.
      */
-    OSS_ACCESS_KEY("oss_aliyun_access_key", String.class),
+    OSS_ACCESS_KEY("oss_aliyun_access_key", String.class, ""),
 
     /**
      * Aliyun oss access secret.
      */
-    OSS_ACCESS_SECRET("oss_aliyun_access_secret", String.class);
+    OSS_ACCESS_SECRET("oss_aliyun_access_secret", String.class, "");
 
-    private String value;
-    private Class<?> type;
+    private final String value;
 
-    AliYunProperties(String value, Class<?> type) {
+    private final Class<?> type;
+
+    private final String defaultValue;
+
+    AliYunProperties(String value, Class<?> type, String defaultValue) {
+        this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);
         }
@@ -42,6 +47,11 @@ public enum  AliYunProperties implements PropertyEnum {
     @Override
     public Class<?> getType() {
         return type;
+    }
+
+    @Override
+    public String defaultValue() {
+        return defaultValue;
     }
 
     @Override
