@@ -23,7 +23,7 @@ import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
-import run.halo.app.web.controller.support.PageJacksonSerializer;
+import run.halo.app.controller.support.PageJacksonSerializer;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "run.halo.app.web.controller")
+@ComponentScan(basePackages = "run.halo.app.controller")
 @PropertySource(value = "classpath:application.yaml", ignoreResourceNotFound = true, encoding = "UTF-8")
 public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 

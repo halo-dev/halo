@@ -64,7 +64,7 @@ public class SwaggerConfiguration {
         log.debug("Doc disabled: [{}]", haloProperties.isDocDisabled());
         // TODO Build with different security configuration
         return buildApiDocket("run.halo.app.content.api",
-                "run.halo.app.web.controller.content.api",
+                "run.halo.app.controller.content.api",
                 "/api/**")
                 .enable(!haloProperties.isDocDisabled());
     }
@@ -74,7 +74,7 @@ public class SwaggerConfiguration {
         log.debug("Doc disabled: [{}]", haloProperties.isDocDisabled());
         // TODO Build with different security configuration
         return buildApiDocket("run.halo.app.admin",
-                "run.halo.app.web.controller.admin",
+                "run.halo.app.controller.admin",
                 "/api/admin/**")
                 .enable(!haloProperties.isDocDisabled());
     }
