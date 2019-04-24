@@ -80,6 +80,7 @@
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
           :dataSource="formattedDatas"
+          :loading="listLoading"
         >
           <a-list-item
             slot="renderItem"
@@ -161,6 +162,7 @@ export default {
   data() {
     return {
       attachmentType: attachmentApi.type,
+      listLoading: true,
       uploadVisible: false,
       selectAttachment: {},
       attachments: [],
@@ -203,9 +205,11 @@ export default {
       if (isSearch) {
         this.queryParam.page = 0
       }
+      this.listLoading = true
       attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
+        this.listLoading = false
       })
     },
     loadMediaTypes() {
