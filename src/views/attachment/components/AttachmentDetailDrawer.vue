@@ -121,6 +121,18 @@
     <a-divider />
     <div class="bottom-control">
       <a-popconfirm
+        title="你确定要添加到图库？"
+        @confirm="handleAddToGallery"
+        okText="确定"
+        cancelText="取消"
+        v-if="addToGallery"
+      >
+        <a-button
+          type="dashed"
+          style="marginRight: 8px"
+        >添加到图库</a-button>
+      </a-popconfirm>
+      <a-popconfirm
         title="你确定要删除该附件？"
         @confirm="deleteAttachment"
         okText="确定"
@@ -135,6 +147,7 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import attachmentApi from '@/api/attachment'
+import galleryApi from '@/api/gallery'
 
 export default {
   name: 'AttachmentDetailDrawer',
@@ -142,7 +155,8 @@ export default {
   data() {
     return {
       detailLoading: true,
-      editable: false
+      editable: false,
+      gallery: {}
     }
   },
   model: {
@@ -153,6 +167,11 @@ export default {
     attachment: {
       type: Object,
       required: true
+    },
+    addToGallery: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     visiable: {
       type: Boolean,
@@ -219,6 +238,18 @@ export default {
           console.log('copy.err', err)
           this.$message.error('复制失败')
         })
+    },
+    handleAddToGallery() {
+      this.gallery['name'] = this.attachment.name
+      this.gallery['thumbnail'] = this.attachment.thumbPath
+      this.gallery['url'] = this.attachment.path
+      this.gallery['description'] = ''
+      this.gallery['takeTime'] = ''
+      this.gallery['location'] = ''
+      this.gallery['team'] = ''
+      galleryApi.create(this.gallery).then(response => {
+        this.$message.success('添加成功！')
+      })
     },
     onClose() {
       this.$emit('close', false)

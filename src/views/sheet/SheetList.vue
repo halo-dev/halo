@@ -46,11 +46,6 @@
                   slot="action"
                   slot-scope="text, record"
                 >
-                  <a
-                    href="javascript:;"
-                    @click="viewPage(record.id)"
-                  >查看</a>
-                  <a-divider type="vertical" />
                   <router-link
                     :to="{name:'LinkList'}"
                     v-if="record.id==1"
@@ -69,6 +64,11 @@
                   >
                     <a href="javascript:void(0);">编辑</a>
                   </router-link>
+                  <a-divider type="vertical" />
+                  <a
+                    href="javascript:;"
+                    @click="viewPage(record.id)"
+                  >查看</a>
                 </span>
               </a-table>
             </a-tab-pane>
