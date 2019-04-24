@@ -58,7 +58,12 @@ public class SheetController {
     public SheetDetailDTO updateBy(
             @PathVariable("sheetId") Integer sheetId,
             @RequestBody @Valid SheetParam sheetParam) {
-        Sheet sheet = sheetService.updateBy(sheetParam.convertTo());
+        Sheet sheetToUpdate = sheetService.getById(sheetId);
+
+        sheetParam.update(sheetToUpdate);
+
+        Sheet sheet = sheetService.updateBy(sheetToUpdate);
+
         return sheetService.convertToDetailDto(sheet);
     }
 

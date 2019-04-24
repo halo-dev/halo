@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.post.PostMinimalDTO;
 import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
@@ -105,6 +106,19 @@ public class PostController {
         postParam.update(postToUpdate);
 
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds());
+    }
+
+    @PutMapping("{postId:\\d+}/{status}")
+    public void updateStatusBy(
+            @PathVariable("postId") Integer postId,
+            @PathVariable("status") PostStatus status) {
+        Post post = postService.getById(postId);
+
+        // Set status
+        post.setStatus(status);
+
+        // Update
+        postService.update(post);
     }
 
     @DeleteMapping("{postId:\\d+}")
