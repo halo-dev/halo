@@ -1,6 +1,6 @@
 package run.halo.app.repository;
 
-import run.halo.app.model.entity.Page;
+import run.halo.app.model.entity.Sheet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +19,14 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class PageRepositoryTest {
+public class SheetRepositoryTest {
 
     @Autowired
-    private PageRepository pageRepository;
+    private SheetRepository sheetRepository;
 
     @Test
     public void listAllTest() {
-        List<Page> allPages = pageRepository.findAll();
-        System.out.println(allPages);
+        List<Sheet> allSheets = sheetRepository.findAll();
+        System.out.println(allSheets);
     }
 }

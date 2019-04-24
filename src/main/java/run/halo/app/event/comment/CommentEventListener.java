@@ -15,7 +15,6 @@ import run.halo.app.service.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Comment event listener.
