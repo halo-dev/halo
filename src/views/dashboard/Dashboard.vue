@@ -1,7 +1,13 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24">
+      <a-col
+        :xl="8"
+        :lg="8"
+        :md="12"
+        :sm="24"
+        :xs="24"
+      >
         <a-card
           :loading="postLoading"
           :bordered="false"
@@ -14,16 +20,28 @@
             :dataSource="formattedPostData"
             :pagination="false"
           >
-            <span slot="status" slot-scope="status">
-              <a-badge :status="status.status"/>
+            <span
+              slot="status"
+              slot-scope="status"
+            >
+              <a-badge :status="status.status" />
               {{ status.text }}
             </span>
 
-            <span slot="editTime" slot-scope="editTime">{{ editTime | timeAgo }}</span>
+            <span
+              slot="editTime"
+              slot-scope="editTime"
+            >{{ editTime | timeAgo }}</span>
           </a-table>
         </a-card>
       </a-col>
-      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24">
+      <a-col
+        :xl="8"
+        :lg="8"
+        :md="12"
+        :sm="24"
+        :xs="24"
+      >
         <a-card
           :loading="commentLoading"
           :bordered="false"
@@ -38,7 +56,13 @@
           ></a-table>
         </a-card>
       </a-col>
-      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24">
+      <a-col
+        :xl="8"
+        :lg="8"
+        :md="12"
+        :sm="24"
+        :xs="24"
+      >
         <a-card
           :loading="commentLoading"
           :bordered="false"

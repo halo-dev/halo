@@ -8,34 +8,62 @@
       destroyOnClose
       @close="onClose"
     >
-      <a-row type="flex" align="middle">
-        <a-input-search placeholder="搜索附件" enterButton/>
+      <a-row
+        type="flex"
+        align="middle"
+      >
+        <a-input-search
+          placeholder="搜索附件"
+          enterButton
+        />
       </a-row>
-      <a-divider/>
-      <a-row type="flex" align="middle">
-        <a-skeleton active :loading="skeletonLoading" :paragraph="{ rows: 18 }">
+      <a-divider />
+      <a-row
+        type="flex"
+        align="middle"
+      >
+        <a-skeleton
+          active
+          :loading="skeletonLoading"
+          :paragraph="{ rows: 18 }"
+        >
           <a-col :span="24">
-            <div class="attach-item" v-for="(item, index) in attachments" :key="index" @click="selectAttachment(item)">
+            <div
+              class="attach-item"
+              v-for="(item, index) in attachments"
+              :key="index"
+              @click="selectAttachment(item)"
+            >
               <img :src="item.thumbPath">
             </div>
           </a-col>
         </a-skeleton>
       </a-row>
-      <a-divider/>
-      <a-row type="flex" justify="end">
+      <a-divider />
+      <a-row
+        type="flex"
+        justify="end"
+      >
         <a-pagination
           :defaultPageSize="pagination.size"
           :total="pagination.total"
           @change="handlePaginationChange"
         ></a-pagination>
       </a-row>
-      <a-divider/>
+      <a-divider />
       <div class="bottom-control">
-        <a-button @click="showUploadModal" type="primary">上传附件</a-button>
+        <a-button
+          @click="showUploadModal"
+          type="primary"
+        >上传附件</a-button>
       </div>
     </a-drawer>
 
-    <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
+    <a-modal
+      title="上传附件"
+      v-model="uploadVisible"
+      :footer="null"
+    >
       <upload
         name="file"
         multiple
@@ -44,7 +72,7 @@
         @success="handleAttachmentUploadSuccess"
       >
         <p class="ant-upload-drag-icon">
-          <a-icon type="inbox"/>
+          <a-icon type="inbox" />
         </p>
         <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
         <p class="ant-upload-hint">支持单个或批量上传</p>

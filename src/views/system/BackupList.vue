@@ -4,48 +4,102 @@
       <a-tabs type="card">
         <a-tab-pane key="1">
           <span slot="tab">
-            <a-icon type="folder"/>资源文件备份
+            <a-icon type="folder" />资源文件备份
           </span>
-          <a-table :columns="columns" :dataSource="ResourcesData">
-            <span slot="action" slot-scope="text, record">
-              <a href="javascript:;" @click="downResources('ResourcesData',record.id)">下载</a>
-              <a-divider type="vertical"/>
-              <a href="javascript:;" @click="sendResources('ResourcesData',record.id)">发送到邮箱</a>
-              <a-divider type="vertical"/>
-              <a href="javascript:;" @click="deleteResources('ResourcesData',record.id)">删除</a>
+          <a-table
+            :columns="columns"
+            :dataSource="ResourcesData"
+          >
+            <span
+              slot="action"
+              slot-scope="text, record"
+            >
+              <a
+                href="javascript:;"
+                @click="downResources('ResourcesData',record.id)"
+              >下载</a>
+              <a-divider type="vertical" />
+              <a
+                href="javascript:;"
+                @click="sendResources('ResourcesData',record.id)"
+              >发送到邮箱</a>
+              <a-divider type="vertical" />
+              <a
+                href="javascript:;"
+                @click="deleteResources('ResourcesData',record.id)"
+              >删除</a>
             </span>
           </a-table>
-          <a-button type="primary" @click="backupData('ResourcesData')">备份</a-button>
+          <a-button
+            type="primary"
+            @click="backupData('ResourcesData')"
+          >备份</a-button>
         </a-tab-pane>
         <a-tab-pane key="2">
           <span slot="tab">
-            <a-icon type="database"/>资源文件备份
+            <a-icon type="database" />资源文件备份
           </span>
-          <a-table :columns="columns" :dataSource="DataBaseData">
-            <span slot="action" slot-scope="text, record">
-              <a href="javascript:;" @click="downResources('DataBaseData',record.id)">下载</a>
-              <a-divider type="vertical"/>
-              <a href="javascript:;" @click="sendResources('DataBaseData',record.id)">发送到邮箱</a>
-              <a-divider type="vertical"/>
-              <a href="javascript:;" @click="deleteResources('DataBaseData',record.id)">删除</a>
+          <a-table
+            :columns="columns"
+            :dataSource="DataBaseData"
+          >
+            <span
+              slot="action"
+              slot-scope="text, record"
+            >
+              <a
+                href="javascript:;"
+                @click="downResources('DataBaseData',record.id)"
+              >下载</a>
+              <a-divider type="vertical" />
+              <a
+                href="javascript:;"
+                @click="sendResources('DataBaseData',record.id)"
+              >发送到邮箱</a>
+              <a-divider type="vertical" />
+              <a
+                href="javascript:;"
+                @click="deleteResources('DataBaseData',record.id)"
+              >删除</a>
             </span>
           </a-table>
-          <a-button type="primary" @click="backupData('DataBaseData')">备份</a-button>
+          <a-button
+            type="primary"
+            @click="backupData('DataBaseData')"
+          >备份</a-button>
         </a-tab-pane>
         <a-tab-pane key="3">
           <span slot="tab">
-            <a-icon type="read"/>文章备份
+            <a-icon type="read" />文章备份
           </span>
-          <a-table :columns="columns" :dataSource="FileData">
-            <span slot="action" slot-scope="text, record">
-              <a href="javascript:;" @click="downResources('FileData',record.id)">下载</a>
-              <a-divider type="vertical"/>
-              <a href="javascript:;" @click="sendResources('FileData',record.id)">发送到邮箱</a>
-              <a-divider type="vertical"/>
-              <a href="javascript:;" @click="deleteResources('FileData',record.id)">删除</a>
+          <a-table
+            :columns="columns"
+            :dataSource="FileData"
+          >
+            <span
+              slot="action"
+              slot-scope="text, record"
+            >
+              <a
+                href="javascript:;"
+                @click="downResources('FileData',record.id)"
+              >下载</a>
+              <a-divider type="vertical" />
+              <a
+                href="javascript:;"
+                @click="sendResources('FileData',record.id)"
+              >发送到邮箱</a>
+              <a-divider type="vertical" />
+              <a
+                href="javascript:;"
+                @click="deleteResources('FileData',record.id)"
+              >删除</a>
             </span>
           </a-table>
-          <a-button type="primary" @click="backupData('FileData')">备份</a-button>
+          <a-button
+            type="primary"
+            @click="backupData('FileData')"
+          >备份</a-button>
         </a-tab-pane>
       </a-tabs>
     </div>

@@ -4,14 +4,23 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
-            <a-col :md="6" :sm="24">
+            <a-col
+              :md="6"
+              :sm="24"
+            >
               <a-form-item label="关键词">
-                <a-input v-model="queryParam.keyword"/>
+                <a-input v-model="queryParam.keyword" />
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="24">
+            <a-col
+              :md="6"
+              :sm="24"
+            >
               <a-form-item label="文章状态">
-                <a-select v-model="queryParam.status" placeholder="请选择文章状态">
+                <a-select
+                  v-model="queryParam.status"
+                  placeholder="请选择文章状态"
+                >
                   <a-select-option
                     v-for="status in Object.keys(postStatus)"
                     :key="status"
@@ -20,9 +29,15 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="24">
+            <a-col
+              :md="6"
+              :sm="24"
+            >
               <a-form-item label="分类目录">
-                <a-select v-model="queryParam.categoryId" placeholder="请选择分类">
+                <a-select
+                  v-model="queryParam.categoryId"
+                  placeholder="请选择分类"
+                >
                   <a-select-option
                     v-for="category in categories"
                     :key="category.id"
@@ -31,10 +46,19 @@
               </a-form-item>
             </a-col>
 
-            <a-col :md="6" :sm="24">
+            <a-col
+              :md="6"
+              :sm="24"
+            >
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="loadPosts">查询</a-button>
-                <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
+                <a-button
+                  type="primary"
+                  @click="loadPosts"
+                >查询</a-button>
+                <a-button
+                  style="margin-left: 8px;"
+                  @click="resetParam"
+                >重置</a-button>
               </span>
             </a-col>
           </a-row>
@@ -43,20 +67,23 @@
 
       <div class="table-operator">
         <router-link :to="{name:'PostEdit'}">
-          <a-button type="primary" icon="plus">写文章</a-button>
+          <a-button
+            type="primary"
+            icon="plus"
+          >写文章</a-button>
         </router-link>
         <a-dropdown>
           <a-menu slot="overlay">
             <a-menu-item key="1">
-              <a-icon type="delete"/>移到回收站
+              <a-icon type="delete" />移到回收站
             </a-menu-item>
             <a-menu-item key="2">
-              <a-icon type="delete"/>永久删除
+              <a-icon type="delete" />永久删除
             </a-menu-item>
           </a-menu>
           <a-button style="margin-left: 8px;">
             批量操作
-            <a-icon type="down"/>
+            <a-icon type="down" />
           </a-button>
         </a-dropdown>
       </div>
@@ -72,12 +99,18 @@
           :loading="postsLoading"
           :pagination="false"
         >
-          <span slot="status" slot-scope="statusProperty">
-            <a-badge :status="statusProperty.status"/>
+          <span
+            slot="status"
+            slot-scope="statusProperty"
+          >
+            <a-badge :status="statusProperty.status" />
             {{ statusProperty.text }}
           </span>
 
-          <span slot="categories" slot-scope="categoriesOfPost">
+          <span
+            slot="categories"
+            slot-scope="categoriesOfPost"
+          >
             <a-tag
               v-for="(category,index) in categoriesOfPost"
               :key="index"
@@ -85,21 +118,47 @@
             >{{ category.name }}</a-tag>
           </span>
 
-          <span slot="tags" slot-scope="tags">
-            <a-tag v-for="(tag, index) in tags" :key="index" color="green">{{ tag.name }}</a-tag>
+          <span
+            slot="tags"
+            slot-scope="tags"
+          >
+            <a-tag
+              v-for="(tag, index) in tags"
+              :key="index"
+              color="green"
+            >{{ tag.name }}</a-tag>
           </span>
 
-          <span slot="createTime" slot-scope="createTime">{{ createTime | timeAgo }}</span>
+          <span
+            slot="createTime"
+            slot-scope="createTime"
+          >{{ createTime | timeAgo }}</span>
 
-          <span slot="updateTime" slot-scope="updateTime">{{ updateTime | timeAgo }}</span>
+          <span
+            slot="updateTime"
+            slot-scope="updateTime"
+          >{{ updateTime | timeAgo }}</span>
 
-          <span slot="action" slot-scope="text, post">
-            <a href="javascript:;" @click="onEditClick(post)">编辑</a>
-            <a-divider type="vertical"/>
-            <a href="javascript:;" @click="deletePost(post.id)">删除</a>
+          <span
+            slot="action"
+            slot-scope="text, post"
+          >
+            <a
+              href="javascript:;"
+              @click="onEditClick(post)"
+            >编辑</a>
+            <a-divider type="vertical" />
+            <a
+              href="javascript:;"
+              @click="deletePost(post.id)"
+            >删除</a>
           </span>
         </a-table>
-        <a-row type="flex" justify="end" align="middle">
+        <a-row
+          type="flex"
+          justify="end"
+          align="middle"
+        >
           <a-pagination
             class="pagination"
             :total="pagination.total"

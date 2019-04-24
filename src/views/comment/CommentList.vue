@@ -4,14 +4,23 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
-            <a-col :md="6" :sm="24">
+            <a-col
+              :md="6"
+              :sm="24"
+            >
               <a-form-item label="关键词">
-                <a-input v-model="queryParam.keyword"/>
+                <a-input v-model="queryParam.keyword" />
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="24">
+            <a-col
+              :md="6"
+              :sm="24"
+            >
               <a-form-item label="评论状态">
-                <a-select v-model="queryParam.status" placeholder="请选择评论状态">
+                <a-select
+                  v-model="queryParam.status"
+                  placeholder="请选择评论状态"
+                >
                   <a-select-option
                     v-for="status in Object.keys(commentStatus)"
                     :key="status"
@@ -21,10 +30,19 @@
               </a-form-item>
             </a-col>
 
-            <a-col :md="12" :sm="24">
+            <a-col
+              :md="12"
+              :sm="24"
+            >
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="loadComments">查询</a-button>
-                <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
+                <a-button
+                  type="primary"
+                  @click="loadComments"
+                >查询</a-button>
+                <a-button
+                  style="margin-left: 8px;"
+                  @click="resetParam"
+                >重置</a-button>
               </span>
             </a-col>
           </a-row>
@@ -35,12 +53,12 @@
         <a-dropdown>
           <a-menu slot="overlay">
             <a-menu-item key="1">
-              <a-icon type="delete"/>回收站
+              <a-icon type="delete" />回收站
             </a-menu-item>
           </a-menu>
           <a-button>
             批量操作
-            <a-icon type="down"/>
+            <a-icon type="down" />
           </a-button>
         </a-dropdown>
       </div>
@@ -52,19 +70,43 @@
           :loading="commentsLoading"
           :pagination="false"
         >
-          <span slot="status" slot-scope="statusProperty">
-            <a-badge :status="statusProperty.status"/>
+          <span
+            slot="status"
+            slot-scope="statusProperty"
+          >
+            <a-badge :status="statusProperty.status" />
             {{ statusProperty.text }}
           </span>
-          <a slot="post" slot-scope="post" :href="post.url" target="_blank">{{ post.title }}</a>
-          <span slot="createTime" slot-scope="createTime">{{ createTime | timeAgo }}</span>
-          <span slot="action" slot-scope="text, record">
-            <a href="javascript:;" @click="editComment(record.id)">通过</a>
-            <a-divider type="vertical"/>
-            <a href="javascript:;" @click="deleteComment(record.id)">删除</a>
+          <a
+            slot="post"
+            slot-scope="post"
+            :href="post.url"
+            target="_blank"
+          >{{ post.title }}</a>
+          <span
+            slot="createTime"
+            slot-scope="createTime"
+          >{{ createTime | timeAgo }}</span>
+          <span
+            slot="action"
+            slot-scope="text, record"
+          >
+            <a
+              href="javascript:;"
+              @click="editComment(record.id)"
+            >通过</a>
+            <a-divider type="vertical" />
+            <a
+              href="javascript:;"
+              @click="deleteComment(record.id)"
+            >删除</a>
           </span>
         </a-table>
-        <a-row type="flex" justify="end" align="middle">
+        <a-row
+          type="flex"
+          justify="end"
+          align="middle"
+        >
           <a-pagination
             class="pagination"
             :total="pagination.total"

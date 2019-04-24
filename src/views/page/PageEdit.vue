@@ -1,7 +1,13 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+      <a-col
+        :xl="24"
+        :lg="24"
+        :md="24"
+        :sm="24"
+        :xs="24"
+      >
         <div style="margin-bottom: 16px">
           <a-input
             v-model="postToStage.title"
@@ -11,11 +17,21 @@
           />
         </div>
         <div id="editor">
-          <mavon-editor v-model="postToStage.originalContent" :boxShadow="false" :ishljs="true"/>
+          <mavon-editor
+            v-model="postToStage.originalContent"
+            :boxShadow="false"
+            :ishljs="true"
+          />
         </div>
       </a-col>
 
-      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+      <a-col
+        :xl="24"
+        :lg="24"
+        :md="24"
+        :sm="24"
+        :xs="24"
+      >
         <a-drawer
           title="页面设置"
           :width="isMobile()?'100%':'460'"
@@ -32,50 +48,74 @@
                     label="页面路径："
                     :help="'https://localhost:8090/p/'+ (postToStage.url ? postToStage.url : '{auto_generate}')"
                   >
-                    <a-input v-model="postToStage.url"/>
+                    <a-input v-model="postToStage.url" />
                   </a-form-item>
                   <a-form-item label="页面密码：">
-                    <a-input type="password" v-model="postToStage.password"/>
+                    <a-input
+                      type="password"
+                      v-model="postToStage.password"
+                    />
                   </a-form-item>
                   <a-form-item label="是否关闭评论：">
-                    <a-radio-group v-model="postToStage.disallowComment" :defaultValue="false">
+                    <a-radio-group
+                      v-model="postToStage.disallowComment"
+                      :defaultValue="false"
+                    >
                       <a-radio :value="false">开启</a-radio>
                       <a-radio :value="true">关闭</a-radio>
                     </a-radio-group>
                   </a-form-item>
                   <a-form-item label="自定义模板：">
                     <a-select v-model="postToStage.template">
-                      <a-select-option v-for="tpl in customTpls" :key="tpl" :value="tpl">{{ tpl }}</a-select-option>
+                      <a-select-option
+                        v-for="tpl in customTpls"
+                        :key="tpl"
+                        :value="tpl"
+                      >{{ tpl }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-form>
               </div>
             </div>
-            <a-divider/>
+            <a-divider />
 
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">缩略图</h3>
               <div class="post-setting-drawer-item">
                 <div class="post-thum">
-                  <img class="img" src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png">
+                  <img
+                    class="img"
+                    src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+                  >
                 </div>
               </div>
             </div>
-            <a-divider/>
+            <a-divider />
           </div>
           <div class="postControl">
-            <a-button style="marginRight: 8px" @click="handleDraftClick">保存草稿</a-button>
-            <a-button type="primary" @click="handlePublishClick">{{ publishText }}</a-button>
+            <a-button
+              style="marginRight: 8px"
+              @click="handleDraftClick"
+            >保存草稿</a-button>
+            <a-button
+              type="primary"
+              @click="handlePublishClick"
+            >{{ publishText }}</a-button>
           </div>
         </a-drawer>
       </a-col>
     </a-row>
-    <AttachmentDrawer v-model="attachmentDrawerVisible"/>
-    <footer-tool-bar
-      :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
-    >
-      <a-button type="primary" @click="showDrawer">发布</a-button>
-      <a-button type="dashed" style="margin-left: 8px;" @click="showAttachDrawer">附件库</a-button>
+    <AttachmentDrawer v-model="attachmentDrawerVisible" />
+    <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
+      <a-button
+        type="primary"
+        @click="showDrawer"
+      >发布</a-button>
+      <a-button
+        type="dashed"
+        style="margin-left: 8px;"
+        @click="showAttachDrawer"
+      >附件库</a-button>
     </footer-tool-bar>
   </div>
 </template>

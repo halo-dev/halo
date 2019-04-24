@@ -1,17 +1,29 @@
 <template>
   <div class="page-header-index-wide">
     <a-row>
-      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+      <a-col
+        :xl="24"
+        :lg="24"
+        :md="24"
+        :sm="24"
+        :xs="24"
+      >
         <a-card :bordered="false">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="关键词">
-                    <a-input/>
+                    <a-input />
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="年月份">
                     <a-select placeholder="请选择年月">
                       <a-select-option value="2019-01">2019-01</a-select-option>
@@ -20,7 +32,10 @@
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="状态">
                     <a-select placeholder="请选择状态">
                       <a-select-option value="1">公开</a-select-option>
@@ -28,7 +43,10 @@
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <span class="table-page-search-submitButtons">
                     <a-button type="primary">查询</a-button>
                     <a-button style="margin-left: 8px;">重置</a-button>
@@ -38,17 +56,39 @@
             </a-form>
           </div>
           <div class="table-operator">
-            <a-button type="primary" icon="plus" @click="handleNew">写日志</a-button>
+            <a-button
+              type="primary"
+              icon="plus"
+              @click="handleNew"
+            >写日志</a-button>
           </div>
-          <a-divider/>
+          <a-divider />
           <div style="margin-top:15px">
-            <a-list itemLayout="vertical" :pagination="pagination" :dataSource="listData">
-              <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-                <a slot="actions" @click="handleEdit(item)">编辑</a>
+            <a-list
+              itemLayout="vertical"
+              :pagination="pagination"
+              :dataSource="listData"
+            >
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item, index"
+                :key="index"
+              >
+                <a
+                  slot="actions"
+                  @click="handleEdit(item)"
+                >编辑</a>
                 <a slot="actions">删除</a>
                 <a-list-item-meta :description="item.description">
-                  <a slot="title" :href="item.href">{{ item.title }}</a>
-                  <a-avatar slot="avatar" :src="item.avatar" size="large"/>
+                  <a
+                    slot="title"
+                    :href="item.href"
+                  >{{ item.title }}</a>
+                  <a-avatar
+                    slot="avatar"
+                    :src="item.avatar"
+                    size="large"
+                  />
                 </a-list-item-meta>
                 {{ item.content }}
               </a-list-item>
@@ -58,10 +98,13 @@
       </a-col>
     </a-row>
 
-    <a-modal title="新建" v-model="visible">
+    <a-modal
+      title="新建"
+      v-model="visible"
+    >
       <a-form layout="vertical">
         <a-form-item label="标题：">
-          <a-input v-model="journal.title"/>
+          <a-input v-model="journal.title" />
         </a-form-item>
         <a-form-item label="内容：">
           <a-input

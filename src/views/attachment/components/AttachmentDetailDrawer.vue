@@ -7,27 +7,50 @@
     destroyOnClose
     @close="onClose"
   >
-    <a-row type="flex" align="middle">
+    <a-row
+      type="flex"
+      align="middle"
+    >
       <a-col :span="24">
-        <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
+        <a-skeleton
+          active
+          :loading="detailLoading"
+          :paragraph="{rows: 8}"
+        >
           <div class="attach-detail-img">
             <img :src="attachment.path">
           </div>
         </a-skeleton>
       </a-col>
-      <a-divider/>
+      <a-divider />
       <a-col :span="24">
-        <a-skeleton active :loading="detailLoading" :paragraph="{rows: 8}">
+        <a-skeleton
+          active
+          :loading="detailLoading"
+          :paragraph="{rows: 8}"
+        >
           <a-list itemLayout="horizontal">
             <a-list-item>
               <a-list-item-meta>
-                <template slot="description" v-if="editable">
-                  <a-input v-model="attachment.name" @blur="updateAttachment"/>
+                <template
+                  slot="description"
+                  v-if="editable"
+                >
+                  <a-input
+                    v-model="attachment.name"
+                    @blur="updateAttachment"
+                  />
                 </template>
-                <template slot="description" v-else>{{ attachment.name }}</template>
+                <template
+                  slot="description"
+                  v-else
+                >{{ attachment.name }}</template>
                 <span slot="title">
                   附件名：
-                  <a-icon type="edit" @click="handleEditName"/>
+                  <a-icon
+                    type="edit"
+                    @click="handleEditName"
+                  />
                 </span>
               </a-list-item-meta>
             </a-list-item>
@@ -66,7 +89,10 @@
               <a-list-item-meta :description="attachment.path">
                 <span slot="title">
                   普通链接：
-                  <a-icon type="copy" @click="doCopyNormalLink"/>
+                  <a-icon
+                    type="copy"
+                    @click="doCopyNormalLink"
+                  />
                 </span>
               </a-list-item-meta>
             </a-list-item>
@@ -75,7 +101,10 @@
                 <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
                 <span slot="title">
                   Markdown 格式：
-                  <a-icon type="copy" @click="doCopyMarkdownLink"/>
+                  <a-icon
+                    type="copy"
+                    @click="doCopyMarkdownLink"
+                  />
                 </span>
               </a-list-item-meta>
             </a-list-item>
@@ -83,9 +112,14 @@
         </a-skeleton>
       </a-col>
     </a-row>
-    <a-divider/>
+    <a-divider />
     <div class="bottom-control">
-      <a-popconfirm title="你确定要删除该附件？" @confirm="deleteAttachment" okText="确定" cancelText="取消">
+      <a-popconfirm
+        title="你确定要删除该附件？"
+        @confirm="deleteAttachment"
+        okText="确定"
+        cancelText="取消"
+      >
         <a-button type="danger">删除</a-button>
       </a-popconfirm>
     </div>

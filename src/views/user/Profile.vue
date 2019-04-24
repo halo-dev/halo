@@ -1,10 +1,21 @@
 <template>
   <div class="page-header-index-wide page-header-wrapper-grid-content-main">
     <a-row :gutter="12">
-      <a-col :lg="10" :md="24" :style="{ 'padding-bottom': '12px' }">
-        <a-card :bodyStyle="{ padding: '16' }" :bordered="false">
+      <a-col
+        :lg="10"
+        :md="24"
+        :style="{ 'padding-bottom': '12px' }"
+      >
+        <a-card
+          :bodyStyle="{ padding: '16' }"
+          :bordered="false"
+        >
           <div class="profile-center-avatarHolder">
-            <a-tooltip placement="right" :trigger="['hover']" title="点击可修改头像">
+            <a-tooltip
+              placement="right"
+              :trigger="['hover']"
+              title="点击可修改头像"
+            >
               <template slot="title">
                 <span>prompt text</span>
               </template>
@@ -20,21 +31,27 @@
           </div>
           <div class="profile-center-detail">
             <p>
-              <a-icon type="link"/>
-              <a href="http://localhost:8090" target="method">http://localhost:8090</a>
+              <a-icon type="link" />
+              <a
+                href="http://localhost:8090"
+                target="method"
+              >http://localhost:8090</a>
             </p>
             <p>
-              <a-icon type="mail"/>
+              <a-icon type="mail" />
               {{ user.email }}
             </p>
             <p>
-              <a-icon type="calendar"/>
+              <a-icon type="calendar" />
               {{ counts.establishDays || 0 }} 天
             </p>
           </div>
-          <a-divider/>
+          <a-divider />
           <div class="general-profile">
-            <a-list :loading="countsLoading" itemLayout="horizontal">
+            <a-list
+              :loading="countsLoading"
+              itemLayout="horizontal"
+            >
               <a-list-item>累计发表了 {{ counts.postCount || 0 }} 篇文章。</a-list-item>
               <a-list-item>累计创建了 {{ counts.linkCount || 0 }} 个标签。</a-list-item>
               <a-list-item>累计获得了 {{ counts.commentCount || 0 }} 条评论。</a-list-item>
@@ -45,45 +62,69 @@
           </div>
         </a-card>
       </a-col>
-      <a-col :lg="14" :md="24" :style="{ 'padding-bottom': '12px' }">
-        <a-card :bodyStyle="{ padding: '0' }" :bordered="false" title="个人资料">
+      <a-col
+        :lg="14"
+        :md="24"
+        :style="{ 'padding-bottom': '12px' }"
+      >
+        <a-card
+          :bodyStyle="{ padding: '0' }"
+          :bordered="false"
+          title="个人资料"
+        >
           <div class="card-container">
             <a-tabs type="card">
               <a-tab-pane key="1">
                 <span slot="tab">
-                  <a-icon type="idcard"/>基本资料
+                  <a-icon type="idcard" />基本资料
                 </span>
                 <a-form layout="vertical">
                   <a-form-item label="用户名：">
-                    <a-input v-model="user.username"/>
+                    <a-input v-model="user.username" />
                   </a-form-item>
                   <a-form-item label="昵称：">
-                    <a-input v-model="user.nickname"/>
+                    <a-input v-model="user.nickname" />
                   </a-form-item>
                   <a-form-item label="邮箱：">
-                    <a-input v-model="user.email"/>
+                    <a-input v-model="user.email" />
                   </a-form-item>
                   <a-form-item label="个人说明：">
-                    <a-input :autosize="{ minRows: 5 }" type="textarea" v-model="user.description"/>
+                    <a-input
+                      :autosize="{ minRows: 5 }"
+                      type="textarea"
+                      v-model="user.description"
+                    />
                   </a-form-item>
                   <a-form-item>
-                    <a-button @click="updateProfile" type="primary">保存</a-button>
+                    <a-button
+                      @click="updateProfile"
+                      type="primary"
+                    >保存</a-button>
                   </a-form-item>
                 </a-form>
               </a-tab-pane>
               <a-tab-pane key="2">
                 <span slot="tab">
-                  <a-icon type="lock"/>密码
+                  <a-icon type="lock" />密码
                 </span>
                 <a-form layout="vertical">
                   <a-form-item label="原密码：">
-                    <a-input type="password" v-model="passwordParam.oldPassword"/>
+                    <a-input
+                      type="password"
+                      v-model="passwordParam.oldPassword"
+                    />
                   </a-form-item>
                   <a-form-item label="新密码：">
-                    <a-input type="password" v-model="passwordParam.newPassword"/>
+                    <a-input
+                      type="password"
+                      v-model="passwordParam.newPassword"
+                    />
                   </a-form-item>
                   <a-form-item label="确认密码：">
-                    <a-input type="password" v-model="passwordParam.confirmPassword"/>
+                    <a-input
+                      type="password"
+                      v-model="passwordParam.confirmPassword"
+                    />
                   </a-form-item>
                   <a-form-item>
                     <a-button
@@ -100,7 +141,10 @@
       </a-col>
     </a-row>
 
-    <AttachmentSelectDrawer v-model="attachmentDrawerVisible" @listenToSelect="selectAvatar"/>
+    <AttachmentSelectDrawer
+      v-model="attachmentDrawerVisible"
+      @listenToSelect="selectAvatar"
+    />
   </div>
 </template>
 

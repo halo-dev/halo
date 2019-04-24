@@ -57,7 +57,7 @@
         :attachment="selectedAttachment"
         @delete="handleDelete"
       />
-      <a-divider/>
+      <a-divider />
       <div class="bottom-control">
         <a-button
           @click="showUploadModal"

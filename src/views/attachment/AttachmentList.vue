@@ -1,17 +1,30 @@
 <template>
   <page-view>
-    <a-row :gutter="12" type="flex" align="middle">
-      <a-col :span="24" class="search-box">
+    <a-row
+      :gutter="12"
+      type="flex"
+      align="middle"
+    >
+      <a-col
+        :span="24"
+        class="search-box"
+      >
         <a-card :bordered="false">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword"/>
+                    <a-input v-model="queryParam.keyword" />
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="存储位置">
                     <a-select v-model="queryParam.attachmentType">
                       <a-select-option
@@ -22,7 +35,10 @@
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="文件类型">
                     <a-select v-model="queryParam.mediaType">
                       <a-select-option
@@ -33,17 +49,30 @@
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <span class="table-page-search-submitButtons">
-                    <a-button type="primary" @click="loadAttachments(true)">查询</a-button>
-                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
+                    <a-button
+                      type="primary"
+                      @click="loadAttachments(true)"
+                    >查询</a-button>
+                    <a-button
+                      style="margin-left: 8px;"
+                      @click="resetParam"
+                    >重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
           <div class="table-operator">
-            <a-button type="primary" icon="plus" @click="showUploadModal">上传</a-button>
+            <a-button
+              type="primary"
+              icon="plus"
+              @click="showUploadModal"
+            >上传</a-button>
           </div>
         </a-card>
       </a-col>
@@ -52,20 +81,35 @@
           :grid="{ gutter: 12, xs: 1, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
           :dataSource="formattedDatas"
         >
-          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-            <a-card :bodyStyle="{ padding: 0 }" hoverable @click="showDetailDrawer(item)">
+          <a-list-item
+            slot="renderItem"
+            slot-scope="item, index"
+            :key="index"
+          >
+            <a-card
+              :bodyStyle="{ padding: 0 }"
+              hoverable
+              @click="showDetailDrawer(item)"
+            >
               <div class="attach-thumb">
                 <img :src="item.thumbPath">
               </div>
               <a-card-meta>
-                <ellipsis :length="isMobile()?36:18" tooltip slot="description">{{ item.name }}</ellipsis>
+                <ellipsis
+                  :length="isMobile()?36:18"
+                  tooltip
+                  slot="description"
+                >{{ item.name }}</ellipsis>
               </a-card-meta>
             </a-card>
           </a-list-item>
         </a-list>
       </a-col>
     </a-row>
-    <a-row type="flex" justify="end">
+    <a-row
+      type="flex"
+      justify="end"
+    >
       <a-pagination
         :total="pagination.total"
         :defaultPageSize="pagination.size"
@@ -75,10 +119,19 @@
         @showSizeChange="handlePaginationChange"
       />
     </a-row>
-    <a-modal title="上传附件" v-model="uploadVisible" :footer="null">
-      <upload name="file" multiple :uploadHandler="uploadHandler" @success="handleUploadSuccess">
+    <a-modal
+      title="上传附件"
+      v-model="uploadVisible"
+      :footer="null"
+    >
+      <upload
+        name="file"
+        multiple
+        :uploadHandler="uploadHandler"
+        @success="handleUploadSuccess"
+      >
         <p class="ant-upload-drag-icon">
-          <a-icon type="inbox"/>
+          <a-icon type="inbox" />
         </p>
         <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
         <p class="ant-upload-hint">支持单个或批量上传</p>

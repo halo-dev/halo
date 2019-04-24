@@ -2,26 +2,52 @@
   <div class="page-header-index-wide">
     <div class="card-content">
       <a-row :gutter="12">
-        <a-col :sm="24" :md="12" :lg="8">
+        <a-col
+          :sm="24"
+          :md="12"
+          :lg="8"
+        >
           <div class="case">
-            <a-card title="Markdown 导入" :bordered="false">
+            <a-card
+              title="Markdown 导入"
+              :bordered="false"
+            >
               <span style="font-size:18px">Markdown 文档导入</span>
-              <a-button type="primary" style="float:right" @click="importMarkDown">导入</a-button>
+              <a-button
+                type="primary"
+                style="float:right"
+                @click="importMarkDown"
+              >导入</a-button>
               <p>支持 Hexo/Jekyll 导入并解析元数据</p>
             </a-card>
           </div>
         </a-col>
-        <a-col :sm="24" :md="12" :lg="8">
+        <a-col
+          :sm="24"
+          :md="12"
+          :lg="8"
+        >
           <div class="case">
-            <a-card title="WordPress 导入" :bordered="false">
+            <a-card
+              title="WordPress 导入"
+              :bordered="false"
+            >
               <span style="font-size:18px">WordPress 数据导入</span>
-              <a-button type="primary" style="float:right" @click="importWordPress">导入</a-button>
+              <a-button
+                type="primary"
+                style="float:right"
+                @click="importWordPress"
+              >导入</a-button>
               <p>尽请期待</p>
             </a-card>
           </div>
         </a-col>
       </a-row>
-      <a-modal title="Markdown 文档导入" v-model="ishow" @ok="sure">
+      <a-modal
+        title="Markdown 文档导入"
+        v-model="ishow"
+        @ok="sure"
+      >
         <a-upload-dragger
           name="file"
           :multiple="true"
@@ -29,7 +55,7 @@
           @change="handleChange"
         >
           <p class="ant-upload-drag-icon">
-            <a-icon type="inbox"/>
+            <a-icon type="inbox" />
           </p>
           <p class="ant-upload-text">拖拽或点击选择MarkDown文件到此处</p>
         </a-upload-dragger>
