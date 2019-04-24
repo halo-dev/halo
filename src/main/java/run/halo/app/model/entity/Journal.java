@@ -11,6 +11,6 @@ import javax.persistence.Entity;
  */
 @Entity(name = "Journal")
 @DiscriminatorValue("2")
-public class Journal extends BasePost {
+public class Journal extends BaseComment {
 
 }

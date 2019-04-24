@@ -4,12 +4,13 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 /**
- * Comment entity.
+ * Sheet comment.
  *
  * @author johnniang
+ * @date 19-4-24
  */
-@Entity(name = "Comment")
-@DiscriminatorValue("0")
-public class Comment extends BaseComment {
+@Entity(name = "SheetComment")
+@DiscriminatorValue("1")
+public class SheetComment extends BaseComment {
 
 }

@@ -1,15 +1,13 @@
 package run.halo.app.repository;
 
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import run.halo.app.model.entity.Comment;
-import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.projection.CommentCountProjection;
-import run.halo.app.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import run.halo.app.model.entity.Comment;
+import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.projection.CommentCountProjection;
+import run.halo.app.repository.base.BaseCommentRepository;
 
 import java.util.List;
 
@@ -19,17 +17,7 @@ import java.util.List;
  * @author johnniang
  * @date 3/21/19
  */
-public interface CommentRepository extends BaseRepository<Comment, Long>, JpaSpecificationExecutor<Comment> {
-
-    /**
-     * Finds all comments by status.
-     *
-     * @param status   status must not be null
-     * @param pageable page info must not be null
-     * @return a page of comment
-     */
-    @NonNull
-    Page<Comment> findAllByStatus(@Nullable CommentStatus status, @NonNull Pageable pageable);
+public interface CommentRepository extends BaseCommentRepository<Comment> {
 
     /**
      * Finds all comments by post ids.
