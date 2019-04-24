@@ -36,7 +36,6 @@ public class SheetParam implements InputConverter<Sheet> {
     @Size(max = 255, message = "Length of password must not be more than {max}")
     private String password;
 
-    @NotBlank(message = "Template must not be blank")
     @Size(max = 255, message = "Length of template must not be more than {max}")
     private String template;
 
