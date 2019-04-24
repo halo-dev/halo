@@ -4,10 +4,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import run.halo.app.model.dto.CommentDTO;
+import run.halo.app.model.dto.BaseCommentDTO;
 
 /**
- * Comment list with parent comment vo.
+ * Base comment with parent comment vo.
  *
  * @author johnniang
  * @date 3/31/19
@@ -16,17 +16,16 @@ import run.halo.app.model.dto.CommentDTO;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
-@Deprecated
-public class CommentWithParentVO extends CommentDTO implements Cloneable {
+public class BaseCommentWithParentVO extends BaseCommentDTO implements Cloneable {
 
     /**
      * Parent comment.
      */
-    private CommentWithParentVO parent;
+    private BaseCommentWithParentVO parent;
 
-    public CommentWithParentVO clone() {
+    public BaseCommentWithParentVO clone() {
         try {
-            return (CommentWithParentVO) super.clone();
+            return (BaseCommentWithParentVO) super.clone();
         } catch (CloneNotSupportedException e) {
             log.error("Clone not support exception", e);
             return null;

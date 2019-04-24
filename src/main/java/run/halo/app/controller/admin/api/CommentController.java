@@ -37,19 +37,22 @@ public class CommentController {
     @ApiOperation("Lists comments")
     public Page<CommentWithPostVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                           CommentQuery commentQuery) {
-        return commentService.pageBy(commentQuery, pageable);
+        Page<Comment> commentPage = commentService.pageBy(commentQuery, pageable);
+        return commentService.convertToWithPostVo(commentPage);
     }
 
     @GetMapping("latest")
     @ApiOperation("Pages latest comments")
     public List<CommentWithPostVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
-        return commentService.pageLatest(top).getContent();
+        List<Comment> content = commentService.pageLatest(top).getContent();
+        return commentService.convertToWithPostVo(content);
     }
 
     @GetMapping("status/{status}")
     public Page<CommentWithPostVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                           @PathVariable("status") CommentStatus status) {
-        return commentService.pageBy(status, pageable);
+        Page<Comment> commentPage = commentService.pageBy(status, pageable);
+        return commentService.convertToWithPostVo(commentPage);
     }
 
     @PostMapping

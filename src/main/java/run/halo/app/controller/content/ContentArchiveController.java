@@ -17,7 +17,7 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.vo.CommentVO;
+import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 
@@ -116,7 +116,7 @@ public class ContentArchiveController {
         List<Category> categories = postCategoryService.listCategoryBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
 
-        Page<CommentVO> comments = commentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentVO> comments = commentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
         final int[] pageRainbow = PageUtil.rainbow(cp, comments.getTotalPages(), 3);
 
         model.addAttribute("is_post", true);

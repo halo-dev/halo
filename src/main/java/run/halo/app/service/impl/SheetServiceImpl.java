@@ -10,10 +10,12 @@ import run.halo.app.event.post.VisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.SheetDetailDTO;
+import run.halo.app.model.dto.post.SheetListDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.SheetRepository;
+import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.DateUtils;
@@ -21,6 +23,9 @@ import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.Optional;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * Sheet service implementation.
@@ -36,9 +41,14 @@ public class SheetServiceImpl extends AbstractCrudService<Sheet, Integer> implem
 
     public SheetServiceImpl(SheetRepository sheetRepository,
                             ApplicationEventPublisher eventPublisher) {
+    private final SheetCommentService sheetCommentService;
+
+    public SheetServiceImpl(SheetRepository sheetRepository,
+                            SheetCommentService sheetCommentService) {
         super(sheetRepository);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
+        this.sheetCommentService = sheetCommentService;
     }
 
     @Override
@@ -88,6 +98,21 @@ public class SheetServiceImpl extends AbstractCrudService<Sheet, Integer> implem
 
         // Convert and return
         return new SheetDetailDTO().convertFrom(sheet);
+    }
+
+    @Override
+    public Page<SheetListDTO> convertToListDto(Page<Sheet> sheetPage) {
+        Assert.notNull(sheetPage, "Sheet page must not be null");
+
+        // Get all sheet id
+        List<Sheet> sheets = sheetPage.getContent();
+
+        Set<Integer> sheetIds = ServiceUtils.fetchProperty(sheets, Sheet::getId);
+
+
+        return sheetPage.map(sheet -> {
+            return new SheetListDTO().convertFrom(sheet);
+        });
     }
 
     @NonNull
