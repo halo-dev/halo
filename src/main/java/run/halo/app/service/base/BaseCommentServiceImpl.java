@@ -26,7 +26,6 @@ import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
-import run.halo.app.model.vo.CommentWithParentVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BaseCommentRepository;
 import run.halo.app.security.authentication.Authentication;
@@ -183,7 +182,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
                 if (parentComment != null) {
                     // Convert to parent comment vo
-                    parentCommentVo = new CommentWithParentVO().convertFrom(parentComment);
+                    parentCommentVo = new BaseCommentWithParentVO().convertFrom(parentComment);
                     // Cache the parent comment vo
                     parentCommentVoMap.put(parentComment.getId(), parentCommentVo);
                 }
