@@ -17,9 +17,9 @@ import java.util.concurrent.*;
 @Slf4j
 public abstract class AbstractVisitEventListener {
 
-    private final Map<Integer, BlockingQueue<Integer>> postVisitQueueMap;
+    private final Map<Integer, BlockingQueue<Integer>> visitQueueMap;
 
-    private final Map<Integer, PostVisitTask> postVisitTaskMap;
+    private final Map<Integer, PostVisitTask> visitTaskMap;
 
     private final BasePostService basePostService;
 
@@ -36,8 +36,8 @@ public abstract class AbstractVisitEventListener {
             initCapacity = (int) count;
         }
 
-        postVisitQueueMap = new ConcurrentHashMap<>(initCapacity << 1);
-        postVisitTaskMap = new ConcurrentHashMap<>(initCapacity << 1);
+        visitQueueMap = new ConcurrentHashMap<>(initCapacity << 1);
+        visitTaskMap = new ConcurrentHashMap<>(initCapacity << 1);
 
         this.executor = Executors.newCachedThreadPool();
     }
@@ -57,9 +57,9 @@ public abstract class AbstractVisitEventListener {
         log.debug("Received a visit event, post id: [{}]", id);
 
         // Get post visit queue
-        BlockingQueue<Integer> postVisitQueue = postVisitQueueMap.computeIfAbsent(id, this::createEmptyQueue);
+        BlockingQueue<Integer> postVisitQueue = visitQueueMap.computeIfAbsent(id, this::createEmptyQueue);
 
-        postVisitTaskMap.computeIfAbsent(id, this::createPostVisitTask);
+        visitTaskMap.computeIfAbsent(id, this::createPostVisitTask);
 
         // Put a visit for the post
         postVisitQueue.put(id);
@@ -87,17 +87,17 @@ public abstract class AbstractVisitEventListener {
      */
     private class PostVisitTask implements Runnable {
 
-        private final Integer postId;
+        private final Integer id;
 
-        private PostVisitTask(Integer postId) {
-            this.postId = postId;
+        private PostVisitTask(Integer id) {
+            this.id = id;
         }
 
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    BlockingQueue<Integer> postVisitQueue = postVisitQueueMap.get(postId);
+                    BlockingQueue<Integer> postVisitQueue = visitQueueMap.get(id);
                     Integer postId = postVisitQueue.take();
 
                     log.debug("Took a new visit for post id: [{}]", postId);
