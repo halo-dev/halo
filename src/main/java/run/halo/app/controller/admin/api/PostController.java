@@ -5,8 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.post.PostMinimalOutputDTO;
-import run.halo.app.model.dto.post.PostSimpleOutputDTO;
+import run.halo.app.model.dto.post.PostMinimalDTO;
+import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
@@ -62,15 +62,15 @@ public class PostController {
 
     @GetMapping("latest")
     @ApiOperation("Pages latest post")
-    public List<PostMinimalOutputDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+    public List<PostMinimalDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         return postService.pageLatestOfMinimal(top).getContent();
     }
 
     @GetMapping("status/{status}")
     @ApiOperation("Gets a page of post by post status")
-    public Page<? extends PostSimpleOutputDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
-                                                            @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
-                                                            @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    public Page<? extends PostSimpleDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
+                                                      @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
+                                                      @PageableDefault(sort = "editTime", direction = DESC) Pageable pageable) {
         if (more) {
             return postService.pageListVoBy(status, pageable);
         }

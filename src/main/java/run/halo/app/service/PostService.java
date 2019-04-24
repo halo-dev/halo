@@ -4,8 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
-import run.halo.app.model.dto.post.PostMinimalOutputDTO;
-import run.halo.app.model.dto.post.PostSimpleOutputDTO;
+import run.halo.app.model.dto.post.PostMinimalDTO;
+import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
@@ -35,7 +35,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return latest posts of minimal
      */
     @NonNull
-    Page<PostMinimalOutputDTO> pageLatestOfMinimal(int top);
+    Page<PostMinimalDTO> pageLatestOfMinimal(int top);
 
 
     /**
@@ -45,7 +45,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return latest posts of simple
      */
     @NonNull
-    Page<PostSimpleOutputDTO> pageLatestOfSimple(int top);
+    Page<PostSimpleDTO> pageLatestOfSimple(int top);
 
 
     /**
@@ -92,10 +92,10 @@ public interface PostService extends CrudService<Post, Integer> {
      *
      * @param status   post status must not be null
      * @param pageable page info must not be null
-     * @return Page<PostSimpleOutputDTO>
+     * @return Page<PostSimpleDTO>
      */
     @NonNull
-    Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(@NonNull PostStatus status, @NonNull Pageable pageable);
+    Page<PostSimpleDTO> pageSimpleDtoByStatus(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
      * Lists page list vo by status and pageable.
@@ -238,7 +238,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return a page of post simple output dto
      */
     @NonNull
-    Page<PostSimpleOutputDTO> convertToSimpleDto(@NonNull Page<Post> postPage);
+    Page<PostSimpleDTO> convertToSimpleDto(@NonNull Page<Post> postPage);
 
     /**
      * Converts to a page of post list vo.

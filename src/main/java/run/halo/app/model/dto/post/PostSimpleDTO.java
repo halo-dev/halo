@@ -1,7 +1,5 @@
 package run.halo.app.model.dto.post;
 
-import run.halo.app.model.enums.PostCreateFrom;
-import run.halo.app.model.enums.PostType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -16,7 +14,7 @@ import run.halo.app.model.enums.PostType;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class PostSimpleOutputDTO extends PostMinimalOutputDTO {
+public class PostSimpleDTO extends PostMinimalDTO {
 
     private PostType type;
 

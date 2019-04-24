@@ -12,7 +12,7 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class PostDetailOutputDTO extends PostSimpleOutputDTO {
+public class PostDetailDTO extends PostSimpleDTO {
 
     private String originalContent;
 

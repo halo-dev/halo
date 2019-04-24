@@ -20,8 +20,8 @@ import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
-import run.halo.app.model.dto.post.PostMinimalOutputDTO;
-import run.halo.app.model.dto.post.PostSimpleOutputDTO;
+import run.halo.app.model.dto.post.PostMinimalDTO;
+import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
@@ -90,13 +90,13 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Page<PostMinimalOutputDTO> pageLatestOfMinimal(int top) {
-        return pageLatest(top).map(post -> new PostMinimalOutputDTO().convertFrom(post));
+    public Page<PostMinimalDTO> pageLatestOfMinimal(int top) {
+        return pageLatest(top).map(post -> new PostMinimalDTO().convertFrom(post));
     }
 
     @Override
-    public Page<PostSimpleOutputDTO> pageLatestOfSimple(int top) {
-        return pageLatest(top).map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    public Page<PostSimpleDTO> pageLatestOfSimple(int top) {
+        return pageLatest(top).map(post -> new PostSimpleDTO().convertFrom(post));
     }
 
     @Override
@@ -184,11 +184,11 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      *
      * @param status   status
      * @param pageable pageable
-     * @return Page<PostSimpleOutputDTO>
+     * @return Page<PostSimpleDTO>
      */
     @Override
-    public Page<PostSimpleOutputDTO> pageSimpleDtoByStatus(PostStatus status, Pageable pageable) {
-        return pageBy(status, pageable).map(post -> new PostSimpleOutputDTO().convertFrom(post));
+    public Page<PostSimpleDTO> pageSimpleDtoByStatus(PostStatus status, Pageable pageable) {
+        return pageBy(status, pageable).map(post -> new PostSimpleDTO().convertFrom(post));
     }
 
     @Override
@@ -465,10 +465,10 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     }
 
     @Override
-    public Page<PostSimpleOutputDTO> convertToSimpleDto(@NonNull Page<Post> postPage) {
+    public Page<PostSimpleDTO> convertToSimpleDto(@NonNull Page<Post> postPage) {
         Assert.notNull(postPage, "Post page must not be null");
 
-        return postPage.map(post -> new PostSimpleOutputDTO().convertFrom(post));
+        return postPage.map(post -> new PostSimpleDTO().convertFrom(post));
     }
 
     @Override
@@ -579,14 +579,14 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
      * @return a list of post minimal output dto
      */
     @NonNull
-    private List<PostMinimalOutputDTO> convertTo(@NonNull List<Post> posts) {
+    private List<PostMinimalDTO> convertTo(@NonNull List<Post> posts) {
         if (CollectionUtils.isEmpty(posts)) {
             return Collections.emptyList();
         }
 
         // Convert
         return posts.stream()
-                .map(post -> new PostMinimalOutputDTO().<PostMinimalOutputDTO>convertFrom(post))
+                .map(post -> new PostMinimalDTO().<PostMinimalDTO>convertFrom(post))
                 .collect(Collectors.toList());
     }
 

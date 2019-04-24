@@ -10,4 +10,5 @@ import run.halo.app.service.base.CrudService;
  * @date 19-4-24
  */
 public interface JournalService extends CrudService<Journal, Long> {
+
 }
