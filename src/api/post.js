@@ -42,6 +42,20 @@ postApi.update = (postId, postToUpdate) => {
   })
 }
 
+postApi.updateStatus = (postId, status) => {
+  return service({
+    url: `${baseUrl}/${postId}/${status}`,
+    method: 'put'
+  })
+}
+
+postApi.delete = postId => {
+  return service({
+    url: `${baseUrl}/${postId}`,
+    method: 'delete'
+  })
+}
+
 postApi.postStatus = {
   PUBLISHED: {
     color: 'green',

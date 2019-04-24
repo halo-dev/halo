@@ -34,6 +34,20 @@ sheetApi.update = (sheetId, sheetToUpdate) => {
   })
 }
 
+sheetApi.updateStatus = (sheetId, status) => {
+  return service({
+    url: `${baseUrl}/${sheetId}/${status}`,
+    method: 'put'
+  })
+}
+
+sheetApi.delete = sheetId => {
+  return service({
+    url: `${baseUrl}/${sheetId}`,
+    method: 'delete'
+  })
+}
+
 sheetApi.sheetStatus = {
   PUBLISHED: {
     color: 'green',

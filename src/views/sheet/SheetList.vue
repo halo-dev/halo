@@ -104,20 +104,45 @@
                     @click="onEditClick(sheet)"
                     v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
                   >编辑</a>
-                  <a
-                    href="javascript:;"
-                    @click="onEditClick(sheet)"
-                    v-if="sheet.status === 'RECYCLE'"
-                  >还原</a>
-                  <a-divider type="vertical" />
-                  <a
-                    href="javascript:;"
-                    v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
-                  >回收站</a>
-                  <a
-                    href="javascript:;"
+
+                  <a-popconfirm
+                    :title="'你确定要发布【' + sheet.title + '】？'"
+                    @confirm="onEditStatusClick(sheet.id,'PUBLISHED')"
+                    okText="确定"
+                    cancelText="取消"
                     v-else-if="sheet.status === 'RECYCLE'"
-                  >删除</a>
+                  >
+                    <a
+                      href="javascript:;"
+                    >还原</a>
+                  </a-popconfirm>
+
+                  <a-divider type="vertical" />
+
+                  <a-popconfirm
+                    :title="'你确定要将【' + sheet.title + '】页面移到回收站？'"
+                    @confirm="onEditStatusClick(sheet.id,'RECYCLE')"
+                    okText="确定"
+                    cancelText="取消"
+                    v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
+                  >
+                    <a
+                      href="javascript:;"
+                    >回收站</a>
+                  </a-popconfirm>
+
+                  <a-popconfirm
+                    :title="'你确定要永久删除【' + sheet.title + '】页面？'"
+                    @confirm="onDeleteClick(sheet.id)"
+                    okText="确定"
+                    cancelText="取消"
+                    v-else-if="sheet.status === 'RECYCLE'"
+                  >
+                    <a
+                      href="javascript:;"
+                    >删除</a>
+                  </a-popconfirm>
+
                 </span>
               </a-table>
             </a-tab-pane>
@@ -224,6 +249,18 @@ export default {
     },
     onEditClick(sheet) {
       this.$router.push({ name: 'SheetEdit', query: { sheetId: sheet.id } })
+    },
+    onEditStatusClick(sheetId, status) {
+      sheetApi.updateStatus(sheetId, status).then(response => {
+        this.$message.success('操作成功！')
+        this.loadSheets()
+      })
+    },
+    onDeleteClick(sheetId) {
+      sheetApi.delete(sheetId).then(response => {
+        this.$message.success('删除成功！')
+        this.loadSheets()
+      })
     },
     viewPage(id) {
       this.$message.success('查看' + id)

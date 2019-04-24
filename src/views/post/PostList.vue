@@ -143,22 +143,37 @@
               @click="onEditClick(post)"
               v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
             >编辑</a>
-            <a
-              href="javascript:;"
-              @click="onEditClick(post)"
-              v-if="post.status === 'RECYCLE'"
-            >还原</a>
-            <a-divider type="vertical" />
-            <a
-              href="javascript:;"
-              @click="deletePost(post.id)"
-              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
-            >回收站</a>
-            <a
-              href="javascript:;"
-              @click="deletePost(post.id)"
+            <a-popconfirm
+              :title="'你确定要发布【' + post.title + '】文章？'"
+              @confirm="onEditStatusClick(post.id,'PUBLISHED')"
+              okText="确定"
+              cancelText="取消"
               v-else-if="post.status === 'RECYCLE'"
-            >删除</a>
+            >
+              <a href="javascript:;">还原</a>
+            </a-popconfirm>
+
+            <a-divider type="vertical" />
+
+            <a-popconfirm
+              :title="'你确定要将【' + post.title + '】文章移到回收站？'"
+              @confirm="onEditStatusClick(post.id,'RECYCLE')"
+              okText="确定"
+              cancelText="取消"
+              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
+            >
+              <a href="javascript:;">回收站</a>
+            </a-popconfirm>
+
+            <a-popconfirm
+              :title="'你确定要永久删除【' + post.title + '】文章？'"
+              @confirm="onDeleteClick(post.id)"
+              okText="确定"
+              cancelText="取消"
+              v-else-if="post.status === 'RECYCLE'"
+            >
+              <a href="javascript:;">删除</a>
+            </a-popconfirm>
           </span>
         </a-table>
         <a-row
@@ -309,6 +324,18 @@ export default {
       this.queryParam.categoryId = null
       this.queryParam.status = null
       this.loadPosts()
+    },
+    onEditStatusClick(postId, status) {
+      postApi.updateStatus(postId, status).then(response => {
+        this.$message.success('操作成功！')
+        this.loadPosts()
+      })
+    },
+    onDeleteClick(postId) {
+      postApi.delete(postId).then(response => {
+        this.$message.success('删除成功！')
+        this.loadPosts()
+      })
     }
   }
 }
