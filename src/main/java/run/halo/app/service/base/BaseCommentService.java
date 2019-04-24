@@ -28,7 +28,6 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      * %s: parent commentator author name
      * %s: comment content
      */
-    @Deprecated
     String COMMENT_TEMPLATE = "<a href='#comment-id-%d'>@%s</a> %s";
 
     /**
