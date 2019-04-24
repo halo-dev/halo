@@ -74,9 +74,36 @@
             </a-tab-pane>
             <a-tab-pane key="custom">
               <span slot="tab">
-                <a-icon type="fork" />内置页面
+                <a-icon type="fork" />自定义页面
               </span>
-              自定义页面
+              <a-table
+                :rowKey="sheet => sheet.id"
+                :columns="customColumns"
+                :dataSource="formattedSheets"
+                :pagination="false"
+              >
+                <span
+                  slot="status"
+                  slot-scope="statusProperty"
+                >
+                  <a-badge :status="statusProperty.status" />
+                  {{ statusProperty.text }}
+                </span>
+
+                <span
+                  slot="updateTime"
+                  slot-scope="updateTime"
+                >{{ updateTime | timeAgo }}</span>
+
+                <span
+                  slot="action"
+                  slot-scope="text, sheet"
+                >
+                  <a href="javascript:;" @click="onEditClick(sheet)">编辑</a>
+                  <a-divider type="vertical" />
+                  <a href="javascript:;">删除</a>
+                </span>
+              </a-table>
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -87,6 +114,7 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import sheetApi from '@/api/sheet'
 const internalColumns = [
   {
     title: '页面名称',
@@ -99,6 +127,36 @@ const internalColumns = [
   {
     title: '操作',
     dataIndex: 'action',
+    width: '150px',
+    scopedSlots: { customRender: 'action' }
+  }
+]
+const customColumns = [
+  {
+    title: '标题',
+    dataIndex: 'title'
+  },
+  {
+    title: '状态',
+    className: 'status',
+    dataIndex: 'statusProperty',
+    scopedSlots: { customRender: 'status' }
+  },
+  {
+    title: '评论量',
+    dataIndex: 'commentCount'
+  },
+  {
+    title: '访问量',
+    dataIndex: 'visits'
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'updateTime',
+    scopedSlots: { customRender: 'updateTime' }
+  },
+  {
+    title: '操作',
     width: '150px',
     scopedSlots: { customRender: 'action' }
   }
@@ -124,13 +182,32 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
+      sheetStatus: sheetApi.sheetStatus,
       internalColumns,
-      internalPages
+      customColumns,
+      internalPages,
+      sheets: []
     }
   },
+  computed: {
+    formattedSheets() {
+      return this.sheets.map(sheet => {
+        sheet.statusProperty = this.sheetStatus[sheet.status]
+        return sheet
+      })
+    }
+  },
+  created() {
+    this.loadSheets()
+  },
   methods: {
-    editPage(id) {
-      this.$message.success('编辑' + id)
+    loadSheets() {
+      sheetApi.list().then(response => {
+        this.sheets = response.data.data.content
+      })
+    },
+    onEditClick(sheet) {
+      this.$router.push({ name: 'SheetEdit', query: { sheetId: sheet.id } })
     },
     viewPage(id) {
       this.$message.success('查看' + id)

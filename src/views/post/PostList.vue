@@ -130,11 +130,6 @@
           </span>
 
           <span
-            slot="createTime"
-            slot-scope="createTime"
-          >{{ createTime | timeAgo }}</span>
-
-          <span
             slot="updateTime"
             slot-scope="updateTime"
           >{{ updateTime | timeAgo }}</span>

@@ -10,7 +10,7 @@
       >
         <div style="margin-bottom: 16px">
           <a-input
-            v-model="postToStage.title"
+            v-model="sheetToStage.title"
             v-decorator="['title', { rules: [{ required: true, message: '请输入页面标题' }] }]"
             size="large"
             placeholder="请输入页面标题"
@@ -18,7 +18,7 @@
         </div>
         <div id="editor">
           <mavon-editor
-            v-model="postToStage.originalContent"
+            v-model="sheetToStage.originalContent"
             :boxShadow="false"
             :toolbars="toolbars"
             :ishljs="true"
@@ -47,19 +47,19 @@
                 <a-form layout="vertical">
                   <a-form-item
                     label="页面路径："
-                    :help="'https://localhost:8090/p/'+ (postToStage.url ? postToStage.url : '{auto_generate}')"
+                    :help="'https://localhost:8090/s/'+ (sheetToStage.url ? sheetToStage.url : '{auto_generate}')"
                   >
-                    <a-input v-model="postToStage.url" />
+                    <a-input v-model="sheetToStage.url" />
                   </a-form-item>
                   <a-form-item label="页面密码：">
                     <a-input
                       type="password"
-                      v-model="postToStage.password"
+                      v-model="sheetToStage.password"
                     />
                   </a-form-item>
-                  <a-form-item label="是否关闭评论：">
+                  <a-form-item label="开启评论：">
                     <a-radio-group
-                      v-model="postToStage.disallowComment"
+                      v-model="sheetToStage.disallowComment"
                       :defaultValue="false"
                     >
                       <a-radio :value="false">开启</a-radio>
@@ -67,7 +67,7 @@
                     </a-radio-group>
                   </a-form-item>
                   <a-form-item label="自定义模板：">
-                    <a-select v-model="postToStage.template">
+                    <a-select v-model="sheetToStage.template">
                       <a-select-option
                         v-for="tpl in customTpls"
                         :key="tpl"
@@ -83,17 +83,23 @@
             <div :style="{ marginBottom: '16px' }">
               <h3 class="post-setting-drawer-title">缩略图</h3>
               <div class="post-setting-drawer-item">
-                <div class="post-thum">
+                <div class="sheet-thum">
                   <img
                     class="img"
-                    src="https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png"
+                    :src="sheetToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
+                    @click="showThumbDrawer"
                   >
                 </div>
               </div>
             </div>
             <a-divider />
           </div>
-          <div class="postControl">
+          <AttachmentSelectDrawer
+            v-model="thumDrawerVisible"
+            @listenToSelect="selectSheetThumb"
+            :drawerWidth="460"
+          />
+          <div class="sheetControl">
             <a-button
               style="marginRight: 8px"
               @click="handleDraftClick"
@@ -124,10 +130,11 @@
 <script>
 import { mavonEditor } from 'mavon-editor'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
+import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
-import postApi from '@/api/post'
+import sheetApi from '@/api/sheet'
 import themeApi from '@/api/theme'
 const toolbars = {
   bold: true, // 粗体
@@ -153,11 +160,11 @@ const toolbars = {
   preview: true // 预览
 }
 export default {
-  name: 'Editor',
   components: {
     mavonEditor,
     FooterToolBar,
-    AttachmentDrawer
+    AttachmentDrawer,
+    AttachmentSelectDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -168,16 +175,17 @@ export default {
         xs: { span: 24 }
       },
       attachmentDrawerVisible: false,
+      thumDrawerVisible: false,
       toolbars,
       visible: false,
-      postUrl: 'hello-world',
+      sheetUrl: 'hello-world',
       customTpls: [],
-      postToStage: {}
+      sheetToStage: {}
     }
   },
   computed: {
     publishText() {
-      if (this.postToStage.id) {
+      if (this.sheetToStage.id) {
         return '更新并发布'
       }
       return '创建并发布'
@@ -187,16 +195,14 @@ export default {
     this.loadCustomTpls()
   },
   beforeRouteEnter(to, from, next) {
-    // Get post id from query
-    const postId = to.query.postId
+    // Get sheetId id from query
+    const sheetId = to.query.sheetId
 
     next(vm => {
-      if (postId) {
-        postApi.get(postId).then(response => {
-          const post = response.data.data
-          vm.postToStage = post
-          vm.selectedTagIds = post.tagIds
-          vm.selectedCategoryIds = post.categoryIds
+      if (sheetId) {
+        sheetApi.get(sheetId).then(response => {
+          const sheet = response.data.data
+          vm.sheetToStage = sheet
         })
       }
     })
@@ -210,35 +216,40 @@ export default {
     showAttachDrawer() {
       this.attachmentDrawerVisible = true
     },
+    showThumbDrawer() {
+      this.thumDrawerVisible = true
+    },
     showDrawer() {
       this.visible = true
     },
     handlePublishClick() {
-      this.postToStage.status = 'PUBLISHED'
-      this.createOrUpdatePost()
+      this.sheetToStage.status = 'PUBLISHED'
+      this.createOrUpdateSheet()
     },
     handleDraftClick() {
-      this.postToStage.status = 'DRAFT'
-      this.createOrUpdatePost()
+      this.sheetToStage.status = 'DRAFT'
+      this.createOrUpdateSheet()
     },
-    createOrUpdatePost() {
-      if (this.postToStage.id) {
-        // Update the post
-        postApi.update(this.postToStage.id, this.postToStage).then(response => {
-          this.$log.debug('Updated post', response.data.data)
+    createOrUpdateSheet() {
+      if (this.sheetToStage.id) {
+        sheetApi.update(this.sheetToStage.id, this.sheetToStage).then(response => {
+          this.$log.debug('Updated sheet', response.data.data)
           this.$message.success('页面更新成功')
         })
       } else {
-        // Create the post
-        postApi.create(this.postToStage).then(response => {
-          this.$log.debug('Created post', response.data.data)
+        sheetApi.create(this.sheetToStage).then(response => {
+          this.$log.debug('Created sheet', response.data.data)
           this.$message.success('页面创建成功')
-          this.postToStage = response.data.data
+          this.sheetToStage = response.data.data
         })
       }
     },
     onClose() {
       this.visible = false
+    },
+    selectSheetThumb(data) {
+      this.sheetToStage.thumbnail = data.path
+      this.thumDrawerVisible = false
     }
   }
 }
@@ -249,7 +260,7 @@ export default {
   min-height: 580px;
 }
 
-.postControl {
+.sheetControl {
   position: absolute;
   bottom: 0px;
   width: 100%;
@@ -261,7 +272,7 @@ export default {
   border-radius: 0px 0px 4px 4px;
 }
 
-.post-thum .img {
+.sheet-thum .img {
   width: 100%;
 }
 </style>

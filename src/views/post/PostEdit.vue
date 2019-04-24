@@ -58,7 +58,7 @@
                       v-model="postToStage.password"
                     />
                   </a-form-item>
-                  <a-form-item label="是否关闭评论：">
+                  <a-form-item label="开启评论：">
                     <a-radio-group
                       v-model="postToStage.disallowComment"
                       :defaultValue="false"
@@ -122,7 +122,7 @@
             <a-divider />
           </div>
           <AttachmentSelectDrawer
-            v-model="childDrawerVisible"
+            v-model="thumDrawerVisible"
             @listenToSelect="selectPostThumb"
             :drawerWidth="460"
           />
@@ -161,14 +161,14 @@
 import CategoryTree from './components/CategoryTree'
 import TagSelect from './components/TagSelect'
 import { mavonEditor } from 'mavon-editor'
+import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
+import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
-import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
-import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 const toolbars = {
   bold: true, // 粗体
   italic: true, // 斜体
@@ -193,7 +193,6 @@ const toolbars = {
   preview: true // 预览
 }
 export default {
-  name: 'Editor',
   components: {
     TagSelect,
     mavonEditor,
@@ -212,7 +211,7 @@ export default {
       },
       attachmentDrawerVisible: false,
       visible: false,
-      childDrawerVisible: false,
+      thumDrawerVisible: false,
       tags: [],
       categories: [],
       selectedCategoryIds: [],
@@ -287,7 +286,7 @@ export default {
       this.attachmentDrawerVisible = true
     },
     showThumbDrawer() {
-      this.childDrawerVisible = true
+      this.thumDrawerVisible = true
     },
     handlePublishClick() {
       this.postToStage.status = 'PUBLISHED'
@@ -300,12 +299,9 @@ export default {
     onClose() {
       this.visible = false
     },
-    onChildClose() {
-      this.childDrawerVisible = false
-    },
     selectPostThumb(data) {
       this.postToStage.thumbnail = data.path
-      this.childDrawerVisible = false
+      this.thumDrawerVisible = false
     }
   }
 }
