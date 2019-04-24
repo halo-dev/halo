@@ -1,10 +1,10 @@
 package run.halo.app.controller.admin.api;
 
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.service.OptionService;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;

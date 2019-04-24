@@ -8,9 +8,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.GalleryDTO;
+import run.halo.app.model.entity.Gallery;
+import run.halo.app.model.params.GalleryParam;
 import run.halo.app.model.params.GalleryQuery;
 import run.halo.app.service.GalleryService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -69,5 +72,10 @@ public class GalleryController {
     @ApiOperation("Delete gallery by id")
     public void deletePermanently(@PathVariable("galleryId") Integer galleryId) {
         galleryService.removeById(galleryId);
+    }
+
+    @PostMapping
+    public Gallery createBy(@Valid @RequestBody GalleryParam galleryParam) {
+        return galleryService.createBy(galleryParam);
     }
 }
