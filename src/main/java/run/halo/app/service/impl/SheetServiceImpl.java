@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import run.halo.app.event.post.VisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.SheetDetailDTO;
@@ -85,7 +84,8 @@ public class SheetServiceImpl extends AbstractCrudService<Sheet, Integer> implem
 
         if (PostStatus.PUBLISHED.equals(status)) {
             // Log it
-            eventPublisher.publishEvent(new VisitEvent(this, sheet.getId()));
+            // TODO Fatal bug here
+//            eventPublisher.publishEvent(new PostVisitEvent(this, sheet.getId()));
         }
 
         return sheet;
