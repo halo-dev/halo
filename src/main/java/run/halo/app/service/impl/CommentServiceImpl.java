@@ -1,9 +1,7 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.util.URLUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
@@ -19,12 +17,16 @@ import org.springframework.web.util.HtmlUtils;
 import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.PostMinimalOutputDTO;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.params.CommentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.projection.CommentCountProjection;
+import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.CommentVO;
@@ -37,11 +39,11 @@ import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.service.CommentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
-import run.halo.app.utils.OwoUtil;
 import run.halo.app.utils.ServiceUtils;
+import run.halo.app.utils.ServletUtils;
+import run.halo.app.utils.ValidationUtils;
 
 import javax.persistence.criteria.Predicate;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -149,52 +151,64 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
     }
 
     @Override
-    public Comment createBy(Comment comment, HttpServletRequest request) {
-        Assert.notNull(comment, "Comment must not be null");
-        Assert.notNull(request, "Http servlet request must not be null");
-
-        // Set some default value
-        comment.setContent(OwoUtil.parseOwo(formatContent(comment.getContent())));
-        comment.setIpAddress(ServletUtil.getClientIP(request));
-        comment.setUserAgent(ServletUtil.getHeaderIgnoreCase(request, HttpHeaders.USER_AGENT));
-
+    public Comment createBy(CommentParam commentParam) {
+        Assert.notNull(commentParam, "Comment param must not be null");
 
         // Check user login status and set this field
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication != null) {
-            // If the user is login
+            User user = authentication.getDetail().getUser();
+            commentParam.setAuthor(StringUtils.isEmpty(user.getNickname()) ? user.getUsername() : user.getNickname());
+            commentParam.setEmail(user.getEmail());
+            commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
+        }
+
+        // Validate the comment param manually
+        ValidationUtils.validate(commentParam);
+
+        // Check post id
+        boolean isPostExist = postRepository.existsById(commentParam.getPostId());
+        if (!isPostExist) {
+            throw new NotFoundException("The post with id " + commentParam.getPostId() + " was not found");
+        }
+
+        // Check parent id
+        if (!ServiceUtils.isEmptyId(commentParam.getParentId())) {
+            mustExistById(commentParam.getParentId());
+        }
+
+        // Convert to comment
+        Comment comment = commentParam.convertTo();
+
+        // Set some default values
+        comment.setIpAddress(ServletUtils.getRequestIp());
+        comment.setUserAgent(ServletUtils.getHeaderIgnoreCase(HttpHeaders.USER_AGENT));
+        comment.setGavatarMd5(DigestUtils.md5Hex(comment.getEmail()));
+
+        if (authentication != null) {
+            // Comment of blogger
             comment.setIsAdmin(true);
             comment.setStatus(CommentStatus.PUBLISHED);
         } else {
+            // Comment of guest
             // Handle comment status
             Boolean needAudit = optionService.getByPropertyOrDefault(CommentProperties.NEW_NEED_CHECK, Boolean.class, true);
-            if (needAudit) {
-                comment.setStatus(CommentStatus.AUDITING);
-            } else {
-                comment.setStatus(CommentStatus.PUBLISHED);
-            }
+            comment.setStatus(needAudit ? CommentStatus.AUDITING : CommentStatus.PUBLISHED);
         }
 
-        comment.setAuthor(HtmlUtils.htmlEscape(comment.getAuthor()));
-        comment.setGavatarMd5(SecureUtil.md5(comment.getEmail()));
-
-        if (StringUtils.isNotBlank(comment.getAuthorUrl())) {
-            // Normalize the author url and set it
-            comment.setAuthorUrl(URLUtil.normalize(comment.getAuthorUrl()));
-        }
-
+        // Create comment
         Comment createdComment = create(comment);
 
-        // TODO Handle email sending
-
-        if (createdComment.getParentId() == null || createdComment.getParentId() == 0) {
-            // New comment
-            eventPublisher.publishEvent(new CommentNewEvent(this, createdComment.getId()));
+        if (ServiceUtils.isEmptyId(createdComment.getParentId())) {
+            if (authentication == null) {
+                // New comment of guest
+                eventPublisher.publishEvent(new CommentNewEvent(this, createdComment.getId()));
+            }
         } else {
             // Reply comment
             eventPublisher.publishEvent(new CommentReplyEvent(this, createdComment.getId()));
         }
-
 
         return createdComment;
     }

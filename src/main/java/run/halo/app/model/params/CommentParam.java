@@ -1,5 +1,6 @@
 package run.halo.app.model.params;
 
+import org.hibernate.validator.constraints.URL;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Comment;
 import lombok.Data;

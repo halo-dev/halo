@@ -1,18 +1,18 @@
 package run.halo.app.service;
 
-import run.halo.app.model.entity.Comment;
-import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.params.CommentQuery;
-import run.halo.app.model.vo.CommentWithParentVO;
-import run.halo.app.model.vo.CommentWithPostVO;
-import run.halo.app.model.vo.CommentVO;
-import run.halo.app.service.base.CrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import run.halo.app.model.entity.Comment;
+import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.params.CommentParam;
+import run.halo.app.model.params.CommentQuery;
+import run.halo.app.model.vo.CommentVO;
+import run.halo.app.model.vo.CommentWithParentVO;
+import run.halo.app.model.vo.CommentWithPostVO;
+import run.halo.app.service.base.CrudService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,7 @@ public interface CommentService extends CrudService<Comment, Long> {
      * Pages comments.
      *
      * @param commentQuery comment query must not be null
-     * @param pageable  page info must not be null
+     * @param pageable     page info must not be null
      * @return a page of comment
      */
     @NonNull
@@ -81,12 +81,11 @@ public interface CommentService extends CrudService<Comment, Long> {
     /**
      * Creates a comment by comment param.
      *
-     * @param comment comment must not be null
-     * @param request http servlet request must not be null
+     * @param commentParam comment param must not be null
      * @return created comment
      */
     @NonNull
-    Comment createBy(@NonNull Comment comment, @NonNull HttpServletRequest request);
+    Comment createBy(@NonNull CommentParam commentParam);
 
     /**
      * Lists comment vos by post id.

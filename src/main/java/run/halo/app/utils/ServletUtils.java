@@ -43,4 +43,15 @@ public class ServletUtils {
         return getCurrentRequest().map(ServletUtil::getClientIP).orElse(null);
     }
 
+    /**
+     * Gets request header.
+     *
+     * @param header http header name
+     * @return http header of null
+     */
+    @Nullable
+    public static String getHeaderIgnoreCase(String header) {
+        return getCurrentRequest().map(request -> ServletUtil.getHeaderIgnoreCase(request, header)).orElse(null);
+    }
+
 }
