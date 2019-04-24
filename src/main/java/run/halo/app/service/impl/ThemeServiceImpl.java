@@ -172,7 +172,7 @@ public class ThemeServiceImpl implements ThemeService {
         if (null != themeFiles && themeFiles.length > 0) {
             for (File file : themeFiles) {
                 String[] split = StrUtil.removeSuffix(file.getName(), HaloConst.SUFFIX_FTL).split("_");
-                if (split.length == 2 && "page".equals(split[0])) {
+                if (split.length == 2 && "sheet".equals(split[0])) {
                     templates.add(StrUtil.removeSuffix(file.getName(), HaloConst.SUFFIX_FTL));
                 }
             }
