@@ -4,12 +4,10 @@ import {
   DEFAULT_THEME,
   DEFAULT_LAYOUT_MODE,
   DEFAULT_COLOR,
-  DEFAULT_COLOR_WEAK,
   DEFAULT_FIXED_HEADER,
   DEFAULT_FIXED_SIDEMENU,
   DEFAULT_FIXED_HEADER_HIDDEN,
-  DEFAULT_CONTENT_WIDTH_TYPE,
-  DEFAULT_MULTI_TAB
+  DEFAULT_CONTENT_WIDTH_TYPE
 } from '@/store/mutation-types'
 
 const app = {
@@ -22,9 +20,7 @@ const app = {
     fixedHeader: false,
     fixSiderbar: false,
     autoHideHeader: false,
-    color: null,
-    weak: false,
-    multiTab: false
+    color: null
   },
   mutations: {
     SET_SIDEBAR_TYPE: (state, type) => {
@@ -66,14 +62,6 @@ const app = {
     TOGGLE_COLOR: (state, color) => {
       Vue.ls.set(DEFAULT_COLOR, color)
       state.color = color
-    },
-    TOGGLE_WEAK: (state, flag) => {
-      Vue.ls.set(DEFAULT_COLOR_WEAK, flag)
-      state.weak = flag
-    },
-    TOGGLE_MULTI_TAB: (state, bool) => {
-      Vue.ls.set(DEFAULT_MULTI_TAB, bool)
-      state.multiTab = bool
     }
   },
   actions: {
@@ -109,12 +97,6 @@ const app = {
     },
     ToggleColor({ commit }, color) {
       commit('TOGGLE_COLOR', color)
-    },
-    ToggleWeak({ commit }, weakFlag) {
-      commit('TOGGLE_WEAK', weakFlag)
-    },
-    ToggleMultiTab({ commit }, bool) {
-      commit('TOGGLE_MULTI_TAB', bool)
     }
   }
 }

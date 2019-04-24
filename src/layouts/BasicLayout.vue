@@ -44,9 +44,8 @@
 
       <!-- layout content -->
       <a-layout-content
-        :style="{ height: '100%', margin: multiTab ? '24px 24px 0' : '24px 24px 0', paddingTop: fixedHeader ? '64px' : '0' }"
+        :style="{ height: '100%', margin: '24px 24px 0', paddingTop: fixedHeader ? '64px' : '0' }"
       >
-        <multi-tab v-if="multiTab"></multi-tab>
         <transition name="page-transition">
           <route-view/>
         </transition>
@@ -68,7 +67,6 @@ import config from '@/config/defaultSettings'
 import { asyncRouterMap } from '@/config/router.config.js'
 
 import RouteView from './RouteView'
-import MultiTab from '@/components/MultiTab'
 import SideMenu from '@/components/Menu/SideMenu'
 import GlobalHeader from '@/components/GlobalHeader'
 import GlobalFooter from '@/components/GlobalFooter'
@@ -78,7 +76,6 @@ export default {
   mixins: [mixin, mixinDevice],
   components: {
     RouteView,
-    MultiTab,
     SideMenu,
     GlobalHeader,
     GlobalFooter
