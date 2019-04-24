@@ -18,7 +18,7 @@ import java.util.concurrent.*;
  */
 @Slf4j
 @Component
-public class VisitEventListener {
+public class PostVisitEventListener {
 
     private final Map<Integer, BlockingQueue<Integer>> postVisitQueueMap;
 
@@ -28,7 +28,7 @@ public class VisitEventListener {
 
     private final ExecutorService executor;
 
-    public VisitEventListener(PostService postService) {
+    public PostVisitEventListener(PostService postService) {
         this.postService = postService;
 
         int initCapacity = 8;
@@ -47,7 +47,7 @@ public class VisitEventListener {
 
     @Async
     @EventListener
-    public void onApplicationEvent(VisitEvent event) throws InterruptedException {
+    public void onApplicationEvent(PostVisitEvent event) throws InterruptedException {
         // Get post id
         Integer postId = event.getPostId();
 
