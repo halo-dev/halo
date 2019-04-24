@@ -22,10 +22,7 @@ import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +41,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     private final StringCacheStore cacheStore;
 
+    private final Map<String, PropertyEnum> propertyEnumMap;
+
     public OptionServiceImpl(OptionRepository optionRepository,
                              ApplicationContext applicationContext,
                              StringCacheStore cacheStore) {
@@ -51,6 +50,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         this.optionRepository = optionRepository;
         this.applicationContext = applicationContext;
         this.cacheStore = cacheStore;
+
+        propertyEnumMap = Collections.unmodifiableMap(PropertyEnum.getValuePropertyEnumMap());
     }
 
     @Override
@@ -125,7 +126,37 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public Map<String, Object> listOptions() {
-        return ServiceUtils.convertToMap(listAll(), Option::getKey, Option::getValue);
+        List<Option> options = listAll();
+
+        Set<String> keys = ServiceUtils.fetchProperty(options, Option::getKey);
+
+        Map<String, Object> result = ServiceUtils.convertToMap(options, Option::getKey, option -> {
+            String key = option.getKey();
+
+            PropertyEnum propertyEnum = propertyEnumMap.get(key);
+
+            if (propertyEnum == null) {
+                return option.getValue();
+            }
+
+            return PropertyEnum.convertTo(option.getValue(), propertyEnum);
+        });
+
+        // Add default property
+        propertyEnumMap.keySet()
+                .stream()
+                .filter(key -> !keys.contains(key))
+                .forEach(key -> {
+                    PropertyEnum propertyEnum = propertyEnumMap.get(key);
+
+                    if (StringUtils.isBlank(propertyEnum.defaultValue())) {
+                        return;
+                    }
+
+                    result.put(key, PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
+                });
+
+        return result;
     }
 
     @Override

@@ -8,25 +8,28 @@ package run.halo.app.model.properties;
  */
 public enum EmailProperties implements PropertyEnum {
 
-    HOST("email_host", String.class),
+    HOST("email_host", String.class, ""),
 
-    PROTOCOL("email_protocol", String.class),
+    PROTOCOL("email_protocol", String.class, ""),
 
-    SSL_PORT("email_ssl_port", Integer.class),
+    SSL_PORT("email_ssl_port", Integer.class, ""),
 
-    USERNAME("email_username", String.class),
+    USERNAME("email_username", String.class, ""),
 
-    PASSWORD("email_password", String.class),
+    PASSWORD("email_password", String.class, ""),
 
-    FROM_NAME("email_from_name", String.class),
+    FROM_NAME("email_from_name", String.class, ""),
 
-    ENABLED("email_enabled", Boolean.class);
+    ENABLED("email_enabled", Boolean.class, "");
 
     private final String value;
 
     private final Class<?> type;
 
-    EmailProperties(String value, Class<?> type) {
+    private final String defaultValue;
+
+    EmailProperties(String value, Class<?> type, String defaultValue) {
+        this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);
         }
@@ -41,6 +44,12 @@ public enum EmailProperties implements PropertyEnum {
     }
 
     @Override
+    public String defaultValue() {
+        return defaultValue;
+    }
+
+    @Override
     public String getValue() {
         return value;
-    }}
+    }
+}

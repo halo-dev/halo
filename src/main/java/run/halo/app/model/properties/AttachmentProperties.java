@@ -1,7 +1,6 @@
 package run.halo.app.model.properties;
 
 import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.enums.AttachmentType;
 
 /**
  * Attachment properties.
@@ -11,15 +10,18 @@ import run.halo.app.model.enums.AttachmentType;
  */
 public enum AttachmentProperties implements PropertyEnum {
 
-    ATTACHMENT_TYPE("attachment_type", AttachmentType.class);
+    ATTACHMENT_TYPE("attachment_type", AttachmentType.class, AttachmentType.LOCAL.name());
 
     private final String value;
 
     private final Class<?> type;
 
-    AttachmentProperties(String value, Class<?> type) {
+    private final String defaultValue;
+
+    AttachmentProperties(String value, Class<?> type, String defaultValue) {
         this.value = value;
         this.type = type;
+        this.defaultValue = defaultValue;
     }
 
     @Override
@@ -28,6 +30,14 @@ public enum AttachmentProperties implements PropertyEnum {
     }
 
     @Override
+    public String defaultValue() {
+        return defaultValue;
+    }
+
+    @Override
     public String getValue() {
         return value;
-    }}
+    }
+
+
+}

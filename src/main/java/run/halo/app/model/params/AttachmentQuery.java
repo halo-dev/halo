@@ -1,6 +1,7 @@
 package run.halo.app.model.params;
 
 import lombok.Data;
+import run.halo.app.model.enums.AttachmentType;
 
 /**
  * Attachment query params.
@@ -18,5 +19,5 @@ public class AttachmentQuery {
 
     private String mediaType;
 
-    private String attachmentType;
+    private AttachmentType attachmentType;
 }
