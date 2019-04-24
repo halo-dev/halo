@@ -5,8 +5,8 @@
     <title>图库 · ${options.blog_title!}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="anatole/source/plugins/gallery/css/main.css" />
-    <noscript><link rel="stylesheet" href="/source/plugins/gallery/css/noscript.css" /></noscript>
+    <link rel="stylesheet" href="${theme.folderName}/source/plugins/gallery/css/main.css" />
+    <noscript><link rel="stylesheet" href="/${theme.folderName}/plugins/gallery/css/noscript.css" /></noscript>
 </head>
 <body class="is-loading-0 is-loading-1 is-loading-2">
 <div id="main">
@@ -41,9 +41,9 @@
         </ul>
     </footer>
 </div>
-<script src="anatole/source/plugins/gallery/js/jquery.min.js"></script>
-<script src="anatole/source/plugins/gallery/js/skel.min.js"></script>
-<script src="anatole/source/plugins/gallery/js/main.js"></script>
+<script src="${theme.folderName}/source/plugins/gallery/js/jquery.min.js"></script>
+<script src="${theme.folderName}/source/plugins/gallery/js/skel.min.js"></script>
+<script src="${theme.folderName}/source/plugins/gallery/js/main.js"></script>
 <@statistics></@statistics>
 </body>
 </html>

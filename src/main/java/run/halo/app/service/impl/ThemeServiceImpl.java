@@ -258,7 +258,7 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         try {
-            for (String optionsName : OPTIONS_NAMES) {
+            for (String optionsName : SETTINGS_NAMES) {
                 // Resolve the options path
                 Path optionsPath = Paths.get(themeProperty.getThemePath(), optionsName);
 
@@ -707,7 +707,7 @@ public class ThemeServiceImpl implements ThemeService {
     private boolean hasOptions(@NonNull Path themePath) {
         Assert.notNull(themePath, "Path must not be null");
 
-        for (String optionsName : OPTIONS_NAMES) {
+        for (String optionsName : SETTINGS_NAMES) {
             // Resolve the options path
             Path optionsPath = themePath.resolve(optionsName);
 

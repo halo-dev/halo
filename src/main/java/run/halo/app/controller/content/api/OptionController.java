@@ -19,7 +19,7 @@ import java.util.Map;
  * @author johnniang
  * @date 4/3/19
  */
-@RestController("PortalOptionController")
+@RestController("ApiContentOptionController")
 @RequestMapping("/api/options")
 public class OptionController {
 
@@ -37,7 +37,7 @@ public class OptionController {
 
     @GetMapping("map_view")
     @ApiOperation("Lists all options with map view")
-    public Map<String, String> listAllWithMapView() {
+    public Map<String, Object> listAllWithMapView() {
         return optionService.listOptions();
     }
 
