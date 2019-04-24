@@ -188,12 +188,7 @@ export default {
 }
 </script>
 
-<style scope>
-.post-thum .img {
-  width: 100%;
-  cursor: pointer;
-}
-
+<style lang="less" scope>
 .attach-item {
   width: 50%;
   margin: 0 auto;
@@ -202,13 +197,12 @@ export default {
   overflow: hidden;
   float: left;
   cursor: pointer;
-}
-
-.attach-item > img {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
+  img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 </style>

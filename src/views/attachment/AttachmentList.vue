@@ -266,13 +266,13 @@ export default {
   position: relative;
   padding-bottom: 56%;
   overflow: hidden;
-}
-.attach-thumb > img {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
+  img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 
 .ant-card-meta {

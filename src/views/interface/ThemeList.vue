@@ -375,19 +375,7 @@ export default {
 }
 </script>
 
-<style scoped>
-.ant-divider-horizontal {
-  margin: 14px 0;
-}
-
-.theme-item .theme-control .theme-title {
-  font-size: 18px;
-}
-
-.theme-item .theme-control .theme-button {
-  float: right;
-}
-
+<style lang="less" scoped>
 .upload-button {
   position: fixed;
   bottom: 80px;
