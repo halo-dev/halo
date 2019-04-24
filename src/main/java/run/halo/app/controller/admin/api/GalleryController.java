@@ -1,13 +1,19 @@
 package run.halo.app.controller.admin.api;
 
-import run.halo.app.model.dto.GalleryDTO;
-import run.halo.app.service.GalleryService;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.dto.GalleryDTO;
+import run.halo.app.model.params.GalleryQuery;
+import run.halo.app.service.GalleryService;
 
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Gallery controller
@@ -31,9 +37,15 @@ public class GalleryController {
      * @param sort sort
      * @return all of galleries
      */
-    @GetMapping
+    @GetMapping(value = "latest")
     public List<GalleryDTO> listGalleries(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
         return galleryService.listDtos(sort);
+    }
+
+    @GetMapping
+    public Page<GalleryDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                   GalleryQuery galleryQuery) {
+        return galleryService.pageDtosBy(pageable, galleryQuery);
     }
 
     /**

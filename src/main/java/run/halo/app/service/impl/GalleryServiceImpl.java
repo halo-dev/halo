@@ -1,16 +1,23 @@
 package run.halo.app.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.model.dto.GalleryDTO;
 import run.halo.app.model.entity.Gallery;
+import run.halo.app.model.params.GalleryQuery;
 import run.halo.app.model.vo.GalleryTeamVO;
 import run.halo.app.repository.GalleryRepository;
 import run.halo.app.service.GalleryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
+import javax.persistence.criteria.Predicate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -91,5 +98,42 @@ public class GalleryServiceImpl extends AbstractCrudService<Gallery, Integer> im
     public List<GalleryDTO> listByTeam(String team, Sort sort) {
         List<Gallery> galleries = galleryRepository.findByTeam(team, sort);
         return galleries.stream().map(gallery -> (GalleryDTO) new GalleryDTO().convertFrom(gallery)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<GalleryDTO> pageDtosBy(Pageable pageable, GalleryQuery galleryQuery) {
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // List all
+        Page<Gallery> galleryPage = galleryRepository.findAll(buildSpecByQuery(galleryQuery), pageable);
+
+        // Convert and return
+        return galleryPage.map(gallery -> new GalleryDTO().convertFrom(gallery));
+    }
+
+    @NonNull
+    private Specification<Gallery> buildSpecByQuery(@NonNull GalleryQuery galleryQuery) {
+        Assert.notNull(galleryQuery, "Attachment query must not be null");
+
+        return (Specification<Gallery>) (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (galleryQuery.getTeam() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("team"), galleryQuery.getTeam()));
+            }
+
+            if (galleryQuery.getKeyword() != null) {
+
+                String likeCondition = String.format("%%%s%%", StringUtils.strip(galleryQuery.getKeyword()));
+
+                Predicate nameLike = criteriaBuilder.like(root.get("name"), likeCondition);
+                Predicate descriptionLike = criteriaBuilder.like(root.get("description"), likeCondition);
+                Predicate locationLike = criteriaBuilder.like(root.get("location"), likeCondition);
+
+                predicates.add(criteriaBuilder.or(nameLike, descriptionLike, locationLike));
+            }
+
+            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
     }
 }

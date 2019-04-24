@@ -1,9 +1,12 @@
 package run.halo.app.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.GalleryDTO;
 import run.halo.app.model.entity.Gallery;
+import run.halo.app.model.params.GalleryQuery;
 import run.halo.app.model.vo.GalleryTeamVO;
 import run.halo.app.service.base.CrudService;
 
@@ -40,4 +43,14 @@ public interface GalleryService extends CrudService<Gallery, Integer> {
      * @return list of galleries
      */
     List<GalleryDTO> listByTeam(@NonNull String team, Sort sort);
+
+    /**
+     * Pages gallery output dtos.
+     *
+     * @param pageable     page info must not be null
+     * @param galleryQuery galleryQuery
+     * @return a page of gallery output dto
+     */
+    @NonNull
+    Page<GalleryDTO> pageDtosBy(@NonNull Pageable pageable, GalleryQuery galleryQuery);
 }
