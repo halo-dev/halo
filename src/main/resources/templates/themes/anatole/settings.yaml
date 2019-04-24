@@ -55,6 +55,7 @@ style:
       name: icon
       label: 右上角图标
       type: text
+      default: '/anatole/source/images/logo.png'
     post_title_uppper:
       name: post_title_uppper
       label: 文章标题大写
@@ -103,15 +104,13 @@ style:
       name: google_color
       label: 浏览器沉浸颜色
       type: text
-      default: #fff
+      default: '#fff'
     scrollbar:
       name: scrollbar
       label: 全局滚动条颜色
       type: text
-      default: #3798e8
+      default: '#3798e8'
     custom:
       name: custom
       label: 自定义样式
       type: textarea
-
-
