@@ -1,8 +1,8 @@
 package run.halo.app.model.vo;
 
-import run.halo.app.model.dto.CommentDTO;
 import lombok.Data;
 import lombok.ToString;
+import run.halo.app.model.dto.CommentDTO;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Data
 @ToString(callSuper = true)
+@Deprecated
 public class CommentVO extends CommentDTO {
 
     private List<CommentVO> children;

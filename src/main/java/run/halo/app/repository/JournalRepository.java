@@ -1,7 +1,12 @@
 package run.halo.app.repository;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.Journal;
+import run.halo.app.model.projection.CommentCountProjection;
 import run.halo.app.repository.base.BaseCommentRepository;
+
+import java.util.List;
 
 /**
  * Journal repository.
@@ -11,4 +16,13 @@ import run.halo.app.repository.base.BaseCommentRepository;
  */
 public interface JournalRepository extends BaseCommentRepository<Journal> {
 
+    /**
+     * Counts comment count by post id collection.
+     *
+     * @param postIds post id collection must not be null
+     * @return a list of comment count
+     */
+    @Query("select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), comment.postId) from Journal comment where comment.postId in ?1 group by comment.postId")
+    @NonNull
+    List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
 }

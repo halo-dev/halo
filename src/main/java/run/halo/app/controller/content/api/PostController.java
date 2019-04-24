@@ -1,13 +1,5 @@
 package run.halo.app.controller.content.api;
 
-import run.halo.app.model.dto.post.PostDetailDTO;
-import run.halo.app.model.dto.post.PostSimpleDTO;
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.vo.CommentVO;
-import run.halo.app.model.vo.CommentWithParentVO;
-import run.halo.app.service.CommentService;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +8,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.dto.post.PostDetailDTO;
+import run.halo.app.model.dto.post.PostSimpleDTO;
+import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.BaseCommentVO;
+import run.halo.app.model.vo.BaseCommentWithParentVO;
+import run.halo.app.service.CommentService;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.PostService;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -71,17 +71,17 @@ public class PostController {
 
     @GetMapping("{postId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
-    public Page<CommentVO> listCommentsTree(@PathVariable("postId") Integer postId,
-                                            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+    public Page<BaseCommentVO> listCommentsTree(@PathVariable("postId") Integer postId,
+                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return commentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{postId:\\d+}/comments/list_view")
     @ApiOperation("Lists comment with list view")
-    public Page<CommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
-                                                  @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                  @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+    public Page<BaseCommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
+                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return commentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
