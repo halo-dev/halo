@@ -2,7 +2,7 @@ package run.halo.app.model.vo;
 
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
-import run.halo.app.model.dto.post.PostSimpleOutputDTO;
+import run.halo.app.model.dto.post.PostSimpleDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +16,7 @@ import java.util.List;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class PostListVO extends PostSimpleOutputDTO {
+public class PostListVO extends PostSimpleDTO {
 
     private Long commentCount;
 

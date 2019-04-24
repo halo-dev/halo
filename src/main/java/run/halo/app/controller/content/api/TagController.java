@@ -1,7 +1,7 @@
 package run.halo.app.controller.content.api;
 
 import run.halo.app.model.dto.TagDTO;
-import run.halo.app.model.dto.post.PostSimpleOutputDTO;
+import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
@@ -50,12 +50,12 @@ public class TagController {
 
     @GetMapping("{slugName}/posts")
     @ApiOperation("Lists posts by tag slug name")
-    public Page<PostSimpleOutputDTO> listPostsBy(@PathVariable("slugName") String slugName,
-                                                 @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    public Page<PostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
+                                           @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
         // Get tag by slug name
         Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
         // Get posts, convert and return
-        return postTagService.pagePostsBy(tag.getId(), pageable).map(post -> new PostSimpleOutputDTO().convertFrom(post));
+        return postTagService.pagePostsBy(tag.getId(), pageable).map(post -> new PostSimpleDTO().convertFrom(post));
     }
 }

@@ -1,9 +1,8 @@
 package run.halo.app.model.params;
 
-import org.hibernate.validator.constraints.URL;
+import lombok.Data;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Comment;
-import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;

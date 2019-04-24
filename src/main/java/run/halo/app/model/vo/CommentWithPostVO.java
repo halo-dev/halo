@@ -1,7 +1,7 @@
 package run.halo.app.model.vo;
 
 import run.halo.app.model.dto.CommentDTO;
-import run.halo.app.model.dto.post.PostMinimalOutputDTO;
+import run.halo.app.model.dto.post.PostMinimalDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -16,5 +16,5 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class CommentWithPostVO extends CommentDTO {
 
-    private PostMinimalOutputDTO post;
+    private PostMinimalDTO post;
 }

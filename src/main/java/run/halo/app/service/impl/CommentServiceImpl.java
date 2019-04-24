@@ -18,7 +18,7 @@ import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.dto.post.PostMinimalOutputDTO;
+import run.halo.app.model.dto.post.PostMinimalDTO;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.User;
@@ -440,7 +440,7 @@ public class CommentServiceImpl extends AbstractCrudService<Comment, Long> imple
             CommentWithPostVO commentWithPostVO = new CommentWithPostVO().convertFrom(comment);
 
             // Get post and set to the vo
-            commentWithPostVO.setPost(new PostMinimalOutputDTO().convertFrom(postMap.get(comment.getPostId())));
+            commentWithPostVO.setPost(new PostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
 
             return commentWithPostVO;
         }).collect(Collectors.toList());

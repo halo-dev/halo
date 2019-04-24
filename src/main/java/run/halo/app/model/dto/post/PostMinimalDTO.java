@@ -1,16 +1,12 @@
 package run.halo.app.model.dto.post;
 
 import run.halo.app.model.dto.base.OutputConverter;
-import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.enums.PostType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import run.halo.app.model.dto.base.OutputConverter;
-import run.halo.app.model.entity.Post;
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.enums.PostType;
 
 import java.util.Date;
 
@@ -22,7 +18,7 @@ import java.util.Date;
 @Data
 @ToString
 @EqualsAndHashCode
-public class PostMinimalOutputDTO implements OutputConverter<PostMinimalOutputDTO, Post> {
+public class PostMinimalDTO implements OutputConverter<PostMinimalDTO, BasePost> {
 
     private Integer id;
 
