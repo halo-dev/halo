@@ -47,10 +47,12 @@
                 >{{ attachment.name }}</template>
                 <span slot="title">
                   附件名：
-                  <a-icon
-                    type="edit"
-                    @click="handleEditName"
-                  />
+                  <a href="javascript:void(0);">
+                    <a-icon
+                      type="edit"
+                      @click="handleEditName"
+                    />
+                  </a>
                 </span>
               </a-list-item-meta>
             </a-list-item>
@@ -89,10 +91,12 @@
               <a-list-item-meta :description="attachment.path">
                 <span slot="title">
                   普通链接：
-                  <a-icon
-                    type="copy"
-                    @click="doCopyNormalLink"
-                  />
+                  <a href="javascript:void(0);">
+                    <a-icon
+                      type="copy"
+                      @click="doCopyNormalLink"
+                    />
+                  </a>
                 </span>
               </a-list-item-meta>
             </a-list-item>
@@ -101,10 +105,12 @@
                 <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
                 <span slot="title">
                   Markdown 格式：
-                  <a-icon
-                    type="copy"
-                    @click="doCopyMarkdownLink"
-                  />
+                  <a href="javascript:void(0);">
+                    <a-icon
+                      type="copy"
+                      @click="doCopyMarkdownLink"
+                    />
+                  </a>
                 </span>
               </a-list-item-meta>
             </a-list-item>
