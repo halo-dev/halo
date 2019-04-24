@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.post.PostMinimalDTO;
 import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;

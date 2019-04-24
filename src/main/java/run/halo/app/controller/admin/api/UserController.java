@@ -1,11 +1,11 @@
 package run.halo.app.controller.admin.api;
 
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.PasswordParam;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.service.UserService;
-import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 

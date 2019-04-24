@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.GalleryDTO;
 import run.halo.app.model.entity.Gallery;
+import run.halo.app.model.params.GalleryParam;
 import run.halo.app.model.params.GalleryQuery;
 import run.halo.app.model.vo.GalleryTeamVO;
 import run.halo.app.service.base.CrudService;
@@ -53,4 +54,13 @@ public interface GalleryService extends CrudService<Gallery, Integer> {
      */
     @NonNull
     Page<GalleryDTO> pageDtosBy(@NonNull Pageable pageable, GalleryQuery galleryQuery);
+
+    /**
+     * Creates gallery by gallery param.
+     *
+     * @param galleryParam must not be null
+     * @return create gallery
+     */
+    @NonNull
+    Gallery createBy(@NonNull GalleryParam galleryParam);
 }

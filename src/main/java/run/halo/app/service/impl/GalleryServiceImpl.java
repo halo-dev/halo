@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.model.dto.GalleryDTO;
 import run.halo.app.model.entity.Gallery;
+import run.halo.app.model.params.GalleryParam;
 import run.halo.app.model.params.GalleryQuery;
 import run.halo.app.model.vo.GalleryTeamVO;
 import run.halo.app.repository.GalleryRepository;
@@ -109,6 +110,13 @@ public class GalleryServiceImpl extends AbstractCrudService<Gallery, Integer> im
 
         // Convert and return
         return galleryPage.map(gallery -> new GalleryDTO().convertFrom(gallery));
+    }
+
+    @Override
+    public Gallery createBy(GalleryParam galleryParam) {
+        Assert.notNull(galleryParam, "Gallery param must not be null");
+
+        return create(galleryParam.convertTo());
     }
 
     @NonNull
