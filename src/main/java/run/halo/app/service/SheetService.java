@@ -45,15 +45,6 @@ public interface SheetService extends CrudService<Sheet, Integer> {
     Page<Sheet> pageBy(@NonNull Pageable pageable);
 
     /**
-     * Converts to detail dto.
-     *
-     * @param sheet sheet must not be null
-     * @return sheet detail dto
-     */
-    @NonNull
-    SheetDetailDTO convertToDetailDto(@NonNull Sheet sheet);
-
-    /**
      * Gets sheet by post status and url.
      *
      * @param status post status must not be null
@@ -63,6 +54,17 @@ public interface SheetService extends CrudService<Sheet, Integer> {
     @NonNull
     Sheet getBy(@NonNull PostStatus status, @NonNull String url);
 
+
+    /**
+     * Converts to detail dto.
+     *
+     * @param sheet sheet must not be null
+     * @return sheet detail dto
+     */
+    @NonNull
+    SheetDetailDTO convertToDetailDto(@NonNull Sheet sheet);
+
+
     /**
      * Converts to list dto page.
      *
@@ -71,4 +73,6 @@ public interface SheetService extends CrudService<Sheet, Integer> {
      */
     @NonNull
     Page<SheetListDTO> convertToListDto(@NonNull Page<Sheet> sheetPage);
+
+
 }
