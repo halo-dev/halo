@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
-import run.halo.app.event.post.VisitEvent;
+import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
@@ -313,7 +313,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         if (PostStatus.PUBLISHED.equals(status)) {
             // Log it
-            eventPublisher.publishEvent(new VisitEvent(this, post.getId()));
+            eventPublisher.publishEvent(new PostVisitEvent(this, post.getId()));
         }
 
         return post;

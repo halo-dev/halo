@@ -65,9 +65,9 @@ public class ContentSheetController {
     public String sheet(@PathVariable(value = "url") String url,
                         @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                         Model model) {
-        final Sheet sheet = sheetService.getBy(PostStatus.PUBLISHED, url);
+        Sheet sheet = sheetService.getBy(PostStatus.PUBLISHED, url);
 
-        model.addAttribute("sheet", sheet);
+        model.addAttribute("sheet", sheetService.convertToDetailDto(sheet));
 
         if (StrUtil.isNotEmpty(sheet.getTemplate())) {
             return themeService.render(sheet.getTemplate());
