@@ -22,6 +22,7 @@ import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -107,9 +108,13 @@ public class SheetServiceImpl extends AbstractCrudService<Sheet, Integer> implem
 
         Set<Integer> sheetIds = ServiceUtils.fetchProperty(sheets, Sheet::getId);
 
+        // key: sheet id, value: comment count
+        Map<Integer, Long> sheetCommentCountMap = sheetCommentService.countByPostIds(sheetIds);
 
         return sheetPage.map(sheet -> {
-            return new SheetListDTO().convertFrom(sheet);
+            SheetListDTO sheetListDTO = new SheetListDTO().convertFrom(sheet);
+            sheetListDTO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
+            return sheetListDTO;
         });
     }
 

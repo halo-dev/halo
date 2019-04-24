@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.dto.post.SheetListDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.SheetParam;
@@ -38,8 +39,9 @@ public class SheetController {
 
     @GetMapping
     @ApiOperation("Gets a page of sheet")
-    public Page<Sheet> pageBy(@PageableDefault(sort = "editTime", direction = DESC) Pageable pageable) {
-        return sheetService.pageBy(pageable);
+    public Page<SheetListDTO> pageBy(@PageableDefault(sort = "editTime", direction = DESC) Pageable pageable) {
+        Page<Sheet> sheetPage = sheetService.pageBy(pageable);
+        return sheetService.convertToListDto(sheetPage);
     }
 
     @PostMapping
