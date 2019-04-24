@@ -1,6 +1,7 @@
 package run.halo.app.model.params;
 
 import cn.hutool.crypto.digest.BCrypt;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Sheet;
@@ -15,6 +16,7 @@ import javax.validation.constraints.Size;
  * @author johnniang
  * @date 19-4-24
  */
+@Data
 public class SheetParam implements InputConverter<Sheet> {
 
     @NotBlank(message = "Title must not be blank")
