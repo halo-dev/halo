@@ -7,7 +7,6 @@ import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.SheetCommentRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
-import run.halo.app.service.base.BaseCommentServiceImpl;
 
 /**
  * Sheet comment service implementation.

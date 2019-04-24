@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,9 +14,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
-import run.halo.app.exception.AlreadyExistsException;
-import run.halo.app.exception.BadRequestException;
-import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.PostMinimalDTO;
@@ -32,20 +28,16 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.service.*;
-import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.DateUtils;
-import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
@@ -56,7 +48,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  */
 @Slf4j
 @Service
-public class PostServiceImpl extends AbstractCrudService<Post, Integer> implements PostService {
+public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostService {
 
     private final PostRepository postRepository;
 
@@ -97,23 +89,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
     @Override
     public Page<PostSimpleDTO> pageLatestOfSimple(int top) {
         return pageLatest(top).map(post -> new PostSimpleDTO().convertFrom(post));
-    }
-
-    @Override
-    public Page<Post> pageLatest(int top) {
-        Assert.isTrue(top > 0, "Top number must not be less than 0");
-
-        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "editTime"));
-
-        return listAll(latestPageable);
-    }
-
-    @Override
-    public Page<Post> pageBy(PostStatus status, Pageable pageable) {
-        Assert.notNull(status, "Post status must not be null");
-        Assert.notNull(pageable, "Page info must not be null");
-
-        return postRepository.findAllByStatus(status, pageable);
     }
 
     @Override
@@ -198,20 +173,9 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return convertToListVo(postPage);
     }
 
-    /**
-     * Counts posts by status.
-     *
-     * @param status status
-     * @return posts count
-     */
-    @Override
-    public Long countByStatus(PostStatus status) {
-        return postRepository.countByStatus(status);
-    }
-
     @Override
     public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds) {
-        return createOrUpdate(postToCreate, tagIds, categoryIds, this::create);
+        return createOrUpdate(postToCreate, tagIds, categoryIds);
     }
 
     @Override
@@ -219,7 +183,7 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
 
-        return createOrUpdate(postToUpdate, tagIds, categoryIds, this::update);
+        return createOrUpdate(postToUpdate, tagIds, categoryIds);
     }
 
     @Override
@@ -244,30 +208,11 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
         return updatedPost;
     }
 
-    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, @NonNull Function<Post, Post> postOperation) {
+    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds) {
         Assert.notNull(post, "Post param must not be null");
-        Assert.notNull(postOperation, "Post operation must not be null");
 
-        // Check url
-        long count;
-        boolean isUpdating = post.getId() != null;
-        if (isUpdating) {
-            // For updating
-            count = postRepository.countByIdNotAndUrl(post.getId(), post.getUrl());
-        } else {
-            // For creating
-            count = postRepository.countByUrl(post.getUrl());
-        }
-
-        if (count > 0) {
-            throw new AlreadyExistsException("The post url has been exist already").setErrorData(post.getUrl());
-        }
-
-        // Render content
-        post.setFormatContent(MarkdownUtils.renderMarkdown(post.getOriginalContent()));
-
-        // Update post
-        post = postOperation.apply(post);
+        // Create or update post
+        post = createOrUpdateBy(post);
 
         // List all tags
         List<Tag> tags = tagService.listAllByIds(tagIds);
@@ -291,25 +236,9 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
                 () -> ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId));
     }
 
-    /**
-     * Gets post by url.
-     *
-     * @param url post url.
-     * @return Post
-     */
-    @Override
-    public Post getByUrl(String url) {
-        return postRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("The post does not exist").setErrorData(url));
-    }
-
     @Override
     public Post getBy(PostStatus status, String url) {
-        Assert.notNull(status, "Post status must not be null");
-        Assert.hasText(url, "Post url must not be blank");
-
-        Optional<Post> postOptional = postRepository.getByUrlAndStatus(url, status);
-
-        Post post = postOptional.orElseThrow(() -> new NotFoundException("The post with status " + status + " and url " + url + "was not existed").setErrorData(url));
+        Post post = super.getBy(status, url);
 
         if (PostStatus.PUBLISHED.equals(status)) {
             // Log it
@@ -327,52 +256,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
         // Convert to post detail vo
         return convertTo(post);
-    }
-
-    @Override
-    public long countVisit() {
-        return Optional.ofNullable(postRepository.countVisit()).orElse(0L);
-    }
-
-    @Override
-    public long countLike() {
-        return Optional.ofNullable(postRepository.countLike()).orElse(0L);
-    }
-
-    @Override
-    public void increaseVisit(long visits, Integer postId) {
-        Assert.isTrue(visits > 0, "Visits to increase must not be less than 1");
-        Assert.notNull(postId, "Goods id must not be null");
-
-        long affectedRows = postRepository.updateVisit(visits, postId);
-
-        if (affectedRows != 1) {
-            log.error("Post with id: [{}] may not be found", postId);
-            throw new BadRequestException("Failed to increase visits " + visits + " for post with id " + postId);
-        }
-    }
-
-    @Override
-    public void increaseLike(long likes, Integer postId) {
-        Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
-        Assert.notNull(postId, "Goods id must not be null");
-
-        long affectedRows = postRepository.updateLikes(likes, postId);
-
-        if (affectedRows != 1) {
-            log.error("Post with id: [{}] may not be found", postId);
-            throw new BadRequestException("Failed to increase likes " + likes + " for post with id " + postId);
-        }
-    }
-
-    @Override
-    public void increaseVisit(Integer postId) {
-        increaseVisit(1L, postId);
-    }
-
-    @Override
-    public void increaseLike(Integer postId) {
-        increaseLike(1L, postId);
     }
 
     @Override
@@ -515,61 +398,6 @@ public class PostServiceImpl extends AbstractCrudService<Post, Integer> implemen
 
             return postListVO;
         });
-    }
-
-    @Override
-    public List<Post> listAllBy(PostStatus status) {
-        Assert.notNull(status, "Post status must not be null");
-
-        return postRepository.findAllByStatus(status);
-    }
-
-    @Override
-    public Post filterIfEncrypt(Post post) {
-        Assert.notNull(post, "Post must not be null");
-
-        if (StringUtils.isNotBlank(post.getPassword())) {
-            String tip = "The post is encrypted by author";
-            post.setSummary(tip);
-            post.setOriginalContent(tip);
-            post.setFormatContent(tip);
-        }
-
-        return post;
-    }
-
-    @Override
-    public Optional<Post> getPrePost(Date date) {
-        List<Post> posts = listPrePosts(date, 1);
-
-        return CollectionUtils.isEmpty(posts) ? Optional.empty() : Optional.of(posts.get(0));
-    }
-
-    @Override
-    public Optional<Post> getNextPost(Date date) {
-        List<Post> posts = listNextPosts(date, 1);
-
-        return CollectionUtils.isEmpty(posts) ? Optional.empty() : Optional.of(posts.get(0));
-    }
-
-    @Override
-    public List<Post> listPrePosts(Date date, int size) {
-        Assert.notNull(date, "Date must not be null");
-
-        return postRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
-                date,
-                PageRequest.of(0, size, Sort.by(ASC, "createTime")))
-                .getContent();
-    }
-
-    @Override
-    public List<Post> listNextPosts(Date date, int size) {
-        Assert.notNull(date, "Date must not be null");
-
-        return postRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED,
-                date,
-                PageRequest.of(0, size, Sort.by(DESC, "createTime")))
-                .getContent();
     }
 
     /**

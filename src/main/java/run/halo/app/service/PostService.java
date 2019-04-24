@@ -13,11 +13,9 @@ import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.base.CrudService;
+import run.halo.app.service.base.BasePostService;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -26,7 +24,7 @@ import java.util.Set;
  * @author johnniang
  * @author RYAN0UP
  */
-public interface PostService extends CrudService<Post, Integer> {
+public interface PostService extends BasePostService<Post> {
 
     /**
      * Lists latest posts of minimal.
@@ -46,26 +44,6 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     Page<PostSimpleDTO> pageLatestOfSimple(int top);
-
-
-    /**
-     * Lists latest posts.
-     *
-     * @param top top number must not be less than 0
-     * @return latest posts
-     */
-    @NonNull
-    Page<Post> pageLatest(int top);
-
-    /**
-     * Lists by status.
-     *
-     * @param status   post status must not be null
-     * @param pageable page info must not be null
-     * @return a page of post
-     */
-    @NonNull
-    Page<Post> pageBy(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
      * Pages posts.
@@ -108,14 +86,6 @@ public interface PostService extends CrudService<Post, Integer> {
     Page<PostListVO> pageListVoBy(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
-     * Count posts by status.
-     *
-     * @param status status
-     * @return posts count
-     */
-    Long countByStatus(PostStatus status);
-
-    /**
      * Creates post by post param.
      *
      * @param post        post must not be null
@@ -140,15 +110,6 @@ public interface PostService extends CrudService<Post, Integer> {
     PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds);
 
     /**
-     * Get post by url.
-     *
-     * @param url post url.
-     * @return Post
-     */
-    @NonNull
-    Post getByUrl(@NonNull String url);
-
-    /**
      * Gets post by post status and url.
      *
      * @param status post status must not be null
@@ -156,6 +117,7 @@ public interface PostService extends CrudService<Post, Integer> {
      * @return post info
      */
     @NonNull
+    @Override
     Post getBy(@NonNull PostStatus status, @NonNull String url);
 
     /**
@@ -166,54 +128,6 @@ public interface PostService extends CrudService<Post, Integer> {
      */
     @NonNull
     PostDetailVO getDetailVoBy(@NonNull Integer postId);
-
-    /**
-     * Counts visit total number.
-     *
-     * @return visit total number
-     */
-    long countVisit();
-
-    /**
-     * Counts like total number.
-     *
-     * @return like total number
-     */
-    long countLike();
-
-    /**
-     * Increases post visits.
-     *
-     * @param visits visits must not be less than 1
-     * @param postId post id must not be null
-     */
-    @Transactional
-    void increaseVisit(long visits, @NonNull Integer postId);
-
-    /**
-     * Increase post likes.
-     *
-     * @param likes  likes must not be less than 1
-     * @param postId post id must not be null
-     */
-    @Transactional
-    void increaseLike(long likes, @NonNull Integer postId);
-
-    /**
-     * Increases post visits (1).
-     *
-     * @param postId post id must not be null
-     */
-    @Transactional
-    void increaseVisit(@NonNull Integer postId);
-
-    /**
-     * Increase post likes(1).
-     *
-     * @param postId post id must not be null
-     */
-    @Transactional
-    void increaseLike(@NonNull Integer postId);
 
     /**
      * Lists year archives.
@@ -249,59 +163,4 @@ public interface PostService extends CrudService<Post, Integer> {
     @NonNull
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
 
-    /**
-     * Lists all posts by post status.
-     *
-     * @param status post status must not be null
-     * @return a list of post
-     */
-    @NonNull
-    List<Post> listAllBy(@NonNull PostStatus status);
-
-    /**
-     * Filters post content if the password is not blank.
-     *
-     * @param post original post must not be null
-     * @return filtered post
-     */
-    @NonNull
-    Post filterIfEncrypt(@NonNull Post post);
-
-    /**
-     * Gets previous post.
-     *
-     * @param date date must not be null
-     * @return an optional post
-     */
-    @NonNull
-    Optional<Post> getPrePost(@NonNull Date date);
-
-    /**
-     * Gets next post.
-     *
-     * @param date date must not be null
-     * @return an optional post
-     */
-    @NonNull
-    Optional<Post> getNextPost(@NonNull Date date);
-
-    /**
-     * Lists previous posts.
-     *
-     * @param date date must not be null
-     * @param size previous max post size
-     * @return a list of previous post
-     */
-    @NonNull
-    List<Post> listPrePosts(@NonNull Date date, int size);
-
-    /**
-     * Lits next posts.
-     *
-     * @param date date must not be null
-     * @param size next max post size
-     * @return a list of next post
-     */
-    @NonNull
-    List<Post> listNextPosts(@NonNull Date date, int size);
 }

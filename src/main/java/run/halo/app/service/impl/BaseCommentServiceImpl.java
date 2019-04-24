@@ -1,4 +1,4 @@
-package run.halo.app.service.base;
+package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -31,6 +31,8 @@ import run.halo.app.repository.base.BaseCommentRepository;
 import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.service.base.BaseCommentService;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ServletUtils;
 
