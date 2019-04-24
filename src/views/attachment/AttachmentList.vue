@@ -224,14 +224,6 @@ export default {
     showUploadModal() {
       this.uploadVisible = true
     },
-    handleChange(info) {
-      const status = info.file.status
-      if (status === 'done') {
-        this.$message.success(`${info.file.name} 文件上传成功`)
-      } else if (status === 'error') {
-        this.$message.error(`${info.file.name} 文件上传失败`)
-      }
-    },
     handleUploadSuccess() {
       this.loadAttachments()
       this.loadMediaTypes()

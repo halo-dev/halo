@@ -14,6 +14,8 @@
       >
         <a-input-search
           placeholder="搜索附件"
+          v-model="queryParam.keyword"
+          @search="loadAttachments(true)"
           enterButton
         />
       </a-row>
@@ -122,6 +124,12 @@ export default {
         size: 10,
         sort: ''
       },
+      queryParam: {
+        page: 0,
+        size: 18,
+        sort: null,
+        keyword: null
+      },
       attachments: [],
       selectedAttachment: {},
       attachmentUploadHandler: attachmentApi.upload
@@ -161,10 +169,14 @@ export default {
       this.$log.debug('Show detail of', attachment)
       this.detailVisiable = true
     },
-    loadAttachments() {
-      const pagination = Object.assign({}, this.pagination)
-      pagination.page--
-      attachmentApi.query(pagination).then(response => {
+    loadAttachments(isSearch) {
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
+      this.queryParam.sort = this.pagination.sort
+      if (isSearch) {
+        this.queryParam.page = 0
+      }
+      attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
       })
