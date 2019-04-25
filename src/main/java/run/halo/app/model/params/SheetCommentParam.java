@@ -3,17 +3,17 @@ package run.halo.app.model.params;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.entity.SheetComment;
 
 /**
- * PostComment param.
+ * Sheet comment param.
  *
  * @author johnniang
- * @date 3/22/19
+ * @date 19-4-25
  */
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class CommentParam extends BaseCommentParam<PostComment> {
+public class SheetCommentParam extends BaseCommentParam<SheetComment> {
 
 }
