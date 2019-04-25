@@ -2,10 +2,9 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.post.SheetDetailDTO;
-import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.base.BasePostService;
 
 /**

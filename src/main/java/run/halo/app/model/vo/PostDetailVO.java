@@ -1,9 +1,8 @@
 package run.halo.app.model.vo;
 
-import run.halo.app.model.dto.post.BasePostDetailDTO;
-import run.halo.app.model.dto.post.PostDetailDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
 
 import java.util.Set;
 
