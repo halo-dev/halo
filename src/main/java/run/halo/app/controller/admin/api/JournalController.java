@@ -5,14 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
-import run.halo.app.model.entity.JournalComment;
-import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
@@ -51,7 +49,7 @@ public class JournalController {
 
     @GetMapping
     @ApiOperation("Gets latest journals")
-    public Page<JournalWithCmtCountDTO> pageBy(Pageable pageable) {
+    public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
         Page<Journal> journalPage = journalService.listAll(pageable);
         return journalService.convertToCmtCountDto(journalPage);
     }
@@ -68,6 +66,15 @@ public class JournalController {
     public JournalDTO createBy(@RequestBody @Valid JournalParam journalParam) {
         Journal createdJournal = journalService.createBy(journalParam);
         return journalService.convertTo(createdJournal);
+    }
+
+    @PutMapping("{id:\\d+}")
+    @ApiOperation("Updates a Journal")
+    public JournalDTO updateBy(@PathVariable("id") Integer id,
+                               @RequestBody @Valid JournalParam journalParam) {
+        Journal journal = journalService.getById(id);
+        journalParam.update(journal);
+        return new JournalDTO().convertFrom(journalService.update(journal));
     }
 
     @GetMapping("{journalId:\\d+}/comments/tree_view")

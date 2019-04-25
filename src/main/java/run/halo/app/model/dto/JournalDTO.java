@@ -4,6 +4,8 @@ import lombok.Data;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Journal;
 
+import java.util.Date;
+
 /**
  * Journal dto.
  *
@@ -18,4 +20,6 @@ public class JournalDTO implements OutputConverter<JournalDTO, Journal> {
     private String content;
 
     private Long likes;
+
+    private Date createTime;
 }
