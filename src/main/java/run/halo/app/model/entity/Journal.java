@@ -1,7 +1,12 @@
 package run.halo.app.model.entity;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
 
 /**
  * Journal entity
@@ -9,17 +14,33 @@ import javax.persistence.Entity;
  * @author johnniang
  * @date 3/22/19
  */
-@Entity(name = "Journal")
-@DiscriminatorValue("2")
-public class Journal extends BaseComment {
+@Entity
+@Table(name = "journals")
+@SQLDelete(sql = "update journals set deleted = true where id = ?")
+@Where(clause = "deleted = false")
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class Journal extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "content", columnDefinition = "varchar(1023) not null")
+    private String content;
+
+    @Column(name = "likes", columnDefinition = "bigint default 0")
+    private Long likes;
 
     @Override
     public void prePersist() {
         super.prePersist();
 
-        if (getPostId() == null) {
-            setPostId(0);
+        id = null;
+
+        if (likes == null || likes < 0) {
+            likes = 0L;
         }
     }
 }

@@ -1,12 +1,12 @@
 package run.halo.app.model.entity;
 
-import run.halo.app.model.enums.PostCreateFrom;
-import run.halo.app.model.enums.PostStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import run.halo.app.model.enums.PostCreateFrom;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.utils.MarkdownUtils;
 
 import javax.persistence.*;
@@ -143,10 +143,6 @@ public class BasePost extends BaseEntity {
             thumbnail = "";
         }
 
-        if (visits == null) {
-            visits = 0L;
-        }
-
         if (disallowComment == null) {
             disallowComment = false;
         }
@@ -167,7 +163,11 @@ public class BasePost extends BaseEntity {
             createFrom = PostCreateFrom.ADMIN;
         }
 
-        if (likes == null) {
+        if (visits == null || visits < 0) {
+            visits = 0L;
+        }
+
+        if (likes == null || likes < 0) {
             likes = 0L;
         }
     }
