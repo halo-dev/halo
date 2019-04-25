@@ -13,4 +13,13 @@ import javax.persistence.Entity;
 @DiscriminatorValue("2")
 public class Journal extends BaseComment {
 
+
+    @Override
+    public void prePersist() {
+        super.prePersist();
+
+        if (getPostId() == null) {
+            setPostId(0);
+        }
+    }
 }
