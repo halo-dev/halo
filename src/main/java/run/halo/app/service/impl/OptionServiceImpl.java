@@ -130,7 +130,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         Set<String> keys = ServiceUtils.fetchProperty(options, Option::getKey);
 
-        Map<String, Object> result = ServiceUtils.convertToMap(options, Option::getKey, option -> {
+        Map<String, Object> userDefinedOptionMap = ServiceUtils.convertToMap(options, Option::getKey, option -> {
             String key = option.getKey();
 
             PropertyEnum propertyEnum = propertyEnumMap.get(key);
@@ -141,6 +141,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
             return PropertyEnum.convertTo(option.getValue(), propertyEnum);
         });
+
+        Map<String, Object> result = new HashMap<>(userDefinedOptionMap);
 
         // Add default property
         propertyEnumMap.keySet()

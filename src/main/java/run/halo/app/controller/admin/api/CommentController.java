@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.CommentDTO;
+import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentParam;
@@ -57,29 +57,26 @@ public class CommentController {
 
     @PostMapping
     @ApiOperation("Creates a comment (new or reply)")
-    public CommentDTO createBy(@RequestBody CommentParam commentParam) {
-        return new CommentDTO().convertFrom(commentService.createBy(commentParam));
+    public BaseCommentDTO createBy(@RequestBody CommentParam commentParam) {
+        Comment createdComment = commentService.createBy(commentParam);
+        return commentService.convertTo(createdComment);
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
     @ApiOperation("Updates comment status")
-    public CommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
-                                     @PathVariable("status") CommentStatus status) {
+    public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
+                                         @PathVariable("status") CommentStatus status) {
         // Update comment status
         Comment updatedComment = commentService.updateStatus(commentId, status);
 
-        return new CommentDTO().convertFrom(updatedComment);
+        return commentService.convertTo(updatedComment);
     }
 
     @DeleteMapping("{commentId:\\d+}")
     @ApiOperation("Deletes comment permanently and recursively")
-    public CommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
-        // Get comment by id
-        Comment comment = commentService.getById(commentId);
+    public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
+        Comment deletedComment = commentService.removeById(commentId);
 
-        // Remove it
-        commentService.remove(comment);
-
-        return new CommentDTO().convertFrom(comment);
+        return commentService.convertTo(deletedComment);
     }
 }
