@@ -30,7 +30,7 @@ public class ContentSheetController {
     }
 
     /**
-     * Render gallery page
+     * Render photo page
      *
      * @return template path: themes/{theme}/gallery.ftl
      */

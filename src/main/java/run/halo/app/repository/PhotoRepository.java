@@ -2,24 +2,24 @@ package run.halo.app.repository;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import run.halo.app.model.entity.Gallery;
+import run.halo.app.model.entity.Photo;
 import run.halo.app.repository.base.BaseRepository;
 
 import java.util.List;
 
 /**
- * Gallery repository.
+ * Photo repository.
  *
  * @author johnniang
  */
-public interface GalleryRepository extends BaseRepository<Gallery, Integer>, JpaSpecificationExecutor<Gallery> {
+public interface PhotoRepository extends BaseRepository<Photo, Integer>, JpaSpecificationExecutor<Photo> {
 
     /**
-     * Query galleries by team
+     * Query photos by team
      *
      * @param team team
      * @param sort sort
-     * @return list of gallery
+     * @return list of photo
      */
-    List<Gallery> findByTeam(String team, Sort sort);
+    List<Photo> findByTeam(String team, Sort sort);
 }
