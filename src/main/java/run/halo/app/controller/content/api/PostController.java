@@ -8,13 +8,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.post.PostDetailDTO;
-import run.halo.app.model.dto.post.PostSimpleDTO;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
+import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
-import run.halo.app.service.PostCommentService;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -45,28 +46,29 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<PostSimpleDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
-        return postService.pageSimpleDtoByStatus(PostStatus.PUBLISHED, pageable);
+    public Page<BasePostSimpleDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        return postService.convertToSimple(postPage);
     }
 
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
-    public PostDetailDTO getBy(@PathVariable("postId") Integer postId,
-                               @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
-                               @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
-        PostDetailDTO postDetail = new PostDetailDTO().convertFrom(postService.getById(postId));
+    public BasePostDetailDTO getBy(@PathVariable("postId") Integer postId,
+                                   @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+                                   @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+        BasePostDetailDTO detailDTO = postService.convertToDetail(postService.getById(postId));
 
         if (formatDisabled) {
             // Clear the format content
-            postDetail.setFormatContent(null);
+            detailDTO.setFormatContent(null);
         }
 
         if (sourceDisabled) {
             // Clear the original content
-            postDetail.setOriginalContent(null);
+            detailDTO.setOriginalContent(null);
         }
 
-        return postDetail;
+        return detailDTO;
     }
 
     @GetMapping("{postId:\\d+}/comments/tree_view")

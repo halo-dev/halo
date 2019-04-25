@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
@@ -75,7 +76,9 @@ public class ContentIndexController {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, sort);
 
-        Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, pageable);
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
+
         int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
         model.addAttribute("is_index", true);

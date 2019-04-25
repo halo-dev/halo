@@ -82,16 +82,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public Page<PostMinimalDTO> pageLatestOfMinimal(int top) {
-        return pageLatest(top).map(post -> new PostMinimalDTO().convertFrom(post));
-    }
-
-    @Override
-    public Page<PostSimpleDTO> pageLatestOfSimple(int top) {
-        return pageLatest(top).map(post -> new PostSimpleDTO().convertFrom(post));
-    }
-
-    @Override
     public Page<Post> pageBy(PostQuery postQuery, Pageable pageable) {
         Assert.notNull(postQuery, "Post query must not be null");
         Assert.notNull(pageable, "Page info must not be null");
@@ -107,6 +97,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
+        postQuery.setStatus(PostStatus.PUBLISHED);
 
         // Build specification and find all
         return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
@@ -152,25 +143,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             return query.where(predicates.toArray(new Predicate[0])).getRestriction();
         };
-    }
-
-    /**
-     * List by status.
-     *
-     * @param status   status
-     * @param pageable pageable
-     * @return Page<PostSimpleDTO>
-     */
-    @Override
-    public Page<PostSimpleDTO> pageSimpleDtoByStatus(PostStatus status, Pageable pageable) {
-        return pageBy(status, pageable).map(post -> new PostSimpleDTO().convertFrom(post));
-    }
-
-    @Override
-    public Page<PostListVO> pageListVoBy(PostStatus status, Pageable pageable) {
-        Page<Post> postPage = pageBy(status, pageable);
-
-        return convertToListVo(postPage);
     }
 
     @Override
@@ -249,16 +221,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public PostDetailVO getDetailVoBy(Integer postId) {
-        Assert.notNull(postId, "post id must not be null");
-
-        Post post = getById(postId);
-
-        // Convert to post detail vo
-        return convertTo(post);
-    }
-
-    @Override
     public List<ArchiveYearVO> listYearArchives() {
         // Get all posts
         List<Post> posts = postRepository.findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
@@ -324,6 +286,13 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
+    public PostDetailVO convertToDetailVo(Post post) {
+        return convertTo(post,
+                () -> postTagService.listTagIdsByPostId(post.getId()),
+                () -> postCategoryService.listCategoryIdsByPostId(post.getId()));
+    }
+
+    @Override
     public Post removeById(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
@@ -345,13 +314,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED, deletedPost.getTitle()));
 
         return deletedPost;
-    }
-
-    @Override
-    public Page<PostSimpleDTO> convertToSimpleDto(@NonNull Page<Post> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(post -> new PostSimpleDTO().convertFrom(post));
     }
 
     @Override
@@ -416,19 +378,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return posts.stream()
                 .map(post -> new PostMinimalDTO().<PostMinimalDTO>convertFrom(post))
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Converts to post detail vo.
-     *
-     * @param post post must not be null
-     * @return post detail vo
-     */
-    @NonNull
-    private PostDetailVO convertTo(@NonNull Post post) {
-        return convertTo(post,
-                () -> postTagService.listTagIdsByPostId(post.getId()),
-                () -> postCategoryService.listCategoryIdsByPostId(post.getId()));
     }
 
     /**

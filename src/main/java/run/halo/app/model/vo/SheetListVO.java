@@ -1,8 +1,9 @@
-package run.halo.app.model.dto.post;
+package run.halo.app.model.vo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
 
 /**
  * Sheet list dto.
@@ -13,7 +14,7 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class SheetListDTO extends SheetSimpleDTO {
+public class SheetListVO extends BasePostSimpleDTO {
 
     private Long commentCount;
 }

@@ -7,15 +7,14 @@ import run.halo.app.model.enums.PostCreateFrom;
 import run.halo.app.model.enums.PostType;
 
 /**
- * Page simple output dto.
+ * Base page simple output dto.
  *
  * @author johnniang
  */
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-@Deprecated
-public class PostSimpleDTO extends PostMinimalDTO {
+public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
     private PostType type;
 

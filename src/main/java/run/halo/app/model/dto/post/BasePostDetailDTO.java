@@ -5,15 +5,14 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * Post detail output dto.
+ * Base post detail output dto.
  *
  * @author johnniang
  */
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-@Deprecated
-public class PostDetailDTO extends PostSimpleDTO {
+public class BasePostDetailDTO extends BasePostSimpleDTO {
 
     private String originalContent;
 
