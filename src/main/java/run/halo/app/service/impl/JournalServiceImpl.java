@@ -1,9 +1,12 @@
 package run.halo.app.service.impl;
 
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.repository.JournalRepository;
+import run.halo.app.repository.PostRepository;
 import run.halo.app.service.JournalService;
-import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.service.OptionService;
 
 /**
  * Journal service implementation.
@@ -11,12 +14,16 @@ import run.halo.app.service.base.AbstractCrudService;
  * @author johnniang
  * @date 19-4-24
  */
-public class JournalServiceImpl extends AbstractCrudService<Journal, Long> implements JournalService {
+@Service
+public class JournalServiceImpl extends BaseCommentServiceImpl<Journal> implements JournalService {
 
     private final JournalRepository journalRepository;
 
-    public JournalServiceImpl(JournalRepository journalRepository) {
-        super(journalRepository);
+    public JournalServiceImpl(JournalRepository journalRepository,
+                              PostRepository postRepository,
+                              OptionService optionService,
+                              ApplicationEventPublisher eventPublisher) {
+        super(journalRepository, postRepository, optionService, eventPublisher);
         this.journalRepository = journalRepository;
     }
 }
