@@ -67,7 +67,8 @@
             <a-list
               itemLayout="vertical"
               :pagination="pagination"
-              :dataSource="listData"
+              :dataSource="journals"
+              :loading="listLoading"
             >
               <a-list-item
                 slot="renderItem"
@@ -119,6 +120,8 @@
 </template>
 
 <script>
+import journalApi from '@/api/journal'
+
 const listData = []
 for (let i = 0; i < 50; i++) {
   listData.push({
@@ -135,18 +138,41 @@ export default {
   data() {
     return {
       listData,
+      listLoading: false,
       visible: false,
       pagination: {
-        onChange: page => {
-          console.log(page)
-        },
-        pageSize: 10
+        page: 1,
+        size: 10,
+        sort: null
+      },
+      queryParam: {
+        page: 0,
+        size: 10,
+        sort: null,
+        keyword: null
       },
       actions: [{ type: 'star-o', text: '156' }, { type: 'like-o', text: '156' }, { type: 'message', text: '2' }],
-      journal: {}
+      journals: {}
     }
   },
+  created() {
+    this.loadJournals()
+  },
   methods: {
+    loadJournals(isSearch) {
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
+      this.queryParam.sort = this.pagination.sort
+      if (isSearch) {
+        this.queryParam.page = 0
+      }
+      this.listLoading = true
+      journalApi.query(this.queryParam).then(response => {
+        this.journals = response.data.data.content
+        this.pagination.total = response.data.data.total
+        this.listLoading = false
+      })
+    },
     handleNew() {
       this.visible = true
     },
