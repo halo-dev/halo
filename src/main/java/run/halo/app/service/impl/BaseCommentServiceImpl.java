@@ -207,41 +207,40 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
-    public COMMENT createBy(COMMENT COMMENT) {
-        Assert.notNull(COMMENT, "Domain must not be null");
+    public COMMENT createBy(COMMENT comment) {
+        Assert.notNull(comment, "Domain must not be null");
 
         // Check post id
-        boolean isPostExist = postRepository.existsById(COMMENT.getPostId());
-        if (!isPostExist) {
-            throw new NotFoundException("The post with id " + COMMENT.getPostId() + " was not found");
+        if (!ServiceUtils.isEmptyId(comment.getPostId())) {
+            postMustExist(comment.getPostId());
         }
 
         // Check parent id
-        if (!ServiceUtils.isEmptyId(COMMENT.getParentId())) {
-            mustExistById(COMMENT.getParentId());
+        if (!ServiceUtils.isEmptyId(comment.getParentId())) {
+            mustExistById(comment.getParentId());
         }
 
         // Check user login status and set this field
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // Set some default values
-        COMMENT.setIpAddress(ServletUtils.getRequestIp());
-        COMMENT.setUserAgent(ServletUtils.getHeaderIgnoreCase(HttpHeaders.USER_AGENT));
-        COMMENT.setGavatarMd5(DigestUtils.md5Hex(COMMENT.getEmail()));
+        comment.setIpAddress(ServletUtils.getRequestIp());
+        comment.setUserAgent(ServletUtils.getHeaderIgnoreCase(HttpHeaders.USER_AGENT));
+        comment.setGavatarMd5(DigestUtils.md5Hex(comment.getEmail()));
 
         if (authentication != null) {
             // Comment of blogger
-            COMMENT.setIsAdmin(true);
-            COMMENT.setStatus(CommentStatus.PUBLISHED);
+            comment.setIsAdmin(true);
+            comment.setStatus(CommentStatus.PUBLISHED);
         } else {
             // Comment of guest
             // Handle comment status
             Boolean needAudit = optionService.getByPropertyOrDefault(CommentProperties.NEW_NEED_CHECK, Boolean.class, true);
-            COMMENT.setStatus(needAudit ? CommentStatus.AUDITING : CommentStatus.PUBLISHED);
+            comment.setStatus(needAudit ? CommentStatus.AUDITING : CommentStatus.PUBLISHED);
         }
 
         // Create comment
-        COMMENT createdComment = create(COMMENT);
+        COMMENT createdComment = create(comment);
 
         if (ServiceUtils.isEmptyId(createdComment.getParentId())) {
             if (authentication == null) {
@@ -300,6 +299,18 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         Assert.notNull(comment, "Comment must not be null");
 
         return new BaseCommentDTO().convertFrom(comment);
+    }
+
+    /**
+     * Post must exist.
+     *
+     * @param postId post id must not be null
+     */
+    protected void postMustExist(@NonNull Integer postId) {
+        boolean isPostExist = postRepository.existsById(postId);
+        if (!isPostExist) {
+            throw new NotFoundException("The post with id " + postId + " was not found");
+        }
     }
 
     @NonNull

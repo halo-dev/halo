@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.JournalParam;
@@ -16,6 +17,7 @@ import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
+import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ValidationUtils;
 
 /**
@@ -51,6 +53,11 @@ public class JournalServiceImpl extends BaseCommentServiceImpl<Journal> implemen
             journalParam.setAuthor(StringUtils.isBlank(user.getNickname()) ? user.getUsername() : user.getNickname());
             journalParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
             journalParam.setEmail(user.getEmail());
+        } else {
+            // Guest comment
+            if (ServiceUtils.isEmptyId(journalParam.getParentId())) {
+                throw new ForbiddenException("You have no right to create a journal");
+            }
         }
 
         // Validate the journal param

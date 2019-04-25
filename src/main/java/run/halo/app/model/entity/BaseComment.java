@@ -132,7 +132,6 @@ public class BaseComment extends BaseEntity {
         if (isAdmin == null) {
             isAdmin = false;
         }
-
     }
 
 }
