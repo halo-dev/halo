@@ -8,10 +8,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.service.OptionService;
@@ -85,6 +87,12 @@ public class PostController {
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return postCommentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+    }
+
+    @PostMapping("comments")
+    @ApiOperation("Comments a post")
+    public BaseCommentDTO comment(@RequestBody PostCommentParam postCommentParam) {
+        return postCommentService.convertTo(postCommentService.createBy(postCommentParam));
     }
 
     @PostMapping("{postId:\\d+}/likes")
