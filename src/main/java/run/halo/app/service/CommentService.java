@@ -18,15 +18,6 @@ import java.util.List;
 public interface CommentService extends BaseCommentService<Comment> {
 
     /**
-     * Creates a comment by comment param.
-     *
-     * @param commentParam comment param must not be null
-     * @return created comment
-     */
-    @NonNull
-    Comment createBy(@NonNull CommentParam commentParam);
-
-    /**
      * Converts to with post vo.
      *
      * @param commentPage comment page must not be null

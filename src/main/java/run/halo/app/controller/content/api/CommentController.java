@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import run.halo.app.model.dto.CommentDTO;
+import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.params.CommentParam;
 import run.halo.app.service.CommentService;
 
@@ -27,7 +27,7 @@ public class CommentController {
 
     @PostMapping
     @ApiOperation("Comments a post")
-    public CommentDTO comment(@RequestBody CommentParam commentParam) {
-        return new CommentDTO().convertFrom(commentService.createBy(commentParam));
+    public BaseCommentDTO comment(@RequestBody CommentParam commentParam) {
+        return commentService.convertTo(commentService.createBy(commentParam));
     }
 }
