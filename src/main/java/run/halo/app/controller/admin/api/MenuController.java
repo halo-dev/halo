@@ -44,6 +44,18 @@ public class MenuController {
         return menuService.listAsTree(sort);
     }
 
+    /**
+     * Get menu by menuId.
+     *
+     * @param menuId menuId
+     * @return MenuDTO
+     */
+    @GetMapping("{menuId:\\d+}")
+    @ApiOperation("Get menu detail by id")
+    public MenuDTO getBy(@PathVariable("menuId") Integer menuId) {
+        return new MenuDTO().convertFrom(menuService.getById(menuId));
+    }
+
     @PostMapping
     @ApiOperation("Creates a menu")
     public MenuDTO createBy(@RequestBody @Valid MenuParam menuParam) {

@@ -75,7 +75,21 @@ public class PhotoController {
     }
 
     @PostMapping
-    public Photo createBy(@Valid @RequestBody PhotoParam photoParam) {
-        return photoService.createBy(photoParam);
+    public PhotoDTO createBy(@Valid @RequestBody PhotoParam photoParam) {
+        return new PhotoDTO().convertFrom(photoService.createBy(photoParam));
+    }
+
+    @PutMapping("{photoId:\\d+}")
+    @ApiOperation("Updates a photo")
+    public PhotoDTO updateBy(@PathVariable("photoId") Integer photoId,
+                             @RequestBody @Valid PhotoParam photoParam) {
+        // Get the photo
+        Photo photo = photoService.getById(photoId);
+
+        // Update changed properties of the photo
+        photoParam.update(photo);
+
+        // Update menu in database
+        return new PhotoDTO().convertFrom(photoService.update(photo));
     }
 }

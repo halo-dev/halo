@@ -24,4 +24,8 @@ public class PhotoDTO implements OutputConverter<PhotoDTO, Photo> {
     private String url;
 
     private String team;
+
+    private String location;
+
+    private String description;
 }
