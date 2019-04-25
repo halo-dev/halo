@@ -7,40 +7,36 @@
           :md="12"
           :lg="8"
         >
-          <div class="case">
-            <a-card
-              title="Markdown 导入"
-              :bordered="false"
-            >
-              <span style="font-size:18px">Markdown 文档导入</span>
-              <a-button
-                type="primary"
-                style="float:right"
-                @click="importMarkDown"
-              >导入</a-button>
-              <p>支持 Hexo/Jekyll 导入并解析元数据</p>
-            </a-card>
-          </div>
+          <a-card
+            title="Markdown 导入"
+            :bordered="false"
+          >
+            <span style="font-size:18px">Markdown 文档导入</span>
+            <a-button
+              type="primary"
+              style="float:right"
+              @click="importMarkDown"
+            >导入</a-button>
+            <p>支持 Hexo/Jekyll 导入并解析元数据</p>
+          </a-card>
         </a-col>
         <a-col
           :sm="24"
           :md="12"
           :lg="8"
         >
-          <div class="case">
-            <a-card
-              title="WordPress 导入"
-              :bordered="false"
-            >
-              <span style="font-size:18px">WordPress 数据导入</span>
-              <a-button
-                type="primary"
-                style="float:right"
-                @click="importWordPress"
-              >导入</a-button>
-              <p>尽请期待</p>
-            </a-card>
-          </div>
+          <a-card
+            title="WordPress 导入"
+            :bordered="false"
+          >
+            <span style="font-size:18px">WordPress 数据导入</span>
+            <a-button
+              type="primary"
+              style="float:right"
+              @click="importWordPress"
+            >导入</a-button>
+            <p>尽请期待</p>
+          </a-card>
         </a-col>
       </a-row>
       <a-modal
@@ -97,10 +93,4 @@ export default {
 </script>
 
 <style scoped>
-.card-content {
-  padding: 11px;
-}
-.case {
-  padding: 5px;
-}
 </style>

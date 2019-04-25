@@ -116,6 +116,11 @@
                     :src="postToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
                     @click="showThumbDrawer"
                   >
+                  <a-button
+                    class="post-thum-remove"
+                    type="dashed"
+                    @click="handlerRemoveThumb"
+                  >移除</a-button>
                 </div>
               </div>
             </div>
@@ -165,33 +170,11 @@ import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { toolbars } from '@/core/const'
 import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
-const toolbars = {
-  bold: true, // 粗体
-  italic: true, // 斜体
-  header: true, // 标题
-  underline: true, // 下划线
-  strikethrough: true, // 中划线
-  quote: true, // 引用
-  ol: true, // 有序列表
-  ul: true, // 无序列表
-  link: true, // 链接
-  imagelink: true, // 图片链接
-  code: true, // code
-  table: true, // 表格
-  fullscreen: true, // 全屏编辑
-  readmodel: true, // 沉浸式阅读
-  htmlcode: true, // 展示html源码
-  undo: true, // 上一步
-  redo: true, // 下一步
-  trash: true, // 清空
-  navigation: true, // 导航目录
-  subfield: true, // 单双栏模式
-  preview: true // 预览
-}
 export default {
   components: {
     TagSelect,
@@ -204,6 +187,7 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
+      toolbars,
       wrapperCol: {
         xl: { span: 24 },
         sm: { span: 24 },
@@ -216,7 +200,6 @@ export default {
       categories: [],
       selectedCategoryIds: [],
       selectedTagIds: [],
-      toolbars: toolbars,
       postToStage: {}
     }
   },
@@ -296,6 +279,9 @@ export default {
       this.postToStage.status = 'DRAFT'
       this.createOrUpdatePost()
     },
+    handlerRemoveThumb() {
+      this.postToStage.thumbnail = null
+    },
     onClose() {
       this.visible = false
     },
@@ -307,14 +293,20 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .v-note-wrapper {
   z-index: 1000;
   min-height: 580px;
 }
 
-.post-thum .img {
-  width: 100%;
-  cursor: pointer;
+.post-thum {
+  .img {
+    width: 100%;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .post-thum-remove {
+    margin-top: 16px;
+  }
 }
 </style>

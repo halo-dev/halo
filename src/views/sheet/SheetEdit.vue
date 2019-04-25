@@ -89,6 +89,11 @@
                     :src="sheetToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
                     @click="showThumbDrawer"
                   >
+                  <a-button
+                    class="sheet-thum-remove"
+                    type="dashed"
+                    @click="handlerRemoveThumb"
+                  >移除</a-button>
                 </div>
               </div>
             </div>
@@ -99,7 +104,7 @@
             @listenToSelect="selectSheetThumb"
             :drawerWidth="460"
           />
-          <div class="sheetControl">
+          <div class="bottom-control">
             <a-button
               style="marginRight: 8px"
               @click="handleDraftClick"
@@ -133,32 +138,10 @@ import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { toolbars } from '@/core/const'
 import 'mavon-editor/dist/css/index.css'
 import sheetApi from '@/api/sheet'
 import themeApi from '@/api/theme'
-const toolbars = {
-  bold: true, // 粗体
-  italic: true, // 斜体
-  header: true, // 标题
-  underline: true, // 下划线
-  strikethrough: true, // 中划线
-  quote: true, // 引用
-  ol: true, // 有序列表
-  ul: true, // 无序列表
-  link: true, // 链接
-  imagelink: true, // 图片链接
-  code: true, // code
-  table: true, // 表格
-  fullscreen: true, // 全屏编辑
-  readmodel: true, // 沉浸式阅读
-  htmlcode: true, // 展示html源码
-  undo: true, // 上一步
-  redo: true, // 下一步
-  trash: true, // 清空
-  navigation: true, // 导航目录
-  subfield: true, // 单双栏模式
-  preview: true // 预览
-}
 export default {
   components: {
     mavonEditor,
@@ -169,6 +152,7 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
+      toolbars,
       wrapperCol: {
         xl: { span: 24 },
         sm: { span: 24 },
@@ -176,9 +160,7 @@ export default {
       },
       attachmentDrawerVisible: false,
       thumDrawerVisible: false,
-      toolbars,
       visible: false,
-      sheetUrl: 'hello-world',
       customTpls: [],
       sheetToStage: {}
     }
@@ -230,6 +212,9 @@ export default {
       this.sheetToStage.status = 'DRAFT'
       this.createOrUpdateSheet()
     },
+    handlerRemoveThumb() {
+      this.sheetToStage.thumbnail = null
+    },
     createOrUpdateSheet() {
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage).then(response => {
@@ -254,25 +239,20 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style lang="less" scoped>
 .v-note-wrapper {
   z-index: 1000;
   min-height: 580px;
 }
 
-.sheetControl {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
-  border-top: 1px solid rgb(232, 232, 232);
-  padding: 10px 16px;
-  text-align: right;
-  left: 0px;
-  background: rgb(255, 255, 255);
-  border-radius: 0px 0px 4px 4px;
-}
-
-.sheet-thum .img {
-  width: 100%;
+.sheet-thum {
+  .img {
+    width: 100%;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .sheet-thum-remove {
+    margin-top: 16px;
+  }
 }
 </style>
