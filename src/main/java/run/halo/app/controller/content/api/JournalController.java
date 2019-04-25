@@ -38,20 +38,20 @@ public class JournalController {
         this.optionService = optionService;
     }
 
-    @GetMapping("{sheetId:\\d+}/comments/tree_view")
+    @GetMapping("{journalId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
-    public Page<BaseCommentVO> listCommentsTree(@PathVariable("sheetId") Integer sheetId,
+    public Page<BaseCommentVO> listCommentsTree(@PathVariable("journalId") Integer journalId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                 @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageVosBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return journalCommentService.pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
-    @GetMapping("{sheetId:\\d+}/comments/list_view")
+    @GetMapping("{journalId:\\d+}/comments/list_view")
     @ApiOperation("Lists comment with list view")
-    public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
+    public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageWithParentVoBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return journalCommentService.pageWithParentVoBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @PostMapping("comments")
