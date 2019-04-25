@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.params.CommentParam;
+import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.service.PostCommentService;
@@ -50,8 +50,8 @@ public class PostCommentController {
 
     @PostMapping
     @ApiOperation("Creates a comment (new or reply)")
-    public BaseCommentDTO createBy(@RequestBody CommentParam commentParam) {
-        PostComment createdPostComment = postCommentService.createBy(commentParam);
+    public BaseCommentDTO createBy(@RequestBody PostCommentParam postCommentParam) {
+        PostComment createdPostComment = postCommentService.createBy(postCommentParam);
         return postCommentService.convertTo(createdPostComment);
     }
 

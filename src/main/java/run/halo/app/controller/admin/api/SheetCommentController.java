@@ -1,16 +1,24 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.SheetComment;
+import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.SheetCommentParam;
+import run.halo.app.model.vo.SheetCommentWithSheetVO;
 import run.halo.app.service.SheetCommentService;
 
+import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 /**
+ * Sheet comment controller.
+ *
  * @author johnniang
  * @date 19-4-25
  */
@@ -22,6 +30,19 @@ public class SheetCommentController {
 
     public SheetCommentController(SheetCommentService sheetCommentService) {
         this.sheetCommentService = sheetCommentService;
+    }
+
+    @GetMapping
+    public Page<SheetCommentWithSheetVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                                CommentQuery commentQuery) {
+        Page<SheetComment> sheetCommentPage = sheetCommentService.pageBy(commentQuery, pageable);
+        return sheetCommentService.convertToWithPostVo(sheetCommentPage);
+    }
+
+    @GetMapping("latest")
+    public List<SheetCommentWithSheetVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+        Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top);
+        return sheetCommentService.convertToWithPostVo(sheetCommentPage.getContent());
     }
 
     @PostMapping

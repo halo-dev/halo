@@ -14,6 +14,6 @@ import run.halo.app.model.entity.PostComment;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class CommentParam extends BaseCommentParam<PostComment> {
+public class PostCommentParam extends BaseCommentParam<PostComment> {
 
 }
