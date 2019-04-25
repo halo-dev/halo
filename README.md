@@ -125,7 +125,6 @@ Halo 的诞生离不开下面这些项目：
 - [Layer](https://github.com/sentsin/layer.git)：个人认为最实用最好看的弹出层组件，没有之一
 - [JQuery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：消息提示组件
 - [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
-- [OwO](https://github.com/DIYgod/OwO)：前端表情库
 
 ## 捐赠
 

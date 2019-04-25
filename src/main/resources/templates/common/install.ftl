@@ -126,7 +126,7 @@
             </div>
         </div>
     </body>
-    <script src="/static/halo-common/jquery/jquery.min.js"></script>
+    <script src="/static/halo-common/jquery.min.js"></script>
     <script src="/static/halo-admin/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/halo-admin/plugins/bootstrapvalidator/js/bootstrapValidator.min.js"></script>
     <script src="/static/halo-admin/plugins/bootstrapvalidator/js/language/zh_CN.js"></script>
