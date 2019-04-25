@@ -12,6 +12,9 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.base.BasePostRepository;
@@ -21,9 +24,11 @@ import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -217,6 +222,63 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return post;
+    }
+
+    @Override
+    public BasePostMinimalDTO convertToMinimal(POST post) {
+        Assert.notNull(post, "Post must not be null");
+
+        return new BasePostMinimalDTO().convertFrom(post);
+    }
+
+    @Override
+    public List<BasePostMinimalDTO> convertToMinimal(List<POST> posts) {
+        if (CollectionUtils.isEmpty(posts)) {
+            return Collections.emptyList();
+        }
+
+        return posts.stream()
+                .map(this::convertToMinimal)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<BasePostMinimalDTO> convertToMinimal(Page<POST> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+
+        return postPage.map(this::convertToMinimal);
+    }
+
+    @Override
+    public BasePostSimpleDTO convertToSimple(POST post) {
+        Assert.notNull(post, "Post must not be null");
+
+        return new BasePostSimpleDTO().convertFrom(post);
+    }
+
+    @Override
+    public List<BasePostSimpleDTO> convertToSimple(List<POST> posts) {
+        if (CollectionUtils.isEmpty(posts)) {
+            return Collections.emptyList();
+        }
+
+        return posts.stream()
+                .map(this::convertToSimple)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<BasePostSimpleDTO> convertToSimple(Page<POST> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+
+        return postPage.map(this::convertToSimple);
+    }
+
+    @Override
+    public BasePostDetailDTO convertToDetail(POST post) {
+        Assert.notNull(post, "Post must not be null");
+
+        return new BasePostDetailDTO().convertFrom(post);
     }
 
     /**

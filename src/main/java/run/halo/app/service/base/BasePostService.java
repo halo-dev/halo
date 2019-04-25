@@ -3,7 +3,11 @@ package run.halo.app.service.base;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
 
@@ -188,4 +192,24 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     @NonNull
     POST filterIfEncrypt(@NonNull POST post);
 
+    @NonNull
+    BasePostMinimalDTO convertToMinimal(@NonNull POST post);
+
+    @NonNull
+    List<BasePostMinimalDTO> convertToMinimal(@Nullable List<POST> posts);
+
+    @NonNull
+    Page<BasePostMinimalDTO> convertToMinimal(@NonNull Page<POST> postPage);
+
+    @NonNull
+    BasePostSimpleDTO convertToSimple(@NonNull POST post);
+
+    @NonNull
+    List<BasePostSimpleDTO> convertToSimple(@Nullable List<POST> posts);
+
+    @NonNull
+    Page<BasePostSimpleDTO> convertToSimple(@NonNull Page<POST> postPage);
+
+    @NonNull
+    BasePostDetailDTO convertToDetail(@NonNull POST post);
 }

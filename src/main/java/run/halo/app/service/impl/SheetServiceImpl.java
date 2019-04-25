@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.model.dto.post.SheetDetailDTO;
-import run.halo.app.model.dto.post.SheetListDTO;
+import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.SheetRepository;
@@ -88,7 +88,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public Page<SheetListDTO> convertToListDto(Page<Sheet> sheetPage) {
+    public Page<SheetListVO> convertToListDto(Page<Sheet> sheetPage) {
         Assert.notNull(sheetPage, "Sheet page must not be null");
 
         // Get all sheet id
@@ -100,9 +100,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Map<Integer, Long> sheetCommentCountMap = sheetCommentService.countByPostIds(sheetIds);
 
         return sheetPage.map(sheet -> {
-            SheetListDTO sheetListDTO = new SheetListDTO().convertFrom(sheet);
-            sheetListDTO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
-            return sheetListDTO;
+            SheetListVO sheetListVO = new SheetListVO().convertFrom(sheet);
+            sheetListVO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
+            return sheetListVO;
         });
     }
 

@@ -1,5 +1,6 @@
 package run.halo.app.model.vo;
 
+import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.PostDetailDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import java.util.Set;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class PostDetailVO extends PostDetailDTO {
+public class PostDetailVO extends BasePostDetailDTO {
 
     private Set<Integer> tagIds;
 

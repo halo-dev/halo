@@ -27,25 +27,6 @@ import java.util.Set;
 public interface PostService extends BasePostService<Post> {
 
     /**
-     * Lists latest posts of minimal.
-     *
-     * @param top top number must not be less than 0
-     * @return latest posts of minimal
-     */
-    @NonNull
-    Page<PostMinimalDTO> pageLatestOfMinimal(int top);
-
-
-    /**
-     * Lists latest posts of simple .
-     *
-     * @param top top number must not be less than 0
-     * @return latest posts of simple
-     */
-    @NonNull
-    Page<PostSimpleDTO> pageLatestOfSimple(int top);
-
-    /**
      * Pages posts.
      *
      * @param postQuery post query must not be null
@@ -64,26 +45,6 @@ public interface PostService extends BasePostService<Post> {
      */
     @NonNull
     Page<Post> pageBy(@NonNull String keyword, @NonNull Pageable pageable);
-
-    /**
-     * Lists simple output dto by status.
-     *
-     * @param status   post status must not be null
-     * @param pageable page info must not be null
-     * @return Page<PostSimpleDTO>
-     */
-    @NonNull
-    Page<PostSimpleDTO> pageSimpleDtoByStatus(@NonNull PostStatus status, @NonNull Pageable pageable);
-
-    /**
-     * Lists page list vo by status and pageable.
-     *
-     * @param status   post status must not be null
-     * @param pageable page info must not be null
-     * @return a page of page list vo
-     */
-    @NonNull
-    Page<PostListVO> pageListVoBy(@NonNull PostStatus status, @NonNull Pageable pageable);
 
     /**
      * Creates post by post param.
@@ -121,15 +82,6 @@ public interface PostService extends BasePostService<Post> {
     Post getBy(@NonNull PostStatus status, @NonNull String url);
 
     /**
-     * Get post detail vo by post id.
-     *
-     * @param postId post id must not be null
-     * @return post detail vo
-     */
-    @NonNull
-    PostDetailVO getDetailVoBy(@NonNull Integer postId);
-
-    /**
      * Lists year archives.
      *
      * @return a list of year archive
@@ -146,13 +98,13 @@ public interface PostService extends BasePostService<Post> {
     List<ArchiveMonthVO> listMonthArchives();
 
     /**
-     * Converts to a page of post simple output dto.
+     * Converts to detail vo.
      *
-     * @param postPage post page must not be null
-     * @return a page of post simple output dto
+     * @param post post must not be null
+     * @return post detail vo
      */
     @NonNull
-    Page<PostSimpleDTO> convertToSimpleDto(@NonNull Page<Post> postPage);
+    PostDetailVO convertToDetailVo(@NonNull Post post);
 
     /**
      * Converts to a page of post list vo.

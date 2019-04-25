@@ -85,12 +85,14 @@ public class ContentArchiveController {
                            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
 
-        Page<PostListVO> posts = postService.pageListVoBy(PostStatus.PUBLISHED, pageable);
-        int[] pageRainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> postListVos = postService.convertToListVo(postPage);
+        int[] pageRainbow = PageUtil.rainbow(page, postListVos.getTotalPages(), 3);
 
         model.addAttribute("is_archives", true);
         model.addAttribute("pageRainbow", pageRainbow);
-        model.addAttribute("posts", posts);
+        model.addAttribute("posts", postListVos);
+
         return themeService.render("archives");
     }
 
