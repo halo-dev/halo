@@ -19,9 +19,12 @@ import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
+import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.projection.CommentCountProjection;
+import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.BaseCommentVO;
@@ -35,6 +38,7 @@ import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BaseCommentService;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ServletUtils;
+import run.halo.app.utils.ValidationUtils;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
@@ -51,19 +55,15 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
     private final BaseCommentRepository<COMMENT> baseCommentRepository;
 
-    protected final PostRepository postRepository;
-
     protected final OptionService optionService;
 
     protected final ApplicationEventPublisher eventPublisher;
 
     public BaseCommentServiceImpl(BaseCommentRepository<COMMENT> baseCommentRepository,
-                                  PostRepository postRepository,
                                   OptionService optionService,
                                   ApplicationEventPublisher eventPublisher) {
         super(baseCommentRepository);
         this.baseCommentRepository = baseCommentRepository;
-        this.postRepository = postRepository;
         this.optionService = optionService;
         this.eventPublisher = eventPublisher;
     }
@@ -206,12 +206,12 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
-    public COMMENT createBy(COMMENT comment) {
+    public COMMENT create(COMMENT comment) {
         Assert.notNull(comment, "Domain must not be null");
 
         // Check post id
         if (!ServiceUtils.isEmptyId(comment.getPostId())) {
-            postMustExist(comment.getPostId());
+            targetMustExist(comment.getPostId());
         }
 
         // Check parent id
@@ -239,7 +239,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         }
 
         // Create comment
-        COMMENT createdComment = create(comment);
+        COMMENT createdComment = super.create(comment);
 
         if (ServiceUtils.isEmptyId(createdComment.getParentId())) {
             if (authentication == null) {
@@ -252,6 +252,27 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         }
 
         return createdComment;
+    }
+
+    @Override
+    public COMMENT createBy(BaseCommentParam<COMMENT> commentParam) {
+        Assert.notNull(commentParam, "Comment param must not be null");
+
+        // Check user login status and set this field
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            User user = authentication.getDetail().getUser();
+            commentParam.setAuthor(StringUtils.isBlank(user.getNickname()) ? user.getUsername() : user.getNickname());
+            commentParam.setEmail(user.getEmail());
+            commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
+        }
+
+        // Validate the comment param manually
+        ValidationUtils.validate(commentParam);
+
+        // Convert to comment
+        return create(commentParam.convertTo());
     }
 
     @Override
@@ -298,18 +319,6 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         Assert.notNull(comment, "Comment must not be null");
 
         return new BaseCommentDTO().convertFrom(comment);
-    }
-
-    /**
-     * Post must exist.
-     *
-     * @param postId post id must not be null
-     */
-    protected void postMustExist(@NonNull Integer postId) {
-        boolean isPostExist = postRepository.existsById(postId);
-        if (!isPostExist) {
-            throw new NotFoundException("The post with id " + postId + " was not found");
-        }
     }
 
     @NonNull

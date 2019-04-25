@@ -4,10 +4,14 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
+import run.halo.app.model.entity.JournalComment;
+import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.params.JournalParam;
+import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 
 import javax.validation.Valid;
@@ -25,8 +29,12 @@ public class JournalController {
 
     private final JournalService journalService;
 
-    public JournalController(JournalService journalService) {
+    private final JournalCommentService journalCommentService;
+
+    public JournalController(JournalService journalService,
+                             JournalCommentService journalCommentService) {
         this.journalService = journalService;
+        this.journalCommentService = journalCommentService;
     }
 
     @GetMapping
@@ -50,4 +58,10 @@ public class JournalController {
         return journalService.convertTo(createdJournal);
     }
 
+    @PostMapping("comments")
+    @ApiOperation("Create a journal comment")
+    public BaseCommentDTO createCommentBy(@RequestBody JournalCommentParam journalCommentParam) {
+        JournalComment journalComment = journalCommentService.createBy(journalCommentParam);
+        return journalCommentService.convertTo(journalComment);
+    }
 }

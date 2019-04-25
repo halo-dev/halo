@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
@@ -98,13 +99,23 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     Map<Integer, Long> countByPostIds(@Nullable Collection<Integer> postIds);
 
     /**
-     * Creates a comment by comment param.
+     * Creates a comment by comment.
      *
      * @param COMMENT comment must not be null
      * @return created comment
      */
     @NonNull
-    COMMENT createBy(@NonNull COMMENT COMMENT);
+    @Override
+    COMMENT create(@NonNull COMMENT COMMENT);
+
+    /**
+     * Creates a comment by comment param.
+     *
+     * @param commentParam commet param must not be null
+     * @return created comment
+     */
+    @NonNull
+    COMMENT createBy(@NonNull BaseCommentParam<COMMENT> commentParam);
 
     /**
      * Updates comment status.
@@ -142,4 +153,11 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     Page<BaseCommentDTO> convertTo(@NonNull Page<COMMENT> commentPage);
+
+    /**
+     * Target must exist.
+     *
+     * @param targetId target id must not be null
+     */
+    void targetMustExist(@NonNull Integer targetId);
 }

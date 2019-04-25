@@ -2,9 +2,10 @@ package run.halo.app.service.impl;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.SheetComment;
-import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.SheetCommentRepository;
+import run.halo.app.repository.SheetRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 
@@ -19,11 +20,21 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
 
     private final SheetCommentRepository sheetCommentRepository;
 
+    private final SheetRepository sheetRepository;
+
     public SheetCommentServiceImpl(SheetCommentRepository sheetCommentRepository,
-                                   PostRepository postRepository,
                                    OptionService optionService,
-                                   ApplicationEventPublisher eventPublisher) {
-        super(sheetCommentRepository, postRepository, optionService, eventPublisher);
+                                   ApplicationEventPublisher eventPublisher,
+                                   SheetRepository sheetRepository) {
+        super(sheetCommentRepository, optionService, eventPublisher);
         this.sheetCommentRepository = sheetCommentRepository;
+        this.sheetRepository = sheetRepository;
+    }
+
+    @Override
+    public void targetMustExist(Integer sheetId) {
+        if (sheetRepository.existsById(sheetId)) {
+            throw new NotFoundException("The sheet with id " + sheetId + " was not found");
+        }
     }
 }

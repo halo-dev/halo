@@ -1,28 +1,22 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.PostMinimalDTO;
 import run.halo.app.model.entity.Comment;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.entity.User;
-import run.halo.app.model.params.CommentParam;
-import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.vo.CommentWithPostVO;
 import run.halo.app.repository.CommentRepository;
 import run.halo.app.repository.PostRepository;
-import run.halo.app.security.authentication.Authentication;
-import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.service.CommentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.ServiceUtils;
-import run.halo.app.utils.ValidationUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,33 +36,15 @@ public class CommentServiceImpl extends BaseCommentServiceImpl<Comment> implemen
 
     private final CommentRepository commentRepository;
 
+    private final PostRepository postRepository;
+
     public CommentServiceImpl(CommentRepository commentRepository,
                               PostRepository postRepository,
                               OptionService optionService,
                               ApplicationEventPublisher eventPublisher) {
-        super(commentRepository, postRepository, optionService, eventPublisher);
+        super(commentRepository, optionService, eventPublisher);
         this.commentRepository = commentRepository;
-    }
-
-    @Override
-    public Comment createBy(CommentParam commentParam) {
-        Assert.notNull(commentParam, "Comment param must not be null");
-
-        // Check user login status and set this field
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null) {
-            User user = authentication.getDetail().getUser();
-            commentParam.setAuthor(StringUtils.isBlank(user.getNickname()) ? user.getUsername() : user.getNickname());
-            commentParam.setEmail(user.getEmail());
-            commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
-        }
-
-        // Validate the comment param manually
-        ValidationUtils.validate(commentParam);
-
-        // Convert to comment
-        return createBy(commentParam.convertTo());
+        this.postRepository = postRepository;
     }
 
     @Override
@@ -102,4 +78,10 @@ public class CommentServiceImpl extends BaseCommentServiceImpl<Comment> implemen
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public void targetMustExist(Integer postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new NotFoundException("The post with id " + postId + " was not found");
+        }
+    }
 }
