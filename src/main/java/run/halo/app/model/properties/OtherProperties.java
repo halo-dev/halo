@@ -8,7 +8,7 @@ package run.halo.app.model.properties;
  */
 public enum OtherProperties implements PropertyEnum {
 
-    API_ENABLED("api_enabled", Boolean.class, ""),
+    API_ENABLED("api_enabled", Boolean.class, "false"),
 
     API_TOKEN("api_token", String.class, ""),
 
