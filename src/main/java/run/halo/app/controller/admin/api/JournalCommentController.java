@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.JournalComment;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.vo.JournalCommentWithJournalVO;
@@ -53,4 +54,19 @@ public class JournalCommentController {
         return journalCommentService.convertTo(journalComment);
     }
 
+    @PutMapping("{commentId:\\d+}/status/{status}")
+    @ApiOperation("Updates comment status")
+    public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
+                                         @PathVariable("status") CommentStatus status) {
+        // Update comment status
+        JournalComment updatedJournalComment = journalCommentService.updateStatus(commentId, status);
+        return journalCommentService.convertTo(updatedJournalComment);
+    }
+
+    @DeleteMapping("{commentId:\\d+}")
+    @ApiOperation("Deletes comment permanently and recursively")
+    public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
+        JournalComment deletedJournalComment = journalCommentService.removeById(commentId);
+        return journalCommentService.convertTo(deletedJournalComment);
+    }
 }

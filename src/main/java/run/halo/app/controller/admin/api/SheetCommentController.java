@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.SheetComment;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.SheetCommentParam;
 import run.halo.app.model.vo.SheetCommentWithSheetVO;
@@ -50,5 +51,21 @@ public class SheetCommentController {
     public BaseCommentDTO createBy(@RequestBody SheetCommentParam commentParam) {
         SheetComment createdComment = sheetCommentService.createBy(commentParam);
         return sheetCommentService.convertTo(createdComment);
+    }
+
+    @PutMapping("{commentId:\\d+}/status/{status}")
+    @ApiOperation("Updates comment status")
+    public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
+                                         @PathVariable("status") CommentStatus status) {
+        // Update comment status
+        SheetComment updatedSheetComment = sheetCommentService.updateStatus(commentId, status);
+        return sheetCommentService.convertTo(updatedSheetComment);
+    }
+
+    @DeleteMapping("{commentId:\\d+}")
+    @ApiOperation("Deletes comment permanently and recursively")
+    public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
+        SheetComment deletedSheetComment = sheetCommentService.removeById(commentId);
+        return sheetCommentService.convertTo(deletedSheetComment);
     }
 }

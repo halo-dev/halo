@@ -61,7 +61,6 @@ public class PostCommentController {
                                          @PathVariable("status") CommentStatus status) {
         // Update comment status
         PostComment updatedPostComment = postCommentService.updateStatus(commentId, status);
-
         return postCommentService.convertTo(updatedPostComment);
     }
 
@@ -69,7 +68,6 @@ public class PostCommentController {
     @ApiOperation("Deletes comment permanently and recursively")
     public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
         PostComment deletedPostComment = postCommentService.removeById(commentId);
-
         return postCommentService.convertTo(deletedPostComment);
     }
 }
