@@ -1,6 +1,8 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.Journal;
@@ -23,6 +25,13 @@ public class JournalController {
 
     public JournalController(JournalService journalService) {
         this.journalService = journalService;
+    }
+
+    @GetMapping
+    @ApiOperation("Gets latest journals")
+    public Page<BaseCommentDTO> pageBy(Pageable pageable) {
+        Page<Journal> journalPage = journalService.pageBy(pageable);
+        return journalService.convertTo(journalPage);
     }
 
     @GetMapping("latest")

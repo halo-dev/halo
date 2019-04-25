@@ -78,12 +78,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
     @Override
     public Page<COMMENT> pageLatest(int top) {
-        Assert.isTrue(top > 0, "Top number must not be less than 0");
-
-        // Build page request
-        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(Sort.Direction.DESC, "createTime"));
-
-        return listAll(latestPageable);
+        return listAll(buildLatestPageable(top));
     }
 
     @Override
@@ -294,6 +289,13 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public Page<BaseCommentDTO> convertTo(Page<COMMENT> commentPage) {
+        Assert.notNull(commentPage, "Comment page must not be null");
+
+        return commentPage.map(this::convertTo);
+    }
+
+    @Override
     public BaseCommentDTO convertTo(COMMENT comment) {
         Assert.notNull(comment, "Comment must not be null");
 
@@ -301,7 +303,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @NonNull
-    private Specification<COMMENT> buildSpecByQuery(@NonNull CommentQuery commentQuery) {
+    protected Specification<COMMENT> buildSpecByQuery(@NonNull CommentQuery commentQuery) {
         Assert.notNull(commentQuery, "Comment query must not be null");
 
         return (Specification<COMMENT>) (root, query, criteriaBuilder) -> {
@@ -332,7 +334,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
      * @param sort sort info
      * @return comment comparator
      */
-    private Comparator<BaseCommentVO> buildCommentComparator(Sort sort) {
+    protected Comparator<BaseCommentVO> buildCommentComparator(Sort sort) {
         return (currentComment, toCompareComment) -> {
             Assert.notNull(currentComment, "Current comment must not be null");
             Assert.notNull(toCompareComment, "Comment to compare must not be null");
@@ -358,9 +360,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
      * @param comments          comment list must not null
      * @param commentComparator comment vo comparator
      */
-    private void concreteTree(@NonNull BaseCommentVO parentComment,
-                              @Nullable Collection<COMMENT> comments,
-                              @NonNull Comparator<BaseCommentVO> commentComparator) {
+    protected void concreteTree(@NonNull BaseCommentVO parentComment,
+                                @Nullable Collection<COMMENT> comments,
+                                @NonNull Comparator<BaseCommentVO> commentComparator) {
         Assert.notNull(parentComment, "Parent comment must not be null");
         Assert.notNull(commentComparator, "Comment comparator must not be null");
 
@@ -402,5 +404,18 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             // Sort the children
             parentComment.getChildren().sort(commentComparator);
         }
+    }
+
+    /**
+     * Builds latest page request.
+     *
+     * @param top top must not be less than 1
+     * @return latest page request
+     */
+    @NonNull
+    Pageable buildLatestPageable(int top) {
+        Assert.isTrue(top > 0, "Top number must not be less than 0");
+
+        return PageRequest.of(0, top, Sort.by(Sort.Direction.DESC, "createTime"));
     }
 }

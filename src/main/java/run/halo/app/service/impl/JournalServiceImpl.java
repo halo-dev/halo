@@ -3,6 +3,8 @@ package run.halo.app.service.impl;
 import cn.hutool.core.lang.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.User;
@@ -57,4 +59,17 @@ public class JournalServiceImpl extends BaseCommentServiceImpl<Journal> implemen
         // Convert, create and return
         return createBy(journalParam.convertTo());
     }
+
+    @Override
+    public Page<Journal> pageBy(Pageable pageable) {
+        Assert.notNull(pageable, "Page info must not be null");
+
+        return journalRepository.findAllByParentId(0L, pageable);
+    }
+
+    @Override
+    public Page<Journal> pageLatest(int top) {
+        return pageBy(buildLatestPageable(top));
+    }
+
 }
