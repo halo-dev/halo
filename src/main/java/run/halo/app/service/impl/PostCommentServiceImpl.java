@@ -9,12 +9,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.PostMinimalDTO;
-import run.halo.app.model.entity.Comment;
+import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.vo.CommentWithPostVO;
-import run.halo.app.repository.CommentRepository;
+import run.halo.app.model.vo.PostCommentWithPostVO;
+import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.repository.PostRepository;
-import run.halo.app.service.CommentService;
+import run.halo.app.service.PostCommentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.ServiceUtils;
 
@@ -25,56 +25,56 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * CommentService implementation class
+ * PostCommentService implementation class
  *
  * @author : RYAN0UP
  * @date : 2019-03-14
  */
 @Slf4j
 @Service
-public class CommentServiceImpl extends BaseCommentServiceImpl<Comment> implements CommentService {
+public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> implements PostCommentService {
 
-    private final CommentRepository commentRepository;
+    private final PostCommentRepository postCommentRepository;
 
     private final PostRepository postRepository;
 
-    public CommentServiceImpl(CommentRepository commentRepository,
-                              PostRepository postRepository,
-                              OptionService optionService,
-                              ApplicationEventPublisher eventPublisher) {
-        super(commentRepository, optionService, eventPublisher);
-        this.commentRepository = commentRepository;
+    public PostCommentServiceImpl(PostCommentRepository postCommentRepository,
+                                  PostRepository postRepository,
+                                  OptionService optionService,
+                                  ApplicationEventPublisher eventPublisher) {
+        super(postCommentRepository, optionService, eventPublisher);
+        this.postCommentRepository = postCommentRepository;
         this.postRepository = postRepository;
     }
 
     @Override
-    public Page<CommentWithPostVO> convertToWithPostVo(Page<Comment> commentPage) {
-        Assert.notNull(commentPage, "Comment page must not be null");
+    public Page<PostCommentWithPostVO> convertToWithPostVo(Page<PostComment> commentPage) {
+        Assert.notNull(commentPage, "PostComment page must not be null");
 
         return new PageImpl<>(convertToWithPostVo(commentPage.getContent()), commentPage.getPageable(), commentPage.getTotalElements());
 
     }
 
     @Override
-    public List<CommentWithPostVO> convertToWithPostVo(List<Comment> comments) {
-        if (CollectionUtils.isEmpty(comments)) {
+    public List<PostCommentWithPostVO> convertToWithPostVo(List<PostComment> postComments) {
+        if (CollectionUtils.isEmpty(postComments)) {
             return Collections.emptyList();
         }
 
         // Fetch goods ids
-        Set<Integer> postIds = ServiceUtils.fetchProperty(comments, Comment::getPostId);
+        Set<Integer> postIds = ServiceUtils.fetchProperty(postComments, PostComment::getPostId);
 
         // Get all posts
         Map<Integer, Post> postMap = ServiceUtils.convertToMap(postRepository.findAllById(postIds), Post::getId);
 
-        return comments.stream().map(comment -> {
+        return postComments.stream().map(comment -> {
             // Convert to vo
-            CommentWithPostVO commentWithPostVO = new CommentWithPostVO().convertFrom(comment);
+            PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
 
             // Get post and set to the vo
-            commentWithPostVO.setPost(new PostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
+            postCommentWithPostVO.setPost(new PostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
 
-            return commentWithPostVO;
+            return postCommentWithPostVO;
         }).collect(Collectors.toList());
     }
 

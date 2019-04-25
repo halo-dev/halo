@@ -4,7 +4,7 @@ import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.service.CommentService;
+import run.halo.app.service.PostCommentService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -18,10 +18,10 @@ import java.util.Map;
 @Component
 public class CommentTagDirective implements TemplateDirectiveModel {
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
-    public CommentTagDirective(CommentService commentService) {
-        this.commentService = commentService;
+    public CommentTagDirective(PostCommentService postCommentService) {
+        this.postCommentService = postCommentService;
     }
 
     @Override
@@ -33,10 +33,10 @@ public class CommentTagDirective implements TemplateDirectiveModel {
             int top = Integer.parseInt(params.get("top").toString());
             switch (method) {
                 case "latest":
-                    env.setVariable("categories", builder.build().wrap(commentService.pageLatest(top)));
+                    env.setVariable("categories", builder.build().wrap(postCommentService.pageLatest(top)));
                     break;
                 case "count":
-                    env.setVariable("count", builder.build().wrap(commentService.count()));
+                    env.setVariable("count", builder.build().wrap(postCommentService.count()));
                     break;
                 default:
                     break;

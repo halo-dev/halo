@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.exception.ServiceException;
-import run.halo.app.model.entity.Comment;
+import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.properties.BlogProperties;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Comment event listener.
+ * PostComment event listener.
  *
  * @author johnniang
  * @date 19-4-23
@@ -30,7 +30,7 @@ public class CommentEventListener {
 
     private final OptionService optionService;
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
     private final PostService postService;
 
@@ -38,12 +38,12 @@ public class CommentEventListener {
 
     public CommentEventListener(MailService mailService,
                                 OptionService optionService,
-                                CommentService commentService,
+                                PostCommentService postCommentService,
                                 PostService postService,
                                 UserService userService) {
         this.mailService = mailService;
         this.optionService = optionService;
-        this.commentService = commentService;
+        this.postCommentService = postCommentService;
         this.postService = postService;
         this.userService = userService;
     }
@@ -60,10 +60,10 @@ public class CommentEventListener {
 
         User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("Can not find blog owner"));
 
-        // Get comment id
-        Comment comment = commentService.getById(newEvent.getCommentId());
+        // Get postComment id
+        PostComment postComment = postCommentService.getById(newEvent.getCommentId());
 
-        Post post = postService.getById(comment.getPostId());
+        Post post = postService.getById(postComment.getPostId());
 
         Map<String, Object> data = new HashMap<>();
 
@@ -72,8 +72,8 @@ public class CommentEventListener {
                 .append(post.getUrl());
         data.put("url", url.toString());
         data.put("page", post.getTitle());
-        data.put("author", comment.getAuthor());
-        data.put("content",comment.getContent());
+        data.put("author", postComment.getAuthor());
+        data.put("content", postComment.getContent());
         mailService.sendTemplateMail(user.getEmail(), "您的博客有新的评论", data, "common/mail_template/mail_notice.ftl");
     }
 
@@ -87,8 +87,8 @@ public class CommentEventListener {
             return;
         }
 
-        // Get comment id
-        Comment comment = commentService.getById(passEvent.getCommentId());
+        // Get postComment id
+        PostComment postComment = postCommentService.getById(passEvent.getCommentId());
 
         // TODO Complete mail sending
     }
@@ -103,8 +103,8 @@ public class CommentEventListener {
             return;
         }
 
-        // Get comment id
-        Comment comment = commentService.getById(replyEvent.getCommentId());
+        // Get postComment id
+        PostComment postComment = postCommentService.getById(replyEvent.getCommentId());
 
         // TODO Complete mail sending
     }

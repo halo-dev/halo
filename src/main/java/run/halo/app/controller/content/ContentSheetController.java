@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.service.CommentService;
+import run.halo.app.service.PostCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 
@@ -22,15 +22,15 @@ public class ContentSheetController {
 
     private final SheetService sheetService;
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
     private final ThemeService themeService;
 
     public ContentSheetController(SheetService sheetService,
-                                  CommentService commentService,
+                                  PostCommentService postCommentService,
                                   ThemeService themeService) {
         this.sheetService = sheetService;
-        this.commentService = commentService;
+        this.postCommentService = postCommentService;
         this.themeService = themeService;
     }
 

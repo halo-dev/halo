@@ -5,7 +5,7 @@ import run.halo.app.model.enums.CommentStatus;
 import javax.persistence.Converter;
 
 /**
- * Comment status converter.
+ * PostComment status converter.
  *
  * @author johnniang
  * @date 3/27/19

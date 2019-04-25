@@ -4,12 +4,12 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 /**
- * Comment entity.
+ * PostComment entity.
  *
  * @author johnniang
  */
-@Entity(name = "Comment")
+@Entity(name = "PostComment")
 @DiscriminatorValue("0")
-public class Comment extends BaseComment {
+public class PostComment extends BaseComment {
 
 }

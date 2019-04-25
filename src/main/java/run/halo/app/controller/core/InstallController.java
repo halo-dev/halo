@@ -43,7 +43,7 @@ public class InstallController {
 
     private final PostService postService;
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
     private final OptionService optionService;
 
@@ -56,7 +56,7 @@ public class InstallController {
     public InstallController(UserService userService,
                              CategoryService categoryService,
                              PostService postService,
-                             CommentService commentService,
+                             PostCommentService postCommentService,
                              OptionService optionService,
                              MenuService menuService,
                              Configuration configuration,
@@ -64,7 +64,7 @@ public class InstallController {
         this.userService = userService;
         this.categoryService = categoryService;
         this.postService = postService;
-        this.commentService = commentService;
+        this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.menuService = menuService;
         this.configuration = configuration;
@@ -115,8 +115,8 @@ public class InstallController {
         // Create default post
         Post post = createDefaultPost(category);
 
-        // Create default comment
-        Comment comment = createDefaultComment();
+        // Create default postComment
+        PostComment postComment = createDefaultComment();
 
         // Create default menu
         createDefaultMenu();
@@ -149,7 +149,7 @@ public class InstallController {
     }
 
 
-    private Comment createDefaultComment() {
+    private PostComment createDefaultComment() {
         // TODO Create default comment
         return null;
     }

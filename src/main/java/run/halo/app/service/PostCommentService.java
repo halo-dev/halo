@@ -3,19 +3,18 @@ package run.halo.app.service;
 import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import run.halo.app.model.entity.Comment;
-import run.halo.app.model.params.CommentParam;
-import run.halo.app.model.vo.CommentWithPostVO;
+import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.service.base.BaseCommentService;
 
 import java.util.List;
 
 /**
- * Comment service.
+ * PostComment service.
  *
  * @author johnniang
  */
-public interface CommentService extends BaseCommentService<Comment> {
+public interface PostCommentService extends BaseCommentService<PostComment> {
 
     /**
      * Converts to with post vo.
@@ -24,14 +23,14 @@ public interface CommentService extends BaseCommentService<Comment> {
      * @return a page of comment with post vo
      */
     @NonNull
-    Page<CommentWithPostVO> convertToWithPostVo(@NonNull Page<Comment> commentPage);
+    Page<PostCommentWithPostVO> convertToWithPostVo(@NonNull Page<PostComment> commentPage);
 
     /**
      * Converts to with post vo
      *
-     * @param comments comment list
+     * @param postComments comment list
      * @return a list of comment with post vo
      */
     @NonNull
-    List<CommentWithPostVO> convertToWithPostVo(@Nullable List<Comment> comments);
+    List<PostCommentWithPostVO> convertToWithPostVo(@Nullable List<PostComment> postComments);
 }

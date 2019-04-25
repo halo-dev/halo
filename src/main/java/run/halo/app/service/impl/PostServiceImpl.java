@@ -60,7 +60,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final PostCategoryService postCategoryService;
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -69,7 +69,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                            CategoryService categoryService,
                            PostTagService postTagService,
                            PostCategoryService postCategoryService,
-                           CommentService commentService,
+                           PostCommentService postCommentService,
                            ApplicationEventPublisher eventPublisher) {
         super(postRepository);
         this.postRepository = postRepository;
@@ -77,7 +77,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         this.categoryService = categoryService;
         this.postTagService = postTagService;
         this.postCategoryService = postCategoryService;
-        this.commentService = commentService;
+        this.postCommentService = postCommentService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -369,7 +369,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Map<Integer, List<Category>> categoryListMap = postCategoryService.listCategoryListMap(postIds);
 
         // Get comment count
-        Map<Integer, Long> commentCountMap = commentService.countByPostIds(postIds);
+        Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
 
 
         return postPage.map(post -> {
