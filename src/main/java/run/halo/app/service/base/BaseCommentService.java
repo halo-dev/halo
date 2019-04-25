@@ -133,4 +133,13 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     List<BaseCommentDTO> convertTo(@NonNull List<COMMENT> comments);
+
+    /**
+     * Converts to base comment dto page.
+     *
+     * @param commentPage comment page must not be null
+     * @return a page of base comment dto
+     */
+    @NonNull
+    Page<BaseCommentDTO> convertTo(@NonNull Page<COMMENT> commentPage);
 }
