@@ -70,13 +70,6 @@ public class JournalController {
         return journalService.convertTo(createdJournal);
     }
 
-    @PostMapping("comments")
-    @ApiOperation("Create a journal comment")
-    public BaseCommentDTO createCommentBy(@RequestBody JournalCommentParam journalCommentParam) {
-        JournalComment journalComment = journalCommentService.createBy(journalCommentParam);
-        return journalCommentService.convertTo(journalComment);
-    }
-
     @GetMapping("{journalId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("journalId") Integer journalId,

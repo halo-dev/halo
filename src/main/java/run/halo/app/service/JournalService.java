@@ -47,15 +47,6 @@ public interface JournalService extends CrudService<Journal, Integer> {
     JournalDTO convertTo(@NonNull Journal journal);
 
     /**
-     * Converts to journal with comment count dto.
-     *
-     * @param journal journal must not be null
-     * @return journal with comment count dto
-     */
-    @NonNull
-    JournalWithCmtCountDTO convertToCmtCountDto(@NonNull Journal journal);
-
-    /**
      * Converts to journal with comment count dto list.
      *
      * @param journals journal list
