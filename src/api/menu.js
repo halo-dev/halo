@@ -26,4 +26,19 @@ menuApi.delete = menuId => {
   })
 }
 
+menuApi.get = menuId => {
+  return service({
+    url: `${baseUrl}/${menuId}`,
+    method: 'get'
+  })
+}
+
+menuApi.update = (menuId, menu) => {
+  return service({
+    url: `${baseUrl}/${menuId}`,
+    data: menu,
+    method: 'put'
+  })
+}
+
 export default menuApi

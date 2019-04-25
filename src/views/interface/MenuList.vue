@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="添加菜单">
+        <a-card :title="title">
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -57,8 +57,20 @@
             <a-form-item>
               <a-button
                 type="primary"
-                @click="createMenu"
+                @click="handleSaveClick"
+                v-if="formType==='create'"
               >保存</a-button>
+              <a-button-group v-else>
+                <a-button
+                  type="primary"
+                  @click="handleSaveClick"
+                >更新</a-button>
+                <a-button
+                  type="dashed"
+                  @click="handleAddMenu"
+                  v-if="formType==='update'"
+                >返回添加</a-button>
+              </a-button-group>
               <a
                 :style="{ marginLeft: '8px'}"
                 @click="toggleExpand"
@@ -97,12 +109,12 @@
             >
               <a
                 href="javascript:;"
-                @click="editMenu(record.id)"
+                @click="handleEditMenu(record.id)"
               >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 :title="'你确定要删除【' + record.name + '】菜单？'"
-                @confirm="deleteMenu(record.id)"
+                @confirm="handleDeleteMenu(record.id)"
                 okText="确定"
                 cancelText="取消"
               >
@@ -147,8 +159,10 @@ export default {
   components: { MenuSelectTree },
   data() {
     return {
+      title: '添加菜单',
       data: [],
-      loading: true,
+      formType: 'create',
+      loading: false,
       columns,
       menus: [],
       menuToCreate: {},
@@ -160,24 +174,45 @@ export default {
   },
   methods: {
     loadMenus() {
+      this.loading = true
       menuApi.listAll().then(response => {
         this.menus = response.data.data
         this.loading = false
       })
     },
-    createMenu() {
-      menuApi.create(this.menuToCreate).then(response => {
-        this.loadMenus()
+    handleSaveClick() {
+      this.createOrUpdateMenu()
+    },
+    handleAddMenu() {
+      this.title = '添加菜单'
+      this.formType = 'create'
+      this.menuToCreate = {}
+    },
+    handleEditMenu(id) {
+      menuApi.get(id).then(response => {
+        this.menuToCreate = response.data.data
+        this.title = '编辑菜单'
+        this.formType = 'update'
       })
     },
-    editMenu(id) {
-      this.$message.success('编辑' + id)
-    },
-    deleteMenu(id) {
+    handleDeleteMenu(id) {
       menuApi.delete(id).then(response => {
         this.$message.success('删除成功！')
         this.loadMenus()
       })
+    },
+    createOrUpdateMenu() {
+      if (this.menuToCreate.id) {
+        menuApi.update(this.menuToCreate.id, this.menuToCreate).then(response => {
+          this.$message.success('更新成功！')
+        })
+      } else {
+        menuApi.create(this.menuToCreate).then(response => {
+          this.$message.success('保存成功！')
+        })
+      }
+      this.handleAddMenu()
+      this.loadMenus()
     },
     toggleExpand() {
       this.fieldExpand = !this.fieldExpand

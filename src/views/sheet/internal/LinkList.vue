@@ -49,7 +49,7 @@
                 >更新</a-button>
                 <a-button
                   type="dashed"
-                  @click="addLink"
+                  @click="handleAddLink"
                   v-if="formType==='update'"
                 >返回添加</a-button>
               </a-button-group>
@@ -93,12 +93,12 @@
             >
               <a
                 href="javascript:;"
-                @click="editLink(record.id)"
+                @click="handleEditLink(record.id)"
               >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 :title="'你确定要删除【' + record.name + '】链接？'"
-                @confirm="deleteLink(record.id)"
+                @confirm="handleDeleteLink(record.id)"
                 okText="确定"
                 cancelText="取消"
               >
@@ -141,7 +141,7 @@ export default {
       title: '添加友情链接',
       formType: 'create',
       data: [],
-      loading: true,
+      loading: false,
       columns,
       links: [],
       link: {}
@@ -152,6 +152,7 @@ export default {
   },
   methods: {
     loadLinks() {
+      this.loading = true
       linkApi.listAll().then(response => {
         this.links = response.data.data
         this.loading = false
@@ -160,21 +161,19 @@ export default {
     handleSaveClick() {
       this.createOrUpdateLink()
     },
-    updateLink() {
-      this.$message.success('编辑')
-    },
-    addLink() {
+    handleAddLink() {
       this.title = '添加友情链接'
       this.formType = 'create'
+      this.link = {}
     },
-    editLink(id) {
+    handleEditLink(id) {
       linkApi.get(id).then(response => {
         this.link = response.data.data
         this.title = '编辑友情链接'
         this.formType = 'update'
       })
     },
-    deleteLink(id) {
+    handleDeleteLink(id) {
       linkApi.delete(id).then(response => {
         this.$message.success('删除成功！')
         this.loadLinks()
@@ -190,9 +189,8 @@ export default {
           this.$message.success('保存成功！')
         })
       }
-      this.addLink()
+      this.handleAddLink()
       this.loadLinks()
-      this.link = {}
     }
   }
 }
