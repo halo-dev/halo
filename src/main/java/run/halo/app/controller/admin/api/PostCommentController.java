@@ -34,7 +34,7 @@ public class PostCommentController {
     }
 
     @GetMapping
-    @ApiOperation("Lists comments")
+    @ApiOperation("Lists post comments")
     public Page<PostCommentWithPostVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                               CommentQuery commentQuery) {
         Page<PostComment> commentPage = postCommentService.pageBy(commentQuery, pageable);
