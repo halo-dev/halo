@@ -1,6 +1,5 @@
 package run.halo.app.listener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -11,18 +10,15 @@ import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.model.properties.PrimaryProperties;
-import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.FileUtils;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The method executed after the application is started.
@@ -41,9 +37,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     private OptionService optionService;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private ThemeService themeService;
 
     @Autowired
@@ -52,7 +45,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         // save halo version to database
-        this.cacheOwo();
         this.printStartInfo();
         this.initThemes();
 
@@ -91,22 +83,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         log.info("Halo admin started at   {}/admin", blogUrl);
         if (!haloProperties.isDocDisabled()) {
             log.debug("Halo doc was enable at  {}/swagger-ui.html", blogUrl);
-        }
-    }
-
-    /**
-     * Cache Owo
-     */
-    private void cacheOwo() {
-        try {
-            // The Map is LinkedHashMap
-            @SuppressWarnings("unchecked")
-            Map<String, String> owoMap = objectMapper.readValue(ResourceUtils.getURL("classpath:static/halo-common/OwO/OwO.path.json"), Map.class);
-
-            HaloConst.OWO_MAP = Collections.unmodifiableMap(owoMap);
-        } catch (IOException e) {
-            log.error("Failed to read owo json", e);
-            // TODO Consider to throw an exception
         }
     }
 

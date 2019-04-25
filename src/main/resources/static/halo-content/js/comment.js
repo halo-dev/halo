@@ -1,12 +1,3 @@
-var s = new OwO({
-    logo: 'OωO表情',
-    container: document.getElementsByClassName('OwO')[0],
-    target: document.getElementsByClassName('comment-input-content')[0],
-    position: 'down',
-    width: '100%',
-    maxHeight: '210px',
-    api: "/static/halo-common/OwO/OwO.min.json"
-});
 $(document).ready(function () {
     $(".comment-list-one-head").each(function (i) {
         var uaInfo = $(this).children(".comment-ua-info").html();

@@ -126,7 +126,6 @@ The birth of Halo is inseparable from the following projects：
 - [JQuery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)
 : message prompt component
 - [Pjax](https://github.com/defunkt/jquery-pjax.git): pushState + ajax = pjax
-- [OwO](https://github.com/DIYgod/OwO): front-end expression library
 
 ## Donate
 

@@ -1,5 +1,4 @@
 <@compress single_line=true>
-<link type="text/css" rel="stylesheet" href="/static/halo-common/OwO/OwO.min.css">
 <link type="text/css" rel="stylesheet" href="/static/halo-content/css/comment.min.css">
 <style>
 ${options.native_css!}
@@ -19,7 +18,6 @@ ${options.native_css!}
         </div>
         <div class="comment-content">
             <textarea class="comment-input-content" name="content" id="commentContent" placeholder="${options.comment_content_placeholder!'赶快评论一个吧！'}"></textarea>
-            <div class="OwO"></div>
         </div>
         <div class="comment-footer">
             <button type="button" class="comment-cancel-reply" id="comment-cancel-reply" style="display: none;">取消回复</button>
@@ -117,7 +115,6 @@ ${options.native_css!}
 <script src="/static/halo-common/jquery/jquery.min.js"></script>
 <script src="/static/halo-content/plugins/md5/md5.min.js"></script>
 <script src="/static/halo-content/plugins/ua-parser/ua-parser.min.js"></script>
-<script src="/static/halo-common/OwO/OwO.min.js"></script>
 <script>
 var gavatarDefault = "${options.native_comment_avatar!'mm'}";
 </script>
