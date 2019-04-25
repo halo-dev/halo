@@ -1,14 +1,20 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.JournalComment;
+import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.JournalCommentParam;
+import run.halo.app.model.vo.JournalCommentWithJournalVO;
 import run.halo.app.service.JournalCommentService;
+
+import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Journal comment controller.
@@ -24,6 +30,20 @@ public class JournalCommentController {
 
     public JournalCommentController(JournalCommentService journalCommentService) {
         this.journalCommentService = journalCommentService;
+    }
+
+    @GetMapping
+    @ApiOperation("Lists journal comments")
+    public Page<JournalCommentWithJournalVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                                    CommentQuery commentQuery) {
+        Page<JournalComment> journalCommentPage = journalCommentService.pageBy(commentQuery, pageable);
+
+        return journalCommentService.convertToWithJournalVo(journalCommentPage);
+    }
+
+    @GetMapping("latest")
+    public List<JournalCommentWithJournalVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+        return journalCommentService.convertToWithJournalVo(journalCommentService.pageLatest(top).getContent());
     }
 
     @PostMapping
