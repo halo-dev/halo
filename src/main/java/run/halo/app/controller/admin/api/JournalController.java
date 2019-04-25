@@ -2,7 +2,10 @@ package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.JournalDTO;
@@ -11,11 +14,16 @@ import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.JournalComment;
 import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.params.JournalParam;
+import run.halo.app.model.vo.BaseCommentVO;
+import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
+import run.halo.app.service.OptionService;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Journal controller.
@@ -31,10 +39,14 @@ public class JournalController {
 
     private final JournalCommentService journalCommentService;
 
+    private final OptionService optionService;
+
     public JournalController(JournalService journalService,
-                             JournalCommentService journalCommentService) {
+                             JournalCommentService journalCommentService,
+                             OptionService optionService) {
         this.journalService = journalService;
         this.journalCommentService = journalCommentService;
+        this.optionService = optionService;
     }
 
     @GetMapping
@@ -63,5 +75,21 @@ public class JournalController {
     public BaseCommentDTO createCommentBy(@RequestBody JournalCommentParam journalCommentParam) {
         JournalComment journalComment = journalCommentService.createBy(journalCommentParam);
         return journalCommentService.convertTo(journalComment);
+    }
+
+    @GetMapping("{journalId:\\d+}/comments/tree_view")
+    @ApiOperation("Lists comments with tree view")
+    public Page<BaseCommentVO> listCommentTree(@PathVariable("journalId") Integer journalId,
+                                               @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        return journalCommentService.pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+    }
+
+    @GetMapping("{journalId:\\d+}/comments/list_view")
+    @ApiOperation("Lists comment with list view")
+    public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
+                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        return journalCommentService.pageWithParentVoBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 }

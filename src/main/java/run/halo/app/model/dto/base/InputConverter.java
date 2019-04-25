@@ -22,7 +22,7 @@ public interface InputConverter<DOMAIN> {
     @SuppressWarnings("unchecked")
     default DOMAIN convertTo() {
         // Get parameterized type
-        ParameterizedType currentType = getParameterizedType();
+        ParameterizedType currentType = parameterizedType();
 
         // Assert not equal
         Objects.requireNonNull(currentType, "Cannot fetch actual type because parameterized type is null");
@@ -47,7 +47,7 @@ public interface InputConverter<DOMAIN> {
      * @return parameterized type or null
      */
     @Nullable
-    default ParameterizedType getParameterizedType() {
+    default ParameterizedType parameterizedType() {
         return ReflectionUtils.getParameterizedType(InputConverter.class, this.getClass());
     }
 }
