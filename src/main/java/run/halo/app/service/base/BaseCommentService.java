@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentQuery;
@@ -13,7 +14,6 @@ import run.halo.app.model.vo.BaseCommentWithParentVO;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Base comment service interface.
@@ -115,4 +115,22 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     COMMENT updateStatus(@NonNull Long commentId, @NonNull CommentStatus status);
+
+    /**
+     * Converts to base comment dto.
+     *
+     * @param comment comment must not be null
+     * @return base comment dto
+     */
+    @NonNull
+    BaseCommentDTO convertTo(@NonNull COMMENT comment);
+
+    /**
+     * Converts to base comment dto list.
+     *
+     * @param comments comment list must not be null
+     * @return a list of base comment dto
+     */
+    @NonNull
+    List<BaseCommentDTO> convertTo(@NonNull List<COMMENT> comments);
 }

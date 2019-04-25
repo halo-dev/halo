@@ -18,6 +18,7 @@ import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentQuery;
@@ -38,6 +39,7 @@ import run.halo.app.utils.ServletUtils;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Base comment service implementation.
@@ -279,6 +281,23 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         }
 
         return updatedComment;
+    }
+
+    @Override
+    public List<BaseCommentDTO> convertTo(List<COMMENT> comments) {
+        if (CollectionUtils.isEmpty(comments)) {
+            return Collections.emptyList();
+        }
+        return comments.stream()
+                .map(this::convertTo)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public BaseCommentDTO convertTo(COMMENT comment) {
+        Assert.notNull(comment, "Comment must not be null");
+
+        return new BaseCommentDTO().convertFrom(comment);
     }
 
     @NonNull
