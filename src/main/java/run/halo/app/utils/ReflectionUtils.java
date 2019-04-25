@@ -20,20 +20,20 @@ public class ReflectionUtils {
     /**
      * Gets parameterized type.
      *
-     * @param interfaceType interface type must not be null
-     * @param genericTypes  generic type array
+     * @param superType    super type must not be null (super class or super interface)
+     * @param genericTypes generic type array
      * @return parameterized type of the interface or null if it is mismatch
      */
     @Nullable
-    public static ParameterizedType getParameterizedType(@NonNull Class<?> interfaceType, Type... genericTypes) {
-        Assert.notNull(interfaceType, "Interface type must not be null");
+    public static ParameterizedType getParameterizedType(@NonNull Class<?> superType, Type... genericTypes) {
+        Assert.notNull(superType, "Interface or super type must not be null");
 
         ParameterizedType currentType = null;
 
         for (Type genericType : genericTypes) {
             if (genericType instanceof ParameterizedType) {
                 ParameterizedType parameterizedType = (ParameterizedType) genericType;
-                if (parameterizedType.getRawType().getTypeName().equals(interfaceType.getTypeName())) {
+                if (parameterizedType.getRawType().getTypeName().equals(superType.getTypeName())) {
                     currentType = parameterizedType;
                     break;
                 }
@@ -53,6 +53,7 @@ public class ReflectionUtils {
     @Nullable
     public static ParameterizedType getParameterizedType(@NonNull Class<?> interfaceType, Class<?> implementationClass) {
         Assert.notNull(interfaceType, "Interface type must not be null");
+        Assert.isTrue(interfaceType.isInterface(), "The give type must be an interface");
 
         if (implementationClass == null) {
             // If the super class is Object parent then return null
@@ -70,5 +71,22 @@ public class ReflectionUtils {
         Class<?> superclass = implementationClass.getSuperclass();
 
         return getParameterizedType(interfaceType, superclass);
+    }
+
+    /**
+     * Gets parameterized type by super class.
+     *
+     * @param superClassType super class type must not be null
+     * @param extensionClass extension class
+     * @return parameterized type or null
+     */
+    @Nullable
+    public static ParameterizedType getParameterizedTypeBySuperClass(@NonNull Class<?> superClassType, Class<?> extensionClass) {
+
+        if (extensionClass == null) {
+            return null;
+        }
+
+        return getParameterizedType(superClassType, extensionClass.getGenericSuperclass());
     }
 }

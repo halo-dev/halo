@@ -1,14 +1,11 @@
 package run.halo.app.model.dto.base;
 
-import run.halo.app.utils.ReflectionUtils;
+import org.springframework.lang.Nullable;
 import run.halo.app.utils.BeanUtils;
 import run.halo.app.utils.ReflectionUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Objects;
-
-import static run.halo.app.utils.BeanUtils.transformFrom;
-import static run.halo.app.utils.BeanUtils.updateProperties;
 
 /**
  * Converter interface for input DTO.
@@ -25,7 +22,7 @@ public interface InputConverter<DOMAIN> {
     @SuppressWarnings("unchecked")
     default DOMAIN convertTo() {
         // Get parameterized type
-        ParameterizedType currentType = ReflectionUtils.getParameterizedType(InputConverter.class, this.getClass());
+        ParameterizedType currentType = getParameterizedType();
 
         // Assert not equal
         Objects.requireNonNull(currentType, "Cannot fetch actual type because parameterized type is null");
@@ -42,6 +39,16 @@ public interface InputConverter<DOMAIN> {
      */
     default void update(DOMAIN domain) {
         BeanUtils.updateProperties(this, domain);
+    }
+
+    /**
+     * Get parameterized type.
+     *
+     * @return parameterized type or null
+     */
+    @Nullable
+    default ParameterizedType getParameterizedType() {
+        return ReflectionUtils.getParameterizedType(InputConverter.class, this.getClass());
     }
 }
 
