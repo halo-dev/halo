@@ -24,18 +24,6 @@
                   :md="6"
                   :sm="24"
                 >
-                  <a-form-item label="年月份">
-                    <a-select placeholder="请选择年月">
-                      <a-select-option value="2019-01">2019-01</a-select-option>
-                      <a-select-option value="2019-02">2019-02</a-select-option>
-                      <a-select-option value="2019-03">2019-03</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
                   <a-form-item label="状态">
                     <a-select placeholder="请选择状态">
                       <a-select-option value="1">公开</a-select-option>
@@ -48,8 +36,11 @@
                   :sm="24"
                 >
                   <span class="table-page-search-submitButtons">
-                    <a-button type="primary">查询</a-button>
-                    <a-button style="margin-left: 8px;">重置</a-button>
+                    <a-button
+                      type="primary"
+                      @click="loadJournals(true)"
+                    >查询</a-button>
+                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
                   </span>
                 </a-col>
               </a-row>
@@ -66,7 +57,7 @@
           <div style="margin-top:15px">
             <a-list
               itemLayout="vertical"
-              :pagination="pagination"
+              :pagination="false"
               :dataSource="journals"
               :loading="listLoading"
             >
@@ -75,22 +66,45 @@
                 slot-scope="item, index"
                 :key="index"
               >
-                <a
+                <template
                   slot="actions"
-                  @click="handleEdit(item)"
-                >编辑</a>
-                <a slot="actions">删除</a>
-                <a-list-item-meta :description="item.description">
+                  v-for="{type, text} in actions"
+                >
+                  <span :key="type">
+                    <a-icon
+                      :type="type"
+                      style="margin-right: 8px"
+                    />
+                    {{ text }}
+                  </span>
+                </template>
+                <template slot="extra">
                   <a
-                    slot="title"
-                  >{{ item.content }}</a>
+                    href="javascript:void(0);"
+                    @click="handleEdit(item)"
+                  >编辑</a>
+                  <a-divider type="vertical" />
+                  <a href="javascript:void(0);">删除</a>
+                </template>
+                <a-list-item-meta :description="item.content">
+                  <span slot="title">{{ item.createTime | moment }}</span>
                   <a-avatar
                     slot="avatar"
                     size="large"
+                    src="https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm"
                   />
                 </a-list-item-meta>
-                {{ item.content }}
               </a-list-item>
+              <template>
+                <a-pagination
+                  class="pagination"
+                  :total="pagination.total"
+                  :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
+                  showSizeChanger
+                  @showSizeChange="onPaginationChange"
+                  @change="onPaginationChange"
+                />
+              </template>
             </a-list>
           </div>
         </a-card>
@@ -98,17 +112,23 @@
     </a-row>
 
     <a-modal
-      title="新建"
+      :title="title"
       v-model="visible"
     >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="createOrUpdateJournal"
+        >
+          发布
+        </a-button>
+      </template>
       <a-form layout="vertical">
-        <a-form-item label="标题：">
-          <a-input v-model="journal.title" />
-        </a-form-item>
-        <a-form-item label="内容：">
+        <a-form-item>
           <a-input
             type="textarea"
-            :autosize="{ minRows: 5 }"
+            :autosize="{ minRows: 8 }"
             v-model="journal.content"
           />
         </a-form-item>
@@ -120,22 +140,10 @@
 <script>
 import journalApi from '@/api/journal'
 
-const listData = []
-for (let i = 0; i < 50; i++) {
-  listData.push({
-    href: '#',
-    title: `Title ${i}`,
-    avatar: 'https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm',
-    description: '2019-04-12 09:00:00',
-    content:
-      '这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志,这是一条日志'
-  })
-}
-
 export default {
   data() {
     return {
-      listData,
+      title: '发表',
       listLoading: false,
       visible: false,
       pagination: {
@@ -149,7 +157,7 @@ export default {
         sort: null,
         keyword: null
       },
-      actions: [{ type: 'star-o', text: '156' }, { type: 'like-o', text: '156' }, { type: 'message', text: '2' }],
+      actions: [{ type: 'like-o', text: '28031230' }, { type: 'message', text: '2' }],
       journals: [],
       journal: {}
     }
@@ -173,14 +181,43 @@ export default {
       })
     },
     handleNew() {
+      this.title = '新建'
       this.visible = true
+      this.journal = {}
     },
     handleEdit(item) {
+      this.title = '编辑'
       this.journal = item
       this.visible = true
+    },
+    createOrUpdateJournal() {
+      if (this.journal.id) {
+        journalApi.update(this.journal.id, this.journal).then(response => {
+          this.$message.success('更新成功！')
+        })
+      } else {
+        journalApi.create(this.journal).then(response => {
+          this.$message.success('发表成功！')
+        })
+      }
+      this.visible = false
+      this.loadJournals()
+    },
+    onPaginationChange(page, pageSize) {
+      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
+      this.pagination.page = page
+      this.pagination.size = pageSize
+      this.loadJournals()
+    },
+    resetParam() {
+      this.queryParam.keyword = null
+      this.loadJournals()
     }
   }
 }
 </script>
-<style>
+<style scoped>
+.pagination {
+  margin-top: 1rem;
+}
 </style>

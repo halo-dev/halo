@@ -20,4 +20,12 @@ journalApi.create = (journal) => {
   })
 }
 
+journalApi.update = (journalId, journal) => {
+  return service({
+    url: `${baseUrl}/${journalId}`,
+    data: journal,
+    method: 'put'
+  })
+}
+
 export default journalApi

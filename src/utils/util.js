@@ -46,6 +46,6 @@ export function timeAgo(time) {
   if (days < 5) {
     return days + ' 天前'
   } else {
-    return moment(time).format('YYYY-MM-DD HH:mm:ss')
+    return moment(time).format('YYYY-MM-DD HH:mm')
   }
 }
