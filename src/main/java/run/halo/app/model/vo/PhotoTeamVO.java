@@ -2,7 +2,7 @@ package run.halo.app.model.vo;
 
 import lombok.Data;
 import lombok.ToString;
-import run.halo.app.model.dto.GalleryDTO;
+import run.halo.app.model.dto.PhotoDTO;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ import java.util.List;
  */
 @Data
 @ToString
-public class GalleryTeamVO {
+public class PhotoTeamVO {
 
     private String team;
 
-    private List<GalleryDTO> galleries;
+    private List<PhotoDTO> photos;
 }

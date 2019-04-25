@@ -5,7 +5,7 @@ import freemarker.template.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.service.GalleryService;
+import run.halo.app.service.PhotoService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,18 +13,18 @@ import java.util.Map;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Freemarker custom tag of gallery.
+ * Freemarker custom tag of photo.
  *
  * @author : RYAN0UP
  * @date : 2019/4/21
  */
 @Component
-public class GalleryTagDirective implements TemplateDirectiveModel {
+public class PhotoTagDirective implements TemplateDirectiveModel {
 
-    private final GalleryService galleryService;
+    private final PhotoService photoService;
 
-    public GalleryTagDirective(GalleryService galleryService) {
-        this.galleryService = galleryService;
+    public PhotoTagDirective(PhotoService photoService) {
+        this.photoService = photoService;
     }
 
     @Override
@@ -36,16 +36,16 @@ public class GalleryTagDirective implements TemplateDirectiveModel {
             String team = params.get("team").toString();
             switch (method) {
                 case "list":
-                    env.setVariable("galleries", builder.build().wrap(galleryService.listAll()));
+                    env.setVariable("photos", builder.build().wrap(photoService.listAll()));
                     break;
                 case "listTeams":
-                    env.setVariable("teams", builder.build().wrap(galleryService.listDtos(Sort.by(DESC, "createTime"))));
+                    env.setVariable("teams", builder.build().wrap(photoService.listDtos(Sort.by(DESC, "createTime"))));
                     break;
                 case "listByTeam":
-                    env.setVariable("galleries", builder.build().wrap(galleryService.listByTeam(team, Sort.by(DESC, "createTime"))));
+                    env.setVariable("photos", builder.build().wrap(photoService.listByTeam(team, Sort.by(DESC, "createTime"))));
                     break;
                 case "count":
-                    env.setVariable("count", builder.build().wrap(galleryService.count()));
+                    env.setVariable("count", builder.build().wrap(photoService.count()));
                     break;
                 default:
                     break;

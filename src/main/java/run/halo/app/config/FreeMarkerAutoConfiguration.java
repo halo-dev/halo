@@ -59,7 +59,7 @@ public class FreeMarkerAutoConfiguration {
     private TagTagDirective tagTagDirective;
 
     @Autowired
-    private GalleryTagDirective galleryTagDirective;
+    private PhotoTagDirective photoTagDirective;
 
     @Autowired
     private RandomMethod randomMethod;
@@ -83,7 +83,7 @@ public class FreeMarkerAutoConfiguration {
             configuration.setSharedVariable("menuTag", menuTagDirective);
             configuration.setSharedVariable("tagTag", tagTagDirective);
             configuration.setSharedVariable("postTag", postTagDirective);
-            configuration.setSharedVariable("galleryTag", galleryTagDirective);
+            configuration.setSharedVariable("photoTag", photoTagDirective);
             configuration.setSharedVariable("randomMethod", randomMethod);
             configuration.setSharedVariable("recentPostsMethod", recentPostsMethod);
             configuration.setSharedVariable("recentCommentsMethod", recentCommentsMethod);

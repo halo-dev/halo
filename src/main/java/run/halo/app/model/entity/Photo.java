@@ -10,19 +10,19 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Gallery entity
+ * Photo entity
  *
  * @author : RYAN0UP
  * @date : 2019-03-12
  */
 @Data
 @Entity
-@Table(name = "galleries")
-@SQLDelete(sql = "update galleries set deleted = true where id = ?")
+@Table(name = "photos")
+@SQLDelete(sql = "update photos set deleted = true where id = ?")
 @Where(clause = "deleted = false")
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class Gallery extends BaseEntity {
+public class Photo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,7 +67,7 @@ public class Gallery extends BaseEntity {
     private String url;
 
     /**
-     * Gallery team name.
+     * Photo team name.
      */
     @Column(name = "team", columnDefinition = "varchar(255) default ''")
     private String team;
