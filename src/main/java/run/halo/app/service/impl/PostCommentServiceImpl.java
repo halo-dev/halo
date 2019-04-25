@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.dto.post.PostMinimalDTO;
-import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.repository.PostRepository;
-import run.halo.app.service.PostCommentService;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCommentService;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.Collections;
@@ -67,15 +67,17 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
         // Get all posts
         Map<Integer, Post> postMap = ServiceUtils.convertToMap(postRepository.findAllById(postIds), Post::getId);
 
-        return postComments.stream().map(comment -> {
-            // Convert to vo
-            PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
+        return postComments.stream()
+                .filter(comment -> postMap.containsKey(comment.getPostId()))
+                .map(comment -> {
+                    // Convert to vo
+                    PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
 
-            // Get post and set to the vo
-            postCommentWithPostVO.setPost(new PostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
+                    // Get post and set to the vo
+                    postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
 
-            return postCommentWithPostVO;
-        }).collect(Collectors.toList());
+                    return postCommentWithPostVO;
+                }).collect(Collectors.toList());
     }
 
     @Override

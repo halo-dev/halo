@@ -1,10 +1,5 @@
 package run.halo.app.controller.content.api;
 
-import run.halo.app.model.dto.TagDTO;
-import run.halo.app.model.dto.post.PostSimpleDTO;
-import run.halo.app.model.entity.Tag;
-import run.halo.app.service.PostTagService;
-import run.halo.app.service.TagService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.domain.Page;
@@ -13,6 +8,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.dto.TagDTO;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
+import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.Tag;
+import run.halo.app.service.PostService;
+import run.halo.app.service.PostTagService;
+import run.halo.app.service.TagService;
 
 import java.util.List;
 
@@ -32,16 +34,21 @@ public class TagController {
 
     private final PostTagService postTagService;
 
-    public TagController(TagService tagService, PostTagService postTagService) {
+    private final PostService postService;
+
+    public TagController(TagService tagService,
+                         PostTagService postTagService,
+                         PostService postService) {
         this.tagService = tagService;
         this.postTagService = postTagService;
+        this.postService = postService;
     }
 
     @GetMapping
     @ApiOperation("Lists tags")
     public List<? extends TagDTO> listTags(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
                                            @ApiParam("If the param is true, post count of tag will be returned")
-                                                 @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
+                                           @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);
         }
@@ -50,12 +57,13 @@ public class TagController {
 
     @GetMapping("{slugName}/posts")
     @ApiOperation("Lists posts by tag slug name")
-    public Page<PostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
-                                           @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
+                                               @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
         // Get tag by slug name
         Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
         // Get posts, convert and return
-        return postTagService.pagePostsBy(tag.getId(), pageable).map(post -> new PostSimpleDTO().convertFrom(post));
+        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), pageable);
+        return postService.convertToSimple(postPage);
     }
 }

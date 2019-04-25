@@ -11,13 +11,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
-import run.halo.app.model.dto.post.PostMinimalDTO;
-import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
@@ -240,7 +237,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Build archive
             ArchiveYearVO archive = new ArchiveYearVO();
             archive.setYear(year);
-            archive.setPosts(convertTo(postList));
+            archive.setPosts(convertToMinimal(postList));
 
             // Add archive
             archives.add(archive);
@@ -274,7 +271,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     ArchiveMonthVO archive = new ArchiveMonthVO();
                     archive.setYear(year);
                     archive.setMonth(month);
-                    archive.setPosts(convertTo(postList));
+                    archive.setPosts(convertToMinimal(postList));
 
                     archives.add(archive);
                 }));
@@ -333,7 +330,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Get comment count
         Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
 
-
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
@@ -360,24 +356,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             return postListVO;
         });
-    }
-
-    /**
-     * Converts to post minimal output dto.
-     *
-     * @param posts a list of post
-     * @return a list of post minimal output dto
-     */
-    @NonNull
-    private List<PostMinimalDTO> convertTo(@NonNull List<Post> posts) {
-        if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
-        }
-
-        // Convert
-        return posts.stream()
-                .map(post -> new PostMinimalDTO().<PostMinimalDTO>convertFrom(post))
-                .collect(Collectors.toList());
     }
 
     /**
