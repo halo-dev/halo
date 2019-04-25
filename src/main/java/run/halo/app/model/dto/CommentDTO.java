@@ -10,8 +10,8 @@ import lombok.ToString;
  * @author johnniang
  */
 @Data
-@ToString
-@EqualsAndHashCode
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class CommentDTO extends BaseCommentDTO {
 
 }

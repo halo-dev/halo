@@ -59,7 +59,7 @@ public class CommentServiceImpl extends BaseCommentServiceImpl<Comment> implemen
 
         if (authentication != null) {
             User user = authentication.getDetail().getUser();
-            commentParam.setAuthor(StringUtils.isEmpty(user.getNickname()) ? user.getUsername() : user.getNickname());
+            commentParam.setAuthor(StringUtils.isBlank(user.getNickname()) ? user.getUsername() : user.getNickname());
             commentParam.setEmail(user.getEmail());
             commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
         }
