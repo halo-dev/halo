@@ -47,7 +47,7 @@ import {
   Skeleton,
   Comment,
   ConfigProvider,
-  TimeLine
+  Timeline
 } from 'ant-design-vue';
 
 Vue.use(Anchor);
@@ -94,7 +94,7 @@ Vue.use(Upload);
 Vue.use(Skeleton);
 Vue.use(Comment);
 Vue.use(ConfigProvider);
-Vue.use(TimeLine);
+Vue.use(Timeline);
 
 Vue.prototype.$message = message;
 Vue.prototype.$notification = notification;
