@@ -80,15 +80,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public SheetDetailDTO convertToDetailDto(Sheet sheet) {
-        Assert.notNull(sheet, "Sheet must not be null");
-
-        // Convert and return
-        return new SheetDetailDTO().convertFrom(sheet);
-    }
-
-    @Override
-    public Page<SheetListVO> convertToListDto(Page<Sheet> sheetPage) {
+    public Page<SheetListVO> convertToListVo(Page<Sheet> sheetPage) {
         Assert.notNull(sheetPage, "Sheet page must not be null");
 
         // Get all sheet id

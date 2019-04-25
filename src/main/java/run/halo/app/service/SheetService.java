@@ -38,23 +38,13 @@ public interface SheetService extends BasePostService<Sheet> {
     Sheet getBy(PostStatus status, String url);
 
     /**
-     * Converts to detail dto.
-     *
-     * @param sheet sheet must not be null
-     * @return sheet detail dto
-     */
-    @NonNull
-    SheetDetailDTO convertToDetailDto(@NonNull Sheet sheet);
-
-
-    /**
      * Converts to list dto page.
      *
      * @param sheetPage sheet page must not be nulls
      * @return a page of sheet list dto
      */
     @NonNull
-    Page<SheetListVO> convertToListDto(@NonNull Page<Sheet> sheetPage);
+    Page<SheetListVO> convertToListVo(@NonNull Page<Sheet> sheetPage);
 
 
 }
