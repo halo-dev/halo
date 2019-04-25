@@ -24,13 +24,10 @@
               <a-input v-model="menuToCreate.url" />
             </a-form-item>
             <a-form-item label="上级菜单：">
-              <a-select v-model="menuToCreate.parentId">
-                <a-select-option
-                  v-for="(menu,index) in menus"
-                  :key="index"
-                  :value="menu.id"
-                >{{ menu.name }}</a-select-option>
-              </a-select>
+              <menu-select-tree
+                :menus="menus"
+                v-model="menuToCreate.parentId"
+              />
             </a-form-item>
             <a-form-item label="排序编号：">
               <a-input
@@ -120,6 +117,7 @@
 </template>
 
 <script>
+import MenuSelectTree from './components/MenuSelectTree'
 import menuApi from '@/api/menu'
 const columns = [
   {
@@ -146,6 +144,7 @@ const columns = [
   }
 ]
 export default {
+  components: { MenuSelectTree },
   data() {
     return {
       data: [],
