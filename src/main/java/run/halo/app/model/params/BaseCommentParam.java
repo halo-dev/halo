@@ -42,7 +42,7 @@ public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMEN
     private Long parentId = 0L;
 
     @Override
-    public ParameterizedType getParameterizedType() {
+    public ParameterizedType parameterizedType() {
         return ReflectionUtils.getParameterizedTypeBySuperClass(BaseCommentParam.class, this.getClass());
     }
 }
