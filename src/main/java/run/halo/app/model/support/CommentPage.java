@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 /**
- * Comment page implementation.
+ * PostComment page implementation.
  *
  * @author johnniang
  * @date 3/25/19

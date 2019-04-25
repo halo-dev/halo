@@ -32,7 +32,7 @@ public class AdminController {
 
     private final AttachmentService attachmentService;
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
     private final OptionService optionService;
 
@@ -42,13 +42,13 @@ public class AdminController {
 
     public AdminController(PostService postService,
                            AttachmentService attachmentService,
-                           CommentService commentService,
+                           PostCommentService postCommentService,
                            OptionService optionService,
                            UserService userService,
                            LinkService linkService) {
         this.postService = postService;
         this.attachmentService = attachmentService;
-        this.commentService = commentService;
+        this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.userService = userService;
         this.linkService = linkService;
@@ -65,7 +65,7 @@ public class AdminController {
         CountDTO countDTO = new CountDTO();
         countDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
         countDTO.setAttachmentCount(attachmentService.count());
-        countDTO.setCommentCount(commentService.count());
+        countDTO.setCommentCount(postCommentService.count());
 
         long currentTimeMillis = System.currentTimeMillis();
 

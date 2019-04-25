@@ -38,7 +38,7 @@ public class ContentArchiveController {
 
     private final PostService postService;
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
     private final ThemeService themeService;
 
@@ -49,13 +49,13 @@ public class ContentArchiveController {
     private final OptionService optionService;
 
     public ContentArchiveController(PostService postService,
-                                    CommentService commentService,
+                                    PostCommentService postCommentService,
                                     ThemeService themeService,
                                     PostCategoryService postCategoryService,
                                     PostTagService postTagService,
                                     OptionService optionService) {
         this.postService = postService;
-        this.commentService = commentService;
+        this.postCommentService = postCommentService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
         this.postTagService = postTagService;
@@ -116,7 +116,7 @@ public class ContentArchiveController {
         List<Category> categories = postCategoryService.listCategoryBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
 
-        Page<BaseCommentVO> comments = commentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentVO> comments = postCommentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
         final int[] pageRainbow = PageUtil.rainbow(cp, comments.getTotalPages(), 3);
 
         model.addAttribute("is_post", true);

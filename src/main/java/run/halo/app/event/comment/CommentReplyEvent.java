@@ -3,7 +3,7 @@ package run.halo.app.event.comment;
 import org.springframework.lang.NonNull;
 
 /**
- * Comment reply event.
+ * PostComment reply event.
  *
  * @author johnniang
  * @date 19-4-23

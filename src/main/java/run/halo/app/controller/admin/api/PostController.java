@@ -36,20 +36,12 @@ public class PostController {
 
     private final PostTagService postTagService;
 
-    private final CommentService commentService;
-
-    private final OptionService optionService;
-
     public PostController(PostService postService,
                           PostCategoryService postCategoryService,
-                          PostTagService postTagService,
-                          CommentService commentService,
-                          OptionService optionService) {
+                          PostTagService postTagService) {
         this.postService = postService;
         this.postCategoryService = postCategoryService;
         this.postTagService = postTagService;
-        this.commentService = commentService;
-        this.optionService = optionService;
     }
 
     @GetMapping

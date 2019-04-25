@@ -13,7 +13,7 @@ import run.halo.app.model.dto.post.PostSimpleDTO;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
-import run.halo.app.service.CommentService;
+import run.halo.app.service.PostCommentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
@@ -31,15 +31,15 @@ public class PostController {
 
     private final PostService postService;
 
-    private final CommentService commentService;
+    private final PostCommentService postCommentService;
 
     private final OptionService optionService;
 
     public PostController(PostService postService,
-                          CommentService commentService,
+                          PostCommentService postCommentService,
                           OptionService optionService) {
         this.postService = postService;
-        this.commentService = commentService;
+        this.postCommentService = postCommentService;
         this.optionService = optionService;
     }
 
@@ -74,7 +74,7 @@ public class PostController {
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("postId") Integer postId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                 @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return commentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return postCommentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{postId:\\d+}/comments/list_view")
@@ -82,7 +82,7 @@ public class PostController {
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return commentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return postCommentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @PostMapping("{postId:\\d+}/likes")
