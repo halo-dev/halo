@@ -1,5 +1,9 @@
 package run.halo.app.utils;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -115,5 +119,31 @@ public class ServiceUtils {
      */
     public static boolean isEmptyId(@Nullable Number id) {
         return id == null || id.longValue() <= 0;
+    }
+
+    /**
+     * Builds latest page request.
+     *
+     * @param top top must not be less than 1
+     * @return latest page request
+     */
+    @NonNull
+    public static Pageable buildLatestPageable(int top) {
+        return buildLatestPageable(top, "createTime");
+    }
+
+    /**
+     * Builds latest page request.
+     *
+     * @param top          top must not be less than 1
+     * @param sortProperty sort property must not be blank
+     * @return latest page request
+     */
+    @NonNull
+    public static Pageable buildLatestPageable(int top, @NonNull String sortProperty) {
+        Assert.isTrue(top > 0, "Top number must not be less than 0");
+        Assert.hasText(sortProperty, "Sort property must not be blank");
+
+        return PageRequest.of(0, top, Sort.by(Sort.Direction.DESC, sortProperty));
     }
 }

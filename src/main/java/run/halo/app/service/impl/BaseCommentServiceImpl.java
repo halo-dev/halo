@@ -5,7 +5,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -78,7 +77,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
     @Override
     public Page<COMMENT> pageLatest(int top) {
-        return listAll(buildLatestPageable(top));
+        return listAll(ServiceUtils.buildLatestPageable(top));
     }
 
     @Override
@@ -417,16 +416,4 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         }
     }
 
-    /**
-     * Builds latest page request.
-     *
-     * @param top top must not be less than 1
-     * @return latest page request
-     */
-    @NonNull
-    Pageable buildLatestPageable(int top) {
-        Assert.isTrue(top > 0, "Top number must not be less than 0");
-
-        return PageRequest.of(0, top, Sort.by(Sort.Direction.DESC, "createTime"));
-    }
 }

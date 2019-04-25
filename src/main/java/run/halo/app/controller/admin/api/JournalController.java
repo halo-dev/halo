@@ -4,11 +4,13 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.BaseCommentDTO;
+import run.halo.app.model.dto.JournalDTO;
+import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.service.JournalService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -29,21 +31,21 @@ public class JournalController {
 
     @GetMapping
     @ApiOperation("Gets latest journals")
-    public Page<BaseCommentDTO> pageBy(Pageable pageable) {
-        Page<Journal> journalPage = journalService.pageBy(pageable);
-        return journalService.convertTo(journalPage);
+    public Page<JournalWithCmtCountDTO> pageBy(Pageable pageable) {
+        Page<Journal> journalPage = journalService.listAll(pageable);
+        return journalService.convertToCmtCountDto(journalPage);
     }
 
     @GetMapping("latest")
     @ApiOperation("Gets latest journals")
-    public List<BaseCommentDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+    public List<JournalWithCmtCountDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         List<Journal> journals = journalService.pageLatest(top).getContent();
-        return journalService.convertTo(journals);
+        return journalService.convertToCmtCountDto(journals);
     }
 
     @PostMapping
     @ApiOperation("Creates a journal")
-    public BaseCommentDTO createBy(@RequestBody JournalParam journalParam) {
+    public JournalDTO createBy(@RequestBody @Valid JournalParam journalParam) {
         Journal createdJournal = journalService.createBy(journalParam);
         return journalService.convertTo(createdJournal);
     }
