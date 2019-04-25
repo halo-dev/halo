@@ -244,7 +244,7 @@ export default {
       this.gallery['thumbnail'] = this.attachment.thumbPath
       this.gallery['url'] = this.attachment.path
       this.gallery['description'] = ''
-      this.gallery['takeTime'] = ''
+      this.gallery['takeTime'] = new Date().getTime()
       this.gallery['location'] = ''
       this.gallery['team'] = ''
       galleryApi.create(this.gallery).then(response => {

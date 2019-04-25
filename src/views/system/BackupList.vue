@@ -37,7 +37,7 @@
         </a-tab-pane>
         <a-tab-pane key="2">
           <span slot="tab">
-            <a-icon type="database" />资源文件备份
+            <a-icon type="database" />数据库备份
           </span>
           <a-table
             :columns="columns"

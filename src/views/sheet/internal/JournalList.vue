@@ -83,11 +83,9 @@
                 <a-list-item-meta :description="item.description">
                   <a
                     slot="title"
-                    :href="item.href"
-                  >{{ item.title }}</a>
+                  >{{ item.content }}</a>
                   <a-avatar
                     slot="avatar"
-                    :src="item.avatar"
                     size="large"
                   />
                 </a-list-item-meta>
@@ -152,7 +150,8 @@ export default {
         keyword: null
       },
       actions: [{ type: 'star-o', text: '156' }, { type: 'like-o', text: '156' }, { type: 'message', text: '2' }],
-      journals: {}
+      journals: [],
+      journal: {}
     }
   },
   created() {
