@@ -80,10 +80,10 @@ export const asyncRouterMap = [
             meta: { title: '友情链接', hiddenHeaderContent: false }
           },
           {
-            path: '/sheets/galleries',
-            name: 'GalleryList',
+            path: '/sheets/photos',
+            name: 'PhotoList',
             hidden: true,
-            component: () => import('@/views/sheet/internal/GalleryList'),
+            component: () => import('@/views/sheet/internal/PhotoList'),
             meta: { title: '图库', hiddenHeaderContent: false }
           },
           {

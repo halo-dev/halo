@@ -142,7 +142,7 @@
       v-model="drawerVisiable"
       v-if="selectAttachment"
       :attachment="selectAttachment"
-      :addToGallery="true"
+      :addToPhoto="true"
       @delete="handleDelete"
     />
   </page-view>

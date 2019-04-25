@@ -53,7 +53,7 @@
                     <a href="javascript:void(0);">编辑</a>
                   </router-link>
                   <router-link
-                    :to="{name:'GalleryList'}"
+                    :to="{name:'PhotoList'}"
                     v-if="record.id==2"
                   >
                     <a href="javascript:void(0);">编辑</a>
@@ -211,7 +211,7 @@ const internalPages = [
   {
     id: '2',
     name: '图库页面',
-    url: '/galleries'
+    url: '/photos'
   },
   {
     id: '3',

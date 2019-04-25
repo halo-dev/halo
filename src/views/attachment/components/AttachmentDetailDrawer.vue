@@ -122,10 +122,10 @@
     <div class="bottom-control">
       <a-popconfirm
         title="你确定要添加到图库？"
-        @confirm="handleAddToGallery"
+        @confirm="handleAddToPhoto"
         okText="确定"
         cancelText="取消"
-        v-if="addToGallery"
+        v-if="addToPhoto"
       >
         <a-button
           type="dashed"
@@ -147,7 +147,7 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import attachmentApi from '@/api/attachment'
-import galleryApi from '@/api/gallery'
+import photoApi from '@/api/photo'
 
 export default {
   name: 'AttachmentDetailDrawer',
@@ -156,7 +156,7 @@ export default {
     return {
       detailLoading: true,
       editable: false,
-      gallery: {}
+      photo: {}
     }
   },
   model: {
@@ -168,7 +168,7 @@ export default {
       type: Object,
       required: true
     },
-    addToGallery: {
+    addToPhoto: {
       type: Boolean,
       required: false,
       default: false
@@ -239,15 +239,12 @@ export default {
           this.$message.error('复制失败')
         })
     },
-    handleAddToGallery() {
-      this.gallery['name'] = this.attachment.name
-      this.gallery['thumbnail'] = this.attachment.thumbPath
-      this.gallery['url'] = this.attachment.path
-      this.gallery['description'] = ''
-      this.gallery['takeTime'] = new Date().getTime()
-      this.gallery['location'] = ''
-      this.gallery['team'] = ''
-      galleryApi.create(this.gallery).then(response => {
+    handleAddToPhoto() {
+      this.photo['name'] = this.attachment.name
+      this.photo['thumbnail'] = this.attachment.thumbPath
+      this.photo['url'] = this.attachment.path
+      this.photo['takeTime'] = new Date().getTime()
+      photoApi.create(this.photo).then(response => {
         this.$message.success('添加成功！')
       })
     },
