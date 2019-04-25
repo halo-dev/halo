@@ -8,7 +8,7 @@ package run.halo.app.model.properties;
  */
 public enum PostProperties implements PropertyEnum {
 
-    SUMMARY_LENGTH("post_summary_length", Integer.class, ""),
+    SUMMARY_LENGTH("post_summary_length", Integer.class, "150"),
 
     RSS_PAGE_SIZE("rss_page_size", Integer.class, "20"),
 

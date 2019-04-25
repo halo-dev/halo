@@ -8,7 +8,7 @@ package run.halo.app.model.properties;
  */
 public enum QnYunProperties implements PropertyEnum {
 
-    ZONE("oss_qiniu_zone", String.class, ""),
+    ZONE("oss_qiniu_zone", String.class, "auto"),
 
     ACCESS_KEY("oss_qiniu_access_key", String.class, ""),
 
@@ -23,7 +23,7 @@ public enum QnYunProperties implements PropertyEnum {
     private final String value;
 
     private final Class<?> type;
-    
+
     private final String defaultValue;
 
     QnYunProperties(String value, Class<?> type, String defaultValue) {

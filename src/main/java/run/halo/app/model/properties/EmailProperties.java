@@ -20,7 +20,7 @@ public enum EmailProperties implements PropertyEnum {
 
     FROM_NAME("email_from_name", String.class, ""),
 
-    ENABLED("email_enabled", Boolean.class, "");
+    ENABLED("email_enabled", Boolean.class, "false");
 
     private final String value;
 
