@@ -20,6 +20,14 @@ photoApi.create = (photo) => {
   })
 }
 
+photoApi.update = (photoId, photo) => {
+  return service({
+    url: `${baseUrl}/${photoId}`,
+    method: 'put',
+    data: photo
+  })
+}
+
 photoApi.delete = photoId => {
   return service({
     url: `${baseUrl}/${photoId}`,

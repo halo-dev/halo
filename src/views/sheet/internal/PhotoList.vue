@@ -54,6 +54,7 @@
             <a-button
               type="primary"
               icon="plus"
+              @click="handleAddClick"
             >添加</a-button>
           </div>
         </a-card>
@@ -74,7 +75,7 @@
               hoverable
               @click="showDrawer(item)"
             >
-              <div class="attach-thumb">
+              <div class="photo-thumb">
                 <img :src="item.thumbnail">
               </div>
               <a-card-meta>
@@ -120,8 +121,11 @@
             :loading="drawerLoading"
             :paragraph="{rows: 8}"
           >
-            <div class="attach-detail-img">
-              <img :src="photo.url">
+            <div class="photo-detail-img">
+              <img
+                :src="photo.url || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
+                @click="showThumbDrawer"
+              >
             </div>
           </a-skeleton>
         </a-col>
@@ -133,6 +137,23 @@
             :paragraph="{rows: 8}"
           >
             <a-list itemLayout="horizontal">
+              <a-list-item>
+                <a-list-item-meta>
+                  <template
+                    slot="description"
+                    v-if="editable"
+                  >
+                    <a-input v-model="photo.thumbnail" />
+                  </template>
+                  <template
+                    slot="description"
+                    v-else
+                  >{{ photo.thumbnail }}</template>
+                  <span slot="title">
+                    缩略图地址：
+                  </span>
+                </a-list-item-meta>
+              </a-list-item>
               <a-list-item>
                 <a-list-item-meta>
                   <template
@@ -218,20 +239,25 @@
           </a-skeleton>
         </a-col>
       </a-row>
+      <AttachmentSelectDrawer
+        v-model="thumDrawerVisible"
+        @listenToSelect="selectPhotoThumb"
+        :drawerWidth="460"
+      />
       <a-divider />
       <div class="bottom-control">
-          <a-button
-            type="dashed"
-            style="marginRight: 8px"
-            @click="handleEditClick"
-            v-if="!editable"
-          >编辑</a-button>
-          <a-button
-            type="primary"
-            style="marginRight: 8px"
-            @click="handleEditClick"
-            v-else
-          >保存</a-button>
+        <a-button
+          type="dashed"
+          style="marginRight: 8px"
+          @click="handleEditClick"
+          v-if="!editable"
+        >编辑</a-button>
+        <a-button
+          type="primary"
+          style="marginRight: 8px"
+          @click="handleCreateOrUpdate"
+          v-else
+        >保存</a-button>
         <a-popconfirm
           title="你确定要删除该图片？"
           okText="确定"
@@ -246,16 +272,21 @@
 </template>
 
 <script>
+import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import photoApi from '@/api/photo'
 
 export default {
+  components: {
+    AttachmentSelectDrawer
+  },
   mixins: [mixin, mixinDevice],
   data() {
     return {
       drawerVisiable: false,
       drawerLoading: false,
       listLoading: true,
+      thumDrawerVisible: false,
       photo: {},
       photos: [],
       editable: false,
@@ -268,9 +299,7 @@ export default {
         page: 0,
         size: 18,
         sort: null,
-        keyword: null,
-        mediaType: null,
-        attachmentType: null
+        keyword: null
       }
     }
   },
@@ -292,6 +321,19 @@ export default {
         this.listLoading = false
       })
     },
+    handleCreateOrUpdate() {
+      if (this.photo.id) {
+        photoApi.update(this.photo.id, this.photo).then(response => {
+          this.$message.success('照片更新成功')
+        })
+      } else {
+        photoApi.create(this.photo).then(response => {
+          this.$message.success('照片添加成功')
+          this.photo = response.data.data
+        })
+      }
+      this.editable = false
+    },
     showDrawer(photo) {
       this.photo = photo
       this.drawerVisiable = true
@@ -302,26 +344,35 @@ export default {
       this.pagination.size = size
       this.loadPhotos()
     },
+    handleAddClick() {
+      this.editable = true
+      this.drawerVisiable = true
+    },
     handleEditClick() {
       this.editable = true
     },
     handleDeletePhoto() {
       photoApi.delete(this.photo.id).then(response => {
         this.$message.success('删除成功！')
-        this.onClose()
+        this.onDrawerClose()
+        this.loadPhotos()
       })
+    },
+    showThumbDrawer() {
+      this.thumDrawerVisible = true
+    },
+    selectPhotoThumb(data) {
+      this.photo.url = data.path
+      this.thumDrawerVisible = false
     },
     resetParam() {
       this.queryParam.keyword = null
-      this.queryParam.mediaType = null
-      this.queryParam.attachmentType = null
-      this.loadPhotos()
-    },
-    handleDelete(attachment) {
       this.loadPhotos()
     },
     onDrawerClose() {
       this.drawerVisiable = false
+      this.photo = {}
+      this.editable = false
     }
   }
 }
@@ -336,7 +387,7 @@ export default {
   padding-bottom: 12px;
 }
 
-.attach-thumb {
+.photo-thumb {
   width: 100%;
   margin: 0 auto;
   position: relative;
@@ -355,7 +406,7 @@ export default {
   padding: 0.8rem;
 }
 
-.attach-detail-img img {
+.photo-detail-img img {
   width: 100%;
 }
 
