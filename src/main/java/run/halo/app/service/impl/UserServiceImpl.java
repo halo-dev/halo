@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * UserService implementation class
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-03-14
  */
 @Service

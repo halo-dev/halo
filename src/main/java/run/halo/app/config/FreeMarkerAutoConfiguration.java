@@ -18,7 +18,7 @@ import javax.annotation.PostConstruct;
 /**
  * FreeMarker configuration.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2018/4/26
  */
 @Slf4j

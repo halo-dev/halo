@@ -12,7 +12,7 @@ import javax.persistence.*;
 /**
  * Attachment entity
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-03-12
  */
 @Data

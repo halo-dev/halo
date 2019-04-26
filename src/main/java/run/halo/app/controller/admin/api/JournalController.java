@@ -12,6 +12,7 @@ import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.params.JournalParam;
+import run.halo.app.model.params.JournalQuery;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.service.JournalCommentService;
@@ -27,6 +28,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Journal controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-25
  */
 @RestController
@@ -49,8 +51,9 @@ public class JournalController {
 
     @GetMapping
     @ApiOperation("Gets latest journals")
-    public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
-        Page<Journal> journalPage = journalService.listAll(pageable);
+    public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                               JournalQuery journalQuery) {
+        Page<Journal> journalPage = journalService.pageBy(journalQuery,pageable);
         return journalService.convertToCmtCountDto(journalPage);
     }
 

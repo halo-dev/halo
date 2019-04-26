@@ -3,7 +3,7 @@ package run.halo.app.utils;
 import org.junit.Test;
 
 /**
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2017/12/26
  * @version : 1.0
  * description:

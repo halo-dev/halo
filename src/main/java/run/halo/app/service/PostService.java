@@ -20,7 +20,7 @@ import java.util.Set;
  * Post service.
  *
  * @author johnniang
- * @author RYAN0UP
+ * @author ryanwang
  */
 public interface PostService extends BasePostService<Post> {
 

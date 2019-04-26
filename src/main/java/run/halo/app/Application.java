@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  *     Halo run!
  * </pre>
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2017/11/14
  */
 @SpringBootApplication

@@ -12,7 +12,7 @@ import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 
 /**
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-03-21
  */
 @Controller

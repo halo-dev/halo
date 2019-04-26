@@ -18,7 +18,7 @@ import java.io.FileNotFoundException;
 /**
  * Error page Controller
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2017/12/26
  */
 @Slf4j

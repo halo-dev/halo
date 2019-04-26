@@ -14,7 +14,7 @@ import java.util.List;
  * Menu service.
  *
  * @author johnniang
- * @author RYAN0UP
+ * @author ryanwang
  */
 public interface MenuService extends CrudService<Menu, Integer> {
 

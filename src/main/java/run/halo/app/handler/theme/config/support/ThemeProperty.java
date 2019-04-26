@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Theme property.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-03-22
  */
 @Data

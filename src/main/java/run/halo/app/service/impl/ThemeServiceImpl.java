@@ -51,7 +51,7 @@ import java.util.zip.ZipInputStream;
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
 /**
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/3/26
  */
 @Slf4j

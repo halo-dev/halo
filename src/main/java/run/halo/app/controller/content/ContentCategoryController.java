@@ -21,7 +21,7 @@ import run.halo.app.service.ThemeService;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/3/20
  */
 @Controller

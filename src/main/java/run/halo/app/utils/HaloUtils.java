@@ -25,7 +25,7 @@ import java.util.UUID;
  * 常用工具
  * </pre>
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2017/12/22
  */
 @Slf4j

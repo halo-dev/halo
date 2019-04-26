@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 /**
  * Admin page.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-04-23
  */
 @Controller

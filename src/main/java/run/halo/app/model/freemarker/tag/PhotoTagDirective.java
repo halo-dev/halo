@@ -15,7 +15,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 /**
  * Freemarker custom tag of photo.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/4/21
  */
 @Component
