@@ -82,6 +82,12 @@
                 <div>
                   <a-form layout="vertical">
                     <a-form-item v-if="categoryForm">
+                      <category-select-tree
+                        :categories="categories"
+                        v-model="categoryToCreate.parentId"
+                      />
+                    </a-form-item>
+                    <a-form-item v-if="categoryForm">
                       <a-input placeholder="分类名称" v-model="categoryToCreate.name"/>
                     </a-form-item>
                     <a-form-item v-if="categoryForm">
@@ -171,6 +177,7 @@ import TagSelect from './components/TagSelect'
 import { mavonEditor } from 'mavon-editor'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
+import CategorySelectTree from './components/CategorySelectTree'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { toolbars } from '@/core/const'
@@ -185,7 +192,8 @@ export default {
     CategoryTree,
     FooterToolBar,
     AttachmentDrawer,
-    AttachmentSelectDrawer
+    AttachmentSelectDrawer,
+    CategorySelectTree
   },
   mixins: [mixin, mixinDevice],
   data() {
