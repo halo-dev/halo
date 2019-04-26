@@ -79,6 +79,21 @@
                   v-model="selectedCategoryIds"
                   :categories="categories"
                 />
+                <div>
+                  <a-form layout="vertical">
+                    <a-form-item v-if="categoryForm">
+                      <a-input placeholder="分类名称" v-model="categoryToCreate.name"/>
+                    </a-form-item>
+                    <a-form-item v-if="categoryForm">
+                      <a-input placeholder="分类路径" v-model="categoryToCreate.slugNames"/>
+                    </a-form-item>
+                    <a-form-item>
+                      <a-button type="primary" style="marginRight: 8px" v-if="categoryForm" @click="handlerCreateCategory">保存</a-button>
+                      <a-button type="dashed" style="marginRight: 8px" v-if="!categoryForm" @click="toggleCategoryForm">新增</a-button>
+                      <a-button v-if="categoryForm" @click="toggleCategoryForm">取消</a-button>
+                    </a-form-item>
+                  </a-form>
+                </div>
               </div>
             </div>
             <a-divider />
@@ -89,18 +104,6 @@
                 <a-form layout="vertical">
                   <a-form-item>
                     <TagSelect v-model="selectedTagIds" />
-                    <!-- <a-select
-                      v-model="selectedTagIds"
-                      allowClear
-                      mode="multiple"
-                      placeholder="选择或输入标签"
-                    >
-                      <a-select-option
-                        v-for="tag in tags"
-                        :key="tag.id"
-                        :value="tag.id"
-                      >{{ tag.name }}</a-select-option>
-                    </a-select> -->
                   </a-form-item>
                 </a-form>
               </div>
@@ -196,11 +199,13 @@ export default {
       attachmentDrawerVisible: false,
       visible: false,
       thumDrawerVisible: false,
+      categoryForm: false,
       tags: [],
       categories: [],
       selectedCategoryIds: [],
       selectedTagIds: [],
-      postToStage: {}
+      postToStage: {},
+      categoryToCreate: {}
     }
   },
   computed: {
@@ -271,6 +276,9 @@ export default {
     showThumbDrawer() {
       this.thumDrawerVisible = true
     },
+    toggleCategoryForm() {
+      this.categoryForm = !this.categoryForm
+    },
     handlePublishClick() {
       this.postToStage.status = 'PUBLISHED'
       this.createOrUpdatePost()
@@ -281,6 +289,12 @@ export default {
     },
     handlerRemoveThumb() {
       this.postToStage.thumbnail = null
+    },
+    handlerCreateCategory() {
+      categoryApi.create(this.categoryToCreate).then(response => {
+        this.loadCategories()
+        this.categoryToCreate = {}
+      })
     },
     onClose() {
       this.visible = false

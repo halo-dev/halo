@@ -1,6 +1,6 @@
 <template>
   <div class="user-wrapper">
-    <a href="/" target="_blank">
+    <a href="http://localhost:8090" target="_blank">
       <span class="action">
         <a-icon type="link" />
       </span>

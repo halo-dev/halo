@@ -15,7 +15,13 @@
     <div class="aboutTitle">关于我们</div>
     <div>
       <a-row>
-        <a-col :xs="8" :md="6" :lg="4" :xl="4" v-for="(dev,index) in devs" :key="index">
+        <a-col
+          :xs="8"
+          :md="6"
+          :lg="4"
+          :xl="4"
+          v-for="(dev,index) in devs"
+          :key="index">
           <div class="head-Box">
             <a-avatar :size="60" :src="dev.src"/>
             <p>{{ dev.Name }}</p>
