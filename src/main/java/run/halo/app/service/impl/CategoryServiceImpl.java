@@ -177,8 +177,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             return Collections.emptyList();
         }
 
-        return categories
-                .stream()
+        return categories.stream()
                 .map(this::convertTo)
                 .collect(Collectors.toList());
     }

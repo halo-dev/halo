@@ -1,6 +1,7 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
@@ -36,7 +37,9 @@ public class TagController {
     }
 
     @GetMapping
+    @ApiOperation("Lists tag")
     public List<? extends TagDTO> listTags(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort,
+                                           @ApiParam("Return more information(post count) if it is set")
                                            @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);
@@ -45,6 +48,7 @@ public class TagController {
     }
 
     @PostMapping
+    @ApiOperation("Creates tag")
     public TagDTO createTag(@Valid @RequestBody TagParam tagParam) {
         // Convert to tag
         Tag tag = tagParam.convertTo();
@@ -52,7 +56,7 @@ public class TagController {
         log.debug("Tag to be created: [{}]", tag);
 
         // Create and convert
-        return new TagDTO().convertFrom(tagService.create(tag));
+        return tagService.convertTo(tagService.create(tag));
     }
 
     /**
@@ -64,7 +68,7 @@ public class TagController {
     @GetMapping("{tagId:\\d+}")
     @ApiOperation("Get tag detail by id")
     public TagDTO getBy(@PathVariable("tagId") Integer tagId) {
-        return new TagDTO().convertFrom(tagService.getById(tagId));
+        return tagService.convertTo(tagService.getById(tagId));
     }
 
     @PutMapping("{tagId:\\d+}")
@@ -78,20 +82,17 @@ public class TagController {
         tagParam.update(tag);
 
         // Update tag
-        return new TagDTO().convertFrom(tagService.update(tag));
+        return tagService.convertTo(tagService.update(tag));
     }
 
-    /**
-     * Delete tag by id.
-     *
-     * @param tagId tag id
-     */
     @DeleteMapping("{tagId:\\d+}")
-    @ApiOperation("Delete tag by id")
-    public void deletePermanently(@PathVariable("tagId") Integer tagId) {
+    @ApiOperation("Deletes tag")
+    public TagDTO deletePermanently(@PathVariable("tagId") Integer tagId) {
         // Remove the tag
-        tagService.removeById(tagId);
+        Tag deletedTag = tagService.removeById(tagId);
         // Remove the post tag relationship
         postTagService.removeByTagId(tagId);
+
+        return tagService.convertTo(deletedTag);
     }
 }
