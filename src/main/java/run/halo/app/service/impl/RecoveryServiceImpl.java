@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.*;
 import run.halo.app.utils.BeanUtils;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Recovery service implementation.
@@ -139,7 +142,7 @@ public class RecoveryServiceImpl implements RecoveryService {
             post.setFormatContent(postMap.getOrDefault("postContent", "").toString());
             post.setSummary(postMap.getOrDefault("postSummary", "").toString());
             post.setThumbnail(postMap.getOrDefault("postThumbnail", "").toString());
-            post.setVisits(getLongOrDefault(postMap.get("postViews").toString(), 0L));
+            post.setVisits(getLongOrDefault(postMap.getOrDefault("postViews", "").toString(), 0L));
             post.setDisallowComment(false);
             post.setTemplate(postMap.getOrDefault("customTpl", "").toString());
 
@@ -150,19 +153,19 @@ public class RecoveryServiceImpl implements RecoveryService {
             }
 
             // Set create time
-            Long createTime = getLongOrDefault(postMap.get("postDate").toString(), 0L);
+            Long createTime = getLongOrDefault(postMap.getOrDefault("postDate", "").toString(), 0L);
             if (createTime != 0L) {
                 post.setCreateTime(new Date(createTime));
             }
 
             // Set update time
-            Long updateTime = getLongOrDefault(postMap.get("postUpdate").toString(), 0L);
+            Long updateTime = getLongOrDefault(postMap.getOrDefault("postUpdate", "").toString(), 0L);
             if (updateTime != 0L) {
                 post.setUpdateTime(new Date(updateTime));
             }
 
             // Set status (default draft)
-            Integer postStatus = getIntegerOrDefault(postMap.get("postStatus").toString(), 1);
+            Integer postStatus = getIntegerOrDefault(postMap.getOrDefault("postStatus", "").toString(), 1);
             if (postStatus == 0) {
                 post.setStatus(PostStatus.PUBLISHED);
             } else if (postStatus == 1) {
@@ -199,6 +202,19 @@ public class RecoveryServiceImpl implements RecoveryService {
 
         Object commentsObject = postMap.get("comments");
         // TODO Handle comments
+        List<BaseComment> baseComments = handleComment(commentsObject, createdPost.getId());
+
+        List<PostComment> postComments = baseComments.stream()
+                .map(baseComment -> BeanUtils.transformFrom(baseComment, PostComment.class))
+                .collect(Collectors.toList());
+
+        try {
+            // Create comments
+            List<PostComment> createdPostComments = postCommentService.createInBatch(postComments);
+        } catch (Exception e) {
+            log.warn("Failed to create post comments for post with id " + createdPost.getId(), e);
+            // Ignore this exception
+        }
 
         return createdPost;
     }
@@ -212,8 +228,67 @@ public class RecoveryServiceImpl implements RecoveryService {
 
         Object commentsObject = postMap.get("comments");
         // TODO Handle comments
+        List<BaseComment> baseComments = handleComment(commentsObject, createdSheet.getId());
+
+        List<SheetComment> sheetComments = baseComments.stream()
+                .map(baseComment -> BeanUtils.transformFrom(baseComment, SheetComment.class))
+                .collect(Collectors.toList());
+
+        // Create comments
+        try {
+            sheetCommentService.createInBatch(sheetComments);
+        } catch (Exception e) {
+            log.warn("Failed to create sheet comments for sheet with id " + createdSheet.getId(), e);
+            // Ignore this exception
+        }
 
         return createdSheet;
+    }
+
+    private List<BaseComment> handleComment(@Nullable Object commentsObject, @NonNull Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        if (!(commentsObject instanceof List)) {
+            return Collections.emptyList();
+        }
+
+        List<Object> commentObjectList = (List<Object>) commentsObject;
+
+        List<BaseComment> result = new LinkedList<>();
+
+        commentObjectList.forEach(commentObject -> {
+            if (!(commentObject instanceof Map)) {
+                return;
+            }
+
+            Map<String, Object> commentMap = (Map<String, Object>) commentObject;
+
+            BaseComment baseComment = new BaseComment();
+            baseComment.setId(getLongOrDefault(commentMap.getOrDefault("commentId", "").toString(), null));
+            baseComment.setAuthor(commentMap.getOrDefault("commentAuthor", "").toString());
+            baseComment.setEmail(commentMap.getOrDefault("commentAuthorEmail", "").toString());
+            baseComment.setIpAddress(commentMap.getOrDefault("commentAuthorIp", "").toString());
+            baseComment.setAuthorUrl(commentMap.getOrDefault("commentAuthorUrl", "").toString());
+            baseComment.setGavatarMd5(commentMap.getOrDefault("commentAuthorAvatarMd5", "").toString());
+            baseComment.setContent(commentMap.getOrDefault("commentContent", "").toString());
+            baseComment.setUserAgent(commentMap.getOrDefault("commentAgent", "").toString());
+            baseComment.setIsAdmin(getBooleanOrDefault(commentMap.getOrDefault("isAdmin", "").toString(), false));
+            baseComment.setPostId(postId);
+            baseComment.setParentId(getLongOrDefault(commentMap.getOrDefault("commentParent", "").toString(), 0L));
+
+            Integer commentStatus = getIntegerOrDefault(commentMap.getOrDefault("commentStatus", "").toString(), 1);
+            if (commentStatus == 0) {
+                baseComment.setStatus(CommentStatus.PUBLISHED);
+            } else if (commentStatus == 1) {
+                baseComment.setStatus(CommentStatus.AUDITING);
+            } else {
+                baseComment.setStatus(CommentStatus.RECYCLE);
+            }
+
+            result.add(baseComment);
+        });
+
+        return result;
     }
 
 
@@ -390,7 +465,7 @@ public class RecoveryServiceImpl implements RecoveryService {
     }
 
     @NonNull
-    private Integer getIntegerOrDefault(@Nullable String numberString, int defaultNumber) {
+    private Integer getIntegerOrDefault(@Nullable String numberString, @Nullable Integer defaultNumber) {
         try {
             return Integer.valueOf(numberString);
         } catch (Exception e) {
@@ -400,7 +475,7 @@ public class RecoveryServiceImpl implements RecoveryService {
     }
 
     @NonNull
-    private Long getLongOrDefault(@Nullable String numberString, long defaultNumber) {
+    private Long getLongOrDefault(@Nullable String numberString, @Nullable Long defaultNumber) {
         try {
             return Long.valueOf(numberString);
         } catch (Exception e) {
@@ -409,4 +484,23 @@ public class RecoveryServiceImpl implements RecoveryService {
         }
     }
 
+    private Boolean getBooleanOrDefault(@Nullable String boolString, @Nullable Boolean defaultValue) {
+        if (StringUtils.equalsIgnoreCase(boolString, "0")) {
+            return false;
+        }
+
+        if (StringUtils.equalsIgnoreCase(boolString, "1")) {
+            return true;
+        }
+
+        if (StringUtils.equalsIgnoreCase(boolString, "true")) {
+            return true;
+        }
+
+        if (StringUtils.equalsIgnoreCase(boolString, "false")) {
+            return false;
+        }
+
+        return defaultValue;
+    }
 }
