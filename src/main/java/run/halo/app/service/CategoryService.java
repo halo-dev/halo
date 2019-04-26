@@ -19,14 +19,6 @@ import java.util.List;
 public interface CategoryService extends CrudService<Category, Integer> {
 
     /**
-     * Remove category and relationship
-     *
-     * @param id id
-     */
-    @Deprecated
-    void remove(@NonNull Integer id);
-
-    /**
      * Lists as category tree.
      *
      * @param sort sort info must not be null
@@ -52,8 +44,18 @@ public interface CategoryService extends CrudService<Category, Integer> {
     @Transactional
     void removeCategoryAndPostCategoryBy(Integer categoryId);
 
+
     /**
      * Converts to category dto.
+     *
+     * @param category category must not be null
+     * @return category dto
+     */
+    @NonNull
+    CategoryDTO convertTo(@NonNull Category category);
+
+    /**
+     * Converts to category dto list.
      *
      * @param categories category list
      * @return a list of category dto
