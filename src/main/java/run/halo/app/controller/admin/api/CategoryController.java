@@ -37,6 +37,19 @@ public class CategoryController {
         this.postCategoryService = postCategoryService;
     }
 
+
+    /**
+     * Get Category by id
+     *
+     * @param id id
+     * @return CategoryDTO
+     */
+    @GetMapping("{id:\\d+}")
+    @ApiOperation("Get category detail by id")
+    public CategoryDTO getBy(@PathVariable("id") Integer id) {
+        return new CategoryDTO().convertFrom(categoryService.getById(id));
+    }
+
     @GetMapping
     @ApiOperation("List all categories")
     public List<? extends CategoryDTO> listAll(
@@ -64,16 +77,13 @@ public class CategoryController {
         return new CategoryDTO().convertFrom(categoryService.create(category));
     }
 
-    /**
-     * Get Category by id
-     *
-     * @param id id
-     * @return CategoryDTO
-     */
-    @GetMapping("{id:\\d+}")
-    @ApiOperation("Get category detail by id")
-    public CategoryDTO getBy(@PathVariable("id") Integer id) {
-        return new CategoryDTO().convertFrom(categoryService.getById(id));
+    @PutMapping("{id:\\d+}")
+    @ApiOperation("Update category")
+    public CategoryDTO updateBy(@PathVariable("id") Integer id,
+                                @RequestBody @Valid CategoryParam categoryParam) {
+        Category categoryToUpdate = categoryService.getById(id);
+        categoryParam.update(categoryToUpdate);
+        return new CategoryDTO().convertFrom(categoryService.update(categoryToUpdate));
     }
 
     /**
@@ -82,7 +92,7 @@ public class CategoryController {
      * @param id id
      */
     @DeleteMapping("{id:\\d+}")
-    @ApiOperation("Delete category by id")
+    @ApiOperation("Delete category")
     public void deletePermanently(@PathVariable("id") Integer id) {
         categoryService.removeCategoryAndPostCategoryBy(id);
     }
