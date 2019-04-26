@@ -45,8 +45,13 @@ public class BaseEntity {
     protected void prePersist() {
         deleted = false;
         Date now = DateUtils.now();
-        createTime = now;
-        updateTime = now;
+        if (createTime == null) {
+            createTime = now;
+        }
+
+        if (updateTime == null) {
+            updateTime = now;
+        }
     }
 
     @PreUpdate

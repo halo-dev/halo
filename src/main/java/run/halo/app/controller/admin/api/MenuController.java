@@ -34,7 +34,7 @@ public class MenuController {
 
     @GetMapping
     @ApiOperation("Lists all menus")
-    public List<MenuDTO> listAll(@SortDefault(sort = "sort", direction = DESC) Sort sort) {
+    public List<MenuDTO> listAll(@SortDefault(sort = "priority", direction = DESC) Sort sort) {
         return menuService.listDtos(sort);
     }
 

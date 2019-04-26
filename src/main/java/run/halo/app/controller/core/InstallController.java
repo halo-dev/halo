@@ -137,14 +137,14 @@ public class InstallController {
         // TODO i18n
         menuIndex.setName("首页");
         menuIndex.setUrl("/");
-        menuIndex.setSort(1);
+        menuIndex.setPriority(1);
         menuService.create(menuIndex);
 
         Menu menuArchive = new Menu();
         // TODO i18n
         menuArchive.setName("归档");
         menuArchive.setUrl("/archives");
-        menuArchive.setSort(2);
+        menuArchive.setPriority(2);
         menuService.create(menuArchive);
     }
 

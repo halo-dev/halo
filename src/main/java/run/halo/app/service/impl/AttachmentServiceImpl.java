@@ -9,6 +9,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.handler.file.FileHandlers;
 import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
@@ -27,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * AttachmentService implementation class
+ * AttachmentService implementation
  *
  * @author : RYAN0UP
  * @date : 2019-03-14
@@ -162,6 +163,31 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     @Override
     public List<String> listAllMediaType() {
         return attachmentRepository.findAllMediaType();
+    }
+
+    @Override
+    public Attachment create(Attachment attachment) {
+        Assert.notNull(attachment, "Attachment must not be null");
+
+        // Check attachment path
+        pathMustNotExist(attachment);
+
+        return super.create(attachment);
+    }
+
+    /**
+     * Attachment path must not be exist.
+     *
+     * @param attachment attachment must not be null
+     */
+    private void pathMustNotExist(@NonNull Attachment attachment) {
+        Assert.notNull(attachment, "Attachment must not be null");
+
+        long pathCount = attachmentRepository.countByPath(attachment.getPath());
+
+        if (pathCount > 0) {
+            throw new AlreadyExistsException("The attachment with path " + attachment.getPath() + " exists already");
+        }
     }
 
     /**

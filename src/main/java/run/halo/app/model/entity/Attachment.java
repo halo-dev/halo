@@ -60,7 +60,7 @@ public class Attachment extends BaseEntity {
     private String mediaType;
 
     /**
-     * Attachment suffix,such as .png,.jpg
+     * Attachment suffix,such as png, zip, mp4, jpge.
      */
     @Column(name = "suffix", columnDefinition = "varchar(50) default ''")
     private String suffix;
