@@ -92,7 +92,6 @@ public class Attachment extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
-        id = null;
 
         if (fileKey == null) {
             fileKey = "";
