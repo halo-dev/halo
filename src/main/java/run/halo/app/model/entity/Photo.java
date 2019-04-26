@@ -76,5 +76,25 @@ public class Photo extends BaseEntity {
     public void prePersist() {
         super.prePersist();
         id = null;
+
+        if (takeTime == null) {
+            takeTime = this.getCreateTime();
+        }
+
+        if (description == null) {
+            description = "";
+        }
+
+        if (location == null) {
+            location = "";
+        }
+
+        if (thumbnail == null) {
+            thumbnail = "";
+        }
+
+        if (team == null) {
+            team = "";
+        }
     }
 }

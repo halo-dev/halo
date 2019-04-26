@@ -129,7 +129,10 @@ public class BasePost extends BaseEntity {
         super.prePersist();
 
         id = null;
-        editTime = getCreateTime();
+
+        if (editTime == null) {
+            editTime = getCreateTime();
+        }
 
         if (status == null) {
             status = PostStatus.DRAFT;
