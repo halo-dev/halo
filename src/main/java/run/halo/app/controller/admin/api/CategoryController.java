@@ -37,21 +37,14 @@ public class CategoryController {
         this.postCategoryService = postCategoryService;
     }
 
-
-    /**
-     * Get Category by id
-     *
-     * @param id id
-     * @return CategoryDTO
-     */
-    @GetMapping("{id:\\d+}")
-    @ApiOperation("Get category detail by id")
-    public CategoryDTO getBy(@PathVariable("id") Integer id) {
-        return new CategoryDTO().convertFrom(categoryService.getById(id));
+    @GetMapping("{categoryId:\\d+}")
+    @ApiOperation("Gets category detail")
+    public CategoryDTO getBy(@PathVariable("categoryId") Integer categoryId) {
+        return categoryService.convertTo(categoryService.getById(categoryId));
     }
 
     @GetMapping
-    @ApiOperation("List all categories")
+    @ApiOperation("Lists all categories")
     public List<? extends CategoryDTO> listAll(
             @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
             @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
@@ -63,37 +56,33 @@ public class CategoryController {
     }
 
     @GetMapping("tree_view")
-    @ApiOperation("List as category tree")
+    @ApiOperation("List all categories as tree")
     public List<CategoryVO> listAsTree(@SortDefault(sort = "name", direction = ASC) Sort sort) {
         return categoryService.listAsTree(sort);
     }
 
     @PostMapping
-    public CategoryDTO createBy(@Valid @RequestBody CategoryParam categoryParam) {
+    @ApiOperation("Creates category")
+    public CategoryDTO createBy(@RequestBody @Valid CategoryParam categoryParam) {
         // Convert to category
         Category category = categoryParam.convertTo();
 
         // Save it
-        return new CategoryDTO().convertFrom(categoryService.create(category));
+        return categoryService.convertTo(categoryService.create(category));
     }
 
-    @PutMapping("{id:\\d+}")
-    @ApiOperation("Update category")
-    public CategoryDTO updateBy(@PathVariable("id") Integer id,
+    @PutMapping("{categoryId:\\d+}")
+    @ApiOperation("Updates category")
+    public CategoryDTO updateBy(@PathVariable("categoryId") Integer categoryId,
                                 @RequestBody @Valid CategoryParam categoryParam) {
-        Category categoryToUpdate = categoryService.getById(id);
+        Category categoryToUpdate = categoryService.getById(categoryId);
         categoryParam.update(categoryToUpdate);
-        return new CategoryDTO().convertFrom(categoryService.update(categoryToUpdate));
+        return categoryService.convertTo(categoryService.update(categoryToUpdate));
     }
 
-    /**
-     * Delete category by id.
-     *
-     * @param id id
-     */
-    @DeleteMapping("{id:\\d+}")
-    @ApiOperation("Delete category")
-    public void deletePermanently(@PathVariable("id") Integer id) {
-        categoryService.removeCategoryAndPostCategoryBy(id);
+    @DeleteMapping("{categoryId:\\d+}")
+    @ApiOperation("Deletes category")
+    public void deletePermanently(@PathVariable("categoryId") Integer categoryId) {
+        categoryService.removeCategoryAndPostCategoryBy(categoryId);
     }
 }

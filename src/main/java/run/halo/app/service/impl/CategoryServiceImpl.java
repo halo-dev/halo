@@ -1,5 +1,11 @@
 package run.halo.app.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryDTO;
@@ -9,12 +15,6 @@ import run.halo.app.repository.CategoryRepository;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -40,16 +40,6 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
         this.postCategoryService = postCategoryService;
-    }
-
-    /**
-     * Remove category and relationship
-     *
-     * @param id id
-     */
-    @Override
-    public void remove(Integer id) {
-        // TODO 删除分类，以及和文章的对应关系
     }
 
     @Override
@@ -175,6 +165,13 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     }
 
     @Override
+    public CategoryDTO convertTo(Category category) {
+        Assert.notNull(category, "Category must not be null");
+
+        return new CategoryDTO().convertFrom(category);
+    }
+
+    @Override
     public List<CategoryDTO> convertTo(List<Category> categories) {
         if (CollectionUtils.isEmpty(categories)) {
             return Collections.emptyList();
@@ -182,7 +179,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         return categories
                 .stream()
-                .map(category -> new CategoryDTO().<CategoryDTO>convertFrom(category))
+                .map(this::convertTo)
                 .collect(Collectors.toList());
     }
 }
