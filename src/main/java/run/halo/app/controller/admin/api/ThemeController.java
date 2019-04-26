@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * Theme controller.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/3/20
  */
 @RestController

@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Markdown utils
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2018/11/14
  */
 public class MarkdownUtils {

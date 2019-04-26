@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 /**
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-03-17
  */
 public enum BlogProperties implements PropertyEnum {

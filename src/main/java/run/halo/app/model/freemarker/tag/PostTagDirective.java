@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Freemarker custom tag of post.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2018/4/26
  */
 @Component

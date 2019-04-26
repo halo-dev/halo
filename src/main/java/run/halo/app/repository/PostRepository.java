@@ -10,7 +10,7 @@ import run.halo.app.repository.base.BasePostRepository;
  * Post repository.
  *
  * @author johnniang
- * @author RYAN0UP
+ * @author ryanwang
  */
 public interface PostRepository extends BasePostRepository<Post>, JpaSpecificationExecutor<Post> {
 

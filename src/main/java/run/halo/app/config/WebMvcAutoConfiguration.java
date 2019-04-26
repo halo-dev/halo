@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Mvc configuration.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2018/1/2
  */
 @Slf4j

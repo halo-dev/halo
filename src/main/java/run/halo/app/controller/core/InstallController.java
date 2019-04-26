@@ -29,7 +29,7 @@ import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 /**
  * Installation controller.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-03-17
  */
 @Slf4j

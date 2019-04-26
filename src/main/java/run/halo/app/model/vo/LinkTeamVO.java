@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Link team vo.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/3/22
  */
 @Data

@@ -1,7 +1,11 @@
 package run.halo.app.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -9,22 +13,22 @@ import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.params.JournalParam;
+import run.halo.app.model.params.JournalQuery;
 import run.halo.app.repository.JournalRepository;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.persistence.criteria.Predicate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Journal service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-24
  */
 @Service
@@ -51,6 +55,13 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
     @Override
     public Page<Journal> pageLatest(int top) {
         return listAll(ServiceUtils.buildLatestPageable(top));
+    }
+
+    @Override
+    public Page<Journal> pageBy(JournalQuery journalQuery, Pageable pageable) {
+        Assert.notNull(journalQuery, "Journal query must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+        return journalRepository.findAll(buildSpecByQuery(journalQuery), pageable);
     }
 
     @Override
@@ -94,4 +105,30 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
     }
 
 
+    /**
+     * Build specification by journal query.
+     *
+     * @param journalQuery query query must not be null
+     * @return a query specification
+     */
+    @NonNull
+    private Specification<Journal> buildSpecByQuery(@NonNull JournalQuery journalQuery) {
+        Assert.notNull(journalQuery, "Journal query must not be null");
+
+        return (Specification<Journal>) (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (journalQuery.getKeyword() != null) {
+                // Format like condition
+                String likeCondition = String.format("%%%s%%", StringUtils.strip(journalQuery.getKeyword()));
+
+                // Build like predicate
+                Predicate contentLike = criteriaBuilder.like(root.get("content"), likeCondition);
+
+                predicates.add(criteriaBuilder.or(contentLike));
+            }
+
+            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
+    }
 }

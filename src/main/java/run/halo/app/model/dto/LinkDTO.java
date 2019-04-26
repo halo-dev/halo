@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * Link output dto.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/3/21
  */
 @Data

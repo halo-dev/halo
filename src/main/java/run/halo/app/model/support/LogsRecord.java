@@ -5,7 +5,7 @@ package run.halo.app.model.support;
  *     日志常量
  * </pre>
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2018/1/19
  */
 public interface LogsRecord {

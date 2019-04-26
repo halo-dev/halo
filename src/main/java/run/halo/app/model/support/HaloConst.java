@@ -5,7 +5,7 @@ package run.halo.app.model.support;
  *     公共常量
  * </pre>
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2017/12/29
  */
 public class HaloConst {

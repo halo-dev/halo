@@ -21,7 +21,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 /**
  * Photo controller
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/3/21
  */
 @RestController

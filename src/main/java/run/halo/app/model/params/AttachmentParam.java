@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 /**
  * Attachment params.
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019/04/20
  */
 @Data

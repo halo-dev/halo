@@ -28,7 +28,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 /**
  * Blog archive page controller
  *
- * @author : RYAN0UP
+ * @author ryanwang
  * @date : 2019-03-17
  */
 @Slf4j
