@@ -57,7 +57,7 @@
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
-                  @click="resetParam"
+                  @click="handleResetParam"
                 >重置</a-button>
               </span>
             </a-col>
@@ -140,12 +140,12 @@
           >
             <a
               href="javascript:;"
-              @click="onEditClick(post)"
+              @click="handleEditClick(post)"
               v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
             >编辑</a>
             <a-popconfirm
               :title="'你确定要发布【' + post.title + '】文章？'"
-              @confirm="onEditStatusClick(post.id,'PUBLISHED')"
+              @confirm="handleEditStatusClick(post.id,'PUBLISHED')"
               okText="确定"
               cancelText="取消"
               v-else-if="post.status === 'RECYCLE'"
@@ -157,7 +157,7 @@
 
             <a-popconfirm
               :title="'你确定要将【' + post.title + '】文章移到回收站？'"
-              @confirm="onEditStatusClick(post.id,'RECYCLE')"
+              @confirm="handleEditStatusClick(post.id,'RECYCLE')"
               okText="确定"
               cancelText="取消"
               v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
@@ -167,7 +167,7 @@
 
             <a-popconfirm
               :title="'你确定要永久删除【' + post.title + '】文章？'"
-              @confirm="onDeleteClick(post.id)"
+              @confirm="handleDeleteClick(post.id)"
               okText="确定"
               cancelText="取消"
               v-else-if="post.status === 'RECYCLE'"
@@ -182,8 +182,8 @@
             :total="pagination.total"
             :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
             showSizeChanger
-            @showSizeChange="onPaginationChange"
-            @change="onPaginationChange"
+            @showSizeChange="handlePaginationChange"
+            @change="handlePaginationChange"
           />
         </div>
       </div>
@@ -292,11 +292,8 @@ export default {
         this.categories = response.data.data
       })
     },
-    onEditClick(post) {
+    handleEditClick(post) {
       this.$router.push({ name: 'PostEdit', query: { postId: post.id } })
-    },
-    deletePost(id) {
-      this.$message.success('删除')
     },
     onSelectionChange(selectedRowKeys) {
       this.$log.debug(`SelectedRowKeys: ${selectedRowKeys}`)
@@ -309,25 +306,25 @@ export default {
         }
       }
     },
-    onPaginationChange(page, pageSize) {
+    handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.current = page
       this.pagination.pageSize = pageSize
       this.loadPosts()
     },
-    resetParam() {
+    handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.categoryId = null
       this.queryParam.status = null
       this.loadPosts()
     },
-    onEditStatusClick(postId, status) {
+    handleEditStatusClick(postId, status) {
       postApi.updateStatus(postId, status).then(response => {
         this.$message.success('操作成功！')
         this.loadPosts()
       })
     },
-    onDeleteClick(postId) {
+    handleDeleteClick(postId) {
       postApi.delete(postId).then(response => {
         this.$message.success('删除成功！')
         this.loadPosts()

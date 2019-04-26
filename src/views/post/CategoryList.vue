@@ -42,7 +42,7 @@
             <a-form-item>
               <a-button
                 type="primary"
-                @click="createCategory"
+                @click="handleCreateCategory"
               >保存</a-button>
             </a-form-item>
           </a-form>
@@ -77,12 +77,12 @@
             >
               <a
                 href="javascript:;"
-                @click="editCategory(record.id)"
+                @click="handleEditCategory(record.id)"
               >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
                 :title="'你确定要删除【' + record.name + '】分类？'"
-                @confirm="deleteCategory(record.id)"
+                @confirm="handleDeleteCategory(record.id)"
                 okText="确定"
                 cancelText="取消"
               >
@@ -149,17 +149,17 @@ export default {
         this.categories = response.data.data
       })
     },
-    createCategory() {
+    handleCreateCategory() {
       categoryApi.create(this.categoryToCreate).then(response => {
         this.$message.success('添加成功！')
         this.loadCategories()
         this.categoryToCreate = {}
       })
     },
-    editCategory(id) {
+    handleEditCategory(id) {
       this.$message.success('编辑' + id)
     },
-    deleteCategory(id) {
+    handleDeleteCategory(id) {
       categoryApi.delete(id).then(response => {
         this.$message.success('删除成功！')
         this.loadCategories()

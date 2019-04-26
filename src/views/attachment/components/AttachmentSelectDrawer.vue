@@ -32,7 +32,7 @@
               class="attach-item"
               v-for="(item, index) in attachments"
               :key="index"
-              @click="selectAttachment(item)"
+              @click="handleSelectAttachment(item)"
             >
               <img :src="item.thumbPath">
             </div>
@@ -50,7 +50,7 @@
       <a-divider />
       <div class="bottom-control">
         <a-button
-          @click="showUploadModal"
+          @click="handleShowUploadModal"
           type="primary"
         >上传附件</a-button>
       </div>
@@ -132,7 +132,7 @@ export default {
         this.skeletonLoading = false
       }, 500)
     },
-    showUploadModal() {
+    handleShowUploadModal() {
       this.uploadVisible = true
     },
     loadAttachments() {
@@ -143,7 +143,7 @@ export default {
         this.pagination.total = response.data.data.total
       })
     },
-    selectAttachment(item) {
+    handleSelectAttachment(item) {
       this.$emit('listenToSelect', item)
     },
     handlePaginationChange(page, pageSize) {

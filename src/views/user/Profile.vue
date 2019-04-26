@@ -22,7 +22,7 @@
               <div class="avatar">
                 <img
                   :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'"
-                  @click="showAttachDrawer"
+                  @click="handleShowAttachDrawer"
                 >
               </div>
             </a-tooltip>
@@ -97,7 +97,7 @@
                   </a-form-item>
                   <a-form-item>
                     <a-button
-                      @click="updateProfile"
+                      @click="handleUpdateProfile"
                       type="primary"
                     >保存</a-button>
                   </a-form-item>
@@ -129,7 +129,7 @@
                   <a-form-item>
                     <a-button
                       :disabled="passwordUpdateButtonDisabled"
-                      @click="updatePassword"
+                      @click="handleUpdatePassword"
                       type="primary"
                     >确认更改</a-button>
                   </a-form-item>
@@ -143,7 +143,7 @@
 
     <AttachmentSelectDrawer
       v-model="attachmentDrawerVisible"
-      @listenToSelect="selectAvatar"
+      @listenToSelect="handleSelectAvatar"
     />
   </div>
 </template>
@@ -181,7 +181,7 @@ export default {
     this.getCounts()
   },
   methods: {
-    showAttachDrawer() {
+    handleShowAttachDrawer() {
       this.attachmentDrawerVisible = true
     },
     loadUser() {
@@ -196,7 +196,7 @@ export default {
         this.countsLoading = false
       })
     },
-    updatePassword() {
+    handleUpdatePassword() {
       // Check confirm password
       if (this.passwordParam.newPassword !== this.passwordParam.confirmPassword) {
         this.$message.error('确认密码和新密码不匹配！')
@@ -205,13 +205,13 @@ export default {
 
       userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {})
     },
-    updateProfile() {
+    handleUpdateProfile() {
       userApi.updateProfile(this.user).then(response => {
         this.user = response.data.data
         this.$message.success('资料更新成功！')
       })
     },
-    selectAvatar(data) {
+    handleSelectAvatar(data) {
       this.user.avatar = data.path
       this.attachmentDrawerVisible = false
     }

@@ -123,7 +123,7 @@
                   <img
                     class="img"
                     :src="postToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
-                    @click="showThumbDrawer"
+                    @click="handleShowThumbDrawer"
                   >
                   <a-button
                     class="post-thum-remove"
@@ -137,7 +137,7 @@
           </div>
           <AttachmentSelectDrawer
             v-model="thumDrawerVisible"
-            @listenToSelect="selectPostThumb"
+            @listenToSelect="handleSelectPostThumb"
             :drawerWidth="460"
           />
           <a-divider />
@@ -160,11 +160,11 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="primary"
-        @click="showDrawer"
+        @click="handleShowDrawer"
       >发布</a-button>
       <a-button
         type="dashed"
-        @click="showAttachDrawer"
+        @click="handleShowAttachDrawer"
         style="margin-left: 8px;"
       >附件库</a-button>
     </footer-tool-bar>
@@ -275,13 +275,13 @@ export default {
         })
       }
     },
-    showDrawer() {
+    handleShowDrawer() {
       this.visible = true
     },
-    showAttachDrawer() {
+    handleShowAttachDrawer() {
       this.attachmentDrawerVisible = true
     },
-    showThumbDrawer() {
+    handleShowThumbDrawer() {
       this.thumDrawerVisible = true
     },
     toggleCategoryForm() {
@@ -307,7 +307,7 @@ export default {
     onClose() {
       this.visible = false
     },
-    selectPostThumb(data) {
+    handleSelectPostThumb(data) {
       this.postToStage.thumbnail = data.path
       this.thumDrawerVisible = false
     }

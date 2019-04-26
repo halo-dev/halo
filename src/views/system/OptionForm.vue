@@ -52,7 +52,7 @@
                 <a-form-item>
                   <a-button
                     type="primary"
-                    @click="saveOptions"
+                    @click="handleSaveOptions"
                   >保存</a-button>
                 </a-form-item>
               </a-form>
@@ -113,7 +113,7 @@
                 <a-form-item>
                   <a-button
                     type="primary"
-                    @click="saveOptions"
+                    @click="handleSaveOptions"
                   >保存</a-button>
                 </a-form-item>
               </a-form>
@@ -156,7 +156,7 @@
                 <a-form-item>
                   <a-button
                     type="primary"
-                    @click="saveOptions"
+                    @click="handleSaveOptions"
                   >保存</a-button>
                 </a-form-item>
               </a-form>
@@ -277,7 +277,7 @@
                 <a-form-item>
                   <a-button
                     type="primary"
-                    @click="saveOptions"
+                    @click="handleSaveOptions"
                   >保存</a-button>
                 </a-form-item>
               </a-form>
@@ -445,7 +445,7 @@
                 <a-form-item>
                   <a-button
                     type="primary"
-                    @click="saveOptions"
+                    @click="handleSaveOptions"
                   >保存</a-button>
                 </a-form-item>
               </a-form>
@@ -518,7 +518,7 @@
                     <a-form-item>
                       <a-button
                         type="primary"
-                        @click="saveOptions"
+                        @click="handleSaveOptions"
                       >保存</a-button>
                     </a-form-item>
                   </a-form>
@@ -593,7 +593,7 @@
                 <a-form-item>
                   <a-button
                     type="primary"
-                    @click="saveOptions"
+                    @click="handleSaveOptions"
                   >保存</a-button>
                 </a-form-item>
               </a-form>
@@ -630,7 +630,7 @@ export default {
         this.options = response.data.data
       })
     },
-    saveOptions() {
+    handleSaveOptions() {
       optionApi.save(this.options).then(response => {
         this.loadOptions()
         this.$message.success('保存成功！')

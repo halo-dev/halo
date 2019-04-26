@@ -38,7 +38,7 @@
         <a-card title="Anatole 主题">
           <theme-file
             :files="files"
-            @listenToSelect="catchSelectFile"
+            @listenToSelect="handleSelectFile"
           />
         </a-card>
       </a-col>
@@ -85,7 +85,7 @@ export default {
         this.files = response.data.data
       })
     },
-    catchSelectFile(file) {
+    handleSelectFile(file) {
       const _this = this
       if (!file.editable) {
         this.$message.info('该文件不支持修改')

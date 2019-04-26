@@ -87,7 +87,7 @@
                   <img
                     class="img"
                     :src="sheetToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
-                    @click="showThumbDrawer"
+                    @click="handleShowThumbDrawer"
                   >
                   <a-button
                     class="sheet-thum-remove"
@@ -101,7 +101,7 @@
           </div>
           <AttachmentSelectDrawer
             v-model="thumDrawerVisible"
-            @listenToSelect="selectSheetThumb"
+            @listenToSelect="handleSelectSheetThumb"
             :drawerWidth="460"
           />
           <div class="bottom-control">
@@ -121,12 +121,12 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="primary"
-        @click="showDrawer"
+        @click="handleShowDrawer"
       >发布</a-button>
       <a-button
         type="dashed"
         style="margin-left: 8px;"
-        @click="showAttachDrawer"
+        @click="handleShowAttachDrawer"
       >附件库</a-button>
     </footer-tool-bar>
   </div>
@@ -195,13 +195,13 @@ export default {
         this.customTpls = response.data.data
       })
     },
-    showAttachDrawer() {
+    handleShowAttachDrawer() {
       this.attachmentDrawerVisible = true
     },
-    showThumbDrawer() {
+    handleShowThumbDrawer() {
       this.thumDrawerVisible = true
     },
-    showDrawer() {
+    handleShowDrawer() {
       this.visible = true
     },
     handlePublishClick() {
@@ -232,7 +232,7 @@ export default {
     onClose() {
       this.visible = false
     },
-    selectSheetThumb(data) {
+    handleSelectSheetThumb(data) {
       this.sheetToStage.thumbnail = data.path
       this.thumDrawerVisible = false
     }

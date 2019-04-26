@@ -67,7 +67,7 @@
                   <a-divider type="vertical" />
                   <a
                     href="javascript:;"
-                    @click="viewPage(record.id)"
+                    @click="handleViewPage(record.id)"
                   >查看</a>
                 </span>
               </a-table>
@@ -101,13 +101,13 @@
                 >
                   <a
                     href="javascript:;"
-                    @click="onEditClick(sheet)"
+                    @click="handleEditClick(sheet)"
                     v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
                   >编辑</a>
 
                   <a-popconfirm
                     :title="'你确定要发布【' + sheet.title + '】？'"
-                    @confirm="onEditStatusClick(sheet.id,'PUBLISHED')"
+                    @confirm="handleEditStatusClick(sheet.id,'PUBLISHED')"
                     okText="确定"
                     cancelText="取消"
                     v-else-if="sheet.status === 'RECYCLE'"
@@ -121,7 +121,7 @@
 
                   <a-popconfirm
                     :title="'你确定要将【' + sheet.title + '】页面移到回收站？'"
-                    @confirm="onEditStatusClick(sheet.id,'RECYCLE')"
+                    @confirm="handleEditStatusClick(sheet.id,'RECYCLE')"
                     okText="确定"
                     cancelText="取消"
                     v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
@@ -133,7 +133,7 @@
 
                   <a-popconfirm
                     :title="'你确定要永久删除【' + sheet.title + '】页面？'"
-                    @confirm="onDeleteClick(sheet.id)"
+                    @confirm="handleDeleteClick(sheet.id)"
                     okText="确定"
                     cancelText="取消"
                     v-else-if="sheet.status === 'RECYCLE'"
@@ -247,22 +247,22 @@ export default {
         this.sheets = response.data.data.content
       })
     },
-    onEditClick(sheet) {
+    handleEditClick(sheet) {
       this.$router.push({ name: 'SheetEdit', query: { sheetId: sheet.id } })
     },
-    onEditStatusClick(sheetId, status) {
+    handleEditStatusClick(sheetId, status) {
       sheetApi.updateStatus(sheetId, status).then(response => {
         this.$message.success('操作成功！')
         this.loadSheets()
       })
     },
-    onDeleteClick(sheetId) {
+    handleDeleteClick(sheetId) {
       sheetApi.delete(sheetId).then(response => {
         this.$message.success('删除成功！')
         this.loadSheets()
       })
     },
-    viewPage(id) {
+    handleViewPage(id) {
       this.$message.success('查看' + id)
     }
   }

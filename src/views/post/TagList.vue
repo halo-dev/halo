@@ -26,7 +26,7 @@
             <a-form-item>
               <a-button
                 type="primary"
-                @click="createTag"
+                @click="handleCreateTag"
               >保存</a-button>
             </a-form-item>
           </a-form>
@@ -51,7 +51,7 @@
             </template>
             <a-tag
               closable
-              @close="deleteTag(tag.id)"
+              @close="handleDeleteTag(tag.id)"
               color="blue"
             >{{ tag.name }}</a-tag>
           </a-tooltip>
@@ -81,17 +81,17 @@ export default {
         this.tags = response.data.data
       })
     },
-    createTag() {
+    handleCreateTag() {
       tagApi.create(this.tagToCreate).then(response => {
         this.loadTags()
       })
     },
-    updateTag(tagId) {
+    handleUpdateTag(tagId) {
       tagApi.update(tagId, this.tagToUpdate).then(response => {
         this.loadTags()
       })
     },
-    deleteTag(tagId) {
+    handleDeleteTag(tagId) {
       tagApi.delete(tagId).then(response => {
         this.$message.success('删除成功！')
         this.loadTags()

@@ -60,7 +60,7 @@
                     >查询</a-button>
                     <a-button
                       style="margin-left: 8px;"
-                      @click="resetParam"
+                      @click="handleResetParam"
                     >重置</a-button>
                   </span>
                 </a-col>
@@ -71,7 +71,7 @@
             <a-button
               type="primary"
               icon="plus"
-              @click="showUploadModal"
+              @click="handleShowUploadModal"
             >上传</a-button>
           </div>
         </a-card>
@@ -90,7 +90,7 @@
             <a-card
               :bodyStyle="{ padding: 0 }"
               hoverable
-              @click="showDetailDrawer(item)"
+              @click="handleShowDetailDrawer(item)"
             >
               <div class="attach-thumb">
                 <img :src="item.thumbPath">
@@ -215,11 +215,11 @@ export default {
         this.mediaTypes = response.data.data
       })
     },
-    showDetailDrawer(attachment) {
+    handleShowDetailDrawer(attachment) {
       this.selectAttachment = attachment
       this.drawerVisiable = true
     },
-    showUploadModal() {
+    handleShowUploadModal() {
       this.uploadVisible = true
     },
     handleUploadSuccess() {
@@ -232,7 +232,7 @@ export default {
       this.pagination.size = size
       this.loadAttachments()
     },
-    resetParam() {
+    handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.mediaType = null
       this.queryParam.attachmentType = null

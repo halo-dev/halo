@@ -41,7 +41,7 @@
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
-                  @click="resetParam"
+                  @click="handleResetParam"
                 >重置</a-button>
               </span>
             </a-col>
@@ -93,12 +93,12 @@
           >
             <a
               href="javascript:;"
-              @click="editComment(record.id)"
+              @click="handleEditComment(record.id)"
             >通过</a>
             <a-divider type="vertical" />
             <a
               href="javascript:;"
-              @click="deleteComment(record.id)"
+              @click="handleDeleteComment(record.id)"
             >删除</a>
           </span>
         </a-table>
@@ -108,8 +108,8 @@
             :total="pagination.total"
             :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
             showSizeChanger
-            @showSizeChange="onPaginationChange"
-            @change="onPaginationChange"
+            @showSizeChange="handlePaginationChange"
+            @change="handlePaginationChange"
           />
         </div>
       </div>
@@ -203,19 +203,19 @@ export default {
         this.commentsLoading = false
       })
     },
-    editComment(id) {
+    handleEditComment(id) {
       this.$message.success('编辑')
     },
-    deleteComment(id) {
+    handleDeleteComment(id) {
       this.$message.success('删除')
     },
-    onPaginationChange(page, pageSize) {
+    handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.current = page
       this.pagination.pageSize = pageSize
       this.loadComments()
     },
-    resetParam() {
+    handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.status = null
       this.loadComments()

@@ -58,7 +58,7 @@
                       <a-popconfirm
                         v-if="!item.activated"
                         :title="'确定删除【' + item.name + '】主题？'"
-                        @confirm="deleteTheme(item.id)"
+                        @confirm="handleDeleteTheme(item.id)"
                         okText="确定"
                         cancelText="取消"
                       >
@@ -193,7 +193,7 @@
                     <a-form-item>
                       <a-button
                         type="primary"
-                        @click="saveSettings"
+                        @click="handleSaveSettings"
                       >保存</a-button>
                     </a-form-item>
                   </a-form>
@@ -210,7 +210,7 @@
         shape="circle"
         icon="plus"
         size="large"
-        @click="showUploadModal"
+        @click="handleShowUploadModal"
       ></a-button>
     </div>
     <a-modal
@@ -320,13 +320,13 @@ export default {
         this.loadThemes()
       })
     },
-    deleteTheme(key) {
+    handleDeleteTheme(key) {
       themeApi.delete(key).then(response => {
         this.$message.success('删除成功！')
         this.loadThemes()
       })
     },
-    saveSettings() {
+    handleSaveSettings() {
       themeApi.saveSettings(this.themeProperty.id, this.themeSettings).then(response => {
         this.$message.success('保存成功！')
       })
@@ -342,7 +342,7 @@ export default {
       this.themeConfiguration = null
       this.themeProperty = null
     },
-    showUploadModal() {
+    handleShowUploadModal() {
       this.uploadVisible = true
     },
     handleChange(info) {

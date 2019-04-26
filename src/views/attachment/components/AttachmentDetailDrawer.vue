@@ -38,7 +38,7 @@
                 >
                   <a-input
                     v-model="attachment.name"
-                    @blur="updateAttachment"
+                    @blur="doUpdateAttachment"
                   />
                 </template>
                 <template
@@ -94,7 +94,7 @@
                   <a href="javascript:void(0);">
                     <a-icon
                       type="copy"
-                      @click="doCopyNormalLink"
+                      @click="handleCopyNormalLink"
                     />
                   </a>
                 </span>
@@ -108,7 +108,7 @@
                   <a href="javascript:void(0);">
                     <a-icon
                       type="copy"
-                      @click="doCopyMarkdownLink"
+                      @click="handleCopyMarkdownLink"
                     />
                   </a>
                 </span>
@@ -134,7 +134,7 @@
       </a-popconfirm>
       <a-popconfirm
         title="你确定要删除该附件？"
-        @confirm="deleteAttachment"
+        @confirm="handleDeleteAttachment"
         okText="确定"
         cancelText="取消"
       >
@@ -198,7 +198,7 @@ export default {
         this.detailLoading = false
       }, 500)
     },
-    deleteAttachment() {
+    handleDeleteAttachment() {
       attachmentApi.delete(this.attachment.id).then(response => {
         this.$message.success('删除成功！')
         this.$emit('delete', this.attachment)
@@ -208,14 +208,14 @@ export default {
     handleEditName() {
       this.editable = !this.editable
     },
-    updateAttachment() {
+    doUpdateAttachment() {
       attachmentApi.update(this.attachment.id, this.attachment).then(response => {
         this.$log.debug('Updated attachment', response.data.data)
         this.$message.success('附件修改成功')
       })
       this.editable = false
     },
-    doCopyNormalLink() {
+    handleCopyNormalLink() {
       const text = `${this.attachment.path}`
       this.$copyText(text)
         .then(message => {
@@ -227,7 +227,7 @@ export default {
           this.$message.error('复制失败')
         })
     },
-    doCopyMarkdownLink() {
+    handleCopyMarkdownLink() {
       const text = `![${this.attachment.name}](${this.attachment.path})`
       this.$copyText(text)
         .then(message => {
