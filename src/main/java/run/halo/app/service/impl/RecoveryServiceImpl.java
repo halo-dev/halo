@@ -440,7 +440,7 @@ public class RecoveryServiceImpl implements RecoveryService {
             }
 
             // Set location
-            String attachLocation = attachmentMap.get("attachLocation").toString();
+            String attachLocation = attachmentMap.getOrDefault("attachLocation", "").toString();
             if (StringUtils.equalsIgnoreCase(attachLocation, "qiniu")) {
                 attachment.setType(AttachmentType.QNYUN);
             } else if (StringUtils.equalsIgnoreCase(attachLocation, "upyun")) {
