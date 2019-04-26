@@ -40,7 +40,10 @@
                       type="primary"
                       @click="loadJournals(true)"
                     >查询</a-button>
-                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
+                    <a-button
+                      style="margin-left: 8px;"
+                      @click="resetParam"
+                    >重置</a-button>
                   </span>
                 </a-col>
               </a-row>
@@ -95,7 +98,7 @@
                   />
                 </a-list-item-meta>
               </a-list-item>
-              <template>
+              <div class="page-wrapper">
                 <a-pagination
                   class="pagination"
                   :total="pagination.total"
@@ -104,7 +107,7 @@
                   @showSizeChange="onPaginationChange"
                   @change="onPaginationChange"
                 />
-              </template>
+              </div>
             </a-list>
           </div>
         </a-card>
@@ -194,14 +197,15 @@ export default {
       if (this.journal.id) {
         journalApi.update(this.journal.id, this.journal).then(response => {
           this.$message.success('更新成功！')
+          this.loadJournals()
         })
       } else {
         journalApi.create(this.journal).then(response => {
           this.$message.success('发表成功！')
+          this.loadJournals()
         })
       }
       this.visible = false
-      this.loadJournals()
     },
     onPaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)

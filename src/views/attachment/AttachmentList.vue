@@ -107,10 +107,7 @@
         </a-list>
       </a-col>
     </a-row>
-    <a-row
-      type="flex"
-      justify="end"
-    >
+    <div class="page-wrapper">
       <a-pagination
         :total="pagination.total"
         :defaultPageSize="pagination.size"
@@ -119,7 +116,7 @@
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
       />
-    </a-row>
+    </div>
     <a-modal
       title="上传附件"
       v-model="uploadVisible"

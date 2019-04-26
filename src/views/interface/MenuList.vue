@@ -205,14 +205,15 @@ export default {
       if (this.menuToCreate.id) {
         menuApi.update(this.menuToCreate.id, this.menuToCreate).then(response => {
           this.$message.success('更新成功！')
+          this.loadMenus()
         })
       } else {
         menuApi.create(this.menuToCreate).then(response => {
           this.$message.success('保存成功！')
+          this.loadMenus()
         })
       }
       this.handleAddMenu()
-      this.loadMenus()
     },
     toggleExpand() {
       this.fieldExpand = !this.fieldExpand

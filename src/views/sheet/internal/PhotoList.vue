@@ -90,10 +90,7 @@
         </a-list>
       </a-col>
     </a-row>
-    <a-row
-      type="flex"
-      justify="end"
-    >
+    <div class="page-wrapper">
       <a-pagination
         :total="pagination.total"
         :defaultPageSize="pagination.size"
@@ -102,7 +99,7 @@
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
       />
-    </a-row>
+    </div>
     <a-drawer
       title="图片详情"
       :width="isMobile()?'100%':'460'"
