@@ -103,7 +103,6 @@ public class BaseComment extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
-        id = null;
 
         if (parentId == null || parentId < 0) {
             parentId = 0L;
