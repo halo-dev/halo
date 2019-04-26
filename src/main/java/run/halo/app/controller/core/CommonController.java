@@ -35,14 +35,9 @@ public class CommonController implements ErrorController {
 
     private final ThemeService themeService;
 
-    private final OptionService optionService;
-
-    public CommonController(ThemeService themeService,
-                            OptionService optionService) {
+    public CommonController(ThemeService themeService) {
         this.themeService = themeService;
-        this.optionService = optionService;
     }
-
 
     /**
      * Handle error
@@ -109,7 +104,7 @@ public class CommonController implements ErrorController {
      * @return String
      */
     @GetMapping(value = "/404")
-    public String contentNotFround() throws FileNotFoundException {
+    public String contentNotFround() {
         if (!themeService.isTemplateExist(NOT_FROUND_TEMPLATE)) {
             return "common/error/404";
         }
