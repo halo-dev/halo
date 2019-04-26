@@ -42,16 +42,13 @@
         </a-skeleton>
       </a-row>
       <a-divider />
-      <a-row
-        type="flex"
-        justify="end"
-      >
+      <div class="page-wrapper">
         <a-pagination
           :defaultPageSize="pagination.size"
           :total="pagination.total"
           @change="handlePaginationChange"
         ></a-pagination>
-      </a-row>
+      </div>
 
       <AttachmentDetailDrawer
         v-model="detailVisiable"

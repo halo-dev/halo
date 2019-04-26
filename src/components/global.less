@@ -8,7 +8,8 @@ body {
   height: auto;
   overflow-x: hidden;
 
-  &.mobile,&.tablet {
+  &.mobile,
+  &.tablet {
 
     .ant-layout-content {
 
@@ -25,11 +26,14 @@ body {
       .ant-table-content {
         overflow-y: auto;
       }
+
       .ant-table-body {
         min-width: 800px;
       }
     }
+
     .topmenu {
+
       /* 必须为 topmenu  才能启用流式布局 */
       &.content-width-Fluid {
         .header-index-wide {
@@ -43,7 +47,8 @@ body {
     .sidemenu {
       .ant-header-fixedHeader {
 
-        &.ant-header-side-opened, &.ant-header-side-closed  {
+        &.ant-header-side-opened,
+        &.ant-header-side-closed {
           width: 100%
         }
       }
@@ -60,6 +65,7 @@ body {
     padding: 0 24px;
     cursor: pointer;
     transition: color .3s;
+
     &:hover {
       background: rgba(0, 0, 0, 0.025);
     }
@@ -82,6 +88,7 @@ body {
         width: 100%;
       }
     }
+
     /* 必须为 topmenu  才能启用流式布局 */
     &.content-width-Fluid {
       .header-index-wide {
@@ -123,7 +130,8 @@ body {
     position: relative;
   }
 
-  .header, .top-nav-header-index {
+  .header,
+  .top-nav-header-index {
 
     .user-wrapper {
       float: right;
@@ -160,6 +168,7 @@ body {
 
         .action {
           color: rgba(255, 255, 255, 0.85);
+
           a {
             color: rgba(255, 255, 255, 0.85);
           }
@@ -172,7 +181,8 @@ body {
     }
   }
 
-  &.mobile,&.tablet {
+  &.mobile,
+  &.tablet {
     .top-nav-header-index {
 
       .header-index-wide {
@@ -188,6 +198,7 @@ body {
             flex: 0;
             text-align: center;
             line-height: 58px;
+
             h1 {
               display: none;
             }
@@ -205,24 +216,27 @@ body {
             }
           }
         }
+
         //
       }
     }
   }
 
   &.tablet {
+
     // overflow: hidden; text-overflow:ellipsis; white-space: nowrap;
     .top-nav-header-index {
 
       .header-index-wide {
 
         .header-index-left {
-          .logo > a {
+          .logo>a {
             overflow: hidden;
-            text-overflow:ellipsis;
+            text-overflow: ellipsis;
             white-space: nowrap;
           }
         }
+
         .ant-menu.ant-menu-horizontal {
           flex: 1 1;
           white-space: normal;
@@ -233,9 +247,9 @@ body {
   }
 
   .top-nav-header-index {
-    box-shadow: 0 1px 4px rgba(0,21,41,.08);
+    box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
     position: relative;
-    transition: background .3s,width .2s;
+    transition: background .3s, width .2s;
 
     .header-index-wide {
       max-width: 1200px;
@@ -262,7 +276,8 @@ body {
           transition: all .3s;
           overflow: hidden;
 
-          img, svg {
+          img,
+          svg {
             display: inline-block;
             vertical-align: middle;
             height: 32px;
@@ -330,8 +345,10 @@ body {
       background-color: rgb(0, 21, 41);
     }
   }
+
   &.light {
     box-shadow: none;
+
     .ant-drawer-content {
       background-color: #fff;
     }
@@ -349,10 +366,11 @@ body {
   z-index: 10;
   height: auto;
 
-  .ant-layout-sider-children  {
+  .ant-layout-sider-children {
     padding-top: 64px;
     overflow-y: hidden;
-    &:hover{
+
+    &:hover {
       overflow-y: auto;
     }
   }
@@ -376,12 +394,15 @@ body {
     overflow: hidden;
     z-index: 9;
 
-    img, svg, h1 {
+    img,
+    svg,
+    h1 {
       display: inline-block;
       vertical-align: middle;
     }
 
-    img, svg {
+    img,
+    svg {
       height: 32px;
       width: 32px;
     }
@@ -390,7 +411,7 @@ body {
       color: #fff;
       font-size: 20px;
       margin: 0;
-      font-family: Avenir,Helvetica Neue,Arial,Helvetica,sans-serif;
+      font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       font-weight: 600;
       vertical-align: middle;
     }
@@ -422,6 +443,7 @@ body {
     user-select: none;
   }
 }
+
 .user-dropdown-menu-wrapper.ant-dropdown-menu {
   padding: 4px 0;
 
@@ -429,10 +451,9 @@ body {
     width: 160px;
   }
 
-  .ant-dropdown-menu-item > .anticon:first-child,
-  .ant-dropdown-menu-item > a > .anticon:first-child,
-  .ant-dropdown-menu-submenu-title > .anticon:first-child
-  .ant-dropdown-menu-submenu-title > a > .anticon:first-child {
+  .ant-dropdown-menu-item>.anticon:first-child,
+  .ant-dropdown-menu-item>a>.anticon:first-child,
+  .ant-dropdown-menu-submenu-title>.anticon:first-child .ant-dropdown-menu-submenu-title>a>.anticon:first-child {
     min-width: 12px;
     margin-right: 8px;
   }
@@ -464,6 +485,7 @@ body {
         padding-right: 8px;
         width: auto;
       }
+
       .ant-form-item-control {
         height: 32px;
         line-height: 32px;
@@ -490,51 +512,57 @@ body {
   }
 }
 
-.ant-card{
-  .ant-card-head{
-    padding: 0 16px!important;
-    .ant-card-head-wrapper{
-      .ant-card-head-title{
-        padding: 12px 0!important;
+.ant-card {
+  .ant-card-head {
+    padding: 0 16px !important;
+
+    .ant-card-head-wrapper {
+      .ant-card-head-title {
+        padding: 12px 0 !important;
       }
     }
   }
 }
 
-.ant-card-wider-padding{
-  .ant-card-body{
-    padding: 24px!important;
+.ant-card-wider-padding {
+  .ant-card-body {
+    padding: 24px !important;
   }
 }
 
-.ant-form{
-  .ant-form-item{
-    padding-bottom: 0!important;
+.ant-form {
+  .ant-form-item {
+    padding-bottom: 0 !important;
     margin-bottom: 20px;
   }
 }
 
-.ant-list-item{
+.ant-list-item {
   word-break: break-all;
 }
 
 .card-container {
   background: #f5f5f5;
-  & > .ant-tabs-card {
-    & > .ant-tabs-content {
+
+  &>.ant-tabs-card {
+    &>.ant-tabs-content {
       margin-top: -16px;
-      & > .ant-tabs-tabpane {
+
+      &>.ant-tabs-tabpane {
         background: #fff;
         padding: 16px;
       }
     }
-    & > .ant-tabs-bar {
+
+    &>.ant-tabs-bar {
       border-color: #fff;
+
       .ant-tabs-tab {
-        border: none!important;
-        margin-right: 0!important;
+        border: none !important;
+        margin-right: 0 !important;
         background: transparent;
       }
+
       .ant-tabs-tab-active {
         border-color: #fff;
         background: #fff;
@@ -553,4 +581,23 @@ body {
   left: 0px;
   background: rgb(255, 255, 255);
   border-radius: 0px 0px 4px 4px;
+}
+
+.page-wrapper {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-flow: row wrap;
+  flex-flow: row wrap;
+  .ant-pagination-options-size-changer.ant-select{
+    margin:0
+  }
 }

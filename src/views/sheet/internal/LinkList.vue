@@ -183,14 +183,15 @@ export default {
       if (this.link.id) {
         linkApi.update(this.link.id, this.link).then(response => {
           this.$message.success('更新成功！')
+          this.loadLinks()
         })
       } else {
         linkApi.create(this.link).then(response => {
           this.$message.success('保存成功！')
+          this.loadLinks()
         })
       }
       this.handleAddLink()
-      this.loadLinks()
     }
   }
 }

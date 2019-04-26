@@ -17,7 +17,7 @@
                   :sm="24"
                 >
                   <a-form-item label="关键词">
-                    <a-input />
+                    <a-input v-model="queryParam.keyword"/>
                   </a-form-item>
                 </a-col>
                 <a-col
@@ -40,7 +40,10 @@
                       type="primary"
                       @click="loadJournals(true)"
                     >查询</a-button>
-                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
+                    <a-button
+                      style="margin-left: 8px;"
+                      @click="resetParam"
+                    >重置</a-button>
                   </span>
                 </a-col>
               </a-row>
@@ -84,7 +87,14 @@
                     @click="handleEdit(item)"
                   >编辑</a>
                   <a-divider type="vertical" />
-                  <a href="javascript:void(0);">删除</a>
+                  <a-popconfirm
+                    title="你确定要删除这条日志？"
+                    @confirm="handleDelete(item.id)"
+                    okText="确定"
+                    cancelText="取消"
+                  >
+                    <a href="javascript:void(0);">删除</a>
+                  </a-popconfirm>
                 </template>
                 <a-list-item-meta :description="item.content">
                   <span slot="title">{{ item.createTime | moment }}</span>
@@ -95,7 +105,7 @@
                   />
                 </a-list-item-meta>
               </a-list-item>
-              <template>
+              <div class="page-wrapper">
                 <a-pagination
                   class="pagination"
                   :total="pagination.total"
@@ -104,7 +114,7 @@
                   @showSizeChange="onPaginationChange"
                   @change="onPaginationChange"
                 />
-              </template>
+              </div>
             </a-list>
           </div>
         </a-card>
@@ -190,18 +200,25 @@ export default {
       this.journal = item
       this.visible = true
     },
+    handleDelete(id) {
+      journalApi.delete(id).then(response => {
+        this.$message.success('删除成功！')
+        this.loadJournals()
+      })
+    },
     createOrUpdateJournal() {
       if (this.journal.id) {
         journalApi.update(this.journal.id, this.journal).then(response => {
           this.$message.success('更新成功！')
+          this.loadJournals()
         })
       } else {
         journalApi.create(this.journal).then(response => {
           this.$message.success('发表成功！')
+          this.loadJournals()
         })
       }
       this.visible = false
-      this.loadJournals()
     },
     onPaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)

@@ -102,11 +102,7 @@
             >删除</a>
           </span>
         </a-table>
-        <a-row
-          type="flex"
-          justify="end"
-          align="middle"
-        >
+        <div class="page-wrapper">
           <a-pagination
             class="pagination"
             :total="pagination.total"
@@ -115,7 +111,7 @@
             @showSizeChange="onPaginationChange"
             @change="onPaginationChange"
           />
-        </a-row>
+        </div>
       </div>
     </a-card>
   </page-view>
