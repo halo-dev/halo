@@ -87,7 +87,14 @@
                     @click="handleEdit(item)"
                   >编辑</a>
                   <a-divider type="vertical" />
-                  <a href="javascript:void(0);">删除</a>
+                  <a-popconfirm
+                    title="你确定要删除这条日志？"
+                    @confirm="handleDelete(item.id)"
+                    okText="确定"
+                    cancelText="取消"
+                  >
+                    <a href="javascript:void(0);">删除</a>
+                  </a-popconfirm>
                 </template>
                 <a-list-item-meta :description="item.content">
                   <span slot="title">{{ item.createTime | moment }}</span>
@@ -192,6 +199,12 @@ export default {
       this.title = '编辑'
       this.journal = item
       this.visible = true
+    },
+    handleDelete(id) {
+      journalApi.delete(id).then(response => {
+        this.$message.success('删除成功！')
+        this.loadJournals()
+      })
     },
     createOrUpdateJournal() {
       if (this.journal.id) {

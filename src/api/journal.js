@@ -28,4 +28,11 @@ journalApi.update = (journalId, journal) => {
   })
 }
 
+journalApi.delete = journalId => {
+  return service({
+    url: `${baseUrl}/${journalId}`,
+    method: 'delete'
+  })
+}
+
 export default journalApi
