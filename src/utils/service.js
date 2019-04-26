@@ -5,7 +5,7 @@ import Vue from 'vue'
 import { message } from 'ant-design-vue'
 
 const service = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? 'http://terransforce.ddns.net:8090' : 'http://localhost:8090',
+  baseURL: process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8090',
   timeout: 5000,
   withCredentials: true
 })
