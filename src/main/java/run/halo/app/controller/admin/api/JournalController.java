@@ -53,7 +53,7 @@ public class JournalController {
     @ApiOperation("Gets latest journals")
     public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                                JournalQuery journalQuery) {
-        Page<Journal> journalPage = journalService.pageBy(journalQuery,pageable);
+        Page<Journal> journalPage = journalService.pageBy(journalQuery, pageable);
         return journalService.convertToCmtCountDto(journalPage);
     }
 
@@ -78,6 +78,17 @@ public class JournalController {
         Journal journal = journalService.getById(id);
         journalParam.update(journal);
         return new JournalDTO().convertFrom(journalService.update(journal));
+    }
+
+    /**
+     * Delete journal by id.
+     *
+     * @param journalId journalId
+     */
+    @DeleteMapping("{journalId:\\d+}")
+    @ApiOperation("Delete link by id")
+    public void deletePermanently(@PathVariable("journalId") Integer journalId) {
+        journalService.removeById(journalId);
     }
 
     @GetMapping("{journalId:\\d+}/comments/tree_view")
