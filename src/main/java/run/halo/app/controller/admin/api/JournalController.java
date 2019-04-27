@@ -80,15 +80,11 @@ public class JournalController {
         return new JournalDTO().convertFrom(journalService.update(journal));
     }
 
-    /**
-     * Delete journal by id.
-     *
-     * @param journalId journalId
-     */
     @DeleteMapping("{journalId:\\d+}")
-    @ApiOperation("Delete link by id")
-    public void deletePermanently(@PathVariable("journalId") Integer journalId) {
-        journalService.removeById(journalId);
+    @ApiOperation("Delete journal")
+    public JournalDTO deleteBy(@PathVariable("journalId") Integer journalId) {
+        Journal deletedJournal = journalService.removeById(journalId);
+        return journalService.convertTo(deletedJournal);
     }
 
     @GetMapping("{journalId:\\d+}/comments/tree_view")
