@@ -28,7 +28,7 @@ public class MenuParam implements InputConverter<Menu> {
     private String url;
 
     @Min(value = 0, message = "Menu priority must not be less than {value}")
-    private Integer sort;
+    private Integer priority;
 
     @Size(max = 50, message = "Length of menu target must not be more than {max}")
     private String target;
