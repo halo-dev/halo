@@ -16,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
-import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.User;
@@ -29,7 +28,6 @@ import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
-import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BaseCommentRepository;
 import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
@@ -359,16 +357,16 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             Assert.notNull(toCompareComment, "Comment to compare must not be null");
 
             // Get sort order
-            Sort.Order order = sort.filter(anOrder -> anOrder.getProperty().equals("createTime"))
+            Sort.Order order = sort.filter(anOrder -> anOrder.getProperty().equals("id"))
                     .get()
                     .findFirst()
-                    .orElseGet(() -> Sort.Order.desc("createTime"));
+                    .orElseGet(() -> Sort.Order.desc("id"));
 
             // Init sign
             int sign = order.getDirection().isAscending() ? 1 : -1;
 
-            // Compare createTime property
-            return sign * currentComment.getCreateTime().compareTo(toCompareComment.getCreateTime());
+            // Compare id property
+            return sign * currentComment.getId().compareTo(toCompareComment.getId());
         };
     }
 
