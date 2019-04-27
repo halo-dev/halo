@@ -1,13 +1,7 @@
 <template>
   <div class="page-header-index-wide">
     <a-row>
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
+      <a-col :span="24">
         <div class="card-container">
           <a-tabs type="card">
             <a-tab-pane key="internal">
@@ -112,9 +106,7 @@
                     cancelText="取消"
                     v-else-if="sheet.status === 'RECYCLE'"
                   >
-                    <a
-                      href="javascript:;"
-                    >还原</a>
+                    <a href="javascript:;">还原</a>
                   </a-popconfirm>
 
                   <a-divider type="vertical" />
@@ -126,9 +118,7 @@
                     cancelText="取消"
                     v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
                   >
-                    <a
-                      href="javascript:;"
-                    >回收站</a>
+                    <a href="javascript:;">回收站</a>
                   </a-popconfirm>
 
                   <a-popconfirm
@@ -138,9 +128,7 @@
                     cancelText="取消"
                     v-else-if="sheet.status === 'RECYCLE'"
                   >
-                    <a
-                      href="javascript:;"
-                    >删除</a>
+                    <a href="javascript:;">删除</a>
                   </a-popconfirm>
 
                 </span>

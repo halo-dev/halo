@@ -1,13 +1,7 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
+      <a-col :span="24">
         <div style="margin-bottom: 16px">
           <a-input
             v-model="sheetToStage.title"

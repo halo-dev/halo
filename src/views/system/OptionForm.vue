@@ -1,13 +1,7 @@
 <template>
   <div class="page-header-index-wide">
     <a-row>
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
+      <a-col :span="24">
         <div class="card-container">
           <a-tabs type="card">
             <a-tab-pane key="general">
@@ -335,7 +329,10 @@
                     label="操作员密码："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input type="password" v-model="options.oss_upyun_password" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_upyun_password"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="文件目录："

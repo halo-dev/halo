@@ -2,11 +2,7 @@
   <div class="page-header-index-wide">
     <a-row>
       <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
+        :span="24"
       >
         <a-card :bordered="false">
           <div class="table-page-search-wrapper">
