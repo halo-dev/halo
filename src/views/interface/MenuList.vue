@@ -160,7 +160,6 @@ export default {
   data() {
     return {
       title: '添加菜单',
-      data: [],
       formType: 'create',
       loading: false,
       columns,

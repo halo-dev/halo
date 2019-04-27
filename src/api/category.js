@@ -36,6 +36,21 @@ categoryApi.delete = categoryId => {
   })
 }
 
+categoryApi.get = categoryId => {
+  return service({
+    url: `${baseUrl}/${categoryId}`,
+    method: 'get'
+  })
+}
+
+categoryApi.update = (categoryId, category) => {
+  return service({
+    url: `${baseUrl}/${categoryId}`,
+    data: category,
+    method: 'put'
+  })
+}
+
 function concreteTree(parentCategory, categories) {
   categories.forEach(category => {
     if (parentCategory.key === category.parentId) {

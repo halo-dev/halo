@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="添加分类目录">
+        <a-card :title="title">
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -21,7 +21,7 @@
               label="路径名称："
               help="* 这是文章路径上显示的名称，最好为英文"
             >
-              <a-input v-model="categoryToCreate.slugNames" />
+              <a-input v-model="categoryToCreate.slugName" />
             </a-form-item>
             <a-form-item label="上级目录：">
               <category-select-tree
@@ -42,8 +42,20 @@
             <a-form-item>
               <a-button
                 type="primary"
-                @click="handleCreateCategory"
+                @click="handleSaveClick"
+                v-if="formType==='create'"
               >保存</a-button>
+              <a-button-group v-else>
+                <a-button
+                  type="primary"
+                  @click="handleSaveClick"
+                >更新</a-button>
+                <a-button
+                  type="dashed"
+                  @click="handleAddCategory"
+                  v-if="formType==='update'"
+                >返回添加</a-button>
+              </a-button-group>
             </a-form-item>
           </a-form>
         </a-card>
@@ -134,6 +146,8 @@ export default {
   components: { CategorySelectTree, CategoryTree },
   data() {
     return {
+      title: '添加分类',
+      formType: 'create',
       categories: [],
       categoryToCreate: {},
       loading: false,
@@ -145,25 +159,48 @@ export default {
   },
   methods: {
     loadCategories() {
+      this.loading = true
       categoryApi.listAll(true).then(response => {
         this.categories = response.data.data
+        this.loading = false
       })
     },
-    handleCreateCategory() {
-      categoryApi.create(this.categoryToCreate).then(response => {
-        this.$message.success('添加成功！')
-        this.loadCategories()
-        this.categoryToCreate = {}
-      })
+    handleSaveClick() {
+      this.createOrUpdateCategory()
+    },
+    handleAddCategory() {
+      this.title = '添加分类'
+      this.formType = 'create'
+      this.categoryToCreate = {}
     },
     handleEditCategory(id) {
-      this.$message.success('编辑' + id)
+      categoryApi.get(id).then(response => {
+        this.categoryToCreate = response.data.data
+        this.title = '编辑分类'
+        this.formType = 'update'
+      })
     },
     handleDeleteCategory(id) {
       categoryApi.delete(id).then(response => {
         this.$message.success('删除成功！')
         this.loadCategories()
       })
+    },
+    createOrUpdateCategory() {
+      if (this.categoryToCreate.id) {
+        categoryApi.update(this.categoryToCreate.id, this.categoryToCreate).then(response => {
+          this.$message.success('更新成功！')
+          this.loadCategories()
+          this.categoryToCreate = {}
+        })
+      } else {
+        categoryApi.create(this.categoryToCreate).then(response => {
+          this.$message.success('保存成功！')
+          this.loadCategories()
+          this.categoryToCreate = {}
+        })
+      }
+      this.handleAddCategory()
     }
   }
 }
