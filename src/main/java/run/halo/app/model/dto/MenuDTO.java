@@ -19,7 +19,7 @@ public class MenuDTO implements OutputConverter<MenuDTO, Menu> {
 
     private String url;
 
-    private Integer sort;
+    private Integer priority;
 
     private String target;
 
