@@ -32,7 +32,7 @@
             <a-form-item label="排序编号：">
               <a-input
                 type="number"
-                v-model="menuToCreate.sort"
+                v-model="menuToCreate.priority"
               />
             </a-form-item>
             <a-form-item
@@ -143,7 +143,7 @@ const columns = [
   },
   {
     title: '排序',
-    dataIndex: 'sort'
+    dataIndex: 'priority'
   },
   {
     title: '图标',
