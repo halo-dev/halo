@@ -159,13 +159,20 @@ export default {
   components: { MenuSelectTree },
   data() {
     return {
-      title: '添加菜单',
       formType: 'create',
       loading: false,
       columns,
       menus: [],
       menuToCreate: {},
       fieldExpand: false
+    }
+  },
+  computed: {
+    title() {
+      if (this.menuToCreate.id) {
+        return '修改菜单'
+      }
+      return '添加菜单'
     }
   },
   created() {
@@ -183,14 +190,12 @@ export default {
       this.createOrUpdateMenu()
     },
     handleAddMenu() {
-      this.title = '添加菜单'
       this.formType = 'create'
       this.menuToCreate = {}
     },
     handleEditMenu(id) {
       menuApi.get(id).then(response => {
         this.menuToCreate = response.data.data
-        this.title = '编辑菜单'
         this.formType = 'update'
       })
     },

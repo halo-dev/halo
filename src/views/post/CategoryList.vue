@@ -146,12 +146,19 @@ export default {
   components: { CategorySelectTree, CategoryTree },
   data() {
     return {
-      title: '添加分类',
       formType: 'create',
       categories: [],
       categoryToCreate: {},
       loading: false,
       columns
+    }
+  },
+  computed: {
+    title() {
+      if (this.categoryToCreate.id) {
+        return '修改分类'
+      }
+      return '添加分类'
     }
   },
   created() {
@@ -169,14 +176,12 @@ export default {
       this.createOrUpdateCategory()
     },
     handleAddCategory() {
-      this.title = '添加分类'
       this.formType = 'create'
       this.categoryToCreate = {}
     },
     handleEditCategory(id) {
       categoryApi.get(id).then(response => {
         this.categoryToCreate = response.data.data
-        this.title = '编辑分类'
         this.formType = 'update'
       })
     },

@@ -138,13 +138,20 @@ const columns = [
 export default {
   data() {
     return {
-      title: '添加友情链接',
       formType: 'create',
       data: [],
       loading: false,
       columns,
       links: [],
       link: {}
+    }
+  },
+  computed: {
+    title() {
+      if (this.link.id) {
+        return '修改友情链接'
+      }
+      return '添加友情链接'
     }
   },
   created() {
@@ -162,14 +169,12 @@ export default {
       this.createOrUpdateLink()
     },
     handleAddLink() {
-      this.title = '添加友情链接'
       this.formType = 'create'
       this.link = {}
     },
     handleEditLink(id) {
       linkApi.get(id).then(response => {
         this.link = response.data.data
-        this.title = '编辑友情链接'
         this.formType = 'update'
       })
     },
