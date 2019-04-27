@@ -175,7 +175,7 @@ export default {
   methods: {
     loadMenus() {
       this.loading = true
-      menuApi.listAll().then(response => {
+      menuApi.listTree().then(response => {
         this.menus = response.data.data
         this.loading = false
       })

@@ -11,6 +11,13 @@ menuApi.listAll = () => {
   })
 }
 
+menuApi.listTree = () => {
+  return service({
+    url: `${baseUrl}/tree_view`,
+    method: 'get'
+  })
+}
+
 menuApi.create = menu => {
   return service({
     url: baseUrl,

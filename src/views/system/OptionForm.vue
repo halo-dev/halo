@@ -335,7 +335,7 @@
                     label="操作员密码："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_upyun_password" />
+                    <a-input type="password" v-model="options.oss_upyun_password" />
                   </a-form-item>
                   <a-form-item
                     label="文件目录："
