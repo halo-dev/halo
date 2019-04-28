@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.service.OptionService;
@@ -34,6 +35,7 @@ public class RecoveryController {
 
     @PostMapping("migrations/v0_4_3")
     @ApiOperation("Migrates from halo v0.4.3")
+    @CacheLock
     public void migrateFromVersion_0_4_3(
             @ApiParam("This file content type should be json")
             @RequestPart("file") MultipartFile file) {
