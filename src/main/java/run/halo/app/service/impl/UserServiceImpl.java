@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
@@ -200,6 +201,17 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         setPassword(user, userParam.getPassword());
 
         return create(user);
+    }
+
+    @Override
+    @CacheLock
+    public User create(User user) {
+        // Check user
+        if (count() != 0) {
+            throw new BadRequestException("This blog already exists a blogger");
+        }
+
+        return super.create(user);
     }
 
     @Override

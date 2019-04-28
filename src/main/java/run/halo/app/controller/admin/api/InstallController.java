@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.entity.*;
@@ -72,6 +75,7 @@ public class InstallController {
 
     @PostMapping
     @ResponseBody
+    @CacheLock
     public BaseResponse<String> installBlog(@RequestBody @Valid InstallParam installParam) {
         // TODO Install blog.
         // Check is installed
