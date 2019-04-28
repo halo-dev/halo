@@ -190,9 +190,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
 
-        // Check url
-        urlMustNotExist(post);
-
         // Render content
         post.setFormatContent(MarkdownUtils.renderMarkdown(post.getOriginalContent()));
 
@@ -281,6 +278,22 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         return new BasePostDetailDTO().convertFrom(post);
     }
 
+    @Override
+    public POST create(POST post) {
+        // Check title
+        urlMustNotExist(post);
+
+        return super.create(post);
+    }
+
+    @Override
+    public POST update(POST post) {
+        // Check title
+        urlMustNotExist(post);
+
+        return super.update(post);
+    }
+
     /**
      * Check if the url is exist.
      *
@@ -288,21 +301,20 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
      */
     protected void urlMustNotExist(@NonNull POST post) {
         Assert.notNull(post, "Sheet must not be null");
-        // TODO Refactor this method with BasePostService
 
-        // TODO May refactor these queries
         // Get url count
-        long count;
+        boolean exist;
+
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
-            count = basePostRepository.countByUrl(post.getUrl());
+            exist = basePostRepository.countByUrl(post.getUrl());
         } else {
             // The sheet will be updated
-            count = basePostRepository.countByIdNotAndUrl(post.getId(), post.getUrl());
+            exist = basePostRepository.countByIdNotAndUrl(post.getId(), post.getUrl());
         }
 
-        if (count > 0) {
-            throw new AlreadyExistsException("The sheet url has been exist");
+        if (exist) {
+            throw new AlreadyExistsException("The post url " + post.getUrl() + " has been exist");
         }
     }
 }

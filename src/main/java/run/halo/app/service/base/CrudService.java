@@ -55,7 +55,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return List
      */
     @NonNull
-    List<DOMAIN> listAllByIds(@NonNull Collection<ID> ids);
+    List<DOMAIN> listAllByIds(@Nullable Collection<ID> ids);
 
     /**
      * List all by ids and sort
@@ -65,7 +65,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return List
      */
     @NonNull
-    List<DOMAIN> listAllByIds(@NonNull Collection<ID> ids, @NonNull Sort sort);
+    List<DOMAIN> listAllByIds(@Nullable Collection<ID> ids, @NonNull Sort sort);
 
     /**
      * Fetch by id

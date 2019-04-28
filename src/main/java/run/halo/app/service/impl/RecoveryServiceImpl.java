@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +78,7 @@ public class RecoveryServiceImpl implements RecoveryService {
     }
 
     @Override
+    @Async
     public void migrateFromV0_4_3(MultipartFile file) {
         // TODO Async execution
         // Get migration content
@@ -198,7 +200,7 @@ public class RecoveryServiceImpl implements RecoveryService {
         Post post = BeanUtils.transformFrom(basePost, Post.class);
 
         // Create it
-        Post createdPost = postService.create(post);
+        Post createdPost = postService.createOrUpdateBy(post);
 
         Object commentsObject = postMap.get("comments");
         // TODO Handle comments
@@ -210,6 +212,7 @@ public class RecoveryServiceImpl implements RecoveryService {
 
         try {
             // Create comments
+            // TODO Don't use createInBatch method
             List<PostComment> createdPostComments = postCommentService.createInBatch(postComments);
         } catch (Exception e) {
             log.warn("Failed to create post comments for post with id " + createdPost.getId(), e);
@@ -224,7 +227,7 @@ public class RecoveryServiceImpl implements RecoveryService {
         Sheet sheet = BeanUtils.transformFrom(basePost, Sheet.class);
 
         // Create it
-        Sheet createdSheet = sheetService.create(sheet);
+        Sheet createdSheet = sheetService.createOrUpdateBy(sheet);
 
         Object commentsObject = postMap.get("comments");
         // TODO Handle comments

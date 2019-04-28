@@ -13,6 +13,7 @@ import run.halo.app.model.vo.MenuVO;
 import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.ServiceUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -46,13 +47,6 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     public Menu createBy(MenuParam menuParam) {
         Assert.notNull(menuParam, "Menu param must not be null");
 
-        // Check the name
-        boolean exists = menuRepository.existsByName(menuParam.getName());
-
-        if (exists) {
-            throw new AlreadyExistsException("The menu name " + menuParam.getName() + " has already existed").setErrorData(menuParam.getName());
-        }
-
         // Create an return
         return create(menuParam.convertTo());
     }
@@ -83,11 +77,25 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         return topLevelMenu.getChildren();
     }
 
+    @Override
+    public Menu create(Menu menu) {
+        nameMustNotExist(menu);
+
+        return super.create(menu);
+    }
+
+    @Override
+    public Menu update(Menu menu) {
+        nameMustNotExist(menu);
+
+        return super.update(menu);
+    }
+
     /**
      * Concrete menu tree.
      *
      * @param parentMenu parent menu vo must not be null
-     * @param menus     a list of menu
+     * @param menus      a list of menu
      */
     private void concreteTree(MenuVO parentMenu, List<Menu> menus) {
         Assert.notNull(parentMenu, "Parent menu must not be null");
@@ -147,5 +155,23 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         return menus.stream()
                 .map(menu -> new MenuDTO().<MenuDTO>convertFrom(menu))
                 .collect(Collectors.toList());
+    }
+
+    private void nameMustNotExist(@NonNull Menu menu) {
+        Assert.notNull(menu, "Menu must not be null");
+
+        boolean exist = false;
+
+        if (ServiceUtils.isEmptyId(menu.getId())) {
+            // Create action
+            exist = menuRepository.existsByName(menu.getName());
+        } else {
+            // Update action
+            exist = menuRepository.existsByIdNotAndName(menu.getId(), menu.getName());
+        }
+
+        if (exist) {
+            throw new AlreadyExistsException("The menu name " + menu.getName() + " already exists");
+        }
     }
 }

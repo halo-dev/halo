@@ -1,21 +1,23 @@
-package run.halo.app.controller.content.api;
+package run.halo.app.controller.admin.api;
 
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.enums.LogType;
+import run.halo.app.model.params.CategoryParam;
 import run.halo.app.model.params.InstallParam;
 import run.halo.app.model.properties.*;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.service.*;
+import run.halo.app.utils.ValidationUtils;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -31,7 +33,7 @@ import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
  */
 @Slf4j
 @Controller
-@RequestMapping("/installations")
+@RequestMapping("/api/admin/installations")
 public class InstallController {
 
     private final UserService userService;
@@ -70,7 +72,7 @@ public class InstallController {
 
     @PostMapping
     @ResponseBody
-    public BaseResponse<?> installBlog(@Valid InstallParam installParam) {
+    public BaseResponse<String> installBlog(@RequestBody @Valid InstallParam installParam) {
         // TODO Install blog.
         // Check is installed
         boolean isInstalled = Boolean.parseBoolean(optionService.getByProperty(PrimaryProperties.IS_INSTALLED).orElse(Boolean.FALSE.toString()));
@@ -136,14 +138,17 @@ public class InstallController {
         return null;
     }
 
+    @NonNull
     private Category createDefaultCategory() {
-        Category category = new Category();
+        CategoryParam category = new CategoryParam();
 
-        // TODO Multi level category
         category.setName("未分类");
         category.setSlugName("default");
         category.setDescription("未分类");
-        return categoryService.create(category);
+
+        ValidationUtils.validate(category);
+
+        return categoryService.create(category.convertTo());
     }
 
     private User createDefaultUser(InstallParam installParam) {
