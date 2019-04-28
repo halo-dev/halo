@@ -181,66 +181,31 @@
                   label="评论审核后才显示："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-radio-group
-                    v-decorator="['radio-group']"
-                    defaultValue="true"
-                    v-model="options.comment_new_need_check"
-                  >
-                    <a-radio value="true">启用</a-radio>
-                    <a-radio value="false">禁用</a-radio>
-                  </a-radio-group>
+                  <a-switch v-model="options.comment_new_need_check"/>
                 </a-form-item>
                 <a-form-item
                   label="新评论通知："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-radio-group
-                    v-decorator="['radio-group']"
-                    defaultValue="true"
-                    v-model="options.comment_new_notice"
-                  >
-                    <a-radio value="true">启用</a-radio>
-                    <a-radio value="false">禁用</a-radio>
-                  </a-radio-group>
+                  <a-switch v-model="options.comment_new_notice"/>
                 </a-form-item>
                 <a-form-item
                   label="评论审核通过通知对方："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-radio-group
-                    v-decorator="['radio-group']"
-                    defaultValue="false"
-                    v-model="options.comment_pass_notice"
-                  >
-                    <a-radio value="true">启用</a-radio>
-                    <a-radio value="false">禁用</a-radio>
-                  </a-radio-group>
+                  <a-switch v-model="options.comment_pass_notice"/>
                 </a-form-item>
                 <a-form-item
                   label="评论回复通知对方："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-radio-group
-                    v-decorator="['radio-group']"
-                    defaultValue="false"
-                    v-model="options.comment_reply_notice"
-                  >
-                    <a-radio value="true">启用</a-radio>
-                    <a-radio value="false">禁用</a-radio>
-                  </a-radio-group>
+                  <a-switch v-model="options.comment_reply_notice"/>
                 </a-form-item>
                 <a-form-item
                   label="API 评论开关："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-radio-group
-                    v-decorator="['radio-group']"
-                    defaultValue="false"
-                    v-model="options.comment_api_enabled"
-                  >
-                    <a-radio value="true">启用</a-radio>
-                    <a-radio value="false">禁用</a-radio>
-                  </a-radio-group>
+                  <a-switch v-model="options.comment_api_enabled"/>
                 </a-form-item>
                 <a-form-item
                   label="每页显示条数： "
@@ -461,14 +426,7 @@
                       label="是否启用："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-radio-group
-                        v-decorator="['radio-group']"
-                        defaultValue="false"
-                        v-model="options.email_enabled"
-                      >
-                        <a-radio value="true">启用</a-radio>
-                        <a-radio value="false">禁用</a-radio>
-                      </a-radio-group>
+                      <a-switch v-model="options.email_enabled"/>
                     </a-form-item>
                     <a-form-item
                       label="SMTP 地址："
@@ -562,14 +520,7 @@
                   label="API服务："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-radio-group
-                    v-decorator="['radio-group']"
-                    defaultValue="false"
-                    v-model="options.api_enabled"
-                  >
-                    <a-radio value="true">启用</a-radio>
-                    <a-radio value="false">禁用</a-radio>
-                  </a-radio-group>
+                  <a-switch v-model="options.api_enabled"/>
                 </a-form-item>
                 <a-form-item
                   label="Access key："

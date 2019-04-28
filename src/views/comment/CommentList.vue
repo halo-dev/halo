@@ -216,7 +216,7 @@ export default {
           this.pagination.total = response.data.data.total
           this.commentsLoading = false
         })
-      }else{
+      } else {
         // TODO tree view
       }
     },
