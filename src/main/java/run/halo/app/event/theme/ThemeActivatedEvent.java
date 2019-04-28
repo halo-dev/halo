@@ -13,21 +13,13 @@ import run.halo.app.handler.theme.config.support.ThemeProperty;
  */
 public class ThemeActivatedEvent extends ApplicationEvent {
 
-    private final ThemeProperty themeProperty;
-
     /**
      * Creates a new ApplicationEvent.
      *
-     * @param source        the object on which the event initially occurred (never {@code null})
-     * @param themeProperty theme property must not be null
+     * @param source the object on which the event initially occurred (never {@code null})
      */
-    public ThemeActivatedEvent(Object source, @NonNull ThemeProperty themeProperty) {
+    public ThemeActivatedEvent(Object source) {
         super(source);
-        Assert.notNull(themeProperty, "Activated theme property must not be null");
-        this.themeProperty = themeProperty;
     }
 
-    public ThemeProperty getThemeProperty() {
-        return themeProperty;
-    }
 }
