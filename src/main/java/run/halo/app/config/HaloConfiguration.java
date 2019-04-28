@@ -121,7 +121,11 @@ public class HaloConfiguration {
         failureHandler.setObjectMapper(objectMapper);
 
         // Config the admin filter
-        adminAuthenticationFilter.addExcludeUrlPatterns("/api/admin/login");
+        adminAuthenticationFilter.addExcludeUrlPatterns(
+                "/api/admin/login",
+                "/api/admin/installations",
+                "/api/admin/recoveries/migration/*"
+        );
         adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/admin/comments", HttpMethod.POST.name());
         adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/comments", HttpMethod.POST.name());
         adminAuthenticationFilter.setFailureHandler(

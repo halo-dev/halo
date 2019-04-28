@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 import javax.persistence.*;
 
@@ -54,6 +55,14 @@ public class Category extends BaseEntity {
     public void prePersist() {
         super.prePersist();
         id = null;
+
+        if (description == null) {
+            description = "";
+        }
+
+        if (parentId == null || parentId < 0) {
+            parentId = 0;
+        }
     }
 
 }

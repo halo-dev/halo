@@ -181,7 +181,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(post, "Post param must not be null");
 
         // Create or update post
-        post = createOrUpdateBy(post);
+        post = super.createOrUpdateBy(post);
 
         // List all tags
         List<Tag> tags = tagService.listAllByIds(tagIds);

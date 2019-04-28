@@ -19,8 +19,7 @@ public class InstallParam extends UserParam {
     /**
      * Blog locale.
      */
-    @NotBlank(message = "Blog locale must not be blank")
-    private String locale;
+    private String locale = "zh";
 
     /**
      * Blog title.

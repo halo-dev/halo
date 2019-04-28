@@ -5,6 +5,8 @@ import run.halo.app.repository.base.BaseRepository;
 import org.springframework.lang.NonNull;
 import run.halo.app.repository.base.BaseRepository;
 
+import java.util.Optional;
+
 /**
  * Menu repository.
  *
@@ -12,11 +14,7 @@ import run.halo.app.repository.base.BaseRepository;
  */
 public interface MenuRepository extends BaseRepository<Menu, Integer> {
 
-    /**
-     * Exists by menu name.
-     *
-     * @param name must not be blank
-     * @return true if exists; false otherwise
-     */
     boolean existsByName(@NonNull String name);
+
+    boolean existsByIdNotAndName(@NonNull Integer id, @NonNull String name);
 }

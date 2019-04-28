@@ -2,6 +2,7 @@ package run.halo.app.model.params;
 
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Category;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.SlugUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -40,17 +41,17 @@ public class CategoryParam implements InputConverter<Category> {
     /**
      * Parent category.
      */
-    private Integer parentId;
+    private Integer parentId = 0;
 
     @Override
     public Category convertTo() {
         // Handle default value
         if (StringUtils.isBlank(slugName)) {
             slugName = SlugUtils.slugify(name);
-        }
 
-        if (parentId == null || parentId < 0) {
-            parentId = 0;
+            if (StringUtils.isBlank(slugName)) {
+                slugName = HaloUtils.initializeUrlIfBlank(slugName);
+            }
         }
 
         return InputConverter.super.convertTo();
