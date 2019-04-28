@@ -332,7 +332,7 @@ public class ThemeServiceImpl implements ThemeService {
         clearThemeCache();
 
         // Publish a theme activated event
-        eventPublisher.publishEvent(new ThemeActivatedEvent(this, themeProperty));
+        eventPublisher.publishEvent(new ThemeActivatedEvent(this));
 
         return themeProperty;
     }
