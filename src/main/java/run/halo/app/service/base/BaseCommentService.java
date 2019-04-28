@@ -29,6 +29,7 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      * %s: parent commentator author name
      * %s: comment content
      */
+    @Deprecated
     String COMMENT_TEMPLATE = "<a href='#comment-id-%d'>@%s</a> %s";
 
     /**
@@ -157,7 +158,7 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     /**
      * Target must exist.
      *
-     * @param targetId target id must not be null
+     * @param targetId target id must not be null (post id, sheet id or journal id)
      */
     void targetMustExist(@NonNull Integer targetId);
 }

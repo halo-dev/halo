@@ -105,17 +105,10 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         // List all the top comments (Caution: This list will be cleared)
         List<COMMENT> comments = baseCommentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
 
-        // Init the top virtual comment
-        BaseCommentVO topVirtualComment = new BaseCommentVO();
-        topVirtualComment.setId(0L);
-        topVirtualComment.setChildren(new LinkedList<>());
-
         Comparator<BaseCommentVO> commentVOComparator = buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
 
-        // Concrete the comment tree
-        concreteTree(topVirtualComment, new LinkedList<>(comments), commentVOComparator);
-
-        List<BaseCommentVO> topComments = topVirtualComment.getChildren();
+        // Convert to vo
+        List<BaseCommentVO> topComments = convertToVo(comments, commentVOComparator);
 
         List<BaseCommentVO> pageContent;
 
@@ -371,6 +364,30 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     /**
+     * Converts to base comment vo tree.
+     *
+     * @param comments   comments list could be null
+     * @param comparator comment comparator could be null
+     * @return a comment vo tree
+     */
+    @NonNull
+    protected List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments, @Nullable Comparator<BaseCommentVO> comparator) {
+        if (CollectionUtils.isEmpty(comments)) {
+            return Collections.emptyList();
+        }
+
+        // Init the top virtual comment
+        BaseCommentVO topVirtualComment = new BaseCommentVO();
+        topVirtualComment.setId(0L);
+        topVirtualComment.setChildren(new LinkedList<>());
+
+        // Concrete the comment tree
+        concreteTree(topVirtualComment, new LinkedList<>(comments), comparator);
+
+        return topVirtualComment.getChildren();
+    }
+
+    /**
      * Concretes comment tree.
      *
      * @param parentComment     parent comment vo must not be null
@@ -379,9 +396,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
      */
     protected void concreteTree(@NonNull BaseCommentVO parentComment,
                                 @Nullable Collection<COMMENT> comments,
-                                @NonNull Comparator<BaseCommentVO> commentComparator) {
+                                @Nullable Comparator<BaseCommentVO> commentComparator) {
         Assert.notNull(parentComment, "Parent comment must not be null");
-        Assert.notNull(commentComparator, "Comment comparator must not be null");
 
         if (CollectionUtils.isEmpty(comments)) {
             return;
@@ -419,7 +435,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             // Recursively concrete the children
             parentComment.getChildren().forEach(childComment -> concreteTree(childComment, comments, commentComparator));
             // Sort the children
-            parentComment.getChildren().sort(commentComparator);
+            if (commentComparator != null) {
+                parentComment.getChildren().sort(commentComparator);
+            }
         }
     }
 
