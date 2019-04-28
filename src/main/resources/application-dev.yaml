@@ -58,3 +58,4 @@ halo:
   doc-disabled: false
   production-env: false
   auth-enabled: false
+  workDir: ${user.home}/halo-dev/
