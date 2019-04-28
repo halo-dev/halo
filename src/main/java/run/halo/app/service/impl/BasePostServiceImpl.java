@@ -307,10 +307,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
-            exist = basePostRepository.countByUrl(post.getUrl());
+            exist = basePostRepository.existsByUrl(post.getUrl());
         } else {
             // The sheet will be updated
-            exist = basePostRepository.countByIdNotAndUrl(post.getId(), post.getUrl());
+            exist = basePostRepository.existsByIdNotAndUrl(post.getId(), post.getUrl());
         }
 
         if (exist) {
