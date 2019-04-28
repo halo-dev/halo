@@ -162,6 +162,18 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public Map<String, Object> listByKeys(String params) {
+        Assert.notNull(params, "Keys must not be null");
+        Map<String,Object> options = listOptions();
+        Map<String,Object> result = new HashMap<>();
+        String[] keysParam = params.split(",");
+        for (String key : keysParam) {
+            result.put(key,options.get(key));
+        }
+        return result;
+    }
+
+    @Override
     public List<OptionDTO> listDtos() {
         return listAll().stream().map(option -> new OptionDTO().<OptionDTO>convertFrom(option)).collect(Collectors.toList());
     }
