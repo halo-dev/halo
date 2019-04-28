@@ -1,4 +1,4 @@
-package run.halo.app.controller.admin.api;
+package run.halo.app.controller.content.api;
 
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
@@ -147,7 +147,7 @@ public class InstallController {
     }
 
     private User createDefaultUser(InstallParam installParam) {
-        return userService.createBy(installParam, installParam.getPassword());
+        return userService.createBy(installParam);
     }
 
     private void initSettings(InstallParam installParam) {
