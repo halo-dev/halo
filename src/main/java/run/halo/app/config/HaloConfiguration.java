@@ -124,7 +124,7 @@ public class HaloConfiguration {
         adminAuthenticationFilter.addExcludeUrlPatterns(
                 "/api/admin/login",
                 "/api/admin/installations",
-                "/api/admin/recoveries/migration/*"
+                "/api/admin/recoveries/migrations/*"
         );
         adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/admin/comments", HttpMethod.POST.name());
         adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/comments", HttpMethod.POST.name());
