@@ -128,7 +128,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         if (!BCrypt.checkpw(password, user.getPassword())) {
             // If the password is mismatch
             // Add login failure count
-            Integer loginFailureCount = stringCacheStore.get(LOGIN_FAILURE_COUNT_KEY).map(Integer::valueOf).orElse(0);
+            Integer loginFailureCount = stringCacheStore.getAny(LOGIN_FAILURE_COUNT_KEY, Integer.class).orElse(0);
 
             if (loginFailureCount >= MAX_LOGIN_TRY - 1) {
                 // Set expiration
@@ -139,7 +139,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
             loginFailureCount++;
 
-            stringCacheStore.put(LOGIN_FAILURE_COUNT_KEY, loginFailureCount.toString(), LOCK_MINUTES, TimeUnit.MINUTES);
+            stringCacheStore.putAny(LOGIN_FAILURE_COUNT_KEY, loginFailureCount, LOCK_MINUTES, TimeUnit.MINUTES);
 
             int remainder = MAX_LOGIN_TRY - loginFailureCount;
 

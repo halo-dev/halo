@@ -15,7 +15,6 @@ import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
 import run.halo.app.security.support.UserDetail;
 import run.halo.app.service.UserService;
-import run.halo.app.utils.JsonUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -84,15 +83,14 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         if (StringUtils.isNotBlank(token)) {
 
             // Valid the token
-            // TODO Add key prefix
-            Optional<String> userDetailOptional = cacheStore.get(token);
+            Optional<UserDetail> optionalUserDetail = cacheStore.getAny(token, UserDetail.class);
 
-            if (!userDetailOptional.isPresent()) {
+            if (!optionalUserDetail.isPresent()) {
                 getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
                 return;
             }
 
-            UserDetail userDetail = JsonUtils.jsonToObject(userDetailOptional.get(), UserDetail.class);
+            UserDetail userDetail = optionalUserDetail.get();
 
             // Set security
             SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));

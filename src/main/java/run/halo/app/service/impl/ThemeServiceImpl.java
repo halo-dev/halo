@@ -36,7 +36,6 @@ import run.halo.app.service.support.HaloMediaType;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
-import run.halo.app.utils.JsonUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -122,12 +121,13 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public Set<ThemeProperty> getThemes() {
-        Optional<String> themeCacheString = cacheStore.get(THEMES_CACHE_KEY);
+
+        Optional<ThemeProperty[]> themePropertiesOptional = cacheStore.getAny(THEMES_CACHE_KEY, ThemeProperty[].class);
 
         try {
-            if (themeCacheString.isPresent()) {
+            if (themePropertiesOptional.isPresent()) {
                 // Convert to theme properties
-                ThemeProperty[] themeProperties = JsonUtils.jsonToObject(themeCacheString.get(), ThemeProperty[].class);
+                ThemeProperty[] themeProperties = themePropertiesOptional.get();
                 return new HashSet<>(Arrays.asList(themeProperties));
             }
 
@@ -142,7 +142,7 @@ public class ThemeServiceImpl implements ThemeService {
             Set<ThemeProperty> themes = themePaths.stream().map(this::getProperty).collect(Collectors.toSet());
 
             // Cache the themes
-            cacheStore.put(THEMES_CACHE_KEY, JsonUtils.objectToJson(themes));
+            cacheStore.putAny(THEMES_CACHE_KEY, themes);
 
             return themes;
         } catch (IOException e) {
