@@ -5,10 +5,12 @@ import com.qiniu.common.Zone;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.entity.Option;
@@ -43,13 +45,17 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     private final Map<String, PropertyEnum> propertyEnumMap;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     public OptionServiceImpl(OptionRepository optionRepository,
                              ApplicationContext applicationContext,
-                             StringCacheStore cacheStore) {
+                             StringCacheStore cacheStore,
+                             ApplicationEventPublisher eventPublisher) {
         super(optionRepository);
         this.optionRepository = optionRepository;
         this.applicationContext = applicationContext;
         this.cacheStore = cacheStore;
+        this.eventPublisher = eventPublisher;
 
         propertyEnumMap = Collections.unmodifiableMap(PropertyEnum.getValuePropertyEnumMap());
     }
@@ -96,6 +102,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         // TODO Optimize the queries
         options.forEach(this::save);
+
+        publishEvent();
     }
 
     @Override
@@ -106,6 +114,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         // TODO Optimize the query
         optionParams.forEach(optionParam -> save(optionParam.getKey(), optionParam.getValue()));
+
+        publishEvent();
     }
 
     @Override
@@ -113,6 +123,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         Assert.notNull(property, "Property must not be null");
 
         save(property.getValue(), value);
+
+        publishEvent();
     }
 
     @Override
@@ -122,6 +134,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         }
 
         properties.forEach((property, value) -> save(property.getValue(), value));
+
+        publishEvent();
     }
 
     @Override
@@ -164,11 +178,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public Map<String, Object> listByKeys(String params) {
         Assert.notNull(params, "Keys must not be null");
-        Map<String,Object> options = listOptions();
-        Map<String,Object> result = new HashMap<>();
+        Map<String, Object> options = listOptions();
+        Map<String, Object> result = new HashMap<>();
         String[] keysParam = params.split(",");
         for (String key : keysParam) {
-            result.put(key,options.get(key));
+            result.put(key, options.get(key));
         }
         return result;
     }
@@ -341,5 +355,9 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         }
 
         return blogUrl;
+    }
+
+    private void publishEvent() {
+        eventPublisher.publishEvent(new OptionUpdatedEvent(this));
     }
 }
