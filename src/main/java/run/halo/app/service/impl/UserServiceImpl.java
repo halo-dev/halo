@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
+import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.User;
@@ -211,7 +212,11 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
             throw new BadRequestException("This blog already exists a blogger");
         }
 
-        return super.create(user);
+        User createdUser = super.create(user);
+
+        eventPublisher.publishEvent(new UserUpdatedEvent(this, createdUser.getId()));
+
+        return createdUser;
     }
 
     @Override
@@ -220,6 +225,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
         // Log it
         eventPublisher.publishEvent(new LogEvent(this, user.getId().toString(), LogType.PROFILE_UPDATED, user.getUsername()));
+        eventPublisher.publishEvent(new UserUpdatedEvent(this, user.getId()));
 
         return updatedUser;
     }

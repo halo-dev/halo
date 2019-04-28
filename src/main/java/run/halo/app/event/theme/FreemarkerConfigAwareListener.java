@@ -9,6 +9,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
@@ -56,36 +57,43 @@ public class FreemarkerConfigAwareListener {
     @Async
     @EventListener
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    public void onApplicationStartedEvent(ApplicationStartedEvent applicationStartedEvent) {
-        try {
-            configuration.setSharedVariable("theme", themeService.getActivatedTheme());
-            configuration.setSharedVariable("options", optionsService.listOptions());
-            configuration.setSharedVariable("user", userService.getCurrentUser().orElse(null));
-            configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
-            log.info("Initialized freemarker configuration");
-        } catch (TemplateModelException e) {
-            log.warn("Failed to configure freemarker", e);
-            // Ignore this error
-        }
+    public void onApplicationStartedEvent(ApplicationStartedEvent applicationStartedEvent) throws TemplateModelException {
+        log.debug("Received application started event");
+
+        loadThemeConfig();
+        loadOptionsConfig();
+        loadUserConfig();
     }
 
     @Async
     @EventListener
-    public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent) {
+    public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent) throws TemplateModelException {
         log.debug("Received theme activated event");
 
-        try {
-            ThemeProperty activatedTheme = themeService.getActivatedTheme();
-            log.debug("Set shared variable theme: [{}]", activatedTheme);
-            configuration.setSharedVariable("theme", activatedTheme);
-            Map<String, Object> options = optionService.listOptions();
-            log.debug("Set shared variable options: [{}]", options);
-            configuration.setSharedVariable("options", options);
-            log.debug("Set shared variable theme settings: [{}]", options);
-            configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
-        } catch (TemplateModelException e) {
-            log.warn("Failed to configure freemarker", e);
-            // Ignore this error
-        }
+        loadThemeConfig();
+    }
+
+    @Async
+    @EventListener
+    public void onUserUpdate(UserUpdatedEvent event) throws TemplateModelException {
+        log.debug("Received user update event, user id: [{}]", event.getUserId());
+
+        loadUserConfig();
+    }
+
+
+    private void loadUserConfig() throws TemplateModelException {
+        configuration.setSharedVariable("user", userService.getCurrentUser().orElse(null));
+    }
+
+    private void loadOptionsConfig() throws TemplateModelException {
+        Map<String, Object> options = optionService.listOptions();
+        configuration.setSharedVariable("options", options);
+    }
+
+    private void loadThemeConfig() throws TemplateModelException {
+        ThemeProperty activatedTheme = themeService.getActivatedTheme();
+        configuration.setSharedVariable("theme", activatedTheme);
+        configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
     }
 }

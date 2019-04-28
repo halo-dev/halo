@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -11,6 +12,7 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.repository.PostRepository;
@@ -78,6 +80,13 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
 
                     return postCommentWithPostVO;
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<PostCommentWithPostVO> pageTreeBy(CommentQuery commentQuery, Pageable pageable) {
+        Page<PostComment> postCommentPage = pageBy(commentQuery, pageable);
+
+        return null;
     }
 
     @Override
