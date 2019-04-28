@@ -48,18 +48,6 @@
               v-show="stepCurrent == 0"
             >
               <a-form-item
-                label="博客名称"
-                v-bind="formItemLayout"
-              >
-                <a-input />
-              </a-form-item>
-              <a-form-item
-                label="博客地址"
-                v-bind="formItemLayout"
-              >
-                <a-input />
-              </a-form-item>
-              <a-form-item
                 label="用户名"
                 v-bind="formItemLayout"
               >
