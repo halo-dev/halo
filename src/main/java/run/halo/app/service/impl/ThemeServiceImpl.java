@@ -296,7 +296,7 @@ public class ThemeServiceImpl implements ThemeService {
         if (activatedThemeId == null) {
             synchronized (this) {
                 if (activatedThemeId == null) {
-                    activatedThemeId = optionService.getByProperty(PrimaryProperties.THEME).orElse(DEFAULT_THEME_ID);
+                    activatedThemeId = optionService.getByPropertyOrDefault(PrimaryProperties.THEME, String.class, DEFAULT_THEME_ID);
                 }
             }
         }

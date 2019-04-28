@@ -1,13 +1,5 @@
 package run.halo.app.handler.file;
 
-import run.halo.app.exception.FileOperationException;
-import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.properties.QnYunProperties;
-import run.halo.app.model.support.QiNiuPutSet;
-import run.halo.app.model.support.UploadResult;
-import run.halo.app.service.OptionService;
-import run.halo.app.utils.FilenameUtils;
-import run.halo.app.utils.JsonUtils;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.http.Response;
@@ -23,6 +15,14 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.exception.FileOperationException;
+import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.QnYunProperties;
+import run.halo.app.model.support.QiNiuPutSet;
+import run.halo.app.model.support.UploadResult;
+import run.halo.app.service.OptionService;
+import run.halo.app.utils.FilenameUtils;
+import run.halo.app.utils.JsonUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -53,11 +53,11 @@ public class QnYunFileHandler implements FileHandler {
 
         // Get all config
         Zone zone = optionService.getQnYunZone();
-        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY);
-        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY);
-        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET);
-        String domain = optionService.getByPropertyOfNonNull(QnYunProperties.DOMAIN);
-        String smallUrl = optionService.getByPropertyOfNullable(QnYunProperties.SMALL_URL);
+        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY).toString();
+        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET).toString();
+        String domain = optionService.getByPropertyOfNonNull(QnYunProperties.DOMAIN).toString();
+        String smallUrl = optionService.getByPropertyOrDefault(QnYunProperties.SMALL_URL, String.class, "");
 
         // TODO Consider to cache the configuration
         // Create configuration
@@ -132,9 +132,9 @@ public class QnYunFileHandler implements FileHandler {
 
         // Get all config
         Zone zone = optionService.getQnYunZone();
-        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY);
-        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY);
-        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET);
+        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY).toString();
+        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET).toString();
 
         // TODO Consider to cache the configuration
         // Create configuration

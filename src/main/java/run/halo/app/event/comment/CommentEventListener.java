@@ -67,7 +67,7 @@ public class CommentEventListener {
 
         Map<String, Object> data = new HashMap<>();
 
-        StrBuilder url = new StrBuilder(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL))
+        StrBuilder url = new StrBuilder(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL).toString())
                 .append("/archives/")
                 .append(post.getUrl());
         data.put("url", url.toString());
