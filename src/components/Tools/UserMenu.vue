@@ -1,31 +1,47 @@
 <template>
   <div class="user-wrapper">
-    <a href="http://localhost:8090" target="_blank">
+    <a
+      :href="options.blog_url"
+      target="_blank"
+    >
       <span class="action">
         <a-icon type="link" />
       </span>
     </a>
-    <a href="javascript:void(0)" @click="showOptionModal">
+    <a
+      href="javascript:void(0)"
+      @click="showOptionModal"
+    >
       <span class="action">
         <a-icon type="setting" />
       </span>
     </a>
-    <header-comment class="action"/>
+    <header-comment class="action" />
     <a-dropdown>
       <span class="action ant-dropdown-link user-dropdown-menu">
-        <a-avatar class="avatar" size="small" :src="avatar"/>
+        <a-avatar
+          class="avatar"
+          size="small"
+          :src="user.avatar"
+        />
       </span>
-      <a-menu slot="overlay" class="user-dropdown-menu-wrapper">
+      <a-menu
+        slot="overlay"
+        class="user-dropdown-menu-wrapper"
+      >
         <a-menu-item key="0">
           <router-link :to="{ name: 'Profile' }">
-            <a-icon type="user"/>
+            <a-icon type="user" />
             <span>个人资料</span>
           </router-link>
         </a-menu-item>
-        <a-menu-divider/>
+        <a-menu-divider />
         <a-menu-item key="3">
-          <a href="javascript:;" @click="handleLogout">
-            <a-icon type="logout"/>
+          <a
+            href="javascript:;"
+            @click="handleLogout"
+          >
+            <a-icon type="logout" />
             <span>退出登录</span>
           </a>
         </a-menu-item>
@@ -39,6 +55,8 @@
 import HeaderComment from './HeaderComment'
 import SettingDrawer from '@/components/SettingDrawer/SettingDrawer'
 import { mapActions, mapGetters } from 'vuex'
+import userApi from '@/api/user'
+import optionApi from '@/api/option'
 
 export default {
   name: 'UserMenu',
@@ -49,11 +67,17 @@ export default {
   data() {
     return {
       optionVisible: true,
-      avatar: 'https://gravatar.loli.net/avatar/?s=256&d=mm'
+      user: {},
+      options: [],
+      keys: 'blog_url'
     }
   },
   mounted() {
     this.optionVisible = this.$refs.drawer.visible
+  },
+  created() {
+    this.loadUser()
+    this.loadOptions()
   },
   methods: {
     ...mapActions(['Logout']),
@@ -83,6 +107,16 @@ export default {
     showOptionModal() {
       this.optionVisible = this.$refs.drawer.visible
       this.$refs.drawer.toggle()
+    },
+    loadUser() {
+      userApi.getProfile().then(response => {
+        this.user = response.data.data
+      })
+    },
+    loadOptions() {
+      optionApi.listByKeys(this.keys).then(response => {
+        this.options = response.data.data
+      })
     }
   }
 }

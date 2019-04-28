@@ -106,7 +106,7 @@
             <a-button
               type="primary"
               @click="handlePublishClick"
-            >{{ publishText }}</a-button>
+            >发布</a-button>
           </div>
         </a-drawer>
       </a-col>
@@ -156,19 +156,19 @@ export default {
       thumDrawerVisible: false,
       visible: false,
       customTpls: [],
-      sheetToStage: {}
-    }
-  },
-  computed: {
-    publishText() {
-      if (this.sheetToStage.id) {
-        return '更新并发布'
-      }
-      return '创建并发布'
+      sheetToStage: {},
+      timer: null
     }
   },
   created() {
     this.loadCustomTpls()
+    clearInterval(this.timer)
+    this.timer = null
+    this.autoSaveTimer()
+  },
+  destroyed: function() {
+    clearInterval(this.timer)
+    this.timer = null
   },
   beforeRouteEnter(to, from, next) {
     // Get sheetId id from query
@@ -229,6 +229,27 @@ export default {
     handleSelectSheetThumb(data) {
       this.sheetToStage.thumbnail = data.path
       this.thumDrawerVisible = false
+    },
+    autoSaveTimer() {
+      if (this.timer == null) {
+        this.timer = setInterval(() => {
+          if (this.sheetToStage.title != null && this.sheetToStage.originalContent != null) {
+            this.sheetToStage.categoryIds = this.selectedCategoryIds
+            this.sheetToStage.tagIds = this.selectedTagIds
+
+            if (this.sheetToStage.id) {
+              sheetApi.update(this.sheetToStage.id, this.sheetToStage).then(response => {
+                this.$log.debug('Auto updated sheet', response.data.data)
+              })
+            } else {
+              sheetApi.create(this.sheetToStage).then(response => {
+                this.$log.debug('Auto saved sheet', response.data.data)
+                this.sheetToStage = response.data.data
+              })
+            }
+          }
+        }, 15000)
+      }
     }
   }
 }

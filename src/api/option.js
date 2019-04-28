@@ -11,6 +11,16 @@ optionApi.listAll = () => {
   })
 }
 
+optionApi.listByKeys = keys => {
+  return service({
+    url: `/api/admin/options/map_keys`,
+    method: 'get',
+    params: {
+      keys: keys
+    }
+  })
+}
+
 optionApi.save = options => {
   return service({
     url: `${baseUrl}/saving`,

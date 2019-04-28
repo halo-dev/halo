@@ -1,9 +1,7 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="12">
-      <a-col
-        :span="24"
-      >
+      <a-col :span="24">
         <div style="margin-bottom: 16px">
           <a-input
             v-model="postToStage.title"
@@ -84,15 +82,34 @@
                       />
                     </a-form-item>
                     <a-form-item v-if="categoryForm">
-                      <a-input placeholder="分类名称" v-model="categoryToCreate.name"/>
+                      <a-input
+                        placeholder="分类名称"
+                        v-model="categoryToCreate.name"
+                      />
                     </a-form-item>
                     <a-form-item v-if="categoryForm">
-                      <a-input placeholder="分类路径" v-model="categoryToCreate.slugNames"/>
+                      <a-input
+                        placeholder="分类路径"
+                        v-model="categoryToCreate.slugNames"
+                      />
                     </a-form-item>
                     <a-form-item>
-                      <a-button type="primary" style="marginRight: 8px" v-if="categoryForm" @click="handlerCreateCategory">保存</a-button>
-                      <a-button type="dashed" style="marginRight: 8px" v-if="!categoryForm" @click="toggleCategoryForm">新增</a-button>
-                      <a-button v-if="categoryForm" @click="toggleCategoryForm">取消</a-button>
+                      <a-button
+                        type="primary"
+                        style="marginRight: 8px"
+                        v-if="categoryForm"
+                        @click="handlerCreateCategory"
+                      >保存</a-button>
+                      <a-button
+                        type="dashed"
+                        style="marginRight: 8px"
+                        v-if="!categoryForm"
+                        @click="toggleCategoryForm"
+                      >新增</a-button>
+                      <a-button
+                        v-if="categoryForm"
+                        @click="toggleCategoryForm"
+                      >取消</a-button>
                     </a-form-item>
                   </a-form>
                 </div>
@@ -145,7 +162,7 @@
             <a-button
               @click="handlePublishClick"
               type="primary"
-            >{{ publishText }}</a-button>
+            >发布</a-button>
           </div>
         </a-drawer>
       </a-col>
@@ -209,20 +226,20 @@ export default {
       selectedCategoryIds: [],
       selectedTagIds: [],
       postToStage: {},
-      categoryToCreate: {}
-    }
-  },
-  computed: {
-    publishText() {
-      if (this.postToStage.id) {
-        return '更新并发布'
-      }
-      return '创建并发布'
+      categoryToCreate: {},
+      timer: null
     }
   },
   created() {
     this.loadTags()
     this.loadCategories()
+    clearInterval(this.timer)
+    this.timer = null
+    this.autoSaveTimer()
+  },
+  destroyed: function() {
+    clearInterval(this.timer)
+    this.timer = null
   },
   beforeRouteEnter(to, from, next) {
     // Get post id from query
@@ -306,6 +323,27 @@ export default {
     handleSelectPostThumb(data) {
       this.postToStage.thumbnail = data.path
       this.thumDrawerVisible = false
+    },
+    autoSaveTimer() {
+      if (this.timer == null) {
+        this.timer = setInterval(() => {
+          if (this.postToStage.title != null && this.postToStage.originalContent != null) {
+            this.postToStage.categoryIds = this.selectedCategoryIds
+            this.postToStage.tagIds = this.selectedTagIds
+
+            if (this.postToStage.id) {
+              postApi.update(this.postToStage.id, this.postToStage).then(response => {
+                this.$log.debug('Auto updated post', response.data.data)
+              })
+            } else {
+              postApi.create(this.postToStage).then(response => {
+                this.$log.debug('Auto saved post', response.data.data)
+                this.postToStage = response.data.data
+              })
+            }
+          }
+        }, 15000)
+      }
     }
   }
 }
