@@ -119,6 +119,26 @@
             >
               <a-form-item>
                 <a-input
+                  v-model="installation.url"
+                  placeholder="博客地址（选填）"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="link"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                  <a-select
+                    slot="addonBefore"
+                    defaultValue="http://"
+                    style="width: 90px"
+                  >
+                    <a-select-option value="http://">http://</a-select-option>
+                    <a-select-option value="https://">https://</a-select-option>
+                  </a-select>
+                </a-input>
+              </a-form-item>
+              <a-form-item>
+                <a-input
                   v-model="installation.title"
                   placeholder="博客标题"
                 >
@@ -129,25 +149,20 @@
                   />
                 </a-input>
               </a-form-item>
-              <a-form-item>
-                <a-input
-                  v-model="installation.url"
-                  placeholder="博客地址"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="link"
-                    style="color: rgba(0,0,0,.25)"
-                  />
-                </a-input>
-              </a-form-item>
             </a-form>
 
             <!-- Data migration -->
             <div v-show="stepCurrent == 2">
+              <a-alert
+                style="margin-bottom: 1rem"
+                message="如果有迁移需求，请点击并选择'迁移文件'"
+                type="info"
+              />
               <Upload
-                :uploadHandler="handleMigrationUpload"
+                :name="migrationUploadName"
                 accept="application/json"
+                :uploadHandler="handleMigrationUpload"
+                @remove="handleMigrationFileRemove"
               >
                 <p class="ant-upload-drag-icon">
                   <a-icon type="inbox" />
@@ -212,6 +227,7 @@ export default {
         }
       },
       installation: {},
+      migrationUploadName: 'file',
       migrationData: null,
       stepCurrent: 0
     }
@@ -220,10 +236,18 @@ export default {
     handleMigrationUpload(data) {
       this.$log.debug('Selected data', data)
       this.migrationData = data
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         this.$log.debug('Handle uploading')
-        resolve.resolve()
+        resolve()
       })
+    },
+    handleMigrationFileRemove(file) {
+      this.$log.debug('Removed file', file)
+      this.$log.debug('Migration file from data', this.migrationData.get(this.migrationUploadName))
+      if (this.migrationData.get(this.migrationUploadName).uid === file.uid) {
+        this.migrationData = null
+        this.migrationFile = null
+      }
     },
     install() {
       adminApi.install(this.installation).then(response => {
@@ -247,7 +271,7 @@ export default {
       }
 
       // Handle migration
-      if (this.migrationData) {
+      if (this.migrationFile) {
         recoveryApi.migrate(this.migrationData).then(response => {
           this.$log.debug('Migrated successfullly')
           this.$message.success('数据迁移成功')

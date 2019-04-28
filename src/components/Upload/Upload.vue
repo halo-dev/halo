@@ -6,6 +6,7 @@
       :multiple="multiple"
       :accept="accept"
       :customRequest="handleUpload"
+      :remove="handleRemove"
       @change="handleChange"
     >
       <slot
@@ -19,6 +20,7 @@
       :multiple="multiple"
       :accept="accept"
       :customRequest="handleUpload"
+      :remove="handleRemove"
       @change="handleChange"
     >
       <slot />
@@ -61,13 +63,17 @@ export default {
     handleChange(info) {
       this.$emit('change', info)
     },
+    handleRemove(file) {
+      this.$log.debug('Removed file', file)
+      this.$emit('remove', file)
+    },
     handleUpload(option) {
       this.$log.debug('Uploading option', option)
       const CancelToken = axios.CancelToken
       const source = CancelToken.source()
 
       const data = new FormData()
-      data.append('file', option.file)
+      data.append(this.name, option.file)
 
       this.uploadHandler(
         data,
@@ -78,18 +84,22 @@ export default {
           this.$log.debug('Uploading percent: ', progressEvent.percent)
           option.onProgress(progressEvent)
         },
-        source.token
+        source.token,
+        option.file
       )
         .then(response => {
+          this.$log.debug('Uploaded successfully', response)
           option.onSuccess(response, option.file)
           this.$emit('success', response, option.file)
         })
         .catch(error => {
+          this.$log.debug('Failed to upload file', error)
           option.onError(error, error.response)
           this.$emit('failure', error, option.file)
         })
       return {
         abort: () => {
+          this.$log.debug('Upload operation aborted by the user')
           source.cancel('Upload operation canceled by the user.')
         }
       }
