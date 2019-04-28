@@ -20,8 +20,9 @@ public class TagTagDirective implements TemplateDirectiveModel {
 
     private final TagService tagService;
 
-    public TagTagDirective(TagService tagService) {
+    public TagTagDirective(Configuration configuration, TagService tagService) {
         this.tagService = tagService;
+        configuration.setSharedVariable("tagTag", this);
     }
 
     @Override

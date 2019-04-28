@@ -22,8 +22,9 @@ public class MenuTagDirective implements TemplateDirectiveModel {
 
     private final MenuService menuService;
 
-    public MenuTagDirective(MenuService menuService) {
+    public MenuTagDirective(Configuration configuration,MenuService menuService) {
         this.menuService = menuService;
+        configuration.setSharedVariable("menuTag", this);
     }
 
     @Override

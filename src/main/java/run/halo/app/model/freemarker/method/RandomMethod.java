@@ -1,6 +1,7 @@
 package run.halo.app.model.freemarker.method;
 
 import cn.hutool.core.util.RandomUtil;
+import freemarker.template.Configuration;
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
@@ -14,6 +15,10 @@ import java.util.List;
  */
 @Component
 public class RandomMethod implements TemplateMethodModelEx {
+
+    public RandomMethod(Configuration configuration) {
+        configuration.setSharedVariable("randomMethod", this);
+    }
 
     /**
      * 生成随机数

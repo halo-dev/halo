@@ -20,8 +20,10 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
 
     private final CategoryService categoryService;
 
-    public CategoryTagDirective(CategoryService categoryService) {
+    public CategoryTagDirective(Configuration configuration, CategoryService categoryService) {
         this.categoryService = categoryService;
+
+        configuration.setSharedVariable("categoryTag", this);
     }
 
     @Override

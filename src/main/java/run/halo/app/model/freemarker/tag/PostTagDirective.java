@@ -20,8 +20,11 @@ public class PostTagDirective implements TemplateDirectiveModel {
 
     private final PostService postService;
 
-    public PostTagDirective(PostService postService) {
+    public PostTagDirective(Configuration configuration,
+                            PostService postService) {
         this.postService = postService;
+
+        configuration.setSharedVariable("postTag", this);
     }
 
     @Override
@@ -34,10 +37,10 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     env.setVariable("count", builder.build().wrap(postService.count()));
                     break;
                 case "archiveYear":
-                    env.setVariable("archives",builder.build().wrap(postService.listYearArchives()));
+                    env.setVariable("archives", builder.build().wrap(postService.listYearArchives()));
                     break;
                 case "archiveMonth":
-                    env.setVariable("archives",builder.build().wrap(postService.listMonthArchives()));
+                    env.setVariable("archives", builder.build().wrap(postService.listMonthArchives()));
                     break;
                 default:
                     break;

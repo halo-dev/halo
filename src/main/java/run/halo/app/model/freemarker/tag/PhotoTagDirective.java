@@ -23,8 +23,9 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
 
     private final PhotoService photoService;
 
-    public PhotoTagDirective(PhotoService photoService) {
+    public PhotoTagDirective(Configuration configuration, PhotoService photoService) {
         this.photoService = photoService;
+        configuration.setSharedVariable("photoTag", this);
     }
 
     @Override

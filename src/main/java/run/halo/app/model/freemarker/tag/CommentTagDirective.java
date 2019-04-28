@@ -20,8 +20,9 @@ public class CommentTagDirective implements TemplateDirectiveModel {
 
     private final PostCommentService postCommentService;
 
-    public CommentTagDirective(PostCommentService postCommentService) {
+    public CommentTagDirective(Configuration configuration, PostCommentService postCommentService) {
         this.postCommentService = postCommentService;
+        configuration.setSharedVariable("commentTag", this);
     }
 
     @Override

@@ -23,8 +23,9 @@ public class LinkTagDirective implements TemplateDirectiveModel {
 
     private final LinkService linkService;
 
-    public LinkTagDirective(LinkService linkService) {
+    public LinkTagDirective(Configuration configuration, LinkService linkService) {
         this.linkService = linkService;
+        configuration.setSharedVariable("linkTag", this);
     }
 
     @Override
