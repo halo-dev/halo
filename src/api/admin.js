@@ -11,4 +11,11 @@ adminApi.counts = () => {
   })
 }
 
+adminApi.install = data => {
+  return service({
+    url: `${baseUrl}/installations`,
+    data: data,
+    method: 'post'
+  })
+}
 export default adminApi

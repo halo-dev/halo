@@ -47,35 +47,67 @@
               layout="horizontal"
               v-show="stepCurrent == 0"
             >
-              <a-form-item
-                label="用户名"
-                v-bind="formItemLayout"
-              >
-                <a-input v-model="installation.username" />
+              <a-form-item>
+                <a-input
+                  v-model="installation.username"
+                  placeholder="用户名"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="user"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                </a-input>
               </a-form-item>
-              <a-form-item
-                label="用户昵称"
-                v-bind="formItemLayout"
-              >
-                <a-input v-model="installation.nickname" />
+              <a-form-item>
+                <a-input
+                  v-model="installation.nickname"
+                  placeholder="用户昵称"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="smile"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                </a-input>
               </a-form-item>
-              <a-form-item
-                label="用户邮箱"
-                v-bind="formItemLayout"
-              >
-                <a-input v-model="installation.email" />
+              <a-form-item>
+                <a-input
+                  v-model="installation.email"
+                  placeholder="用户邮箱"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="mail"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                </a-input>
               </a-form-item>
-              <a-form-item
-                label="用户密码"
-                v-bind="formItemLayout"
-              >
-                <a-input v-model="installation.password" />
+              <a-form-item>
+                <a-input
+                  v-model="installation.password"
+                  type="password"
+                  placeholder="用户密码"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="lock"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                </a-input>
               </a-form-item>
-              <a-form-item
-                label="确定密码"
-                v-bind="formItemLayout"
-              >
-                <a-input v-model="installation.confirmPassword" />
+              <a-form-item>
+                <a-input
+                  v-model="installation.confirmPassword"
+                  type="password"
+                  placeholder="确定密码"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="key"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                </a-input>
               </a-form-item>
             </a-form>
 
@@ -85,22 +117,48 @@
               layout="horizontal"
               v-show="stepCurrent == 1"
             >
-              <a-form-item
-                label="博客标题"
-                v-bind="formItemLayout"
-              >
-                <a-input v-model="installation.title" />
+              <a-form-item>
+                <a-input
+                  v-model="installation.title"
+                  placeholder="博客标题"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="book"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                </a-input>
               </a-form-item>
-              <a-form-item
-                label="博客地址"
-                v-bind="formItemLayout"
-              >
-                <a-input v-model="installation.url" />
+              <a-form-item>
+                <a-input
+                  v-model="installation.url"
+                  placeholder="博客地址"
+                >
+                  <a-icon
+                    slot="prefix"
+                    type="link"
+                    style="color: rgba(0,0,0,.25)"
+                  />
+                </a-input>
               </a-form-item>
             </a-form>
 
             <!-- Data migration -->
+            <div v-show="stepCurrent == 2">
+              <Upload
+                :uploadHandler="handleMigrationUpload"
+                accept="application/json"
+              >
+                <p class="ant-upload-drag-icon">
+                  <a-icon type="inbox" />
+                </p>
+                <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
+                <p class="ant-upload-hint">仅支持单个文件上传</p>
+              </Upload>
+            </div>
+
             <a-row
+              class="install-action"
               type="flex"
               justify="space-between"
             >
@@ -120,6 +178,7 @@
                 v-if="stepCurrent == 2"
                 type="danger"
                 icon="upload"
+                @click="handleInstall"
               >安装</a-button>
             </a-row>
           </a-card>
@@ -130,6 +189,9 @@
 </template>
 
 <script>
+import adminApi from '@/api/admin'
+import recoveryApi from '@/api/recovery'
+
 export default {
   data() {
     return {
@@ -150,16 +212,56 @@ export default {
         }
       },
       installation: {},
+      migrationData: null,
       stepCurrent: 0
+    }
+  },
+  methods: {
+    handleMigrationUpload(data) {
+      this.$log.debug('Selected data', data)
+      this.migrationData = data
+      return new Promise(resolve => {
+        this.$log.debug('Handle uploading')
+        resolve.resolve()
+      })
+    },
+    install() {
+      adminApi.install(this.installation).then(response => {
+        this.$log.debug('Installation response', response)
+        this.$message.success('安装成功')
+        setTimeout(() => {
+          this.$router.push({ name: 'Dashboard' })
+        }, 300)
+      })
+    },
+    handleInstall() {
+      const password = this.installation.password
+      const confirmPassword = this.installation.confirmPassword
+
+      this.$log.debug('Password', password)
+      this.$log.debug('Confirm password', confirmPassword)
+
+      if (password !== confirmPassword) {
+        this.$message.error('确认密码和密码不匹配')
+        return
+      }
+
+      // Handle migration
+      if (this.migrationData) {
+        recoveryApi.migrate(this.migrationData).then(response => {
+          this.$log.debug('Migrated successfullly')
+          this.$message.success('数据迁移成功')
+          this.install()
+        })
+      } else {
+        this.install()
+      }
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-// .card-container {
-//   padding-top: 50px;
-// }
 .logo {
   font-size: 56px;
   text-align: center;
@@ -173,6 +275,9 @@ export default {
   height: 100vh;
 }
 
+.install-action {
+  margin-top: 1rem;
+}
 .previus-button {
   margin-right: 1rem;
 }

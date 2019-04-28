@@ -44,7 +44,7 @@ postApi.update = (postId, postToUpdate) => {
 
 postApi.updateStatus = (postId, status) => {
   return service({
-    url: `${baseUrl}/${postId}/${status}`,
+    url: `${baseUrl}/${postId}/status/${status}`,
     method: 'put'
   })
 }
