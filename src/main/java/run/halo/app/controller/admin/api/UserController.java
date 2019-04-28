@@ -5,7 +5,9 @@ import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.PasswordParam;
 import run.halo.app.model.params.UserParam;
+import run.halo.app.model.support.UpdateCheck;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.ValidationUtils;
 
 import javax.validation.Valid;
 
@@ -25,13 +27,16 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("profile")
+    @GetMapping("profiles")
     public UserDTO getProfile(User user) {
         return new UserDTO().convertFrom(user);
     }
 
-    @PutMapping("profile")
-    public UserDTO updateProfile(@Valid @RequestBody UserParam userParam, User user) {
+    @PutMapping("profiles")
+    public UserDTO updateProfile(@RequestBody UserParam userParam, User user) {
+        // Validate the user param
+        ValidationUtils.validate(userParam, UpdateCheck.class);
+
         // Update properties
         userParam.update(user);
 
@@ -39,8 +44,8 @@ public class UserController {
         return new UserDTO().convertFrom(userService.update(user));
     }
 
-    @PutMapping("profile/password")
-    public void updatePassword(@Valid @RequestBody PasswordParam passwordParam, User user) {
+    @PutMapping("profiles/password")
+    public void updatePassword(@RequestBody @Valid PasswordParam passwordParam, User user) {
         userService.updatePassword(passwordParam.getOldPassword(), passwordParam.getNewPassword(), user.getId());
     }
 }

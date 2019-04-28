@@ -103,9 +103,8 @@ public interface UserService extends CrudService<User, Integer> {
      * Creates an user.
      *
      * @param userParam user param must not be null.
-     * @param password  password must not be blank
      * @return created user
      */
     @NonNull
-    User createBy(@NonNull UserParam userParam, @NonNull String password);
+    User createBy(@NonNull UserParam userParam);
 }

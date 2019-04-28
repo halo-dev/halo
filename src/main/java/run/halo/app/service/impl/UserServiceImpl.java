@@ -180,7 +180,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         }
 
         // Set new password
-        setPassword(newPassword, user);
+        setPassword(user, newPassword);
 
         // Update this user
         User updatedUser = update(user);
@@ -192,13 +192,12 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     }
 
     @Override
-    public User createBy(UserParam userParam, String password) {
+    public User createBy(UserParam userParam) {
         Assert.notNull(userParam, "User param must not be null");
-        Assert.hasText(password, "Password must not be blank");
 
         User user = userParam.convertTo();
 
-        setPassword(password, user);
+        setPassword(user, userParam.getPassword());
 
         return create(user);
     }
@@ -213,9 +212,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         return updatedUser;
     }
 
-    private void setPassword(@NonNull String plainPassword, @NonNull User user) {
-        Assert.hasText(plainPassword, "Plain password must not be blank");
+    private void setPassword(@NonNull User user, @NonNull String plainPassword) {
         Assert.notNull(user, "User must not be null");
+        Assert.hasText(plainPassword, "Plain password must not be blank");
 
         user.setPassword(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
     }

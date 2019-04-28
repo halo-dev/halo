@@ -10,10 +10,12 @@ import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.model.properties.PrimaryProperties;
+import run.halo.app.model.support.CreateCheck;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.FileUtils;
+import run.halo.app.utils.ValidationUtils;
 
 import java.net.URI;
 import java.nio.file.*;
@@ -66,10 +68,14 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             userParam.setUsername("test");
             userParam.setNickname("developer");
             userParam.setEmail("test@test.com");
+            userParam.setPassword("opentest");
 
             log.debug("Initializing a test user: [{}]", userParam);
 
-            User testUser = userService.createBy(userParam, "opentest");
+            // Validate the user param
+            ValidationUtils.validate(userParam, CreateCheck.class);
+
+            User testUser = userService.createBy(userParam);
 
             log.debug("Initialized a test user: [{}]", testUser);
         }
