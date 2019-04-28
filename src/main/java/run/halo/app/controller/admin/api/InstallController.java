@@ -2,6 +2,7 @@ package run.halo.app.controller.admin.api;
 
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
@@ -165,7 +166,8 @@ public class InstallController {
         properties.put(PrimaryProperties.IS_INSTALLED, Boolean.TRUE.toString());
         properties.put(BlogProperties.BLOG_LOCALE, installParam.getLocale());
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
-        properties.put(BlogProperties.BLOG_URL, installParam.getUrl());
+        properties.put(BlogProperties.BLOG_URL, StringUtils.isBlank(installParam.getUrl()) ?
+                optionService.getBlogBaseUrl() : installParam.getUrl());
         properties.put(PrimaryProperties.THEME, DEFAULT_THEME_ID);
         properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
         properties.put(EmailProperties.ENABLED, Boolean.FALSE.toString());
