@@ -30,14 +30,7 @@ public interface OptionService extends CrudService<Option, Integer> {
 
     int DEFAULT_RSS_PAGE_SIZE = 20;
 
-    /**
-     * Save one option
-     *
-     * @param key   key must not be blank
-     * @param value value
-     */
-    @Transactional
-    void save(@NonNull String key, String value);
+    String OPTIONS_KEY = "options";
 
     /**
      * Save multiple options
