@@ -24,7 +24,6 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * OptionService implementation class
@@ -209,40 +208,44 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public List<OptionDTO> listDtos() {
-        return listAll().stream().map(option -> new OptionDTO().<OptionDTO>convertFrom(option)).collect(Collectors.toList());
+        List<OptionDTO> result = new LinkedList<>();
+
+        listOptions().forEach((key, value) -> result.add(new OptionDTO(key, value)));
+
+        return result;
     }
 
     @Override
-    public String getByKeyOfNullable(String key) {
+    public Object getByKeyOfNullable(String key) {
         return getByKey(key).orElse(null);
     }
 
     @Override
-    public String getByKeyOfNonNull(String key) {
+    public Object getByKeyOfNonNull(String key) {
         return getByKey(key).orElseThrow(() -> new MissingPropertyException("You have to config " + key + " setting"));
     }
 
     @Override
-    public Optional<String> getByKey(String key) {
+    public Optional<Object> getByKey(String key) {
         Assert.hasText(key, "Option key must not be blank");
 
-        return optionRepository.findByKey(key).map(Option::getValue);
+        return Optional.ofNullable(listOptions().get(key));
     }
 
     @Override
-    public String getByPropertyOfNullable(PropertyEnum property) {
+    public Object getByPropertyOfNullable(PropertyEnum property) {
         return getByProperty(property).orElse(null);
     }
 
     @Override
-    public String getByPropertyOfNonNull(PropertyEnum property) {
+    public Object getByPropertyOfNonNull(PropertyEnum property) {
         Assert.notNull(property, "Blog property must not be null");
 
         return getByKeyOfNonNull(property.getValue());
     }
 
     @Override
-    public Optional<String> getByProperty(PropertyEnum property) {
+    public Optional<Object> getByProperty(PropertyEnum property) {
         Assert.notNull(property, "Blog property must not be null");
 
         return getByKey(property.getValue());
@@ -257,7 +260,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public <T> Optional<T> getByProperty(PropertyEnum property, Class<T> propertyType) {
-        return getByProperty(property).map(propertyValue -> PropertyEnum.convertTo(propertyValue, propertyType));
+        return getByProperty(property).map(propertyValue -> PropertyEnum.convertTo(propertyValue.toString(), propertyType));
     }
 
     @Override
@@ -267,12 +270,12 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public <T> Optional<T> getByKey(String key, Class<T> valueType) {
-        return getByKey(key).map(value -> PropertyEnum.convertTo(value, valueType));
+        return getByKey(key).map(value -> PropertyEnum.convertTo(value.toString(), valueType));
     }
 
     @Override
     public <T extends Enum<T>> Optional<T> getEnumByProperty(PropertyEnum property, Class<T> valueType) {
-        return getByProperty(property).map(value -> PropertyEnum.convertToEnum(value, valueType));
+        return getByProperty(property).map(value -> PropertyEnum.convertToEnum(value.toString(), valueType));
     }
 
     @Override
@@ -282,7 +285,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public <V, E extends ValueEnum<V>> Optional<E> getValueEnumByProperty(PropertyEnum property, Class<V> valueType, Class<E> enumType) {
-        return getByProperty(property).map(value -> ValueEnum.valueToEnum(enumType, PropertyEnum.convertTo(value, valueType)));
+        return getByProperty(property).map(value -> ValueEnum.valueToEnum(enumType, PropertyEnum.convertTo(value.toString(), valueType)));
     }
 
     @Override
@@ -325,7 +328,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         return getByProperty(QnYunProperties.ZONE).map(qiniuZone -> {
 
             Zone zone;
-            switch (qiniuZone) {
+            switch (qiniuZone.toString()) {
                 case "z0":
                     zone = Zone.zone0();
                     break;
@@ -354,7 +357,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     public Locale getLocale() {
         return getByProperty(BlogProperties.BLOG_LOCALE).map(localeStr -> {
             try {
-                return Locale.forLanguageTag(localeStr);
+                return Locale.forLanguageTag(localeStr.toString());
             } catch (Exception e) {
                 return Locale.getDefault();
             }
@@ -366,7 +369,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         // Get server port
         String serverPort = applicationContext.getEnvironment().getProperty("server.port", "8080");
 
-        String blogUrl = getByPropertyOfNullable(BlogProperties.BLOG_URL);
+        String blogUrl = getByProperty(BlogProperties.BLOG_URL).orElse("").toString();
 
         if (StrUtil.isNotBlank(blogUrl)) {
             blogUrl = StrUtil.removeSuffix(blogUrl, "/");

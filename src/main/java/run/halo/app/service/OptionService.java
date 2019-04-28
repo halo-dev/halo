@@ -101,7 +101,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return option value or null
      */
     @Nullable
-    String getByKeyOfNullable(@NonNull String key);
+    Object getByKeyOfNullable(@NonNull String key);
 
     /**
      * Gets option value of non null.
@@ -110,7 +110,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return option value of non null
      */
     @NonNull
-    String getByKeyOfNonNull(@NonNull String key);
+    Object getByKeyOfNonNull(@NonNull String key);
 
     /**
      * Get option by key
@@ -119,7 +119,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return an optional option value
      */
     @NonNull
-    Optional<String> getByKey(@NonNull String key);
+    Optional<Object> getByKey(@NonNull String key);
 
     /**
      * Gets option value by blog property.
@@ -128,7 +128,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return an option value
      */
     @Nullable
-    String getByPropertyOfNullable(@NonNull PropertyEnum property);
+    Object getByPropertyOfNullable(@NonNull PropertyEnum property);
 
     /**
      * Gets option value by blog property.
@@ -138,7 +138,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @throws MissingPropertyException throws when property value dismisses
      */
     @NonNull
-    String getByPropertyOfNonNull(@NonNull PropertyEnum property);
+    Object getByPropertyOfNonNull(@NonNull PropertyEnum property);
 
     /**
      * Gets option value by blog property.
@@ -147,7 +147,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return an optional option value
      */
     @NonNull
-    Optional<String> getByProperty(@NonNull PropertyEnum property);
+    Optional<Object> getByProperty(@NonNull PropertyEnum property);
 
     /**
      * Gets property value by blog property.

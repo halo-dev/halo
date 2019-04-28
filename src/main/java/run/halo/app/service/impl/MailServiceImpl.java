@@ -62,7 +62,7 @@ public class MailServiceImpl implements MailService {
     public void sendMail(String to, String subject, String content) {
         loadConfig();
 
-        String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME);
+        String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME).toString();
 
         try {
             OhMyEmail.subject(subject)
@@ -89,7 +89,7 @@ public class MailServiceImpl implements MailService {
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         loadConfig();
 
-        String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME);
+        String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME).toString();
 
         try {
             StrBuilder text = new StrBuilder();
@@ -120,7 +120,7 @@ public class MailServiceImpl implements MailService {
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilename) {
         loadConfig();
 
-        String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME);
+        String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME).toString();
 
         File file = new File(attachFilename);
         try {
@@ -149,11 +149,11 @@ public class MailServiceImpl implements MailService {
         // Get default properties
         Properties defaultProperties = OhMyEmail.defaultConfig(log.isDebugEnabled());
         // Set smtp host
-        defaultProperties.setProperty("mail.smtp.host", optionService.getByPropertyOfNonNull(EmailProperties.HOST));
+        defaultProperties.setProperty("mail.smtp.host", optionService.getByPropertyOfNonNull(EmailProperties.HOST).toString());
         // Config email
         OhMyEmail.config(defaultProperties,
-                optionService.getByPropertyOfNonNull(EmailProperties.USERNAME),
-                optionService.getByPropertyOfNonNull(EmailProperties.PASSWORD));
+                optionService.getByPropertyOfNonNull(EmailProperties.USERNAME).toString(),
+                optionService.getByPropertyOfNonNull(EmailProperties.PASSWORD).toString());
 
         // Set config loaded with true
         loaded = true;

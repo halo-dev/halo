@@ -79,7 +79,7 @@ public class InstallController {
     public BaseResponse<String> installBlog(@RequestBody @Valid InstallParam installParam) {
         // TODO Install blog.
         // Check is installed
-        boolean isInstalled = Boolean.parseBoolean(optionService.getByProperty(PrimaryProperties.IS_INSTALLED).orElse(Boolean.FALSE.toString()));
+        boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
         if (isInstalled) {
             // TODO i18n
@@ -172,7 +172,7 @@ public class InstallController {
         properties.put(CommentProperties.NEW_NOTICE, Boolean.FALSE.toString());
         properties.put(CommentProperties.PASS_NOTICE, Boolean.FALSE.toString());
         properties.put(CommentProperties.REPLY_NOTICE, Boolean.FALSE.toString());
-        properties.put(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.LOCAL.getValue().toString());
+        properties.put(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.LOCAL.name());
 
         // Create properties
         optionService.saveProperties(properties);

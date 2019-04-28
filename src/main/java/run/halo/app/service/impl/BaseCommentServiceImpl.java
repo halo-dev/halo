@@ -256,7 +256,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             User user = authentication.getDetail().getUser();
             commentParam.setAuthor(StringUtils.isBlank(user.getNickname()) ? user.getUsername() : user.getNickname());
             commentParam.setEmail(user.getEmail());
-            commentParam.setAuthorUrl(optionService.getByPropertyOfNullable(BlogProperties.BLOG_URL));
+            commentParam.setAuthorUrl(optionService.getByPropertyOrDefault(BlogProperties.BLOG_URL, String.class, null));
         }
 
         // Validate the comment param manually
