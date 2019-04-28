@@ -61,6 +61,18 @@
             <a-icon type="down" />
           </a-button>
         </a-dropdown>
+        <a-button
+          type="primary"
+          icon="message"
+          v-if="tableListMode"
+          @click="toggleTableMode"
+        >会话模式</a-button>
+        <a-button
+          type="primary"
+          icon="ordered-list"
+          v-else
+          @click="toggleTableMode"
+        >列表模式</a-button>
       </div>
       <div style="margin-top:15px">
         <a-table
@@ -176,6 +188,7 @@ export default {
       selectedRows: [],
       comments: [],
       commentsLoading: false,
+      tableListMode: true,
       commentStatus: commentApi.commentStatus
     }
   },
@@ -197,11 +210,15 @@ export default {
       this.queryParam.page = this.pagination.current - 1
       this.queryParam.size = this.pagination.pageSize
       this.queryParam.sort = this.pagination.sort
-      commentApi.query(this.queryParam).then(response => {
-        this.comments = response.data.data.content
-        this.pagination.total = response.data.data.total
-        this.commentsLoading = false
-      })
+      if (this.tableListMode) {
+        commentApi.query(this.queryParam).then(response => {
+          this.comments = response.data.data.content
+          this.pagination.total = response.data.data.total
+          this.commentsLoading = false
+        })
+      }else{
+        // TODO tree view
+      }
     },
     handleEditComment(id) {
       this.$message.success('编辑')
@@ -218,6 +235,10 @@ export default {
     handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.status = null
+      this.loadComments()
+    },
+    toggleTableMode() {
+      this.tableListMode = !this.tableListMode
       this.loadComments()
     }
   }
