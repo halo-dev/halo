@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.theme.ThemeActivatedEvent;
+import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.exception.*;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
 import run.halo.app.handler.theme.config.ThemePropertyResolver;
@@ -237,7 +238,7 @@ public class ThemeServiceImpl implements ThemeService {
             FileUtil.del(Paths.get(themeProperty.getThemePath()));
 
             // Delete theme cache
-            clearThemeCache();
+            eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
         } catch (Exception e) {
             throw new ServiceException("Failed to delete theme folder", e).setErrorData(themeId);
         }
@@ -329,7 +330,7 @@ public class ThemeServiceImpl implements ThemeService {
         setActivatedTheme(themeProperty);
 
         // Clear the cache
-        clearThemeCache();
+        eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
 
         // Publish a theme activated event
         eventPublisher.publishEvent(new ThemeActivatedEvent(this));
@@ -402,7 +403,7 @@ public class ThemeServiceImpl implements ThemeService {
         ThemeProperty property = getProperty(targetThemePath);
 
         // Clear theme cache
-        clearThemeCache();
+        this.eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
 
         // Delete cache
         return property;
@@ -494,13 +495,6 @@ public class ThemeServiceImpl implements ThemeService {
     @NonNull
     private Path createTempPath() throws IOException {
         return Files.createTempDirectory("halo");
-    }
-
-    /**
-     * Clears theme cache.
-     */
-    private void clearThemeCache() {
-        cacheStore.delete(THEMES_CACHE_KEY);
     }
 
     /**

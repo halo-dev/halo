@@ -19,7 +19,6 @@ import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.properties.*;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
-import run.halo.app.service.ThemeService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
@@ -60,8 +59,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         propertyEnumMap = Collections.unmodifiableMap(PropertyEnum.getValuePropertyEnumMap());
     }
 
-    @Override
-    public void save(String key, String value) {
+    private void save(String key, String value) {
         Assert.hasText(key, "Option key must not be blank");
 
         if (StringUtils.isBlank(value)) {
@@ -90,8 +88,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         Option savedOption = optionRepository.save(option);
 
         log.debug("Saved option: [{}]", savedOption);
-
-        cacheStore.delete(ThemeService.THEMES_CACHE_KEY);
     }
 
     @Override
@@ -103,7 +99,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         // TODO Optimize the queries
         options.forEach(this::save);
 
-        publishEvent();
+        publishOptionUpdatedEvent();
     }
 
     @Override
@@ -115,7 +111,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         // TODO Optimize the query
         optionParams.forEach(optionParam -> save(optionParam.getKey(), optionParam.getValue()));
 
-        publishEvent();
+        publishOptionUpdatedEvent();
     }
 
     @Override
@@ -124,7 +120,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         save(property.getValue(), value);
 
-        publishEvent();
+        publishOptionUpdatedEvent();
     }
 
     @Override
@@ -135,44 +131,51 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         properties.forEach((property, value) -> save(property.getValue(), value));
 
-        publishEvent();
+        publishOptionUpdatedEvent();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Object> listOptions() {
-        List<Option> options = listAll();
+        // Get options from cache
+        return cacheStore.getAny(OPTIONS_KEY, Map.class).orElseGet(() -> {
+            List<Option> options = listAll();
 
-        Set<String> keys = ServiceUtils.fetchProperty(options, Option::getKey);
+            Set<String> keys = ServiceUtils.fetchProperty(options, Option::getKey);
 
-        Map<String, Object> userDefinedOptionMap = ServiceUtils.convertToMap(options, Option::getKey, option -> {
-            String key = option.getKey();
+            Map<String, Object> userDefinedOptionMap = ServiceUtils.convertToMap(options, Option::getKey, option -> {
+                String key = option.getKey();
 
-            PropertyEnum propertyEnum = propertyEnumMap.get(key);
+                PropertyEnum propertyEnum = propertyEnumMap.get(key);
 
-            if (propertyEnum == null) {
-                return option.getValue();
-            }
+                if (propertyEnum == null) {
+                    return option.getValue();
+                }
 
-            return PropertyEnum.convertTo(option.getValue(), propertyEnum);
+                return PropertyEnum.convertTo(option.getValue(), propertyEnum);
+            });
+
+            Map<String, Object> result = new HashMap<>(userDefinedOptionMap);
+
+            // Add default property
+            propertyEnumMap.keySet()
+                    .stream()
+                    .filter(key -> !keys.contains(key))
+                    .forEach(key -> {
+                        PropertyEnum propertyEnum = propertyEnumMap.get(key);
+
+                        if (StringUtils.isBlank(propertyEnum.defaultValue())) {
+                            return;
+                        }
+
+                        result.put(key, PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
+                    });
+
+            // Cache the result
+            cacheStore.putAny(OPTIONS_KEY, result);
+
+            return result;
         });
-
-        Map<String, Object> result = new HashMap<>(userDefinedOptionMap);
-
-        // Add default property
-        propertyEnumMap.keySet()
-                .stream()
-                .filter(key -> !keys.contains(key))
-                .forEach(key -> {
-                    PropertyEnum propertyEnum = propertyEnumMap.get(key);
-
-                    if (StringUtils.isBlank(propertyEnum.defaultValue())) {
-                        return;
-                    }
-
-                    result.put(key, PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
-                });
-
-        return result;
     }
 
     @Override
@@ -357,7 +360,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         return blogUrl;
     }
 
-    private void publishEvent() {
+    private void publishOptionUpdatedEvent() {
         eventPublisher.publishEvent(new OptionUpdatedEvent(this));
     }
 }

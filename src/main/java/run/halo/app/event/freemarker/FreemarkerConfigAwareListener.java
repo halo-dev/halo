@@ -38,21 +38,17 @@ public class FreemarkerConfigAwareListener {
 
     private final ThemeSettingService themeSettingService;
 
-    private final OptionService optionsService;
-
     private final UserService userService;
 
     public FreemarkerConfigAwareListener(OptionService optionService,
                                          Configuration configuration,
                                          ThemeService themeService,
                                          ThemeSettingService themeSettingService,
-                                         OptionService optionsService,
                                          UserService userService) {
         this.optionService = optionService;
         this.configuration = configuration;
         this.themeService = themeService;
         this.themeSettingService = themeSettingService;
-        this.optionsService = optionsService;
         this.userService = userService;
     }
 
@@ -97,13 +93,11 @@ public class FreemarkerConfigAwareListener {
     }
 
     private void loadOptionsConfig() throws TemplateModelException {
-        Map<String, Object> options = optionService.listOptions();
-        configuration.setSharedVariable("options", options);
+        configuration.setSharedVariable("options", optionService.listOptions());
     }
 
     private void loadThemeConfig() throws TemplateModelException {
-        ThemeProperty activatedTheme = themeService.getActivatedTheme();
-        configuration.setSharedVariable("theme", activatedTheme);
+        configuration.setSharedVariable("theme", themeService.getActivatedTheme());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
     }
 }
