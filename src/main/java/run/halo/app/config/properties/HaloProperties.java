@@ -1,8 +1,12 @@
 package run.halo.app.config.properties;
 
-import run.halo.app.model.support.HaloConst;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import run.halo.app.model.support.HaloConst;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Halo configuration properties.
@@ -31,5 +35,9 @@ public class HaloProperties {
     /**
      * Work directory.
      */
-    private String workDir = HaloConst.USER_HOME + "/halo/";
+    private String workDir = HaloConst.USER_HOME + "/.halo/";
+
+    public HaloProperties() throws IOException {
+        Files.createDirectories(Paths.get(workDir));
+    }
 }
