@@ -1,5 +1,5 @@
 sns:
-  label: 社交资料设置
+  label: 社交资料
   items:
     rss:
       name: rss

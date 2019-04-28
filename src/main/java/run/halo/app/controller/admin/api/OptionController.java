@@ -42,6 +42,12 @@ public class OptionController {
         return optionService.listOptions();
     }
 
+    @GetMapping("map_keys")
+    @ApiOperation("List all of options by keys")
+    public Map<String, Object> listByKeysWithMapView(@RequestParam(value = "keys") String keys) {
+        return optionService.listByKeys(keys);
+    }
+
     @PostMapping("map_view/saving")
     @ApiOperation("Saves options by option map")
     public void saveOptionsWithMapView(@RequestBody Map<String, String> optionMap) {

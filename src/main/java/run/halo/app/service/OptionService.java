@@ -81,6 +81,15 @@ public interface OptionService extends CrudService<Option, Integer> {
     Map<String, Object> listOptions();
 
     /**
+     * List by keys
+     *
+     * @param params params
+     * @return Map
+     */
+    @NonNull
+    Map<String, Object> listByKeys(String params);
+
+    /**
      * Lists all option dtos.
      *
      * @return a list of option dto
