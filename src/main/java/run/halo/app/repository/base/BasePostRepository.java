@@ -108,9 +108,9 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      */
     long countByStatus(@NonNull PostStatus status);
 
-    boolean countByUrl(@NonNull String title);
+    boolean existsByUrl(@NonNull String title);
 
-    boolean countByIdNotAndUrl(@NonNull Integer id, @NonNull String title);
+    boolean existsByIdNotAndUrl(@NonNull Integer id, @NonNull String title);
 
     /**
      * Get post by url
