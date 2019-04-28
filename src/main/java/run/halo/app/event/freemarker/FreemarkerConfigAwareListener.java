@@ -1,4 +1,4 @@
-package run.halo.app.event.theme;
+package run.halo.app.event.freemarker;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
@@ -9,6 +9,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import run.halo.app.event.options.OptionUpdatedEvent;
+import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.OptionService;
@@ -76,9 +78,17 @@ public class FreemarkerConfigAwareListener {
     @Async
     @EventListener
     public void onUserUpdate(UserUpdatedEvent event) throws TemplateModelException {
-        log.debug("Received user update event, user id: [{}]", event.getUserId());
+        log.debug("Received user updated event, user id: [{}]", event.getUserId());
 
         loadUserConfig();
+    }
+
+    @Async
+    @EventListener
+    public void onOptionUpdate(OptionUpdatedEvent event) throws TemplateModelException {
+        log.debug("Received option updated event");
+
+        loadOptionsConfig();
     }
 
 
