@@ -179,6 +179,23 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public Map<String, Object> listOptions(List<String> keys) {
+        if (CollectionUtils.isEmpty(keys)) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Object> optionMap = listOptions();
+
+        Map<String, Object> result = new HashMap<>(keys.size());
+
+        keys.stream()
+                .filter(optionMap::containsKey)
+                .forEach(key -> result.put(key, optionMap.get(key)));
+
+        return result;
+    }
+
+    @Override
     public Map<String, Object> listByKeys(String params) {
         Assert.notNull(params, "Keys must not be null");
         Map<String, Object> options = listOptions();
