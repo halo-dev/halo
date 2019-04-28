@@ -1,6 +1,7 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.params.OptionParam;
@@ -38,12 +39,17 @@ public class OptionController {
 
     @GetMapping("map_view")
     @ApiOperation("Lists all options with map view")
-    public Map<String, Object> listAllWithMapView() {
-        return optionService.listOptions();
+    public Map<String, Object> listAllWithMapView(@RequestParam(value = "key", required = false) List<String> keys) {
+        if (CollectionUtils.isEmpty(keys)) {
+            return optionService.listOptions();
+        }
+
+        return optionService.listOptions(keys);
     }
 
     @GetMapping("map_keys")
     @ApiOperation("List all of options by keys")
+    @Deprecated
     public Map<String, Object> listByKeysWithMapView(@RequestParam(value = "keys") String keys) {
         return optionService.listByKeys(keys);
     }

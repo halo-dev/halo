@@ -73,6 +73,9 @@ public interface OptionService extends CrudService<Option, Integer> {
     @NonNull
     Map<String, Object> listOptions();
 
+    @NonNull
+    Map<String, Object> listOptions(List<String> keys);
+
     /**
      * List by keys
      *
@@ -80,6 +83,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return Map
      */
     @NonNull
+    @Deprecated
     Map<String, Object> listByKeys(String params);
 
     /**
