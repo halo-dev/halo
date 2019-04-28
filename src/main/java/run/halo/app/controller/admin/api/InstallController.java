@@ -1,12 +1,9 @@
-package run.halo.app.controller.core;
+package run.halo.app.controller.admin.api;
 
-import cn.hutool.core.util.StrUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -69,26 +66,6 @@ public class InstallController {
         this.menuService = menuService;
         this.configuration = configuration;
         this.eventPublisher = eventPublisher;
-    }
-
-    /**
-     * Render install page
-     *
-     * @param model model
-     * @return template path: common/install.ftl
-     */
-    @GetMapping
-    public String install(Model model) {
-        try {
-            if (StrUtil.equals(Boolean.TRUE.toString(), optionService.getByProperty(PrimaryProperties.IS_INSTALLED).orElse(Boolean.FALSE.toString()))) {
-                model.addAttribute("isInstall", true);
-            } else {
-                model.addAttribute("isInstall", false);
-            }
-        } catch (Exception e) {
-            log.error("Error occurred", e);
-        }
-        return "common/install";
     }
 
     @PostMapping
