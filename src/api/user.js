@@ -6,14 +6,14 @@ const userApi = {}
 
 userApi.getProfile = () => {
   return service({
-    url: `${baseUrl}/profile`,
+    url: `${baseUrl}/profiles`,
     method: 'get'
   })
 }
 
 userApi.updateProfile = profile => {
   return service({
-    url: `${baseUrl}/profile`,
+    url: `${baseUrl}/profiles`,
     method: 'put',
     data: profile
   })
@@ -21,7 +21,7 @@ userApi.updateProfile = profile => {
 
 userApi.updatePassword = (oldPassword, newPassword) => {
   return service({
-    url: `${baseUrl}/profile/password`,
+    url: `${baseUrl}/profiles/password`,
     method: 'put',
     data: {
       oldPassword: oldPassword,
