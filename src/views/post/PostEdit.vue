@@ -20,153 +20,146 @@
           />
         </div>
       </a-col>
-
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-      >
-        <a-drawer
-          title="文章设置"
-          :width="isMobile()?'100%':'460'"
-          closable
-          @close="onClose"
-          :visible="visible"
-        >
-          <div class="post-setting-drawer-content">
-            <div :style="{ marginBottom: '16px' }">
-              <h3 class="post-setting-drawer-title">基本设置</h3>
-              <div class="post-setting-drawer-item">
-                <a-form layout="vertical">
-                  <a-form-item
-                    label="文章路径："
-                    :help="'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
-                  >
-                    <a-input v-model="postToStage.url" />
-                  </a-form-item>
-                  <a-form-item label="文章密码：">
-                    <a-input
-                      type="password"
-                      v-model="postToStage.password"
-                    />
-                  </a-form-item>
-                  <a-form-item label="开启评论：">
-                    <a-radio-group
-                      v-model="postToStage.disallowComment"
-                      :defaultValue="false"
-                    >
-                      <a-radio :value="false">开启</a-radio>
-                      <a-radio :value="true">关闭</a-radio>
-                    </a-radio-group>
-                  </a-form-item>
-                </a-form>
-              </div>
-            </div>
-            <a-divider />
-
-            <div :style="{ marginBottom: '16px' }">
-              <h3 class="post-setting-drawer-title">分类目录</h3>
-              <div class="post-setting-drawer-item">
-                <category-tree
-                  v-model="selectedCategoryIds"
-                  :categories="categories"
-                />
-                <div>
-                  <a-form layout="vertical">
-                    <a-form-item v-if="categoryForm">
-                      <category-select-tree
-                        :categories="categories"
-                        v-model="categoryToCreate.parentId"
-                      />
-                    </a-form-item>
-                    <a-form-item v-if="categoryForm">
-                      <a-input
-                        placeholder="分类名称"
-                        v-model="categoryToCreate.name"
-                      />
-                    </a-form-item>
-                    <a-form-item v-if="categoryForm">
-                      <a-input
-                        placeholder="分类路径"
-                        v-model="categoryToCreate.slugNames"
-                      />
-                    </a-form-item>
-                    <a-form-item>
-                      <a-button
-                        type="primary"
-                        style="marginRight: 8px"
-                        v-if="categoryForm"
-                        @click="handlerCreateCategory"
-                      >保存</a-button>
-                      <a-button
-                        type="dashed"
-                        style="marginRight: 8px"
-                        v-if="!categoryForm"
-                        @click="toggleCategoryForm"
-                      >新增</a-button>
-                      <a-button
-                        v-if="categoryForm"
-                        @click="toggleCategoryForm"
-                      >取消</a-button>
-                    </a-form-item>
-                  </a-form>
-                </div>
-              </div>
-            </div>
-            <a-divider />
-
-            <div :style="{ marginBottom: '16px' }">
-              <h3 class="post-setting-drawer-title">标签</h3>
-              <div class="post-setting-drawer-item">
-                <a-form layout="vertical">
-                  <a-form-item>
-                    <TagSelect v-model="selectedTagIds" />
-                  </a-form-item>
-                </a-form>
-              </div>
-            </div>
-            <a-divider />
-
-            <div :style="{ marginBottom: '16px' }">
-              <h3 class="post-setting-drawer-title">缩略图</h3>
-              <div class="post-setting-drawer-item">
-                <div class="post-thum">
-                  <img
-                    class="img"
-                    :src="postToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
-                    @click="handleShowThumbDrawer"
-                  >
-                  <a-button
-                    class="post-thum-remove"
-                    type="dashed"
-                    @click="handlerRemoveThumb"
-                  >移除</a-button>
-                </div>
-              </div>
-            </div>
-            <a-divider />
-          </div>
-          <AttachmentSelectDrawer
-            v-model="thumDrawerVisible"
-            @listenToSelect="handleSelectPostThumb"
-            :drawerWidth="460"
-          />
-          <a-divider />
-          <div class="bottom-control">
-            <a-button
-              style="marginRight: 8px"
-              @click="handleDraftClick"
-            >保存草稿</a-button>
-            <a-button
-              @click="handlePublishClick"
-              type="primary"
-            >发布</a-button>
-          </div>
-        </a-drawer>
-      </a-col>
     </a-row>
+
+    <a-drawer
+      title="文章设置"
+      :width="isMobile()?'100%':'460'"
+      placement="right"
+      closable
+      @close="onClose"
+      :visible="visible"
+    >
+      <div class="post-setting-drawer-content">
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">基本设置</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item
+                label="文章路径："
+                :help="'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
+              >
+                <a-input v-model="postToStage.url" />
+              </a-form-item>
+              <a-form-item label="文章密码：">
+                <a-input
+                  type="password"
+                  v-model="postToStage.password"
+                />
+              </a-form-item>
+              <a-form-item label="开启评论：">
+                <a-radio-group
+                  v-model="postToStage.disallowComment"
+                  :defaultValue="false"
+                >
+                  <a-radio :value="false">开启</a-radio>
+                  <a-radio :value="true">关闭</a-radio>
+                </a-radio-group>
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">分类目录</h3>
+          <div class="post-setting-drawer-item">
+            <category-tree
+              v-model="selectedCategoryIds"
+              :categories="categories"
+            />
+            <div>
+              <a-form layout="vertical">
+                <a-form-item v-if="categoryForm">
+                  <category-select-tree
+                    :categories="categories"
+                    v-model="categoryToCreate.parentId"
+                  />
+                </a-form-item>
+                <a-form-item v-if="categoryForm">
+                  <a-input
+                    placeholder="分类名称"
+                    v-model="categoryToCreate.name"
+                  />
+                </a-form-item>
+                <a-form-item v-if="categoryForm">
+                  <a-input
+                    placeholder="分类路径"
+                    v-model="categoryToCreate.slugNames"
+                  />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    style="marginRight: 8px"
+                    v-if="categoryForm"
+                    @click="handlerCreateCategory"
+                  >保存</a-button>
+                  <a-button
+                    type="dashed"
+                    style="marginRight: 8px"
+                    v-if="!categoryForm"
+                    @click="toggleCategoryForm"
+                  >新增</a-button>
+                  <a-button
+                    v-if="categoryForm"
+                    @click="toggleCategoryForm"
+                  >取消</a-button>
+                </a-form-item>
+              </a-form>
+            </div>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">标签</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item>
+                <TagSelect v-model="selectedTagIds" />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">缩略图</h3>
+          <div class="post-setting-drawer-item">
+            <div class="post-thum">
+              <img
+                class="img"
+                :src="postToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
+                @click="handleShowThumbDrawer"
+              >
+              <a-button
+                class="post-thum-remove"
+                type="dashed"
+                @click="handlerRemoveThumb"
+              >移除</a-button>
+            </div>
+          </div>
+        </div>
+        <a-divider />
+      </div>
+      <AttachmentSelectDrawer
+        v-model="thumDrawerVisible"
+        @listenToSelect="handleSelectPostThumb"
+        :drawerWidth="460"
+      />
+      <a-divider />
+      <div class="bottom-control">
+        <a-button
+          style="marginRight: 8px"
+          @click="handleDraftClick"
+        >保存草稿</a-button>
+        <a-button
+          @click="handlePublishClick"
+          type="primary"
+        >发布</a-button>
+      </div>
+    </a-drawer>
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
 

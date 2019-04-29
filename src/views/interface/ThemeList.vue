@@ -18,12 +18,16 @@
             <a-card
               hoverable
               :title="item.name"
+              :bodyStyle="{ padding: 0 }"
             >
-              <img
+              <!-- <img
                 :alt="item.name"
                 :src="item.screenshots"
                 slot="cover"
-              >
+              > -->
+              <div class="theme-thumb">
+                <img :alt="item.name" :src="item.screenshots">
+              </div>
               <template
                 class="ant-card-actions"
                 slot="actions"
@@ -380,5 +384,19 @@ export default {
   position: fixed;
   bottom: 80px;
   right: 20px;
+}
+.theme-thumb {
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 56%;
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 </style>

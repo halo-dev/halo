@@ -1,32 +1,53 @@
 <template>
-  <div class="setting-drawer" ref="settingDrawer">
-    <a-drawer width="300" closable @close="onClose" :visible="visible" :zIndex="9999">
+  <div
+    class="setting-drawer"
+    ref="settingDrawer"
+  >
+    <a-drawer
+      width="300"
+      closable
+      @close="onClose"
+      :visible="visible"
+      :zIndex="9999"
+    >
       <div class="setting-drawer-index-content">
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">整体风格设置</h3>
           <div class="setting-drawer-index-blockChecbox">
             <a-tooltip>
               <template slot="title">暗色菜单风格</template>
-              <div class="setting-drawer-index-item" @click="handleMenuTheme('dark')">
+              <div
+                class="setting-drawer-index-item"
+                @click="handleMenuTheme('dark')"
+              >
                 <img
                   src="https://gw.alipayobjects.com/zos/rmsportal/LCkqqYNmvBEbokSDscrm.svg"
                   alt="dark"
                 >
-                <div class="setting-drawer-index-selectIcon" v-if="navTheme === 'dark'">
-                  <a-icon type="check"/>
+                <div
+                  class="setting-drawer-index-selectIcon"
+                  v-if="navTheme === 'dark'"
+                >
+                  <a-icon type="check" />
                 </div>
               </div>
             </a-tooltip>
 
             <a-tooltip>
               <template slot="title">亮色菜单风格</template>
-              <div class="setting-drawer-index-item" @click="handleMenuTheme('light')">
+              <div
+                class="setting-drawer-index-item"
+                @click="handleMenuTheme('light')"
+              >
                 <img
                   src="https://gw.alipayobjects.com/zos/rmsportal/jpRkZQMyYRryryPNtyIC.svg"
                   alt="light"
                 >
-                <div class="setting-drawer-index-selectIcon" v-if="navTheme !== 'dark'">
-                  <a-icon type="check"/>
+                <div
+                  class="setting-drawer-index-selectIcon"
+                  v-if="navTheme !== 'dark'"
+                >
+                  <a-icon type="check" />
                 </div>
               </div>
             </a-tooltip>
@@ -42,89 +63,128 @@
               :key="index"
             >
               <template slot="title">{{ item.key }}</template>
-              <a-tag :color="item.color" @click="changeColor(item.color)">
-                <a-icon type="check" v-if="item.color === primaryColor"></a-icon>
+              <a-tag
+                :color="item.color"
+                @click="changeColor(item.color)"
+              >
+                <a-icon
+                  type="check"
+                  v-if="item.color === primaryColor"
+                ></a-icon>
               </a-tag>
             </a-tooltip>
           </div>
         </div>
-        <a-divider/>
+        <a-divider />
 
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">导航模式</h3>
 
           <div class="setting-drawer-index-blockChecbox">
-            <div class="setting-drawer-index-item" @click="handleLayout('sidemenu')">
+            <div
+              class="setting-drawer-index-item"
+              @click="handleLayout('sidemenu')"
+            >
               <img
                 src="https://gw.alipayobjects.com/zos/rmsportal/JopDzEhOqwOjeNTXkoje.svg"
                 alt="sidemenu"
               >
-              <div class="setting-drawer-index-selectIcon" v-if="layoutMode === 'sidemenu'">
-                <a-icon type="check"/>
+              <div
+                class="setting-drawer-index-selectIcon"
+                v-if="layoutMode === 'sidemenu'"
+              >
+                <a-icon type="check" />
               </div>
             </div>
 
-            <div class="setting-drawer-index-item" @click="handleLayout('topmenu')">
+            <div
+              class="setting-drawer-index-item"
+              @click="handleLayout('topmenu')"
+            >
               <img
                 src="https://gw.alipayobjects.com/zos/rmsportal/KDNDBbriJhLwuqMoxcAr.svg"
                 alt="topmenu"
               >
-              <div class="setting-drawer-index-selectIcon" v-if="layoutMode !== 'sidemenu'">
-                <a-icon type="check"/>
+              <div
+                class="setting-drawer-index-selectIcon"
+                v-if="layoutMode !== 'sidemenu'"
+              >
+                <a-icon type="check" />
               </div>
             </div>
           </div>
         </div>
-        <a-divider/>
+        <a-divider />
 
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">仪表盘</h3>
           <a-list :split="false">
             <a-list-item>
-              <a-switch slot="actions" size="small"/>
+              <a-switch
+                slot="actions"
+                size="small"
+              />
               <a-list-item-meta>
                 <div slot="title">文章总数</div>
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch slot="actions" size="small"/>
+              <a-switch
+                slot="actions"
+                size="small"
+              />
               <a-list-item-meta>
                 <div slot="title">评论总数</div>
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch slot="actions" size="small"/>
+              <a-switch
+                slot="actions"
+                size="small"
+              />
               <a-list-item-meta>
                 <div slot="title">附件总数</div>
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch slot="actions" size="small"/>
+              <a-switch
+                slot="actions"
+                size="small"
+              />
               <a-list-item-meta>
                 <div slot="title">成立天数</div>
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch slot="actions" size="small"/>
+              <a-switch
+                slot="actions"
+                size="small"
+              />
               <a-list-item-meta>
                 <div slot="title">最新文章</div>
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch slot="actions" size="small"/>
+              <a-switch
+                slot="actions"
+                size="small"
+              />
               <a-list-item-meta>
                 <div slot="title">最新日志</div>
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch slot="actions" size="small"/>
+              <a-switch
+                slot="actions"
+                size="small"
+              />
               <a-list-item-meta>
                 <div slot="title">最新评论</div>
               </a-list-item-meta>
             </a-list-item>
           </a-list>
         </div>
-        <a-divider/>
+        <a-divider />
       </div>
     </a-drawer>
   </div>

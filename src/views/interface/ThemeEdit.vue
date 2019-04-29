@@ -35,7 +35,7 @@
         :xs="24"
         :style="{'padding-bottom':'12px'}"
       >
-        <a-card title="Anatole 主题">
+        <a-card :title="activatedTheme.name+' 主题'">
           <theme-file
             :files="files"
             @listenToSelect="handleSelectFile"
@@ -67,11 +67,13 @@ export default {
       },
       files: [],
       file: {},
-      content: ''
+      content: '',
+      activatedTheme: {}
     }
   },
   created() {
     this.loadFiles()
+    this.loadActivatedTheme()
   },
   methods: {
     onSelect(keys) {
@@ -83,6 +85,11 @@ export default {
     loadFiles() {
       themeApi.listFiles().then(response => {
         this.files = response.data.data
+      })
+    },
+    loadActivatedTheme() {
+      themeApi.getActivatedTheme().then(response => {
+        this.activatedTheme = response.data.data
       })
     },
     handleSelectFile(file) {
