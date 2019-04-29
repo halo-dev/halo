@@ -1,10 +1,10 @@
 package run.halo.app.cache;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import run.halo.app.utils.DateUtils;
 
 import java.util.Date;
 import java.util.Optional;
@@ -50,8 +50,6 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
         Assert.notNull(key, "Cache key must not be blank");
 
         return getInternal(key).map(cacheWrapper -> {
-            log.debug("Cache wrapper: [{}]", cacheWrapper);
-
             // Check expiration
             if (cacheWrapper.getExpireAt() != null && cacheWrapper.getExpireAt().before(run.halo.app.utils.DateUtils.now())) {
                 // Expired then delete it
@@ -101,14 +99,7 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
         Date expireAt = null;
 
         if (timeout > 0 && timeUnit != null) {
-            // Handle expiration
-            long millis = timeUnit.toMillis(timeout);
-            if (millis <= 0) {
-                millis = 1L;
-            }
-
-            // Calc the expiry time
-            expireAt = DateUtils.addMilliseconds(now, Long.valueOf(millis).intValue());
+            expireAt = DateUtils.add(now, timeout, timeUnit);
         }
 
         // Build cache wrapper

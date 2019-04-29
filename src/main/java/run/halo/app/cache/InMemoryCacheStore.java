@@ -57,7 +57,7 @@ public class InMemoryCacheStore extends StringCacheStore {
         // Put the cache wrapper
         CacheWrapper<String> putCacheWrapper = cacheContainer.put(key, cacheWrapper);
 
-        log.debug("Put cache wrapper: [{}]", putCacheWrapper);
+        log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper, cacheWrapper);
     }
 
     @Override
