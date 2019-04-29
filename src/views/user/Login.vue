@@ -9,7 +9,13 @@
           class="animated fadeInUp"
           :style="{'animation-delay': '0.1s'}"
         >
-          <a-input placeholder="用户名/邮箱"></a-input>
+          <a-input placeholder="用户名/邮箱">
+            <a-icon
+              slot="prefix"
+              type="user"
+              style="color: rgba(0,0,0,.25)"
+            />
+          </a-input>
         </a-form-item>
         <a-form-item
           class="animated fadeInUp"
@@ -18,7 +24,13 @@
           <a-input
             type="password"
             placeholder="密码"
-          ></a-input>
+          >
+            <a-icon
+              slot="prefix"
+              type="lock"
+              style="color: rgba(0,0,0,.25)"
+            />
+          </a-input>
         </a-form-item>
         <a-form-item
           class="animated fadeInUp"
