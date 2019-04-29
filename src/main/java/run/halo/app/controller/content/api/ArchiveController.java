@@ -16,7 +16,7 @@ import java.util.List;
  * @date 4/2/19
  */
 @RestController("ApiContentArchiveController")
-@RequestMapping("/api/portal/archives")
+@RequestMapping("/api/content/archives")
 public class ArchiveController {
 
     private final PostService postService;

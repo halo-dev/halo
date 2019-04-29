@@ -27,7 +27,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @date 4/2/19
  */
 @RestController("ApiContentTagController")
-@RequestMapping("/api/portal/tags")
+@RequestMapping("/api/content/tags")
 public class TagController {
 
     private final TagService tagService;
