@@ -14,12 +14,12 @@
                         <@linkTag method="list">
                             <#if links?? && links?size gt 0>
                                 <#list links as link>
-                                <p>
-                                    <a href="${link.url}" target="_blank" rel="external">${link.name}</a>
-                                    <#if link.description!=''>
-                                         – ${link.description}
-                                    </#if>
-                                </p>
+                                    <p>
+                                        <a href="${link.url}" target="_blank" rel="external">${link.name}</a>
+                                        <#if link.description!=''>
+                                            – ${link.description}
+                                        </#if>
+                                    </p>
                                 </#list>
                             </#if>
                         </@linkTag>
