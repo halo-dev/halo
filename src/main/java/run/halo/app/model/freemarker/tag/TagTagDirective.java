@@ -35,12 +35,12 @@ public class TagTagDirective implements TemplateDirectiveModel {
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
-            Integer postId = Integer.parseInt(params.get("postId").toString());
             switch (method) {
                 case "list":
                     env.setVariable("tags", builder.build().wrap(tagService.listAll()));
                     break;
                 case "listByPostId":
+                    Integer postId = Integer.parseInt(params.get("postId").toString());
                     env.setVariable("tags", builder.build().wrap(postTagService.listTagsBy(postId)));
                     break;
                 case "count":

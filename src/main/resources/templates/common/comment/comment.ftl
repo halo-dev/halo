@@ -112,7 +112,7 @@ ${options.native_css!}
         </#if>
     </div>
 </div>
-<script src="/static/halo-common/jquery/jquery.min.js"></script>
+<script src="/static/halo-common/jquery.min.js"></script>
 <script src="/static/halo-content/plugins/md5/md5.min.js"></script>
 <script src="/static/halo-content/plugins/ua-parser/ua-parser.min.js"></script>
 <script>

@@ -34,7 +34,6 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
-            String team = params.get("team").toString();
             switch (method) {
                 case "list":
                     env.setVariable("photos", builder.build().wrap(photoService.listAll()));
@@ -43,6 +42,7 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
                     env.setVariable("teams", builder.build().wrap(photoService.listDtos(Sort.by(DESC, "createTime"))));
                     break;
                 case "listByTeam":
+                    String team = params.get("team").toString();
                     env.setVariable("photos", builder.build().wrap(photoService.listByTeam(team, Sort.by(DESC, "createTime"))));
                     break;
                 case "count":

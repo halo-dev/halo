@@ -41,11 +41,9 @@ public class PostTagDirective implements TemplateDirectiveModel {
         final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
-            Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
-            Integer tagId = Integer.parseInt(params.get("tagId").toString());
-            int top = Integer.parseInt(params.get("top").toString());
             switch (method) {
                 case "latest":
+                    int top = Integer.parseInt(params.get("top").toString());
                     env.setVariable("posts", builder.build().wrap(postService.listLatest(top)));
                     break;
                 case "count":
@@ -58,9 +56,11 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     env.setVariable("archives", builder.build().wrap(postService.listMonthArchives()));
                     break;
                 case "listByCategoryId":
+                    Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
                     env.setVariable("posts", builder.build().wrap(postCategoryService.listPostBy(categoryId)));
                     break;
                 case "listByTagId":
+                    Integer tagId = Integer.parseInt(params.get("tagId").toString());
                     env.setVariable("posts", builder.build().wrap(postTagService.listPostsBy(tagId)));
                     break;
                 default:

@@ -158,7 +158,7 @@ public class InstallController {
         Set<Integer> categoryIds = new HashSet<>();
         categoryIds.add(category.getId());
         postParam.setCategoryIds(categoryIds);
-        return postService.create(postParam.convertTo());
+        return postService.createOrUpdateBy(postParam.convertTo());
     }
 
     @NonNull
