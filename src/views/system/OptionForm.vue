@@ -123,7 +123,6 @@
                 >
                   <a-input
                     type="number"
-                    defaultValue="10"
                     v-model="options.post_index_page_size"
                   />
                 </a-form-item>
@@ -133,7 +132,6 @@
                 >
                   <a-input
                     type="number"
-                    defaultValue="10"
                     v-model="options.rss_page_size"
                   />
                 </a-form-item>
@@ -143,7 +141,6 @@
                 >
                   <a-input
                     type="number"
-                    defaultValue="200"
                     v-model="options.post_summary_length"
                   />
                 </a-form-item>
@@ -165,7 +162,6 @@
                   :wrapper-col="wrapperCol"
                 >
                   <a-select
-                    defaultValue="mm"
                     v-model="options.comment_gavatar_default"
                   >
                     <a-select-option value="mm">默认</a-select-option>
@@ -181,31 +177,31 @@
                   label="评论审核后才显示："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-switch v-model="options.comment_new_need_check"/>
+                  <a-switch v-model="options.comment_new_need_check" />
                 </a-form-item>
                 <a-form-item
                   label="新评论通知："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-switch v-model="options.comment_new_notice"/>
+                  <a-switch v-model="options.comment_new_notice" />
                 </a-form-item>
                 <a-form-item
                   label="评论审核通过通知对方："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-switch v-model="options.comment_pass_notice"/>
+                  <a-switch v-model="options.comment_pass_notice" />
                 </a-form-item>
                 <a-form-item
                   label="评论回复通知对方："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-switch v-model="options.comment_reply_notice"/>
+                  <a-switch v-model="options.comment_reply_notice" />
                 </a-form-item>
                 <a-form-item
                   label="API 评论开关："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-switch v-model="options.comment_api_enabled"/>
+                  <a-switch v-model="options.comment_api_enabled" />
                 </a-form-item>
                 <a-form-item
                   label="每页显示条数： "
@@ -213,7 +209,6 @@
                 >
                   <a-input
                     type="number"
-                    defaultValue="10"
                     v-model="options.comment_page_size"
                   />
                 </a-form-item>
@@ -251,7 +246,6 @@
                   :wrapper-col="wrapperCol"
                 >
                   <a-select
-                    defaultValue="local"
                     @change="handleAttachChange"
                     v-model="options.attachment_type"
                   >
@@ -321,7 +315,6 @@
                     :wrapper-col="wrapperCol"
                   >
                     <a-select
-                      defaultValue="auto"
                       v-model="options.oss_qiniu_zone"
                     >
                       <a-select-option value="auto">自动选择</a-select-option>
@@ -426,7 +419,7 @@
                       label="是否启用："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-switch v-model="options.email_enabled"/>
+                      <a-switch v-model="options.email_enabled" />
                     </a-form-item>
                     <a-form-item
                       label="SMTP 地址："
@@ -520,7 +513,7 @@
                   label="API服务："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-switch v-model="options.api_enabled"/>
+                  <a-switch v-model="options.api_enabled" />
                 </a-form-item>
                 <a-form-item
                   label="Access key："
@@ -576,6 +569,7 @@ export default {
     loadOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
+        this.handleAttachChange(this.options['attachment_type'])   
       })
     },
     handleSaveOptions() {
