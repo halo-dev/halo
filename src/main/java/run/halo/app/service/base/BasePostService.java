@@ -112,13 +112,21 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     Optional<POST> getNextPost(@NonNull Date date);
 
     /**
-     * Lists latest posts.
+     * Pages latest posts.
      *
      * @param top top number must not be less than 0
      * @return latest posts
      */
     @NonNull
     Page<POST> pageLatest(int top);
+
+    /**
+     * Lists latest posts.
+     * @param top top number must not be less than 0
+     * @return latest posts
+     */
+    @NonNull
+    List<POST> listLatest(int top);
 
     /**
      * Gets a page of sheet.

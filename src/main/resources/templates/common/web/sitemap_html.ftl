@@ -158,11 +158,11 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 <div id="content">
     <h3>分类目录</h3>
     <ul id="myTable">
-        <@commonTag method="categories">
+        <@categoryTag method="list">
             <#if categories?? && categories?size gt 0>
                 <#list categories as cate>
                     <li>
-                        <div class="T1 pull-left"><a href="${options.blog_url}/categories/${cate.url!}" title="前端编程">${cate.name} | ${options.blog_title!}</a></div>
+                        <div class="T1 pull-left"><a href="${options.blog_url}/categories/${cate.slugName!}" title="前端编程">${cate.name} | ${options.blog_title!}</a></div>
                         <div class="T2 pull-right">${cate.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
@@ -170,17 +170,17 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
                     <div class="myClear"></div>
                 </#list>
             </#if>
-        </@commonTag>
+        </@categoryTag>
     </ul>
 </div>
 <div id="content">
     <h3>标签目录</h3>
     <ul id="myTable">
-        <@commonTag method="tags">
+        <@tagTag method="list">
             <#if tags?? && tags?size gt 0>
                 <#list tags as tag>
                     <li>
-                        <div class="T1 pull-left"><a href="${options.blog_url}/tags/${tag.url!}" title="前端编程">${tag.name} | ${options.blog_title!}</a></div>
+                        <div class="T1 pull-left"><a href="${options.blog_url}/tags/${tag.slugName!}" title="前端编程">${tag.name} | ${options.blog_title!}</a></div>
                         <div class="T2 pull-right">${tag.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
@@ -188,7 +188,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
                     <div class="myClear"></div>
                 </#list>
             </#if>
-        </@commonTag>
+        </@tagTag>
     </ul>
 </div>
 <div id="footer">

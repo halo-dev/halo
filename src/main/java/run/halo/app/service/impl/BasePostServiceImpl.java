@@ -134,6 +134,20 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         return listAll(latestPageable);
     }
 
+    /**
+     * Lists latest posts.
+     *
+     * @param top top number must not be less than 0
+     * @return latest posts
+     */
+    @Override
+    public List<POST> listLatest(int top) {
+        Assert.isTrue(top > 0, "Top number must not be less than 0");
+
+        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "editTime"));
+        return basePostRepository.findAllByStatus(PostStatus.PUBLISHED, latestPageable).getContent();
+    }
+
     @Override
     public Page<POST> pageBy(Pageable pageable) {
         Assert.notNull(pageable, "Page info must not be null");
