@@ -18,7 +18,7 @@ router.beforeEach((to, from, next) => {
     document.title = to.meta.title + ' | Halo Dashboard'
   }
 
-  if (to.name !== 'Login' && !store.getters.token) {
+  if (to.name !== 'Login' && to.name !== 'Install' && to.name !== '404' && !store.getters.token) {
     Vue.$log.debug('Redirectint to Login page')
     next({ name: 'Login' })
     return

@@ -227,11 +227,13 @@ export const constantRouterMap = [
   },
   {
     path: '/install',
+    name: 'Install',
     meta: { title: '安装向导' },
     component: () => import('@/views/system/Installation')
   },
   {
     path: '/404',
+    name: '404',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
   }
 ]
