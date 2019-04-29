@@ -35,12 +35,12 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
-            Integer postId = Integer.parseInt(params.get("postId").toString());
             switch (method) {
                 case "list":
                     env.setVariable("categories", builder.build().wrap(categoryService.listAll()));
                     break;
                 case "listByPostId":
+                    Integer postId = Integer.parseInt(params.get("postId").toString());
                     env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoryBy(postId)));
                 case "count":
                     env.setVariable("count", builder.build().wrap(categoryService.count()));

@@ -31,9 +31,9 @@ public class CommentTagDirective implements TemplateDirectiveModel {
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
-            int top = Integer.parseInt(params.get("top").toString());
             switch (method) {
                 case "latest":
+                    int top = Integer.parseInt(params.get("top").toString());
                     env.setVariable("categories", builder.build().wrap(postCommentService.pageLatest(top)));
                     break;
                 case "count":
