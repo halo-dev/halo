@@ -20,11 +20,6 @@
               :title="item.name"
               :bodyStyle="{ padding: 0 }"
             >
-              <!-- <img
-                :alt="item.name"
-                :src="item.screenshots"
-                slot="cover"
-              > -->
               <div class="theme-thumb">
                 <img
                   :alt="item.name"

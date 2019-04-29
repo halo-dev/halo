@@ -76,12 +76,6 @@ export default {
     this.loadActivatedTheme()
   },
   methods: {
-    onSelect(keys) {
-      console.log('Trigger Select', keys)
-    },
-    onExpand() {
-      console.log('Trigger Expand')
-    },
     loadFiles() {
       themeApi.listFiles().then(response => {
         this.files = response.data.data
