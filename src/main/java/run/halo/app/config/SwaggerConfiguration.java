@@ -8,11 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
+import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.support.UserDetail;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.AlternateTypeRule;
@@ -66,6 +68,8 @@ public class SwaggerConfiguration {
         return buildApiDocket("run.halo.app.content.api",
                 "run.halo.app.controller.content.api",
                 "/api/**")
+                .securitySchemes(portalApiKeys())
+                .securityContexts(portalSecurityContext())
                 .enable(!haloProperties.isDocDisabled());
     }
 
@@ -76,6 +80,8 @@ public class SwaggerConfiguration {
         return buildApiDocket("run.halo.app.admin",
                 "run.halo.app.controller.admin",
                 "/api/admin/**")
+                .securitySchemes(adminApiKeys())
+                .securityContexts(adminSecurityContext())
                 .enable(!haloProperties.isDocDisabled());
     }
 
@@ -104,8 +110,6 @@ public class SwaggerConfiguration {
                 .paths(PathSelectors.ant(antPattern))
                 .build()
                 .apiInfo(apiInfo())
-                .securitySchemes(Collections.singletonList(apiKeys()))
-                .securityContexts(Collections.singletonList(securityContext()))
                 .useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, globalResponses)
                 .globalResponseMessage(RequestMethod.POST, globalResponses)
@@ -114,15 +118,36 @@ public class SwaggerConfiguration {
                 .directModelSubstitute(Temporal.class, String.class);
     }
 
-    private ApiKey apiKeys() {
-        return new ApiKey("TOKEN ACCESS", TOKEN_HEADER, In.HEADER.name());
+    private List<ApiKey> adminApiKeys() {
+        return Arrays.asList(
+                new ApiKey("Token from header", AdminAuthenticationFilter.ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
+                new ApiKey("Token from query", AdminAuthenticationFilter.ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
+        );
     }
 
-    private SecurityContext securityContext() {
-        return SecurityContext.builder()
-                .securityReferences(defaultAuth())
-                .forPaths(PathSelectors.regex("/api/admin/.*"))
-                .build();
+    private List<SecurityContext> adminSecurityContext() {
+        return Collections.singletonList(
+                SecurityContext.builder()
+                        .securityReferences(defaultAuth())
+                        .forPaths(PathSelectors.ant("/api/admin/**"))
+                        .build()
+        );
+    }
+
+    private List<ApiKey> portalApiKeys() {
+        return Arrays.asList(
+                new ApiKey("Token from header", HttpHeaders.AUTHORIZATION, In.HEADER.name()),
+                new ApiKey("Token from query", "token", In.QUERY.name())
+        );
+    }
+
+    private List<SecurityContext> portalSecurityContext() {
+        return Collections.singletonList(
+                SecurityContext.builder()
+                        .securityReferences(defaultAuth())
+                        .forPaths(PathSelectors.ant("/api/**"))
+                        .build()
+        );
     }
 
     private List<SecurityReference> defaultAuth() {

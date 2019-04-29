@@ -58,7 +58,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
     /**
      * Admin token param name.
      */
-    public final static String ADMIN_TOKEN_PARAM_NAME = "adminToken";
+    public final static String ADMIN_TOKEN_QUERY_NAME = "adminToken";
 
     private final HaloProperties haloProperties;
 
@@ -152,9 +152,9 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
         // Get from param
         if (StringUtils.isBlank(token)) {
-            token = request.getParameter(ADMIN_TOKEN_PARAM_NAME);
+            token = request.getParameter(ADMIN_TOKEN_QUERY_NAME);
 
-            log.debug("Got token from parameter: [{}: {}]", ADMIN_TOKEN_PARAM_NAME, token);
+            log.debug("Got token from parameter: [{}: {}]", ADMIN_TOKEN_QUERY_NAME, token);
         } else {
             log.debug("Got token from header: [{}: {}]", ADMIN_TOKEN_HEADER_NAME, token);
         }

@@ -13,6 +13,13 @@ import run.halo.app.security.token.AuthToken;
  */
 public interface AdminService {
 
+    /**
+     * Expired seconds.
+     */
+    int ACCESS_TOKEN_EXPIRED_SECONDS = 24 * 3600;
+
+    int REFRESH_TOKEN_EXPIRED_DAYS = 30;
+
     String ACCESS_TOKEN_CACHE_PREFIX = "halo.admin.access_token.";
 
     String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";

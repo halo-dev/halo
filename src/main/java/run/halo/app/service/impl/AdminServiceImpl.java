@@ -95,19 +95,17 @@ public class AdminServiceImpl implements AdminService {
         // Generate new token
         AuthToken token = new AuthToken();
 
-        int expiredIn = 24 * 3600;
-
         token.setAccessToken(HaloUtils.randomUUIDWithoutDash());
-        token.setExpiredIn(expiredIn);
+        token.setExpiredIn(ACCESS_TOKEN_EXPIRED_SECONDS);
         token.setRefreshToken(HaloUtils.randomUUIDWithoutDash());
 
         // Cache those tokens, just for clearing
-        cacheStore.putAny(SecurityUtils.buildAccessTokenKey(user), token.getAccessToken(), 30, TimeUnit.DAYS);
-        cacheStore.putAny(SecurityUtils.buildRefreshTokenKey(user), token.getRefreshToken(), 30, TimeUnit.DAYS);
+        cacheStore.putAny(SecurityUtils.buildAccessTokenKey(user), token.getAccessToken(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
+        cacheStore.putAny(SecurityUtils.buildRefreshTokenKey(user), token.getRefreshToken(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
 
         // Cache those tokens with user id
-        cacheStore.putAny(SecurityUtils.buildTokenAccessKey(token.getAccessToken()), user.getId(), expiredIn, TimeUnit.SECONDS);
-        cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), 30, TimeUnit.DAYS);
+        cacheStore.putAny(SecurityUtils.buildTokenAccessKey(token.getAccessToken()), user.getId(), ACCESS_TOKEN_EXPIRED_SECONDS, TimeUnit.SECONDS);
+        cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
 
         return token;
     }
