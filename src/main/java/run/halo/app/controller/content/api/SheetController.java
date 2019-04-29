@@ -23,7 +23,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @date 19-4-26
  */
 @RestController("PortalSheetController")
-@RequestMapping("/api/sheets")
+@RequestMapping("/api/portal/sheets")
 public class SheetController {
 
     private final SheetService sheetService;

@@ -63,11 +63,13 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket haloDefaultApi() {
-        log.debug("Doc disabled: [{}]", haloProperties.isDocDisabled());
-        // TODO Build with different security configuration
+        if (haloProperties.isDocDisabled()) {
+            log.debug("Doc has been disabled");
+        }
+
         return buildApiDocket("run.halo.app.content.api",
                 "run.halo.app.controller.content.api",
-                "/api/**")
+                "/api/portal/**")
                 .securitySchemes(portalApiKeys())
                 .securityContexts(portalSecurityContext())
                 .enable(!haloProperties.isDocDisabled());
@@ -75,8 +77,10 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket haloAdminApi() {
-        log.debug("Doc disabled: [{}]", haloProperties.isDocDisabled());
-        // TODO Build with different security configuration
+        if (haloProperties.isDocDisabled()) {
+            log.debug("Doc has been disabled");
+        }
+
         return buildApiDocket("run.halo.app.admin",
                 "run.halo.app.controller.admin",
                 "/api/admin/**")
@@ -129,7 +133,7 @@ public class SwaggerConfiguration {
         return Collections.singletonList(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
-                        .forPaths(PathSelectors.ant("/api/admin/**"))
+                        .forPaths(PathSelectors.regex("/api/admin/.*"))
                         .build()
         );
     }
@@ -145,16 +149,16 @@ public class SwaggerConfiguration {
         return Collections.singletonList(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
-                        .forPaths(PathSelectors.ant("/api/**"))
+                        .forPaths(PathSelectors.regex("/api/portal/.*"))
                         .build()
         );
     }
 
     private List<SecurityReference> defaultAuth() {
         AuthorizationScope[] authorizationScopes = {new AuthorizationScope("global", "accessEverything")};
-        return Collections.singletonList(new SecurityReference("TOKEN ACCESS", authorizationScopes));
+        return Arrays.asList(new SecurityReference("Token from header", authorizationScopes),
+                new SecurityReference("Token from query", authorizationScopes));
     }
-
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
