@@ -1,3 +1,3 @@
 <#if !post.disallowComment>
-    <#include "/common/comment/_native_comment.ftl">
+    <#include "/common/comment/comment.ftl">
 </#if>

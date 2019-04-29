@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="${post.title!} · ${options.blog_title!'Halo'}" keywords="${post.title!},${options.seo_keywords!'Halo'}" description="${post.summary!'Halo'}"></@head>
+<@head title="${post.title!} · ${options.blog_title!'Anatole'}" keywords="${post.title!},${options.seo_keywords!'Anatole'}" description="${post.summary!'Anatole'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <link href="/${theme.folderName}/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
