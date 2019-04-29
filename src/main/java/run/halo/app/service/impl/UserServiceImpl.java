@@ -24,8 +24,8 @@ import run.halo.app.service.UserService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.ServletUtils;
 
-import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -103,10 +103,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     }
 
     @Override
-    public User login(String key, String password, HttpSession httpSession) {
+    public User login(String key, String password) {
         Assert.hasText(key, "Username or email must not be blank");
         Assert.hasText(password, "Password must not be blank");
-        Assert.notNull(httpSession, "Http session must not be null");
 
         // Check login status
         if (SecurityContextHolder.getContext().isAuthenticated()) {
@@ -155,7 +154,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         stringCacheStore.delete(LOGIN_FAILURE_COUNT_KEY);
 
         // Set session
-        httpSession.setAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY, new UserDetail(user));
+        ServletUtils.getCurrentRequest().ifPresent(request -> {
+            request.getSession().setAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY, new UserDetail(user));
+        });
 
         // Log it
         eventPublisher.publishEvent(new LogEvent(this, user.getId().toString(), LogType.LOGGED_IN, user.getUsername()));

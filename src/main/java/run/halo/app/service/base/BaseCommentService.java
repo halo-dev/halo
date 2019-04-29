@@ -100,6 +100,14 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     Map<Integer, Long> countByPostIds(@Nullable Collection<Integer> postIds);
 
     /**
+     * Counts by comment status.
+     *
+     * @param status comment status must not be null
+     * @return comment count
+     */
+    long countByStatus(@NonNull CommentStatus status);
+
+    /**
      * Creates a comment by comment.
      *
      * @param COMMENT comment must not be null

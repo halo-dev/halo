@@ -1,10 +1,10 @@
 package run.halo.app.service;
 
+import org.springframework.lang.NonNull;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.service.base.CrudService;
-import org.springframework.lang.NonNull;
 
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
@@ -82,11 +82,11 @@ public interface UserService extends CrudService<User, Integer> {
      *
      * @param key         username or email must not be blank
      * @param password    password must not be blank
-     * @param httpSession http session must not be null
      * @return user info
      */
     @NonNull
-    User login(@NonNull String key, @NonNull String password, @NonNull HttpSession httpSession);
+    @Deprecated
+    User login(@NonNull String key, @NonNull String password);
 
     /**
      * Updates user password.

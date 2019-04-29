@@ -288,4 +288,11 @@ public interface OptionService extends CrudService<Option, Integer> {
     @NonNull
     String getBlogBaseUrl();
 
+    /**
+     * Gets blog birthday.
+     *
+     * @return birthday timestamp
+     */
+    long getBirthday();
+
 }
