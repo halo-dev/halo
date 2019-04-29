@@ -18,7 +18,7 @@ import java.util.List;
  * @date 4/3/19
  */
 @RestController("ApiContentLinkController")
-@RequestMapping("/api/links")
+@RequestMapping("/api/portal/links")
 public class LinkController {
 
     private final LinkService linkService;

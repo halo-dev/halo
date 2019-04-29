@@ -21,7 +21,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @date 19-4-26
  */
 @RestController("PortalJournalController")
-@RequestMapping("/api/journals")
+@RequestMapping("/api/portal/journals")
 public class JournalController {
 
     private final JournalService journalService;
