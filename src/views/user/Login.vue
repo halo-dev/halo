@@ -4,12 +4,18 @@
       Halo
     </div>
     <div class="loginBody animated">
-      <a-form layout="vertical">
+      <a-form
+        layout="vertical"
+        @keyup.enter.native="handleLogin"
+      >
         <a-form-item
           class="animated fadeInUp"
           :style="{'animation-delay': '0.1s'}"
         >
-          <a-input placeholder="用户名/邮箱">
+          <a-input
+            placeholder="用户名/邮箱"
+            v-model="username"
+          >
             <a-icon
               slot="prefix"
               type="user"
@@ -22,6 +28,7 @@
           :style="{'animation-delay': '0.2s'}"
         >
           <a-input
+            v-model="password"
             type="password"
             placeholder="密码"
           >
@@ -38,7 +45,8 @@
         >
           <a-button
             type="primary"
-            block="true"
+            :block="true"
+            @click="handleLogin"
           >登录</a-button>
         </a-form-item>
       </a-form>
@@ -47,18 +55,42 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
-  beforeCreate() {
-    this.form = this.$form.createForm(this)
+  data() {
+    return {
+      username: null,
+      password: null
+    }
   },
   methods: {
-    handleSubmit(e) {
-      e.preventDefault()
-      this.form.validateFields((err, values) => {
-        if (!err) {
-          console.log('Received values of form: ', values)
-        }
+    ...mapActions(['login']),
+    handleLogin() {
+      if (!this.username) {
+        this.$message.warn('用户名不能为空')
+        return
+      }
+
+      if (!this.password) {
+        this.$message.warn('密码不能为空')
+        return
+      }
+
+      this.login({ username: this.username, password: this.password }).then(response => {
+        // Go to dashboard
+        this.loginSuccess()
       })
+    },
+    loginSuccess() {
+      this.$router.push({ name: 'Dashboard' })
+      // 延迟 1 秒显示欢迎信息
+      setTimeout(() => {
+        this.$notification.success({
+          message: '欢迎',
+          description: `欢迎回来`
+        })
+      }, 1000)
     }
   }
 }
