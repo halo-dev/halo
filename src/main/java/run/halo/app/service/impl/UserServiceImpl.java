@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.BCrypt;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.LogType;
@@ -203,6 +205,25 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         setPassword(user, userParam.getPassword());
 
         return create(user);
+    }
+
+    @Override
+    public void mustNotExpire(User user) {
+        Assert.notNull(user, "User must not be null");
+
+        Date now = DateUtils.now();
+        if (user.getExpireTime() != null && user.getExpireTime().after(now)) {
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(user.getExpireTime().getTime() - now.getTime());
+            // If expired
+            throw new ForbiddenException("You have been temporarily disabled，please try again " + HaloUtils.timeFormat(seconds) + " later").setErrorData(seconds);
+        }
+    }
+
+    @Override
+    public boolean passwordMatch(User user, String plainPassword) {
+        Assert.notNull(user, "User must not be null");
+
+        return !StringUtils.isBlank(plainPassword) && BCrypt.checkpw(plainPassword, user.getPassword());
     }
 
     @Override

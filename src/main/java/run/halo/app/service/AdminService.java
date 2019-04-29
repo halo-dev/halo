@@ -1,7 +1,7 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.CountDTO;
+import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.security.token.AuthToken;
 
@@ -12,6 +12,10 @@ import run.halo.app.security.token.AuthToken;
  * @date 19-4-29
  */
 public interface AdminService {
+
+    String ACCESS_TOKEN_CACHE_PREFIX = "halo.admin.access_token.";
+
+    String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
 
     /**
      * Authenticates.
@@ -25,7 +29,7 @@ public interface AdminService {
     /**
      * Clears authentication.
      */
-    void clearAuthentication();
+    void clearToken();
 
     /**
      * Get system counts.
@@ -33,5 +37,5 @@ public interface AdminService {
      * @return count dto
      */
     @NonNull
-    CountDTO getCount();
+    StatisticDTO getCount();
 }

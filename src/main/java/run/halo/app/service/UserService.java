@@ -1,12 +1,13 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.service.base.CrudService;
 
-import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 /**
@@ -80,8 +81,8 @@ public interface UserService extends CrudService<User, Integer> {
     /**
      * Logins by username and password.
      *
-     * @param key         username or email must not be blank
-     * @param password    password must not be blank
+     * @param key      username or email must not be blank
+     * @param password password must not be blank
      * @return user info
      */
     @NonNull
@@ -107,4 +108,21 @@ public interface UserService extends CrudService<User, Integer> {
      */
     @NonNull
     User createBy(@NonNull UserParam userParam);
+
+    /**
+     * The user must not expire.
+     *
+     * @param user user info must not be null
+     * @throws ForbiddenException throws if the given user has been expired
+     */
+    void mustNotExpire(@NonNull User user);
+
+    /**
+     * Checks the password is match the user password.
+     *
+     * @param user          user info must not be null
+     * @param plainPassword plain password
+     * @return true if the given password is match the user password; false otherwise
+     */
+    boolean passwordMatch(@NonNull User user, @Nullable String plainPassword);
 }

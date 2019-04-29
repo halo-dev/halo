@@ -91,6 +91,7 @@ public class InMemoryCacheStore extends StringCacheStore {
         Assert.hasText(key, "Cache key must not be blank");
 
         cacheContainer.remove(key);
+        log.debug("Removed key: [{}]", key);
     }
 
     /**

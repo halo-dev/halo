@@ -4,15 +4,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
-import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.dto.CountDTO;
+import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
-import run.halo.app.security.context.SecurityContextHolder;
-import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.token.AuthToken;
 import run.halo.app.service.AdminService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -39,7 +35,7 @@ public class AdminController {
      */
     @GetMapping("counts")
     @ApiOperation("Gets count info")
-    public CountDTO getCount() {
+    public StatisticDTO getCount() {
         return adminService.getCount();
     }
 
@@ -52,17 +48,7 @@ public class AdminController {
     @PostMapping("logout")
     @ApiOperation("Logs out (Clear session)")
     @CacheLock
-    public void logout(HttpServletRequest request) {
-        adminService.clearAuthentication();
-        // Check if the current is logging in
-        boolean authenticated = SecurityContextHolder.getContext().isAuthenticated();
-
-        if (!authenticated) {
-            throw new BadRequestException("You haven't logged in yet, so you can't log out");
-        }
-
-        request.getSession().removeAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY);
-
-        log.info("You have been logged out, Welcome to you next time!");
+    public void logout() {
+        adminService.clearToken();
     }
 }

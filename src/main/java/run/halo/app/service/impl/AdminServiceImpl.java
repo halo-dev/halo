@@ -1,17 +1,24 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.dto.CountDTO;
+import run.halo.app.model.dto.StatisticDTO;
+import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
+import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.token.AuthToken;
+import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.*;
+import run.halo.app.utils.HaloUtils;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Admin service implementation.
@@ -69,42 +76,92 @@ public class AdminServiceImpl implements AdminService {
     public AuthToken authenticate(LoginParam loginParam) {
         Assert.notNull(loginParam, "Login param must not be null");
 
-        return null;
+        if (SecurityContextHolder.getContext().isAuthenticated()) {
+            // If the user has been logged in
+            throw new BadRequestException("您已经登录，无需重复登录");
+        }
+
+        String username = loginParam.getUsername();
+        User user = Validator.isEmail(username) ?
+                userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+
+        userService.mustNotExpire(user);
+
+        if (!userService.passwordMatch(user, loginParam.getPassword())) {
+            // If the password is mismatch
+            throw new BadRequestException("Username or password is incorrect");
+        }
+
+        // Generate new token
+        AuthToken token = new AuthToken();
+
+        int expiredIn = 24 * 3600;
+
+        token.setAccessToken(HaloUtils.randomUUIDWithoutDash());
+        token.setExpiredIn(expiredIn);
+        token.setRefreshToken(HaloUtils.randomUUIDWithoutDash());
+
+        // Cache those tokens, just for clearing
+        cacheStore.putAny(SecurityUtils.buildAccessTokenKey(user), token.getAccessToken(), 30, TimeUnit.DAYS);
+        cacheStore.putAny(SecurityUtils.buildRefreshTokenKey(user), token.getRefreshToken(), 30, TimeUnit.DAYS);
+
+        // Cache those tokens with user id
+        cacheStore.putAny(SecurityUtils.buildTokenAccessKey(token.getAccessToken()), user.getId(), expiredIn, TimeUnit.SECONDS);
+        cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), 30, TimeUnit.DAYS);
+
+        return token;
     }
 
     @Override
-    public void clearAuthentication() {
+    public void clearToken() {
         // Check if the current is logging in
-        boolean authenticated = SecurityContextHolder.getContext().isAuthenticated();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (!authenticated) {
+        if (authentication == null) {
             throw new BadRequestException("You haven't logged in yet, so you can't log out");
         }
+
+        // Get current user
+        User user = authentication.getDetail().getUser();
+
+        // Clear access token
+        cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class).ifPresent(accessToken -> {
+            // Delete token
+            cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken));
+            cacheStore.delete(SecurityUtils.buildAccessTokenKey(user));
+        });
+
+        // Clear refresh token
+        cacheStore.getAny(SecurityUtils.buildRefreshTokenKey(user), String.class).ifPresent(refreshToken -> {
+            cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
+            cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
+        });
 
         log.info("You have been logged out, looking forward to your next visit!");
     }
 
     @Override
-    public CountDTO getCount() {
-        CountDTO countDTO = new CountDTO();
-        countDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
-        countDTO.setAttachmentCount(attachmentService.count());
+    public StatisticDTO getCount() {
+        StatisticDTO statisticDTO = new StatisticDTO();
+        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
+        statisticDTO.setAttachmentCount(attachmentService.count());
 
         // Handle comment count
         long postCommentCount = postCommentService.countByStatus(CommentStatus.PUBLISHED);
         long sheetCommentCount = sheetCommentService.countByStatus(CommentStatus.PUBLISHED);
         long journalCommentCount = journalCommentService.countByStatus(CommentStatus.PUBLISHED);
 
-        countDTO.setCommentCount(postCommentCount + sheetCommentCount + journalCommentCount);
+        statisticDTO.setCommentCount(postCommentCount + sheetCommentCount + journalCommentCount);
 
         long birthday = optionService.getBirthday();
         long days = (System.currentTimeMillis() - birthday) / (1000 * 24 * 3600);
-        countDTO.setEstablishDays(days);
+        statisticDTO.setEstablishDays(days);
 
-        countDTO.setLinkCount(linkService.count());
+        statisticDTO.setLinkCount(linkService.count());
 
-        countDTO.setVisitCount(postService.countVisit() + sheetService.countVisit());
-        countDTO.setLikeCount(postService.countLike() + sheetService.countLike());
-        return countDTO;
+        statisticDTO.setVisitCount(postService.countVisit() + sheetService.countVisit());
+        statisticDTO.setLikeCount(postService.countLike() + sheetService.countLike());
+        return statisticDTO;
     }
+
 }

@@ -3,13 +3,13 @@ package run.halo.app.model.dto;
 import lombok.Data;
 
 /**
- * Count output DTO.
+ * Statistic DTO.
  *
  * @author johnniang
  * @date 3/19/19
  */
 @Data
-public class CountDTO {
+public class StatisticDTO {
 
     private long postCount;
 
