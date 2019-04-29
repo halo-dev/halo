@@ -9,12 +9,15 @@ import org.springframework.util.Assert;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
+import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.entity.User;
+import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
 import run.halo.app.security.support.UserDetail;
 import run.halo.app.security.util.SecurityUtils;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 
 import javax.servlet.FilterChain;
@@ -22,7 +25,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -64,25 +66,35 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private final UserService userService;
 
+    private final OptionService optionService;
+
     public AdminAuthenticationFilter(StringCacheStore cacheStore,
                                      UserService userService,
-                                     HaloProperties haloProperties) {
+                                     HaloProperties haloProperties,
+                                     OptionService optionService) {
         super(haloProperties);
         this.cacheStore = cacheStore;
         this.userService = userService;
         this.haloProperties = haloProperties;
+        this.optionService = optionService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (!haloProperties.isProductionEnv()) {
-            List<User> users = userService.listAll();
-            if (!users.isEmpty()) {
-                // Set security context
-                User user = users.get(0);
-                SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user))));
-            }
+        // Check whether the blog is installed or not
+        Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+
+        if (!isInstalled) {
+            // If not installed
+            getFailureHandler().onFailure(request, response, new NotInstallException("The blog has not been initialized yet!"));
+            return;
+        }
+
+        if (!haloProperties.isAuthEnabled()) {
+            userService.getCurrentUser().ifPresent(user ->
+                    SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
+
             // If authentication disabled
             filterChain.doFilter(request, response);
             return;
@@ -141,6 +153,10 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         // Get from param
         if (StringUtils.isBlank(token)) {
             token = request.getParameter(ADMIN_TOKEN_PARAM_NAME);
+
+            log.debug("Got token from parameter: [{}: {}]", ADMIN_TOKEN_PARAM_NAME, token);
+        } else {
+            log.debug("Got token from header: [{}: {}]", ADMIN_TOKEN_HEADER_NAME, token);
         }
 
         return token;

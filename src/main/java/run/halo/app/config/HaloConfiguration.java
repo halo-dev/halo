@@ -21,6 +21,7 @@ import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.handler.AdminAuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.HttpClientUtils;
 
@@ -113,8 +114,9 @@ public class HaloConfiguration {
     public FilterRegistrationBean<AdminAuthenticationFilter> adminAuthenticationFilter(StringCacheStore cacheStore,
                                                                                        UserService userService,
                                                                                        HaloProperties haloProperties,
-                                                                                       ObjectMapper objectMapper) {
-        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties);
+                                                                                       ObjectMapper objectMapper,
+                                                                                       OptionService optionService) {
+        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties, optionService);
 
         AdminAuthenticationFailureHandler failureHandler = new AdminAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());

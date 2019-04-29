@@ -39,8 +39,9 @@ public class AdminController {
         return adminService.getCount();
     }
 
-    @PostMapping("auth/login")
+    @PostMapping("login")
     @ApiOperation("Login")
+    @CacheLock
     public AuthToken auth(@RequestBody @Valid LoginParam loginParam) {
         return adminService.authenticate(loginParam);
     }
