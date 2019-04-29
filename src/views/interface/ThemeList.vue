@@ -26,7 +26,10 @@
                 slot="cover"
               > -->
               <div class="theme-thumb">
-                <img :alt="item.name" :src="item.screenshots">
+                <img
+                  :alt="item.name"
+                  :src="item.screenshots"
+                >
               </div>
               <template
                 class="ant-card-actions"
@@ -194,12 +197,6 @@
                         >{{ option.label }}</a-select-option>
                       </a-select>
                     </a-form-item>
-                    <a-form-item>
-                      <a-button
-                        type="primary"
-                        @click="handleSaveSettings"
-                      >保存</a-button>
-                    </a-form-item>
                   </a-form>
                 </a-tab-pane>
               </a-tabs>
@@ -207,6 +204,20 @@
           </a-skeleton>
         </a-col>
       </a-row>
+
+      <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
+        <a-button
+          type="primary"
+          @click="handleSaveSettings"
+        >保存</a-button>
+        <a-button
+          type="dashed"
+          @click="handleShowAttachDrawer"
+          style="margin-left: 8px;"
+        >附件库</a-button>
+      </footer-tool-bar>
+
+      <AttachmentDrawer v-model="attachmentDrawerVisible" />
     </a-drawer>
     <div class="upload-button">
       <a-button
@@ -265,9 +276,17 @@
 </template>
 
 <script>
+import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
+import FooterToolBar from '@/components/FooterToolbar'
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 import themeApi from '@/api/theme'
 
 export default {
+  components: {
+    AttachmentDrawer,
+    FooterToolBar
+  },
+  mixins: [mixin, mixinDevice],
   data() {
     return {
       optionLoading: true,
@@ -278,6 +297,7 @@ export default {
         sm: { span: 24 },
         xs: { span: 24 }
       },
+      attachmentDrawerVisible: false,
       themes: [],
       visible: false,
       themeConfiguration: null,
@@ -348,6 +368,9 @@ export default {
     },
     handleShowUploadModal() {
       this.uploadVisible = true
+    },
+    handleShowAttachDrawer() {
+      this.attachmentDrawerVisible = true
     },
     handleChange(info) {
       const status = info.file.status
