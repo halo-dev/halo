@@ -1,9 +1,5 @@
 package run.halo.app.cache.lock;
 
-import run.halo.app.cache.StringCacheStore;
-import run.halo.app.exception.FrequentAccessException;
-import run.halo.app.exception.ServiceException;
-import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,8 +9,11 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import run.halo.app.cache.StringCacheStore;
+import run.halo.app.exception.FrequentAccessException;
+import run.halo.app.exception.ServiceException;
+import run.halo.app.utils.ServletUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 
 /**
@@ -34,12 +33,8 @@ public class CacheLockInterceptor {
 
     private final StringCacheStore cacheStore;
 
-    private final HttpServletRequest httpServletRequest;
-
-    public CacheLockInterceptor(StringCacheStore cacheStore,
-                                HttpServletRequest httpServletRequest) {
+    public CacheLockInterceptor(StringCacheStore cacheStore) {
         this.cacheStore = cacheStore;
-        this.httpServletRequest = httpServletRequest;
     }
 
     @Around("@annotation(run.halo.app.cache.lock.CacheLock)")
@@ -121,7 +116,7 @@ public class CacheLockInterceptor {
 
         if (cacheLock.traceRequest()) {
             // Append http request info
-            cacheKeyBuilder.append(delimiter).append(ServletUtil.getClientIP(httpServletRequest));
+            cacheKeyBuilder.append(delimiter).append(ServletUtils.getRequestIp());
         }
 
         return cacheKeyBuilder.toString();
