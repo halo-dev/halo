@@ -14,31 +14,17 @@
       >
         <div class="card-container">
           <a-card
-            :hoverable="true"
+            :bordered="false"
             title="Halo 安装向导"
+            class="install-card"
           >
-            <!-- <div class="logo">
-              Halo<small style="font-size: 14px;">安装向导</small>
-            </div> -->
 
             <a-steps :current="stepCurrent">
               <a-step title="博主信息">
-                <a-icon
-                  type="user"
-                  slot="icon"
-                />
               </a-step>
               <a-step title="博客信息">
-                <a-icon
-                  type="rocket"
-                  slot="icon"
-                />
               </a-step>
               <a-step title="数据迁移">
-                <a-icon
-                  type="fork"
-                  slot="icon"
-                />
               </a-step>
             </a-steps>
             <a-divider dashed />
@@ -47,7 +33,7 @@
               layout="horizontal"
               v-show="stepCurrent == 0"
             >
-              <a-form-item>
+              <a-form-item class="animated fadeInUp">
                 <a-input
                   v-model="installation.username"
                   placeholder="用户名"
@@ -59,7 +45,10 @@
                   />
                 </a-input>
               </a-form-item>
-              <a-form-item>
+              <a-form-item
+                class="animated fadeInUp"
+                :style="{'animation-delay': '0.1s'}"
+              >
                 <a-input
                   v-model="installation.nickname"
                   placeholder="用户昵称"
@@ -71,7 +60,10 @@
                   />
                 </a-input>
               </a-form-item>
-              <a-form-item>
+              <a-form-item
+                class="animated fadeInUp"
+                :style="{'animation-delay': '0.2s'}"
+              >
                 <a-input
                   v-model="installation.email"
                   placeholder="用户邮箱"
@@ -83,7 +75,10 @@
                   />
                 </a-input>
               </a-form-item>
-              <a-form-item>
+              <a-form-item
+                class="animated fadeInUp"
+                :style="{'animation-delay': '0.3s'}"
+              >
                 <a-input
                   v-model="installation.password"
                   type="password"
@@ -96,7 +91,10 @@
                   />
                 </a-input>
               </a-form-item>
-              <a-form-item>
+              <a-form-item
+                class="animated fadeInUp"
+                :style="{'animation-delay': '0.4s'}"
+              >
                 <a-input
                   v-model="installation.confirmPassword"
                   type="password"
@@ -104,7 +102,7 @@
                 >
                   <a-icon
                     slot="prefix"
-                    type="key"
+                    type="lock"
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
@@ -117,7 +115,7 @@
               layout="horizontal"
               v-show="stepCurrent == 1"
             >
-              <a-form-item>
+              <a-form-item class="animated fadeInUp">
                 <a-input
                   v-model="installation.url"
                   placeholder="博客地址（选填）"
@@ -137,7 +135,10 @@
                   </a-select>
                 </a-input>
               </a-form-item>
-              <a-form-item>
+              <a-form-item
+                class="animated fadeInUp"
+                :style="{'animation-delay': '0.2s'}"
+              >
                 <a-input
                   v-model="installation.title"
                   placeholder="博客标题"
@@ -157,12 +158,15 @@
                 style="margin-bottom: 1rem"
                 message="如果有迁移需求，请点击并选择'迁移文件'"
                 type="info"
+                class="animated fadeInUp"
               />
               <Upload
                 :name="migrationUploadName"
                 accept="application/json"
                 :uploadHandler="handleMigrationUpload"
                 @remove="handleMigrationFileRemove"
+                class="animated fadeInUp"
+                :style="{'animation-delay': '0.2s'}"
               >
                 <p class="ant-upload-drag-icon">
                   <a-icon type="inbox" />
@@ -286,15 +290,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.logo {
-  font-size: 56px;
-  text-align: center;
-  margin-bottom: 25px;
-  font-weight: 500;
-  color: #444;
-  text-shadow: #b2baba 0.1em 0.1em 0.2em;
-}
-
 .height-100 {
   height: 100vh;
 }
@@ -304,5 +299,9 @@ export default {
 }
 .previus-button {
   margin-right: 1rem;
+}
+
+.install-card {
+  box-shadow: 0px 10px 20px 0px rgba(236, 236, 236, 0.86);
 }
 </style>
