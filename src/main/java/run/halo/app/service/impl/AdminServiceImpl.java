@@ -154,7 +154,7 @@ public class AdminServiceImpl implements AdminService {
         Assert.hasText(refreshToken, "Refresh token must not be blank");
 
         Integer userId = cacheStore.getAny(SecurityUtils.buildTokenRefreshKey(refreshToken), Integer.class)
-                .orElseThrow(() -> new BadRequestException("The refresh token may have been expired already"));
+                .orElseThrow(() -> new BadRequestException("The refresh token may have been expired already").setErrorData(refreshToken));
 
         // Get user info
         User user = userService.getById(userId);
