@@ -4,7 +4,9 @@ import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
+import run.halo.app.service.PostTagService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,10 +22,17 @@ public class PostTagDirective implements TemplateDirectiveModel {
 
     private final PostService postService;
 
-    public PostTagDirective(Configuration configuration,
-                            PostService postService) {
-        this.postService = postService;
+    private final PostTagService postTagService;
 
+    private final PostCategoryService postCategoryService;
+
+    public PostTagDirective(Configuration configuration,
+                            PostService postService,
+                            PostTagService postTagService,
+                            PostCategoryService postCategoryService) {
+        this.postService = postService;
+        this.postTagService = postTagService;
+        this.postCategoryService = postCategoryService;
         configuration.setSharedVariable("postTag", this);
     }
 
@@ -32,6 +41,8 @@ public class PostTagDirective implements TemplateDirectiveModel {
         final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
+            Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
+            Integer tagId = Integer.parseInt(params.get("tagId").toString());
             switch (method) {
                 case "count":
                     env.setVariable("count", builder.build().wrap(postService.count()));
@@ -41,6 +52,12 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     break;
                 case "archiveMonth":
                     env.setVariable("archives", builder.build().wrap(postService.listMonthArchives()));
+                    break;
+                case "listByCategoryId":
+                    env.setVariable("posts", builder.build().wrap(postCategoryService.listPostBy(categoryId)));
+                    break;
+                case "listByTagId":
+                    env.setVariable("posts", builder.build().wrap(postTagService.listPostsBy(tagId)));
                     break;
                 default:
                     break;
