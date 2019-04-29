@@ -115,20 +115,6 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
             return;
         }
 
-        // Get info from session
-        Object adminSessionValue = request.getSession().getAttribute(ADMIN_SESSION_KEY);
-
-        if (adminSessionValue instanceof UserDetail) {
-            // Convert to user detail
-            UserDetail userDetail = (UserDetail) adminSessionValue;
-
-            // Set security context
-            SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         if (shouldSkipAuthenticateFailure(request)) {
             // If should skip this authentication failure
             log.debug("Skipping authentication failure, url: [{}], method: [{}]", request.getServletPath(), request.getMethod());
