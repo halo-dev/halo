@@ -43,7 +43,11 @@ public class PostTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
             Integer tagId = Integer.parseInt(params.get("tagId").toString());
+            int top = Integer.parseInt(params.get("top").toString());
             switch (method) {
+                case "latest":
+                    env.setVariable("posts", builder.build().wrap(postService.listLatest(top)));
+                    break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(postService.count()));
                     break;
