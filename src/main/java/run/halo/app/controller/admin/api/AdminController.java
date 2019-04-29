@@ -52,4 +52,11 @@ public class AdminController {
     public void logout() {
         adminService.clearToken();
     }
+
+    @PostMapping("refresh/{refreshToken}")
+    @ApiOperation("Refreshes token")
+    @CacheLock
+    public AuthToken refresh(@PathVariable("refreshToken") String refreshToken) {
+        return adminService.refreshToken(refreshToken);
+    }
 }

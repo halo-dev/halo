@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.cache.StringCacheStore;
@@ -93,21 +94,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // Generate new token
-        AuthToken token = new AuthToken();
-
-        token.setAccessToken(HaloUtils.randomUUIDWithoutDash());
-        token.setExpiredIn(ACCESS_TOKEN_EXPIRED_SECONDS);
-        token.setRefreshToken(HaloUtils.randomUUIDWithoutDash());
-
-        // Cache those tokens, just for clearing
-        cacheStore.putAny(SecurityUtils.buildAccessTokenKey(user), token.getAccessToken(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
-        cacheStore.putAny(SecurityUtils.buildRefreshTokenKey(user), token.getRefreshToken(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
-
-        // Cache those tokens with user id
-        cacheStore.putAny(SecurityUtils.buildTokenAccessKey(token.getAccessToken()), user.getId(), ACCESS_TOKEN_EXPIRED_SECONDS, TimeUnit.SECONDS);
-        cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
-
-        return token;
+        return buildAuthToken(user);
     }
 
     @Override
@@ -162,4 +149,52 @@ public class AdminServiceImpl implements AdminService {
         return statisticDTO;
     }
 
+    @Override
+    public AuthToken refreshToken(String refreshToken) {
+        Assert.hasText(refreshToken, "Refresh token must not be blank");
+
+        Integer userId = cacheStore.getAny(SecurityUtils.buildTokenRefreshKey(refreshToken), Integer.class)
+                .orElseThrow(() -> new BadRequestException("The refresh token may have been expired already"));
+
+        // Get user info
+        User user = userService.getById(userId);
+
+        // Remove all token
+        cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class).ifPresent(accessToken -> {
+            cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken));
+        });
+        cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
+        cacheStore.delete(SecurityUtils.buildAccessTokenKey(user));
+        cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
+
+        return buildAuthToken(user);
+    }
+
+    /**
+     * Builds authentication token.
+     *
+     * @param user user info must not be null
+     * @return authentication token
+     */
+    @NonNull
+    private AuthToken buildAuthToken(@NonNull User user) {
+        Assert.notNull(user, "User must not be null");
+
+        // Generate new token
+        AuthToken token = new AuthToken();
+
+        token.setAccessToken(HaloUtils.randomUUIDWithoutDash());
+        token.setExpiredIn(ACCESS_TOKEN_EXPIRED_SECONDS);
+        token.setRefreshToken(HaloUtils.randomUUIDWithoutDash());
+
+        // Cache those tokens, just for clearing
+        cacheStore.putAny(SecurityUtils.buildAccessTokenKey(user), token.getAccessToken(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
+        cacheStore.putAny(SecurityUtils.buildRefreshTokenKey(user), token.getRefreshToken(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
+
+        // Cache those tokens with user id
+        cacheStore.putAny(SecurityUtils.buildTokenAccessKey(token.getAccessToken()), user.getId(), ACCESS_TOKEN_EXPIRED_SECONDS, TimeUnit.SECONDS);
+        cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
+
+        return token;
+    }
 }

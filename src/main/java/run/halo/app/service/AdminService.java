@@ -45,4 +45,13 @@ public interface AdminService {
      */
     @NonNull
     StatisticDTO getCount();
+
+    /**
+     * Refreshes token.
+     *
+     * @param refreshToken refresh token must not be blank
+     * @return authentication token
+     */
+    @NonNull
+    AuthToken refreshToken(@NonNull String refreshToken);
 }
