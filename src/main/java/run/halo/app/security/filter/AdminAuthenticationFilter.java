@@ -14,6 +14,7 @@ import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
 import run.halo.app.security.support.UserDetail;
+import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.UserService;
 
 import javax.servlet.FilterChain;
@@ -36,6 +37,16 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
      * Admin session key.
      */
     public final static String ADMIN_SESSION_KEY = "halo.admin.session";
+
+    /**
+     * Access token cache prefix.
+     */
+    public final static String TOKEN_ACCESS_CACHE_PREFIX = "halo.admin.access.token.";
+
+    /**
+     * Refresh token cache prefix.
+     */
+    public final static String TOKEN_REFRESH_CACHE_PREFIX = "halo.admin.refresh.token.";
 
     /**
      * Admin token header name.
@@ -82,20 +93,25 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
         if (StringUtils.isNotBlank(token)) {
 
-            // Valid the token
-            Optional<UserDetail> optionalUserDetail = cacheStore.getAny(token, UserDetail.class);
+            // Get user id from cache
+            Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
 
-            if (!optionalUserDetail.isPresent()) {
+            if (!optionalUserId.isPresent()) {
                 getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
                 return;
             }
 
-            UserDetail userDetail = optionalUserDetail.get();
+            // Get the user
+            User user = userService.getById(optionalUserId.get());
+
+            // Build user detail
+            UserDetail userDetail = new UserDetail(user);
 
             // Set security
             SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
 
             filterChain.doFilter(request, response);
+
             return;
         }
 
