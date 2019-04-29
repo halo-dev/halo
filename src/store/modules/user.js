@@ -10,7 +10,6 @@ const user = {
     roles: [],
     info: {}
   },
-
   mutations: {
     SET_TOKEN: (state, token) => {
       Vue.ls.set(ACCESS_TOKEN, token)

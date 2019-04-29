@@ -3,6 +3,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import Vue from 'vue'
 import { message } from 'ant-design-vue'
+import store from '@/store'
 
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8090',
@@ -14,6 +15,11 @@ service.interceptors.request.use(
   config => {
     NProgress.start()
     // TODO set token
+    const token = store.getters.token
+    Vue.$log.debug('Got token from store', token)
+    if (token && token.access_token) {
+      config.headers['Admin-Authorization'] = token.access_token
+    }
     return config
   },
   error => {
