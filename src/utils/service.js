@@ -4,6 +4,7 @@ import 'nprogress/nprogress.css'
 import Vue from 'vue'
 import { message } from 'ant-design-vue'
 import store from '@/store'
+import router from '@/router'
 
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8090',
@@ -55,6 +56,16 @@ service.interceptors.response.use(
         // TODO handle 400 status error
       } else if (data.status === 401) {
         // TODO handle 401 status error
+        if (store.getters.token && store.getters.token.access_token === data.data) {
+          // Token expired
+          // TODO Refresh token
+          store.dispatch('refreshToken', store.getters.token.refresh_token).then(response => {
+            Vue.$log.debug('Refresh token successfully')
+          })
+        } else {
+          // Login
+          router.push({ name: 'Login' })
+        }
       } else if (data.status === 403) {
         // TODO handle 403 status error
       } else if (data.status === 404) {
