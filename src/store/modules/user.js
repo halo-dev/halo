@@ -1,3 +1,7 @@
+import Vue from 'vue'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
+import adminApi from '@/api/admin'
+
 const user = {
   state: {
     token: '',
@@ -6,9 +10,9 @@ const user = {
     roles: [],
     info: {}
   },
-
   mutations: {
     SET_TOKEN: (state, token) => {
+      Vue.ls.set(ACCESS_TOKEN, token)
       state.token = token
     },
     SET_NAME: (state, { name }) => {
@@ -24,8 +28,23 @@ const user = {
       state.info = info
     }
   },
-
   actions: {
+    login({ commit }, { username, password }) {
+      return new Promise((resolve, reject) => {
+        adminApi
+          .login(username, password)
+          .then(response => {
+            const token = response.data.data
+            Vue.$log.debug('Got token', token)
+            commit('SET_TOKEN', token)
+
+            resolve(response)
+          })
+          .catch(error => {
+            reject(error)
+          })
+      })
+    }
   }
 }
 
