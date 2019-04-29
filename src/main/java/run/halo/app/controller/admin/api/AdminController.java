@@ -41,21 +41,21 @@ public class AdminController {
 
     @PostMapping("login")
     @ApiOperation("Login")
-    @CacheLock
+    @CacheLock(autoDelete = false)
     public AuthToken auth(@RequestBody @Valid LoginParam loginParam) {
         return adminService.authenticate(loginParam);
     }
 
     @PostMapping("logout")
     @ApiOperation("Logs out (Clear session)")
-    @CacheLock
+    @CacheLock(autoDelete = false)
     public void logout() {
         adminService.clearToken();
     }
 
     @PostMapping("refresh/{refreshToken}")
     @ApiOperation("Refreshes token")
-    @CacheLock
+    @CacheLock(autoDelete = false)
     public AuthToken refresh(@PathVariable("refreshToken") String refreshToken) {
         return adminService.refreshToken(refreshToken);
     }
