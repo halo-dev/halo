@@ -569,7 +569,7 @@ export default {
     loadOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
-        this.handleAttachChange(this.options['attachment_type'])   
+        this.handleAttachChange(this.options['attachment_type'])
       })
     },
     handleSaveOptions() {

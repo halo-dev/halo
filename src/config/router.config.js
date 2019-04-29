@@ -221,10 +221,12 @@ export const constantRouterMap = [
   },
   {
     path: '/login',
+    meta: { title: '登录' },
     component: () => import('@/views/user/Login')
   },
   {
     path: '/install',
+    meta: { title: '安装向导' },
     component: () => import('@/views/system/Installation')
   },
   {
