@@ -275,7 +275,7 @@ export default {
       }
 
       // Handle migration
-      if (this.migrationFile) {
+      if (this.migrationData) {
         recoveryApi.migrate(this.migrationData).then(response => {
           this.$log.debug('Migrated successfullly')
           this.$message.success('数据迁移成功')
