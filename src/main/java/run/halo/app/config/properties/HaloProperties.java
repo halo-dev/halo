@@ -38,6 +38,7 @@ public class HaloProperties {
     private String workDir = HaloConst.USER_HOME + "/.halo/";
 
     public HaloProperties() throws IOException {
+        // Create work directory if not exist
         Files.createDirectories(Paths.get(workDir));
     }
 }
