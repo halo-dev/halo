@@ -1,6 +1,8 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
@@ -20,11 +22,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.controller.support.PageJacksonSerializer;
 import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
-import run.halo.app.controller.support.PageJacksonSerializer;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -111,13 +114,20 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      * @return new FreeMarkerConfigurer
      */
     @Bean
-    public FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties) {
+    public FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties) throws IOException, TemplateException {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
         configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
-//        if (haloProperties.isProductionEnv()) {
-//            configurer.getConfiguration().setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-//        }
+
+        // Predefine configuration
+        freemarker.template.Configuration configuration = configurer.createConfiguration();
+        if (haloProperties.isProductionEnv()) {
+            configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        }
+
+        // Set predefined freemarker configuration
+        configurer.setConfiguration(configuration);
+
         return configurer;
     }
 
