@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.entity.*;
+import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.enums.LogType;
-import run.halo.app.model.params.CategoryParam;
-import run.halo.app.model.params.InstallParam;
+import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.*;
 import run.halo.app.model.properties.*;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.service.*;
@@ -25,7 +27,9 @@ import run.halo.app.utils.ValidationUtils;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
@@ -83,7 +87,6 @@ public class InstallController {
         boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
         if (isInstalled) {
-            // TODO i18n
             throw new BadRequestException("该博客已初始化，不能再次安装！");
         }
 
@@ -100,59 +103,71 @@ public class InstallController {
         Post post = createDefaultPost(category);
 
         // Create default postComment
-        PostComment postComment = createDefaultComment();
+        createDefaultComment(post);
 
         // Create default menu
         createDefaultMenu();
 
         // TODO Handle option cache
 
-        // TODO i18n
+
         eventPublisher.publishEvent(
                 new LogEvent(this, user.getId().toString(), LogType.BLOG_INITIALIZED, "博客已成功初始化")
         );
 
-        // TODO i18n
+
         return BaseResponse.ok("安装完成！");
     }
 
     private void createDefaultMenu() {
-        Menu menuIndex = new Menu();
-        // TODO i18n
+        MenuParam menuIndex = new MenuParam();
+
         menuIndex.setName("首页");
         menuIndex.setUrl("/");
         menuIndex.setPriority(1);
-        menuService.create(menuIndex);
 
-        Menu menuArchive = new Menu();
-        // TODO i18n
+        menuService.create(menuIndex.convertTo());
+
+        MenuParam menuArchive = new MenuParam();
+
         menuArchive.setName("归档");
         menuArchive.setUrl("/archives");
         menuArchive.setPriority(2);
-        menuService.create(menuArchive);
+        menuService.create(menuArchive.convertTo());
     }
 
 
-    private PostComment createDefaultComment() {
-        // TODO Create default comment
-        return null;
+    private void createDefaultComment(Post post) {
+        PostCommentParam commentParam = new PostCommentParam();
+        commentParam.setAuthor("Halo Bot");
+        commentParam.setAuthorUrl("https://github.com/halo-dev/halo");
+        commentParam.setContent("欢迎使用 Halo，这是你的第一条评论。");
+        commentParam.setEmail("i@ryanc.cc");
+        commentParam.setPostId(post.getId());
+        postCommentService.create(commentParam.convertTo());
     }
 
     private Post createDefaultPost(Category category) {
-        // TODO Create default post
-        return null;
+        PostParam postParam = new PostParam();
+        postParam.setUrl("hello-halo");
+        postParam.setTitle("Hello Halo");
+        postParam.setStatus(PostStatus.PUBLISHED);
+        postParam.setOriginalContent("## Hello Halo!\n" +
+                "\n" +
+                "感谢使用 [Halo](https://github.com/halo-dev/halo) 进行创作，请删除该文章开始吧！");
+        Set<Integer> categoryIds = new HashSet<>();
+        categoryIds.add(category.getId());
+        postParam.setCategoryIds(categoryIds);
+        return postService.create(postParam.convertTo());
     }
 
     @NonNull
     private Category createDefaultCategory() {
         CategoryParam category = new CategoryParam();
-
         category.setName("未分类");
         category.setSlugName("default");
         category.setDescription("未分类");
-
         ValidationUtils.validate(category);
-
         return categoryService.create(category.convertTo());
     }
 
