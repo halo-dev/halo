@@ -14,19 +14,19 @@
     <meta name="author" content="${user.nickName!}" />
     <meta name="keywords" content="${keywords!}"/>
     <meta name="description" content="${description!}" />
-    <@verification></@verification>
-    <@favicon></@favicon>
+    <@verification />
+    <@favicon />
     <link href="/${theme.folderName}/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="/${theme.folderName}/source/css/blog_basic.min.css?version=88107691fe">
     <link href="/${theme.folderName}/source/css/style.min.css" type="text/css" rel="stylesheet" />
-    <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/feed.xml">
+    <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml">
     <style>
-        <#if !(settings.post_title_uppper!true)>
+        <#if !settings.post_title_uppper!true>
         .post .post-title h3 {
             text-transform: none;
         }
         </#if>
-        <#if !(settings.blog_title_uppper!true)>
+        <#if !settings.blog_title_uppper!true>
         .sidebar .logo-title .title h3 {
             text-transform: none;
         }
@@ -64,7 +64,7 @@
         $(".nav li a").eq(0).addClass('current');
     }
 
-    <#if (options.anatole_style_hitokoto!'false')=="true">
+    <#if settings.hitokoto!false>
 	  var xhr = new XMLHttpRequest();
 	  xhr.open('get', 'https://v1.hitokoto.cn');
 	  xhr.onreadystatechange = function () {
@@ -77,7 +77,7 @@
 	  xhr.send();
     </#if>
 </script>
-<@statistics></@statistics>
+<@statistics />
 </body>
 </html>
 </#macro>

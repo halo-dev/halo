@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="标签：${tag.name} · ${options.blog_title!'Halo'}" keywords="${options.seo_keywords!'Halo'}" description="${options.seo_desc!'Halo'}"></@head>
+<@head title="标签：${tag.name} · ${options.blog_title!'Anatole'}" keywords="${options.seo_keywords!'Anatole'}" description="${options.seo_description!'Anatole'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <#include "module/page-top.ftl">
