@@ -29,7 +29,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @date 4/2/19
  */
 @RestController("ApiContentPostController")
-@RequestMapping("/api/portal/posts")
+@RequestMapping("/api/content/posts")
 public class PostController {
 
     private final PostService postService;

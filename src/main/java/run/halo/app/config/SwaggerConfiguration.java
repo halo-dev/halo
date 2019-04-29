@@ -69,7 +69,7 @@ public class SwaggerConfiguration {
 
         return buildApiDocket("run.halo.app.content.api",
                 "run.halo.app.controller.content.api",
-                "/api/portal/**")
+                "/api/content/**")
                 .securitySchemes(portalApiKeys())
                 .securityContexts(portalSecurityContext())
                 .enable(!haloProperties.isDocDisabled());
@@ -149,7 +149,7 @@ public class SwaggerConfiguration {
         return Collections.singletonList(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
-                        .forPaths(PathSelectors.regex("/api/portal/.*"))
+                        .forPaths(PathSelectors.regex("/api/content/.*"))
                         .build()
         );
     }
