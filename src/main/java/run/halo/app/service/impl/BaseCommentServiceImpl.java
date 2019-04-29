@@ -197,6 +197,11 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public long countByStatus(CommentStatus status) {
+        return baseCommentRepository.countByStatus(status);
+    }
+
+    @Override
     public COMMENT create(COMMENT comment) {
         Assert.notNull(comment, "Domain must not be null");
 

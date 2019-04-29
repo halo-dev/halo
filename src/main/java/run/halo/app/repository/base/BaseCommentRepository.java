@@ -62,6 +62,14 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
     List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
 
     /**
+     * Counts by comment status.
+     *
+     * @param status comment status must not be null
+     * @return comment count
+     */
+    long countByStatus(@NonNull CommentStatus status);
+
+    /**
      * Finds comments by post id, comment status.
      *
      * @param postId post id must not be null

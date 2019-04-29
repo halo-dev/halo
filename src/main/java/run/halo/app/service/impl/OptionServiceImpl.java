@@ -20,6 +20,7 @@ import run.halo.app.model.properties.*;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 
@@ -378,6 +379,15 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         }
 
         return blogUrl;
+    }
+
+    @Override
+    public long getBirthday() {
+        return getByProperty(PrimaryProperties.BIRTHDAY, Long.class).orElseGet(() -> {
+            long currentTime = DateUtils.now().getTime();
+            saveProperty(PrimaryProperties.BIRTHDAY, String.valueOf(currentTime));
+            return currentTime;
+        });
     }
 
     private void publishOptionUpdatedEvent() {

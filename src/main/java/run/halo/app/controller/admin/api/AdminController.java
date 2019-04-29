@@ -6,13 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.dto.CountDTO;
-import run.halo.app.model.dto.UserDTO;
-import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
-import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.filter.AdminAuthenticationFilter;
-import run.halo.app.service.*;
+import run.halo.app.security.token.AuthToken;
+import run.halo.app.service.AdminService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,30 +26,10 @@ import javax.validation.Valid;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    private final PostService postService;
+    private final AdminService adminService;
 
-    private final AttachmentService attachmentService;
-
-    private final PostCommentService postCommentService;
-
-    private final OptionService optionService;
-
-    private final UserService userService;
-
-    private final LinkService linkService;
-
-    public AdminController(PostService postService,
-                           AttachmentService attachmentService,
-                           PostCommentService postCommentService,
-                           OptionService optionService,
-                           UserService userService,
-                           LinkService linkService) {
-        this.postService = postService;
-        this.attachmentService = attachmentService;
-        this.postCommentService = postCommentService;
-        this.optionService = optionService;
-        this.userService = userService;
-        this.linkService = linkService;
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
 
     /**
@@ -62,36 +40,20 @@ public class AdminController {
     @GetMapping("counts")
     @ApiOperation("Gets count info")
     public CountDTO getCount() {
-        CountDTO countDTO = new CountDTO();
-        countDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
-        countDTO.setAttachmentCount(attachmentService.count());
-        countDTO.setCommentCount(postCommentService.count());
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        // Calculate birthday
-        // TODO Initialize the birthday if absent
-        Long birthday = optionService.getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, Long.class, currentTimeMillis);
-        long days = (currentTimeMillis - birthday) / (1000 * 24 * 3600);
-        countDTO.setEstablishDays(days);
-
-        countDTO.setLinkCount(linkService.count());
-        countDTO.setVisitCount(postService.countVisit());
-        countDTO.setLikeCount(postService.countLike());
-        return countDTO;
+        return adminService.getCount();
     }
 
-    @PostMapping("login")
-    @ApiOperation("Login with session")
-    @CacheLock(autoDelete = false, traceRequest = true)
-    public UserDTO login(@Valid @RequestBody LoginParam loginParam, HttpServletRequest request) {
-        return new UserDTO().convertFrom(userService.login(loginParam.getUsername(), loginParam.getPassword(), request.getSession()));
+    @PostMapping("auth/login")
+    @ApiOperation("Login")
+    public AuthToken auth(@RequestBody @Valid LoginParam loginParam) {
+        return adminService.authenticate(loginParam);
     }
 
     @PostMapping("logout")
     @ApiOperation("Logs out (Clear session)")
     @CacheLock
     public void logout(HttpServletRequest request) {
+        adminService.clearAuthentication();
         // Check if the current is logging in
         boolean authenticated = SecurityContextHolder.getContext().isAuthenticated();
 
