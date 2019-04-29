@@ -5,6 +5,7 @@ import freemarker.template.*;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.CategoryService;
+import run.halo.app.service.PostCategoryService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,9 +21,11 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
 
     private final CategoryService categoryService;
 
-    public CategoryTagDirective(Configuration configuration, CategoryService categoryService) {
-        this.categoryService = categoryService;
+    private final PostCategoryService postCategoryService;
 
+    public CategoryTagDirective(Configuration configuration, CategoryService categoryService, PostCategoryService postCategoryService) {
+        this.categoryService = categoryService;
+        this.postCategoryService = postCategoryService;
         configuration.setSharedVariable("categoryTag", this);
     }
 
@@ -32,10 +35,13 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
+            Integer postId = Integer.parseInt(params.get("postId").toString());
             switch (method) {
                 case "list":
                     env.setVariable("categories", builder.build().wrap(categoryService.listAll()));
                     break;
+                case "listByPostId":
+                    env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoryBy(postId)));
                 case "count":
                     env.setVariable("count", builder.build().wrap(categoryService.count()));
                     break;

@@ -1,10 +1,11 @@
 package run.halo.app.model.freemarker.tag;
 
-import run.halo.app.model.support.HaloConst;
-import run.halo.app.service.TagService;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.stereotype.Component;
+import run.halo.app.model.support.HaloConst;
+import run.halo.app.service.PostTagService;
+import run.halo.app.service.TagService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,8 +21,11 @@ public class TagTagDirective implements TemplateDirectiveModel {
 
     private final TagService tagService;
 
-    public TagTagDirective(Configuration configuration, TagService tagService) {
+    private final PostTagService postTagService;
+
+    public TagTagDirective(Configuration configuration, TagService tagService, PostTagService postTagService) {
         this.tagService = tagService;
+        this.postTagService = postTagService;
         configuration.setSharedVariable("tagTag", this);
     }
 
@@ -31,9 +35,13 @@ public class TagTagDirective implements TemplateDirectiveModel {
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
+            Integer postId = Integer.parseInt(params.get("postId").toString());
             switch (method) {
                 case "list":
                     env.setVariable("tags", builder.build().wrap(tagService.listAll()));
+                    break;
+                case "listByPostId":
+                    env.setVariable("tags", builder.build().wrap(postTagService.listTagsBy(postId)));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(tagService.count()));
