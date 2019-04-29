@@ -78,7 +78,7 @@ public class AdminServiceImpl implements AdminService {
 
         if (SecurityContextHolder.getContext().isAuthenticated()) {
             // If the user has been logged in
-            throw new BadRequestException("您已经登录，无需重复登录");
+            throw new BadRequestException("You have been logged in, do not log in repeatedly please");
         }
 
         String username = loginParam.getUsername();
