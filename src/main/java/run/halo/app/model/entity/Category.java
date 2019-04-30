@@ -14,11 +14,9 @@ import javax.persistence.*;
  *
  * @author johnniang
  */
+@Data
 @Entity
 @Table(name = "categories")
-@SQLDelete(sql = "update categories set deleted = true where id = ?")
-@Where(clause = "deleted = false")
-@Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Category extends BaseEntity {

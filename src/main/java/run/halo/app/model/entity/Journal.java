@@ -14,11 +14,9 @@ import javax.persistence.*;
  * @author johnniang
  * @date 3/22/19
  */
+@Data
 @Entity
 @Table(name = "journals")
-@SQLDelete(sql = "update journals set deleted = true where id = ?")
-@Where(clause = "deleted = false")
-@Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Journal extends BaseEntity {

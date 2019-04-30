@@ -18,8 +18,6 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "attachments")
-@SQLDelete(sql = "update attachments set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Attachment extends BaseEntity {

@@ -17,8 +17,6 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "tags", indexes = @Index(columnList = "slug_name"))
-@SQLDelete(sql = "update tags set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Tag extends BaseEntity {

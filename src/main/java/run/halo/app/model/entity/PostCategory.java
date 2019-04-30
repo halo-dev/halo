@@ -15,8 +15,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "post_categories")
-@SQLDelete(sql = "update post_categories set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @Data
 @ToString(callSuper = true)
 public class PostCategory extends BaseEntity {

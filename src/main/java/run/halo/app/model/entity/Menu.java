@@ -17,8 +17,6 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "menus")
-@SQLDelete(sql = "update menus set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Menu extends BaseEntity {

@@ -14,11 +14,9 @@ import javax.persistence.*;
  *
  * @author johnniang
  */
+@Data
 @Entity
 @Table(name = "options")
-@SQLDelete(sql = "update options set deleted = true where id = ?")
-@Where(clause = "deleted = false")
-@Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

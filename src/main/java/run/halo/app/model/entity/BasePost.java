@@ -17,12 +17,10 @@ import java.util.Date;
  *
  * @author johnniang
  */
+@Data
 @Entity(name = "BasePost")
 @Table(name = "posts", indexes = @Index(columnList = "url"))
-@SQLDelete(sql = "update posts set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
-@Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BasePost extends BaseEntity {

@@ -18,8 +18,6 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "photos")
-@SQLDelete(sql = "update photos set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Photo extends BaseEntity {
