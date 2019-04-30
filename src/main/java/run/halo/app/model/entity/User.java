@@ -20,8 +20,6 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "users")
-@SQLDelete(sql = "update users set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseEntity {

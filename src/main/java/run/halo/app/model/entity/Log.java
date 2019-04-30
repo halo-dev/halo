@@ -16,11 +16,9 @@ import javax.persistence.*;
  *
  * @author johnniang
  */
+@Data
 @Entity
 @Table(name = "logs")
-@SQLDelete(sql = "update logs set deleted = true where id = ?")
-@Where(clause = "deleted = false")
-@Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Log extends BaseEntity {

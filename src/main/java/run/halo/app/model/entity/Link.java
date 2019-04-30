@@ -17,8 +17,6 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "links")
-@SQLDelete(sql = "update links set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Link extends BaseEntity {

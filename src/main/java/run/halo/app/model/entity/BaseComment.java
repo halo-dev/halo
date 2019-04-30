@@ -14,12 +14,10 @@ import javax.persistence.*;
  *
  * @author johnniang
  */
+@Data
 @Entity(name = "BaseComment")
 @Table(name = "comments")
-@SQLDelete(sql = "update comments set deleted = true where id = ?")
-@Where(clause = "deleted = false")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
-@Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BaseComment extends BaseEntity {
