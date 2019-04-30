@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
-import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
@@ -182,12 +181,17 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public boolean isTemplateExist(String template) {
-        StrBuilder templatePath = new StrBuilder(getActivatedThemeId());
-        templatePath.append("/");
-        templatePath.append(template);
-        File file = new File(getThemeBasePath(), templatePath.toString());
-        return file.exists();
+    public boolean templateExists(String template) {
+        Assert.hasText(template, "Template must not be blank");
+
+        // Resolve template path
+        Path templatePath = getBasePath().resolve(getActivatedTheme().getFolderName()).resolve(template);
+
+        // Check the directory
+        checkDirectory(templatePath.toString());
+
+        // Check existence
+        return Files.exists(templatePath);
     }
 
     @Override
