@@ -14,25 +14,7 @@
           title="最新文章"
           :bodyStyle="{ padding: '0px' }"
         >
-          <a-table
-            :rowKey="post => post.id"
-            :columns="postColumns"
-            :dataSource="formattedPostData"
-            :pagination="false"
-          >
-            <span
-              slot="status"
-              slot-scope="status"
-            >
-              <a-badge :status="status.status" />
-              {{ status.text }}
-            </span>
-
-            <span
-              slot="editTime"
-              slot-scope="editTime"
-            >{{ editTime | timeAgo }}</span>
-          </a-table>
+          最新文章
         </a-card>
       </a-col>
       <a-col
@@ -48,12 +30,7 @@
           title="最新评论"
           :bodyStyle="{ padding: '0px' }"
         >
-          <a-table
-            :rowKey="comment => comment.id"
-            :columns="commentColumns"
-            :dataSource="commentData"
-            :pagination="false"
-          ></a-table>
+          最新评论
         </a-card>
       </a-col>
       <a-col
@@ -69,12 +46,7 @@
           title="最新日志"
           :bodyStyle="{ padding: '0px' }"
         >
-          <a-table
-            :rowKey="comment => comment.id"
-            :columns="commentColumns"
-            :dataSource="commentData"
-            :pagination="false"
-          ></a-table>
+          最新日志
         </a-card>
       </a-col>
     </a-row>

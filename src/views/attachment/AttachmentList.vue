@@ -97,7 +97,7 @@
               </div>
               <a-card-meta>
                 <ellipsis
-                  :length="isMobile()?36:18"
+                  :length="isMobile()?36:16"
                   tooltip
                   slot="description"
                 >{{ item.name }}</ellipsis>

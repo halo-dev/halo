@@ -17,6 +17,7 @@
             :boxShadow="false"
             :toolbars="toolbars"
             :ishljs="true"
+            :autofocus="false"
           />
         </div>
       </a-col>

@@ -400,8 +400,8 @@ export default {
 <style lang="less" scoped>
 .upload-button {
   position: fixed;
-  bottom: 80px;
-  right: 20px;
+  bottom: 30px;
+  right: 30px;
 }
 .theme-thumb {
   width: 100%;
