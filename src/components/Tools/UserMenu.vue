@@ -80,7 +80,7 @@ export default {
     this.loadOptions()
   },
   methods: {
-    ...mapActions(['Logout']),
+    ...mapActions(['logout']),
     ...mapGetters(['nickname']),
     handleLogout() {
       const that = this
@@ -90,7 +90,7 @@ export default {
         content: '真的要注销登录吗 ?',
         onOk() {
           return that
-            .Logout({})
+            .logout({})
             .then(() => {
               window.location.reload()
             })

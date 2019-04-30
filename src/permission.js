@@ -21,6 +21,7 @@ router.beforeEach((to, from, next) => {
     // TODO Get installation status
 
     next()
+    NProgress.done()
     return
   }
 
@@ -28,12 +29,10 @@ router.beforeEach((to, from, next) => {
   // Check whitelist
   if (whiteList.includes(to.name)) {
     next()
+    NProgress.done()
     return
   }
 
   next({ name: 'Login', query: { redirect: to.fullPath } })
-})
-
-router.afterEach(() => {
   NProgress.done()
 })
