@@ -56,7 +56,7 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
-                      @click="loadAttachments(true)"
+                      @click="handleQuery"
                     >查询</a-button>
                     <a-button
                       style="margin-left: 8px;"
@@ -196,13 +196,10 @@ export default {
     this.loadMediaTypes()
   },
   methods: {
-    loadAttachments(isSearch) {
+    loadAttachments() {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      if (isSearch) {
-        this.queryParam.page = 0
-      }
       this.listLoading = true
       attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
@@ -236,6 +233,10 @@ export default {
       this.queryParam.keyword = null
       this.queryParam.mediaType = null
       this.queryParam.attachmentType = null
+      this.loadAttachments()
+    },
+    handleQuery() {
+      this.queryParam.page = 0
       this.loadAttachments()
     },
     handleDelete(attachment) {
