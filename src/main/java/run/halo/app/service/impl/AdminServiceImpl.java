@@ -77,11 +77,6 @@ public class AdminServiceImpl implements AdminService {
     public AuthToken authenticate(LoginParam loginParam) {
         Assert.notNull(loginParam, "Login param must not be null");
 
-        if (SecurityContextHolder.getContext().isAuthenticated()) {
-            // If the user has been logged in
-            throw new BadRequestException("You have been logged in, do not log in repeatedly please");
-        }
-
         String username = loginParam.getUsername();
         User user = Validator.isEmail(username) ?
                 userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
@@ -91,6 +86,11 @@ public class AdminServiceImpl implements AdminService {
         if (!userService.passwordMatch(user, loginParam.getPassword())) {
             // If the password is mismatch
             throw new BadRequestException("Username or password is incorrect");
+        }
+
+        if (SecurityContextHolder.getContext().isAuthenticated()) {
+            // If the user has been logged in
+            throw new BadRequestException("You have been logged in, do not log in repeatedly please");
         }
 
         // Generate new token
