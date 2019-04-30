@@ -135,4 +135,10 @@ public class ThemeController {
     public ThemeProperty fetchTheme(@RequestParam("uri") String uri) {
         return themeService.fetch(uri);
     }
+
+    @PostMapping("reload")
+    @ApiOperation("Reloads themes")
+    public void reload() {
+        themeService.reload();
+    }
 }

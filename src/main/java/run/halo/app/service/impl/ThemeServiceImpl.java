@@ -433,6 +433,11 @@ public class ThemeServiceImpl implements ThemeService {
         }
     }
 
+    @Override
+    public void reload() {
+        eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
+    }
+
     /**
      * Clones theme from git.
      *
