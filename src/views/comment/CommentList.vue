@@ -37,7 +37,7 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
-                  @click="loadComments"
+                  @click="loadComments(isSearch)"
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
@@ -204,12 +204,15 @@ export default {
     this.loadComments()
   },
   methods: {
-    loadComments() {
+    loadComments(isSearch) {
       this.commentsLoading = true
       // Set from pagination
       this.queryParam.page = this.pagination.current - 1
       this.queryParam.size = this.pagination.pageSize
       this.queryParam.sort = this.pagination.sort
+      if (isSearch) {
+        this.queryParam.page = 0
+      }
       if (this.tableListMode) {
         commentApi.query(this.queryParam).then(response => {
           this.comments = response.data.data.content
