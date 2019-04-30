@@ -16,6 +16,7 @@ import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.filter.CorsFilter;
+import run.halo.app.filter.GuardFilter;
 import run.halo.app.filter.LogFilter;
 import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.filter.ApiAuthenticationFilter;
@@ -73,6 +74,15 @@ public class HaloConfiguration {
         corsFilter.addUrlPatterns("/api/*");
 
         return corsFilter;
+    }
+
+    @Bean
+    public FilterRegistrationBean<GuardFilter> guardFilter() {
+        FilterRegistrationBean<GuardFilter> guardFilter = new FilterRegistrationBean<>();
+        guardFilter.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        guardFilter.setFilter(new GuardFilter());
+        guardFilter.addUrlPatterns("/api/*");
+        return guardFilter;
     }
 
     /**
