@@ -66,7 +66,7 @@ public class ContentSheetController {
         model.addAttribute("sheet", sheetService.convertToDetail(sheet));
 
         if (StrUtil.isNotEmpty(sheet.getTemplate())) {
-            if (themeService.isTemplateExist(sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            if (themeService.templateExists(sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
                 return themeService.render(sheet.getTemplate());
             }
         }

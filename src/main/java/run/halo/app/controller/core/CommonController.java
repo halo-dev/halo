@@ -8,12 +8,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.FileNotFoundException;
 
 /**
  * Error page Controller
@@ -105,7 +103,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/404")
     public String contentNotFround() {
-        if (!themeService.isTemplateExist(NOT_FROUND_TEMPLATE)) {
+        if (!themeService.templateExists(NOT_FROUND_TEMPLATE)) {
             return "common/error/404";
         }
         StrBuilder path = new StrBuilder("themes/");
@@ -121,7 +119,7 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/500")
     public String contentInternalError() {
-        if (!themeService.isTemplateExist(INTERNAL_ERROR_TEMPLATE)) {
+        if (!themeService.templateExists(INTERNAL_ERROR_TEMPLATE)) {
             return "common/error/500";
         }
         StrBuilder path = new StrBuilder("themes/");

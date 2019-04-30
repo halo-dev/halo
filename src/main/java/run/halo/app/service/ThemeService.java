@@ -119,10 +119,10 @@ public interface ThemeService {
     /**
      * Judging whether template exists under the specified theme
      *
-     * @param template template
+     * @param template template must not be blank
      * @return boolean
      */
-    boolean isTemplateExist(@NonNull String template);
+    boolean templateExists(@NonNull String template);
 
     /**
      * Checks whether theme exists under template path
