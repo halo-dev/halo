@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 
@@ -65,7 +66,9 @@ public class ContentSheetController {
         model.addAttribute("sheet", sheetService.convertToDetail(sheet));
 
         if (StrUtil.isNotEmpty(sheet.getTemplate())) {
-            return themeService.render(sheet.getTemplate());
+            if (themeService.isTemplateExist(sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
+                return themeService.render(sheet.getTemplate());
+            }
         }
         return themeService.render("sheet");
     }
