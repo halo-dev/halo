@@ -4,7 +4,7 @@ import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.User;
@@ -94,13 +95,13 @@ public class InstallController {
         initSettings(installParam);
 
         // Create default user
-        User user = createDefaultUser(installParam);
+        User user = createUser(installParam);
 
         // Create default category
-        Category category = createDefaultCategory();
+        Category category = createDefaultCategoryIfAbsent();
 
         // Create default post
-        Post post = createDefaultPost(category);
+        Post post = createDefaultPostIfAbsent(category);
 
         // Create default postComment
         createDefaultComment(post);
@@ -108,18 +109,20 @@ public class InstallController {
         // Create default menu
         createDefaultMenu();
 
-        // TODO Handle option cache
-
-
         eventPublisher.publishEvent(
                 new LogEvent(this, user.getId().toString(), LogType.BLOG_INITIALIZED, "博客已成功初始化")
         );
-
 
         return BaseResponse.ok("安装完成！");
     }
 
     private void createDefaultMenu() {
+        long menuCount = menuService.count();
+
+        if (menuCount > 0) {
+            return;
+        }
+
         MenuParam menuIndex = new MenuParam();
 
         menuIndex.setName("首页");
@@ -137,17 +140,28 @@ public class InstallController {
     }
 
 
-    private void createDefaultComment(Post post) {
+    @Nullable
+    private BaseComment createDefaultComment(@Nullable Post post) {
+        if (post == null) {
+            return null;
+        }
+
         PostCommentParam commentParam = new PostCommentParam();
         commentParam.setAuthor("Halo Bot");
         commentParam.setAuthorUrl("https://github.com/halo-dev/halo");
         commentParam.setContent("欢迎使用 Halo，这是你的第一条评论。");
         commentParam.setEmail("i@ryanc.cc");
         commentParam.setPostId(post.getId());
-        postCommentService.create(commentParam.convertTo());
+        return postCommentService.create(commentParam.convertTo());
     }
 
-    private Post createDefaultPost(Category category) {
+    @Nullable
+    private Post createDefaultPostIfAbsent(@Nullable Category category) {
+        long publishedCount = postService.countByStatus(PostStatus.PUBLISHED);
+        if (publishedCount > 0) {
+            return null;
+        }
+
         PostParam postParam = new PostParam();
         postParam.setUrl("hello-halo");
         postParam.setTitle("Hello Halo");
@@ -155,14 +169,22 @@ public class InstallController {
         postParam.setOriginalContent("## Hello Halo!\n" +
                 "\n" +
                 "感谢使用 [Halo](https://github.com/halo-dev/halo) 进行创作，请删除该文章开始吧！");
-        Set<Integer> categoryIds = new HashSet<>();
-        categoryIds.add(category.getId());
-        postParam.setCategoryIds(categoryIds);
+
+        if (category != null) {
+            Set<Integer> categoryIds = new HashSet<>();
+            categoryIds.add(category.getId());
+            postParam.setCategoryIds(categoryIds);
+        }
         return postService.createOrUpdateBy(postParam.convertTo());
     }
 
-    @NonNull
-    private Category createDefaultCategory() {
+    @Nullable
+    private Category createDefaultCategoryIfAbsent() {
+        long categoryCount = categoryService.count();
+        if (categoryCount == 0) {
+            return null;
+        }
+
         CategoryParam category = new CategoryParam();
         category.setName("未分类");
         category.setSlugName("default");
@@ -171,8 +193,14 @@ public class InstallController {
         return categoryService.create(category.convertTo());
     }
 
-    private User createDefaultUser(InstallParam installParam) {
-        return userService.createBy(installParam);
+    private User createUser(InstallParam installParam) {
+        // Get user
+        return userService.getCurrentUser().map(user -> {
+            // Update this user
+            installParam.update(user);
+            // Update user
+            return userService.update(user);
+        }).orElseGet(() -> userService.createBy(installParam));
     }
 
     private void initSettings(InstallParam installParam) {
