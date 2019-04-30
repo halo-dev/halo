@@ -53,7 +53,7 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
-                  @click="loadPosts"
+                  @click="loadPosts(true)"
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
@@ -275,12 +275,15 @@ export default {
     this.loadPosts()
   },
   methods: {
-    loadPosts() {
+    loadPosts(isSearch) {
       this.postsLoading = true
       // Set from pagination
       this.queryParam.page = this.pagination.current - 1
       this.queryParam.size = this.pagination.pageSize
       this.queryParam.sort = this.pagination.sort
+      if (isSearch) {
+        this.queryParam.page = 0
+      }
       postApi.query(this.queryParam).then(response => {
         this.posts = response.data.data.content
         this.pagination.total = response.data.data.total
