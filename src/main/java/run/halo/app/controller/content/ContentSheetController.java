@@ -63,7 +63,9 @@ public class ContentSheetController {
                         Model model) {
         Sheet sheet = sheetService.getBy(PostStatus.PUBLISHED, url);
 
+        // sheet and post all can use
         model.addAttribute("sheet", sheetService.convertToDetail(sheet));
+        model.addAttribute("post",sheetService.convertToDetail(sheet));
 
         if (StrUtil.isNotEmpty(sheet.getTemplate())) {
             if (themeService.templateExists(sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {

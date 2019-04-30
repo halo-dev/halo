@@ -2,6 +2,7 @@ package run.halo.app.model.freemarker.tag;
 
 import freemarker.core.Environment;
 import freemarker.template.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.CategoryService;
@@ -9,6 +10,8 @@ import run.halo.app.service.PostCategoryService;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Freemarker custom tag of category.
@@ -37,7 +40,7 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    env.setVariable("categories", builder.build().wrap(categoryService.listAll()));
+                    env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoryWithPostCountDto(Sort.by(DESC, "createTime"))));
                     break;
                 case "listByPostId":
                     Integer postId = Integer.parseInt(params.get("postId").toString());
