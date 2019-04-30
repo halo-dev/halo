@@ -65,8 +65,8 @@ public class ThemeController {
     }
 
     @GetMapping("files/custom")
-    public List<String> customTemplate() {
-        return themeService.getCustomTpl(themeService.getActivatedThemeId());
+    public Set<String> customTemplate() {
+        return themeService.listCustomTemplates(themeService.getActivatedThemeId());
     }
 
     @PostMapping("{themeId}/activation")

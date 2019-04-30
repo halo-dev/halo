@@ -66,6 +66,8 @@ public interface ThemeService {
      */
     String THEMES_CACHE_KEY = "themes";
 
+    String CUSTOM_SHEET_PREFIX = "sheet_";
+
     /**
      * Get theme property by theme id.
      *
@@ -109,12 +111,12 @@ public interface ThemeService {
     List<ThemeFile> listThemeFolderBy(@NonNull String themeId);
 
     /**
-     * Gets custom template, such as page_xxx.ftl, and xxx will be template name
+     * Lists a set of custom template, such as sheet_xxx.ftl, and xxx will be template name
      *
-     * @param themeId theme id
-     * @return List
+     * @param themeId theme id must not be blank
+     * @return a set of templates
      */
-    List<String> getCustomTpl(@NonNull String themeId);
+    Set<String> listCustomTemplates(@NonNull String themeId);
 
     /**
      * Judging whether template exists under the specified theme
@@ -130,14 +132,7 @@ public interface ThemeService {
      * @param themeId theme name
      * @return boolean
      */
-    boolean isThemeExist(@NonNull String themeId);
-
-    /**
-     * Gets theme base path.
-     *
-     * @return File
-     */
-    File getThemeBasePath();
+    boolean themeExists(@NonNull String themeId);
 
     /**
      * Gets theme base path.

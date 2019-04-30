@@ -3,8 +3,6 @@ package run.halo.app.service.impl;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.io.file.FileWriter;
-import cn.hutool.core.util.StrUtil;
-import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -38,7 +36,6 @@ import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,13 +57,11 @@ public class ThemeServiceImpl implements ThemeService {
     /**
      * Theme work directory.
      */
-    private final Path workDir;
+    private final Path themeWorkDir;
 
     private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
-
-    private final Configuration configuration;
 
     private final ThemeConfigResolver themeConfigResolver;
 
@@ -89,19 +84,17 @@ public class ThemeServiceImpl implements ThemeService {
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
                             StringCacheStore cacheStore,
-                            Configuration configuration,
                             ThemeConfigResolver themeConfigResolver,
                             ThemePropertyResolver themePropertyResolver,
                             RestTemplate restTemplate,
                             ApplicationEventPublisher eventPublisher) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
-        this.configuration = configuration;
         this.themeConfigResolver = themeConfigResolver;
         this.themePropertyResolver = themePropertyResolver;
         this.restTemplate = restTemplate;
 
-        workDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
+        themeWorkDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
         this.eventPublisher = eventPublisher;
     }
 
@@ -114,8 +107,10 @@ public class ThemeServiceImpl implements ThemeService {
     public Optional<ThemeProperty> getThemeBy(String themeId) {
         Assert.hasText(themeId, "Theme id must not be blank");
 
+        // Get all themes
         Set<ThemeProperty> themes = getThemes();
 
+        // filter and find first
         return themes.stream().filter(themeProperty -> StringUtils.equals(themeProperty.getId(), themeId)).findFirst();
     }
 
@@ -165,19 +160,23 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public List<String> getCustomTpl(String themeId) {
-        List<String> templates = new ArrayList<>();
-        File themePath = new File(getThemeBasePath(), themeId);
-        File[] themeFiles = themePath.listFiles();
-        if (null != themeFiles && themeFiles.length > 0) {
-            for (File file : themeFiles) {
-                String[] split = StrUtil.removeSuffix(file.getName(), HaloConst.SUFFIX_FTL).split("_");
-                if (split.length == 2 && "sheet".equals(split[0])) {
-                    templates.add(StrUtil.removeSuffix(file.getName(), HaloConst.SUFFIX_FTL));
-                }
-            }
+    public Set<String> listCustomTemplates(String themeId) {
+        // Get the theme path
+        Path themePath = Paths.get(getThemeOfNonNullBy(themeId).getThemePath());
+
+        try {
+            return Files.list(themePath)
+                    .filter(path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), CUSTOM_SHEET_PREFIX))
+                    .map(path -> {
+                        // Remove prefix
+                        String customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), CUSTOM_SHEET_PREFIX);
+                        // Remove suffix
+                        return StringUtils.removeEndIgnoreCase(customTemplate, HaloConst.SUFFIX_FTL);
+                    })
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new ServiceException("Failed to list files of path " + themePath.toString(), e);
         }
-        return templates;
     }
 
     @Override
@@ -185,7 +184,7 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.hasText(template, "Template must not be blank");
 
         // Resolve template path
-        Path templatePath = getBasePath().resolve(getActivatedTheme().getFolderName()).resolve(template);
+        Path templatePath = Paths.get(getActivatedTheme().getThemePath(), template);
 
         // Check the directory
         checkDirectory(templatePath.toString());
@@ -195,18 +194,13 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public boolean isThemeExist(String themeId) {
+    public boolean themeExists(String themeId) {
         return getThemeBy(themeId).isPresent();
     }
 
     @Override
-    public File getThemeBasePath() {
-        return getBasePath().toFile();
-    }
-
-    @Override
     public Path getBasePath() {
-        return workDir;
+        return themeWorkDir;
     }
 
     @Override
@@ -400,7 +394,7 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         // Copy the temporary path to current theme folder
-        Path targetThemePath = workDir.resolve(tmpThemeProperty.getId());
+        Path targetThemePath = themeWorkDir.resolve(tmpThemeProperty.getId());
         FileUtils.copyFolder(themeTmpPath, targetThemePath);
 
         // Get property again
