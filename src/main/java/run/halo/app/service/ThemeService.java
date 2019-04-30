@@ -6,7 +6,6 @@ import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.support.ThemeFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -233,4 +232,9 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty fetch(@NonNull String uri);
+
+    /**
+     * Reloads themes
+     */
+    void reload();
 }
