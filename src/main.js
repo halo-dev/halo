@@ -6,26 +6,12 @@ import store from './store/'
 import './logger'
 
 import './core/lazy_use'
-import bootstrap from './core/bootstrap'
+import './permission'
 import '@/utils/filter' // global filter
 import './components'
 import animated from 'animate.css'
 
 Vue.config.productionTip = false
-
-router.beforeEach((to, from, next) => {
-  if (to.meta.title) {
-    document.title = to.meta.title + ' | Halo Dashboard'
-  }
-
-  if (to.name !== 'Login' && to.name !== 'Install' && to.name !== '404' && !store.getters.token) {
-    Vue.$log.debug('Redirectint to Login page')
-    next({ name: 'Login' })
-    return
-  }
-
-  next()
-})
 
 Vue.use(router)
 Vue.use(animated)
@@ -33,8 +19,5 @@ Vue.use(animated)
 new Vue({
   router,
   store,
-  created() {
-    bootstrap()
-  },
   render: h => h(App)
 }).$mount('#app')

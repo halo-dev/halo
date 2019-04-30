@@ -83,7 +83,11 @@ export default {
       })
     },
     loginSuccess() {
-      this.$router.push({ name: 'Dashboard' })
+      if (this.$route.query.redirect) {
+        this.$router.replace(this.$route.query.redirect)
+      } else {
+        this.$router.replace({ name: 'Dashboard' })
+      }
       // 延迟 1 秒显示欢迎信息
       setTimeout(() => {
         this.$notification.success({

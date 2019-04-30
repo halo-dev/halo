@@ -4,7 +4,7 @@ import adminApi from '@/api/admin'
 
 const user = {
   state: {
-    token: '',
+    token: null,
     name: '',
     avatar: '',
     roles: [],

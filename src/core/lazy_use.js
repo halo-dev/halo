@@ -7,6 +7,7 @@ import '@/core/lazy_lib/components_use'
 import Viser from 'viser-vue'
 import VueCropper from 'vue-cropper'
 import 'ant-design-vue/dist/antd.less'
+import bootstrap from './bootstrap'
 
 // ext library
 import VueClipboard from 'vue-clipboard2'
@@ -18,3 +19,5 @@ Vue.use(Viser)
 Vue.use(VueStorage, config.storageOptions)
 Vue.use(VueClipboard)
 Vue.use(VueCropper)
+
+bootstrap()
