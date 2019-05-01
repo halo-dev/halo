@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -97,6 +98,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
      * @return number of rows affected
      */
     @Override
+    @Transactional
     public long deleteByIdIn(Iterable<ID> ids) {
 
         log.debug("Customized deleteByIdIn method was invoked");

@@ -219,9 +219,17 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // Set some default values
-        comment.setIpAddress(ServletUtils.getRequestIp());
-        comment.setUserAgent(ServletUtils.getHeaderIgnoreCase(HttpHeaders.USER_AGENT));
-        comment.setGavatarMd5(DigestUtils.md5Hex(comment.getEmail()));
+        if (comment.getIpAddress() == null) {
+            comment.setIpAddress(ServletUtils.getRequestIp());
+        }
+
+        if (comment.getUserAgent() == null) {
+            comment.setUserAgent(ServletUtils.getHeaderIgnoreCase(HttpHeaders.USER_AGENT));
+        }
+
+        if (comment.getGavatarMd5() == null) {
+            comment.setGavatarMd5(DigestUtils.md5Hex(comment.getEmail()));
+        }
 
         if (authentication != null) {
             // Comment of blogger
@@ -368,15 +376,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         };
     }
 
-    /**
-     * Converts to base comment vo tree.
-     *
-     * @param comments   comments list could be null
-     * @param comparator comment comparator could be null
-     * @return a comment vo tree
-     */
     @NonNull
-    protected List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments, @Nullable Comparator<BaseCommentVO> comparator) {
+    public List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments, @Nullable Comparator<BaseCommentVO> comparator) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();
         }
@@ -408,32 +409,24 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             return;
         }
 
-        List<COMMENT> children = new LinkedList<>();
+        // Get children
+        List<COMMENT> children = comments.stream()
+                .filter(comment -> Objects.equals(parentComment.getId(), comment.getParentId()))
+                .collect(Collectors.toList());
 
-        comments.forEach(comment -> {
-            if (parentComment.getId().equals(comment.getParentId())) {
-                // Stage the child comment
-                children.add(comment);
+        // Add children
+        children.forEach(comment -> {
+            // Convert to comment vo
+            BaseCommentVO commentVO = new BaseCommentVO().convertFrom(comment);
 
-                // Convert to comment vo
-                BaseCommentVO commentVO = new BaseCommentVO().convertFrom(comment);
-
-                // Add additional content
-                if (commentVO.getParentId() > 0) {
-                    // TODO Provide an optional additional content
-                    commentVO.setContent(String.format(COMMENT_TEMPLATE, parentComment.getId(), parentComment.getAuthor(), commentVO.getContent()));
-                }
-
-                // Init children container
-                if (parentComment.getChildren() == null) {
-                    parentComment.setChildren(new LinkedList<>());
-                }
-
-                parentComment.getChildren().add(commentVO);
+            if (parentComment.getChildren() == null) {
+                parentComment.setChildren(new LinkedList<>());
             }
+
+            parentComment.getChildren().add(commentVO);
         });
 
-        // Remove all children
+        // Remove children
         comments.removeAll(children);
 
         if (!CollectionUtils.isEmpty(parentComment.getChildren())) {
