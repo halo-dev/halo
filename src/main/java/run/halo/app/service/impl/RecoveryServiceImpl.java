@@ -7,6 +7,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.ServiceException;
@@ -14,9 +15,12 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.repository.PostCommentRepository;
+import run.halo.app.repository.SheetCommentRepository;
 import run.halo.app.service.*;
 import run.halo.app.utils.BeanUtils;
 import run.halo.app.utils.JsonUtils;
+import run.halo.app.utils.ServiceUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,7 +53,11 @@ public class RecoveryServiceImpl implements RecoveryService {
 
     private final PostCommentService postCommentService;
 
+    private final PostCommentRepository postCommentRepository;
+
     private final SheetCommentService sheetCommentService;
+
+    private final SheetCommentRepository sheetCommentRepository;
 
     private final SheetService sheetService;
 
@@ -62,7 +70,9 @@ public class RecoveryServiceImpl implements RecoveryService {
                                CategoryService categoryService,
                                TagService tagService,
                                PostCommentService postCommentService,
+                               PostCommentRepository postCommentRepository,
                                SheetCommentService sheetCommentService,
+                               SheetCommentRepository sheetCommentRepository,
                                SheetService sheetService,
                                PhotoService photoService) {
         this.attachmentService = attachmentService;
@@ -72,7 +82,9 @@ public class RecoveryServiceImpl implements RecoveryService {
         this.categoryService = categoryService;
         this.tagService = tagService;
         this.postCommentService = postCommentService;
+        this.postCommentRepository = postCommentRepository;
         this.sheetCommentService = sheetCommentService;
+        this.sheetCommentRepository = sheetCommentRepository;
         this.sheetService = sheetService;
         this.photoService = photoService;
     }
@@ -203,7 +215,7 @@ public class RecoveryServiceImpl implements RecoveryService {
         Post createdPost = postService.createOrUpdateBy(post);
 
         Object commentsObject = postMap.get("comments");
-        // TODO Handle comments
+        // Handle comments
         List<BaseComment> baseComments = handleComment(commentsObject, createdPost.getId());
 
         List<PostComment> postComments = baseComments.stream()
@@ -211,9 +223,11 @@ public class RecoveryServiceImpl implements RecoveryService {
                 .collect(Collectors.toList());
 
         try {
+            // Build virtual comment
+            PostComment virtualPostComment = new PostComment();
+            virtualPostComment.setId(0L);
             // Create comments
-            // TODO Don't use createInBatch method
-            List<PostComment> createdPostComments = postCommentService.createInBatch(postComments);
+            createPostCommentRecursively(virtualPostComment, postComments);
         } catch (Exception e) {
             log.warn("Failed to create post comments for post with id " + createdPost.getId(), e);
             // Ignore this exception
@@ -239,13 +253,73 @@ public class RecoveryServiceImpl implements RecoveryService {
 
         // Create comments
         try {
-            sheetCommentService.createInBatch(sheetComments);
+            // Build virtual comment
+            SheetComment virtualSheetComment = new SheetComment();
+            virtualSheetComment.setId(0L);
+            // Create comments
+            createSheetCommentRecursively(virtualSheetComment, sheetComments);
         } catch (Exception e) {
             log.warn("Failed to create sheet comments for sheet with id " + createdSheet.getId(), e);
             // Ignore this exception
         }
 
         return createdSheet;
+    }
+
+
+    private void createPostCommentRecursively(@NonNull final PostComment parentComment, List<PostComment> postComments) {
+        Long oldParentId = parentComment.getId();
+
+        // Create parent
+        if (!ServiceUtils.isEmptyId(parentComment.getId())) {
+            PostComment createdComment = postCommentRepository.save(parentComment);
+            log.debug("Created post comment: [{}]", createdComment);
+            parentComment.setId(createdComment.getId());
+        }
+
+        if (CollectionUtils.isEmpty(postComments)) {
+            return;
+        }
+        // Get all children
+        List<PostComment> children = postComments.stream()
+                .filter(postComment -> Objects.equals(oldParentId, postComment.getParentId()))
+                .collect(Collectors.toList());
+
+
+        // Set parent id again
+        children.forEach(postComment -> postComment.setParentId(parentComment.getId()));
+
+        // Remove children
+        postComments.removeAll(children);
+
+        // Create children recursively
+        children.forEach(childComment -> createPostCommentRecursively(childComment, postComments));
+    }
+
+    private void createSheetCommentRecursively(@NonNull final SheetComment parentComment, List<SheetComment> sheetComments) {
+        Long oldParentId = parentComment.getId();
+        // Create parent
+        if (!ServiceUtils.isEmptyId(parentComment.getId())) {
+            SheetComment createComment = sheetCommentRepository.save(parentComment);
+            parentComment.setId(createComment.getId());
+        }
+
+        if (CollectionUtils.isEmpty(sheetComments)) {
+            return;
+        }
+        // Get all children
+        List<SheetComment> children = sheetComments.stream()
+                .filter(sheetComment -> Objects.equals(oldParentId, sheetComment.getParentId()))
+                .collect(Collectors.toList());
+
+        // Set parent id again
+        children.forEach(postComment -> postComment.setParentId(parentComment.getId()));
+
+        // Remove children
+        sheetComments.removeAll(children);
+
+        // Create children recursively
+        children.forEach(childComment -> createSheetCommentRecursively(childComment, sheetComments));
     }
 
     private List<BaseComment> handleComment(@Nullable Object commentsObject, @NonNull Integer postId) {
@@ -278,6 +352,10 @@ public class RecoveryServiceImpl implements RecoveryService {
             baseComment.setIsAdmin(getBooleanOrDefault(commentMap.getOrDefault("isAdmin", "").toString(), false));
             baseComment.setPostId(postId);
             baseComment.setParentId(getLongOrDefault(commentMap.getOrDefault("commentParent", "").toString(), 0L));
+
+            // Set create date
+            Long createTimestamp = getLongOrDefault(commentMap.getOrDefault("createDate", "").toString(), System.currentTimeMillis());
+            baseComment.setCreateTime(new Date(createTimestamp));
 
             Integer commentStatus = getIntegerOrDefault(commentMap.getOrDefault("commentStatus", "").toString(), 1);
             if (commentStatus == 0) {
