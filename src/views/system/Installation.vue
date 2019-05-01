@@ -118,21 +118,13 @@
               <a-form-item class="animated fadeInUp">
                 <a-input
                   v-model="installation.url"
-                  placeholder="博客地址（选填）"
+                  placeholder="博客地址"
                 >
                   <a-icon
                     slot="prefix"
                     type="link"
                     style="color: rgba(0,0,0,.25)"
                   />
-                  <a-select
-                    slot="addonBefore"
-                    defaultValue="http://"
-                    style="width: 90px"
-                  >
-                    <a-select-option value="http://">http://</a-select-option>
-                    <a-select-option value="https://">https://</a-select-option>
-                  </a-select>
                 </a-input>
               </a-form-item>
               <a-form-item
@@ -235,6 +227,9 @@ export default {
       migrationData: null,
       stepCurrent: 0
     }
+  },
+  created() {
+    this.installation.url = window.location.protocol+"//"+window.location.host
   },
   methods: {
     handleMigrationUpload(data) {
