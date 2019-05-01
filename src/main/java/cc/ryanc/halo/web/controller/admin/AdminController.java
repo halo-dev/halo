@@ -437,6 +437,7 @@ public class AdminController extends BaseController {
                     commentObj.put("commentParent", comment.getCommentParent());
                     commentObj.put("commentStatus", comment.getCommentStatus());
                     commentObj.put("isAdmin", comment.getIsAdmin());
+                    commentObj.put("createDate",comment.getCommentDate());
                     commentsJar.add(commentObj);
                 }
                 postObj.put("comments", commentsJar);
