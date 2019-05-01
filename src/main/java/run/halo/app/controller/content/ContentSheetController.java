@@ -65,7 +65,8 @@ public class ContentSheetController {
 
         // sheet and post all can use
         model.addAttribute("sheet", sheetService.convertToDetail(sheet));
-        model.addAttribute("post",sheetService.convertToDetail(sheet));
+        model.addAttribute("post", sheetService.convertToDetail(sheet));
+        model.addAttribute("is_sheet", true);
 
         if (StrUtil.isNotEmpty(sheet.getTemplate())) {
             if (themeService.templateExists(sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
