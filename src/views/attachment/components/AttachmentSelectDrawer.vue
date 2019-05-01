@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-drawer
-      title="选择附件"
+      :title="title"
       :width="isMobile()?'100%':drawerWidth"
       closable
       :visible="visiable"
@@ -99,6 +99,11 @@ export default {
       type: Number,
       required: false,
       default: 580
+    },
+    title: {
+      type: String,
+      required: false,
+      default: '选择附件'
     }
   },
   data() {

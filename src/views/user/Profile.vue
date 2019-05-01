@@ -144,6 +144,7 @@
     <AttachmentSelectDrawer
       v-model="attachmentDrawerVisible"
       @listenToSelect="handleSelectAvatar"
+      title="选择头像"
     />
   </div>
 </template>

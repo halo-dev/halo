@@ -215,7 +215,7 @@
       <AttachmentDrawer v-model="attachmentDrawerVisible" />
     </a-drawer>
     <div class="upload-button">
-      <a-dropdown placement="topLeft" :trigger="['hover','click']">
+      <a-dropdown placement="topLeft" :trigger="['click']">
         <a-button
           type="primary"
           shape="circle"
@@ -357,11 +357,6 @@ export default {
     handleSaveSettings() {
       themeApi.saveSettings(this.themeProperty.id, this.themeSettings).then(response => {
         this.$message.success('保存成功！')
-      })
-    },
-    getThemeProperty(themeId) {
-      themeApi.getProperty(themeId).then(response => {
-        this.themeProperty = response.data.data
       })
     },
     onClose() {

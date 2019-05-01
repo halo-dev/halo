@@ -91,17 +91,38 @@
             slot="action"
             slot-scope="text, record"
           >
-            <a-popconfirm
-              :title="'你确定要通过该评论？'"
-              @confirm="handleEditStatusClick(record.id,'RECYCLE')"
-              okText="确定"
-              cancelText="取消"
+
+            <a-dropdown
+              :trigger="['click']"
               v-if="record.status === 'AUDITING'"
             >
-              <a href="javascript:;">通过</a>
-            </a-popconfirm>
+              <a
+                href="javascript:void(0);"
+                class="ant-dropdown-link"
+              >通过</a>
+              <a-menu
+                slot="overlay"
+                @click="handleMenuClick"
+              >
+                <a-menu-item key="1">通过该评论</a-menu-item>
+                <a-menu-item key="2">回复并通过</a-menu-item>
+              </a-menu>
+            </a-dropdown>
 
-            <a href="javascript:;" v-if="record.status === 'PUBLISHED'">回复</a>
+            <a
+              href="javascript:;"
+              v-else-if="record.status === 'PUBLISHED'"
+            >回复</a>
+
+            <a-popconfirm
+              :title="'你确定要还原该评论？'"
+              @confirm="handleEditStatusClick(record.id,'PUBLISHED')"
+              okText="确定"
+              cancelText="取消"
+              v-else-if="record.status === 'RECYCLE'"
+            >
+              <a href="javascript:;">还原</a>
+            </a-popconfirm>
 
             <a-divider type="vertical" />
 
@@ -117,7 +138,7 @@
 
             <a-popconfirm
               :title="'你确定要永久删除该评论？'"
-              @confirm="handleDeleteComment(record.id)"
+              @confirm="handleDeleteClick(record.id)"
               okText="确定"
               cancelText="取消"
               v-else-if="record.status === 'RECYCLE'"
@@ -234,8 +255,17 @@ export default {
     handleEditComment(id) {
       this.$message.success('编辑')
     },
-    handleDeleteComment(id) {
-      this.$message.success('删除')
+    handleEditStatusClick(commentId, status) {
+      commentApi.updateStatus(commentId, status).then(response => {
+        this.$message.success('操作成功！')
+        this.loadComments()
+      })
+    },
+    handleDeleteClick(commentId) {
+      commentApi.delete(commentId).then(response => {
+        this.$message.success('删除成功！')
+        this.loadComments()
+      })
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)

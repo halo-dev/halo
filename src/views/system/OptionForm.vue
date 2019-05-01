@@ -25,13 +25,29 @@
                   label="LOGO："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_logo" />
+                  <a-input v-model="options.blog_logo">
+                    <a
+                      href="javascript:void(0);"
+                      slot="addonAfter"
+                      @click="handleShowLogoAttachDrawer"
+                    >
+                      <a-icon type="picture" />
+                    </a>
+                  </a-input>
                 </a-form-item>
                 <a-form-item
                   label="Favicon："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_favicon" />
+                  <a-input v-model="options.blog_favicon">
+                    <a
+                      href="javascript:void(0);"
+                      slot="addonAfter"
+                      @click="handleShowFaviconAttachDrawer"
+                    >
+                      <a-icon type="picture" />
+                    </a>
+                  </a-input>
                 </a-form-item>
                 <a-form-item
                   label="页脚信息："
@@ -53,7 +69,7 @@
             </a-tab-pane>
             <a-tab-pane key="seo">
               <span slot="tab">
-                <a-icon type="global" />SEO设置
+                <a-icon type="global" />SEO 设置
               </span>
               <a-form layout="vertical">
                 <a-form-item
@@ -161,9 +177,7 @@
                   label="评论者头像："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-select
-                    v-model="options.comment_gavatar_default"
-                  >
+                  <a-select v-model="options.comment_gavatar_default">
                     <a-select-option value="mm">默认</a-select-option>
                     <a-select-option value="identicon">抽象几何图形</a-select-option>
                     <a-select-option value="monsterid">小怪物</a-select-option>
@@ -249,11 +263,11 @@
                     @change="handleAttachChange"
                     v-model="options.attachment_type"
                   >
-                    <a-select-option value="local">本地</a-select-option>
-                    <a-select-option value="smms">SM.MS</a-select-option>
-                    <a-select-option value="upyun">又拍云</a-select-option>
-                    <a-select-option value="qnyun">七牛云</a-select-option>
-                    <a-select-option value="aliyun">阿里云</a-select-option>
+                    <a-select-option
+                      v-for="item in Object.keys(attachmentType)"
+                      :key="item"
+                      :value="item"
+                    >{{ attachmentType[item].text }}</a-select-option>
                   </a-select>
                 </a-form-item>
                 <div
@@ -314,9 +328,7 @@
                     label="区域："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-select
-                      v-model="options.oss_qiniu_zone"
-                    >
+                    <a-select v-model="options.oss_qiniu_zone">
                       <a-select-option value="auto">自动选择</a-select-option>
                       <a-select-option value="z0">华东</a-select-option>
                       <a-select-option value="z1">华北</a-select-option>
@@ -543,13 +555,30 @@
         </div>
       </a-col>
     </a-row>
+
+    <AttachmentSelectDrawer
+      v-model="logoDrawerVisible"
+      @listenToSelect="handleSelectLogo"
+      title="选择 Logo"
+    />
+    <AttachmentSelectDrawer
+      v-model="faviconDrawerVisible"
+      @listenToSelect="handleSelectFavicon"
+      title="选择 Favicon"
+    />
   </div>
 </template>
 <script>
+import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import optionApi from '@/api/option'
+import attachmentApi from '@/api/attachment'
 export default {
+  components: {
+    AttachmentSelectDrawer
+  },
   data() {
     return {
+      attachmentType: attachmentApi.type,
       wrapperCol: {
         xl: { span: 8 },
         lg: { span: 8 },
@@ -559,6 +588,8 @@ export default {
       upyunFormHidden: false,
       qnyunFormHidden: false,
       aliyunFormHidden: false,
+      logoDrawerVisible: false,
+      faviconDrawerVisible: false,
       options: []
     }
   },
@@ -580,28 +611,42 @@ export default {
     },
     handleAttachChange(e) {
       switch (e) {
-        case 'local':
-        case 'smms':
+        case 'LOCAL':
+        case 'SMMS':
           this.upyunFormHidden = false
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
           break
-        case 'upyun':
+        case 'UPYUN':
           this.upyunFormHidden = true
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
           break
-        case 'qnyun':
+        case 'QNYUN':
           this.qnyunFormHidden = true
           this.upyunFormHidden = false
           this.aliyunFormHidden = false
           break
-        case 'aliyun':
+        case 'ALIYUN':
           this.aliyunFormHidden = true
           this.qnyunFormHidden = false
           this.upyunFormHidden = false
           break
       }
+    },
+    handleShowLogoAttachDrawer() {
+      this.logoDrawerVisible = true
+    },
+    handleSelectLogo(data) {
+      this.options.blog_logo = data.path
+      this.logoDrawerVisible = false
+    },
+    handleShowFaviconAttachDrawer() {
+      this.faviconDrawerVisible = true
+    },
+    handleSelectFavicon(data) {
+      this.options.blog_favicon = data.path
+      this.faviconDrawerVisible = false
     }
   }
 }

@@ -19,6 +19,20 @@ commentApi.query = params => {
   })
 }
 
+commentApi.updateStatus = (commentId, status) => {
+  return service({
+    url: `${baseUrl}/${commentId}/status/${status}`,
+    method: 'put'
+  })
+}
+
+commentApi.delete = commentId => {
+  return service({
+    url: `${baseUrl}/${commentId}`,
+    method: 'delete'
+  })
+}
+
 commentApi.commentStatus = {
   PUBLISHED: {
     color: 'green',
