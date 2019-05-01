@@ -229,7 +229,7 @@ export default {
     }
   },
   created() {
-    this.installation.url = window.location.protocol+"//"+window.location.host
+    this.installation.url = window.location.protocol + '//' + window.location.host
   },
   methods: {
     handleMigrationUpload(data) {
