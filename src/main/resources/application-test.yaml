@@ -9,6 +9,9 @@ server:
   servlet:
     session:
       timeout: 86400s
+  compression:
+    enabled: true
+    mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
 spring:
   output:
     ansi:

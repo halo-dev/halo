@@ -2,12 +2,15 @@ package run.halo.app.model.freemarker.tag;
 
 import freemarker.core.Environment;
 import freemarker.template.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.MenuService;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Freemarker custom tag of menu.
@@ -36,6 +39,9 @@ public class MenuTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "list":
                     env.setVariable("menus", builder.build().wrap(menuService.listAll()));
+                    break;
+                case "tree":
+                    env.setVariable("menus",builder.build().wrap(menuService.listAsTree(Sort.by(DESC, "priority"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(menuService.count()));
