@@ -12,7 +12,6 @@
           :loading="postLoading"
           :bordered="false"
           title="最新文章"
-          :bodyStyle="{ padding: '0px' }"
         >
           最新文章
         </a-card>
@@ -28,9 +27,47 @@
           :loading="commentLoading"
           :bordered="false"
           title="最新评论"
-          :bodyStyle="{ padding: '0px' }"
         >
-          最新评论
+          <a-comment>
+            <span slot="actions">Reply to</span>
+            <a slot="author">Han Solo</a>
+            <a-avatar
+              slot="avatar"
+              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+              alt="Han Solo"
+            />
+            <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
+            <a-comment>
+              <span slot="actions">Reply to</span>
+              <a slot="author">Han Solo</a>
+              <a-avatar
+                slot="avatar"
+                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                alt="Han Solo"
+              />
+              <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
+              <a-comment>
+                <span slot="actions">Reply to</span>
+                <a slot="author">Han Solo</a>
+                <a-avatar
+                  slot="avatar"
+                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  alt="Han Solo"
+                />
+                <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
+              </a-comment>
+              <a-comment>
+                <span slot="actions">Reply to</span>
+                <a slot="author">Han Solo</a>
+                <a-avatar
+                  slot="avatar"
+                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                  alt="Han Solo"
+                />
+                <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
+              </a-comment>
+            </a-comment>
+          </a-comment>
         </a-card>
       </a-col>
       <a-col
@@ -44,7 +81,6 @@
           :loading="commentLoading"
           :bordered="false"
           title="最新日志"
-          :bodyStyle="{ padding: '0px' }"
         >
           最新日志
         </a-card>

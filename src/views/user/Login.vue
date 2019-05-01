@@ -39,16 +39,15 @@
             />
           </a-input>
         </a-form-item>
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.3s'}"
-        >
+        <a-row>
           <a-button
             type="primary"
             :block="true"
             @click="handleLogin"
+            class="animated fadeInUp"
+            :style="{'animation-delay': '0.3s'}"
           >登录</a-button>
-        </a-form-item>
+        </a-row>
       </a-form>
     </div>
   </div>
@@ -101,10 +100,14 @@ export default {
 </script>
 <style>
 body {
-  background-color: #f5f5f5;
+  height: 100%;
+  background-color: #f8f8f8;
 }
 * {
   outline: 0;
+}
+.ant-form-item {
+  margin-bottom: 24px;
 }
 .container {
   padding-right: 15px;
@@ -113,21 +116,20 @@ body {
   margin-left: auto;
 }
 .loginForm {
-  max-width: 380px;
-  margin-top: 10%;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  margin: -160px 0 0 -160px;
+  width: 320px;
+  padding: 32px;
+  box-shadow: 0px 0px 20px 0px rgba(76, 50, 50, 0.08);
 }
 .loginLogo {
-  font-size: 56px;
+  font-size: 32px;
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 24px;
   font-weight: 500;
   color: #444;
   text-shadow: #b2baba 0.1em 0.1em 0.2em;
-}
-.loginBody {
-  padding: 20px;
-  background-color: #fff;
-  -o-box-shadow: -4px 7px 46px 2px rgba(0, 0, 0, 0.1);
-  box-shadow: -4px 7px 46px 2px rgba(0, 0, 0, 0.1);
 }
 </style>

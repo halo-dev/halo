@@ -61,18 +61,6 @@
             <a-icon type="down" />
           </a-button>
         </a-dropdown>
-        <a-button
-          type="primary"
-          icon="message"
-          v-if="tableListMode"
-          @click="toggleTableMode"
-        >会话模式</a-button>
-        <a-button
-          type="primary"
-          icon="ordered-list"
-          v-else
-          @click="toggleTableMode"
-        >列表模式</a-button>
       </div>
       <div style="margin-top:15px">
         <a-table
@@ -103,15 +91,39 @@
             slot="action"
             slot-scope="text, record"
           >
-            <a
-              href="javascript:;"
-              @click="handleEditComment(record.id)"
-            >通过</a>
+            <a-popconfirm
+              :title="'你确定要通过该评论？'"
+              @confirm="handleEditStatusClick(record.id,'RECYCLE')"
+              okText="确定"
+              cancelText="取消"
+              v-if="record.status === 'AUDITING'"
+            >
+              <a href="javascript:;">通过</a>
+            </a-popconfirm>
+
+            <a href="javascript:;" v-if="record.status === 'PUBLISHED'">回复</a>
+
             <a-divider type="vertical" />
-            <a
-              href="javascript:;"
-              @click="handleDeleteComment(record.id)"
-            >删除</a>
+
+            <a-popconfirm
+              :title="'你确定要将该评论移到回收站？'"
+              @confirm="handleEditStatusClick(record.id,'RECYCLE')"
+              okText="确定"
+              cancelText="取消"
+              v-if="record.status === 'PUBLISHED' || record.status === 'AUDITING'"
+            >
+              <a href="javascript:;">回收站</a>
+            </a-popconfirm>
+
+            <a-popconfirm
+              :title="'你确定要永久删除该评论？'"
+              @confirm="handleDeleteComment(record.id)"
+              okText="确定"
+              cancelText="取消"
+              v-else-if="record.status === 'RECYCLE'"
+            >
+              <a href="javascript:;">删除</a>
+            </a-popconfirm>
           </span>
         </a-table>
         <div class="page-wrapper">
@@ -139,7 +151,8 @@ const columns = [
   },
   {
     title: '内容',
-    dataIndex: 'content'
+    dataIndex: 'content',
+    scopedSlots: { customRender: 'content' }
   },
   {
     title: '状态',
@@ -188,7 +201,6 @@ export default {
       selectedRows: [],
       comments: [],
       commentsLoading: false,
-      tableListMode: true,
       commentStatus: commentApi.commentStatus
     }
   },
@@ -213,15 +225,11 @@ export default {
       if (isSearch) {
         this.queryParam.page = 0
       }
-      if (this.tableListMode) {
-        commentApi.query(this.queryParam).then(response => {
-          this.comments = response.data.data.content
-          this.pagination.total = response.data.data.total
-          this.commentsLoading = false
-        })
-      } else {
-        // TODO tree view
-      }
+      commentApi.query(this.queryParam).then(response => {
+        this.comments = response.data.data.content
+        this.pagination.total = response.data.data.total
+        this.commentsLoading = false
+      })
     },
     handleEditComment(id) {
       this.$message.success('编辑')
@@ -238,10 +246,6 @@ export default {
     handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.status = null
-      this.loadComments()
-    },
-    toggleTableMode() {
-      this.tableListMode = !this.tableListMode
       this.loadComments()
     }
   }
