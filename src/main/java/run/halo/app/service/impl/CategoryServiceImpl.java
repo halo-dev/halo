@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import com.google.common.base.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -101,23 +102,20 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             return;
         }
 
-        // Create children container for removing after
-        List<Category> children = new LinkedList<>();
+        // Get children for removing after
+        List<Category> children = categories.stream()
+                .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
+                .collect(Collectors.toList());
 
-        categories.forEach(category -> {
-            if (parentCategory.getId().equals(category.getParentId())) {
-                // Save child category
-                children.add(category);
-
-                // Convert to child category vo
-                CategoryVO child = new CategoryVO().convertFrom(category);
-
-                // Init children if absent
-                if (parentCategory.getChildren() == null) {
-                    parentCategory.setChildren(new LinkedList<>());
-                }
-                parentCategory.getChildren().add(child);
+        children.forEach(category -> {
+            // Convert to child category vo
+            CategoryVO child = new CategoryVO().convertFrom(category);
+            // Init children if absent
+            if (parentCategory.getChildren() == null) {
+                parentCategory.setChildren(new LinkedList<>());
             }
+            // Add child
+            parentCategory.getChildren().add(child);
         });
 
         // Remove all child categories
