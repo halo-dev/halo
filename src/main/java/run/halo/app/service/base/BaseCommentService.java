@@ -13,6 +13,7 @@ import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -162,6 +163,15 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     Page<BaseCommentDTO> convertTo(@NonNull Page<COMMENT> commentPage);
+
+    /**
+     * Converts to base comment vo tree.
+     *
+     * @param comments   comments list could be null
+     * @param comparator comment comparator could be null
+     * @return a comment vo tree
+     */
+    List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments, @Nullable Comparator<BaseCommentVO> comparator);
 
     /**
      * Target must exist.

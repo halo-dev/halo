@@ -3,9 +3,8 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.utils.ServiceUtils;
 
 import javax.persistence.*;
 
@@ -102,7 +101,11 @@ public class BaseComment extends BaseEntity {
     public void prePersist() {
         super.prePersist();
 
-        if (parentId == null || parentId < 0) {
+        if (ServiceUtils.isEmptyId(id)) {
+            id = null;
+        }
+
+        if (ServiceUtils.isEmptyId(parentId)) {
             parentId = 0L;
         }
 
