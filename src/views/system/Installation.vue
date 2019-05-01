@@ -157,7 +157,7 @@
                 accept="application/json"
                 :uploadHandler="handleMigrationUpload"
                 @remove="handleMigrationFileRemove"
-                class="animated fadeInUp"
+                class="animated fadeIn"
                 :style="{'animation-delay': '0.2s'}"
               >
                 <p class="ant-upload-drag-icon">

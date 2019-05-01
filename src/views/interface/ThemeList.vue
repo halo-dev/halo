@@ -215,13 +215,22 @@
       <AttachmentDrawer v-model="attachmentDrawerVisible" />
     </a-drawer>
     <div class="upload-button">
-      <a-button
-        type="primary"
-        shape="circle"
-        icon="plus"
-        size="large"
-        @click="handleShowUploadModal"
-      ></a-button>
+      <a-dropdown placement="topLeft" :trigger="['hover','click']">
+        <a-button
+          type="primary"
+          shape="circle"
+          icon="plus"
+          size="large"
+        ></a-button>
+        <a-menu slot="overlay">
+          <a-menu-item>
+            <a rel="noopener noreferrer" href="javascript:void(0);" @click="handleShowUploadModal">安装主题</a>
+          </a-menu-item>
+          <a-menu-item>
+            <a rel="noopener noreferrer" href="javascript:void(0);" @click="handleReload">刷新列表</a>
+          </a-menu-item>
+        </a-menu>
+      </a-dropdown>
     </div>
     <a-modal
       title="安装主题"
@@ -391,6 +400,11 @@ export default {
       themeApi.fetching(this.fetchingUrl).then(response => {
         this.$message.success('上传成功')
         this.loadThemes()
+      })
+    },
+    handleReload() {
+      themeApi.reload().then(response => {
+        this.$message.success('刷新成功！')
       })
     }
   }

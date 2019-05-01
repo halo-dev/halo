@@ -117,4 +117,11 @@ themeApi.saveContent = (path, content) => {
   })
 }
 
+themeApi.reload = () => {
+  return service({
+    url: `${baseUrl}/reload`,
+    method: 'post'
+  })
+}
+
 export default themeApi

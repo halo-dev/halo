@@ -1,9 +1,7 @@
 <template>
   <div class="page-header-index-wide">
     <a-row>
-      <a-col
-        :span="24"
-      >
+      <a-col :span="24">
         <a-card :bordered="false">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
@@ -13,7 +11,7 @@
                   :sm="24"
                 >
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword"/>
+                    <a-input v-model="queryParam.keyword" />
                   </a-form-item>
                 </a-col>
                 <a-col
@@ -65,16 +63,20 @@
                 slot-scope="item, index"
                 :key="index"
               >
-                <template
-                  slot="actions"
-                  v-for="{type, text} in actions"
-                >
-                  <span :key="type">
+                <template slot="actions">
+                  <span>
                     <a-icon
-                      :type="type"
+                      type="like-o"
                       style="margin-right: 8px"
                     />
-                    {{ text }}
+                    {{ item.likes }}
+                  </span>
+                  <span>
+                    <a-icon
+                      type="message"
+                      style="margin-right: 8px"
+                    />
+                    {{ item.commentCount }}
                   </span>
                 </template>
                 <template slot="extra">
@@ -97,7 +99,7 @@
                   <a-avatar
                     slot="avatar"
                     size="large"
-                    src="https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm"
+                    :src="user.avatar"
                   />
                 </a-list-item-meta>
               </a-list-item>
@@ -145,6 +147,7 @@
 
 <script>
 import journalApi from '@/api/journal'
+import userApi from '@/api/user'
 
 export default {
   data() {
@@ -163,13 +166,14 @@ export default {
         sort: null,
         keyword: null
       },
-      actions: [{ type: 'like-o', text: '28031230' }, { type: 'message', text: '2' }],
       journals: [],
-      journal: {}
+      journal: {},
+      user: {}
     }
   },
   created() {
     this.loadJournals()
+    this.loadUser()
   },
   methods: {
     loadJournals(isSearch) {
@@ -184,6 +188,11 @@ export default {
         this.journals = response.data.data.content
         this.pagination.total = response.data.data.total
         this.listLoading = false
+      })
+    },
+    loadUser() {
+      userApi.getProfile().then(response => {
+        this.user = response.data.data
       })
     },
     handleNew() {

@@ -146,10 +146,6 @@ const columns = [
     dataIndex: 'priority'
   },
   {
-    title: '图标',
-    dataIndex: 'icon'
-  },
-  {
     title: '操作',
     key: 'action',
     scopedSlots: { customRender: 'action' }
