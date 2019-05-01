@@ -1,7 +1,7 @@
 <template>
-  <div class="container loginForm">
+  <div class="container">
     <div class="loginLogo animated fadeInUp">
-      Halo
+      <span>Halo</span>
     </div>
     <div class="loginBody animated">
       <a-form
@@ -103,33 +103,34 @@ body {
   height: 100%;
   background-color: #f8f8f8;
 }
-* {
-  outline: 0;
-}
-.ant-form-item {
-  margin-bottom: 24px;
-}
 .container {
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-}
-.loginForm {
   position: absolute;
   top: 45%;
   left: 50%;
   margin: -160px 0 0 -160px;
   width: 320px;
-  padding: 32px;
+  padding: 16px 32px 32px 32px;
   box-shadow: 0px 0px 20px 0px rgba(76, 50, 50, 0.08);
 }
 .loginLogo {
-  font-size: 32px;
+  margin-bottom: 20px;
   text-align: center;
-  margin-bottom: 24px;
-  font-weight: 500;
-  color: #444;
-  text-shadow: #b2baba 0.1em 0.1em 0.2em;
+}
+.loginLogo span {
+  vertical-align: text-bottom;
+  font-size: 36px;
+  display: inline-block;
+  font-weight: 600;
+  color: #1790fe;
+  background-image: -webkit-gradient(
+    linear,
+    37.219838% 34.532506%,
+    36.425669% 93.178216%,
+    from(#36c8f5),
+    to(#1790fe),
+    color-stop(0.37, #1790fe)
+  );
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
 }
 </style>
