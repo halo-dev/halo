@@ -70,6 +70,12 @@
           :loading="commentsLoading"
           :pagination="false"
         >
+          <p
+            slot="content"
+            slot-scope="content"
+            v-html="content"
+          >
+          </p>
           <span
             slot="status"
             slot-scope="statusProperty"
