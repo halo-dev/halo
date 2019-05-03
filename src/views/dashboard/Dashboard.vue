@@ -1,19 +1,22 @@
 <template>
   <page-view>
-    <a-row :gutter="24">
+    <a-row :gutter="12">
       <a-col
         :xl="6"
         :lg="6"
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '24px' }"
+        :style="{ marginBottom: '12px' }"
       >
         <analysis-card
           :loading="countsLoading"
           title="文章"
           :number="countsData.postCount"
         >
+          <router-link :to="{ name:'PostList' }" slot="action">
+            <a-icon type="link" />
+          </router-link>
         </analysis-card>
       </a-col>
       <a-col
@@ -22,13 +25,16 @@
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '24px' }"
+        :style="{ marginBottom: '12px' }"
       >
         <analysis-card
           :loading="countsLoading"
           title="评论"
           :number="countsData.commentCount"
         >
+          <router-link :to="{ name:'Comments' }" slot="action">
+            <a-icon type="link" />
+          </router-link>
         </analysis-card>
       </a-col>
       <a-col
@@ -37,13 +43,16 @@
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '24px' }"
+        :style="{ marginBottom: '12px' }"
       >
         <analysis-card
           :loading="countsLoading"
           title="附件"
           :number="countsData.attachmentCount"
         >
+          <router-link :to="{ name:'Attachments' }" slot="action">
+            <a-icon type="link" />
+          </router-link>
         </analysis-card>
       </a-col>
       <a-col
@@ -52,13 +61,16 @@
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '24px' }"
+        :style="{ marginBottom: '12px' }"
       >
         <analysis-card
           :loading="countsLoading"
           title="成立天数"
           :number="countsData.establishDays"
         >
+          <a-tooltip :title="'已成立'+countsData.establishDays+'天了'" slot="action">
+            <a href="javascript:void(0);"><a-icon type="info-circle-o" /></a>
+          </a-tooltip>
         </analysis-card>
       </a-col>
     </a-row>
@@ -69,6 +81,7 @@
         :md="12"
         :sm="24"
         :xs="24"
+        :style="{ marginBottom: '12px' }"
       >
         <a-card
           :loading="postLoading"
@@ -84,6 +97,7 @@
         :md="12"
         :sm="24"
         :xs="24"
+        :style="{ marginBottom: '12px' }"
       >
         <a-card
           :loading="commentLoading"
@@ -99,9 +113,10 @@
         :md="12"
         :sm="24"
         :xs="24"
+        :style="{ marginBottom: '12px' }"
       >
         <a-card
-          :loading="commentLoading"
+          :loading="logLoading"
           :bordered="false"
           title="最新日志"
         >
@@ -218,8 +233,8 @@ export default {
     },
     getCounts() {
       adminApi.counts().then(response => {
-        this.countsLoading = false
         this.countsData = response.data.data
+        this.countsLoading = false
       })
     }
   }

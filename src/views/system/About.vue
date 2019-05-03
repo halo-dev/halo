@@ -14,8 +14,13 @@
                   <ul>
                     <li>版本：1.0</li>
                     <li>数据库：h2databse</li>
-                    <li>运行时长：2小时45分钟</li>
+                    <li>启动时间：{{ environments.startTime | moment }}</li>
                   </ul>
+                  <a
+                    href="https://github.com/halo-dev"
+                    target="_blank"
+                  >开源地址
+                    <a-icon type="link" /></a>&nbsp;
                   <a
                     href="https://docs.halo.run"
                     target="_blank"
@@ -75,9 +80,11 @@
 </template>
 
 <script>
+import adminApi from '@/api/admin'
 export default {
   data() {
     return {
+      environments: {},
       developers: [
         {
           name: 'Ryan Wang',
@@ -134,6 +141,16 @@ export default {
           content: '确定命名为 Halo，并上传到 Github'
         }
       ]
+    }
+  },
+  created() {
+    this.getEnvironments()
+  },
+  methods: {
+    getEnvironments() {
+      adminApi.environments().then(response => {
+        this.environments = response.data.data
+      })
     }
   }
 }
