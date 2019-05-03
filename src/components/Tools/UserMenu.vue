@@ -36,7 +36,7 @@
           </router-link>
         </a-menu-item>
         <a-menu-divider />
-        <a-menu-item key="3">
+        <a-menu-item key="1">
           <a
             href="javascript:;"
             @click="handleLogout"

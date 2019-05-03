@@ -33,6 +33,14 @@ commentApi.delete = commentId => {
   })
 }
 
+commentApi.create = comment => {
+  return service({
+    url: baseUrl,
+    data: comment,
+    method: 'post'
+  })
+}
+
 commentApi.commentStatus = {
   PUBLISHED: {
     color: 'green',

@@ -100,18 +100,26 @@
                 href="javascript:void(0);"
                 class="ant-dropdown-link"
               >通过</a>
-              <a-menu
-                slot="overlay"
-                @click="handleMenuClick"
-              >
-                <a-menu-item key="1">通过该评论</a-menu-item>
-                <a-menu-item key="2">回复并通过</a-menu-item>
+              <a-menu slot="overlay">
+                <a-menu-item key="1">
+                  <a
+                    href="javascript:void(0);"
+                    @click="handleEditStatusClick(record.id,'PUBLISHED')"
+                  >通过</a>
+                </a-menu-item>
+                <a-menu-item key="2">
+                  <a
+                    href="javascript:void(0);"
+                    @click="handleReplyAndPassClick(record)"
+                  >通过并回复</a>
+                </a-menu-item>
               </a-menu>
             </a-dropdown>
 
             <a
-              href="javascript:;"
+              href="javascript:void(0);"
               v-else-if="record.status === 'PUBLISHED'"
+              @click="handleReplyClick(record)"
             >回复</a>
 
             <a-popconfirm
@@ -159,6 +167,32 @@
         </div>
       </div>
     </a-card>
+
+    <a-modal
+      v-if="selectComment"
+      :title="'回复给：'+selectComment.author"
+      v-model="replyCommentVisible"
+      @close="onReplyClose"
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleCreateClick"
+        >
+          回复
+        </a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item>
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="replyComment.content"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </page-view>
 </template>
 
@@ -206,6 +240,7 @@ export default {
   data() {
     return {
       columns,
+      replyCommentVisible: false,
       pagination: {
         current: 1,
         pageSize: 10,
@@ -221,6 +256,8 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       comments: [],
+      selectComment: {},
+      replyComment: {},
       commentsLoading: false,
       commentStatus: commentApi.commentStatus
     }
@@ -267,6 +304,25 @@ export default {
         this.loadComments()
       })
     },
+    handleReplyAndPassClick(comment) {
+      this.handleReplyClick(comment)
+      this.handleEditStatusClick(comment.id, 'PUBLISHED')
+    },
+    handleReplyClick(comment) {
+      this.selectComment = comment
+      this.replyCommentVisible = true
+      this.replyComment.parentId = comment.id
+      this.replyComment.postId = comment.post.id
+    },
+    handleCreateClick() {
+      commentApi.create(this.replyComment).then(response => {
+        this.$message.success('回复成功！')
+        this.replyComment = {}
+        this.selectComment = {}
+        this.replyCommentVisible = false
+        this.loadComments()
+      })
+    },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.current = page
@@ -277,6 +333,11 @@ export default {
       this.queryParam.keyword = null
       this.queryParam.status = null
       this.loadComments()
+    },
+    onReplyClose() {
+      this.replyComment = {}
+      this.selectComment = {}
+      this.replyCommentVisible = false
     }
   }
 }
