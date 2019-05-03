@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -91,6 +92,7 @@ public class PostController {
 
     @PostMapping("comments")
     @ApiOperation("Comments a post")
+    @CacheLock(autoDelete = false, traceRequest = true)
     public BaseCommentDTO comment(@RequestBody PostCommentParam postCommentParam) {
         return postCommentService.convertTo(postCommentService.createBy(postCommentParam));
     }

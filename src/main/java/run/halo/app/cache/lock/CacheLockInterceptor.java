@@ -62,7 +62,7 @@ public class CacheLockInterceptor {
             }
 
             if (!cacheResult) {
-                throw new FrequentAccessException("Frequent access").setErrorData(cacheLockKey);
+                throw new FrequentAccessException("访问过于频繁，请稍后再试！").setErrorData(cacheLockKey);
             }
 
             // Proceed the method

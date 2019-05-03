@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
@@ -56,6 +57,7 @@ public class JournalController {
 
     @PostMapping("comments")
     @ApiOperation("Comments a post")
+    @CacheLock(autoDelete = false, traceRequest = true)
     public BaseCommentDTO comment(@RequestBody JournalCommentParam journalCommentParam) {
         return journalCommentService.convertTo(journalCommentService.createBy(journalCommentParam));
     }

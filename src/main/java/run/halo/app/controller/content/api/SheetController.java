@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.params.SheetCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
@@ -57,6 +58,7 @@ public class SheetController {
 
     @PostMapping("comments")
     @ApiOperation("Comments a post")
+    @CacheLock(autoDelete = false, traceRequest = true)
     public BaseCommentDTO comment(@RequestBody SheetCommentParam sheetCommentParam) {
         return sheetCommentService.convertTo(sheetCommentService.createBy(sheetCommentParam));
     }

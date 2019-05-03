@@ -19,20 +19,20 @@ import java.lang.reflect.ParameterizedType;
 @Data
 public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMENT> {
 
-    @NotBlank(message = "PostComment author name must not be blank")
+    @NotBlank(message = "评论者名称不能为空")
     @Size(max = 50, message = "Length of comment author name must not be more than {max}")
     private String author;
 
-    @NotBlank(message = "PostComment email must not be blank")
-    @Email(message = "PostComment email's format is incorrect")
-    @Size(max = 255, message = "Length of comment email must not be more than {max}")
+    @NotBlank(message = "邮箱不能为空")
+    @Email(message = "邮箱格式不正确")
+    @Size(max = 255, message = "邮箱的长度不能超过 {max}")
     private String email;
 
-    @Size(max = 127, message = "Length of comment author url must not be more than {max}")
+    @Size(max = 127, message = "评论者博客链接不能超过 {max}")
     private String authorUrl;
 
-    @NotBlank(message = "PostComment content must not be blank")
-    @Size(max = 1023, message = "Length of comment content must not be more than {max}")
+    @NotBlank(message = "评论内容不能为空")
+    @Size(max = 1023, message = "评论内容的长额不能超过 {max}")
     private String content;
 
     @Min(value = 1, message = "Post id must not be less than {value}")
