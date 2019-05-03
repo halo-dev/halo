@@ -10,6 +10,10 @@ import run.halo.app.security.token.AuthToken;
 import run.halo.app.service.AdminService;
 
 import javax.validation.Valid;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Admin controller.
@@ -37,6 +41,15 @@ public class AdminController {
     @ApiOperation("Gets count info")
     public StatisticDTO getCount() {
         return adminService.getCount();
+    }
+
+    @GetMapping("environments")
+    @ApiOperation("Gets environments info")
+    public Map<String, Object> getEnvironments() {
+        Map<String, Object> result = new HashMap<>();
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        result.put("startTime", runtimeMXBean.getStartTime());
+        return result;
     }
 
     @PostMapping("login")
