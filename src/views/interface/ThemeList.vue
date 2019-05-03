@@ -399,6 +399,7 @@ export default {
     },
     handleReload() {
       themeApi.reload().then(response => {
+        this.loadThemes()
         this.$message.success('刷新成功！')
       })
     }
