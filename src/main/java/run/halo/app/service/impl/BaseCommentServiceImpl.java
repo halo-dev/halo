@@ -79,6 +79,11 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public Page<COMMENT> pageLatest(int top,CommentStatus status){
+        return baseCommentRepository.findAllByStatus(status,ServiceUtils.buildLatestPageable(top));
+    }
+
+    @Override
     public Page<COMMENT> pageBy(CommentStatus status, Pageable pageable) {
 
         Assert.notNull(status, "Comment status must not be null");
