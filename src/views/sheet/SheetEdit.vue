@@ -63,6 +63,7 @@
                   </a-form-item>
                   <a-form-item label="自定义模板：">
                     <a-select v-model="sheetToStage.template">
+                      <a-select-option key="" value="">无</a-select-option>
                       <a-select-option
                         v-for="tpl in customTpls"
                         :key="tpl"

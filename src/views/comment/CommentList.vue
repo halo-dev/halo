@@ -53,13 +53,28 @@
         <a-dropdown>
           <a-menu slot="overlay">
             <a-menu-item key="1">
-              <a-icon type="check" />通过
+              <a
+                href="javascript:void(0);"
+                @click="handlePublishMore"
+              >
+                通过
+              </a>
             </a-menu-item>
             <a-menu-item key="2">
-              <a-icon type="delete" />移到回收站
+              <a
+                href="javascript:void(0);"
+                @click="handleRecycleMore"
+              >
+                移到回收站
+              </a>
             </a-menu-item>
             <a-menu-item key="3">
-              <a-icon type="delete" />永久删除
+              <a
+                href="javascript:void(0);"
+                @click="handleDeleteMore"
+              >
+                永久删除
+              </a>
             </a-menu-item>
           </a-menu>
           <a-button>
@@ -350,12 +365,28 @@ export default {
       this.queryParam.status = null
       this.loadComments()
     },
+    handlePublishMore() {
+      if (this.selectedRowKeys.length <= 0) {
+        this.$message.success('请至少选择一项！')
+      }
+    },
+    handleRecycleMore() {
+      if (this.selectedRowKeys.length <= 0) {
+        this.$message.success('请至少选择一项！')
+      }
+    },
+    handleDeleteMore() {
+      if (this.selectedRowKeys.length <= 0) {
+        this.$message.success('请至少选择一项！')
+      }
+    },
     onReplyClose() {
       this.replyComment = {}
       this.selectComment = {}
       this.replyCommentVisible = false
     },
     onSelectionChange(selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys
       this.$log.debug(`SelectedRowKeys: ${selectedRowKeys}`)
     },
     getCheckboxProps(comment) {

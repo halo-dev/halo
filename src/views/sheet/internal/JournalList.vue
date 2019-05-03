@@ -65,18 +65,26 @@
               >
                 <template slot="actions">
                   <span>
-                    <a-icon
-                      type="like-o"
-                      style="margin-right: 8px"
-                    />
-                    {{ item.likes }}
+                    <a
+                      href="javascript:void(0);"
+                    >
+                      <a-icon
+                        type="like-o"
+                        style="margin-right: 8px"
+                      />{{ item.likes }}
+                    </a>
                   </span>
                   <span>
-                    <a-icon
-                      type="message"
-                      style="margin-right: 8px"
-                    />
-                    {{ item.commentCount }}
+                    <a
+                      href="javascript:void(0);"
+                      @click="handleCommentShow(item)"
+                    >
+
+                      <a-icon
+                        type="message"
+                        style="margin-right: 8px"
+                      />{{ item.commentCount }}
+                    </a>
                   </span>
                 </template>
                 <template slot="extra">
@@ -142,19 +150,108 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <a-drawer
+      title="评论列表"
+      :width="isMobile()?'100%':'460'"
+      closable
+      :visible="commentVisiable"
+      destroyOnClose
+      @close="onCommentDrawerClose"
+    >
+      <a-row
+        type="flex"
+        align="middle"
+      >
+        <a-col :span="24">
+          <blockquote>
+            <a-comment>
+              <template slot="actions">
+                <span>
+                  <a-icon type="like" />
+                  <span style="padding-left: '8px';cursor: 'auto'">
+                    {{ journal.likes }}
+                  </span>
+                </span>
+                <span>
+                  <a-icon type="message" />
+                  <span style="padding-left: '8px';cursor: 'auto'">
+                    {{ journal.commentCount }}
+                  </span>
+                </span>
+              </template>
+              <a-avatar
+                :src="user.avatar"
+                :alt="user.nickname"
+                slot="avatar"
+              />
+              <p slot="content">{{ journal.content }}</p>
+
+              <span slot="datetime">{{ journal.createTime | moment }}</span>
+            </a-comment>
+          </blockquote>
+        </a-col>
+        <a-divider />
+        <a-col :span="24">
+          <a-comment>
+            <span slot="actions">回复</span>
+            <a slot="author"> {{ user.nickname }} </a>
+            <a-avatar
+              slot="avatar"
+              :src="user.avatar"
+              :alt="user.nickname"
+            />
+            <p slot="content">{{ journal.content }}</p>
+            <a-comment>
+              <span slot="actions">回复</span>
+              <a slot="author"> {{ user.nickname }} </a>
+              <a-avatar
+                slot="avatar"
+                :src="user.avatar"
+                :alt="user.nickname"
+              />
+              <p slot="content">{{ journal.content }}</p>
+              <a-comment>
+                <span slot="actions">回复</span>
+                <a slot="author"> {{ user.nickname }} </a>
+                <a-avatar
+                  slot="avatar"
+                  :src="user.avatar"
+                  :alt="user.nickname"
+                />
+                <p slot="content">{{ journal.content }}</p>
+              </a-comment>
+              <a-comment>
+                <span slot="actions">回复</span>
+                <a slot="author"> {{ user.nickname }} </a>
+                <a-avatar
+                  slot="avatar"
+                  :src="user.avatar"
+                  :alt="user.nickname"
+                />
+                <p slot="content">{{ journal.content }}</p>
+              </a-comment>
+            </a-comment>
+          </a-comment>
+        </a-col>
+      </a-row>
+    </a-drawer>
   </div>
 </template>
 
 <script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 import journalApi from '@/api/journal'
 import userApi from '@/api/user'
 
 export default {
+  mixins: [mixin, mixinDevice],
   data() {
     return {
       title: '发表',
       listLoading: false,
       visible: false,
+      commentVisiable: false,
       pagination: {
         page: 1,
         size: 10,
@@ -211,6 +308,10 @@ export default {
         this.loadJournals()
       })
     },
+    handleCommentShow(journal) {
+      this.journal = journal
+      this.commentVisiable = true
+    },
     createOrUpdateJournal() {
       if (this.journal.id) {
         journalApi.update(this.journal.id, this.journal).then(response => {
@@ -234,6 +335,9 @@ export default {
     resetParam() {
       this.queryParam.keyword = null
       this.loadJournals()
+    },
+    onCommentDrawerClose() {
+      this.commentVisiable = false
     }
   }
 }
