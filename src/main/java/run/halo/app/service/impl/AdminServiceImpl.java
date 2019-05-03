@@ -85,7 +85,7 @@ public class AdminServiceImpl implements AdminService {
 
         if (!userService.passwordMatch(user, loginParam.getPassword())) {
             // If the password is mismatch
-            throw new BadRequestException("Username or password is incorrect");
+            throw new BadRequestException("用户名或者密码不正确");
         }
 
         if (SecurityContextHolder.getContext().isAuthenticated()) {
