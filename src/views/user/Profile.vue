@@ -7,7 +7,6 @@
         :style="{ 'padding-bottom': '12px' }"
       >
         <a-card
-          :bodyStyle="{ padding: '16' }"
           :bordered="false"
         >
           <div class="profile-center-avatarHolder">

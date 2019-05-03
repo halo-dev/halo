@@ -1,5 +1,67 @@
 <template>
   <page-view>
+    <a-row :gutter="24">
+      <a-col
+        :xl="6"
+        :lg="6"
+        :md="12"
+        :sm="12"
+        :xs="12"
+        :style="{ marginBottom: '24px' }"
+      >
+        <analysis-card
+          :loading="countsLoading"
+          title="文章"
+          :number="countsData.postCount"
+        >
+        </analysis-card>
+      </a-col>
+      <a-col
+        :xl="6"
+        :lg="6"
+        :md="12"
+        :sm="12"
+        :xs="12"
+        :style="{ marginBottom: '24px' }"
+      >
+        <analysis-card
+          :loading="countsLoading"
+          title="评论"
+          :number="countsData.commentCount"
+        >
+        </analysis-card>
+      </a-col>
+      <a-col
+        :xl="6"
+        :lg="6"
+        :md="12"
+        :sm="12"
+        :xs="12"
+        :style="{ marginBottom: '24px' }"
+      >
+        <analysis-card
+          :loading="countsLoading"
+          title="附件"
+          :number="countsData.attachmentCount"
+        >
+        </analysis-card>
+      </a-col>
+      <a-col
+        :xl="6"
+        :lg="6"
+        :md="12"
+        :sm="12"
+        :xs="12"
+        :style="{ marginBottom: '24px' }"
+      >
+        <analysis-card
+          :loading="countsLoading"
+          title="成立天数"
+          :number="countsData.establishDays"
+        >
+        </analysis-card>
+      </a-col>
+    </a-row>
     <a-row :gutter="12">
       <a-col
         :xl="8"
@@ -28,46 +90,7 @@
           :bordered="false"
           title="最新评论"
         >
-          <a-comment>
-            <span slot="actions">Reply to</span>
-            <a slot="author">Han Solo</a>
-            <a-avatar
-              slot="avatar"
-              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-              alt="Han Solo"
-            />
-            <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
-            <a-comment>
-              <span slot="actions">Reply to</span>
-              <a slot="author">Han Solo</a>
-              <a-avatar
-                slot="avatar"
-                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                alt="Han Solo"
-              />
-              <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
-              <a-comment>
-                <span slot="actions">Reply to</span>
-                <a slot="author">Han Solo</a>
-                <a-avatar
-                  slot="avatar"
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                  alt="Han Solo"
-                />
-                <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
-              </a-comment>
-              <a-comment>
-                <span slot="actions">Reply to</span>
-                <a slot="author">Han Solo</a>
-                <a-avatar
-                  slot="avatar"
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                  alt="Han Solo"
-                />
-                <p slot="content">We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure).</p>
-              </a-comment>
-            </a-comment>
-          </a-comment>
+          最新评论
         </a-card>
       </a-col>
       <a-col
@@ -91,6 +114,7 @@
 
 <script>
 import { PageView } from '@/layouts'
+import AnalysisCard from './components/AnalysisCard'
 
 import postApi from '@/api/post'
 import commentApi from '@/api/comment'
@@ -141,7 +165,8 @@ const commentColumns = [
 export default {
   name: 'Dashboard',
   components: {
-    PageView
+    PageView,
+    AnalysisCard
   },
   data() {
     return {

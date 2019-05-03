@@ -8,41 +8,22 @@
           :lg="8"
         >
           <a-card
-            title="Markdown 导入"
+            title="Markdown 文章导入"
             :bordered="false"
           >
-            <span style="font-size:18px">Markdown 文档导入</span>
+            <p>支持 Hexo/Jekyll 导入并解析元数据</p>
             <a-button
               type="primary"
               style="float:right"
               @click="importMarkDown"
             >导入</a-button>
-            <p>支持 Hexo/Jekyll 导入并解析元数据</p>
-          </a-card>
-        </a-col>
-        <a-col
-          :sm="24"
-          :md="12"
-          :lg="8"
-        >
-          <a-card
-            title="WordPress 导入"
-            :bordered="false"
-          >
-            <span style="font-size:18px">WordPress 数据导入</span>
-            <a-button
-              type="primary"
-              style="float:right"
-              @click="importWordPress"
-            >导入</a-button>
-            <p>尽请期待</p>
           </a-card>
         </a-col>
       </a-row>
       <a-modal
-        title="Markdown 文档导入"
-        v-model="ishow"
-        @ok="sure"
+        title="Markdown 文章导入"
+        v-model="markdownUpload"
+        :footer="null"
       >
         <a-upload-dragger
           name="file"
@@ -53,7 +34,7 @@
           <p class="ant-upload-drag-icon">
             <a-icon type="inbox" />
           </p>
-          <p class="ant-upload-text">拖拽或点击选择MarkDown文件到此处</p>
+          <p class="ant-upload-text">拖拽或点击选择 MarkDown 文件到此处</p>
         </a-upload-dragger>
       </a-modal>
     </div>
@@ -64,15 +45,12 @@
 export default {
   data() {
     return {
-      ishow: false
+      markdownUpload: false
     }
   },
   methods: {
     importMarkDown() {
-      this.ishow = true
-    },
-    sure() {
-      this.ishow = false
+      this.markdownUpload = true
     },
     handleChange(info) {
       const status = info.file.status
@@ -84,9 +62,6 @@ export default {
       } else if (status === 'error') {
         this.$message.error(`${info.file.name} file upload failed.`)
       }
-    },
-    importWordPress() {
-      this.$message.info('程序猿正在努力开发呢！')
     }
   }
 }
