@@ -53,7 +53,13 @@
         <a-dropdown>
           <a-menu slot="overlay">
             <a-menu-item key="1">
-              <a-icon type="delete" />回收站
+              <a-icon type="check" />通过
+            </a-menu-item>
+            <a-menu-item key="2">
+              <a-icon type="delete" />移到回收站
+            </a-menu-item>
+            <a-menu-item key="3">
+              <a-icon type="delete" />永久删除
             </a-menu-item>
           </a-menu>
           <a-button>
@@ -65,6 +71,10 @@
       <div style="margin-top:15px">
         <a-table
           :rowKey="comment => comment.id"
+          :rowSelection="{
+            onChange: onSelectionChange,
+            getCheckboxProps: getCheckboxProps
+          }"
           :columns="columns"
           :dataSource="formattedComments"
           :loading="commentsLoading"
@@ -344,6 +354,17 @@ export default {
       this.replyComment = {}
       this.selectComment = {}
       this.replyCommentVisible = false
+    },
+    onSelectionChange(selectedRowKeys) {
+      this.$log.debug(`SelectedRowKeys: ${selectedRowKeys}`)
+    },
+    getCheckboxProps(comment) {
+      return {
+        props: {
+          disabled: comment.status === 'RECYCLE',
+          name: comment.author
+        }
+      }
     }
   }
 }

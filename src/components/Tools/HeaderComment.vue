@@ -21,7 +21,7 @@
                 size="large"
               />
               <template slot="title">
-                <a :href="item.authorUrl" target="_blank">{{ item.author }}</a>：{{ item.content }}
+                <a :href="item.authorUrl" target="_blank">{{ item.author }}</a>：<span v-html="item.content"></span>
               </template>
               <template slot="description">
                 {{ item.createTime | timeAgo }}
@@ -32,7 +32,10 @@
       </a-spin>
     </template>
     <span @click="fetchComment" class="header-comment">
-      <a-badge dot>
+      <a-badge dot v-if="comments.length>0">
+        <a-icon type="bell" />
+      </a-badge>
+      <a-badge v-else>
         <a-icon type="bell" />
       </a-badge>
     </span>
@@ -50,6 +53,9 @@ export default {
       comments: []
     }
   },
+  created() {
+    this.getComment()
+  },
   methods: {
     fetchComment() {
       if (!this.visible) {
@@ -61,7 +67,7 @@ export default {
       this.visible = !this.visible
     },
     getComment() {
-      commentApi.listLatest().then(response => {
+      commentApi.listLatestByStatus(5).then(response => {
         this.comments = response.data.data
         this.loadding = false
       })

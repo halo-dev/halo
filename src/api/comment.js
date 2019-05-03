@@ -11,6 +11,16 @@ commentApi.listLatest = () => {
   })
 }
 
+commentApi.listLatestByStatus = (top) => {
+  return service({
+    url: `${baseUrl}/latest/AUDITING`,
+    params: {
+      top: top
+    },
+    method: 'get'
+  })
+}
+
 commentApi.query = params => {
   return service({
     url: baseUrl,
