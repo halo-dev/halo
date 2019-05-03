@@ -70,7 +70,7 @@ public class ContentSheetController {
 
         if (StrUtil.isNotEmpty(sheet.getTemplate())) {
             if (themeService.templateExists(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
-                return themeService.render(sheet.getTemplate());
+                return themeService.render(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate());
             }
         }
         return themeService.render("sheet");
