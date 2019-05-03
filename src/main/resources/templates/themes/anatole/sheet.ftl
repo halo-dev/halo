@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="${sheet.title!} · ${options.blog_title!'Anatole'}" keywords="${sheet.title!},${options.seo_keywords!'Anatole'}" description="${sheet.summary!'Anatole'}"></@head>
+<@head title="${post.title!} · ${options.blog_title!'Anatole'}" keywords="${post.title!},${options.seo_keywords!'Anatole'}" description="${post.summary!'Anatole'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <link href="/${theme.folderName}/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
@@ -40,19 +40,19 @@
                 <div class="post animated fadeInDown">
                     <div class="post-title">
                         <h3>
-                            <a>${sheet.title!}</a>
+                            <a>${post.title!}</a>
                         </h3>
                     </div>
                     <div class="post-content">
-                        ${sheet.formatContent!}
+                        ${post.formatContent!}
                     </div>
                     <div class="post-footer">
                         <div class="meta">
                             <div class="info">
                                 <i class="fa fa-sun-o"></i>
-                                <span class="date">${sheet.createTime?string("yyyy-MM-dd")}</span>
+                                <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="${options.blog_url!}/archives/${sheet.url!}#comment_widget">Comments</a>
+                                <a href="${options.blog_url!}/archives/${post.url!}#comment_widget">Comments</a>
                             </div>
                         </div>
                     </div>
@@ -67,12 +67,13 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${options.blog_url!}/archives/${sheet.url!} ,${options.blog_title!},${sheet.title!},;"
+                        <a href="http://twitter.com/home?status=${options.blog_url!}/archives/${post.url!} ,${options.blog_title!},${post.title!},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
                 <div id="comment_widget">
                     <#include "module/comment.ftl">
+                    <@comment id="${sheet.id!}" type="sheet" />
                 </div>
             </div>
         </div>

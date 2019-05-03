@@ -52,6 +52,16 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     Page<COMMENT> pageLatest(int top);
 
     /**
+     * Lists latest comments by status
+     *
+     * @param top    top number must not be less than 0
+     * @param status status
+     * @return a page of comments
+     */
+    @NonNull
+    Page<COMMENT> pageLatest(int top, CommentStatus status);
+
+    /**
      * Pages comments.
      *
      * @param status   comment status must not be null

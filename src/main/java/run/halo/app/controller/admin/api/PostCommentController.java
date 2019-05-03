@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.params.CommentQuery;
+import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.service.PostCommentService;
 
@@ -45,6 +45,14 @@ public class PostCommentController {
     @ApiOperation("Pages latest comments")
     public List<PostCommentWithPostVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
         List<PostComment> content = postCommentService.pageLatest(top).getContent();
+        return postCommentService.convertToWithPostVo(content);
+    }
+
+    @GetMapping("latest/{status}")
+    @ApiOperation("Pages latest comments by status")
+    public List<PostCommentWithPostVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top,
+                                                  @PathVariable("status") CommentStatus status) {
+        List<PostComment> content = postCommentService.pageLatest(top, status).getContent();
         return postCommentService.convertToWithPostVo(content);
     }
 
