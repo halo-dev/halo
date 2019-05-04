@@ -35,4 +35,11 @@ journalApi.delete = journalId => {
   })
 }
 
+journalApi.commentTree = journalId => {
+  return service({
+    url: `${baseUrl}/${journalId}/comments/tree_view`,
+    method: 'get'
+  })
+}
+
 export default journalApi

@@ -65,9 +65,7 @@
               >
                 <template slot="actions">
                   <span>
-                    <a
-                      href="javascript:void(0);"
-                    >
+                    <a href="javascript:void(0);">
                       <a-icon
                         type="like-o"
                         style="margin-right: 8px"
@@ -151,6 +149,31 @@
       </a-form>
     </a-modal>
 
+    <a-modal
+      v-if="selectComment"
+      :title="'回复给：'+selectComment.author"
+      v-model="selectCommentVisible"
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleReplyComment"
+        >
+          回复
+        </a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item>
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="replyComment.content"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
     <a-drawer
       title="评论列表"
       :width="isMobile()?'100%':'460'"
@@ -164,75 +187,26 @@
         align="middle"
       >
         <a-col :span="24">
-          <blockquote>
-            <a-comment>
-              <template slot="actions">
-                <span>
-                  <a-icon type="like" />
-                  <span style="padding-left: '8px';cursor: 'auto'">
-                    {{ journal.likes }}
-                  </span>
-                </span>
-                <span>
-                  <a-icon type="message" />
-                  <span style="padding-left: '8px';cursor: 'auto'">
-                    {{ journal.commentCount }}
-                  </span>
-                </span>
-              </template>
-              <a-avatar
-                :src="user.avatar"
-                :alt="user.nickname"
-                slot="avatar"
-              />
-              <p slot="content">{{ journal.content }}</p>
+          <a-comment>
+            <a-avatar
+              :src="user.avatar"
+              :alt="user.nickname"
+              slot="avatar"
+            />
+            <p slot="content">{{ journal.content }}</p>
 
-              <span slot="datetime">{{ journal.createTime | moment }}</span>
-            </a-comment>
-          </blockquote>
+            <span slot="datetime">{{ journal.createTime | moment }}</span>
+          </a-comment>
         </a-col>
         <a-divider />
         <a-col :span="24">
-          <a-comment>
-            <span slot="actions">回复</span>
-            <a slot="author"> {{ user.nickname }} </a>
-            <a-avatar
-              slot="avatar"
-              :src="user.avatar"
-              :alt="user.nickname"
-            />
-            <p slot="content">{{ journal.content }}</p>
-            <a-comment>
-              <span slot="actions">回复</span>
-              <a slot="author"> {{ user.nickname }} </a>
-              <a-avatar
-                slot="avatar"
-                :src="user.avatar"
-                :alt="user.nickname"
-              />
-              <p slot="content">{{ journal.content }}</p>
-              <a-comment>
-                <span slot="actions">回复</span>
-                <a slot="author"> {{ user.nickname }} </a>
-                <a-avatar
-                  slot="avatar"
-                  :src="user.avatar"
-                  :alt="user.nickname"
-                />
-                <p slot="content">{{ journal.content }}</p>
-              </a-comment>
-              <a-comment>
-                <span slot="actions">回复</span>
-                <a slot="author"> {{ user.nickname }} </a>
-                <a-avatar
-                  slot="avatar"
-                  :src="user.avatar"
-                  :alt="user.nickname"
-                />
-                <p slot="content">{{ journal.content }}</p>
-              </a-comment>
-            </a-comment>
-          </a-comment>
+          <journal-comment-tree
+            v-for="(comment,index) in comments"
+            :key="index"
+            :comment="comment"
+            @reply="handleCommentReplyClick"
+            @delete="handleCommentDelete"
+          />
         </a-col>
       </a-row>
     </a-drawer>
@@ -240,18 +214,22 @@
 </template>
 
 <script>
+import JournalCommentTree from './components/JournalCommentTree'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import journalApi from '@/api/journal'
+import journalCommentApi from '@/api/journalComment'
 import userApi from '@/api/user'
 
 export default {
   mixins: [mixin, mixinDevice],
+  components: { JournalCommentTree },
   data() {
     return {
       title: '发表',
       listLoading: false,
       visible: false,
       commentVisiable: false,
+      selectCommentVisible: false,
       pagination: {
         page: 1,
         size: 10,
@@ -264,7 +242,10 @@ export default {
         keyword: null
       },
       journals: [],
+      comments: [],
       journal: {},
+      selectComment: null,
+      replyComment: {},
       user: {}
     }
   },
@@ -310,7 +291,31 @@ export default {
     },
     handleCommentShow(journal) {
       this.journal = journal
-      this.commentVisiable = true
+      journalApi.commentTree(this.journal.id).then(response => {
+        this.comments = response.data.data.content
+        this.commentVisiable = true
+      })
+    },
+    handleCommentReplyClick(comment) {
+      this.selectComment = comment
+      this.selectCommentVisible = true
+      this.replyComment.parentId = comment.id
+      this.replyComment.postId = this.journal.id
+    },
+    handleReplyComment() {
+      journalCommentApi.create(this.replyComment).then(response => {
+        this.$message.success('回复成功！')
+        this.replyComment = {}
+        this.selectComment = {}
+        this.selectCommentVisible = false
+        this.handleCommentShow(this.journal)
+      })
+    },
+    handleCommentDelete(comment) {
+      journalCommentApi.delete(comment.id).then(response => {
+        this.$message.success('删除成功！')
+        this.handleCommentShow(this.journal)
+      })
     },
     createOrUpdateJournal() {
       if (this.journal.id) {
