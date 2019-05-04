@@ -41,8 +41,9 @@ public class SheetCommentController {
     }
 
     @GetMapping("latest")
-    public List<SheetCommentWithSheetVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
-        Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top);
+    public List<SheetCommentWithSheetVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
+                                                    @RequestParam(name = "status", required = false) CommentStatus status) {
+        Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top, status);
         return sheetCommentService.convertToWithPostVo(sheetCommentPage.getContent());
     }
 

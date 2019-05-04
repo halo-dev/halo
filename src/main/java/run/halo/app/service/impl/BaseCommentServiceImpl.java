@@ -75,12 +75,16 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
     @Override
     public Page<COMMENT> pageLatest(int top) {
-        return listAll(ServiceUtils.buildLatestPageable(top));
+        return pageLatest(top, null);
     }
 
     @Override
-    public Page<COMMENT> pageLatest(int top,CommentStatus status){
-        return baseCommentRepository.findAllByStatus(status,ServiceUtils.buildLatestPageable(top));
+    public Page<COMMENT> pageLatest(int top, CommentStatus status) {
+        if (status == null) {
+            return listAll(ServiceUtils.buildLatestPageable(top));
+        }
+
+        return baseCommentRepository.findAllByStatus(status, ServiceUtils.buildLatestPageable(top));
     }
 
     @Override
