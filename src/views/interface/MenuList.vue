@@ -109,7 +109,7 @@
             >
               <a
                 href="javascript:;"
-                @click="handleEditMenu(record.id)"
+                @click="handleEditMenu(record)"
               >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
@@ -189,11 +189,9 @@ export default {
       this.formType = 'create'
       this.menuToCreate = {}
     },
-    handleEditMenu(id) {
-      menuApi.get(id).then(response => {
-        this.menuToCreate = response.data.data
-        this.formType = 'update'
-      })
+    handleEditMenu(menu) {
+      this.menuToCreate = menu
+      this.formType = 'update'
     },
     handleDeleteMenu(id) {
       menuApi.delete(id).then(response => {

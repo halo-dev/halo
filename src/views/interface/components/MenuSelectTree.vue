@@ -5,6 +5,7 @@
     treeDefaultExpandAll
     :treeDataSimpleMode="true"
     :allowClear="true"
+    :value="menuIdString"
     @change="handleSelectionChange"
   >
   </a-tree-select>
@@ -39,6 +40,9 @@ export default {
           pId: menu.parentId
         }
       })
+    },
+    menuIdString() {
+      return this.menuId.toString()
     }
   },
   methods: {
