@@ -5,7 +5,7 @@
     treeDefaultExpandAll
     :treeDataSimpleMode="true"
     :allowClear="true"
-    :value="categoryId"
+    :value="categoryIdString"
     @change="handleSelectionChange"
   >
   </a-tree-select>
@@ -43,6 +43,9 @@ export default {
           pId: category.parentId
         }
       })
+    },
+    categoryIdString() {
+      return this.categoryId.toString()
     }
   },
   methods: {
