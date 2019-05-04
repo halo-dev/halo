@@ -6,9 +6,7 @@
         :md="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card
-          :bordered="false"
-        >
+        <a-card :bordered="false">
           <div class="profile-center-avatarHolder">
             <a-tooltip
               placement="right"
@@ -30,19 +28,16 @@
           </div>
           <div class="profile-center-detail">
             <p>
-              <a-icon type="link" />
-              <a
-                href="http://localhost:8090"
+              <a-icon type="link" /><a
+                :href="options.blog_url"
                 target="method"
-              >http://localhost:8090</a>
+              >{{ options.blog_url }}</a>
             </p>
             <p>
-              <a-icon type="mail" />
-              {{ user.email }}
+              <a-icon type="mail" />{{ user.email }}
             </p>
             <p>
-              <a-icon type="calendar" />
-              {{ counts.establishDays || 0 }} 天
+              <a-icon type="calendar" />{{ counts.establishDays || 0 }} 天
             </p>
           </div>
           <a-divider />
@@ -152,6 +147,7 @@
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import userApi from '@/api/user'
 import adminApi from '@/api/admin'
+import optionApi from '@/api/option'
 
 export default {
   components: {
@@ -168,7 +164,9 @@ export default {
         newPassword: null,
         confirmPassword: null
       },
-      attachment: {}
+      attachment: {},
+      options: [],
+      keys: 'blog_url'
     }
   },
   computed: {
@@ -179,6 +177,7 @@ export default {
   created() {
     this.loadUser()
     this.getCounts()
+    this.loadOptions()
   },
   methods: {
     handleShowAttachDrawer() {
@@ -188,6 +187,11 @@ export default {
       userApi.getProfile().then(response => {
         this.user = response.data.data
         this.profileLoading = false
+      })
+    },
+    loadOptions() {
+      optionApi.listByKeys(this.keys).then(response => {
+        this.options = response.data.data
       })
     },
     getCounts() {

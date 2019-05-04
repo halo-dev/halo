@@ -22,7 +22,7 @@
                   <a-input v-model="options.blog_url" />
                 </a-form-item>
                 <a-form-item
-                  label="LOGO："
+                  label="Logo："
                   :wrapper-col="wrapperCol"
                 >
                   <a-input v-model="options.blog_logo">

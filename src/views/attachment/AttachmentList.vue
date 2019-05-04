@@ -26,7 +26,10 @@
                   :sm="24"
                 >
                   <a-form-item label="存储位置">
-                    <a-select v-model="queryParam.attachmentType">
+                    <a-select
+                      v-model="queryParam.attachmentType"
+                      @change="handleQuery"
+                    >
                       <a-select-option
                         v-for="item in Object.keys(attachmentType)"
                         :key="item"
@@ -40,7 +43,10 @@
                   :sm="24"
                 >
                   <a-form-item label="文件类型">
-                    <a-select v-model="queryParam.mediaType">
+                    <a-select
+                      v-model="queryParam.mediaType"
+                      @change="handleQuery"
+                    >
                       <a-select-option
                         v-for="(item,index) in mediaTypes"
                         :key="index"

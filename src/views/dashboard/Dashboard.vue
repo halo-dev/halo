@@ -74,13 +74,15 @@
       >
         <analysis-card
           :loading="countsLoading"
-          title="成立天数"
+          title="建立天数"
           :number="countsData.establishDays"
         >
           <a-tooltip
-            :title="'已成立'+countsData.establishDays+'天了'"
             slot="action"
           >
+            <template slot="title">
+              博客建立于 {{ countsData.birthday | moment }}
+            </template>
             <a href="javascript:void(0);">
               <a-icon type="info-circle-o" /></a>
           </a-tooltip>
