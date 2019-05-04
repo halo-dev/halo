@@ -101,7 +101,7 @@
           :loading="activityLoading"
           :bordered="false"
           title="新动态"
-          :bodyStyle="{ padding: '16px' }"
+          :bodyStyle="{ padding: 0 }"
         >
           <div class="card-container">
             <a-tabs
@@ -199,7 +199,10 @@
               />
             </a-form-item>
             <a-form-item>
-              <a-button type="primary" @click="handleCreateJournalClick">保存</a-button>
+              <a-button
+                type="primary"
+                @click="handleCreateJournalClick"
+              >保存</a-button>
             </a-form-item>
           </a-form>
         </a-card>
@@ -218,7 +221,18 @@
           title="日志记录"
           :bodyStyle="{ padding: '16px' }"
         >
-          日志记录
+          <a-list :dataSource="logData">
+            <a-list-item
+              slot="renderItem"
+              slot-scope="item, index"
+              :key="index"
+            >
+              <a-list-item-meta :description="item.createTime | timeAgo">
+                <span slot="title">{{ item.type }}</span>
+              </a-list-item-meta>
+              <div>{{ item.content }}</div>
+            </a-list-item>
+          </a-list>
         </a-card>
       </a-col>
     </a-row>
@@ -281,7 +295,7 @@ export default {
       })
     },
     listLatestLogs() {
-      logApi.listLatest().then(response => {
+      logApi.listLatest(5).then(response => {
         this.logData = response.data.data
         this.logLoading = false
       })
