@@ -89,7 +89,7 @@
             >
               <a
                 href="javascript:;"
-                @click="handleEditCategory(record.id)"
+                @click="handleEditCategory(record)"
               >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
@@ -179,11 +179,9 @@ export default {
       this.formType = 'create'
       this.categoryToCreate = {}
     },
-    handleEditCategory(id) {
-      categoryApi.get(id).then(response => {
-        this.categoryToCreate = response.data.data
-        this.formType = 'update'
-      })
+    handleEditCategory(category) {
+      this.categoryToCreate = category
+      this.formType = 'update'
     },
     handleDeleteCategory(id) {
       categoryApi.delete(id).then(response => {

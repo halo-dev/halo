@@ -5,6 +5,7 @@
     treeDefaultExpandAll
     :treeDataSimpleMode="true"
     :allowClear="true"
+    :value="categoryId"
     @change="handleSelectionChange"
   >
   </a-tree-select>
