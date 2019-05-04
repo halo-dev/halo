@@ -52,37 +52,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // save halo version to database
         this.printStartInfo();
         this.initThemes();
-
-        // Init user in development environment
-//        if (!haloProperties.isProductionEnv()) {
-//            initAnTestUserIfAbsent();
-//        }
     }
-
-//    /**
-//     * Initialize an test user if absent
-//     */
-//    private void initAnTestUserIfAbsent() {
-//        // Create an user if absent
-//        List<User> users = userService.listAll();
-//
-//        if (users.isEmpty()) {
-//            UserParam userParam = new UserParam();
-//            userParam.setUsername("test");
-//            userParam.setNickname("developer");
-//            userParam.setEmail("test@test.com");
-//            userParam.setPassword("opentest");
-//
-//            log.debug("Initializing a test user: [{}]", userParam);
-//
-//            // Validate the user param
-//            ValidationUtils.validate(userParam, CreateCheck.class);
-//
-//            User testUser = userService.createBy(userParam);
-//
-//            log.debug("Initialized a test user: [{}]", testUser);
-//        }
-//    }
 
     private void printStartInfo() {
         String blogUrl = optionService.getBlogBaseUrl();
@@ -102,7 +72,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // Whether the blog has initialized
         Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
-        if (isInstalled) {
+        if (haloProperties.isProductionEnv() && isInstalled) {
             // Skip
             return;
         }
