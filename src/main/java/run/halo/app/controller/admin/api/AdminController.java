@@ -4,16 +4,13 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.security.token.AuthToken;
 import run.halo.app.service.AdminService;
 
 import javax.validation.Valid;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Admin controller.
@@ -45,11 +42,8 @@ public class AdminController {
 
     @GetMapping("environments")
     @ApiOperation("Gets environments info")
-    public Map<String, Object> getEnvironments() {
-        Map<String, Object> result = new HashMap<>();
-        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-        result.put("startTime", runtimeMXBean.getStartTime());
-        return result;
+    public EnvironmentDTO getEnvironments() {
+        return adminService.getEnvironments();
     }
 
     @PostMapping("login")

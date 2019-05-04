@@ -1,6 +1,7 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
+import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.security.token.AuthToken;
@@ -9,6 +10,7 @@ import run.halo.app.security.token.AuthToken;
  * Admin service.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-29
  */
 public interface AdminService {
@@ -45,6 +47,13 @@ public interface AdminService {
      */
     @NonNull
     StatisticDTO getCount();
+
+    /**
+     * Get system environments
+     * @return environments
+     */
+    @NonNull
+    EnvironmentDTO getEnvironments();
 
     /**
      * Refreshes token.

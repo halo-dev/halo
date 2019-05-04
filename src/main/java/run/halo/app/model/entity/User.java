@@ -1,11 +1,8 @@
 package run.halo.app.model.entity;
 
-import run.halo.app.utils.DateUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import run.halo.app.utils.DateUtils;
 
 import javax.persistence.*;

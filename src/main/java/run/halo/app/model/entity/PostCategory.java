@@ -2,8 +2,6 @@ package run.halo.app.model.entity;
 
 import lombok.Data;
 import lombok.ToString;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Objects;

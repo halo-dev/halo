@@ -46,3 +46,13 @@
         <#t><#else>刚刚
     </#if>
 </#macro>
+
+<#macro globalHeader>
+    <@favicon />
+    <@verification />
+</#macro>
+
+<#macro globalFooter>
+    <@statistics />
+    <@footer_info />
+</#macro>
