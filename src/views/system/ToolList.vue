@@ -3,8 +3,8 @@
     <div class="card-content">
       <a-row :gutter="12">
         <a-col
-          :xl="4"
-          :lg="4"
+          :xl="6"
+          :lg="6"
           :md="12"
           :sm="24"
           :xs="24"
