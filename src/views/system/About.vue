@@ -13,7 +13,7 @@
                 <template slot="description">
                   <ul>
                     <li>版本：1.0</li>
-                    <li>数据库：h2databse</li>
+                    <li>数据库：{{ environments.database }}</li>
                     <li>启动时间：{{ environments.startTime | moment }}</li>
                   </ul>
                   <a
