@@ -65,6 +65,9 @@ public interface ThemeService {
      */
     String THEMES_CACHE_KEY = "themes";
 
+    /**
+     * Custom sheet prefix.
+     */
     String CUSTOM_SHEET_PREFIX = "sheet_";
 
     /**

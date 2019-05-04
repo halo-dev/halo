@@ -43,8 +43,10 @@ public class JournalCommentController {
     }
 
     @GetMapping("latest")
-    public List<JournalCommentWithJournalVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
-        return journalCommentService.convertToWithJournalVo(journalCommentService.pageLatest(top).getContent());
+    public List<JournalCommentWithJournalVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
+                                                        @RequestParam(name = "status", required = false) CommentStatus status) {
+        List<JournalComment> latestComments = journalCommentService.pageLatest(top, status).getContent();
+        return journalCommentService.convertToWithJournalVo(latestComments);
     }
 
     @PostMapping
