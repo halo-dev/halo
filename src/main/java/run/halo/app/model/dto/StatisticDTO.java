@@ -17,6 +17,8 @@ public class StatisticDTO {
 
     private long attachmentCount;
 
+    private long birthday;
+
     private long establishDays;
 
     private long linkCount;

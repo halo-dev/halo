@@ -2,12 +2,14 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
@@ -20,12 +22,15 @@ import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.*;
 import run.halo.app.utils.HaloUtils;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Admin service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-29
  */
 @Slf4j
@@ -51,6 +56,9 @@ public class AdminServiceImpl implements AdminService {
     private final LinkService linkService;
 
     private final StringCacheStore cacheStore;
+
+    @Value("${spring.datasource.driver-class-name}")
+    private String driverClassName;
 
     public AdminServiceImpl(PostService postService,
                             SheetService sheetService,
@@ -153,12 +161,26 @@ public class AdminServiceImpl implements AdminService {
         long birthday = optionService.getBirthday();
         long days = (System.currentTimeMillis() - birthday) / (1000 * 24 * 3600);
         statisticDTO.setEstablishDays(days);
+        statisticDTO.setBirthday(birthday);
 
         statisticDTO.setLinkCount(linkService.count());
 
         statisticDTO.setVisitCount(postService.countVisit() + sheetService.countVisit());
         statisticDTO.setLikeCount(postService.countLike() + sheetService.countLike());
         return statisticDTO;
+    }
+
+    @Override
+    public EnvironmentDTO getEnvironments() {
+        EnvironmentDTO environmentDTO = new EnvironmentDTO();
+
+        // Get application start time.
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        environmentDTO.setStartTime(runtimeMXBean.getStartTime());
+
+        environmentDTO.setDatabase("org.h2.Driver".equals(driverClassName) ? "H2" : "MySQL");
+
+        return environmentDTO;
     }
 
     @Override
