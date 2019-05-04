@@ -53,15 +53,16 @@
       >
         <analysis-card
           :loading="countsLoading"
-          title="附件"
-          :number="countsData.attachmentCount"
+          title="总访问"
+          :number="countsData.visitCount"
         >
-          <router-link
-            :to="{ name:'Attachments' }"
-            slot="action"
-          >
-            <a-icon type="link" />
-          </router-link>
+          <a-tooltip slot="action">
+            <template slot="title">
+              文章总访问共 {{ countsData.visitCount }} 次
+            </template>
+            <a href="javascript:void(0);">
+              <a-icon type="info-circle-o" /></a>
+          </a-tooltip>
         </analysis-card>
       </a-col>
       <a-col
@@ -77,9 +78,7 @@
           title="建立天数"
           :number="countsData.establishDays"
         >
-          <a-tooltip
-            slot="action"
-          >
+          <a-tooltip slot="action">
             <template slot="title">
               博客建立于 {{ countsData.birthday | moment }}
             </template>
@@ -99,11 +98,76 @@
         :style="{ marginBottom: '12px' }"
       >
         <a-card
-          :loading="postLoading"
+          :loading="activityLoading"
           :bordered="false"
-          title="最新文章"
+          title="新动态"
+          :bodyStyle="{ padding: '16px' }"
         >
-          最新文章
+          <div class="card-container">
+            <a-tabs
+              defaultActiveKey="1"
+              type="card"
+            >
+              <a-tab-pane key="1">
+                <span slot="tab">
+                  最近文章
+                </span>
+                <a-list :dataSource="postData">
+                  <a-list-item
+                    slot="renderItem"
+                    slot-scope="item, index"
+                    :key="index"
+                  >
+                    <a-list-item-meta>
+                      <a
+                        slot="title"
+                        href="javascript:void(0);"
+                        @click="handleEditPostClick(item)"
+                      >{{ item.title }}</a>
+                    </a-list-item-meta>
+                    <div>{{ item.createTime | timeAgo }}</div>
+                  </a-list-item>
+                </a-list>
+              </a-tab-pane>
+              <a-tab-pane
+                key="2"
+                forceRender
+              >
+                <span slot="tab">
+                  最近评论
+                </span>
+                <a-list
+                  itemLayout="horizontal"
+                  :dataSource="commentData"
+                >
+                  <a-list-item
+                    slot="renderItem"
+                    slot-scope="item, index"
+                    :key="index"
+                  >
+                    <a-comment :avatar="'//gravatar.loli.net/avatar/'+item.gavatarMd5+'/?s=256&d=mp'">
+                      <template slot="author">
+                        {{ item.author }} 发表在 《<a
+                          href="javascript:void(0);"
+                          target="_blank"
+                        >{{ item.post.title }}</a>》
+                      </template>
+                      <template slot="actions">
+                        <span>回复</span>
+                      </template>
+                      <p slot="content">{{ item.content }}</p>
+                      <a-tooltip
+                        slot="datetime"
+                        :title="item.createTime | moment"
+                      >
+                        <span>{{ item.createTime | timeAgo }}</span>
+                      </a-tooltip>
+                    </a-comment>
+                  </a-list-item>
+                </a-list>
+              </a-tab-pane>
+            </a-tabs>
+          </div>
         </a-card>
       </a-col>
       <a-col
@@ -115,11 +179,29 @@
         :style="{ marginBottom: '12px' }"
       >
         <a-card
-          :loading="commentLoading"
           :bordered="false"
-          title="最新评论"
+          :bodyStyle="{ padding: '16px' }"
         >
-          最新评论
+          <template slot="title">
+            速记 <a-tooltip
+              slot="action"
+              title="内容将保存到页面/所有页面/日志页面"
+            >
+              <a-icon type="info-circle-o" />
+            </a-tooltip>
+          </template>
+          <a-form layout="vertical">
+            <a-form-item>
+              <a-input
+                type="textarea"
+                :autosize="{ minRows: 8 }"
+                v-model="journal.content"
+              />
+            </a-form-item>
+            <a-form-item>
+              <a-button type="primary" @click="handleCreateJournalClick">保存</a-button>
+            </a-form-item>
+          </a-form>
         </a-card>
       </a-col>
       <a-col
@@ -133,9 +215,10 @@
         <a-card
           :loading="logLoading"
           :bordered="false"
-          title="最新日志"
+          title="日志记录"
+          :bodyStyle="{ padding: '16px' }"
         >
-          最新日志
+          日志记录
         </a-card>
       </a-col>
     </a-row>
@@ -150,48 +233,7 @@ import postApi from '@/api/post'
 import commentApi from '@/api/comment'
 import logApi from '@/api/log'
 import adminApi from '@/api/admin'
-
-const postColumns = [
-  {
-    title: '标题',
-    dataIndex: 'title',
-    scopedSlots: { customRender: 'name' }
-  },
-  {
-    title: '状态',
-    className: 'status',
-    dataIndex: 'status',
-    scopedSlots: { customRender: 'status' }
-  },
-  {
-    title: '最后编辑时间',
-    dataIndex: 'editTime',
-    scopedSlots: { customRender: 'editTime' }
-  }
-]
-
-const commentColumns = [
-  {
-    title: '评论者',
-    dataIndex: 'author',
-    scopedSlots: { customRender: 'name' }
-  },
-  {
-    title: '状态',
-    className: 'status',
-    dataIndex: 'status'
-  },
-  {
-    title: '内容',
-    className: 'content',
-    dataIndex: 'content'
-  },
-  {
-    title: '发布时间',
-    dataIndex: 'date'
-  }
-]
-
+import journalApi from '@/api/journal'
 export default {
   name: 'Dashboard',
   components: {
@@ -200,16 +242,14 @@ export default {
   },
   data() {
     return {
-      postLoading: true,
-      commentLoading: true,
+      activityLoading: true,
       logLoading: true,
       countsLoading: true,
-      postColumns,
       postData: [],
-      commentColumns,
       commentData: [],
       logData: [],
-      countsData: {}
+      countsData: {},
+      journal: {}
     }
   },
   created() {
@@ -229,21 +269,21 @@ export default {
   },
   methods: {
     listLatestPosts() {
-      postApi.listLatest().then(response => {
-        this.postLoading = false
+      postApi.listLatest(5).then(response => {
         this.postData = response.data.data
+        this.activityLoading = false
       })
     },
     listLatestComments() {
-      commentApi.listLatest().then(response => {
-        this.commentLoading = false
+      commentApi.listLatest(5, 'PUBLISHED').then(response => {
         this.commentData = response.data.data
+        this.activityLoading = false
       })
     },
     listLatestLogs() {
       logApi.listLatest().then(response => {
-        this.logLoading = false
         this.logData = response.data.data
+        this.logLoading = false
       })
     },
     getCounts() {
@@ -251,10 +291,28 @@ export default {
         this.countsData = response.data.data
         this.countsLoading = false
       })
+    },
+    handleEditPostClick(post) {
+      this.$router.push({ name: 'PostEdit', query: { postId: post.id } })
+    },
+    handleCreateJournalClick() {
+      journalApi.create(this.journal).then(response => {
+        this.$message.success('发表成功！')
+        this.journal = {}
+      })
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.ant-comment {
+  .ant-comment-actions {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+.ant-comment-inner {
+  padding: 0 !important;
+}
 </style>

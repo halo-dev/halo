@@ -10,6 +10,7 @@
           <a-card
             title="Markdown 文章导入"
             :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
           >
             <p>支持 Hexo/Jekyll 导入并解析元数据</p>
             <a-button

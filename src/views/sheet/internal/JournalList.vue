@@ -84,6 +84,9 @@
                       />{{ item.commentCount }}
                     </a>
                   </span>
+                  <span>
+                    From 微信
+                  </span>
                 </template>
                 <template slot="extra">
                   <a
@@ -125,10 +128,15 @@
       </a-col>
     </a-row>
 
-    <a-modal
-      :title="title"
-      v-model="visible"
-    >
+    <a-modal v-model="visible">
+      <template slot="title">
+        {{ title }} <a-tooltip
+          slot="action"
+          title="只能输入250字"
+        >
+          <a-icon type="info-circle-o" />
+        </a-tooltip>
+      </template>
       <template slot="footer">
         <a-button
           key="submit"
