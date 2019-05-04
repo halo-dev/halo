@@ -59,7 +59,7 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      * @return a page of comments
      */
     @NonNull
-    Page<COMMENT> pageLatest(int top, CommentStatus status);
+    Page<COMMENT> pageLatest(int top, @Nullable CommentStatus status);
 
     /**
      * Pages comments.
