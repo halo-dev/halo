@@ -110,9 +110,14 @@
                 slot="cover"
               >
               <a-card-meta
-                :title="themeProperty.author.name"
                 :description="themeProperty.description"
               >
+                <template slot="title">
+                  <a
+                    :href="themeProperty.author.website"
+                    target="_blank"
+                  >{{ themeProperty.author.name }}</a>
+                </template>
                 <a-avatar
                   v-if="themeProperty.logo"
                   :src="themeProperty.logo"
@@ -134,6 +139,7 @@
           :md="12"
           :sm="24"
           :xs="24"
+          style="padding-bottom: 50px;"
         >
           <a-skeleton
             active
@@ -215,7 +221,10 @@
       <AttachmentDrawer v-model="attachmentDrawerVisible" />
     </a-drawer>
     <div class="upload-button">
-      <a-dropdown placement="topLeft" :trigger="['click']">
+      <a-dropdown
+        placement="topLeft"
+        :trigger="['click']"
+      >
         <a-button
           type="primary"
           shape="circle"
@@ -224,10 +233,18 @@
         ></a-button>
         <a-menu slot="overlay">
           <a-menu-item>
-            <a rel="noopener noreferrer" href="javascript:void(0);" @click="handleShowUploadModal">安装主题</a>
+            <a
+              rel="noopener noreferrer"
+              href="javascript:void(0);"
+              @click="handleShowUploadModal"
+            >安装主题</a>
           </a-menu-item>
           <a-menu-item>
-            <a rel="noopener noreferrer" href="javascript:void(0);" @click="handleReload">刷新列表</a>
+            <a
+              rel="noopener noreferrer"
+              href="javascript:void(0);"
+              @click="handleReload"
+            >刷新列表</a>
           </a-menu-item>
         </a-menu>
       </a-dropdown>

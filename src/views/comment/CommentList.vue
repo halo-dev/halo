@@ -53,7 +53,10 @@
       <div class="table-operator">
         <a-dropdown v-show="queryParam.status!=null && queryParam.status!=''">
           <a-menu slot="overlay">
-            <a-menu-item key="1" v-if="queryParam.status ==='AUDITING'">
+            <a-menu-item
+              key="1"
+              v-if="queryParam.status ==='AUDITING'"
+            >
               <a
                 href="javascript:void(0);"
                 @click="handlePublishMore"
@@ -61,7 +64,10 @@
                 通过
               </a>
             </a-menu-item>
-            <a-menu-item key="2" v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='AUDITING'">
+            <a-menu-item
+              key="2"
+              v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='AUDITING'"
+            >
               <a
                 href="javascript:void(0);"
                 @click="handleRecycleMore"
@@ -69,7 +75,10 @@
                 移到回收站
               </a>
             </a-menu-item>
-            <a-menu-item key="3" v-if="queryParam.status === 'RECYCLE'">
+            <a-menu-item
+              key="3"
+              v-if="queryParam.status === 'RECYCLE'"
+            >
               <a
                 href="javascript:void(0);"
                 @click="handleDeleteMore"
@@ -370,16 +379,37 @@ export default {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
       }
+      for (let index = 0; index < this.selectedRowKeys.length; index++) {
+        const element = this.selectedRowKeys[index]
+        commentApi.updateStatus(element, 'PUBLISHED').then(response => {
+          this.$log.debug(`commentId: ${element}, status: PUBLISHED`)
+        })
+      }
+      this.loadComments()
     },
     handleRecycleMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
       }
+      for (let index = 0; index < this.selectedRowKeys.length; index++) {
+        const element = this.selectedRowKeys[index]
+        commentApi.updateStatus(element, 'RECYCLE').then(response => {
+          this.$log.debug(`commentId: ${element}, status: RECYCLE`)
+        })
+      }
+      this.loadComments()
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
       }
+      for (let index = 0; index < this.selectedRowKeys.length; index++) {
+        const element = this.selectedRowKeys[index]
+        commentApi.delete(element).then(response => {
+          this.$log.debug(`delete: ${element}`)
+        })
+      }
+      this.loadComments()
     },
     onReplyClose() {
       this.replyComment = {}
