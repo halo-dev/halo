@@ -20,6 +20,7 @@
                 <a-select
                   v-model="queryParam.status"
                   placeholder="请选择评论状态"
+                  @change="loadComments(isSearch)"
                 >
                   <a-select-option
                     v-for="status in Object.keys(commentStatus)"
@@ -50,9 +51,9 @@
       </div>
 
       <div class="table-operator">
-        <a-dropdown>
+        <a-dropdown v-show="queryParam.status!=null && queryParam.status!=''">
           <a-menu slot="overlay">
-            <a-menu-item key="1">
+            <a-menu-item key="1" v-if="queryParam.status ==='AUDITING'">
               <a
                 href="javascript:void(0);"
                 @click="handlePublishMore"
@@ -60,7 +61,7 @@
                 通过
               </a>
             </a-menu-item>
-            <a-menu-item key="2">
+            <a-menu-item key="2" v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='AUDITING'">
               <a
                 href="javascript:void(0);"
                 @click="handleRecycleMore"
@@ -68,7 +69,7 @@
                 移到回收站
               </a>
             </a-menu-item>
-            <a-menu-item key="3">
+            <a-menu-item key="3" v-if="queryParam.status === 'RECYCLE'">
               <a
                 href="javascript:void(0);"
                 @click="handleDeleteMore"

@@ -20,6 +20,7 @@
                 <a-select
                   v-model="queryParam.status"
                   placeholder="请选择文章状态"
+                  @change="handleQuery"
                 >
                   <a-select-option
                     v-for="status in Object.keys(postStatus)"
@@ -37,6 +38,7 @@
                 <a-select
                   v-model="queryParam.categoryId"
                   placeholder="请选择分类"
+                  @change="handleQuery"
                 >
                   <a-select-option
                     v-for="category in categories"
@@ -72,9 +74,17 @@
             icon="plus"
           >写文章</a-button>
         </router-link>
-        <a-dropdown>
+        <a-dropdown v-show="queryParam.status!=null && queryParam.status!=''">
           <a-menu slot="overlay">
-            <a-menu-item key="1">
+            <a-menu-item key="1" v-if="queryParam.status === 'DRAFT'">
+              <a
+                href="javascript:void(0);"
+                @click="handleDeleteMore"
+              >
+                <span>发布</span>
+              </a>
+            </a-menu-item>
+            <a-menu-item key="2" v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='DRAFT'">
               <a
                 href="javascript:void(0);"
                 @click="handleRecycleMore"
@@ -82,7 +92,7 @@
                 <span>移到回收站</span>
               </a>
             </a-menu-item>
-            <a-menu-item key="2">
+            <a-menu-item key="3" v-if="queryParam.status === 'RECYCLE'">
               <a
                 href="javascript:void(0);"
                 @click="handleDeleteMore"
