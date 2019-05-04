@@ -44,7 +44,7 @@ public interface JournalService extends CrudService<Journal, Integer> {
      *
      * @param journalQuery journal query must not be null
      * @param pageable     page info must not be null
-     * @return a page of post
+     * @return a page of journal
      */
     @NonNull
     Page<Journal> pageBy(@NonNull JournalQuery journalQuery, @NonNull Pageable pageable);
