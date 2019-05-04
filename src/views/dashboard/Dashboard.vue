@@ -14,7 +14,10 @@
           title="文章"
           :number="countsData.postCount"
         >
-          <router-link :to="{ name:'PostList' }" slot="action">
+          <router-link
+            :to="{ name:'PostList' }"
+            slot="action"
+          >
             <a-icon type="link" />
           </router-link>
         </analysis-card>
@@ -32,7 +35,10 @@
           title="评论"
           :number="countsData.commentCount"
         >
-          <router-link :to="{ name:'Comments' }" slot="action">
+          <router-link
+            :to="{ name:'Comments' }"
+            slot="action"
+          >
             <a-icon type="link" />
           </router-link>
         </analysis-card>
@@ -50,7 +56,10 @@
           title="附件"
           :number="countsData.attachmentCount"
         >
-          <router-link :to="{ name:'Attachments' }" slot="action">
+          <router-link
+            :to="{ name:'Attachments' }"
+            slot="action"
+          >
             <a-icon type="link" />
           </router-link>
         </analysis-card>
@@ -68,8 +77,12 @@
           title="成立天数"
           :number="countsData.establishDays"
         >
-          <a-tooltip :title="'已成立'+countsData.establishDays+'天了'" slot="action">
-            <a href="javascript:void(0);"><a-icon type="info-circle-o" /></a>
+          <a-tooltip
+            :title="'已成立'+countsData.establishDays+'天了'"
+            slot="action"
+          >
+            <a href="javascript:void(0);">
+              <a-icon type="info-circle-o" /></a>
           </a-tooltip>
         </analysis-card>
       </a-col>
@@ -194,7 +207,7 @@ export default {
       commentColumns,
       commentData: [],
       logData: [],
-      countsData: null
+      countsData: {}
     }
   },
   created() {

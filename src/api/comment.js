@@ -4,18 +4,12 @@ const baseUrl = '/api/admin/posts/comments'
 
 const commentApi = {}
 
-commentApi.listLatest = () => {
+commentApi.listLatest = (top, status) => {
   return service({
     url: `${baseUrl}/latest`,
-    method: 'get'
-  })
-}
-
-commentApi.listLatestByStatus = (top) => {
-  return service({
-    url: `${baseUrl}/latest/AUDITING`,
     params: {
-      top: top
+      top: top,
+      status: status
     },
     method: 'get'
   })
