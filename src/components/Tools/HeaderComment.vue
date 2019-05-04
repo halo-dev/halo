@@ -12,7 +12,10 @@
     <template slot="content">
       <a-spin :spinning="loadding">
         <a-list :dataSource="comments">
-          <a-list-item slot="renderItem" slot-scope="item">
+          <a-list-item
+            slot="renderItem"
+            slot-scope="item"
+          >
             <a-list-item-meta>
               <a-avatar
                 style="background-color: white"
@@ -21,7 +24,10 @@
                 size="large"
               />
               <template slot="title">
-                <a :href="item.authorUrl" target="_blank">{{ item.author }}</a>：<span v-html="item.content"></span>
+                <a
+                  :href="item.authorUrl"
+                  target="_blank"
+                >{{ item.author }}</a>：<span v-html="item.content"></span>
               </template>
               <template slot="description">
                 {{ item.createTime | timeAgo }}
@@ -31,8 +37,14 @@
         </a-list>
       </a-spin>
     </template>
-    <span @click="fetchComment" class="header-comment">
-      <a-badge dot v-if="comments.length>0">
+    <span
+      @click="fetchComment"
+      class="header-comment"
+    >
+      <a-badge
+        dot
+        v-if="comments.length > 0"
+      >
         <a-icon type="bell" />
       </a-badge>
       <a-badge v-else>
@@ -67,7 +79,7 @@ export default {
       this.visible = !this.visible
     },
     getComment() {
-      commentApi.listLatestByStatus(5).then(response => {
+      commentApi.listLatest(5, 'AUDITING').then(response => {
         this.comments = response.data.data
         this.loadding = false
       })
