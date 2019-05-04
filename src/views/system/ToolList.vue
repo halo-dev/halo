@@ -3,9 +3,11 @@
     <div class="card-content">
       <a-row :gutter="12">
         <a-col
-          :sm="24"
+          :xl="4"
+          :lg="4"
           :md="12"
-          :lg="8"
+          :sm="24"
+          :xs="24"
         >
           <a-card
             title="Markdown 文章导入"

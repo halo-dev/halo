@@ -221,7 +221,7 @@
           title="日志记录"
           :bodyStyle="{ padding: '16px' }"
         >
-          <a-list :dataSource="logData">
+          <a-list :dataSource="formattedLogDatas">
             <a-list-item
               slot="renderItem"
               slot-scope="item, index"
@@ -256,6 +256,7 @@ export default {
   },
   data() {
     return {
+      logType: logApi.logType,
       activityLoading: true,
       logLoading: true,
       countsLoading: true,
@@ -278,6 +279,12 @@ export default {
         // Format the status
         post.status = postApi.postStatus[post.status]
         return post
+      })
+    },
+    formattedLogDatas() {
+      return this.logData.map(log => {
+        log.type = this.logType[log.type].text
+        return log
       })
     }
   },
