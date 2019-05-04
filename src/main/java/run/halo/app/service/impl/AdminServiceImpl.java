@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
@@ -78,14 +79,25 @@ public class AdminServiceImpl implements AdminService {
         Assert.notNull(loginParam, "Login param must not be null");
 
         String username = loginParam.getUsername();
-        User user = Validator.isEmail(username) ?
-                userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+
+        String mismatchTip = "用户名或者密码不正确";
+
+        final User user;
+
+        try {
+            // Get user by username or email
+            user = Validator.isEmail(username) ?
+                    userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+        } catch (NotFoundException e) {
+            log.error("Failed to find user by name: " + username, e);
+            throw new BadRequestException(mismatchTip);
+        }
 
         userService.mustNotExpire(user);
 
         if (!userService.passwordMatch(user, loginParam.getPassword())) {
             // If the password is mismatch
-            throw new BadRequestException("用户名或者密码不正确");
+            throw new BadRequestException(mismatchTip);
         }
 
         if (SecurityContextHolder.getContext().isAuthenticated()) {

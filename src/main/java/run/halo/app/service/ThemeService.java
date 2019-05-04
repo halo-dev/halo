@@ -1,6 +1,7 @@
 package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
@@ -65,6 +66,9 @@ public interface ThemeService {
      */
     String THEMES_CACHE_KEY = "themes";
 
+    /**
+     * Custom sheet prefix.
+     */
     String CUSTOM_SHEET_PREFIX = "sheet_";
 
     /**
@@ -79,11 +83,11 @@ public interface ThemeService {
     /**
      * Get theme property by theme id.
      *
-     * @param themeId must not be blank
+     * @param themeId theme id
      * @return a optional theme property
      */
     @NonNull
-    Optional<ThemeProperty> getThemeBy(@NonNull String themeId);
+    Optional<ThemeProperty> getThemeBy(@Nullable String themeId);
 
     /**
      * Gets all themes
@@ -123,15 +127,15 @@ public interface ThemeService {
      * @param template template must not be blank
      * @return boolean
      */
-    boolean templateExists(@NonNull String template);
+    boolean templateExists(@Nullable String template);
 
     /**
      * Checks whether theme exists under template path
      *
-     * @param themeId theme name
+     * @param themeId theme id
      * @return boolean
      */
-    boolean themeExists(@NonNull String themeId);
+    boolean themeExists(@Nullable String themeId);
 
     /**
      * Gets theme base path.

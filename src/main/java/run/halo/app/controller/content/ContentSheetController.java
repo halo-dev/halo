@@ -1,6 +1,5 @@
 package run.halo.app.controller.content;
 
-import cn.hutool.core.util.StrUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +12,8 @@ import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 
 /**
+ * Content sheet controller.
+ *
  * @author ryanwang
  * @date : 2019-03-21
  */
@@ -68,10 +69,8 @@ public class ContentSheetController {
         model.addAttribute("post", sheetService.convertToDetail(sheet));
         model.addAttribute("is_sheet", true);
 
-        if (StrUtil.isNotEmpty(sheet.getTemplate())) {
-            if (themeService.templateExists(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
-                return themeService.render(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate());
-            }
+        if (themeService.templateExists(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            return themeService.render(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate());
         }
         return themeService.render("sheet");
     }

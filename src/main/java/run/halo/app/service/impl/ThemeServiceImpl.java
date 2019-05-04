@@ -105,7 +105,9 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public Optional<ThemeProperty> getThemeBy(String themeId) {
-        Assert.hasText(themeId, "Theme id must not be blank");
+        if (StringUtils.isBlank(themeId)) {
+            return Optional.empty();
+        }
 
         // Get all themes
         Set<ThemeProperty> themes = getThemes();
@@ -181,7 +183,9 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public boolean templateExists(String template) {
-        Assert.hasText(template, "Template must not be blank");
+        if (StringUtils.isBlank(template)) {
+            return false;
+        }
 
         // Resolve template path
         Path templatePath = Paths.get(getActivatedTheme().getThemePath(), template);
@@ -507,7 +511,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
         this.activatedTheme = activatedTheme;
-        this.activatedThemeId = activatedTheme.getId();
+        this.activatedThemeId = Optional.ofNullable(activatedTheme).map(ThemeProperty::getId).orElse(null);
     }
 
     /**

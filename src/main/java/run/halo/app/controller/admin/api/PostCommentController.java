@@ -43,16 +43,12 @@ public class PostCommentController {
 
     @GetMapping("latest")
     @ApiOperation("Pages latest comments")
-    public List<PostCommentWithPostVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
-        List<PostComment> content = postCommentService.pageLatest(top).getContent();
-        return postCommentService.convertToWithPostVo(content);
-    }
-
-    @GetMapping("latest/{status}")
-    @ApiOperation("Pages latest comments by status")
     public List<PostCommentWithPostVO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top,
-                                                  @PathVariable("status") CommentStatus status) {
+                                                  @RequestParam(name = "status", required = false) CommentStatus status) {
+        // Get latest comment
         List<PostComment> content = postCommentService.pageLatest(top, status).getContent();
+
+        // Convert and return
         return postCommentService.convertToWithPostVo(content);
     }
 
