@@ -11,7 +11,7 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="renderer" content="webkit">
     <meta name="theme-color" content="${settings.google_color!'#fff'}">
-    <meta name="author" content="${user.nickName!}" />
+    <meta name="author" content="${user.nickname!}" />
     <meta name="keywords" content="${keywords!}"/>
     <meta name="description" content="${description!}" />
     <@verification />
