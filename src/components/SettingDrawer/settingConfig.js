@@ -72,7 +72,7 @@ const updateTheme = primaryColor => {
         javascriptEnabled: true
       };
     `
-    lessScriptNode.src = 'https://gw.alipayobjects.com/os/lib/less.js/3.8.1/less.min.js'
+    lessScriptNode.src = 'https://cdnjs.loli.net/ajax/libs/less.js/3.8.1/less.min.js'
     lessScriptNode.async = true
     lessScriptNode.onload = () => {
       buildIt()

@@ -120,7 +120,7 @@
           >
             <div class="photo-detail-img">
               <img
-                :src="photo.url || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
+                :src="photo.url || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
                 @click="showThumbDrawer"
               >
             </div>

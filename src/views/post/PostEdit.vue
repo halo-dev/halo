@@ -131,7 +131,7 @@
             <div class="post-thum">
               <img
                 class="img"
-                :src="postToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
+                :src="postToStage.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
                 @click="handleShowThumbDrawer"
               >
               <a-button

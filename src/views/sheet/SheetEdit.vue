@@ -82,7 +82,7 @@
                 <div class="sheet-thum">
                   <img
                     class="img"
-                    :src="sheetToStage.thumbnail || 'https://os.alipayobjects.com/rmsportal/mgesTPFxodmIwpi.png'"
+                    :src="sheetToStage.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
                     @click="handleShowThumbDrawer"
                   >
                   <a-button
