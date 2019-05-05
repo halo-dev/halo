@@ -241,7 +241,7 @@
         @listenToSelect="selectPhotoThumb"
         :drawerWidth="460"
       />
-      <a-divider />
+      <a-divider class="divider-transparent"/>
       <div class="bottom-control">
         <a-button
           type="dashed"

@@ -288,7 +288,7 @@
 
         </a-col>
       </a-row>
-      <a-divider />
+      <a-divider class="divider-transparent"/>
       <div class="bottom-control">
         <a-popconfirm
           title="你确定要清空所有操作日志？"

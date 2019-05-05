@@ -2,7 +2,7 @@
   <div>
     <a-drawer
       title="附件库"
-      :width="isMobile()?'100%':'580'"
+      :width="isMobile()?'100%':'460'"
       closable
       :visible="visiable"
       destroyOnClose
@@ -56,7 +56,7 @@
         :attachment="selectedAttachment"
         @delete="handleDelete"
       />
-      <a-divider />
+      <a-divider class="divider-transparent"/>
       <div class="bottom-control">
         <a-button
           @click="handleShowUploadModal"
@@ -118,7 +118,7 @@ export default {
       skeletonLoading: true,
       pagination: {
         page: 1,
-        size: 10,
+        size: 12,
         sort: ''
       },
       queryParam: {

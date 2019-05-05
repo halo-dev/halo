@@ -93,7 +93,7 @@
                 </div>
               </div>
             </div>
-            <a-divider />
+            <a-divider class="divider-transparent"/>
           </div>
           <AttachmentSelectDrawer
             v-model="thumDrawerVisible"

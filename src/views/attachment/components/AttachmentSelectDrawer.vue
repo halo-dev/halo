@@ -47,7 +47,7 @@
           @change="handlePaginationChange"
         ></a-pagination>
       </div>
-      <a-divider />
+      <a-divider class="divider-transparent"/>
       <div class="bottom-control">
         <a-button
           @click="handleShowUploadModal"
@@ -98,7 +98,7 @@ export default {
     drawerWidth: {
       type: Number,
       required: false,
-      default: 580
+      default: 460
     },
     title: {
       type: String,
@@ -112,7 +112,7 @@ export default {
       skeletonLoading: true,
       pagination: {
         page: 1,
-        size: 10,
+        size: 12,
         sort: ''
       },
       attachments: [],

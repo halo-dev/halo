@@ -118,7 +118,7 @@
         </a-skeleton>
       </a-col>
     </a-row>
-    <a-divider />
+    <a-divider class="divider-transparent"/>
     <div class="bottom-control">
       <a-popconfirm
         title="你确定要添加到图库？"
