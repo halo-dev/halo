@@ -1,17 +1,4 @@
 /**
- * components util
- */
-
-/**
- * 清理空值，对象
- * @param children
- * @returns {*[]}
- */
-export function filterEmpty(children = []) {
-  return children.filter(c => c.tag || (c.text && c.text.trim() !== ''))
-}
-
-/**
  * 获取字符串长度，英文字符 长度1，中文字符长度2
  * @param {*} str
  */

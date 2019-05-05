@@ -1,15 +1,6 @@
 <script>
 import Tooltip from 'ant-design-vue/es/tooltip'
 import { cutStrByFullLength, getStrFullLength } from '@/components/_util/util'
-/*
-    const isSupportLineClamp = document.body.style.webkitLineClamp !== undefined;
-
-    const TooltipOverlayStyle = {
-      overflowWrap: 'break-word',
-      wordWrap: 'break-word',
-    };
-  */
-
 export default {
   name: 'Ellipsis',
   components: {
