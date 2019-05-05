@@ -76,7 +76,10 @@
         </router-link>
         <a-dropdown v-show="queryParam.status!=null && queryParam.status!=''">
           <a-menu slot="overlay">
-            <a-menu-item key="1" v-if="queryParam.status === 'DRAFT'">
+            <a-menu-item
+              key="1"
+              v-if="queryParam.status === 'DRAFT'"
+            >
               <a
                 href="javascript:void(0);"
                 @click="handleDeleteMore"
@@ -84,7 +87,10 @@
                 <span>发布</span>
               </a>
             </a-menu-item>
-            <a-menu-item key="2" v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='DRAFT'">
+            <a-menu-item
+              key="2"
+              v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='DRAFT'"
+            >
               <a
                 href="javascript:void(0);"
                 @click="handleRecycleMore"
@@ -92,7 +98,10 @@
                 <span>移到回收站</span>
               </a>
             </a-menu-item>
-            <a-menu-item key="3" v-if="queryParam.status === 'RECYCLE'">
+            <a-menu-item
+              key="3"
+              v-if="queryParam.status === 'RECYCLE'"
+            >
               <a
                 href="javascript:void(0);"
                 @click="handleDeleteMore"
@@ -119,6 +128,12 @@
           :loading="postsLoading"
           :pagination="false"
         >
+          <ellipsis
+            :length="25"
+            tooltip
+            slot="postTitle"
+            slot-scope="postTitle"
+          >{{ postTitle }}</ellipsis>
           <span
             slot="status"
             slot-scope="statusProperty"
@@ -238,7 +253,8 @@ export default {
       columns: [
         {
           title: '标题',
-          dataIndex: 'title'
+          dataIndex: 'title',
+          scopedSlots: { customRender: 'postTitle' }
         },
         {
           title: '状态',

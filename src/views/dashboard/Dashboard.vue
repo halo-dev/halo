@@ -325,15 +325,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.ant-comment {
-  .ant-comment-actions {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
-}
-.ant-comment-inner {
-  padding: 0 !important;
-}
-</style>

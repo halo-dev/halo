@@ -43,6 +43,7 @@ export function timeAgo(time) {
     }
     return hours + ' 小时前'
   }
+  if (days < 0) return '刚刚'
   if (days < 5) {
     return days + ' 天前'
   } else {

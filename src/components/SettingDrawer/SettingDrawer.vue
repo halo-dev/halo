@@ -191,7 +191,6 @@
 </template>
 
 <script>
-import DetailList from '@/components/Tools/DetailList'
 import SettingItem from '@/components/SettingDrawer/SettingItem'
 import config from '@/config/defaultSettings'
 import { updateTheme, colorList } from '@/components/Tools/setting'
@@ -199,7 +198,6 @@ import { mixin, mixinDevice } from '@/utils/mixin'
 
 export default {
   components: {
-    DetailList,
     SettingItem
   },
   mixins: [mixin, mixinDevice],
