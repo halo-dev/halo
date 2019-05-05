@@ -115,6 +115,7 @@
     </a-row>
     <div class="page-wrapper">
       <a-pagination
+        class="pagination"
         :total="pagination.total"
         :defaultPageSize="pagination.size"
         :pageSizeOptions="['18', '36', '54','72','90','108']"

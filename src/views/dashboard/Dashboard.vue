@@ -153,7 +153,7 @@
                         >{{ item.post.title }}</a>》
                       </template>
                       <template slot="actions">
-                        <span>回复</span>
+                        <span @click="handleCommentReplyClick(item)">回复</span>
                       </template>
                       <p slot="content">{{ item.content }}</p>
                       <a-tooltip
@@ -218,9 +218,20 @@
         <a-card
           :loading="logLoading"
           :bordered="false"
-          title="日志记录"
           :bodyStyle="{ padding: '16px' }"
         >
+          <template slot="title">
+            操作记录 <a-tooltip
+              slot="action"
+              title="更多"
+            >
+              <a
+                href="javascript:void(0);"
+                @click="handleShowLogDrawer"
+              >
+                <a-icon type="ellipsis" /></a>
+            </a-tooltip>
+          </template>
           <a-list :dataSource="formattedLogDatas">
             <a-list-item
               slot="renderItem"
@@ -236,12 +247,91 @@
         </a-card>
       </a-col>
     </a-row>
+
+    <a-drawer
+      title="操作日志"
+      :width="isMobile()?'100%':'460'"
+      closable
+      :visible="logDrawerVisiable"
+      destroyOnClose
+      @close="onLogDrawerClose"
+    >
+      <a-row
+        type="flex"
+        align="middle"
+      >
+        <a-col :span="24">
+          <a-list :dataSource="formattedLogsDatas">
+            <a-list-item
+              slot="renderItem"
+              slot-scope="item, index"
+              :key="index"
+            >
+              <a-list-item-meta :description="item.createTime | timeAgo">
+                <span slot="title">{{ item.type }}</span>
+              </a-list-item-meta>
+              <div>{{ item.content }}</div>
+            </a-list-item>
+
+            <div class="page-wrapper">
+              <a-pagination
+                class="pagination"
+                :total="logPagination.total"
+                :defaultPageSize="logPagination.size"
+                :pageSizeOptions="['50', '100','150','200']"
+                showSizeChanger
+                @showSizeChange="onPaginationChange"
+                @change="onPaginationChange"
+              />
+            </div>
+          </a-list>
+
+        </a-col>
+      </a-row>
+      <a-divider />
+      <div class="bottom-control">
+        <a-popconfirm
+          title="你确定要清空所有操作日志？"
+          okText="确定"
+          @confirm="handleClearLogs"
+          cancelText="取消"
+        >
+          <a-button type="danger">清空操作日志</a-button>
+        </a-popconfirm>
+      </div>
+    </a-drawer>
+
+    <a-modal
+      v-if="selectComment"
+      :title="'回复给：'+selectComment.author"
+      v-model="selectCommentVisible"
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleReplyComment"
+        >
+          回复
+        </a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item>
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="replyComment.content"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </page-view>
 </template>
 
 <script>
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 
 import postApi from '@/api/post'
 import commentApi from '@/api/comment'
@@ -250,6 +340,7 @@ import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'
 export default {
   name: 'Dashboard',
+  mixins: [mixin, mixinDevice],
   components: {
     PageView,
     AnalysisCard
@@ -260,11 +351,21 @@ export default {
       activityLoading: true,
       logLoading: true,
       countsLoading: true,
+      logDrawerVisiable: false,
       postData: [],
       commentData: [],
       logData: [],
       countsData: {},
-      journal: {}
+      journal: {},
+      logPagination: {
+        page: 1,
+        size: 50,
+        sort: null
+      },
+      logs: [],
+      selectCommentVisible: false,
+      selectComment: null,
+      replyComment: {}
     }
   },
   created() {
@@ -283,6 +384,12 @@ export default {
     },
     formattedLogDatas() {
       return this.logData.map(log => {
+        log.type = this.logType[log.type].text
+        return log
+      })
+    },
+    formattedLogsDatas() {
+      return this.logs.map(log => {
         log.type = this.logType[log.type].text
         return log
       })
@@ -321,6 +428,48 @@ export default {
         this.$message.success('发表成功！')
         this.journal = {}
       })
+    },
+    handleShowLogDrawer() {
+      this.logDrawerVisiable = true
+      this.loadLogs()
+    },
+    loadLogs() {
+      this.logPagination.page = this.logPagination.page - 1
+      logApi.pageBy(this.logPagination).then(response => {
+        this.logs = response.data.data.content
+        this.logPagination.total = response.data.data.total
+      })
+    },
+    handleClearLogs() {
+      logApi.clear().then(response => {
+        this.$message.success('清除成功！')
+        this.loadLogs()
+        this.listLatestLogs()
+      })
+    },
+    handleCommentReplyClick(comment) {
+      this.selectComment = comment
+      this.selectCommentVisible = true
+      this.replyComment.parentId = comment.id
+      this.replyComment.postId = comment.post.id
+    },
+    handleReplyComment() {
+      commentApi.create(this.replyComment).then(response => {
+        this.$message.success('回复成功！')
+        this.replyComment = {}
+        this.selectComment = {}
+        this.selectCommentVisible = false
+        this.listLatestComments()
+      })
+    },
+    onLogDrawerClose() {
+      this.logDrawerVisiable = false
+    },
+    onPaginationChange(page, pageSize) {
+      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
+      this.logPagination.page = page
+      this.logPagination.size = pageSize
+      this.loadLogs()
     }
   }
 }

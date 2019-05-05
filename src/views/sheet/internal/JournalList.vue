@@ -116,6 +116,7 @@
                 <a-pagination
                   class="pagination"
                   :total="pagination.total"
+                  :defaultPageSize="pagination.size"
                   :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
                   showSizeChanger
                   @showSizeChange="onPaginationChange"
@@ -128,6 +129,7 @@
       </a-col>
     </a-row>
 
+    <!-- 编辑日志弹窗 -->
     <a-modal v-model="visible">
       <template slot="title">
         {{ title }} <a-tooltip
@@ -157,6 +159,7 @@
       </a-form>
     </a-modal>
 
+    <!-- 评论回复弹窗 -->
     <a-modal
       v-if="selectComment"
       :title="'回复给：'+selectComment.author"
@@ -182,6 +185,7 @@
       </a-form>
     </a-modal>
 
+    <!-- 评论列表抽屉 -->
     <a-drawer
       title="评论列表"
       :width="isMobile()?'100%':'460'"
@@ -355,8 +359,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-.pagination {
-  margin-top: 1rem;
-}
-</style>

@@ -384,9 +384,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.pagination {
-  margin-top: 1rem;
-}
-</style>

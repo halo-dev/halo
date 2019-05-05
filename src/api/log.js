@@ -14,6 +14,21 @@ logApi.listLatest = (top) => {
   })
 }
 
+logApi.pageBy = logPagination => {
+  return service({
+    url: baseUrl,
+    params: logPagination,
+    method: 'get'
+  })
+}
+
+logApi.clear = () => {
+  return service({
+    url: `${baseUrl}/clear`,
+    method: 'get'
+  })
+}
+
 logApi.logType = {
   BLOG_INITIALIZED: {
     value: 0,
