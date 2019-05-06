@@ -53,7 +53,7 @@
             </a-tooltip>
           </div>
         </div>
-
+        <a-divider />
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">主题色</h3>
           <div style="height: 20px">
@@ -76,7 +76,6 @@
           </div>
         </div>
         <a-divider />
-
         <div :style="{ marginBottom: '24px' }">
           <h3 class="setting-drawer-index-title">导航模式</h3>
 
@@ -113,76 +112,6 @@
               </div>
             </div>
           </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '24px' }">
-          <h3 class="setting-drawer-index-title">仪表盘</h3>
-          <a-list :split="false">
-            <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-              />
-              <a-list-item-meta>
-                <div slot="title">文章总数</div>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-              />
-              <a-list-item-meta>
-                <div slot="title">评论总数</div>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-              />
-              <a-list-item-meta>
-                <div slot="title">附件总数</div>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-              />
-              <a-list-item-meta>
-                <div slot="title">成立天数</div>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-              />
-              <a-list-item-meta>
-                <div slot="title">最新文章</div>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-              />
-              <a-list-item-meta>
-                <div slot="title">最新日志</div>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-              />
-              <a-list-item-meta>
-                <div slot="title">最新评论</div>
-              </a-list-item-meta>
-            </a-list-item>
-          </a-list>
         </div>
         <a-divider />
       </div>

@@ -42,12 +42,6 @@
               >
                 <a-input v-model="postToStage.url" />
               </a-form-item>
-              <a-form-item label="文章密码：">
-                <a-input
-                  type="password"
-                  v-model="postToStage.password"
-                />
-              </a-form-item>
               <a-form-item label="开启评论：">
                 <a-radio-group
                   v-model="postToStage.disallowComment"
@@ -119,6 +113,23 @@
             <a-form layout="vertical">
               <a-form-item>
                 <TagSelect v-model="selectedTagIds" />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">摘要</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item>
+                <a-input
+                  type="textarea"
+                  :autosize="{ minRows: 5 }"
+                  v-model="postToStage.summary"
+                  placeholder="不填写则会自动生成"
+                />
               </a-form-item>
             </a-form>
           </div>

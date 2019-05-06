@@ -46,12 +46,6 @@
                   >
                     <a-input v-model="sheetToStage.url" />
                   </a-form-item>
-                  <a-form-item label="页面密码：">
-                    <a-input
-                      type="password"
-                      v-model="sheetToStage.password"
-                    />
-                  </a-form-item>
                   <a-form-item label="开启评论：">
                     <a-radio-group
                       v-model="sheetToStage.disallowComment"

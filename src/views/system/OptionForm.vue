@@ -200,12 +200,6 @@
                   <a-switch v-model="options.comment_new_notice" />
                 </a-form-item>
                 <a-form-item
-                  label="评论审核通过通知对方："
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-switch v-model="options.comment_pass_notice" />
-                </a-form-item>
-                <a-form-item
                   label="评论回复通知对方："
                   :wrapper-col="wrapperCol"
                 >
