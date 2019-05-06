@@ -4,14 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
-import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.entity.User;
-import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
@@ -58,7 +55,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
     /**
      * Admin token param name.
      */
-    public final static String ADMIN_TOKEN_QUERY_NAME = "adminToken";
+    public final static String ADMIN_TOKEN_QUERY_NAME = "admin_token";
 
     private final HaloProperties haloProperties;
 
@@ -72,7 +69,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
                                      UserService userService,
                                      HaloProperties haloProperties,
                                      OptionService optionService) {
-        super(haloProperties);
+        super(haloProperties, optionService);
         this.cacheStore = cacheStore;
         this.userService = userService;
         this.haloProperties = haloProperties;
@@ -82,59 +79,45 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // Check whether the blog is installed or not
-        Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+        super.doFilterInternal(request, response, filterChain);
 
-        if (!isInstalled) {
-            // If not installed
-            getFailureHandler().onFailure(request, response, new NotInstallException("The blog has not been initialized yet!"));
-            return;
-        }
+        if (haloProperties.isAuthEnabled()) {
+            // Get token from request
+            String token = getTokenFromRequest(request);
 
-        if (!haloProperties.isAuthEnabled()) {
+            if (StringUtils.isBlank(token)) {
+                if (!shouldSkipAuthenticateFailure(request)) {
+                    getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
+                    return;
+                }
+            } else {
+                // Get user id from cache
+                Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
+
+                if (!optionalUserId.isPresent()) {
+                    getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
+                    return;
+                }
+
+                // Get the user
+                User user = userService.getById(optionalUserId.get());
+
+                // Build user detail
+                UserDetail userDetail = new UserDetail(user);
+
+                // Set security
+                SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
+            }
+        } else {
+            // Set security
             userService.getCurrentUser().ifPresent(user ->
                     SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
-
-            // If authentication disabled
-            filterChain.doFilter(request, response);
-            return;
         }
 
-        // Get token from request
-        String token = getTokenFromRequest(request);
+        filterChain.doFilter(request, response);
 
-        if (StringUtils.isNotBlank(token)) {
-
-            // Get user id from cache
-            Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
-
-            if (!optionalUserId.isPresent()) {
-                getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
-                return;
-            }
-
-            // Get the user
-            User user = userService.getById(optionalUserId.get());
-
-            // Build user detail
-            UserDetail userDetail = new UserDetail(user);
-
-            // Set security
-            SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
-
-            filterChain.doFilter(request, response);
-
-            return;
-        }
-
-        if (shouldSkipAuthenticateFailure(request)) {
-            // If should skip this authentication failure
-            log.debug("Skipping authentication failure, url: [{}], method: [{}]", request.getServletPath(), request.getMethod());
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
+        // Clear context
+        SecurityContextHolder.clearContext();
     }
 
     @Override

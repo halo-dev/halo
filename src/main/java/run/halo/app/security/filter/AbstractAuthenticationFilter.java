@@ -6,10 +6,17 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.NotInstallException;
+import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.security.handler.AuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.service.OptionService;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -36,8 +43,12 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
     private final HaloProperties haloProperties;
 
-    protected AbstractAuthenticationFilter(HaloProperties haloProperties) {
+    private final OptionService optionService;
+
+    protected AbstractAuthenticationFilter(HaloProperties haloProperties,
+                                           OptionService optionService) {
         this.haloProperties = haloProperties;
+        this.optionService = optionService;
 
         antPathMatcher = new AntPathMatcher();
     }
@@ -153,5 +164,17 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         Assert.notNull(failureHandler, "Authentication failure handler must not be null");
 
         this.failureHandler = failureHandler;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Check whether the blog is installed or not
+        Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+
+        if (!isInstalled) {
+            // If not installed
+            getFailureHandler().onFailure(request, response, new NotInstallException("The blog has not been initialized yet!"));
+            return;
+        }
     }
 }
