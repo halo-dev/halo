@@ -8,6 +8,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.properties.PrimaryProperties;
+import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.handler.AuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
 import run.halo.app.service.OptionService;
@@ -75,6 +76,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      * @param request http servlet request must not be null.
      * @return true if the request should skip authentication failure; false otherwise
      */
+    @Deprecated
     protected boolean shouldSkipAuthenticateFailure(@NonNull HttpServletRequest request) {
         Assert.notNull(request, "Http servlet request must not be null");
 
@@ -126,6 +128,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      * @param url    url must not be blank
      * @param method method must not be blank
      */
+    @Deprecated
     public void addTryAuthUrlMethodPattern(@NonNull String url, @NonNull String method) {
         Assert.hasText(url, "Try authenticating url must not be blank");
         Assert.hasText(method, "Try authenticating method must not be blank");
@@ -176,5 +179,19 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
             getFailureHandler().onFailure(request, response, new NotInstallException("The blog has not been initialized yet!"));
             return;
         }
+
+        if (shouldNotFilter(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            // Do authenticate
+            doAuthenticate(request, response, filterChain);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
+
+    protected abstract void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException;
 }

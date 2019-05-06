@@ -39,9 +39,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        super.doFilterInternal(request, response, filterChain);
+    protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // Get token
         String token = getTokenFromRequest(request);
