@@ -29,6 +29,6 @@ public class ContentFilter extends AbstractAuthenticationFilter {
     @Override
     protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // Do nothing
-        return;
+        filterChain.doFilter(request, response);
     }
 }
