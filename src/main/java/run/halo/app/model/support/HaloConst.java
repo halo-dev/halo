@@ -26,11 +26,6 @@ public class HaloConst {
     public static final String HALO_VERSION = "1.0.0";
 
     /**
-     * Token of header param
-     */
-    public static final String TOKEN_HEADER = "token";
-
-    /**
      * Suffix of freemarker template file
      */
     public static final String SUFFIX_FTL = ".ftl";

@@ -137,14 +137,8 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
     }
 
-    /**
-     * Gets token from request.
-     *
-     * @param request http servlet request must not be null
-     * @return token or null
-     */
-    @Nullable
-    private String getTokenFromRequest(@NonNull HttpServletRequest request) {
+    @Override
+    protected String getTokenFromRequest(@NonNull HttpServletRequest request) {
         Assert.notNull(request, "Http servlet request must not be null");
 
         // Get from header
