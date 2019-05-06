@@ -77,47 +77,45 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        super.doFilterInternal(request, response, filterChain);
-
-        if (haloProperties.isAuthEnabled()) {
-            // Get token from request
-            String token = getTokenFromRequest(request);
-
-            if (StringUtils.isBlank(token)) {
-                if (!shouldSkipAuthenticateFailure(request)) {
-                    getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
-                    return;
-                }
-            } else {
-                // Get user id from cache
-                Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
-
-                if (!optionalUserId.isPresent()) {
-                    getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
-                    return;
-                }
-
-                // Get the user
-                User user = userService.getById(optionalUserId.get());
-
-                // Build user detail
-                UserDetail userDetail = new UserDetail(user);
-
-                // Set security
-                SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
-            }
-        } else {
+        if (!haloProperties.isAuthEnabled()) {
             // Set security
             userService.getCurrentUser().ifPresent(user ->
                     SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
+
+            // Do filter
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        filterChain.doFilter(request, response);
+        // Get token from request
+        String token = getTokenFromRequest(request);
 
-        // Clear context
-        SecurityContextHolder.clearContext();
+        if (StringUtils.isBlank(token)) {
+            getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
+            return;
+        }
+
+        // Get user id from cache
+        Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
+
+        if (!optionalUserId.isPresent()) {
+            getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
+            return;
+        }
+
+        // Get the user
+        User user = userService.getById(optionalUserId.get());
+
+        // Build user detail
+        UserDetail userDetail = new UserDetail(user);
+
+        // Set security
+        SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
+
+        // Do filter
+        filterChain.doFilter(request, response);
     }
 
     @Override
