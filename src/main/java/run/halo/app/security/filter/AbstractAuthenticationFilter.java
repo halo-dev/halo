@@ -63,6 +63,8 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     @Nullable
     protected abstract String getTokenFromRequest(@NonNull HttpServletRequest request);
 
+    protected abstract void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException;
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         Assert.notNull(request, "Http servlet request must not be null");
@@ -193,5 +195,4 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         }
     }
 
-    protected abstract void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException;
 }

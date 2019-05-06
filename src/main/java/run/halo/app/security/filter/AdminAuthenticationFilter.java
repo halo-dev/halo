@@ -63,8 +63,6 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private final UserService userService;
 
-    private final OptionService optionService;
-
     public AdminAuthenticationFilter(StringCacheStore cacheStore,
                                      UserService userService,
                                      HaloProperties haloProperties,
@@ -73,7 +71,6 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         this.cacheStore = cacheStore;
         this.userService = userService;
         this.haloProperties = haloProperties;
-        this.optionService = optionService;
     }
 
     @Override

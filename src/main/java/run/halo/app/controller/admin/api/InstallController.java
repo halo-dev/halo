@@ -1,6 +1,5 @@
 package run.halo.app.controller.admin.api;
 
-import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -57,8 +56,6 @@ public class InstallController {
 
     private final MenuService menuService;
 
-    private final Configuration configuration;
-
     private final ApplicationEventPublisher eventPublisher;
 
     public InstallController(UserService userService,
@@ -67,7 +64,6 @@ public class InstallController {
                              PostCommentService postCommentService,
                              OptionService optionService,
                              MenuService menuService,
-                             Configuration configuration,
                              ApplicationEventPublisher eventPublisher) {
         this.userService = userService;
         this.categoryService = categoryService;
@@ -75,7 +71,6 @@ public class InstallController {
         this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.menuService = menuService;
-        this.configuration = configuration;
         this.eventPublisher = eventPublisher;
     }
 
