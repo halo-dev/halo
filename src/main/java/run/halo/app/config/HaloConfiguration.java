@@ -112,6 +112,10 @@ public class HaloConfiguration {
                                                                                    ObjectMapper objectMapper,
                                                                                    OptionService optionService) {
         ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService);
+        apiFilter.addExcludeUrlPatterns(
+                "/api/content/*/comments",
+                "/api/content/*/comments/*"
+        );
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());
