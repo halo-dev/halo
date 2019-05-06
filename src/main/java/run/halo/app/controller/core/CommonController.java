@@ -60,7 +60,7 @@ public class CommonController implements ErrorController {
             log.error("Captured an exception", throwable);
 
             if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
-                // TODO May cause unreasoned problem
+                // TODO May cause unknown-reason problem
                 // if Ftl was not found then redirect to /404
                 if (requestURI.contains(ADMIN_URL) && null != user) {
                     return "redirect:/admin/404";

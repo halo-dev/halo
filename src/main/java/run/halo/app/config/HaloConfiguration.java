@@ -16,11 +16,11 @@ import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.filter.CorsFilter;
-import run.halo.app.filter.GuardFilter;
 import run.halo.app.filter.LogFilter;
 import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.filter.ApiAuthenticationFilter;
-import run.halo.app.security.handler.AdminAuthenticationFailureHandler;
+import run.halo.app.security.filter.ContentFilter;
+import run.halo.app.security.handler.ContentAuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
@@ -76,15 +76,6 @@ public class HaloConfiguration {
         return corsFilter;
     }
 
-    @Bean
-    public FilterRegistrationBean<GuardFilter> guardFilter() {
-        FilterRegistrationBean<GuardFilter> guardFilter = new FilterRegistrationBean<>();
-        guardFilter.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        guardFilter.setFilter(new GuardFilter());
-        guardFilter.addUrlPatterns("/api/*");
-        return guardFilter;
-    }
-
     /**
      * Creates a LogFilter.
      *
@@ -99,6 +90,21 @@ public class HaloConfiguration {
         logFilter.addUrlPatterns("/*");
 
         return logFilter;
+    }
+
+    @Bean
+    public FilterRegistrationBean<ContentFilter> contentFilter(HaloProperties haloProperties,
+                                                               OptionService optionService) {
+        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService);
+        contentFilter.setFailureHandler(new ContentAuthenticationFailureHandler());
+        contentFilter.addExcludeUrlPatterns("/api/*", "/install", "/admin/*", "/js/*", "/css/*");
+
+        FilterRegistrationBean<ContentFilter> contentFrb = new FilterRegistrationBean<>();
+        contentFrb.addUrlPatterns("/*");
+        contentFrb.setFilter(contentFilter);
+        contentFrb.setOrder(-1);
+
+        return contentFrb;
     }
 
     @Bean
@@ -118,6 +124,7 @@ public class HaloConfiguration {
         authenticationFilter.setFilter(apiFilter);
         authenticationFilter.addUrlPatterns("/api/content/*");
         authenticationFilter.setOrder(0);
+
         return authenticationFilter;
     }
 
@@ -129,7 +136,7 @@ public class HaloConfiguration {
                                                                                        OptionService optionService) {
         AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties, optionService);
 
-        AdminAuthenticationFailureHandler failureHandler = new AdminAuthenticationFailureHandler();
+        DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());
         failureHandler.setObjectMapper(objectMapper);
 
@@ -149,6 +156,7 @@ public class HaloConfiguration {
         authenticationFilter.setFilter(adminAuthenticationFilter);
         authenticationFilter.addUrlPatterns("/api/admin/*", "/api/content/comments");
         authenticationFilter.setOrder(1);
+
         return authenticationFilter;
     }
 }
