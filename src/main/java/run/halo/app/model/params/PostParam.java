@@ -34,6 +34,8 @@ public class PostParam implements InputConverter<Post> {
     @NotBlank(message = "Original content must not be blank")
     private String originalContent;
 
+    private String summary;
+
     @Size(max = 255, message = "Length of thumbnail must not be more than {max}")
     private String thumbnail;
 
