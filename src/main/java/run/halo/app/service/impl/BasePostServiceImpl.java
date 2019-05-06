@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -17,7 +18,9 @@ import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BasePostService;
 import run.halo.app.utils.DateUtils;
@@ -44,9 +47,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     private final BasePostRepository<POST> basePostRepository;
 
-    public BasePostServiceImpl(BasePostRepository<POST> basePostRepository) {
+    private final OptionService optionService;
+
+    public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
+                               OptionService optionService) {
         super(basePostRepository);
         this.basePostRepository = basePostRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -264,7 +271,14 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public BasePostSimpleDTO convertToSimple(POST post) {
         Assert.notNull(post, "Post must not be null");
 
-        return new BasePostSimpleDTO().convertFrom(post);
+        BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
+
+        // Set summary
+        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
+            basePostSimpleDTO.setSummary(convertToSummary(post.getOriginalContent()));
+        }
+
+        return basePostSimpleDTO;
     }
 
     @Override
@@ -331,4 +345,17 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
             throw new AlreadyExistsException("The post url " + post.getUrl() + " has been exist");
         }
     }
+
+    @NonNull
+    protected String convertToSummary(@Nullable String markdownContent) {
+        // Render text content
+        String textContent = MarkdownUtils.renderText(markdownContent);
+
+        // Get summary length
+        Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
+
+        // Set summary
+        return StringUtils.substring(textContent, 0, summaryLength);
+    }
+
 }

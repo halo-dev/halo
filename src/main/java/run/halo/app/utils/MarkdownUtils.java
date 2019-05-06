@@ -1,6 +1,6 @@
 package run.halo.app.utils;
 
-import run.halo.app.model.support.HaloConst;
+import org.apache.commons.lang3.StringUtils;
 import org.commonmark.Extension;
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
 import org.commonmark.ext.front.matter.YamlFrontMatterVisitor;
@@ -8,6 +8,10 @@ import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.commonmark.renderer.text.TextContentRenderer;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import run.halo.app.model.support.HaloConst;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +47,11 @@ public class MarkdownUtils {
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder().extensions(EXTENSIONS_YAML).extensions(EXTENSIONS_TABLE).build();
 
     /**
+     * Render text content
+     */
+    private static final TextContentRenderer TEXT_CONTENT_RENDERER = TextContentRenderer.builder().extensions(EXTENSIONS_YAML).extensions(EXTENSIONS_TABLE).build();
+
+    /**
      * Render Markdown content
      *
      * @param content content
@@ -65,6 +74,21 @@ public class MarkdownUtils {
             renderContent = content.replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
         }
         return renderContent;
+    }
+
+    /**
+     * Render text content.
+     *
+     * @param markdownContent markdown content
+     * @return text content or empty string if markdown content is blank
+     */
+    @NonNull
+    public static String renderText(@Nullable String markdownContent) {
+        if (StringUtils.isBlank(markdownContent)) {
+            return "";
+        }
+
+        return TEXT_CONTENT_RENDERER.render(PARSER.parse(markdownContent));
     }
 
     /**

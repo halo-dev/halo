@@ -10,6 +10,7 @@ import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.repository.SheetRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.utils.ServiceUtils;
@@ -35,8 +36,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     public SheetServiceImpl(SheetRepository sheetRepository,
                             ApplicationEventPublisher eventPublisher,
-                            SheetCommentService sheetCommentService) {
-        super(sheetRepository);
+                            SheetCommentService sheetCommentService,
+                            OptionService optionService) {
+        super(sheetRepository, optionService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
