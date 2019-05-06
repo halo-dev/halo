@@ -380,6 +380,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public String getBlogTitle() {
+        return getByProperty(BlogProperties.BLOG_TITLE).orElse("").toString();
+    }
+
+    @Override
     public long getBirthday() {
         return getByProperty(PrimaryProperties.BIRTHDAY, Long.class).orElseGet(() -> {
             long currentTime = DateUtils.now().getTime();
