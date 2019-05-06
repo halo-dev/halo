@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
@@ -150,6 +151,8 @@ public class MailServiceImpl implements MailService {
         Properties defaultProperties = OhMyEmail.defaultConfig(log.isDebugEnabled());
         // Set smtp host
         defaultProperties.setProperty("mail.smtp.host", optionService.getByPropertyOfNonNull(EmailProperties.HOST).toString());
+        defaultProperties.setProperty("mail.smtp.ssl.enable", StrUtil.isEmpty(optionService.getByPropertyOfNonNull(EmailProperties.PROTOCOL).toString()) ? "false" : "true");
+        defaultProperties.setProperty("mail.smtp.port", StrUtil.isEmpty(optionService.getByPropertyOfNonNull(EmailProperties.SSL_PORT).toString()) ? "25" : "465");
         // Config email
         OhMyEmail.config(defaultProperties,
                 optionService.getByPropertyOfNonNull(EmailProperties.USERNAME).toString(),

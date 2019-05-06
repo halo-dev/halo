@@ -1,6 +1,8 @@
 package run.halo.app.event.comment;
 
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -68,7 +70,7 @@ public class CommentEventListener {
 
         Map<String, Object> data = new HashMap<>();
 
-        if (this instanceof PostService) {
+        if (newEvent.getSource() instanceof PostService) {
             // Get postComment id
             PostComment postComment = postCommentService.getById(newEvent.getCommentId());
 
@@ -81,7 +83,7 @@ public class CommentEventListener {
             data.put("page", post.getTitle());
             data.put("author", postComment.getAuthor());
             data.put("content", postComment.getContent());
-        } else if (this instanceof SheetService) {
+        } else if (newEvent.getSource() instanceof SheetService) {
             SheetComment sheetComment = sheetCommentService.getById(newEvent.getCommentId());
 
             Sheet sheet = sheetService.getById(sheetComment.getPostId());
@@ -93,7 +95,7 @@ public class CommentEventListener {
             data.put("page", sheet.getTitle());
             data.put("author", sheetComment.getAuthor());
             data.put("content", sheetComment.getContent());
-        } else if (this instanceof JournalService) {
+        } else if (newEvent.getSource() instanceof JournalService) {
             JournalComment journalComment = journalCommentService.getById(newEvent.getCommentId());
 
             Journal journal = journalService.getById(journalComment.getPostId());
@@ -125,17 +127,25 @@ public class CommentEventListener {
             return;
         }
 
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("Can not find blog owner"));
+        String baseAuthorEmail = "";
 
         String blogTitle = optionService.getBlogTitle();
 
         Map<String, Object> data = new HashMap<>();
 
-        if (this instanceof PostService) {
+        log.debug("replyEvent.getSource():"+replyEvent.getSource().toString());
+
+        if (replyEvent.getSource() instanceof PostCommentService) {
 
             PostComment postComment = postCommentService.getById(replyEvent.getCommentId());
 
             PostComment baseComment = postCommentService.getById(postComment.getParentId());
+
+            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+                return;
+            }
+
+            baseAuthorEmail = baseComment.getEmail();
 
             Post post = postService.getById(postComment.getPostId());
 
@@ -149,11 +159,17 @@ public class CommentEventListener {
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", postComment.getAuthor());
             data.put("replyContent", postComment.getContent());
-        } else if (this instanceof SheetService) {
+        } else if (replyEvent.getSource() instanceof SheetCommentService) {
 
             SheetComment sheetComment = sheetCommentService.getById(replyEvent.getCommentId());
 
             SheetComment baseComment = sheetCommentService.getById(sheetComment.getParentId());
+
+            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+                return;
+            }
+
+            baseAuthorEmail = baseComment.getEmail();
 
             Sheet sheet = sheetService.getById(sheetComment.getPostId());
 
@@ -167,10 +183,16 @@ public class CommentEventListener {
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", sheetComment.getAuthor());
             data.put("replyContent", sheetComment.getContent());
-        } else if (this instanceof JournalService) {
+        } else if (replyEvent.getSource() instanceof JournalCommentService) {
             JournalComment journalComment = journalCommentService.getById(replyEvent.getCommentId());
 
             JournalComment baseComment = journalCommentService.getById(journalComment.getParentId());
+
+            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+                return;
+            }
+
+            baseAuthorEmail = baseComment.getEmail();
 
             Journal journal = journalService.getById(journalComment.getPostId());
 
@@ -184,6 +206,6 @@ public class CommentEventListener {
             data.put("replyContent", journalComment.getContent());
         }
 
-        mailService.sendTemplateMail(user.getEmail(), "您在【" + blogTitle + "】的评论有新回复", data, "common/mail_template/mail_reply.ftl");
+        mailService.sendTemplateMail(baseAuthorEmail, "您在【" + blogTitle + "】的评论有新回复", data, "common/mail_template/mail_reply.ftl");
     }
 }
