@@ -102,8 +102,10 @@ public class HaloConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties, ObjectMapper objectMapper) {
-        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties);
+    public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties,
+                                                                                   ObjectMapper objectMapper,
+                                                                                   OptionService optionService) {
+        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService);
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());

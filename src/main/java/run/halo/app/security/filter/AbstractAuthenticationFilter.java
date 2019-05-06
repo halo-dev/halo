@@ -1,6 +1,7 @@
 package run.halo.app.security.filter;
 
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -40,6 +41,15 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
         antPathMatcher = new AntPathMatcher();
     }
+
+    /**
+     * Gets token from request.
+     *
+     * @param request http servlet request must not be null
+     * @return token or null
+     */
+    @Nullable
+    protected abstract String getTokenFromRequest(@NonNull HttpServletRequest request);
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {

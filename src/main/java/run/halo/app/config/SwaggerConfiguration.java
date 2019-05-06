@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
 import run.halo.app.security.filter.AdminAuthenticationFilter;
+import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.support.UserDetail;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.AlternateTypeRule;
@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static run.halo.app.model.support.HaloConst.HALO_VERSION;
-import static run.halo.app.model.support.HaloConst.TOKEN_HEADER;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 /**
@@ -140,8 +139,8 @@ public class SwaggerConfiguration {
 
     private List<ApiKey> portalApiKeys() {
         return Arrays.asList(
-                new ApiKey("Token from header", HttpHeaders.AUTHORIZATION, In.HEADER.name()),
-                new ApiKey("Token from query", "token", In.QUERY.name())
+                new ApiKey("Token from header", ApiAuthenticationFilter.API_TOKEN_HEADER_NAME, In.HEADER.name()),
+                new ApiKey("Token from query", ApiAuthenticationFilter.API_TOKEN_QUERY_NAME, In.QUERY.name())
         );
     }
 
