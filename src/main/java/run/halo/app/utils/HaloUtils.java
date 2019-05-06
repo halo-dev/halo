@@ -118,7 +118,6 @@ public class HaloUtils {
         if (!StringUtils.isBlank(url)) {
             return url;
         }
-        // TODO Consider to UUID
         return String.valueOf(System.currentTimeMillis());
     }
 

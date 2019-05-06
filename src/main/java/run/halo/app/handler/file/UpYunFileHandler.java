@@ -51,7 +51,6 @@ public class UpYunFileHandler implements FileHandler {
         UpYun upYun = new UpYun(ossBucket, ossOperator, ossPassword);
         upYun.setDebug(log.isDebugEnabled());
         upYun.setTimeout(60);
-        // TODO Provide a property for choosing
         upYun.setApiDomain(UpYun.ED_AUTO);
 
         try {

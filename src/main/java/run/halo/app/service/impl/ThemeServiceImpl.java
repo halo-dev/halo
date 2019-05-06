@@ -47,6 +47,8 @@ import java.util.zip.ZipInputStream;
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
 /**
+ * Theme service implementation.
+ *
  * @author ryanwang
  * @date : 2019/3/26
  */
@@ -249,8 +251,6 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public List<Group> fetchConfig(String themeId) {
         Assert.hasText(themeId, "Theme id must not be blank");
-
-        // TODO Cache the config
 
         // Get theme property
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);

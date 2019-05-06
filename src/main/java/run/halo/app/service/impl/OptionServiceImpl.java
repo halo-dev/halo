@@ -69,20 +69,20 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        // TODO Consider cache options with map
-        Option option = optionRepository.findByKey(key).map(anOption -> {
-            log.debug("Updating option key: [{}], value: from [{}] to [{}]", key, anOption.getValue(), value);
-            // Exist
-            anOption.setValue(value);
-            return anOption;
-        }).orElseGet(() -> {
-            log.debug("Creating option key: [{}], value: [{}]", key, value);
-            // Not exist
-            Option anOption = new Option();
-            anOption.setKey(key);
-            anOption.setValue(value);
-            return anOption;
-        });
+        Option option = optionRepository.findByKey(key)
+                .map(anOption -> {
+                    log.debug("Updating option key: [{}], value: from [{}] to [{}]", key, anOption.getValue(), value);
+                    // Exist
+                    anOption.setValue(value);
+                    return anOption;
+                }).orElseGet(() -> {
+                    log.debug("Creating option key: [{}], value: [{}]", key, value);
+                    // Not exist
+                    Option anOption = new Option();
+                    anOption.setKey(key);
+                    anOption.setValue(value);
+                    return anOption;
+                });
 
         // Save or update the options
         Option savedOption = optionRepository.save(option);
@@ -96,7 +96,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        // TODO Optimize the queries
         options.forEach(this::save);
 
         publishOptionUpdatedEvent();
@@ -108,7 +107,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        // TODO Optimize the query
         optionParams.forEach(optionParam -> save(optionParam.getKey(), optionParam.getValue()));
 
         publishOptionUpdatedEvent();

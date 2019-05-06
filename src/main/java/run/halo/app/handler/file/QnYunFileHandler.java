@@ -59,7 +59,6 @@ public class QnYunFileHandler implements FileHandler {
         String domain = optionService.getByPropertyOfNonNull(QnYunProperties.DOMAIN).toString();
         String smallUrl = optionService.getByPropertyOrDefault(QnYunProperties.SMALL_URL, String.class, "");
 
-        // TODO Consider to cache the configuration
         // Create configuration
         Configuration configuration = new Configuration(zone);
 
@@ -88,7 +87,6 @@ public class QnYunFileHandler implements FileHandler {
             // Get upload manager
             UploadManager uploadManager = new UploadManager(configuration, fileRecorder);
             // Put the file
-            // TODO May need to set key manually
             Response response = uploadManager.put(file.getInputStream(), null, uploadToken, null, null);
 
             log.debug("QnYun response: [{}]", response.toString());
@@ -136,7 +134,6 @@ public class QnYunFileHandler implements FileHandler {
         String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY).toString();
         String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET).toString();
 
-        // TODO Consider to cache the configuration
         // Create configuration
         Configuration configuration = new Configuration(zone);
 

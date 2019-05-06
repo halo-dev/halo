@@ -1,4 +1,4 @@
-package run.halo.app.handler.theme.config.impl;
+package run.halo.app.handler.theme;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;

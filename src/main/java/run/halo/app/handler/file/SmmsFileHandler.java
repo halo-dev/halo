@@ -1,22 +1,21 @@
 package run.halo.app.handler.file;
 
-import run.halo.app.exception.FileOperationException;
-import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.support.UploadResult;
-import run.halo.app.utils.FilenameUtils;
-import run.halo.app.utils.HttpClientUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.support.UploadResult;
+import run.halo.app.utils.FilenameUtils;
+import run.halo.app.utils.HttpClientUtils;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -89,7 +88,7 @@ public class SmmsFileHandler implements FileHandler {
         // Check error
         if (!isResponseSuccessfully(smmsResponse)) {
             log.error("Smms response detail: [{}]", smmsResponse);
-            throw new FileOperationException(smmsResponse.getMsg()).setErrorData(smmsResponse);
+            throw new FileOperationException(smmsResponse == null ? "Smms response is null" : smmsResponse.getMsg()).setErrorData(smmsResponse);
         }
 
         // Get response data
@@ -149,10 +148,8 @@ public class SmmsFileHandler implements FileHandler {
      * @param smmsResponse smms response must not be null
      * @return true if response successfully; false otherwise
      */
-    private boolean isResponseSuccessfully(@NonNull SmmsResponse smmsResponse) {
-        Assert.notNull(smmsResponse, "Smms response must not be null");
-
-        return smmsResponse.getCode().equals(SUCCESS_CODE);
+    private boolean isResponseSuccessfully(@Nullable SmmsResponse smmsResponse) {
+        return smmsResponse != null && smmsResponse.getCode().equals(SUCCESS_CODE);
     }
 
     @Data

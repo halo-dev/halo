@@ -78,7 +78,6 @@ public class InstallController {
     @ResponseBody
     @CacheLock
     public BaseResponse<String> installBlog(@RequestBody @Valid InstallParam installParam) {
-        // TODO Install blog.
         // Check is installed
         boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 

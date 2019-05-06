@@ -12,6 +12,7 @@ import java.util.List;
  * @date : 2018/12/31
  */
 @Component
+@Deprecated
 public class RecentPostsMethod implements TemplateMethodModelEx {
 
     public RecentPostsMethod(Configuration configuration) {
