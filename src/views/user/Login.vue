@@ -87,13 +87,6 @@ export default {
       } else {
         this.$router.replace({ name: 'Dashboard' })
       }
-      // 延迟 1 秒显示欢迎信息
-      setTimeout(() => {
-        this.$notification.success({
-          message: '欢迎',
-          description: `欢迎回来`
-        })
-      }, 1000)
     }
   }
 }
@@ -101,16 +94,17 @@ export default {
 <style>
 body {
   height: 100%;
-  background-color: #f8f8f8;
+  background-color: #f5f5f5;
 }
 .container {
+  background: #f7f7f7;
   position: absolute;
   top: 45%;
   left: 50%;
   margin: -160px 0 0 -160px;
   width: 320px;
   padding: 16px 32px 32px 32px;
-  box-shadow: 0px 0px 20px 0px rgba(76, 50, 50, 0.08);
+  box-shadow: -4px 7px 46px 2px rgba(0,0,0,.1);
 }
 .loginLogo {
   margin-bottom: 20px;

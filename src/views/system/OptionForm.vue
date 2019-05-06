@@ -437,7 +437,11 @@
                       label="发送协议："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="options.email_protocol" />
+                      <!-- <a-input v-model="options.email_protocol" /> -->
+                      <a-select v-model="options.email_protocol">
+                        <a-select-option value="">无</a-select-option>
+                        <a-select-option value="SSL">SSL</a-select-option>
+                      </a-select>
                     </a-form-item>
                     <a-form-item
                       label="SSL 端口："
@@ -486,13 +490,13 @@
                       label="收件人："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input />
+                      <a-input v-model="mailParam.to"/>
                     </a-form-item>
                     <a-form-item
                       label="主题："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input />
+                      <a-input v-model="mailParam.subject"/>
                     </a-form-item>
                     <a-form-item
                       label="内容："
@@ -501,10 +505,11 @@
                       <a-input
                         type="textarea"
                         :autosize="{ minRows: 5 }"
+                        v-model="mailParam.content"
                       />
                     </a-form-item>
                     <a-form-item>
-                      <a-button type="primary">发送</a-button>
+                      <a-button type="primary" @click="handleTestMailClick">发送</a-button>
                     </a-form-item>
                   </a-form>
                 </a-tab-pane>
@@ -584,7 +589,8 @@ export default {
       aliyunFormHidden: false,
       logoDrawerVisible: false,
       faviconDrawerVisible: false,
-      options: []
+      options: [],
+      mailParam: {}
     }
   },
   mounted() {
@@ -637,6 +643,11 @@ export default {
     },
     handleShowFaviconAttachDrawer() {
       this.faviconDrawerVisible = true
+    },
+    handleTestMailClick() {
+      optionApi.testMail(this.mailParam).then(response => {
+        this.$message.info(response.data.message)
+      })
     },
     handleSelectFavicon(data) {
       this.options.blog_favicon = data.path

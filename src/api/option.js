@@ -29,4 +29,12 @@ optionApi.save = options => {
   })
 }
 
+optionApi.testMail = param => {
+  return service({
+    url: `/api/admin/options/test_mail`,
+    method: 'post',
+    data: param
+  })
+}
+
 export default optionApi
