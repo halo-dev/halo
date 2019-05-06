@@ -8,7 +8,9 @@ import org.springframework.util.Assert;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.properties.OtherProperties;
+import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.service.OptionService;
 
 import javax.servlet.FilterChain;
@@ -40,6 +42,15 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Check whether the blog is installed or not
+        Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+
+        if (!isInstalled) {
+            // If not installed
+            getFailureHandler().onFailure(request, response, new NotInstallException("The blog has not been initialized yet!"));
+            return;
+        }
+
         // Get token
         String token = getTokenFromRequest(request);
 
