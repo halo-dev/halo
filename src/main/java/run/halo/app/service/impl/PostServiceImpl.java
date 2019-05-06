@@ -67,8 +67,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                            PostTagService postTagService,
                            PostCategoryService postCategoryService,
                            PostCommentService postCommentService,
-                           ApplicationEventPublisher eventPublisher) {
-        super(postRepository);
+                           ApplicationEventPublisher eventPublisher,
+                           OptionService optionService) {
+        super(postRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
@@ -332,6 +333,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
+
+            if (StringUtils.isBlank(postListVO.getSummary())) {
+                // Set summary
+                postListVO.setSummary(convertToSummary(post.getOriginalContent()));
+            }
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
 
