@@ -172,7 +172,6 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
                 // Build option
                 Option option = new Option();
-                // TODO Convert the value type
                 option.setValue(optionMap.get("value"));
                 option.setLabel(optionMap.get("label").toString());
 
@@ -192,7 +191,6 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
 
 
                 Option option = new Option();
-                // TODO Convert the value type
                 option.setValue(key);
                 option.setLabel(optionMap.get("label").toString());
 

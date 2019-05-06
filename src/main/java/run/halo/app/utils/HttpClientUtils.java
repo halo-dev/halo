@@ -40,7 +40,6 @@ public class HttpClientUtils {
      */
     @NonNull
     public static CloseableHttpClient createHttpsClient(int timeout) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        // TODO Set key store in production environment
         SSLContext sslContext = new SSLContextBuilder()
                 .loadTrustMaterial(null, (certificate, authType) -> true)
                 .build();

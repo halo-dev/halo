@@ -43,7 +43,6 @@ public class BeanUtils {
         // Init the instance
         try {
             // New instance for the target class
-            // TODO Class.newInstance() is deprecated in Java 9
             T targetInstance = targetClass.newInstance();
             // Copy properties
             org.springframework.beans.BeanUtils.copyProperties(source, targetInstance, getNullPropertyNames(source));

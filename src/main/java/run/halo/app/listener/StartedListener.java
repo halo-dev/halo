@@ -58,7 +58,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         String blogUrl = optionService.getBlogBaseUrl();
 
         log.info("Halo started at         {}", blogUrl);
-        // TODO admin may be changeable
         log.info("Halo admin started at   {}/admin", blogUrl);
         if (!haloProperties.isDocDisabled()) {
             log.debug("Halo doc was enable at  {}/swagger-ui.html", blogUrl);

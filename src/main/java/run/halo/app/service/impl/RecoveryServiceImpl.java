@@ -92,7 +92,6 @@ public class RecoveryServiceImpl implements RecoveryService {
     @Override
     @Async
     public void migrateFromV0_4_3(MultipartFile file) {
-        // TODO Async execution
         // Get migration content
         try {
             String migrationContent = FileCopyUtils.copyToString(new InputStreamReader(file.getInputStream()));
@@ -192,10 +191,10 @@ public class RecoveryServiceImpl implements RecoveryService {
 
             try {
                 if (postType.equalsIgnoreCase("post")) {
-                    // TODO Handle post
+                    // Handle post
                     result.add(handlePost(post, postMap));
                 } else {
-                    // TODO Handle page
+                    // Handle page
                     result.add(handleSheet(post, postMap));
                 }
             } catch (Exception e) {
@@ -244,7 +243,7 @@ public class RecoveryServiceImpl implements RecoveryService {
         Sheet createdSheet = sheetService.createOrUpdateBy(sheet);
 
         Object commentsObject = postMap.get("comments");
-        // TODO Handle comments
+        // Handle comments
         List<BaseComment> baseComments = handleComment(commentsObject, createdSheet.getId());
 
         List<SheetComment> sheetComments = baseComments.stream()
