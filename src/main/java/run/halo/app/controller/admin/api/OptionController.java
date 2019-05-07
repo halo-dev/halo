@@ -26,12 +26,8 @@ public class OptionController {
 
     private final OptionService optionService;
 
-    private final MailService mailService;
-
-    public OptionController(OptionService optionService,
-                            MailService mailService) {
+    public OptionController(OptionService optionService) {
         this.optionService = optionService;
-        this.mailService = mailService;
     }
 
     @GetMapping
@@ -46,7 +42,7 @@ public class OptionController {
 
     @GetMapping("map_view")
     @ApiOperation("Lists all options with map view")
-    public Map<String, Object> listAllWithMapView(@RequestParam(value = "key", required = false) List<String> keys) {
+    public Map<String, Object> listAllWithMapView(@RequestParam(value = "key[]", required = false) List<String> keys) {
         if (CollectionUtils.isEmpty(keys)) {
             return optionService.listOptions();
         }
@@ -55,7 +51,7 @@ public class OptionController {
     }
 
     @GetMapping("map_keys")
-    @ApiOperation("List all of options by keys")
+    @ApiOperation("List all of options by keys, replaced by `listAllWithMapView`")
     @Deprecated
     public Map<String, Object> listByKeysWithMapView(@RequestParam(value = "keys") String keys) {
         return optionService.listByKeys(keys);
@@ -67,9 +63,4 @@ public class OptionController {
         optionService.save(optionMap);
     }
 
-    @PostMapping("test_mail")
-    public BaseResponse testMail(@Valid @RequestBody MailParam mailParam){
-        mailService.sendMail(mailParam.getTo(),mailParam.getSubject(),mailParam.getContent());
-        return BaseResponse.ok("发送成功");
-    }
 }
