@@ -10,7 +10,7 @@ public enum EmailProperties implements PropertyEnum {
 
     HOST("email_host", String.class, ""),
 
-    PROTOCOL("email_protocol", String.class, "SSL"),
+    PROTOCOL("email_protocol", String.class, "smtp"),
 
     SSL_PORT("email_ssl_port", Integer.class, "465"),
 
