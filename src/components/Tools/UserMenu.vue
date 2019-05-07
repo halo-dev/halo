@@ -18,12 +18,16 @@
     </a>
     <header-comment class="action" />
     <a-dropdown>
-      <span class="action ant-dropdown-link user-dropdown-menu">
+      <span
+        class="action ant-dropdown-link user-dropdown-menu"
+        v-if="user"
+      >
         <a-avatar
           class="avatar"
           size="small"
-          :src="avatar"
+          :src="user.avatar"
         />
+        {{ user.nickname }}
       </span>
       <a-menu
         slot="overlay"
@@ -55,7 +59,6 @@
 import HeaderComment from './HeaderComment'
 import SettingDrawer from '@/components/SettingDrawer/SettingDrawer'
 import { mapActions, mapGetters } from 'vuex'
-import userApi from '@/api/user'
 import optionApi from '@/api/option'
 
 export default {
@@ -67,7 +70,6 @@ export default {
   data() {
     return {
       optionVisible: true,
-      user: {},
       options: [],
       keys: ['blog_url']
     }
@@ -76,11 +78,10 @@ export default {
     this.optionVisible = this.$refs.drawer.visible
   },
   created() {
-    this.loadUser()
     this.loadOptions()
   },
   computed: {
-    ...mapGetters(['nickname', 'avatar'])
+    ...mapGetters(['user'])
   },
   methods: {
     ...mapActions(['logout']),
@@ -110,11 +111,6 @@ export default {
       this.optionVisible = this.$refs.drawer.visible
       this.$refs.drawer.toggle()
     },
-    loadUser() {
-      userApi.getProfile().then(response => {
-        this.user = response.data.data
-      })
-    },
     loadOptions() {
       optionApi.listAll(this.keys).then(response => {
         this.options = response.data.data
@@ -123,3 +119,9 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+.avatar {
+  margin-right: 0.3rem;
+}
+</style>

@@ -64,7 +64,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['login']),
+    ...mapActions(['login', 'loadUser']),
     handleLogin() {
       if (!this.username) {
         this.$message.warn('用户名不能为空')
@@ -82,6 +82,8 @@ export default {
       })
     },
     loginSuccess() {
+      // Cache the user info
+      this.loadUser()
       if (this.$route.query.redirect) {
         this.$router.replace(this.$route.query.redirect)
       } else {
@@ -104,7 +106,7 @@ body {
   margin: -160px 0 0 -160px;
   width: 320px;
   padding: 16px 32px 32px 32px;
-  box-shadow: -4px 7px 46px 2px rgba(0,0,0,.1);
+  box-shadow: -4px 7px 46px 2px rgba(0, 0, 0, 0.1);
 }
 .loginLogo {
   margin-bottom: 20px;

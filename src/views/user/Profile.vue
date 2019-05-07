@@ -181,7 +181,7 @@ export default {
     this.loadOptions()
   },
   methods: {
-    ...mapMutations({ setAvatar: 'SET_AVATAR' }),
+    ...mapMutations({ setUser: 'SET_USER' }),
     handleShowAttachDrawer() {
       this.attachmentDrawerVisible = true
     },
@@ -214,7 +214,7 @@ export default {
     handleUpdateProfile() {
       userApi.updateProfile(this.user).then(response => {
         this.user = response.data.data
-        this.setAvatar(this.user.avatar)
+        this.setUser(Object.assign({}, this.user))
         this.$message.success('资料更新成功！')
       })
     },
