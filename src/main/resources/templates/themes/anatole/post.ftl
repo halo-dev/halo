@@ -73,7 +73,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${options.blog_url}/archives/${post.url} ,${options.blog_title!},${post.title},;"
+                        <a href="http://twitter.com/home?status=${options.blog_url!}/archives/${post.url} ,${options.blog_title!},${post.title},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
