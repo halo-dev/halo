@@ -148,6 +148,7 @@ import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDra
 import userApi from '@/api/user'
 import adminApi from '@/api/admin'
 import optionApi from '@/api/option'
+import { mapMutations } from 'vuex'
 
 export default {
   components: {
@@ -180,6 +181,7 @@ export default {
     this.loadOptions()
   },
   methods: {
+    ...mapMutations({ setAvatar: 'SET_AVATAR' }),
     handleShowAttachDrawer() {
       this.attachmentDrawerVisible = true
     },
@@ -212,6 +214,7 @@ export default {
     handleUpdateProfile() {
       userApi.updateProfile(this.user).then(response => {
         this.user = response.data.data
+        this.setAvatar(this.user.avatar)
         this.$message.success('资料更新成功！')
       })
     },

@@ -22,7 +22,7 @@
         <a-avatar
           class="avatar"
           size="small"
-          :src="user.avatar"
+          :src="avatar"
         />
       </span>
       <a-menu
@@ -79,9 +79,11 @@ export default {
     this.loadUser()
     this.loadOptions()
   },
+  computed: {
+    ...mapGetters(['nickname', 'avatar'])
+  },
   methods: {
     ...mapActions(['logout']),
-    ...mapGetters(['nickname']),
     handleLogout() {
       const that = this
 
