@@ -97,7 +97,7 @@ public class HaloConfiguration {
                                                                OptionService optionService) {
         ContentFilter contentFilter = new ContentFilter(haloProperties, optionService);
         contentFilter.setFailureHandler(new ContentAuthenticationFailureHandler());
-        contentFilter.addExcludeUrlPatterns("/api/*", "/install", "/version", "/admin/*", "/js/*", "/css/*");
+        contentFilter.addExcludeUrlPatterns("/api/**", "/install", "/version", "/admin/**", "/js/**", "/css/**");
 
         FilterRegistrationBean<ContentFilter> contentFrb = new FilterRegistrationBean<>();
         contentFrb.addUrlPatterns("/*");
