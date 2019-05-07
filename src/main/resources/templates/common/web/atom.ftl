@@ -22,7 +22,7 @@
                 <title>${post.title!}</title>
                 <link>${options.blog_url!}/archives/${post.url!}</link>
                 <comments>${options.blog_url!}/archives/${post.url!}#comments</comments>
-                <pubDate>${post.createTime}</pubDate>
+                <pubDate>${post.createTime!}</pubDate>
                 <dc:creator><![CDATA[${user.nickName!}]]></dc:creator>
 
                 <#if post.categories?? && post.categories?size gt 0>
@@ -40,7 +40,7 @@
                         ${post.formatContent!}
                     ]]>
                 </content:encoded>
-                <slash:comments>${post.comments?size}</slash:comments>
+                <slash:comments>${post.commentCount!0}</slash:comments>
             </item>
         </#list>
     </#if>
