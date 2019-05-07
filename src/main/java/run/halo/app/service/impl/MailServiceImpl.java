@@ -5,9 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.EmailException;
 import run.halo.app.model.properties.EmailProperties;
 import run.halo.app.service.MailService;
@@ -25,7 +27,7 @@ import java.util.Properties;
  */
 @Slf4j
 @Service
-public class MailServiceImpl implements MailService {
+public class MailServiceImpl implements MailService  {
 
     private final FreeMarkerConfigurer freeMarker;
 
@@ -38,18 +40,6 @@ public class MailServiceImpl implements MailService {
         this.freeMarker = freeMarker;
         this.optionService = optionService;
 
-        try {
-            reloadMailConfig();
-        } catch (Exception e) {
-            log.warn("You have to configure the email settings correctly before using email service");
-        }
-    }
-
-    @Override
-    public void reloadMailConfig() {
-        loaded = false;
-        // Get default properties
-        loadConfig();
     }
 
     /**
@@ -140,13 +130,9 @@ public class MailServiceImpl implements MailService {
     }
 
     /**
-     * Load email config.
+     * Loads email config.
      */
-    private synchronized void loadConfig() {
-        if (loaded = true) {
-            return;
-        }
-
+    private void loadConfig() {
         // Get default properties
         Properties defaultProperties = OhMyEmail.defaultConfig(log.isDebugEnabled());
         // Set smtp host
@@ -157,8 +143,6 @@ public class MailServiceImpl implements MailService {
         OhMyEmail.config(defaultProperties,
                 optionService.getByPropertyOfNonNull(EmailProperties.USERNAME).toString(),
                 optionService.getByPropertyOfNonNull(EmailProperties.PASSWORD).toString());
-
-        // Set config loaded with true
-        loaded = true;
     }
+
 }

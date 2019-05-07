@@ -11,11 +11,6 @@ import java.util.Map;
 public interface MailService {
 
     /**
-     * Reload email config.
-     */
-    void reloadMailConfig();
-
-    /**
      * Send a simple email
      *
      * @param to      recipient
