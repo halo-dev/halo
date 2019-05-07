@@ -23,7 +23,7 @@ public class HaloConst {
     /**
      * version constant
      */
-    public static final String HALO_VERSION = "1.0.0";
+    public static final String HALO_VERSION;
 
     /**
      * Suffix of freemarker template file
@@ -74,4 +74,8 @@ public class HaloConst {
      * user_session
      */
     public static String USER_SESSION_KEY = "user_session";
+
+    static {
+        HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
+    }
 }

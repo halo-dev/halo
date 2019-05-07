@@ -3,6 +3,7 @@ package run.halo.app.config;
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -56,7 +57,7 @@ public class SwaggerConfiguration {
             new ResponseMessageBuilder().code(404).message("Not found").build(),
             new ResponseMessageBuilder().code(500).message("Internal server error").build());
 
-    public SwaggerConfiguration(HaloProperties haloProperties) {
+    public SwaggerConfiguration(                                HaloProperties haloProperties) {
         this.haloProperties = haloProperties;
     }
 

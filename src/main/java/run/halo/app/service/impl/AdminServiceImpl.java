@@ -57,8 +57,7 @@ public class AdminServiceImpl implements AdminService {
 
     private final StringCacheStore cacheStore;
 
-    @Value("${spring.datasource.driver-class-name}")
-    private String driverClassName;
+    private final String driverClassName;
 
     public AdminServiceImpl(PostService postService,
                             SheetService sheetService,
@@ -69,7 +68,8 @@ public class AdminServiceImpl implements AdminService {
                             OptionService optionService,
                             UserService userService,
                             LinkService linkService,
-                            StringCacheStore cacheStore) {
+                            StringCacheStore cacheStore,
+                            @Value("${spring.datasource.driver-class-name}") String driverClassName) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.attachmentService = attachmentService;
@@ -80,6 +80,7 @@ public class AdminServiceImpl implements AdminService {
         this.userService = userService;
         this.linkService = linkService;
         this.cacheStore = cacheStore;
+        this.driverClassName = driverClassName;
     }
 
     @Override
