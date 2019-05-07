@@ -18,7 +18,7 @@ public enum CommentProperties implements PropertyEnum {
 
     REPLY_NOTICE("comment_reply_notice", Boolean.class, "false"),
 
-    API_ENABLED("comment_api_enabled", Boolean.class, "false"),
+    API_ENABLED("comment_api_enabled", Boolean.class, "true"),
 
     PAGE_SIZE("comment_page_size", Integer.class, "10"),
 

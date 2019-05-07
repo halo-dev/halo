@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.service.OptionService;
 
@@ -75,6 +76,21 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
         // Do filter
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        boolean result = super.shouldNotFilter(request);
+
+        if (antPathMatcher.match("/api/content/*/comments", request.getServletPath())) {
+            Boolean commentApiEnabled = optionService.getByPropertyOrDefault(CommentProperties.API_ENABLED, Boolean.class, true);
+            if (!commentApiEnabled) {
+                // If the comment api is disabled
+                result = false;
+            }
+        }
+        return result;
+
     }
 
     @Override
