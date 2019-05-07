@@ -40,11 +40,11 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      */
     private Map<String, String> tryAuthUrlMethodPatterns = new HashMap<>(2);
 
-    private final AntPathMatcher antPathMatcher;
+    protected final AntPathMatcher antPathMatcher;
 
-    private final HaloProperties haloProperties;
+    protected final HaloProperties haloProperties;
 
-    private final OptionService optionService;
+    protected final OptionService optionService;
 
     protected AbstractAuthenticationFilter(HaloProperties haloProperties,
                                            OptionService optionService) {

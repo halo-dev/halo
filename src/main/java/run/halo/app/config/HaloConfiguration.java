@@ -114,7 +114,7 @@ public class HaloConfiguration {
         ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService);
         apiFilter.addExcludeUrlPatterns(
                 "/api/content/*/comments",
-                "/api/content/*/comments/*"
+                "/api/content/**/comments/*"
         );
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
