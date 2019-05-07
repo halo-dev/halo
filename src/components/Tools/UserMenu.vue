@@ -69,7 +69,7 @@ export default {
       optionVisible: true,
       user: {},
       options: [],
-      keys: 'blog_url'
+      keys: ['blog_url']
     }
   },
   mounted() {
@@ -114,7 +114,7 @@ export default {
       })
     },
     loadOptions() {
-      optionApi.listByKeys(this.keys).then(response => {
+      optionApi.listAll(this.keys).then(response => {
         this.options = response.data.data
       })
     }

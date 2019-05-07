@@ -490,13 +490,13 @@
                       label="收件人："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="mailParam.to"/>
+                      <a-input v-model="mailParam.to" />
                     </a-form-item>
                     <a-form-item
                       label="主题："
                       :wrapper-col="wrapperCol"
                     >
-                      <a-input v-model="mailParam.subject"/>
+                      <a-input v-model="mailParam.subject" />
                     </a-form-item>
                     <a-form-item
                       label="内容："
@@ -509,7 +509,10 @@
                       />
                     </a-form-item>
                     <a-form-item>
-                      <a-button type="primary" @click="handleTestMailClick">发送</a-button>
+                      <a-button
+                        type="primary"
+                        @click="handleTestMailClick"
+                      >发送</a-button>
                     </a-form-item>
                   </a-form>
                 </a-tab-pane>
@@ -570,7 +573,9 @@
 <script>
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import optionApi from '@/api/option'
+import mailApi from '@/api/mail'
 import attachmentApi from '@/api/attachment'
+
 export default {
   components: {
     AttachmentSelectDrawer
@@ -610,7 +615,7 @@ export default {
       })
     },
     handleAttachChange(e) {
-      switch (e) {
+      switch (e.toUppper()) {
         case 'LOCAL':
         case 'SMMS':
           this.upyunFormHidden = false
@@ -645,7 +650,7 @@ export default {
       this.faviconDrawerVisible = true
     },
     handleTestMailClick() {
-      optionApi.testMail(this.mailParam).then(response => {
+      mailApi.testMail(this.mailParam).then(response => {
         this.$message.info(response.data.message)
       })
     },

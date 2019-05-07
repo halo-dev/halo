@@ -1,39 +1,24 @@
 import service from '@/utils/service'
 
-const baseUrl = '/api/admin/options/map_view'
+const baseUrl = '/api/admin/options'
 
 const optionApi = {}
 
-optionApi.listAll = () => {
+optionApi.listAll = keys => {
   return service({
-    url: baseUrl,
-    method: 'get'
-  })
-}
-
-optionApi.listByKeys = keys => {
-  return service({
-    url: `/api/admin/options/map_keys`,
-    method: 'get',
+    url: `${baseUrl}/map_view`,
     params: {
-      keys: keys
-    }
+      key: keys
+    },
+    method: 'get'
   })
 }
 
 optionApi.save = options => {
   return service({
-    url: `${baseUrl}/saving`,
+    url: `${baseUrl}/map_view/saving`,
     method: 'post',
     data: options
-  })
-}
-
-optionApi.testMail = param => {
-  return service({
-    url: `/api/admin/options/test_mail`,
-    method: 'post',
-    data: param
   })
 }
 

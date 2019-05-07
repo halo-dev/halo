@@ -166,7 +166,7 @@ export default {
       },
       attachment: {},
       options: [],
-      keys: 'blog_url'
+      keys: ['blog_url']
     }
   },
   computed: {
@@ -190,7 +190,7 @@ export default {
       })
     },
     loadOptions() {
-      optionApi.listByKeys(this.keys).then(response => {
+      optionApi.listAll(this.keys).then(response => {
         this.options = response.data.data
       })
     },
