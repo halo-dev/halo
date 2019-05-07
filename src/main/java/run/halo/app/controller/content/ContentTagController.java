@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostTagService;
-import run.halo.app.service.TagService;
-import run.halo.app.service.ThemeService;
+import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -32,14 +30,21 @@ public class ContentTagController {
 
     private final TagService tagService;
 
+    private final PostService postService;
+
     private final PostTagService postTagService;
 
     private final OptionService optionService;
 
     private final ThemeService themeService;
 
-    public ContentTagController(TagService tagService, PostTagService postTagService, OptionService optionService, ThemeService themeService) {
+    public ContentTagController(TagService tagService,
+                                PostService postService,
+                                PostTagService postTagService,
+                                OptionService optionService,
+                                ThemeService themeService) {
         this.tagService = tagService;
+        this.postService = postService;
         this.postTagService = postTagService;
         this.optionService = optionService;
         this.themeService = themeService;
@@ -84,7 +89,8 @@ public class ContentTagController {
         Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
-        Page<Post> posts = postTagService.pagePostsBy(tag.getId(), pageable);
+        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
         model.addAttribute("is_tags", true);

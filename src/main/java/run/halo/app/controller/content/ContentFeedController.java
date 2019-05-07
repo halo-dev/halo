@@ -2,6 +2,7 @@ package run.halo.app.controller.content;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
@@ -140,11 +142,14 @@ public class ContentFeedController {
      * @param pageable pageable
      * @return List<Post>
      */
-    private List<Post> buildPosts(Pageable pageable) {
+    private List<PostListVO> buildPosts(Pageable pageable) {
         if (pageable == null) {
-            return postService.listAllBy(PostStatus.PUBLISHED);
+            Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, null);
+            return postService.convertToListVo(postPage).getContent();
         }
 
-        return postService.pageBy(PostStatus.PUBLISHED, pageable).map(postService::filterIfEncrypt).getContent();
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
+        return posts.getContent();
     }
 }
