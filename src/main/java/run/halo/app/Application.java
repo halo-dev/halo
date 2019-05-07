@@ -25,7 +25,7 @@ public class Application {
 
     public static void main(String[] args) {
         // Customize the spring config location
-        System.setProperty("spring.config.additional-location", "file:${user.home}/halo/,file:${user.home}/halo-dev/");
+        System.setProperty("spring.config.additional-location", "file:${user.home}/.halo/,file:${user.home}/halo-dev/");
 
         // Run application
         SpringApplication.run(Application.class, args);
