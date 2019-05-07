@@ -6,40 +6,25 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-var createServerConfig = function(compilation) {
-  const configJson = {
-    apiUrl: 'http://localhost:8090'
-  }
-  return JSON.stringify(configJson)
-}
+// var createServerConfig = function(compilation) {
+//   const configJson = {
+//     apiUrl: 'http://localhost:8090'
+//   }
+//   return JSON.stringify(configJson)
+// }
 
 // vue.config.js
 module.exports = {
-  /*
-    Vue-cli3:
-    Crashed when using Webpack `import()` #2463
-    https://github.com/vuejs/vue-cli/issues/2463
-
-   */
-  /*
-  pages: {
-    index: {
-      entry: 'src/main.js',
-      chunks: ['chunk-vendors', 'chunk-common', 'index']
-    }
-  },
-  */
   configureWebpack: {
     plugins: [
-      // Ignore all locale files of moment.js
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-      new GenerateAssetPlugin({
-        filename: 'config.json',
-        fn: (compilation, cb) => {
-          cb(null, createServerConfig(compilation))
-        },
-        extraFiles: []
-      })
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+      // new GenerateAssetPlugin({
+      //   filename: 'config.json',
+      //   fn: (compilation, cb) => {
+      //     cb(null, createServerConfig(compilation))
+      //   },
+      //   extraFiles: []
+      // })
     ]
   },
 
@@ -68,27 +53,12 @@ module.exports = {
       .options({
         name: 'assets/[name].[hash:8].[ext]'
       })
-    /* svgRule.oneOf('inline')
-      .resourceQuery(/inline/)
-      .use('vue-svg-loader')
-      .loader('vue-svg-loader')
-      .end()
-      .end()
-      .oneOf('external')
-      .use('file-loader')
-      .loader('file-loader')
-      .options({
-        name: 'assets/[name].[hash:8].[ext]'
-      })
-    */
   },
 
   css: {
     loaderOptions: {
       less: {
         modifyVars: {
-          /* less 变量覆盖，用于自定义 ant design 主题 */
-
           /*
           'primary-color': '#F5222D',
           'link-color': '#F5222D',
@@ -101,22 +71,7 @@ module.exports = {
   },
 
   devServer: {
-    proxy: {
-      '/api': {
-        // target: 'https://mock.ihx.me/mock/5baf3052f7da7e07e04a5116/antd-pro',
-        target: 'https://mock.ihx.me/mock/5baf3052f7da7e07e04a5116/antd-pro',
-        ws: false,
-        changeOrigin: true
-      },
-      '/gateway': {
-        target: 'https://www.easy-mock.com/mock/5b7bce071f130e5b7fe8cd7d/antd-pro',
-        ws: false,
-        changeOrigin: true,
-        pathRewrite: {
-          '^/gateway': '/api'
-        }
-      }
-    }
+    proxy: {}
   },
 
   lintOnSave: undefined,
