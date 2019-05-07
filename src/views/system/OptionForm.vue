@@ -437,11 +437,7 @@
                       label="发送协议："
                       :wrapper-col="wrapperCol"
                     >
-                      <!-- <a-input v-model="options.email_protocol" /> -->
-                      <a-select v-model="options.email_protocol">
-                        <a-select-option value="">无</a-select-option>
-                        <a-select-option value="SSL">SSL</a-select-option>
-                      </a-select>
+                      <a-input v-model="options.email_protocol" />
                     </a-form-item>
                     <a-form-item
                       label="SSL 端口："

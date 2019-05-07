@@ -70,10 +70,6 @@ module.exports = {
     }
   },
 
-  devServer: {
-    proxy: {}
-  },
-
   lintOnSave: undefined,
   // babel-loader no-ignore node_modules/*
   transpileDependencies: [],
