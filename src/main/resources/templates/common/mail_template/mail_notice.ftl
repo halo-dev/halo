@@ -5,7 +5,7 @@
                 您的博客有新的评论！
             </h1>
             <div class="emailtext" style="background:#fff;padding:20px 32px 40px;">
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">${user.nickName!}, 您好!</p>
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">${user.nickname!}, 您好!</p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">有访客在《${page!}》留言:</p>
                     <br />
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;padding:10px 20px;background:#f8f8f8;margin:0">
