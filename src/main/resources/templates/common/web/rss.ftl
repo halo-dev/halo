@@ -14,7 +14,7 @@
                     <link>${options.blog_url}/archives/${post.url!}</link>
                     <content:encoded>
                         <![CDATA[
-                            ${post.formatContent!}
+                            ${post.summary!}
                         ]]>
                     </content:encoded>
                     <pubDate>${post.createTime}</pubDate>
