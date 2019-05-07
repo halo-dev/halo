@@ -66,4 +66,5 @@ public class AdminController {
     public AuthToken refresh(@PathVariable("refreshToken") String refreshToken) {
         return adminService.refreshToken(refreshToken);
     }
+
 }

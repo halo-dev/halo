@@ -1,7 +1,9 @@
-package run.halo.app.controller.content.api;
+package run.halo.app.controller.content;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import run.halo.app.model.support.HaloConst;
 
 /**
  * Admin page.
@@ -21,5 +23,11 @@ public class MainController {
     @GetMapping("/install")
     public String installation() {
         return "redirect:/admin/index.html#install";
+    }
+
+    @GetMapping("/version")
+    @ResponseBody
+    public String version() {
+        return HaloConst.HALO_VERSION;
     }
 }

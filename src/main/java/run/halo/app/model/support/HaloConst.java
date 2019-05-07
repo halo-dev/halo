@@ -76,6 +76,7 @@ public class HaloConst {
     public static String USER_SESSION_KEY = "user_session";
 
     static {
+        // Set version
         HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
     }
 }
