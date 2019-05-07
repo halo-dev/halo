@@ -1,15 +1,12 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.StrUtil;
 import freemarker.template.Template;
 import io.github.biezhi.ome.OhMyEmail;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.EmailException;
 import run.halo.app.model.properties.EmailProperties;
 import run.halo.app.service.MailService;
@@ -27,13 +24,11 @@ import java.util.Properties;
  */
 @Slf4j
 @Service
-public class MailServiceImpl implements MailService  {
+public class MailServiceImpl implements MailService {
 
     private final FreeMarkerConfigurer freeMarker;
 
     private final OptionService optionService;
-
-    private boolean loaded = false;
 
     public MailServiceImpl(FreeMarkerConfigurer freeMarker,
                            OptionService optionService) {
@@ -114,6 +109,7 @@ public class MailServiceImpl implements MailService  {
         String fromUsername = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME).toString();
 
         File file = new File(attachFilename);
+
         try {
             Template template = freeMarker.getConfiguration().getTemplate(templateName);
             OhMyEmail.subject(subject)
@@ -135,10 +131,12 @@ public class MailServiceImpl implements MailService  {
     private void loadConfig() {
         // Get default properties
         Properties defaultProperties = OhMyEmail.defaultConfig(log.isDebugEnabled());
+
         // Set smtp host
         defaultProperties.setProperty("mail.smtp.host", optionService.getByPropertyOfNonNull(EmailProperties.HOST).toString());
-        defaultProperties.setProperty("mail.smtp.ssl.enable", StrUtil.isEmpty(optionService.getByPropertyOfNonNull(EmailProperties.PROTOCOL).toString()) ? "false" : "true");
-        defaultProperties.setProperty("mail.smtp.port", StrUtil.isEmpty(optionService.getByPropertyOfNonNull(EmailProperties.SSL_PORT).toString()) ? "25" : "465");
+        defaultProperties.setProperty("mail.transport.protocol", optionService.getByPropertyOrDefault(EmailProperties.PROTOCOL, String.class, EmailProperties.PROTOCOL.defaultValue()));
+        defaultProperties.setProperty("mail.smtp.port", optionService.getByPropertyOrDefault(EmailProperties.SSL_PORT, String.class, EmailProperties.SSL_PORT.defaultValue()));
+
         // Config email
         OhMyEmail.config(defaultProperties,
                 optionService.getByPropertyOfNonNull(EmailProperties.USERNAME).toString(),
