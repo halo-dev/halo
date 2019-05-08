@@ -95,14 +95,13 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             Path themePath = themeService.getBasePath();
 
             if (!haloProperties.isProductionEnv() || Files.notExists(themePath)) {
-                log.info("Copying theme folder from [{}] to [{}]", source, themePath);
-
                 FileUtils.copyFolder(source, themePath);
+                log.info("Copied theme folder from [{}] to [{}]", source, themePath);
             } else {
-                log.info("Skip copying theme folder due to existence of theme folder");
+                log.info("Skipped copying theme folder due to existence of theme folder");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Init internal theme to user path error", e);
+            throw new RuntimeException("Initialize internal theme to user path error", e);
         }
     }
 
