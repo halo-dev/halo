@@ -571,6 +571,7 @@ import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDra
 import optionApi from '@/api/option'
 import mailApi from '@/api/mail'
 import attachmentApi from '@/api/attachment'
+import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -598,6 +599,7 @@ export default {
     this.loadOptions()
   },
   methods: {
+    ...mapActions(['loadUser']),
     loadOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
@@ -607,11 +609,12 @@ export default {
     handleSaveOptions() {
       optionApi.save(this.options).then(response => {
         this.loadOptions()
+        this.loadUser()
         this.$message.success('保存成功！')
       })
     },
     handleAttachChange(e) {
-      switch (e.toUppper()) {
+      switch (e) {
         case 'LOCAL':
         case 'SMMS':
           this.upyunFormHidden = false

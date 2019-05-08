@@ -40,7 +40,7 @@ const user = {
   },
   actions: {
     loadUser({ commit }) {
-      return Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         userApi
           .getProfile()
           .then(response => {

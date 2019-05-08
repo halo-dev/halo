@@ -138,7 +138,7 @@
                 </span>
                 <a-list
                   itemLayout="horizontal"
-                  :dataSource="commentData"
+                  :dataSource="formmatedCommentData"
                 >
                   <a-list-item
                     slot="renderItem"
@@ -332,6 +332,7 @@
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import marked from 'marked'
 
 import postApi from '@/api/post'
 import commentApi from '@/api/comment'
@@ -392,6 +393,12 @@ export default {
       return this.logs.map(log => {
         log.type = this.logType[log.type].text
         return log
+      })
+    },
+    formmatedCommentData() {
+      return this.commentData.map(comment => {
+        comment.content = marked(comment.content, { sanitize: true })
+        return comment
       })
     }
   },
