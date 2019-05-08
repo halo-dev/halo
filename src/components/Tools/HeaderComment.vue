@@ -11,7 +11,7 @@
   >
     <template slot="content">
       <a-spin :spinning="loadding">
-        <a-list :dataSource="comments">
+        <a-list :dataSource="converttedComments">
           <a-list-item
             slot="renderItem"
             slot-scope="item"
@@ -56,6 +56,8 @@
 
 <script>
 import commentApi from '@/api/comment'
+import marked from 'marked'
+
 export default {
   name: 'HeaderComment',
   data() {
@@ -67,6 +69,14 @@ export default {
   },
   created() {
     this.getComment()
+  },
+  computed: {
+    converttedComments() {
+      return this.comments.map(comment => {
+        comment.content = marked(comment.content, { sanitize: true })
+        return comment
+      })
+    }
   },
   methods: {
     fetchComment() {

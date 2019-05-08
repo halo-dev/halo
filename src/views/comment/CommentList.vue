@@ -240,6 +240,8 @@
 <script>
 import { PageView } from '@/layouts'
 import commentApi from '@/api/comment'
+import marked from 'marked'
+
 const columns = [
   {
     title: '昵称',
@@ -307,6 +309,7 @@ export default {
     formattedComments() {
       return this.comments.map(comment => {
         comment.statusProperty = this.commentStatus[comment.status]
+        comment.content = marked(comment.content, { sanitize: true })
         return comment
       })
     }
