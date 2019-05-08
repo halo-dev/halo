@@ -1,8 +1,6 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.file.FileReader;
-import cn.hutool.core.io.file.FileWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -37,6 +35,7 @@ import run.halo.app.utils.HaloUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -215,7 +214,12 @@ public class ThemeServiceImpl implements ThemeService {
         checkDirectory(absolutePath);
 
         // Read file
-        return new FileReader(absolutePath).readString();
+        Path path = Paths.get(absolutePath);
+        try {
+            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ServiceException("Failed to read file " + absolutePath, e);
+        }
     }
 
     @Override
@@ -224,7 +228,12 @@ public class ThemeServiceImpl implements ThemeService {
         checkDirectory(absolutePath);
 
         // Write file
-        new FileWriter(absolutePath).write(content);
+        Path path = Paths.get(absolutePath);
+        try {
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new ServiceException("Failed to write file " + absolutePath, e);
+        }
     }
 
     @Override
@@ -273,7 +282,7 @@ public class ThemeServiceImpl implements ThemeService {
                 }
 
                 // Read the yaml file
-                String optionContent = new String(Files.readAllBytes(optionsPath));
+                String optionContent = new String(Files.readAllBytes(optionsPath), StandardCharsets.UTF_8);
 
                 // Resolve it
                 return themeConfigResolver.resolve(optionContent);
@@ -638,7 +647,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // Get property content
-            String propertyContent = new String(Files.readAllBytes(propertyPath));
+            String propertyContent = new String(Files.readAllBytes(propertyPath), StandardCharsets.UTF_8);
 
             // Resolve the base properties
             ThemeProperty themeProperty = themePropertyResolver.resolve(propertyContent);

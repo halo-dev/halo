@@ -2,9 +2,9 @@ package run.halo.app.model.params;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import run.halo.app.model.support.CreateCheck;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Install parameters.
@@ -24,7 +24,7 @@ public class InstallParam extends UserParam {
     /**
      * Blog title.
      */
-    @NotBlank(message = "Blog title must not be blank")
+    @NotBlank(message = "Blog title must not be blank", groups = CreateCheck.class)
     private String title;
 
     /**
