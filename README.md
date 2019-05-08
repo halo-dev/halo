@@ -1,6 +1,6 @@
-<h1>Halo</h1>
+<h1 align="center"><a href="https://github.com/halo-dev" target="_blank">Halo</a></h1>
 
-> Halo 可能是最好的 Java 博客系统。（请注意，老版本已不提供维护，当前分支为新版本，正在内测中，将于近期发布版本）
+> Halo 可能是最好的 Java 博客系统。
 
 <p align="center">
 <a href="https://ryanc.cc"><img alt="Author" src="https://img.shields.io/badge/author-ruibaby-red.svg?style=flat-square"/></a>
@@ -11,6 +11,10 @@
 </p>
 
 ------------------------------
+
+## 新版本说明
+
+**老版本已不提供维护，请不要再使用老版本进行部署了，当前分支为新版本，正在内测中，将于近期发布版本**
 
 ## 简介
 
@@ -64,3 +68,35 @@
 | 支付宝/微信/QQ  |
 | :------------: |
 | <img src="https://i.loli.net/2018/12/23/5c1f68ce9b884.png" width="200"/>  |
+
+## 预览图
+
+![anatole.png](https://i.loli.net/2019/05/08/5cd2fc3e478dc.png)
+
+![casper.png](https://i.loli.net/2019/05/08/5cd2fc3e4e587.png)
+
+![material.png](https://i.loli.net/2019/05/08/5cd2fc3e78012.png)
+
+![admin-install.png](https://i.loli.net/2019/05/08/5cd2fcae89cae.png)
+
+![admin-login.png](https://i.loli.net/2019/05/08/5cd2fcae6a3fa.png)
+
+![admin-dashboard.png](https://i.loli.net/2019/05/08/5cd2fcaf1b2d2.png)
+
+![admin-posts.png](https://i.loli.net/2019/05/08/5cd2fcaf18c37.png)
+
+![admin-write.png](https://i.loli.net/2019/05/08/5cd2fcae9bea2.png)
+
+![admin-write1.png](https://i.loli.net/2019/05/08/5cd2fcaf6a1ac.png)
+
+![admin-write2.png](https://i.loli.net/2019/05/08/5cd2fcb08ea2d.png)
+
+![admin-attachment.png](https://i.loli.net/2019/05/08/5cd2fcb1c752e.png)
+
+![admin-themes.png](https://i.loli.net/2019/05/08/5cd2fcb21fc76.png)
+
+![admin-theme-settings.png](https://i.loli.net/2019/05/08/5cd2fcb04f9c3.png)
+
+![admin-profile.png](https://i.loli.net/2019/05/08/5cd2fccee89f5.png)
+
+![admin-options.png](https://i.loli.net/2019/05/08/5cd2fccedc309.png)
