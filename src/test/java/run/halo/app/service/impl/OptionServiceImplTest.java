@@ -1,15 +1,19 @@
 package run.halo.app.service.impl;
 
-import run.halo.app.model.entity.Option;
-import run.halo.app.model.properties.QnYunProperties;
-import run.halo.app.repository.OptionRepository;
 import com.qiniu.common.Zone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import run.halo.app.cache.StringCacheStore;
+import run.halo.app.model.entity.Option;
+import run.halo.app.model.properties.QnYunProperties;
+import run.halo.app.repository.OptionRepository;
+import run.halo.app.service.OptionService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -29,6 +33,9 @@ public class OptionServiceImplTest {
 
     @Mock
     private OptionRepository optionRepository;
+
+    @Mock
+    private StringCacheStore cacheStore;
 
     @InjectMocks
     private OptionServiceImpl optionService;
@@ -76,13 +83,16 @@ public class OptionServiceImplTest {
         QnYunProperties zoneProperty = QnYunProperties.ZONE;
 
         // Given
-        given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
+//        given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
+        Map<String, Object> optionMap = new HashMap<>(1);
+        optionMap.put(zoneProperty.getValue(), Optional.ofNullable(option).map(Option::getValue).orElse(null));
+        given(cacheStore.getAny(OptionService.OPTIONS_KEY, Map.class)).willReturn(Optional.of(optionMap));
 
         // When
         Zone zone = optionService.getQnYunZone();
 
         // Then
-        then(optionRepository).should().findByKey(zoneProperty.getValue());
+        then(cacheStore).should().getAny(OptionService.OPTIONS_KEY, Map.class);
 
         assertNotNull(zone);
         assertThat(zone.getRegion(), equalTo(actualZone.getRegion()));
