@@ -209,13 +209,7 @@ public class InstallController {
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
         properties.put(BlogProperties.BLOG_URL, StringUtils.isBlank(installParam.getUrl()) ?
                 optionService.getBlogBaseUrl() : installParam.getUrl());
-        properties.put(PrimaryProperties.THEME, DEFAULT_THEME_ID);
         properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
-        properties.put(EmailProperties.ENABLED, Boolean.FALSE.toString());
-        properties.put(CommentProperties.NEW_NOTICE, Boolean.FALSE.toString());
-        properties.put(CommentProperties.PASS_NOTICE, Boolean.FALSE.toString());
-        properties.put(CommentProperties.REPLY_NOTICE, Boolean.FALSE.toString());
-        properties.put(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.LOCAL.name());
 
         // Create properties
         optionService.saveProperties(properties);

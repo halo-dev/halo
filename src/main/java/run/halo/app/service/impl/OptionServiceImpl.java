@@ -382,10 +382,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     private void cleanCache() {
-        cacheStore.delete(OptionService.OPTIONS_KEY);
+        cacheStore.delete(OPTIONS_KEY);
     }
 
     private void publishOptionUpdatedEvent() {
+        flush();
         cleanCache();
         eventPublisher.publishEvent(new OptionUpdatedEvent(this));
     }

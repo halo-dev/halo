@@ -87,14 +87,17 @@ public class FreemarkerConfigAwareListener {
 
     private void loadUserConfig() throws TemplateModelException {
         configuration.setSharedVariable("user", userService.getCurrentUser().orElse(null));
+        log.debug("Loaded user");
     }
 
     private void loadOptionsConfig() throws TemplateModelException {
         configuration.setSharedVariable("options", optionService.listOptions());
+        log.debug("Loaded options");
     }
 
     private void loadThemeConfig() throws TemplateModelException {
         configuration.setSharedVariable("theme", themeService.getActivatedTheme());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
+        log.debug("Loaded theme and settings");
     }
 }

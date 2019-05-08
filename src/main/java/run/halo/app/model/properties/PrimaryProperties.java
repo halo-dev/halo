@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
+
 /**
  * Primary properties.
  *
@@ -8,12 +10,11 @@ package run.halo.app.model.properties;
  */
 public enum PrimaryProperties implements PropertyEnum {
 
-    IS_INSTALLED("is_installed", Boolean.class, ""),
+    IS_INSTALLED("is_installed", Boolean.class, "false"),
 
-    THEME("theme", String.class, ""),
+    THEME("theme", String.class, DEFAULT_THEME_ID),
 
-    BIRTHDAY("birthday", Long.class, ""),
-    ;
+    BIRTHDAY("birthday", Long.class, "");
 
     private final String value;
 
