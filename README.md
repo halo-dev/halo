@@ -1,4 +1,4 @@
-<h1>Halo</h1>
+<h1 align="center"><a href="https://github.com/halo-dev" target="_blank">Halo</a></h1>
 
 > Halo 可能是最好的 Java 博客系统。（请注意，老版本已不提供维护，当前分支为新版本，正在内测中，将于近期发布版本）
 
