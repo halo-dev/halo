@@ -331,6 +331,8 @@ public class ThemeServiceImpl implements ThemeService {
         // Set activated theme
         setActivatedTheme(themeProperty);
 
+        optionService.flush();
+
         // Clear the cache
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
 

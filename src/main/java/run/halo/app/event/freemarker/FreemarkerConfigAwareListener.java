@@ -12,13 +12,10 @@ import org.springframework.stereotype.Component;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
-import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
 import run.halo.app.service.UserService;
-
-import java.util.Map;
 
 /**
  * Freemarker config aware listener.

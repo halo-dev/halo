@@ -221,6 +221,11 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
         return repository.saveAndFlush(domain);
     }
 
+    @Override
+    public void flush() {
+        repository.flush();
+    }
+
     /**
      * Updates by domains
      *
