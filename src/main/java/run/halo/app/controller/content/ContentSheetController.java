@@ -36,9 +36,9 @@ public class ContentSheetController {
      *
      * @return template path: themes/{theme}/gallery.ftl
      */
-    @GetMapping(value = "/gallery")
-    public String gallery() {
-        return themeService.render("gallery");
+    @GetMapping(value = "/photos")
+    public String photos() {
+        return themeService.render("photos");
     }
 
     /**
