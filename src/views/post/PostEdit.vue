@@ -271,7 +271,7 @@ export default {
         this.categories = response.data.data
       })
     },
-    createOrUpdatePost() {
+    createOrUpdatePost(createSuccess, updateSuccess) {
       // Set category ids
       this.postToStage.categoryIds = this.selectedCategoryIds
       // Set tag ids
@@ -281,16 +281,26 @@ export default {
         // Update the post
         postApi.update(this.postToStage.id, this.postToStage).then(response => {
           this.$log.debug('Updated post', response.data.data)
-          this.$message.success('文章更新成功')
+          if (updateSuccess) {
+            updateSuccess()
+          }
         })
       } else {
         // Create the post
         postApi.create(this.postToStage).then(response => {
           this.$log.debug('Created post', response.data.data)
-          this.$message.success('文章创建成功')
+          if (createSuccess) {
+            createSuccess()
+          }
           this.postToStage = response.data.data
         })
       }
+    },
+    savePost() {
+      this.createOrUpdatePost(() => this.$message.success('文章创建成功'), () => this.$message.success('文章更新成功'))
+    },
+    autoSavePost() {
+      this.createOrUpdatePost()
     },
     handleShowDrawer() {
       this.visible = true
@@ -331,24 +341,18 @@ export default {
     autoSaveTimer() {
       if (this.timer == null) {
         this.timer = setInterval(() => {
-          if (this.postToStage.title != null && this.postToStage.originalContent != null) {
-            this.postToStage.categoryIds = this.selectedCategoryIds
-            this.postToStage.tagIds = this.selectedTagIds
-
-            if (this.postToStage.id) {
-              postApi.update(this.postToStage.id, this.postToStage).then(response => {
-                this.$log.debug('Auto updated post', response.data.data)
-              })
-            } else {
-              postApi.create(this.postToStage).then(response => {
-                this.$log.debug('Auto saved post', response.data.data)
-                this.postToStage = response.data.data
-              })
-            }
-          }
+          this.autoSavePost()
         }, 15000)
       }
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.timer !== null) {
+      clearInterval(this.timer)
+    }
+    // Auto save the post
+    this.autoSavePost()
+    next()
   }
 }
 </script>
