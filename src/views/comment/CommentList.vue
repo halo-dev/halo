@@ -121,7 +121,7 @@
           <a
             slot="post"
             slot-scope="post"
-            :href="post.url"
+            :href="options.blog_url+'/archives/'+post.url"
             target="_blank"
           >{{ post.title }}</a>
           <span
@@ -240,6 +240,7 @@
 <script>
 import { PageView } from '@/layouts'
 import commentApi from '@/api/comment'
+import optionApi from '@/api/option'
 import marked from 'marked'
 
 const columns = [
@@ -302,7 +303,9 @@ export default {
       selectComment: {},
       replyComment: {},
       commentsLoading: false,
-      commentStatus: commentApi.commentStatus
+      commentStatus: commentApi.commentStatus,
+      options: [],
+      keys: ['blog_url']
     }
   },
   computed: {
@@ -316,6 +319,7 @@ export default {
   },
   created() {
     this.loadComments()
+    this.loadOptions()
   },
   methods: {
     loadComments(isSearch) {
@@ -331,6 +335,11 @@ export default {
         this.comments = response.data.data.content
         this.pagination.total = response.data.data.total
         this.commentsLoading = false
+      })
+    },
+    loadOptions() {
+      optionApi.listAll(this.keys).then(response => {
+        this.options = response.data.data
       })
     },
     handleEditComment(id) {

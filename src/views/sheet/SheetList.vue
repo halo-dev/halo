@@ -10,7 +10,7 @@
               </span>
 
               <!-- TODO 移动端展示 -->
-              <a-collapse
+              <!-- <a-collapse
                 :bordered="false"
                 v-if="isMobile()"
               >
@@ -27,14 +27,13 @@
                     操作：{{ item.url }}
                   </div>
                 </a-collapse-panel>
-              </a-collapse>
+              </a-collapse> -->
 
               <a-table
                 :columns="internalColumns"
                 :dataSource="internalPages"
                 :pagination="false"
                 :rowKey="page => page.id"
-                v-else
               >
                 <span
                   slot="action"
@@ -59,10 +58,7 @@
                     <a href="javascript:void(0);">编辑</a>
                   </router-link>
                   <a-divider type="vertical" />
-                  <a
-                    href="javascript:;"
-                    @click="handleViewPage(record.id)"
-                  >查看</a>
+                  <a :href="options.blog_url+record.url" target="_blank">查看</a>
                 </span>
               </a-table>
             </a-tab-pane>
@@ -144,6 +140,7 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import sheetApi from '@/api/sheet'
+import optionApi from '@/api/option'
 const internalColumns = [
   {
     title: '页面名称',
@@ -215,7 +212,9 @@ export default {
       internalColumns,
       customColumns,
       internalPages,
-      sheets: []
+      sheets: [],
+      options: [],
+      keys: ['blog_url']
     }
   },
   computed: {
@@ -228,11 +227,17 @@ export default {
   },
   created() {
     this.loadSheets()
+    this.loadOptions()
   },
   methods: {
     loadSheets() {
       sheetApi.list().then(response => {
         this.sheets = response.data.data.content
+      })
+    },
+    loadOptions() {
+      optionApi.listAll(this.keys).then(response => {
+        this.options = response.data.data
       })
     },
     handleEditClick(sheet) {
@@ -249,9 +254,6 @@ export default {
         this.$message.success('删除成功！')
         this.loadSheets()
       })
-    },
-    handleViewPage(id) {
-      this.$message.success('查看' + id)
     }
   }
 }
