@@ -149,6 +149,11 @@ public interface CrudService<DOMAIN, ID> {
     DOMAIN update(@NonNull DOMAIN domain);
 
     /**
+     * Flushes all pending changes to the database.
+     */
+    void flush();
+
+    /**
      * Updates by domains
      *
      * @param domains domains
