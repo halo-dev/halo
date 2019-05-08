@@ -22,6 +22,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.*;
 import run.halo.app.model.properties.*;
 import run.halo.app.model.support.BaseResponse;
+import run.halo.app.model.support.CreateCheck;
 import run.halo.app.service.*;
 import run.halo.app.utils.ValidationUtils;
 
@@ -77,7 +78,10 @@ public class InstallController {
     @PostMapping
     @ResponseBody
     @CacheLock
-    public BaseResponse<String> installBlog(@RequestBody @Valid InstallParam installParam) {
+    public BaseResponse<String> installBlog(@RequestBody InstallParam installParam) {
+        // Validate manually
+        ValidationUtils.validate(installParam, CreateCheck.class);
+
         // Check is installed
         boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
