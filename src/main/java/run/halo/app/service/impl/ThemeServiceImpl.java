@@ -353,7 +353,7 @@ public class ThemeServiceImpl implements ThemeService {
     public ThemeProperty upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
-        if (!HaloMediaType.isZipType(file.getContentType())) {
+        if (!StringUtils.endsWithIgnoreCase(file.getOriginalFilename(), ".zip")) {
             throw new UnsupportedMediaTypeException("Unsupported theme media type: " + file.getContentType()).setErrorData(file.getOriginalFilename());
         }
 
