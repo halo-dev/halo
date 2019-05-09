@@ -8,6 +8,7 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+    - $TRAVIS_BUILD_DIR/build/libs/
 dist: trusty
 jobs:
   include:
