@@ -93,7 +93,7 @@
                 </div>
                 <div id="comment_widget">
                     <#include "module/comment.ftl">
-                    <@comment id="${post.id}" type="post" />
+                    <@comment post="${post!}" type="post" />
                 </div>
             </div>
         </div>
