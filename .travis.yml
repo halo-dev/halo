@@ -1,8 +1,6 @@
 language: java
 jdk:
   - oraclejdk8
-env:
-  - HALO_VERSION="1.0.0.bata"
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
