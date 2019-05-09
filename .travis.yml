@@ -1,6 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
+env:
+  - HALO_VERSION="1.0.0.bata"
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -16,17 +18,17 @@ jobs:
       script: ./gradlew check
     - stage: build
       script: ./gradlew build -x test
-    - stage: build-docker-image
-      script:
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker build -t $DOCKER_USERNAME/halo .
-        - docker images
-        - docker push $DOCKER_USERNAME/halo
+    - stage: build-docker-image-for-release
+      script: ./scripts/docker-build-release.sh
+    - stage: build-docker-image-for-dev
+      script: ./scripts/docker-build-dev.sh
 stages:
   - test
   - build
-  - name: build-docker-image
+  - name: build-docker-image-for-release
     if: branch = master
+  - name: build-docker-image-for-dev
+    if: branch = dev
 branches:
   only:
     - master
