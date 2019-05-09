@@ -70,6 +70,7 @@ public class HaloMediaType extends MediaType {
      * @param mediaType media type
      * @return true if the given media type is zip type; false otherwise
      */
+    @Deprecated
     public static boolean isZipType(MediaType mediaType) {
         if (mediaType == null) {
             return false;
@@ -84,6 +85,7 @@ public class HaloMediaType extends MediaType {
      * @param contentType content type
      * @return true if the given content type is zip type; false otherwise
      */
+    @Deprecated
     public static boolean isZipType(String contentType) {
         if (StringUtils.isBlank(contentType)) {
             return false;

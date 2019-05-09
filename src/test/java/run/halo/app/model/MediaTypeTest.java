@@ -1,7 +1,9 @@
 package run.halo.app.model;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.http.MediaType;
+import run.halo.app.service.support.HaloMediaType;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
@@ -10,6 +12,7 @@ import static org.junit.Assert.*;
  * @author johnniang
  * @date 3/26/19
  */
+@Slf4j
 public class MediaTypeTest {
 
     @Test
@@ -41,5 +44,13 @@ public class MediaTypeTest {
 
         isInclude = mediaType.includes(MediaType.TEXT_HTML);
         assertFalse(isInclude);
+    }
+
+    @Test
+    public void zipTest() {
+        MediaType mediaType = MediaType.valueOf("application/x-zip-compressed");
+        log.debug("Zip type: [{}]", mediaType);
+
+        assertFalse(HaloMediaType.isZipType(mediaType));
     }
 }
