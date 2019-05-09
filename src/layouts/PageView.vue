@@ -113,33 +113,4 @@ export default {
       }
     }
   }
-  .page-menu-search {
-    text-align: center;
-    margin-bottom: 16px;
-  }
-  .page-menu-tabs {
-    margin-top: 48px;
-  }
-
-  .extra-img {
-    margin-top: -60px;
-    text-align: center;
-    width: 195px;
-
-    img {
-      width: 100%;
-    }
-  }
-
-  .mobile {
-    .extra-img{
-      margin-top: 0;
-      text-align: center;
-      width: 96px;
-
-      img{
-        width: 100%;
-      }
-    }
-  }
 </style>

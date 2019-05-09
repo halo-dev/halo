@@ -180,6 +180,7 @@
       >
         <a-card
           :bordered="false"
+          :loading="writeLoading"
           :bodyStyle="{ padding: '16px' }"
         >
           <template slot="title">
@@ -350,6 +351,7 @@ export default {
     return {
       logType: logApi.logType,
       activityLoading: true,
+      writeLoading: true,
       logLoading: true,
       countsLoading: true,
       logDrawerVisiable: false,
@@ -413,6 +415,7 @@ export default {
       commentApi.listLatest(5, 'PUBLISHED').then(response => {
         this.commentData = response.data.data
         this.activityLoading = false
+        this.writeLoading = false
       })
     },
     listLatestLogs() {
