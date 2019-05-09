@@ -26,7 +26,7 @@ stages:
   - test
   - build
   - name: build-docker-image
-    if: branch = master OR branch = dev
+    if: branch = master
 branches:
   only:
     - master
