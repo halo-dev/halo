@@ -316,11 +316,11 @@ export default {
     },
     handlePublishClick() {
       this.postToStage.status = 'PUBLISHED'
-      this.createOrUpdatePost()
+      this.savePost()
     },
     handleDraftClick() {
       this.postToStage.status = 'DRAFT'
-      this.createOrUpdatePost()
+      this.savePost()
     },
     handlerRemoveThumb() {
       this.postToStage.thumbnail = null
