@@ -22,20 +22,20 @@ public class CategoryParam implements InputConverter<Category> {
     /**
      * Category name.
      */
-    @NotBlank(message = "Category name must not be blank")
-    @Size(max = 50, message = "Length of category name must not be more than {max}")
+    @NotBlank(message = "分类名称不能为空")
+    @Size(max = 50, message = "分类名称的字符长度不能超过 {max}")
     private String name;
 
     /**
      * Category slug name.
      */
-    @Size(max = 50, message = "Length of category slug name must not be more than {max}")
+    @Size(max = 50, message = "分类别名的字符长度不能超过 {max}")
     private String slugName;
 
     /**
      * Category description.
      */
-    @Size(max = 100, message = "Length of category description must not be more than {max}")
+    @Size(max = 100, message = "分类描述的字符长度不能超过 {max}")
     private String description;
 
     /**

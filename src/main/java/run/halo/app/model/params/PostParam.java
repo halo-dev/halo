@@ -23,25 +23,25 @@ import java.util.Set;
 @Data
 public class PostParam implements InputConverter<Post> {
 
-    @NotBlank(message = "Title must not be blank")
-    @Size(max = 100, message = "Length of title must not be more than {max}")
+    @NotBlank(message = "文章标题不能为空")
+    @Size(max = 100, message = "文章标题的字符长度不能超过 {max}")
     private String title;
 
     private PostStatus status = PostStatus.DRAFT;
 
     private String url;
 
-    @NotBlank(message = "Original content must not be blank")
+    @NotBlank(message = "文章内容不能为空")
     private String originalContent;
 
     private String summary;
 
-    @Size(max = 255, message = "Length of thumbnail must not be more than {max}")
+    @Size(max = 255, message = "文章缩略图链接的字符长度不能超过 {max}")
     private String thumbnail;
 
     private Boolean disallowComment = false;
 
-    @Size(max = 255, message = "Length of password must not be more than {max}")
+    @Size(max = 255, message = "文章密码的字符长度不能超过 {max}")
     private String password;
 
     @Size(max = 255, message = "Length of template must not be more than {max}")

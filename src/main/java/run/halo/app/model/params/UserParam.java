@@ -21,27 +21,27 @@ import javax.validation.constraints.Size;
 @Data
 public class UserParam implements InputConverter<User> {
 
-    @NotBlank(message = "Username must not be blank", groups = {AllCheck.class})
-    @Size(max = 50, message = "Length of username must not be more than {max}", groups = {AllCheck.class})
+    @NotBlank(message = "用户名不能为空", groups = {AllCheck.class})
+    @Size(max = 50, message = "用户名的字符长度不能超过 {max}", groups = {AllCheck.class})
     private String username;
 
-    @NotBlank(message = "Nickname must not be blank", groups = {AllCheck.class})
-    @Size(max = 255, message = "Length of nickname must not be more than {max}", groups = {AllCheck.class})
+    @NotBlank(message = "用户昵称不能为空", groups = {AllCheck.class})
+    @Size(max = 255, message = "用户昵称的字符长度不能超过 {max}", groups = {AllCheck.class})
     private String nickname;
 
-    @Email(message = "The email format is incorrect", groups = {AllCheck.class})
-    @NotBlank(message = "Email must not be blank", groups = {AllCheck.class})
-    @Size(max = 127, message = "Length of email must not be more than {max}", groups = {AllCheck.class})
+    @Email(message = "电子邮件地址的格式不正确", groups = {AllCheck.class})
+    @NotBlank(message = "电子邮件地址不能为空", groups = {AllCheck.class})
+    @Size(max = 127, message = "电子邮件的字符长度不能超过 {max}", groups = {AllCheck.class})
     private String email;
 
     @Null(groups = UpdateCheck.class)
-    @Size(min = 8, max = 100, message = "Length of password must be between {min} and {max}", groups = {CreateCheck.class})
+    @Size(min = 8, max = 100, message = "密码的字符长度必须在 {min} - {max} 之间", groups = {CreateCheck.class})
     private String password;
 
-    @Size(max = 1023, message = "Length of avatar link must not be more than {max}", groups = {AllCheck.class})
+    @Size(max = 1023, message = "头像链接地址的字符长度不能超过 {max}", groups = {AllCheck.class})
     private String avatar;
 
-    @Size(max = 1023, message = "Length of description must not be more than {max}", groups = {AllCheck.class})
+    @Size(max = 1023, message = "用户描述的字符长度不能超过 {max}", groups = {AllCheck.class})
     private String description;
 
 }
