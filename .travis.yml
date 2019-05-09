@@ -1,15 +1,20 @@
 language: java
 jdk:
   - oraclejdk8
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - .autoconf
-    - $HOME/.m2
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 script:
-  - mvn clean package -Pci
+  - ./gradlew check
+  - ./gradlew clean build -x test
 branches:
   only:
     - master
+    - dev
 notifications:
   webhooks:
     - https://fathomless-fjord-24024.herokuapp.com/notify
