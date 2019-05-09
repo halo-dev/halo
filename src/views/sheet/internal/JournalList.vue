@@ -84,9 +84,9 @@
                       />{{ item.commentCount }}
                     </a>
                   </span>
-                  <span>
+                  <!-- <span>
                     From 微信
-                  </span>
+                  </span> -->
                 </template>
                 <template slot="extra">
                   <a
