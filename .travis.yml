@@ -8,9 +8,19 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-script:
-  - ./gradlew check
-  - ./gradlew clean build -x test
+dist: trusty
+jobs:
+  include:
+    - stage: test
+      script: ./gradlew check
+    - stage: build
+      script: ./gradlew build -x test
+    - stage: build docker image
+      scrip:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker build -t $DOCKER_USERNAME/halo .
+        - docker images
+        - docker push $DOCKER_USERNAME/halo
 branches:
   only:
     - master
