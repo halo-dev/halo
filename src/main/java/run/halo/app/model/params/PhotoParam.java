@@ -16,7 +16,7 @@ import java.util.Date;
 @Data
 public class PhotoParam implements InputConverter<Photo> {
 
-    @NotBlank(message = "Photo name must not be blank")
+    @NotBlank(message = "照片名称不能为空")
     private String name;
 
     private String description;
@@ -25,10 +25,10 @@ public class PhotoParam implements InputConverter<Photo> {
 
     private String location;
 
-    @NotBlank(message = "Photo thumbnail must not be blank")
+    @NotBlank(message = "照片缩略图链接地址不能为空")
     private String thumbnail;
 
-    @NotBlank(message = "Photo url must not be blank")
+    @NotBlank(message = "照片链接地址不能为空")
     private String url;
 
     private String team;

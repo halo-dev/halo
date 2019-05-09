@@ -17,22 +17,22 @@ import javax.validation.constraints.Size;
 @Data
 public class LinkParam implements InputConverter<Link> {
 
-    @NotBlank(message = "Link name must not be blank")
-    @Size(max = 255, message = "Length of link name must not be more than {max}")
+    @NotBlank(message = "友情链接名称不能为空")
+    @Size(max = 255, message = "友情链接名称的字符长度不能超过 {max}")
     private String name;
 
-    @NotBlank(message = "Link url must not be blank")
-    @Size(max = 1023, message = "Length of link url must not be more than {max}")
-    @URL(message = "Link url format is incorrect")
+    @NotBlank(message = "友情链接地址不能为空")
+    @Size(max = 1023, message = "友情链接地址的字符长度不能超过 {max}")
+    @URL(message = "友情链接地址格式不正确")
     private String url;
 
-    @Size(max = 1023, message = "Length of link logo must not be more than {max}")
+    @Size(max = 1023, message = "友情链接 Logo 的字符长度不能超过 {max}")
     private String logo;
 
-    @Size(max = 255, message = "Length of link description must not be more than {max}")
+    @Size(max = 255, message = "友情链接描述的字符长度不能超过 {max}")
     private String description;
 
-    @Size(max = 255, message = "Length of link team must not be more than {max}")
+    @Size(max = 255, message = "友情链接分组的字符长度 {max}")
     private String team;
 
 }
