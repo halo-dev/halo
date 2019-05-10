@@ -125,4 +125,12 @@ public interface UserService extends CrudService<User, Integer> {
      * @return true if the given password is match the user password; false otherwise
      */
     boolean passwordMatch(@NonNull User user, @Nullable String plainPassword);
+
+    /**
+     * Set user password.
+     *
+     * @param user          user must not be null
+     * @param plainPassword plain password must not be blank
+     */
+    void setPassword(@NonNull User user, @NonNull String plainPassword);
 }
