@@ -42,7 +42,7 @@
                 <a-form layout="vertical">
                   <a-form-item
                     label="页面路径："
-                    :help="'https://localhost:8090/s/'+ (sheetToStage.url ? sheetToStage.url : '{auto_generate}')"
+                    :help="options.blog_url+'/s/'+ (sheetToStage.url ? sheetToStage.url : '{auto_generate}')"
                   >
                     <a-input v-model="sheetToStage.url" />
                   </a-form-item>
@@ -135,6 +135,7 @@ import { toolbars } from '@/core/const'
 import 'mavon-editor/dist/css/index.css'
 import sheetApi from '@/api/sheet'
 import themeApi from '@/api/theme'
+import optionApi from '@/api/option'
 export default {
   components: {
     mavonEditor,
@@ -156,11 +157,14 @@ export default {
       sheetSettingVisible: false,
       customTpls: [],
       sheetToStage: {},
-      timer: null
+      timer: null,
+      options: [],
+      keys: ['blog_url']
     }
   },
   created() {
     this.loadCustomTpls()
+    this.loadOptions()
     clearInterval(this.timer)
     this.timer = null
     this.autoSaveTimer()
@@ -194,6 +198,11 @@ export default {
     loadCustomTpls() {
       themeApi.customTpls().then(response => {
         this.customTpls = response.data.data
+      })
+    },
+    loadOptions() {
+      optionApi.listAll(this.keys).then(response => {
+        this.options = response.data.data
       })
     },
     handlePublishClick() {

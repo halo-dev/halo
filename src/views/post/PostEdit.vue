@@ -38,7 +38,7 @@
             <a-form layout="vertical">
               <a-form-item
                 label="文章路径："
-                :help="'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
+                :help="options.blog_url+'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
               >
                 <a-input v-model="postToStage.url" />
               </a-form-item>
@@ -202,6 +202,7 @@ import 'mavon-editor/dist/css/index.css'
 import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
+import optionApi from '@/api/option'
 export default {
   components: {
     TagSelect,
@@ -231,12 +232,15 @@ export default {
       selectedTagIds: [],
       postToStage: {},
       categoryToCreate: {},
-      timer: null
+      timer: null,
+      options: [],
+      keys: ['blog_url']
     }
   },
   created() {
     this.loadTags()
     this.loadCategories()
+    this.loadOptions()
     clearInterval(this.timer)
     this.timer = null
     this.autoSaveTimer()
@@ -277,6 +281,11 @@ export default {
     loadCategories() {
       categoryApi.listAll().then(response => {
         this.categories = response.data.data
+      })
+    },
+    loadOptions() {
+      optionApi.listAll(this.keys).then(response => {
+        this.options = response.data.data
       })
     },
     createOrUpdatePost(createSuccess, updateSuccess) {
