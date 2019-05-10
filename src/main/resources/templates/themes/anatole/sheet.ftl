@@ -73,7 +73,7 @@
                 </div>
                 <div id="comment_widget">
                     <#include "module/comment.ftl">
-                    <@comment post="${sheet!}" type="sheet" />
+                    <@comment post=sheet type="sheet" />
                 </div>
             </div>
         </div>
