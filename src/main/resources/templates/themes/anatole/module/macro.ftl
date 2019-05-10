@@ -10,23 +10,23 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="renderer" content="webkit">
-    <meta name="theme-color" content="${options.anatole_style_google_color!'#fff'}">
-    <meta name="author" content="${user.userDisplayName!}" />
+    <meta name="theme-color" content="${settings.google_color!'#fff'}">
+    <meta name="author" content="${user.nickname!}" />
     <meta name="keywords" content="${keywords!}"/>
     <meta name="description" content="${description!}" />
-    <@verification></@verification>
-    <@favicon></@favicon>
-    <link href="/anatole/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/anatole/source/css/blog_basic.min.css?version=88107691fe">
-    <link href="/anatole/source/css/style.min.css" type="text/css" rel="stylesheet" />
-    <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/feed.xml">
+    <@verification />
+    <@favicon />
+    <link href="/${theme.folderName}/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/${theme.folderName}/source/css/blog_basic.min.css?version=88107691fe">
+    <link href="/${theme.folderName}/source/css/style.min.css" type="text/css" rel="stylesheet" />
+    <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml">
     <style>
-        <#if (options.anatole_style_post_title_lower!'true') == "false">
+        <#if !settings.post_title_uppper!true>
         .post .post-title h3 {
             text-transform: none;
         }
         </#if>
-        <#if (options.anatole_style_blog_title_lower!'true') == "false">
+        <#if !settings.blog_title_uppper!true>
         .sidebar .logo-title .title h3 {
             text-transform: none;
         }
@@ -37,18 +37,18 @@
             background-color: #eee;
         }
         ::-webkit-scrollbar-thumb {
-            background-color: ${options.anatole_style_scrollbar!'#3798e8'};
+            background-color: ${settings.scrollbar!'#3798e8'};
         }
         ::-webkit-scrollbar-track {
             background-color: #eee;
         }
-        ${options.anatole_style_self!}
+        ${settings.custom!}
     </style>
 </head>
 <body>
 </#macro>
 <#macro footer>
-<script type="text/javascript" src="/anatole/source/js/jquery.min.js"></script>
+<script type="text/javascript" src="/${theme.folderName}/source/js/jquery.min.js"></script>
 <script type="text/javascript">
     var url = location.href;
     var urlstatus = false;
@@ -64,7 +64,7 @@
         $(".nav li a").eq(0).addClass('current');
     }
 
-    <#if (options.anatole_style_hitokoto!'false')=="true">
+    <#if settings.hitokoto!false>
 	  var xhr = new XMLHttpRequest();
 	  xhr.open('get', 'https://v1.hitokoto.cn');
 	  xhr.onreadystatechange = function () {
@@ -77,7 +77,7 @@
 	  xhr.send();
     </#if>
 </script>
-<@statistics></@statistics>
+<@statistics />
 </body>
 </html>
 </#macro>

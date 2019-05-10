@@ -1,12 +1,12 @@
 <div class="page-top animated fadeInDown">
     <div class="nav">
-        <@commonTag method="menus">
-            <#list menus?sort_by('menuSort') as menu>
+        <@menuTag method="list">
+            <#list menus?sort_by('priority') as menu>
                 <li>
-                    <a href="${menu.menuUrl}" target="${menu.menuTarget!}">${menu.menuName} </a>
+                    <a href="${menu.url}" target="${menu.target!}">${menu.name} </a>
                 </li>
             </#list>
-        </@commonTag>
+        </@menuTag>
     </div>
     <div class="information">
         <div class="back_btn">
@@ -15,7 +15,7 @@
             </li>
         </div>
         <div class="avatar">
-            <img src="${options.anatole_style_right_icon!'/anatole/source/images/logo.png'}" />
+            <img src="${settings.icon!'/${theme.folderName}/source/images/logo.png'}" />
         </div>
     </div>
 </div>

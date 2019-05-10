@@ -1,17 +1,14 @@
-FROM maven:3-jdk-8-alpine
-LABEL maintainer="Ryan Wang<i@ryanc.cc>"
+FROM openjdk:8-jdk-alpine
 
-WORKDIR /opt/halo
-ADD . /tmp
-ENV TZ=Asia/Shanghai \
-DB_USER="admin" \
-DB_PASSWORD="123456"
+VOLUME /tmp
 
-RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
+ARG JAR_FILE=build/libs/halo-1.0.0.bata.jar
+ARG PORT=8090
 
-RUN cd /tmp && mvn package -Pci && mv target/dist/halo/* /opt/halo/ \
-    && rm -rf /tmp/* && rm -rf ~/.m2
+ENV TZ=Asia/Shanghai
 
-EXPOSE 8090
+COPY ${JAR_FILE} halo.jar
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/opt/halo/halo-latest.jar","--spring.datasource.username=${DB_USER}","--spring.datasource.password=${DB_PASSWORD}"]
+EXPOSE ${PORT}
+
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","halo.jar"]

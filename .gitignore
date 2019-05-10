@@ -1,6 +1,14 @@
+### Maven
 target/
 logs/
 !.mvn/wrapper/maven-wrapper.jar
+
+### Gradle
+.gradle
+/build/
+/out/
+!gradle/wrapper/gradle-wrapper.jar
+bin/
 
 ### STS ###
 .apt_generated
@@ -33,3 +41,30 @@ nbdist/
 ### VS Code ###
 *.project
 *.factorypath
+
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+### VSCode
+.vscode
+
+### Halo
+admin/
+

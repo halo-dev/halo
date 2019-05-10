@@ -1,0 +1,116 @@
+sns:
+  label: 社交资料
+  items:
+    rss:
+      name: rss
+      label: RSS
+      type: radio
+      data-type: bool
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+    twitter:
+      name: twitter
+      label: Twitter
+      type: text
+    facebook:
+      name: facebook
+      label: Facebook
+      type: text
+    instagram:
+      name: instagram
+      label: Instagram
+      type: text
+    dribbble:
+      name: dribbble
+      label: Dribbble
+      type: text
+    weibo:
+      name: weibo
+      label: 微博
+      type: text
+    email:
+      name: email
+      label: Email
+      type: text
+    github:
+      name: github
+      label: Github
+      type: text
+    qq:
+      name: qq
+      label: QQ
+      type: text
+    telegram:
+      name: telegram
+      label: Telegram
+      type: text
+style:
+  label: 样式设置
+  items:
+    icon:
+      name: icon
+      label: 右上角图标
+      type: text
+      default: '/anatole/source/images/logo.png'
+    post_title_uppper:
+      name: post_title_uppper
+      label: 文章标题大写
+      type: radio
+      data-type: bool
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+    blog_title_uppper:
+      name: blog_title_uppper
+      label: 博客标题大写
+      type: radio
+      data-type: bool
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+    avatar_circle:
+      name: avatar_circle
+      label: 圆形头像
+      type: radio
+      data-type: bool
+      default: true
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+    hitokoto:
+      name: hitokoto
+      label: 博客描述开启一言
+      type: radio
+      data-type: bool
+      default: false
+      options:
+        - value: true
+          label: 开启
+        - value: false
+          label: 关闭
+    google_color:
+      name: google_color
+      label: 浏览器沉浸颜色
+      type: text
+      default: '#fff'
+    scrollbar:
+      name: scrollbar
+      label: 全局滚动条颜色
+      type: text
+      default: '#3798e8'
+    custom:
+      name: custom
+      label: 自定义样式
+      type: textarea

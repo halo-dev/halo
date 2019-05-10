@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="归档 · ${options.blog_title!'Anatole'}" keywords="文章归档,${options.seo_keywords!'Anatole'}" description="${options.seo_desc!'Anatole'}"></@head>
+<@head title="归档 · ${options.blog_title!'Anatole'}" keywords="文章归档,${options.seo_keywords!'Anatole'}" description="${options.seo_description!'Anatole'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <#include "module/page-top.ftl">
@@ -7,23 +7,23 @@
         <div class="content">
             <div class="archive animated fadeInDown">
                 <ul class="list-with-title">
-                    <@articleTag method="archivesLess">
-                        <#list archivesLess as archive>
-                            <div class="listing-title">${archive.year}</div>
+                    <@postTag method="archiveYear">
+                        <#list archives as archive>
+                            <div class="listing-title">${archive.year?c}</div>
                             <ul class="listing">
-                                <#list archive.posts?sort_by("postDate")?reverse as post>
+                                <#list archive.posts?sort_by("createTime")?reverse as post>
                                     <div class="listing-item">
                                         <div class="listing-post">
-                                            <a href="${options.blog_url!}/archives/${post.postUrl!}" title="${post.postTitle!}">${post.postTitle!}</a>
+                                            <a href="${options.blog_url!}/archives/${post.url!}" title="${post.title!}">${post.title!}</a>
                                             <div class="post-time">
-                                                <span class="date">${post.postDate?string("yyyy-MM-dd")}</span>
+                                                <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </#list>
                             </ul>
                         </#list>
-                    </@articleTag>
+                    </@postTag>
                 </ul>
             </div>
         </div>

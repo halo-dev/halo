@@ -1,0 +1,56 @@
+version: "3.7"
+services:
+
+  nginx:
+    image: nginx
+    container_name: halo-nginx
+    hostname: halo-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/conf.d:/etc/nginx/conf.d
+      - /etc/nginx/vhost.d:/etc/nginx/vhost.d
+      - /usr/share/nginx/html:/usr/share/nginx/html
+      - /etc/nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - halo
+
+  halo:
+    image: ruibaby/halo
+    container_name: halo
+    hostname: halo
+    restart: always
+    ports:
+      - "8090:8090"
+    expose:
+      - "8090"
+    env_file:
+      - ./halo.env
+    volumes:
+      - ~/halo:/root/halo
+
+  docker-gen:
+    image: jwilder/docker-gen
+    container_name: docker-gen
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - /etc/nginx/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
+    volumes_from:
+      - nginx
+    entrypoint: /usr/local/bin/docker-gen -notify-sighup nginx -watch -wait 5s:30s
+      /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+
+  letsencrypt-nginx-proxy-companion:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt-nginx-proxy-companion
+    volumes_from:
+      - nginx
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/certs:/etc/nginx/certs:rw
+    environment:
+      - NGINX_DOCKER_GEN_CONTAINER=docker-gen

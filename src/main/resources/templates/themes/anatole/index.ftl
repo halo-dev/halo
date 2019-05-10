@@ -1,5 +1,5 @@
 <#include "module/macro.ftl">
-<@head title="${options.blog_title!'Anatole'}" keywords="${options.seo_keywords!'Anatole'}" description="${options.seo_desc!'Anatole'}"></@head>
+<@head title="${options.blog_title!'Anatole'}" keywords="${options.seo_keywords!'Anatole'}" description="${options.seo_description!'Anatole'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
     <#include "module/page-top.ftl">
@@ -21,9 +21,9 @@
                             </#if>
                         </#if>
                         <#if posts.hasNext()>
-                        <li class="next pagbuttons">
-                            <a class="btn" role="navigation" href="${options.blog_url!}/page/${posts.number+2}">下一页</a>
-                        </li>
+                            <li class="next pagbuttons">
+                                <a class="btn" role="navigation" href="${options.blog_url!}/page/${posts.number+2}">下一页</a>
+                            </li>
                         </#if>
                     </ul>
                 </div>

@@ -1,0 +1,116 @@
+package run.halo.app.service;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
+import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.vo.ArchiveMonthVO;
+import run.halo.app.model.vo.ArchiveYearVO;
+import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.base.BasePostService;
+
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Post service.
+ *
+ * @author johnniang
+ * @author ryanwang
+ */
+public interface PostService extends BasePostService<Post> {
+
+    /**
+     * Pages posts.
+     *
+     * @param postQuery post query must not be null
+     * @param pageable  page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<Post> pageBy(@NonNull PostQuery postQuery, @NonNull Pageable pageable);
+
+    /**
+     * Pages post by keyword
+     *
+     * @param keyword  keyword
+     * @param pageable pageable
+     * @return a page of post
+     */
+    @NonNull
+    Page<Post> pageBy(@NonNull String keyword, @NonNull Pageable pageable);
+
+    /**
+     * Creates post by post param.
+     *
+     * @param post        post must not be null
+     * @param tagIds      tag id set
+     * @param categoryIds category id set
+     * @return post created
+     */
+    @NonNull
+    @Transactional
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds);
+
+    /**
+     * Updates post by post, tag id set and category id set.
+     *
+     * @param postToUpdate post to update must not be null
+     * @param tagIds       tag id set
+     * @param categoryIds  category id set
+     * @return updated post
+     */
+    @NonNull
+    @Transactional
+    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds);
+
+    /**
+     * Gets post by post status and url.
+     *
+     * @param status post status must not be null
+     * @param url    post url must not be blank
+     * @return post info
+     */
+    @NonNull
+    @Override
+    Post getBy(@NonNull PostStatus status, @NonNull String url);
+
+    /**
+     * Lists year archives.
+     *
+     * @return a list of year archive
+     */
+    @NonNull
+    List<ArchiveYearVO> listYearArchives();
+
+    /**
+     * Lists month archives.
+     *
+     * @return a list of month archive
+     */
+    @NonNull
+    List<ArchiveMonthVO> listMonthArchives();
+
+    /**
+     * Converts to detail vo.
+     *
+     * @param post post must not be null
+     * @return post detail vo
+     */
+    @NonNull
+    PostDetailVO convertToDetailVo(@NonNull Post post);
+
+    /**
+     * Converts to a page of post list vo.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post list vo
+     */
+    @NonNull
+    Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
+
+}
