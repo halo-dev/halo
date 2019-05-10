@@ -32,6 +32,14 @@ branches:
     - master
     - dev
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+deploy:
+  provider: releases
+  api_key:
+    secure: $GITHUB_OAUTH_TOKEN
+  file: build/libs/*
+  skip_cleanup: true
+  on:
+    tags: true
 notifications:
   webhooks:
     - https://fathomless-fjord-24024.herokuapp.com/notify
