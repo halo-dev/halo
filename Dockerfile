@@ -2,7 +2,7 @@ FROM openjdk:8-jdk-alpine
 
 VOLUME /tmp
 
-ARG JAR_FILE=build/libs/halo-1.0.0.beta.jar
+ARG JAR_FILE=build/libs/halo.jar
 ARG PORT=8090
 ARG TIME_ZONE=Asia/Shanghai
 
