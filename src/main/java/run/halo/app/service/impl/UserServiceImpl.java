@@ -252,7 +252,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         return updatedUser;
     }
 
-    private void setPassword(@NonNull User user, @NonNull String plainPassword) {
+    @Override
+    public void setPassword(@NonNull User user, @NonNull String plainPassword) {
         Assert.notNull(user, "User must not be null");
         Assert.hasText(plainPassword, "Plain password must not be blank");
 
