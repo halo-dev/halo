@@ -4,7 +4,7 @@ const baseUrl = '/api/admin/mails'
 
 const mailApi = {}
 
-mailApi.test = mailData => {
+mailApi.testMail = mailData => {
   return service({
     url: `${baseUrl}/test`,
     method: 'post',
