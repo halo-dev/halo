@@ -24,9 +24,14 @@ stages:
   - test
   - build
   - name: build-docker-image-for-release
-    if: branch = master AND tag IS present
+    if: tag = /^v\d+\.\d+\.\d+$/
   - name: build-docker-image-for-dev
-    if: branch = dev AND tag IS present
+    if: tag = /^v\d+\.\d+\.\d+.(beta|alpha).*$/
+branches:
+  only:
+    - master
+    - dev
+    - /^v\d+\.\d+\.\d+.*$/
 notifications:
   webhooks:
     - https://fathomless-fjord-24024.herokuapp.com/notify
