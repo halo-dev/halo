@@ -25,6 +25,7 @@ jobs:
       deploy:
         provider: releases
         api_key: $GITHUB_OAUTH_TOKEN
+        file_glob: true
         file: $TRAVIS_BUILD_DIR/build/libs/*
         skip_cleanup: true
         on:
