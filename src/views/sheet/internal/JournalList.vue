@@ -192,7 +192,7 @@
       closable
       :visible="commentVisiable"
       destroyOnClose
-      @close="onCommentDrawerClose"
+      @close="()=>this.commentVisiable = false"
     >
       <a-row
         type="flex"
@@ -352,9 +352,6 @@ export default {
     resetParam() {
       this.queryParam.keyword = null
       this.loadJournals()
-    },
-    onCommentDrawerClose() {
-      this.commentVisiable = false
     }
   }
 }

@@ -213,7 +213,7 @@
         >保存</a-button>
         <a-button
           type="dashed"
-          @click="handleShowAttachDrawer"
+          @click="()=>this.attachmentDrawerVisible = true"
           style="margin-left: 8px;"
         >附件库</a-button>
       </footer-tool-bar>
@@ -236,7 +236,7 @@
             <a
               rel="noopener noreferrer"
               href="javascript:void(0);"
-              @click="handleShowUploadModal"
+              @click="()=>this.uploadVisible = true"
             >安装主题</a>
           </a-menu-item>
           <a-menu-item>
@@ -381,12 +381,6 @@ export default {
       this.optionLoading = false
       this.themeConfiguration = null
       this.themeProperty = null
-    },
-    handleShowUploadModal() {
-      this.uploadVisible = true
-    },
-    handleShowAttachDrawer() {
-      this.attachmentDrawerVisible = true
     },
     handleChange(info) {
       const status = info.file.status
