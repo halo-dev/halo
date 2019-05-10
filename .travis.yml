@@ -24,9 +24,9 @@ stages:
   - test
   - build
   - name: build-docker-image-for-release
-    if: tag IS present
+    if: branch = master AND tag IS present
   - name: build-docker-image-for-dev
-    if: branch = dev
+    if: branch = dev AND tag IS present
 branches:
   only:
     - master
