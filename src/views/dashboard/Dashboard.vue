@@ -155,7 +155,7 @@
                       <template slot="actions">
                         <span @click="handleCommentReplyClick(item)">回复</span>
                       </template>
-                      <p slot="content" v-html="item.content"></p>
+                      <p class="comment-content-wrapper" slot="content" v-html="item.content"></p>
                       <a-tooltip
                         slot="datetime"
                         :title="item.createTime | moment"

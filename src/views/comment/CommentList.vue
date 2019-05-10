@@ -106,6 +106,7 @@
           :pagination="false"
         >
           <p
+            class="comment-content-wrapper"
             slot="content"
             slot-scope="content"
             v-html="content"
