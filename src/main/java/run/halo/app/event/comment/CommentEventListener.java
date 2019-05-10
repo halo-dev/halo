@@ -74,6 +74,8 @@ public class CommentEventListener {
             // Get postComment id
             PostComment postComment = postCommentService.getById(newEvent.getCommentId());
 
+            log.debug("Got post comment: [{}]", postComment);
+
             Post post = postService.getById(postComment.getPostId());
 
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
@@ -86,6 +88,8 @@ public class CommentEventListener {
         } else if (newEvent.getSource() instanceof SheetService) {
             SheetComment sheetComment = sheetCommentService.getById(newEvent.getCommentId());
 
+            log.debug("Got sheet comment: [{}]", sheetComment);
+
             Sheet sheet = sheetService.getById(sheetComment.getPostId());
 
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
@@ -97,6 +101,8 @@ public class CommentEventListener {
             data.put("content", sheetComment.getContent());
         } else if (newEvent.getSource() instanceof JournalService) {
             JournalComment journalComment = journalCommentService.getById(newEvent.getCommentId());
+
+            log.debug("Got journal comment: [{}]", journalComment);
 
             Journal journal = journalService.getById(journalComment.getPostId());
 
@@ -133,7 +139,7 @@ public class CommentEventListener {
 
         Map<String, Object> data = new HashMap<>();
 
-        log.debug("replyEvent.getSource():"+replyEvent.getSource().toString());
+        log.debug("replyEvent.getSource():" + replyEvent.getSource().toString());
 
         if (replyEvent.getSource() instanceof PostCommentService) {
 

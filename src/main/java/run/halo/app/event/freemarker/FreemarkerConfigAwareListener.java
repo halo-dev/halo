@@ -49,7 +49,6 @@ public class FreemarkerConfigAwareListener {
         this.userService = userService;
     }
 
-    @Async
     @EventListener
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     public void onApplicationStartedEvent(ApplicationStartedEvent applicationStartedEvent) throws TemplateModelException {
@@ -60,7 +59,6 @@ public class FreemarkerConfigAwareListener {
         loadUserConfig();
     }
 
-    @Async
     @EventListener
     public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent) throws TemplateModelException {
         log.debug("Received theme activated event");
@@ -68,7 +66,6 @@ public class FreemarkerConfigAwareListener {
         loadThemeConfig();
     }
 
-    @Async
     @EventListener
     public void onUserUpdate(UserUpdatedEvent event) throws TemplateModelException {
         log.debug("Received user updated event, user id: [{}]", event.getUserId());
@@ -76,7 +73,6 @@ public class FreemarkerConfigAwareListener {
         loadUserConfig();
     }
 
-    @Async
     @EventListener
     public void onOptionUpdate(OptionUpdatedEvent event) throws TemplateModelException {
         log.debug("Received option updated event");
