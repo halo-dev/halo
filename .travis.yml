@@ -24,14 +24,14 @@ stages:
   - test
   - build
   - name: build-docker-image-for-release
-    if: tag =~ /^v\d+\.\d+\.\d+$/
+    if: tag =~ /^v\d+\.\d+(\.\d+)?(-release)?$/
   - name: build-docker-image-for-dev
-    if: tag =~ /^v\d+\.\d+\.\d+\.-(beta|alpha).*$/
+    if: tag =~ /^v\d+\.\d+(\.\d+)?-(beta|alpha)+(\.\d+)?$/
 branches:
   only:
     - master
     - dev
-    - /^v\d+\.\d+\.\d+.*$/
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 notifications:
   webhooks:
     - https://fathomless-fjord-24024.herokuapp.com/notify
