@@ -1,6 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
-const GenerateAssetPlugin = require('generate-asset-webpack-plugin')
+// const GenerateAssetPlugin = require('generate-asset-webpack-plugin')
 
 function resolve(dir) {
   return path.join(__dirname, dir)

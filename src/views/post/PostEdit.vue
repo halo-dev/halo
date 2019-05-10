@@ -28,8 +28,8 @@
       :width="isMobile()?'100%':'460'"
       placement="right"
       closable
-      @close="onClose"
-      :visible="visible"
+      @close="()=>this.postSettingVisible=false"
+      :visible="postSettingVisible"
     >
       <div class="post-setting-drawer-content">
         <div :style="{ marginBottom: '16px' }">
@@ -143,7 +143,7 @@
               <img
                 class="img"
                 :src="postToStage.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
-                @click="handleShowThumbDrawer"
+                @click="()=>this.thumDrawerVisible=true"
               >
               <a-button
                 class="post-thum-remove"
@@ -177,11 +177,11 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="primary"
-        @click="handleShowDrawer"
+        @click="()=>this.postSettingVisible = true"
       >发布</a-button>
       <a-button
         type="dashed"
-        @click="handleShowAttachDrawer"
+        @click="()=>this.attachmentDrawerVisible = true"
         style="margin-left: 8px;"
       >附件库</a-button>
     </footer-tool-bar>
@@ -222,7 +222,7 @@ export default {
         xs: { span: 24 }
       },
       attachmentDrawerVisible: false,
-      visible: false,
+      postSettingVisible: false,
       thumDrawerVisible: false,
       categoryForm: false,
       tags: [],
@@ -244,6 +244,14 @@ export default {
   destroyed: function() {
     clearInterval(this.timer)
     this.timer = null
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.timer !== null) {
+      clearInterval(this.timer)
+    }
+    // Auto save the post
+    this.autoSavePost()
+    next()
   },
   beforeRouteEnter(to, from, next) {
     // Get post id from query
@@ -300,16 +308,9 @@ export default {
       this.createOrUpdatePost(() => this.$message.success('文章创建成功'), () => this.$message.success('文章更新成功'))
     },
     autoSavePost() {
-      this.createOrUpdatePost()
-    },
-    handleShowDrawer() {
-      this.visible = true
-    },
-    handleShowAttachDrawer() {
-      this.attachmentDrawerVisible = true
-    },
-    handleShowThumbDrawer() {
-      this.thumDrawerVisible = true
+      if (this.postToStage.title != null && this.postToStage.originalContent != null) {
+        this.createOrUpdatePost()
+      }
     },
     toggleCategoryForm() {
       this.categoryForm = !this.categoryForm
@@ -331,9 +332,6 @@ export default {
         this.categoryToCreate = {}
       })
     },
-    onClose() {
-      this.visible = false
-    },
     handleSelectPostThumb(data) {
       this.postToStage.thumbnail = data.path
       this.thumDrawerVisible = false
@@ -345,14 +343,6 @@ export default {
         }, 15000)
       }
     }
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.timer !== null) {
-      clearInterval(this.timer)
-    }
-    // Auto save the post
-    this.autoSavePost()
-    next()
   }
 }
 </script>

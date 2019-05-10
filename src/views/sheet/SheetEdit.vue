@@ -32,8 +32,8 @@
           title="页面设置"
           :width="isMobile()?'100%':'460'"
           :closable="true"
-          @close="onClose"
-          :visible="visible"
+          @close="()=>this.sheetSettingVisible = false"
+          :visible="sheetSettingVisible"
         >
           <div class="post-setting-drawer-content">
             <div :style="{ marginBottom: '16px' }">
@@ -57,7 +57,10 @@
                   </a-form-item>
                   <a-form-item label="自定义模板：">
                     <a-select v-model="sheetToStage.template">
-                      <a-select-option key="" value="">无</a-select-option>
+                      <a-select-option
+                        key=""
+                        value=""
+                      >无</a-select-option>
                       <a-select-option
                         v-for="tpl in customTpls"
                         :key="tpl"
@@ -77,7 +80,7 @@
                   <img
                     class="img"
                     :src="sheetToStage.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
-                    @click="handleShowThumbDrawer"
+                    @click="()=>this.thumDrawerVisible = true"
                   >
                   <a-button
                     class="sheet-thum-remove"
@@ -87,7 +90,7 @@
                 </div>
               </div>
             </div>
-            <a-divider class="divider-transparent"/>
+            <a-divider class="divider-transparent" />
           </div>
           <AttachmentSelectDrawer
             v-model="thumDrawerVisible"
@@ -111,12 +114,12 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="primary"
-        @click="handleShowDrawer"
+        @click="()=>this.sheetSettingVisible = true"
       >发布</a-button>
       <a-button
         type="dashed"
         style="margin-left: 8px;"
-        @click="handleShowAttachDrawer"
+        @click="()=>this.attachmentDrawerVisible = true"
       >附件库</a-button>
     </footer-tool-bar>
   </div>
@@ -150,7 +153,7 @@ export default {
       },
       attachmentDrawerVisible: false,
       thumDrawerVisible: false,
-      visible: false,
+      sheetSettingVisible: false,
       customTpls: [],
       sheetToStage: {},
       timer: null
@@ -165,6 +168,14 @@ export default {
   destroyed: function() {
     clearInterval(this.timer)
     this.timer = null
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.timer !== null) {
+      clearInterval(this.timer)
+    }
+    // Auto save the sheet
+    this.autoSaveSheet()
+    next()
   },
   beforeRouteEnter(to, from, next) {
     // Get sheetId id from query
@@ -185,42 +196,42 @@ export default {
         this.customTpls = response.data.data
       })
     },
-    handleShowAttachDrawer() {
-      this.attachmentDrawerVisible = true
-    },
-    handleShowThumbDrawer() {
-      this.thumDrawerVisible = true
-    },
-    handleShowDrawer() {
-      this.visible = true
-    },
     handlePublishClick() {
       this.sheetToStage.status = 'PUBLISHED'
-      this.createOrUpdateSheet()
+      this.saveSheet()
     },
     handleDraftClick() {
       this.sheetToStage.status = 'DRAFT'
-      this.createOrUpdateSheet()
+      this.saveSheet()
     },
     handlerRemoveThumb() {
       this.sheetToStage.thumbnail = null
     },
-    createOrUpdateSheet() {
+    createOrUpdateSheet(createSuccess, updateSuccess) {
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
-          this.$message.success('页面更新成功')
+          if (updateSuccess) {
+            updateSuccess()
+          }
         })
       } else {
         sheetApi.create(this.sheetToStage).then(response => {
           this.$log.debug('Created sheet', response.data.data)
-          this.$message.success('页面创建成功')
+          if (createSuccess) {
+            createSuccess()
+          }
           this.sheetToStage = response.data.data
         })
       }
     },
-    onClose() {
-      this.visible = false
+    saveSheet() {
+      this.createOrUpdateSheet(() => this.$message.success('页面创建成功'), () => this.$message.success('页面更新成功'))
+    },
+    autoSaveSheet() {
+      if (this.sheetToStage.title != null && this.sheetToStage.originalContent != null) {
+        this.createOrUpdateSheet()
+      }
     },
     handleSelectSheetThumb(data) {
       this.sheetToStage.thumbnail = data.path
@@ -229,21 +240,7 @@ export default {
     autoSaveTimer() {
       if (this.timer == null) {
         this.timer = setInterval(() => {
-          if (this.sheetToStage.title != null && this.sheetToStage.originalContent != null) {
-            this.sheetToStage.categoryIds = this.selectedCategoryIds
-            this.sheetToStage.tagIds = this.selectedTagIds
-
-            if (this.sheetToStage.id) {
-              sheetApi.update(this.sheetToStage.id, this.sheetToStage).then(response => {
-                this.$log.debug('Auto updated sheet', response.data.data)
-              })
-            } else {
-              sheetApi.create(this.sheetToStage).then(response => {
-                this.$log.debug('Auto saved sheet', response.data.data)
-                this.sheetToStage = response.data.data
-              })
-            }
-          }
+          this.autoSaveSheet()
         }, 15000)
       }
     }
