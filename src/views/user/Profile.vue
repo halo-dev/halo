@@ -19,7 +19,7 @@
               <div class="avatar">
                 <img
                   :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'"
-                  @click="handleShowAttachDrawer"
+                  @click="()=>this.attachmentDrawerVisible = true"
                 >
               </div>
             </a-tooltip>
@@ -182,9 +182,6 @@ export default {
   },
   methods: {
     ...mapMutations({ setUser: 'SET_USER' }),
-    handleShowAttachDrawer() {
-      this.attachmentDrawerVisible = true
-    },
     loadUser() {
       userApi.getProfile().then(response => {
         this.user = response.data.data

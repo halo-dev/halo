@@ -29,7 +29,7 @@
                     <a
                       href="javascript:void(0);"
                       slot="addonAfter"
-                      @click="handleShowLogoAttachDrawer"
+                      @click="()=>this.logoDrawerVisible = true"
                     >
                       <a-icon type="picture" />
                     </a>
@@ -43,7 +43,7 @@
                     <a
                       href="javascript:void(0);"
                       slot="addonAfter"
-                      @click="handleShowFaviconAttachDrawer"
+                      @click="()=>this.faviconDrawerVisible = true"
                     >
                       <a-icon type="picture" />
                     </a>
@@ -638,15 +638,9 @@ export default {
           break
       }
     },
-    handleShowLogoAttachDrawer() {
-      this.logoDrawerVisible = true
-    },
     handleSelectLogo(data) {
       this.options.blog_logo = data.path
       this.logoDrawerVisible = false
-    },
-    handleShowFaviconAttachDrawer() {
-      this.faviconDrawerVisible = true
     },
     handleTestMailClick() {
       mailApi.testMail(this.mailParam).then(response => {

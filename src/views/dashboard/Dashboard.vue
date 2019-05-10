@@ -255,7 +255,7 @@
       closable
       :visible="logDrawerVisiable"
       destroyOnClose
-      @close="onLogDrawerClose"
+      @close="()=>this.logDrawerVisiable = false"
     >
       <a-row
         type="flex"
@@ -471,9 +471,6 @@ export default {
         this.selectCommentVisible = false
         this.listLatestComments()
       })
-    },
-    onLogDrawerClose() {
-      this.logDrawerVisiable = false
     },
     onPaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)

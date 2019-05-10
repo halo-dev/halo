@@ -77,7 +77,7 @@
             <a-button
               type="primary"
               icon="plus"
-              @click="handleShowUploadModal"
+              @click="()=>this.uploadVisible = true"
             >上传</a-button>
           </div>
         </a-card>
@@ -147,7 +147,7 @@
       v-if="selectAttachment"
       :attachment="selectAttachment"
       :addToPhoto="true"
-      @delete="handleDelete"
+      @delete="()=>this.loadAttachments()"
     />
   </page-view>
 </template>
@@ -223,9 +223,6 @@ export default {
       this.selectAttachment = attachment
       this.drawerVisiable = true
     },
-    handleShowUploadModal() {
-      this.uploadVisible = true
-    },
     handleUploadSuccess() {
       this.loadAttachments()
       this.loadMediaTypes()
@@ -244,9 +241,6 @@ export default {
     },
     handleQuery() {
       this.queryParam.page = 0
-      this.loadAttachments()
-    },
-    handleDelete(attachment) {
       this.loadAttachments()
     }
   }
