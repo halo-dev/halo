@@ -16,30 +16,32 @@ jobs:
       script: ./gradlew check
     - stage: build
       script: ./gradlew build -x test
-    - stage: build-docker-image-for-release
+    - stage: Build Docker Image for Release
       script: ./scripts/docker-build-release.sh
-    - stage: build-docker-image-for-dev
+    - stage: Build Docker Image for Dev
       script: ./scripts/docker-build-dev.sh
+    - stage: GitHub Release
+      script: echo "Deploying to GitHub releases ..."
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        file: build/libs/*
+        skip_cleanup: true
+        on:
+          tags: true
 stages:
   - test
   - build
-  - name: build-docker-image-for-release
+  - GitHub Release
+  - name: Build Docker Image for Release
     if: tag =~ /^v\d+\.\d+(\.\d+)?(-release)?$/
-  - name: build-docker-image-for-dev
+  - name: Build Docker Image for Dev
     if: tag =~ /^v\d+\.\d+(\.\d+)?-(beta|alpha)+(\.\d+)?$/
 branches:
   only:
     - master
     - dev
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
-deploy:
-  provider: releases
-  api_key:
-    secure: $GITHUB_OAUTH_TOKEN
-  file: build/libs/*
-  skip_cleanup: true
-  on:
-    tags: true
 notifications:
   webhooks:
     - https://fathomless-fjord-24024.herokuapp.com/notify
