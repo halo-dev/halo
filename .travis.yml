@@ -24,9 +24,9 @@ stages:
   - test
   - build
   - name: build-docker-image-for-release
-    if: tag = /^v\d+\.\d+\.\d+$/
+    if: tag =~ /^v\d+\.\d+\.\d+$/
   - name: build-docker-image-for-dev
-    if: tag = /^v\d+\.\d+\.\d+\.(beta|alpha).*$/
+    if: tag =~ /^v\d+\.\d+\.\d+\.(beta|alpha).*$/
 branches:
   only:
     - master
