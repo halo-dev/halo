@@ -21,11 +21,11 @@ jobs:
     - stage: Build Docker Image for Dev
       script: ./scripts/docker-build-dev.sh
     - stage: GitHub Release
-      script: echo "Deploying to GitHub releases ..."
+      script: echo "Deploying to GitHub releases ..." && pwd
       deploy:
         provider: releases
         api_key: $GITHUB_OAUTH_TOKEN
-        file: build/libs/*
+        file: $TRAVIS_BUILD_DIR/build/libs/*
         skip_cleanup: true
         on:
           tags: true
