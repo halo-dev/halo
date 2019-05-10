@@ -27,10 +27,6 @@ stages:
     if: branch = master AND tag IS present
   - name: build-docker-image-for-dev
     if: branch = dev AND tag IS present
-branches:
-  only:
-    - master
-    - dev
 notifications:
   webhooks:
     - https://fathomless-fjord-24024.herokuapp.com/notify
