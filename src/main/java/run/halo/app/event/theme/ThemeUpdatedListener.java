@@ -22,13 +22,11 @@ public class ThemeUpdatedListener {
         this.cacheStore = cacheStore;
     }
 
-    @Async
     @EventListener
     public void onApplicationEvent(ThemeUpdatedEvent event) {
         cacheStore.delete(ThemeService.THEMES_CACHE_KEY);
     }
 
-    @Async
     @EventListener
     public void onOptionUpdatedEvent(OptionUpdatedEvent optionUpdatedEvent) {
         cacheStore.delete(ThemeService.THEMES_CACHE_KEY);
