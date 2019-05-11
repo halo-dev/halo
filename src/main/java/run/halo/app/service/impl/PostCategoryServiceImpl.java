@@ -100,7 +100,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
-        Set<Integer> postIds = postCategoryRepository.findAllCategoryIdsByPostId(categoryId);
+        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId);
 
         return postRepository.findAllByIdIn(postIds, pageable);
     }
