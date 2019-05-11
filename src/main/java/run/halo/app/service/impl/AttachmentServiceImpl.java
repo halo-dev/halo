@@ -21,6 +21,7 @@ import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.HaloUtils;
 
 import javax.persistence.criteria.Predicate;
 import java.util.LinkedList;
@@ -108,7 +109,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         // Build attachment
         Attachment attachment = new Attachment();
         attachment.setName(uploadResult.getFilename());
-        attachment.setPath(uploadResult.getFilePath());
+        // Convert separator
+        attachment.setPath(HaloUtils.changeFileSeparatorToUrlSeparator(uploadResult.getFilePath()));
         attachment.setFileKey(uploadResult.getKey());
         attachment.setThumbPath(uploadResult.getThumbPath());
         attachment.setMediaType(uploadResult.getMediaType().toString());
