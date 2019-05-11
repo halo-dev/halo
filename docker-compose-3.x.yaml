@@ -26,10 +26,13 @@ services:
       - "8090:8090"
     expose:
       - "8090"
-    env_file:
-      - ./halo.env
+    environment:
+      - VIRTUAL_PORT=8090
+      - VIRTUAL_HOST=localhost  # 你的博客地址（务必修改）
+      - LETSENCRYPT_HOST=localhost # 你的博客地址 （务必修改）
+      - LETSENCRYPT_EMAIL=i@example.com # 证书所有者的邮箱，快过期时会提醒（务必修改）
     volumes:
-      - ~/halo:/root/halo
+      - ~/.halo:/root/.halo
 
   docker-gen:
     image: jwilder/docker-gen
