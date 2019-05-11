@@ -197,6 +197,7 @@
                 type="textarea"
                 :autosize="{ minRows: 8 }"
                 v-model="journal.content"
+                placeholder="写点什么吧..."
               />
             </a-form-item>
             <a-form-item>
