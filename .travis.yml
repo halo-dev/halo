@@ -33,7 +33,8 @@ jobs:
 stages:
   - test
   - build
-  - GitHub Release
+  - name: GitHub Release
+    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
   - name: Build Docker Image for Release
     if: tag =~ /^v\d+\.\d+(\.\d+)?(-release)?$/
   - name: Build Docker Image for Dev
