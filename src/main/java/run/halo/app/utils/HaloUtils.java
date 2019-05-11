@@ -20,6 +20,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.UUID;
 
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+
 /**
  * <pre>
  * 常用工具
@@ -30,6 +32,18 @@ import java.util.UUID;
  */
 @Slf4j
 public class HaloUtils {
+
+    /**
+     * Changes file separator to url separator.
+     *
+     * @param pathname full path name must not be blank.
+     * @return text with url separator
+     */
+    public static String changeFileSeparatorToUrlSeparator(@NonNull String pathname) {
+        Assert.hasText(pathname, "Path name must not be blank");
+
+        return pathname.replace(FILE_SEPARATOR, "/");
+    }
 
     /**
      * Time format.
