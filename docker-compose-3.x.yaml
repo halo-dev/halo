@@ -18,7 +18,7 @@ services:
       - halo
 
   halo:
-    image: ruibaby/halo
+    image: ruibaby/halo:latest-dev
     container_name: halo
     hostname: halo
     restart: always
@@ -26,11 +26,8 @@ services:
       - "8090:8090"
     expose:
       - "8090"
-    environment:
-      - VIRTUAL_PORT=8090
-      - VIRTUAL_HOST=localhost  # 你的博客地址（务必修改）
-      - LETSENCRYPT_HOST=localhost # 你的博客地址 （务必修改）
-      - LETSENCRYPT_EMAIL=i@example.com # 证书所有者的邮箱，快过期时会提醒（务必修改）
+    env_file:
+      - ./halo.env
     volumes:
       - ~/.halo:/root/.halo
 
