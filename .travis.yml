@@ -15,7 +15,7 @@ jobs:
     - stage: test
       script: ./gradlew check
     - stage: build
-      script: ./gradlew build -x test
+      script: ./gradlew clean build -x test
     - stage: Build Docker Image for Release
       script: ./scripts/docker-build-release.sh
     - stage: Build Docker Image for Dev

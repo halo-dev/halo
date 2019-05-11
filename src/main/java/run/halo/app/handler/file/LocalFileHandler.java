@@ -18,14 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
-import java.util.Locale;
 import java.util.Objects;
+
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
 /**
  * Local file handler.
@@ -97,7 +97,7 @@ public class LocalFileHandler implements FileHandler {
         int month = current.get(Calendar.MONTH) + 1;
 
         // Build directory
-        String subDir = UPLOAD_SUB_DIR + year + File.separator + month + File.separator;
+        String subDir = UPLOAD_SUB_DIR + year + FILE_SEPARATOR + month + FILE_SEPARATOR;
 
         String originalBasename = FilenameUtils.getBasename(file.getOriginalFilename());
 
