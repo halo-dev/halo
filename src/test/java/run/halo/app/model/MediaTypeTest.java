@@ -46,11 +46,4 @@ public class MediaTypeTest {
         assertFalse(isInclude);
     }
 
-    @Test
-    public void zipTest() {
-        MediaType mediaType = MediaType.valueOf("application/x-zip-compressed");
-        log.debug("Zip type: [{}]", mediaType);
-
-        assertFalse(HaloMediaType.isZipType(mediaType));
-    }
 }

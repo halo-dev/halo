@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.lang.Validator;
 import cn.hutool.crypto.digest.BCrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -19,14 +18,10 @@ import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.repository.UserRepository;
-import run.halo.app.security.context.SecurityContextHolder;
-import run.halo.app.security.filter.AdminAuthenticationFilter;
-import run.halo.app.security.support.UserDetail;
 import run.halo.app.service.UserService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
-import run.halo.app.utils.ServletUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -102,68 +97,6 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     @Override
     public User getByEmailOfNonNull(String email) {
         return getByEmail(email).orElseThrow(() -> new NotFoundException("The email dose not exist").setErrorData(email));
-    }
-
-    @Override
-    public User login(String key, String password) {
-        Assert.hasText(key, "Username or email must not be blank");
-        Assert.hasText(password, "Password must not be blank");
-
-        // Check login status
-        if (SecurityContextHolder.getContext().isAuthenticated()) {
-            throw new BadRequestException("You have logged in already, no need to log in again");
-        }
-
-        // Ger user by username
-        User user = Validator.isEmail(key) ? getByEmailOfNonNull(key) : getByUsernameOfNonNull(key);
-
-        Date now = DateUtils.now();
-
-        // Check expiration
-        if (user.getExpireTime() != null && user.getExpireTime().after(now)) {
-            long seconds = TimeUnit.MILLISECONDS.toSeconds(user.getExpireTime().getTime() - now.getTime());
-            // If expired
-            throw new BadRequestException("You have been temporarily disabled，please try again " + HaloUtils.timeFormat(seconds) + " later").setErrorData(seconds);
-        }
-
-        if (!BCrypt.checkpw(password, user.getPassword())) {
-            // If the password is mismatch
-            // Add login failure count
-            Integer loginFailureCount = stringCacheStore.getAny(LOGIN_FAILURE_COUNT_KEY, Integer.class).orElse(0);
-
-            if (loginFailureCount >= MAX_LOGIN_TRY - 1) {
-                // Set expiration
-                user.setExpireTime(org.apache.commons.lang3.time.DateUtils.addMinutes(now, LOCK_MINUTES));
-                // Update user
-                update(user);
-            }
-
-            loginFailureCount++;
-
-            stringCacheStore.putAny(LOGIN_FAILURE_COUNT_KEY, loginFailureCount, LOCK_MINUTES, TimeUnit.MINUTES);
-
-            int remainder = MAX_LOGIN_TRY - loginFailureCount;
-
-            String errorMessage = String.format("Username or password incorrect, you%shave %s", remainder <= 0 ? "" : " still ", HaloUtils.pluralize(remainder, "chance", "chances"));
-
-            // Lot it
-            eventPublisher.publishEvent(new LogEvent(this, key, LogType.LOGIN_FAILED, password));
-
-            throw new BadRequestException(errorMessage);
-        }
-
-        // Clear the login failure count cache
-        stringCacheStore.delete(LOGIN_FAILURE_COUNT_KEY);
-
-        // Set session
-        ServletUtils.getCurrentRequest().ifPresent(request -> {
-            request.getSession().setAttribute(AdminAuthenticationFilter.ADMIN_SESSION_KEY, new UserDetail(user));
-        });
-
-        // Log it
-        eventPublisher.publishEvent(new LogEvent(this, user.getId().toString(), LogType.LOGGED_IN, user.getUsername()));
-
-        return user;
     }
 
     @Override

@@ -79,17 +79,6 @@ public interface UserService extends CrudService<User, Integer> {
     User getByEmailOfNonNull(@NonNull String email);
 
     /**
-     * Logins by username and password.
-     *
-     * @param key      username or email must not be blank
-     * @param password password must not be blank
-     * @return user info
-     */
-    @NonNull
-    @Deprecated
-    User login(@NonNull String key, @NonNull String password);
-
-    /**
      * Updates user password.
      *
      * @param oldPassword old password must not be blank

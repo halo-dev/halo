@@ -1,8 +1,6 @@
 package run.halo.app.model.dto.base;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.junit.Test;
 
 import java.io.Serializable;
@@ -47,6 +45,8 @@ public class InputConverterTest {
     }
 
     @Data
+    @ToString
+    @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TestDomain {
@@ -57,6 +57,8 @@ public class InputConverterTest {
     }
 
     @Data
+    @ToString
+    @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TestInputDTO implements InputConverter<TestDomain>, Serializable {
@@ -65,6 +67,8 @@ public class InputConverterTest {
     }
 
     @Data
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubTestInputDTO extends TestInputDTO {
