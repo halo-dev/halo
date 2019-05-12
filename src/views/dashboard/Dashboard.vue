@@ -337,7 +337,7 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import marked from 'marked'
 
 import postApi from '@/api/post'
-import commentApi from '@/api/comment'
+import commentApi from '@/api/postComment'
 import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'

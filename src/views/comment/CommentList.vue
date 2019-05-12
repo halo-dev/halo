@@ -240,7 +240,7 @@
 
 <script>
 import { PageView } from '@/layouts'
-import commentApi from '@/api/comment'
+import commentApi from '@/api/postComment'
 import optionApi from '@/api/option'
 import marked from 'marked'
 

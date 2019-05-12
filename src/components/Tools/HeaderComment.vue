@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import commentApi from '@/api/comment'
+import commentApi from '@/api/postComment'
 import marked from 'marked'
 
 export default {
