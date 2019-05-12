@@ -13,7 +13,11 @@ sourceCompatibility = '1.8'
 description = 'Halo, personal blog system developed in Java.'
 
 repositories {
+    maven {
+        url 'https://maven.aliyun.com/nexus/content/groups/public'
+    }
     mavenCentral()
+    jcenter()
 }
 
 configurations {
