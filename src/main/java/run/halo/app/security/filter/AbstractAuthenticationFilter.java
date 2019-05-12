@@ -18,7 +18,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Abstract authentication filter.
@@ -34,11 +37,6 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      * Exclude url patterns.
      */
     private Set<String> excludeUrlPatterns = new HashSet<>(2);
-
-    /**
-     * Try authenticating url, method patterns.
-     */
-    private Map<String, String> tryAuthUrlMethodPatterns = new HashMap<>(2);
 
     protected final AntPathMatcher antPathMatcher;
 
@@ -73,26 +71,6 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     }
 
     /**
-     * Should skip authentication failure.
-     *
-     * @param request http servlet request must not be null.
-     * @return true if the request should skip authentication failure; false otherwise
-     */
-    @Deprecated
-    protected boolean shouldSkipAuthenticateFailure(@NonNull HttpServletRequest request) {
-        Assert.notNull(request, "Http servlet request must not be null");
-
-        for (String url : tryAuthUrlMethodPatterns.keySet()) {
-            if (antPathMatcher.match(url, request.getServletPath())
-                    && tryAuthUrlMethodPatterns.get(url).equalsIgnoreCase(request.getMethod())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Sets exclude url patterns.
      *
      * @param excludeUrlPatterns exclude urls
@@ -124,20 +102,6 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         return excludeUrlPatterns;
     }
 
-    /**
-     * Adds try authenticating url method pattern.
-     *
-     * @param url    url must not be blank
-     * @param method method must not be blank
-     */
-    @Deprecated
-    public void addTryAuthUrlMethodPattern(@NonNull String url, @NonNull String method) {
-        Assert.hasText(url, "Try authenticating url must not be blank");
-        Assert.hasText(method, "Try authenticating method must not be blank");
-
-        tryAuthUrlMethodPatterns.put(url, method);
-    }
-
 
     /**
      * Gets authentication failure handler. (Default: @DefaultAuthenticationFailureHandler)
@@ -145,7 +109,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      * @return authentication failure handler
      */
     @NonNull
-    public AuthenticationFailureHandler getFailureHandler() {
+    protected AuthenticationFailureHandler getFailureHandler() {
         if (failureHandler == null) {
             synchronized (this) {
                 if (failureHandler == null) {
