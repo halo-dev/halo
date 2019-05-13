@@ -2,9 +2,9 @@ import service from '@/utils/service'
 
 const baseUrl = '/api/admin/posts/comments'
 
-const commentApi = {}
+const postCommentApi = {}
 
-commentApi.listLatest = (top, status) => {
+postCommentApi.listLatest = (top, status) => {
   return service({
     url: `${baseUrl}/latest`,
     params: {
@@ -15,7 +15,7 @@ commentApi.listLatest = (top, status) => {
   })
 }
 
-commentApi.query = params => {
+postCommentApi.query = params => {
   return service({
     url: baseUrl,
     params: params,
@@ -23,21 +23,21 @@ commentApi.query = params => {
   })
 }
 
-commentApi.updateStatus = (commentId, status) => {
+postCommentApi.updateStatus = (commentId, status) => {
   return service({
     url: `${baseUrl}/${commentId}/status/${status}`,
     method: 'put'
   })
 }
 
-commentApi.delete = commentId => {
+postCommentApi.delete = commentId => {
   return service({
     url: `${baseUrl}/${commentId}`,
     method: 'delete'
   })
 }
 
-commentApi.create = comment => {
+postCommentApi.create = comment => {
   return service({
     url: baseUrl,
     data: comment,
@@ -45,7 +45,7 @@ commentApi.create = comment => {
   })
 }
 
-commentApi.commentStatus = {
+postCommentApi.commentStatus = {
   PUBLISHED: {
     color: 'green',
     status: 'success',
@@ -63,4 +63,4 @@ commentApi.commentStatus = {
   }
 }
 
-export default commentApi
+export default postCommentApi

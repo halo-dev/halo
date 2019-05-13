@@ -337,7 +337,7 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import marked from 'marked'
 
 import postApi from '@/api/post'
-import commentApi from '@/api/postComment'
+import postCommentApi from '@/api/postComment'
 import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'
@@ -413,7 +413,7 @@ export default {
       })
     },
     listLatestComments() {
-      commentApi.listLatest(5, 'PUBLISHED').then(response => {
+      postCommentApi.listLatest(5, 'PUBLISHED').then(response => {
         this.commentData = response.data.data
         this.activityLoading = false
         this.writeLoading = false
@@ -465,7 +465,7 @@ export default {
       this.replyComment.postId = comment.post.id
     },
     handleReplyComment() {
-      commentApi.create(this.replyComment).then(response => {
+      postCommentApi.create(this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}
         this.selectComment = {}

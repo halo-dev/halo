@@ -240,7 +240,7 @@
 
 <script>
 import { PageView } from '@/layouts'
-import commentApi from '@/api/postComment'
+import postCommentApi from '@/api/postComment'
 import optionApi from '@/api/option'
 import marked from 'marked'
 
@@ -304,7 +304,7 @@ export default {
       selectComment: {},
       replyComment: {},
       commentsLoading: false,
-      commentStatus: commentApi.commentStatus,
+      commentStatus: postCommentApi.commentStatus,
       options: [],
       keys: ['blog_url']
     }
@@ -332,7 +332,7 @@ export default {
       if (isSearch) {
         this.queryParam.page = 0
       }
-      commentApi.query(this.queryParam).then(response => {
+      postCommentApi.query(this.queryParam).then(response => {
         this.comments = response.data.data.content
         this.pagination.total = response.data.data.total
         this.commentsLoading = false
@@ -347,13 +347,13 @@ export default {
       this.$message.success('编辑')
     },
     handleEditStatusClick(commentId, status) {
-      commentApi.updateStatus(commentId, status).then(response => {
+      postCommentApi.updateStatus(commentId, status).then(response => {
         this.$message.success('操作成功！')
         this.loadComments()
       })
     },
     handleDeleteClick(commentId) {
-      commentApi.delete(commentId).then(response => {
+      postCommentApi.delete(commentId).then(response => {
         this.$message.success('删除成功！')
         this.loadComments()
       })
@@ -369,7 +369,7 @@ export default {
       this.replyComment.postId = comment.post.id
     },
     handleCreateClick() {
-      commentApi.create(this.replyComment).then(response => {
+      postCommentApi.create(this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}
         this.selectComment = {}
@@ -394,7 +394,7 @@ export default {
       }
       for (let index = 0; index < this.selectedRowKeys.length; index++) {
         const element = this.selectedRowKeys[index]
-        commentApi.updateStatus(element, 'PUBLISHED').then(response => {
+        postCommentApi.updateStatus(element, 'PUBLISHED').then(response => {
           this.$log.debug(`commentId: ${element}, status: PUBLISHED`)
         })
       }
@@ -406,7 +406,7 @@ export default {
       }
       for (let index = 0; index < this.selectedRowKeys.length; index++) {
         const element = this.selectedRowKeys[index]
-        commentApi.updateStatus(element, 'RECYCLE').then(response => {
+        postCommentApi.updateStatus(element, 'RECYCLE').then(response => {
           this.$log.debug(`commentId: ${element}, status: RECYCLE`)
         })
       }
@@ -418,7 +418,7 @@ export default {
       }
       for (let index = 0; index < this.selectedRowKeys.length; index++) {
         const element = this.selectedRowKeys[index]
-        commentApi.delete(element).then(response => {
+        postCommentApi.delete(element).then(response => {
           this.$log.debug(`delete: ${element}`)
         })
       }

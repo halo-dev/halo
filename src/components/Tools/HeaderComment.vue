@@ -11,30 +11,95 @@
   >
     <template slot="content">
       <a-spin :spinning="loadding">
-        <a-list :dataSource="converttedComments">
-          <a-list-item
-            slot="renderItem"
-            slot-scope="item"
+        <a-tabs>
+          <a-tab-pane
+            tab="文章"
+            key="1"
           >
-            <a-list-item-meta>
-              <a-avatar
-                style="background-color: white"
-                slot="avatar"
-                :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
-                size="large"
-              />
-              <template slot="title">
-                <a
-                  :href="item.authorUrl"
-                  target="_blank"
-                >{{ item.author }}</a>：<span v-html="item.content"></span>
-              </template>
-              <template slot="description">
-                {{ item.createTime | timeAgo }}
-              </template>
-            </a-list-item-meta>
-          </a-list-item>
-        </a-list>
+            <a-list :dataSource="converttedPostComments">
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item"
+              >
+                <a-list-item-meta>
+                  <a-avatar
+                    style="background-color: white"
+                    slot="avatar"
+                    :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
+                    size="large"
+                  />
+                  <template slot="title">
+                    <a
+                      :href="item.authorUrl"
+                      target="_blank"
+                    >{{ item.author }}</a>：<span v-html="item.content"></span>
+                  </template>
+                  <template slot="description">
+                    {{ item.createTime | timeAgo }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </a-tab-pane>
+          <a-tab-pane
+            tab="页面"
+            key="2"
+          >
+            <a-list :dataSource="converttedSheetComments">
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item"
+              >
+                <a-list-item-meta>
+                  <a-avatar
+                    style="background-color: white"
+                    slot="avatar"
+                    :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
+                    size="large"
+                  />
+                  <template slot="title">
+                    <a
+                      :href="item.authorUrl"
+                      target="_blank"
+                    >{{ item.author }}</a>：<span v-html="item.content"></span>
+                  </template>
+                  <template slot="description">
+                    {{ item.createTime | timeAgo }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </a-tab-pane>
+          <a-tab-pane
+            tab="日志"
+            key="3"
+          >
+            <a-list :dataSource="converttedJournalComments">
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item"
+              >
+                <a-list-item-meta>
+                  <a-avatar
+                    style="background-color: white"
+                    slot="avatar"
+                    :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
+                    size="large"
+                  />
+                  <template slot="title">
+                    <a
+                      :href="item.authorUrl"
+                      target="_blank"
+                    >{{ item.author }}</a>：<span v-html="item.content"></span>
+                  </template>
+                  <template slot="description">
+                    {{ item.createTime | timeAgo }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </a-tab-pane>
+        </a-tabs>
       </a-spin>
     </template>
     <span
@@ -43,7 +108,7 @@
     >
       <a-badge
         dot
-        v-if="comments.length > 0"
+        v-if="postComments.length > 0"
       >
         <a-icon type="bell" />
       </a-badge>
@@ -55,7 +120,7 @@
 </template>
 
 <script>
-import commentApi from '@/api/postComment'
+import commentApi from '@/api/comment'
 import marked from 'marked'
 
 export default {
@@ -64,15 +129,29 @@ export default {
     return {
       loadding: false,
       visible: false,
-      comments: []
+      postComments: [],
+      sheetComments: [],
+      journalComments: []
     }
   },
   created() {
     this.getComment()
   },
   computed: {
-    converttedComments() {
-      return this.comments.map(comment => {
+    converttedPostComments() {
+      return this.postComments.map(comment => {
+        comment.content = marked(comment.content, { sanitize: true })
+        return comment
+      })
+    },
+    converttedSheetComments() {
+      return this.sheetComments.map(comment => {
+        comment.content = marked(comment.content, { sanitize: true })
+        return comment
+      })
+    },
+    converttedJournalComments() {
+      return this.journalComments.map(comment => {
         comment.content = marked(comment.content, { sanitize: true })
         return comment
       })
@@ -89,8 +168,16 @@ export default {
       this.visible = !this.visible
     },
     getComment() {
-      commentApi.listLatest(5, 'AUDITING').then(response => {
-        this.comments = response.data.data
+      commentApi.latestPostComment(5, 'AUDITING').then(response => {
+        this.postComments = response.data.data
+        this.loadding = false
+      })
+      commentApi.latestSheetComment(5, 'AUDITING').then(response => {
+        this.sheetComments = response.data.data
+        this.loadding = false
+      })
+      commentApi.latestJournalComment(5, 'AUDITING').then(response => {
+        this.journalComments = response.data.data
         this.loadding = false
       })
     }
