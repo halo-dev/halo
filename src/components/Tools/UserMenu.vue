@@ -25,7 +25,7 @@
         <a-avatar
           class="avatar"
           size="small"
-          :src="user.avatar"
+          :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'"
         />
       </span>
       <a-menu
