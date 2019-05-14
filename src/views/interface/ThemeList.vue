@@ -9,6 +9,7 @@
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
           :dataSource="themes"
+          :loading="themeLoading"
         >
           <a-list-item
             slot="renderItem"
@@ -310,6 +311,7 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
+      themeLoading: false,
       optionLoading: true,
       uploadVisible: false,
       wrapperCol: {
@@ -338,8 +340,10 @@ export default {
   },
   methods: {
     loadThemes() {
+      this.themeLoading = true
       themeApi.listAll().then(response => {
         this.themes = response.data.data
+        this.themeLoading = false
       })
     },
     settingDrawer(theme) {
