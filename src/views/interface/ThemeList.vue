@@ -110,9 +110,7 @@
                 :src="themeProperty.screenshots"
                 slot="cover"
               >
-              <a-card-meta
-                :description="themeProperty.description"
-              >
+              <a-card-meta :description="themeProperty.description">
                 <template slot="title">
                   <a
                     :href="themeProperty.author.website"
@@ -256,43 +254,45 @@
       :footer="null"
       :bodyStyle="{ padding: '0 24px 24px' }"
     >
-      <a-tabs defaultActiveKey="1">
-        <a-tab-pane
-          tab="本地上传"
-          key="1"
-        >
-          <upload
-            name="file"
-            multiple
-            accept="application/zip"
-            :uploadHandler="uploadHandler"
-            @change="handleChange"
-            @success="handleUploadSuccess"
+      <div class="custom-tab-wrapper">
+        <a-tabs>
+          <a-tab-pane
+            tab="本地上传"
+            key="1"
           >
-            <p class="ant-upload-drag-icon">
-              <a-icon type="inbox" />
-            </p>
-            <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
-            <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
-          </upload>
-        </a-tab-pane>
-        <a-tab-pane
-          tab="远程拉取"
-          key="2"
-        >
-          <a-form layout="vertical">
-            <a-form-item label="远程地址：">
-              <a-input v-model="fetchingUrl" />
-            </a-form-item>
-            <a-form-item>
-              <a-button
-                type="primary"
-                @click="handleFetching"
-              >确定</a-button>
-            </a-form-item>
-          </a-form>
-        </a-tab-pane>
-      </a-tabs>
+            <upload
+              name="file"
+              multiple
+              accept="application/zip"
+              :uploadHandler="uploadHandler"
+              @change="handleChange"
+              @success="handleUploadSuccess"
+            >
+              <p class="ant-upload-drag-icon">
+                <a-icon type="inbox" />
+              </p>
+              <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
+              <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
+            </upload>
+          </a-tab-pane>
+          <a-tab-pane
+            tab="远程拉取"
+            key="2"
+          >
+            <a-form layout="vertical">
+              <a-form-item label="远程地址：">
+                <a-input v-model="fetchingUrl" />
+              </a-form-item>
+              <a-form-item>
+                <a-button
+                  type="primary"
+                  @click="handleFetching"
+                >确定</a-button>
+              </a-form-item>
+            </a-form>
+          </a-tab-pane>
+        </a-tabs>
+      </div>
     </a-modal>
   </div>
 </template>

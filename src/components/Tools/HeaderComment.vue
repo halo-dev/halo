@@ -11,95 +11,97 @@
   >
     <template slot="content">
       <a-spin :spinning="loadding">
-        <a-tabs>
-          <a-tab-pane
-            tab="文章"
-            key="1"
-          >
-            <a-list :dataSource="converttedPostComments">
-              <a-list-item
-                slot="renderItem"
-                slot-scope="item"
-              >
-                <a-list-item-meta>
-                  <a-avatar
-                    style="background-color: white"
-                    slot="avatar"
-                    :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
-                    size="large"
-                  />
-                  <template slot="title">
-                    <a
-                      :href="item.authorUrl"
-                      target="_blank"
-                    >{{ item.author }}</a>：<span v-html="item.content"></span>
-                  </template>
-                  <template slot="description">
-                    {{ item.createTime | timeAgo }}
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </a-list>
-          </a-tab-pane>
-          <a-tab-pane
-            tab="页面"
-            key="2"
-          >
-            <a-list :dataSource="converttedSheetComments">
-              <a-list-item
-                slot="renderItem"
-                slot-scope="item"
-              >
-                <a-list-item-meta>
-                  <a-avatar
-                    style="background-color: white"
-                    slot="avatar"
-                    :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
-                    size="large"
-                  />
-                  <template slot="title">
-                    <a
-                      :href="item.authorUrl"
-                      target="_blank"
-                    >{{ item.author }}</a>：<span v-html="item.content"></span>
-                  </template>
-                  <template slot="description">
-                    {{ item.createTime | timeAgo }}
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </a-list>
-          </a-tab-pane>
-          <a-tab-pane
-            tab="日志"
-            key="3"
-          >
-            <a-list :dataSource="converttedJournalComments">
-              <a-list-item
-                slot="renderItem"
-                slot-scope="item"
-              >
-                <a-list-item-meta>
-                  <a-avatar
-                    style="background-color: white"
-                    slot="avatar"
-                    :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
-                    size="large"
-                  />
-                  <template slot="title">
-                    <a
-                      :href="item.authorUrl"
-                      target="_blank"
-                    >{{ item.author }}</a>：<span v-html="item.content"></span>
-                  </template>
-                  <template slot="description">
-                    {{ item.createTime | timeAgo }}
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </a-list>
-          </a-tab-pane>
-        </a-tabs>
+        <div class="custom-tab-wrapper">
+          <a-tabs>
+            <a-tab-pane
+              tab="文章"
+              key="1"
+            >
+              <a-list :dataSource="converttedPostComments">
+                <a-list-item
+                  slot="renderItem"
+                  slot-scope="item"
+                >
+                  <a-list-item-meta>
+                    <a-avatar
+                      style="background-color: white"
+                      slot="avatar"
+                      :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
+                      size="large"
+                    />
+                    <template slot="title">
+                      <a
+                        :href="item.authorUrl"
+                        target="_blank"
+                      >{{ item.author }}</a>：<span v-html="item.content"></span>
+                    </template>
+                    <template slot="description">
+                      {{ item.createTime | timeAgo }}
+                    </template>
+                  </a-list-item-meta>
+                </a-list-item>
+              </a-list>
+            </a-tab-pane>
+            <a-tab-pane
+              tab="页面"
+              key="2"
+            >
+              <a-list :dataSource="converttedSheetComments">
+                <a-list-item
+                  slot="renderItem"
+                  slot-scope="item"
+                >
+                  <a-list-item-meta>
+                    <a-avatar
+                      style="background-color: white"
+                      slot="avatar"
+                      :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
+                      size="large"
+                    />
+                    <template slot="title">
+                      <a
+                        :href="item.authorUrl"
+                        target="_blank"
+                      >{{ item.author }}</a>：<span v-html="item.content"></span>
+                    </template>
+                    <template slot="description">
+                      {{ item.createTime | timeAgo }}
+                    </template>
+                  </a-list-item-meta>
+                </a-list-item>
+              </a-list>
+            </a-tab-pane>
+            <a-tab-pane
+              tab="日志"
+              key="3"
+            >
+              <a-list :dataSource="converttedJournalComments">
+                <a-list-item
+                  slot="renderItem"
+                  slot-scope="item"
+                >
+                  <a-list-item-meta>
+                    <a-avatar
+                      style="background-color: white"
+                      slot="avatar"
+                      :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
+                      size="large"
+                    />
+                    <template slot="title">
+                      <a
+                        :href="item.authorUrl"
+                        target="_blank"
+                      >{{ item.author }}</a>：<span v-html="item.content"></span>
+                    </template>
+                    <template slot="description">
+                      {{ item.createTime | timeAgo }}
+                    </template>
+                  </a-list-item-meta>
+                </a-list-item>
+              </a-list>
+            </a-tab-pane>
+          </a-tabs>
+        </div>
       </a-spin>
     </template>
     <span

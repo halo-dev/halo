@@ -104,14 +104,11 @@
           :bodyStyle="{ padding: 0 }"
         >
           <div class="card-container">
-            <a-tabs
-              defaultActiveKey="1"
-              type="card"
-            >
-              <a-tab-pane key="1">
-                <span slot="tab">
-                  最近文章
-                </span>
+            <a-tabs type="card">
+              <a-tab-pane
+                key="1"
+                tab="最近文章"
+              >
                 <a-list :dataSource="postData">
                   <a-list-item
                     slot="renderItem"
@@ -131,40 +128,30 @@
               </a-tab-pane>
               <a-tab-pane
                 key="2"
-                forceRender
+                tab="最近评论"
               >
-                <span slot="tab">
-                  最近评论
-                </span>
-                <a-list
-                  itemLayout="horizontal"
-                  :dataSource="formmatedCommentData"
-                >
-                  <a-list-item
-                    slot="renderItem"
-                    slot-scope="item, index"
-                    :key="index"
-                  >
-                    <a-comment :avatar="'//gravatar.loli.net/avatar/'+item.gavatarMd5+'/?s=256&d=mp'">
-                      <template slot="author">
-                        {{ item.author }} 发表在 《<a
-                          href="javascript:void(0);"
-                          target="_blank"
-                        >{{ item.post.title }}</a>》
-                      </template>
-                      <template slot="actions">
-                        <span @click="handleCommentReplyClick(item)">回复</span>
-                      </template>
-                      <p class="comment-content-wrapper" slot="content" v-html="item.content"></p>
-                      <a-tooltip
-                        slot="datetime"
-                        :title="item.createTime | moment"
-                      >
-                        <span>{{ item.createTime | timeAgo }}</span>
-                      </a-tooltip>
-                    </a-comment>
-                  </a-list-item>
-                </a-list>
+                <div class="custom-tab-wrapper">
+                  <a-tabs>
+                    <a-tab-pane
+                      tab="文章"
+                      key="1"
+                    >
+                      <recent-comment-tab type="post"></recent-comment-tab>
+                    </a-tab-pane>
+                    <a-tab-pane
+                      tab="页面"
+                      key="2"
+                    >
+                      <recent-comment-tab type="sheet"></recent-comment-tab>
+                    </a-tab-pane>
+                    <a-tab-pane
+                      tab="日志"
+                      key="3"
+                    >
+                      <recent-comment-tab type="journal"></recent-comment-tab>
+                    </a-tab-pane>
+                  </a-tabs>
+                </div>
               </a-tab-pane>
             </a-tabs>
           </div>
@@ -302,42 +289,16 @@
         </a-popconfirm>
       </div>
     </a-drawer>
-
-    <a-modal
-      v-if="selectComment"
-      :title="'回复给：'+selectComment.author"
-      v-model="selectCommentVisible"
-    >
-      <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleReplyComment"
-        >
-          回复
-        </a-button>
-      </template>
-      <a-form layout="vertical">
-        <a-form-item>
-          <a-input
-            type="textarea"
-            :autosize="{ minRows: 8 }"
-            v-model="replyComment.content"
-          />
-        </a-form-item>
-      </a-form>
-    </a-modal>
   </page-view>
 </template>
 
 <script>
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
+import RecentCommentTab from './components/RecentCommentTab'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import marked from 'marked'
 
 import postApi from '@/api/post'
-import postCommentApi from '@/api/postComment'
 import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'
@@ -346,7 +307,8 @@ export default {
   mixins: [mixin, mixinDevice],
   components: {
     PageView,
-    AnalysisCard
+    AnalysisCard,
+    RecentCommentTab
   },
   data() {
     return {
@@ -357,25 +319,20 @@ export default {
       countsLoading: true,
       logDrawerVisiable: false,
       postData: [],
-      commentData: [],
       logData: [],
       countsData: {},
       journal: {},
+      logs: [],
       logPagination: {
         page: 1,
         size: 50,
         sort: null
-      },
-      logs: [],
-      selectCommentVisible: false,
-      selectComment: null,
-      replyComment: {}
+      }
     }
   },
   created() {
     this.getCounts()
     this.listLatestPosts()
-    this.listLatestComments()
     this.listLatestLogs()
   },
   computed: {
@@ -397,12 +354,6 @@ export default {
         log.type = this.logType[log.type].text
         return log
       })
-    },
-    formmatedCommentData() {
-      return this.commentData.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
-        return comment
-      })
     }
   },
   methods: {
@@ -412,17 +363,11 @@ export default {
         this.activityLoading = false
       })
     },
-    listLatestComments() {
-      postCommentApi.listLatest(5, 'PUBLISHED').then(response => {
-        this.commentData = response.data.data
-        this.activityLoading = false
-        this.writeLoading = false
-      })
-    },
     listLatestLogs() {
       logApi.listLatest(5).then(response => {
         this.logData = response.data.data
         this.logLoading = false
+        this.writeLoading = false
       })
     },
     getCounts() {
@@ -456,21 +401,6 @@ export default {
         this.$message.success('清除成功！')
         this.loadLogs()
         this.listLatestLogs()
-      })
-    },
-    handleCommentReplyClick(comment) {
-      this.selectComment = comment
-      this.selectCommentVisible = true
-      this.replyComment.parentId = comment.id
-      this.replyComment.postId = comment.post.id
-    },
-    handleReplyComment() {
-      postCommentApi.create(this.replyComment).then(response => {
-        this.$message.success('回复成功！')
-        this.replyComment = {}
-        this.selectComment = {}
-        this.selectCommentVisible = false
-        this.listLatestComments()
       })
     },
     onPaginationChange(page, pageSize) {

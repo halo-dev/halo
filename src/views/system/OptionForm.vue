@@ -415,104 +415,106 @@
               <span slot="tab">
                 <a-icon type="mail" />SMTP 服务
               </span>
-              <a-tabs defaultActiveKey="1">
-                <a-tab-pane
-                  tab="发信设置"
-                  key="1"
-                >
-                  <a-form layout="vertical">
-                    <a-form-item
-                      label="是否启用："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-switch v-model="options.email_enabled" />
-                    </a-form-item>
-                    <a-form-item
-                      label="SMTP 地址："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input v-model="options.email_host" />
-                    </a-form-item>
-                    <a-form-item
-                      label="发送协议："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input v-model="options.email_protocol" />
-                    </a-form-item>
-                    <a-form-item
-                      label="SSL 端口："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input v-model="options.email_ssl_port" />
-                    </a-form-item>
-                    <a-form-item
-                      label="邮箱账号："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input v-model="options.email_username" />
-                    </a-form-item>
-                    <a-form-item
-                      label="邮箱密码："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-tooltip
-                        :trigger="['focus']"
-                        placement="right"
-                        title="部分邮箱可能是授权码"
+              <div class="custom-tab-wrapper">
+                <a-tabs>
+                  <a-tab-pane
+                    tab="发信设置"
+                    key="1"
+                  >
+                    <a-form layout="vertical">
+                      <a-form-item
+                        label="是否启用："
+                        :wrapper-col="wrapperCol"
                       >
-                        <a-input v-model="options.email_password" />
-                      </a-tooltip>
-                    </a-form-item>
-                    <a-form-item
-                      label="发件人："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input v-model="options.email_from_name" />
-                    </a-form-item>
-                    <a-form-item>
-                      <a-button
-                        type="primary"
-                        @click="handleSaveOptions"
-                      >保存</a-button>
-                    </a-form-item>
-                  </a-form>
-                </a-tab-pane>
-                <a-tab-pane
-                  tab="发送测试"
-                  key="2"
-                >
-                  <a-form layout="vertical">
-                    <a-form-item
-                      label="收件人："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input v-model="mailParam.to" />
-                    </a-form-item>
-                    <a-form-item
-                      label="主题："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input v-model="mailParam.subject" />
-                    </a-form-item>
-                    <a-form-item
-                      label="内容："
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input
-                        type="textarea"
-                        :autosize="{ minRows: 5 }"
-                        v-model="mailParam.content"
-                      />
-                    </a-form-item>
-                    <a-form-item>
-                      <a-button
-                        type="primary"
-                        @click="handleTestMailClick"
-                      >发送</a-button>
-                    </a-form-item>
-                  </a-form>
-                </a-tab-pane>
-              </a-tabs>
+                        <a-switch v-model="options.email_enabled" />
+                      </a-form-item>
+                      <a-form-item
+                        label="SMTP 地址："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input v-model="options.email_host" />
+                      </a-form-item>
+                      <a-form-item
+                        label="发送协议："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input v-model="options.email_protocol" />
+                      </a-form-item>
+                      <a-form-item
+                        label="SSL 端口："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input v-model="options.email_ssl_port" />
+                      </a-form-item>
+                      <a-form-item
+                        label="邮箱账号："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input v-model="options.email_username" />
+                      </a-form-item>
+                      <a-form-item
+                        label="邮箱密码："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-tooltip
+                          :trigger="['focus']"
+                          placement="right"
+                          title="部分邮箱可能是授权码"
+                        >
+                          <a-input v-model="options.email_password" />
+                        </a-tooltip>
+                      </a-form-item>
+                      <a-form-item
+                        label="发件人："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input v-model="options.email_from_name" />
+                      </a-form-item>
+                      <a-form-item>
+                        <a-button
+                          type="primary"
+                          @click="handleSaveOptions"
+                        >保存</a-button>
+                      </a-form-item>
+                    </a-form>
+                  </a-tab-pane>
+                  <a-tab-pane
+                    tab="发送测试"
+                    key="2"
+                  >
+                    <a-form layout="vertical">
+                      <a-form-item
+                        label="收件人："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input v-model="mailParam.to" />
+                      </a-form-item>
+                      <a-form-item
+                        label="主题："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input v-model="mailParam.subject" />
+                      </a-form-item>
+                      <a-form-item
+                        label="内容："
+                        :wrapper-col="wrapperCol"
+                      >
+                        <a-input
+                          type="textarea"
+                          :autosize="{ minRows: 5 }"
+                          v-model="mailParam.content"
+                        />
+                      </a-form-item>
+                      <a-form-item>
+                        <a-button
+                          type="primary"
+                          @click="handleTestMailClick"
+                        >发送</a-button>
+                      </a-form-item>
+                    </a-form>
+                  </a-tab-pane>
+                </a-tabs>
+              </div>
             </a-tab-pane>
             <a-tab-pane key="other">
               <span slot="tab">
