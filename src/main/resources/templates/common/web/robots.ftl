@@ -1,4 +1,4 @@
-<#if options.spider_disable!false>
+<#if options.spider_disabled!false>
 User-agent: /
 Disallow: /
 <#else>
