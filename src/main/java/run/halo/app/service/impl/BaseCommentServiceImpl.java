@@ -23,12 +23,14 @@ import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.CommentQuery;
+import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
+import run.halo.app.model.vo.CommentWithHasChildrenVO;
 import run.halo.app.repository.base.BaseCommentRepository;
 import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
@@ -294,7 +296,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             // Anonymous comment
             // Check email
             if (userService.getByEmail(commentParam.getEmail()).isPresent()) {
-                throw new BadRequestException("不能使用博主的邮件，如果您是博主，请登录管理端进行回复。");
+                throw new BadRequestException("不能使用博主的邮箱，如果您是博主，请登录管理端进行回复。");
             }
         }
 
@@ -414,6 +416,41 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         concreteTree(topVirtualComment, new LinkedList<>(comments), comparator);
 
         return topVirtualComment.getChildren();
+    }
+
+    @Override
+    public Page<CommentWithHasChildrenVO> pageTopCommentsBy(Integer targetId, CommentStatus status, Pageable pageable) {
+        Assert.notNull(targetId, "Target id must not be null");
+        Assert.notNull(status, "Comment status must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Get all comments
+        Page<COMMENT> topCommentPage = baseCommentRepository.findAllByPostIdAndStatus(targetId, status, pageable);
+
+        // Get top comment ids
+        Set<Long> topCommentIds = ServiceUtils.fetchProperty(topCommentPage.getContent(), BaseComment::getId);
+
+        // Get direct children count
+        List<CommentChildrenCountProjection> directChildrenCount = baseCommentRepository.findDirectChildrenCount(topCommentIds);
+
+        // Convert to comment - children count map
+        Map<Long, Long> commentChildrenCountMap = ServiceUtils.convertToMap(directChildrenCount, CommentChildrenCountProjection::getCommentId, CommentChildrenCountProjection::getDirectChildrenCount);
+
+        // Convert to comment with has children vo
+        return topCommentPage.map(topComment -> {
+            CommentWithHasChildrenVO comment = new CommentWithHasChildrenVO().convertFrom(topComment);
+            comment.setHasChildren(commentChildrenCountMap.getOrDefault(topComment.getId(), 0L) > 0);
+            return comment;
+        });
+    }
+
+    @Override
+    public List<BaseCommentDTO> listChildrenBy(Integer targetId, Integer commentParentId, CommentStatus status, Sort sort) {
+        Assert.notNull(targetId, "Target id must not be null");
+        Assert.notNull(commentParentId, "Comment parent id must not be null");
+        Assert.notNull(sort, "Sort info must not be null");
+
+        return null;
     }
 
     /**
