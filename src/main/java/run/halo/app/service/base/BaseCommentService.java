@@ -2,6 +2,7 @@ package run.halo.app.service.base;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import run.halo.app.model.dto.BaseCommentDTO;
@@ -11,6 +12,7 @@ import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
+import run.halo.app.model.vo.CommentWithHasChildrenVO;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -189,4 +191,27 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      * @param targetId target id must not be null (post id, sheet id or journal id)
      */
     void targetMustExist(@NonNull Integer targetId);
+
+    /**
+     * Lists a page of top comment.
+     *
+     * @param targetId target id must not be null
+     * @param status   comment status must not be null
+     * @param pageable page info must not be null
+     * @return a page of top comment
+     */
+    @NonNull
+    Page<CommentWithHasChildrenVO> pageTopCommentsBy(@NonNull Integer targetId, @NonNull CommentStatus status, @NonNull Pageable pageable);
+
+    /**
+     * Lists children comments.
+     *
+     * @param targetId        target id must not be null
+     * @param commentParentId comment parent id must not be null
+     * @param status          comment status must not be null
+     * @param sort            sort info must not be null
+     * @return a list of children comment
+     */
+    @NonNull
+    List<BaseCommentDTO> listChildrenBy(@NonNull Integer targetId, @NonNull Integer commentParentId, @NonNull CommentStatus status, @NonNull Sort sort);
 }

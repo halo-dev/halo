@@ -42,12 +42,8 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
     @Override
     protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // Get token
-        String token = getTokenFromRequest(request);
-
-        if (StringUtils.isBlank(token)) {
-            // If the token is missing
-            getFailureHandler().onFailure(request, response, new AuthenticationException("Missing API token"));
+        if (!haloProperties.isAuthEnabled()) {
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -56,6 +52,15 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
         if (!apiEnabled) {
             getFailureHandler().onFailure(request, response, new ForbiddenException("API has been disabled by blogger currently"));
+            return;
+        }
+
+        // Get token
+        String token = getTokenFromRequest(request);
+
+        if (StringUtils.isBlank(token)) {
+            // If the token is missing
+            getFailureHandler().onFailure(request, response, new AuthenticationException("Missing API token"));
             return;
         }
 

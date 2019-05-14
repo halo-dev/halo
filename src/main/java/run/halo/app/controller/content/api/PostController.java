@@ -13,13 +13,17 @@ import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
+import run.halo.app.model.vo.CommentWithHasChildrenVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
+
+import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -73,6 +77,22 @@ public class PostController {
 
         return detailDTO;
     }
+
+    @GetMapping("{postId:\\d+}/comments/top_view")
+    public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("postId") Integer postId,
+                                                          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        return postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+    }
+
+
+    @GetMapping("{postId:\\d+}/comments/{commentParentId:\\d+}/children")
+    public List<BaseCommentDTO> listChildrenBy(@PathVariable("postId") Integer postId,
+                                               @PathVariable("commentParentId") Integer commentParentId,
+                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        return postCommentService.listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
+    }
+
 
     @GetMapping("{postId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
