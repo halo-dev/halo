@@ -151,8 +151,6 @@ public class HaloConfiguration {
                 "/api/admin/installations",
                 "/api/admin/recoveries/migrations/*"
         );
-        adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/admin/comments", HttpMethod.POST.name());
-        adminAuthenticationFilter.addTryAuthUrlMethodPattern("/api/content/comments", HttpMethod.POST.name());
         adminAuthenticationFilter.setFailureHandler(
                 failureHandler);
 

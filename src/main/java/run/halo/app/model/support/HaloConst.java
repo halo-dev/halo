@@ -1,5 +1,7 @@
 package run.halo.app.model.support;
 
+import java.io.File;
+
 /**
  * <pre>
  *     公共常量
@@ -24,6 +26,11 @@ public class HaloConst {
      * version constant
      */
     public static final String HALO_VERSION;
+
+    /**
+     * Path separator.
+     */
+    public static final String FILE_SEPARATOR = File.separator;
 
     /**
      * Suffix of freemarker template file

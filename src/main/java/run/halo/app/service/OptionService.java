@@ -71,6 +71,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return Map
      */
     @NonNull
+    @Transactional
     Map<String, Object> listOptions();
 
     /**

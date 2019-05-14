@@ -6,12 +6,9 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import run.halo.app.model.entity.User;
-import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.ThemeService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * Error page Controller
@@ -29,8 +26,6 @@ public class CommonController implements ErrorController {
 
     private static final String INTERNAL_ERROR_TEMPLATE = "500.ftl";
 
-    private static final String ADMIN_URL = "/admin";
-
     private final ThemeService themeService;
 
     public CommonController(ThemeService themeService) {
@@ -44,12 +39,8 @@ public class CommonController implements ErrorController {
      * @return String
      */
     @GetMapping(value = ERROR_PATH)
-    public String handleError(HttpServletRequest request, HttpSession session) {
+    public String handleError(HttpServletRequest request) {
         final Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-
-        final String requestURI = request.getRequestURI();
-
-        final User user = (User) session.getAttribute(HaloConst.USER_SESSION_KEY);
 
         log.error("Error path: [{}], status: [{}]", getErrorPath(), statusCode);
 
@@ -62,38 +53,15 @@ public class CommonController implements ErrorController {
             if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
                 // TODO May cause unknown-reason problem
                 // if Ftl was not found then redirect to /404
-                if (requestURI.contains(ADMIN_URL) && null != user) {
-                    return "redirect:/admin/404";
-                } else {
-                    return "redirect:/404";
-                }
+                return "redirect:/404";
             }
         }
-        if (requestURI.contains(ADMIN_URL) && null != user) {
-            return "redirect:/admin/500";
-        } else {
+
+        if (statusCode == 500) {
             return "redirect:/500";
+        } else {
+            return "redirect:/404";
         }
-    }
-
-    /**
-     * Render 404 error page
-     *
-     * @return template path:
-     */
-    @GetMapping(value = "/admin/404")
-    public String adminNotFround() {
-        return "common/error/404";
-    }
-
-    /**
-     * Render 500 error page
-     *
-     * @return template path:
-     */
-    @GetMapping(value = "/admin/500")
-    public String adminInternalError() {
-        return "common/error/500";
     }
 
     /**

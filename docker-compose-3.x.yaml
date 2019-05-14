@@ -18,7 +18,7 @@ services:
       - halo
 
   halo:
-    image: ruibaby/halo
+    image: ruibaby/halo:latest-dev
     container_name: halo
     hostname: halo
     restart: always
@@ -29,7 +29,7 @@ services:
     env_file:
       - ./halo.env
     volumes:
-      - ~/halo:/root/halo
+      - ~/.halo:/root/.halo
 
   docker-gen:
     image: jwilder/docker-gen

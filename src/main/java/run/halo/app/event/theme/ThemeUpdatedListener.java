@@ -1,9 +1,10 @@
 package run.halo.app.event.theme;
 
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.service.ThemeService;
 
 /**
@@ -13,7 +14,7 @@ import run.halo.app.service.ThemeService;
  * @date 19-4-29
  */
 @Component
-public class ThemeUpdatedListener implements ApplicationListener<ThemeUpdatedEvent> {
+public class ThemeUpdatedListener {
 
     private final StringCacheStore cacheStore;
 
@@ -21,9 +22,13 @@ public class ThemeUpdatedListener implements ApplicationListener<ThemeUpdatedEve
         this.cacheStore = cacheStore;
     }
 
-    @Override
-    @Async
+    @EventListener
     public void onApplicationEvent(ThemeUpdatedEvent event) {
+        cacheStore.delete(ThemeService.THEMES_CACHE_KEY);
+    }
+
+    @EventListener
+    public void onOptionUpdatedEvent(OptionUpdatedEvent optionUpdatedEvent) {
         cacheStore.delete(ThemeService.THEMES_CACHE_KEY);
     }
 }

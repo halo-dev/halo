@@ -15,6 +15,7 @@ import run.halo.app.repository.SheetCommentRepository;
 import run.halo.app.repository.SheetRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
+import run.halo.app.service.UserService;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.Collections;
@@ -38,9 +39,10 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
 
     public SheetCommentServiceImpl(SheetCommentRepository sheetCommentRepository,
                                    OptionService optionService,
+                                   UserService userService,
                                    ApplicationEventPublisher eventPublisher,
                                    SheetRepository sheetRepository) {
-        super(sheetCommentRepository, optionService, eventPublisher);
+        super(sheetCommentRepository, optionService, userService, eventPublisher);
         this.sheetCommentRepository = sheetCommentRepository;
         this.sheetRepository = sheetRepository;
     }
