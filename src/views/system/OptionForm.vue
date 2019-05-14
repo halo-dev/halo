@@ -532,6 +532,12 @@
                   <a-input v-model="options.blog_api_access_key" />
                 </a-form-item>
                 <a-form-item
+                  label="屏蔽搜索引擎："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-switch v-model="options.spider_disabled" />
+                </a-form-item>
+                <a-form-item
                   label="统计代码："
                   :wrapper-col="wrapperCol"
                 >
