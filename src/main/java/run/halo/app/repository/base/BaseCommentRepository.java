@@ -9,6 +9,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
 
 import java.util.List;
@@ -57,7 +58,10 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @param postIds post id collection must not be null
      * @return a list of comment count
      */
-//    @Query("select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), comment.postId) from BaseComment comment where comment.postId in ?1 group by comment.postId")
+    @Query("select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), comment.postId) " +
+            "from BaseComment comment " +
+            "where comment.postId in ?1 " +
+            "group by comment.postId")
     @NonNull
     List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
 
@@ -89,4 +93,11 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      */
     @NonNull
     Page<COMMENT> findAllByPostIdAndStatus(Integer postId, CommentStatus status, Pageable pageable);
+
+    @Query("select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment.id), comment.parentId) " +
+            "from BaseComment comment " +
+            "where comment.parentId in ?1 " +
+            "group by comment.parentId")
+    @NonNull
+    List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Iterable<Long> commentIds);
 }
