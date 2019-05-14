@@ -425,7 +425,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         Assert.notNull(pageable, "Page info must not be null");
 
         // Get all comments
-        Page<COMMENT> topCommentPage = baseCommentRepository.findAllByPostIdAndStatus(targetId, status, pageable);
+        Page<COMMENT> topCommentPage = baseCommentRepository.findAllByPostIdAndStatusAndParentId(targetId, status, 0L, pageable);
 
         // Get top comment ids
         Set<Long> topCommentIds = ServiceUtils.fetchProperty(topCommentPage.getContent(), BaseComment::getId);
