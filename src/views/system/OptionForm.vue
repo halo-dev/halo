@@ -531,7 +531,7 @@
                   label="Access key："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_api_access_key" />
+                  <a-input v-model="options.api_token" />
                 </a-form-item>
                 <a-form-item
                   label="屏蔽搜索引擎："
