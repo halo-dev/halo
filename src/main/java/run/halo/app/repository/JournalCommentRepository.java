@@ -16,8 +16,8 @@ import java.util.List;
  */
 public interface JournalCommentRepository extends BaseCommentRepository<JournalComment> {
 
-    @Query("select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), comment.postId) from JournalComment comment where comment.postId in ?1 group by comment.postId")
-    @NonNull
-    @Override
-    List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
+//    @Query("select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), comment.postId) from JournalComment comment where comment.postId in ?1 group by comment.postId")
+//    @NonNull
+//    @Override
+//    List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
 }
