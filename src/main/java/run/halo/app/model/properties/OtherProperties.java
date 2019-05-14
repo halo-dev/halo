@@ -12,7 +12,12 @@ public enum OtherProperties implements PropertyEnum {
 
     API_TOKEN("api_token", String.class, ""),
 
-    STATISTICS_CODE("statistics_code", String.class, "");
+    STATISTICS_CODE("statistics_code", String.class, ""),
+
+    /**
+     * 是否禁止爬虫
+     */
+    SPIDER_DISABLE("spider_disable",Boolean.class,"false");
 
     private final String value;
 
