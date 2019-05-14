@@ -94,9 +94,21 @@ export default {
         },
         {
           name: 'John Niang',
-          avatar: 'https://johnniang.me/imgs/avatar.png',
+          avatar: 'https://gravatar.loli.net/avatar/1dcf60ef27363dae539385d5bae9b2bd?s=256&d=mm',
           website: 'https://johnniang.me',
           github: 'https://github.com/johnniang'
+        },
+        {
+          name: 'Aquan',
+          avatar: 'https://gravatar.loli.net/avatar/3958035fa354403fa9ca3fca36b08068?s=256&d=mm',
+          website: 'https://blog.eunji.cn',
+          github: 'https://github.com/aquanlerou'
+        },
+        {
+          name: 'appdev',
+          avatar: 'https://gravatar.loli.net/avatar/08cf681fb7c6ad1b4fe70a8269c2103c?s=256&d=mm',
+          website: 'https://www.apkdv.com',
+          github: 'https://github.com/appdev'
         }
       ],
       steps: [
