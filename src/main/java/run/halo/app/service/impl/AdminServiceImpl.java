@@ -15,6 +15,7 @@ import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.token.AuthToken;
@@ -180,6 +181,8 @@ public class AdminServiceImpl implements AdminService {
         environmentDTO.setStartTime(runtimeMXBean.getStartTime());
 
         environmentDTO.setDatabase("org.h2.Driver".equals(driverClassName) ? "H2" : "MySQL");
+
+        environmentDTO.setVersion(HaloConst.HALO_VERSION);
 
         return environmentDTO;
     }

@@ -79,17 +79,6 @@ public interface UserService extends CrudService<User, Integer> {
     User getByEmailOfNonNull(@NonNull String email);
 
     /**
-     * Logins by username and password.
-     *
-     * @param key      username or email must not be blank
-     * @param password password must not be blank
-     * @return user info
-     */
-    @NonNull
-    @Deprecated
-    User login(@NonNull String key, @NonNull String password);
-
-    /**
      * Updates user password.
      *
      * @param oldPassword old password must not be blank
@@ -125,4 +114,12 @@ public interface UserService extends CrudService<User, Integer> {
      * @return true if the given password is match the user password; false otherwise
      */
     boolean passwordMatch(@NonNull User user, @Nullable String plainPassword);
+
+    /**
+     * Set user password.
+     *
+     * @param user          user must not be null
+     * @param plainPassword plain password must not be blank
+     */
+    void setPassword(@NonNull User user, @NonNull String plainPassword);
 }

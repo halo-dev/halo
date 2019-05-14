@@ -24,7 +24,7 @@ public class InstallParam extends UserParam {
     /**
      * Blog title.
      */
-    @NotBlank(message = "Blog title must not be blank", groups = CreateCheck.class)
+    @NotBlank(message = "博客名称不能为空", groups = CreateCheck.class)
     private String title;
 
     /**

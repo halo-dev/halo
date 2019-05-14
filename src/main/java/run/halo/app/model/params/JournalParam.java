@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 @Data
 public class JournalParam implements InputConverter<Journal> {
 
-    @NotBlank(message = "Content must not be blank")
-    @Size(max = 511, message = "Length of comment content must not be more than {max}")
+    @NotBlank(message = "内容不能为空")
+    @Size(max = 511, message = "内容的字符长度不能超过 {max}")
     private String content;
 }

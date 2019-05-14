@@ -1,8 +1,6 @@
 package run.halo.app.model.dto.base;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -35,6 +33,8 @@ public class OutputConverterTest {
     }
 
     @Data
+    @ToString
+    @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TestDomain {
@@ -45,6 +45,8 @@ public class OutputConverterTest {
     }
 
     @Data
+    @ToString
+    @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TestOutputDTO implements OutputConverter<TestOutputDTO, TestDomain> {
@@ -53,6 +55,8 @@ public class OutputConverterTest {
     }
 
     @Data
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubTestOutputDTO extends TestOutputDTO {

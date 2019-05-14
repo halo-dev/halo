@@ -40,6 +40,7 @@ public class RecoveryServiceTest {
         log.debug(migrationObject.getClass().toString());
 
         if (migrationObject instanceof Map) {
+            @SuppressWarnings("unchecked")
             Map<String, Object> migrationMap = (Map<String, Object>) migrationObject;
 
             migrationMap.forEach((key, value) -> log.debug("Key: [{}], value type: [{}], value: [{}]", key, value.getClass().getTypeName(), value));

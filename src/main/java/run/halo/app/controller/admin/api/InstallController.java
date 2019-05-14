@@ -16,23 +16,21 @@ import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.User;
-import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.*;
-import run.halo.app.model.properties.*;
+import run.halo.app.model.properties.BlogProperties;
+import run.halo.app.model.properties.PrimaryProperties;
+import run.halo.app.model.properties.PropertyEnum;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.CreateCheck;
 import run.halo.app.service.*;
 import run.halo.app.utils.ValidationUtils;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
 /**
  * Installation controller.
@@ -196,6 +194,8 @@ public class InstallController {
         return userService.getCurrentUser().map(user -> {
             // Update this user
             installParam.update(user);
+            // Set password manually
+            userService.setPassword(user, installParam.getPassword());
             // Update user
             return userService.update(user);
         }).orElseGet(() -> userService.createBy(installParam));

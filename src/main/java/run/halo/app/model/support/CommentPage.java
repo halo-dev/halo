@@ -1,6 +1,8 @@
 package run.halo.app.model.support;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -13,6 +15,8 @@ import java.util.List;
  * @date 3/25/19
  */
 @Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class CommentPage<T> extends PageImpl<T> {
 
     /**

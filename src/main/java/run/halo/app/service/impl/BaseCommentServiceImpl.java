@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.User;
@@ -32,6 +33,7 @@ import run.halo.app.repository.base.BaseCommentRepository;
 import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.UserService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BaseCommentService;
 import run.halo.app.utils.ServiceUtils;
@@ -55,14 +57,17 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
     protected final OptionService optionService;
 
+    protected final UserService userService;
+
     protected final ApplicationEventPublisher eventPublisher;
 
     public BaseCommentServiceImpl(BaseCommentRepository<COMMENT> baseCommentRepository,
                                   OptionService optionService,
-                                  ApplicationEventPublisher eventPublisher) {
+                                  UserService userService, ApplicationEventPublisher eventPublisher) {
         super(baseCommentRepository);
         this.baseCommentRepository = baseCommentRepository;
         this.optionService = optionService;
+        this.userService = userService;
         this.eventPublisher = eventPublisher;
     }
 
@@ -275,6 +280,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
+            // Blogger comment
             User user = authentication.getDetail().getUser();
             commentParam.setAuthor(StringUtils.isBlank(user.getNickname()) ? user.getUsername() : user.getNickname());
             commentParam.setEmail(user.getEmail());
@@ -283,6 +289,14 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         // Validate the comment param manually
         ValidationUtils.validate(commentParam);
+
+        if (authentication == null) {
+            // Anonymous comment
+            // Check email
+            if (userService.getByEmail(commentParam.getEmail()).isPresent()) {
+                throw new BadRequestException("不能使用博主的邮件，如果您是博主，请登录管理端进行回复。");
+            }
+        }
 
         // Convert to comment
         return create(commentParam.convertTo());

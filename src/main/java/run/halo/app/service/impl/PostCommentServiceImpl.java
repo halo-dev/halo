@@ -18,6 +18,7 @@ import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
+import run.halo.app.service.UserService;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.Collections;
@@ -42,9 +43,10 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
 
     public PostCommentServiceImpl(PostCommentRepository postCommentRepository,
                                   PostRepository postRepository,
+                                  UserService userService,
                                   OptionService optionService,
                                   ApplicationEventPublisher eventPublisher) {
-        super(postCommentRepository, optionService, eventPublisher);
+        super(postCommentRepository, optionService, userService, eventPublisher);
         this.postCommentRepository = postCommentRepository;
         this.postRepository = postRepository;
     }

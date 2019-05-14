@@ -16,8 +16,8 @@ import javax.validation.constraints.Size;
 @Data
 public class AttachmentParam implements InputConverter<Attachment> {
 
-    @NotBlank(message = "Attachment name must not be blank")
-    @Size(max = 255, message = "Length of attachment name must not be more than {max}")
+    @NotBlank(message = "附件名称不能为空")
+    @Size(max = 255, message = "附件名称的字符长度不能超过 {max}")
     private String name;
 
 }

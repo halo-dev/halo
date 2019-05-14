@@ -15,6 +15,7 @@ import run.halo.app.repository.JournalCommentRepository;
 import run.halo.app.repository.JournalRepository;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.UserService;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.Collections;
@@ -38,8 +39,9 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
 
     public JournalCommentServiceImpl(JournalCommentRepository journalCommentRepository,
                                      OptionService optionService,
+                                     UserService userService,
                                      ApplicationEventPublisher eventPublisher, JournalRepository journalRepository) {
-        super(journalCommentRepository, optionService, eventPublisher);
+        super(journalCommentRepository, optionService, userService, eventPublisher);
         this.journalCommentRepository = journalCommentRepository;
         this.journalRepository = journalRepository;
     }
