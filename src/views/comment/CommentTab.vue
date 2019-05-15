@@ -120,11 +120,19 @@
             {{ statusProperty.text }}
           </span>
           <a
+            v-if="type==='posts'"
             slot="post"
             slot-scope="post"
             :href="options.blog_url+'/archives/'+post.url"
             target="_blank"
           >{{ post.title }}</a>
+          <a
+            v-else
+            slot="sheet"
+            slot-scope="sheet"
+            :href="options.blog_url+'/s/'+sheet.url"
+            target="_blank"
+          >{{ sheet.title }}</a>
           <span
             slot="createTime"
             slot-scope="createTime"
@@ -241,7 +249,40 @@
 import commentApi from '@/api/comment'
 import optionApi from '@/api/option'
 import marked from 'marked'
-const columns = [
+const postColumns = [
+  {
+    title: '昵称',
+    dataIndex: 'author'
+  },
+  {
+    title: '内容',
+    dataIndex: 'content',
+    scopedSlots: { customRender: 'content' }
+  },
+  {
+    title: '状态',
+    className: 'status',
+    dataIndex: 'statusProperty',
+    scopedSlots: { customRender: 'status' }
+  },
+  {
+    title: '评论文章',
+    dataIndex: 'post',
+    scopedSlots: { customRender: 'post' }
+  },
+  {
+    title: '日期',
+    dataIndex: 'createTime',
+    scopedSlots: { customRender: 'createTime' }
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    width: '150px',
+    scopedSlots: { customRender: 'action' }
+  }
+]
+const sheetColumns = [
   {
     title: '昵称',
     dataIndex: 'author'
@@ -259,8 +300,8 @@ const columns = [
   },
   {
     title: '评论页面',
-    dataIndex: 'post',
-    scopedSlots: { customRender: 'post' }
+    dataIndex: 'sheet',
+    scopedSlots: { customRender: 'sheet' }
   },
   {
     title: '日期',
@@ -288,7 +329,7 @@ export default {
   },
   data() {
     return {
-      columns,
+      columns: this.type === 'posts' ? postColumns : sheetColumns,
       replyCommentVisible: false,
       pagination: {
         current: 1,
