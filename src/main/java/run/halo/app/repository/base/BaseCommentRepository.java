@@ -100,11 +100,33 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @param postId   post id must not be null
      * @param status   comment status must not be null
      * @param parentId comment parent id must not be null
+     * @return a list of comment
+     */
+    @NonNull
+    List<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status, Long parentId);
+
+    /**
+     * Finds all comments by status and parent id collection.
+     *
+     * @param status    comment status must not be null
+     * @param parentIds parent id collection must not be null
+     * @return a list of comment
+     */
+    @NonNull
+    List<COMMENT> findAllByStatusAndParentIdIn(@NonNull CommentStatus status, @NonNull Iterable<Long> parentIds);
+
+    /**
+     * Finds comments by post id, comment status and parent id.
+     *
+     * @param postId   post id must not be null
+     * @param status   comment status must not be null
+     * @param parentId comment parent id must not be null
      * @param pageable page info must not be null
      * @return a page of comment
      */
     @NonNull
     Page<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status, Long parentId, Pageable pageable);
+
 
     @Query("select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment.id), comment.parentId) " +
             "from BaseComment comment " +

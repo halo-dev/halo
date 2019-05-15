@@ -445,12 +445,55 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
-    public List<BaseCommentDTO> listChildrenBy(Integer targetId, Integer commentParentId, CommentStatus status, Sort sort) {
+    public List<COMMENT> listChildrenBy(Integer targetId, Long commentParentId, CommentStatus status, Sort sort) {
         Assert.notNull(targetId, "Target id must not be null");
         Assert.notNull(commentParentId, "Comment parent id must not be null");
         Assert.notNull(sort, "Sort info must not be null");
 
-        return null;
+        // Get comments recursively
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByPostIdAndStatusAndParentId(targetId, status, commentParentId);
+
+        // Create result container
+        Set<COMMENT> children = new HashSet<>();
+
+        // Get children comments
+        getChildrenRecursively(directChildren, status, children);
+
+        // Sort children
+        List<COMMENT> childrenList = new ArrayList<>(children);
+        childrenList.sort(Comparator.comparing(BaseComment::getId));
+
+        return childrenList;
+    }
+
+    /**
+     * Get children comments recursively.
+     *
+     * @param topComments top comment list
+     * @param status      comment status must not be null
+     * @param children    children result must not be null
+     */
+    private void getChildrenRecursively(@Nullable List<COMMENT> topComments, @NonNull CommentStatus status, @NonNull Set<COMMENT> children) {
+        Assert.notNull(status, "Comment status must not be null");
+        Assert.notNull(children, "Children comment set must not be null");
+
+        if (CollectionUtils.isEmpty(topComments)) {
+            return;
+        }
+
+        // Convert comment id set
+        Set<Long> commentIds = ServiceUtils.fetchProperty(topComments, COMMENT::getId);
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByStatusAndParentIdIn(status, commentIds);
+
+        // Recursively invoke
+        getChildrenRecursively(directChildren, status, children);
+
+        // Add direct children to children result
+        children.addAll(topComments);
     }
 
     /**

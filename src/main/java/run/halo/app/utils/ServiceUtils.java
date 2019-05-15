@@ -31,6 +31,7 @@ public class ServiceUtils {
      * @param <T>             data type
      * @return a set of id
      */
+    @NonNull
     public static <ID, T> Set<ID> fetchProperty(final Collection<T> datas, Function<T, ID> mappingFunction) {
         return CollectionUtils.isEmpty(datas) ?
                 Collections.emptySet() :
@@ -47,6 +48,7 @@ public class ServiceUtils {
      * @param <D>             data type
      * @return a map which key is in ids and value containing in list
      */
+    @NonNull
     public static <ID, D> Map<ID, List<D>> convertToListMap(Collection<ID> ids, Collection<D> list, Function<D, ID> mappingFunction) {
         Assert.notNull(mappingFunction, "mapping function must not be null");
 
@@ -72,6 +74,7 @@ public class ServiceUtils {
      * @param <D>             data type
      * @return a map which key from list data and value is data
      */
+    @NonNull
     public static <ID, D> Map<ID, D> convertToMap(Collection<D> list, Function<D, ID> mappingFunction) {
         Assert.notNull(mappingFunction, "mapping function must not be null");
 
@@ -97,6 +100,7 @@ public class ServiceUtils {
      * @param <V>           value type
      * @return a map which key from list data and value is data
      */
+    @NonNull
     public static <ID, D, V> Map<ID, V> convertToMap(Collection<D> list, Function<D, ID> keyFunction, Function<D, V> valueFunction) {
         Assert.notNull(keyFunction, "mapping function must not be null");
 
