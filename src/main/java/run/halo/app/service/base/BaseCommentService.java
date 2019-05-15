@@ -213,5 +213,5 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      * @return a list of children comment
      */
     @NonNull
-    List<BaseCommentDTO> listChildrenBy(@NonNull Integer targetId, @NonNull Integer commentParentId, @NonNull CommentStatus status, @NonNull Sort sort);
+    List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull CommentStatus status, @NonNull Sort sort);
 }

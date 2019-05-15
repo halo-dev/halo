@@ -13,6 +13,7 @@ import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostCommentParam;
@@ -88,9 +89,12 @@ public class PostController {
 
     @GetMapping("{postId:\\d+}/comments/{commentParentId:\\d+}/children")
     public List<BaseCommentDTO> listChildrenBy(@PathVariable("postId") Integer postId,
-                                               @PathVariable("commentParentId") Integer commentParentId,
+                                               @PathVariable("commentParentId") Long commentParentId,
                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return postCommentService.listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
+        // Find all children comments
+        List<PostComment> postComments = postCommentService.listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
+        // Convert to base comment dto
+        return postCommentService.convertTo(postComments);
     }
 
 
