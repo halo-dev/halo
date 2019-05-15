@@ -20,6 +20,36 @@ function latestComment(target, top, status) {
   })
 }
 
+commentApi.queryComment = (target, params) => {
+  return service({
+    url: `${baseUrl}/${target}/comments`,
+    params: params,
+    method: 'get'
+  })
+}
+
+commentApi.updateStatus = (target, commentId, status) => {
+  return service({
+    url: `${baseUrl}/${target}/comments/${commentId}/status/${status}`,
+    method: 'put'
+  })
+}
+
+commentApi.delete = (target, commentId) => {
+  return service({
+    url: `${baseUrl}/${target}/comments/${commentId}`,
+    method: 'delete'
+  })
+}
+
+commentApi.create = (target, comment) => {
+  return service({
+    url: `${baseUrl}/${target}/comments`,
+    data: comment,
+    method: 'post'
+  })
+}
+
 /**
  * Creates a comment.
  * @param {String} target
