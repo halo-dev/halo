@@ -50,11 +50,12 @@ public interface PostService extends BasePostService<Post> {
      * @param post        post must not be null
      * @param tagIds      tag id set
      * @param categoryIds category id set
+     * @param autoSave    autoSave
      * @return post created
      */
     @NonNull
     @Transactional
-    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds);
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
 
     /**
      * Updates post by post, tag id set and category id set.
@@ -62,11 +63,12 @@ public interface PostService extends BasePostService<Post> {
      * @param postToUpdate post to update must not be null
      * @param tagIds       tag id set
      * @param categoryIds  category id set
+     * @param autoSave     autoSave
      * @return updated post
      */
     @NonNull
     @Transactional
-    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds);
+    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
 
     /**
      * Gets post by post status and url.
