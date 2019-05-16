@@ -43,19 +43,19 @@
                     :to="{name:'LinkList'}"
                     v-if="record.id==1"
                   >
-                    <a href="javascript:void(0);">编辑</a>
+                    <a href="javascript:void(0);">管理</a>
                   </router-link>
                   <router-link
                     :to="{name:'PhotoList'}"
                     v-if="record.id==2"
                   >
-                    <a href="javascript:void(0);">编辑</a>
+                    <a href="javascript:void(0);">管理</a>
                   </router-link>
                   <router-link
                     :to="{name:'JournalList'}"
                     v-if="record.id==3"
                   >
-                    <a href="javascript:void(0);">编辑</a>
+                    <a href="javascript:void(0);">管理</a>
                   </router-link>
                   <a-divider type="vertical" />
                   <a :href="options.blog_url+record.url" target="_blank">查看</a>

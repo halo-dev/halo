@@ -118,8 +118,8 @@
                     <a-list-item-meta>
                       <a
                         slot="title"
-                        href="javascript:void(0);"
-                        @click="handleEditPostClick(item)"
+                        :href="options.blog_url+'/archives/'+item.url"
+                        target="_blank"
                       >{{ item.title }}</a>
                     </a-list-item-meta>
                     <div>{{ item.createTime | timeAgo }}</div>
@@ -297,6 +297,7 @@ import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import RecentCommentTab from './components/RecentCommentTab'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import optionApi from '@/api/option'
 
 import postApi from '@/api/post'
 import logApi from '@/api/log'
@@ -323,6 +324,8 @@ export default {
       countsData: {},
       journal: {},
       logs: [],
+      options: [],
+      keys: ['blog_url'],
       logPagination: {
         page: 1,
         size: 50,
@@ -334,6 +337,7 @@ export default {
     this.getCounts()
     this.listLatestPosts()
     this.listLatestLogs()
+    this.loadOptions()
   },
   computed: {
     formattedPostData() {
@@ -357,6 +361,11 @@ export default {
     }
   },
   methods: {
+    loadOptions() {
+      optionApi.listAll(this.keys).then(response => {
+        this.options = response.data.data
+      })
+    },
     listLatestPosts() {
       postApi.listLatest(5).then(response => {
         this.postData = response.data.data
