@@ -4,7 +4,7 @@ const baseUrl = '/api/admin/posts'
 
 const postApi = {}
 
-postApi.listLatest = (top) => {
+postApi.listLatest = top => {
   return service({
     url: `${baseUrl}/latest`,
     params: {
