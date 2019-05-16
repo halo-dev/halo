@@ -59,8 +59,7 @@ public class ThemeController {
 
     @PutMapping("files/content")
     public void updateContentBy(@RequestParam(name = "path") String path,
-                                @RequestParam(name = "content") String content) {
-        // TODO Refactor the params to body
+                                @RequestBody String content) {
         themeService.saveTemplateContent(path, content);
     }
 
