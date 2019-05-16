@@ -77,22 +77,24 @@ public class PostController {
     }
 
     @PostMapping
-    public PostDetailVO createBy(@Valid @RequestBody PostParam postParam) {
+    public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
+                                 @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Convert to
         Post post = postParam.convertTo();
 
-        return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds());
+        return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), autoSave);
     }
 
     @PutMapping("{postId:\\d+}")
     public PostDetailVO updateBy(@Valid @RequestBody PostParam postParam,
-                                 @PathVariable("postId") Integer postId) {
+                                 @PathVariable("postId") Integer postId,
+                                 @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
 
         postParam.update(postToUpdate);
 
-        return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds());
+        return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(), autoSave);
     }
 
     @PutMapping("{postId:\\d+}/status/{status}")
