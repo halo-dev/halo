@@ -110,9 +110,9 @@ themeApi.saveContent = (path, content) => {
   return service({
     url: `${baseUrl}/files/content`,
     params: {
-      path: path,
-      content: content
+      path: path
     },
+    data: content,
     method: 'put'
   })
 }
