@@ -31,16 +31,20 @@ async function reRequest(error) {
 let refreshTask = null
 
 async function refreshToken(error) {
+  const refreshToken = store.getters.token.refresh_token
   try {
     if (refreshTask === null) {
-      refreshTask = store.dispatch('refreshToken', store.getters.token.refresh_token)
+      refreshTask = store.dispatch('refreshToken', refreshToken)
     }
 
     await refreshTask
-
-    refreshTask = null
   } catch (err) {
+    if (err.response && err.response.data && err.response.data.data === refreshToken) {
+      router.push({ name: 'Login' })
+    }
     Vue.$log.error('Failed to refresh token', err)
+  } finally {
+    refreshTask = null
   }
   // Rerequest the request
   return reRequest(error)
