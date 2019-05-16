@@ -5,7 +5,6 @@
     placement="bottomRight"
     :autoAdjustOverflow="true"
     :arrowPointAtCenter="true"
-    overlayClassName="header-comment-wrapper"
     :overlayStyle="{ width: '300px', top: '50px' }"
     title="待审核评论"
   >
@@ -186,12 +185,6 @@ export default {
   }
 }
 </script>
-
-<style lang="css">
-.header-comment-wrapper {
-  top: 50px !important;
-}
-</style>
 <style lang="less" scoped>
 .header-comment {
   display: inline-block;
