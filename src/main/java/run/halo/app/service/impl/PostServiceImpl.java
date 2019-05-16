@@ -144,37 +144,26 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds) {
-        return createOrUpdate(postToCreate, tagIds, categoryIds);
-    }
-
-    @Override
-    public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds) {
-        // Set edit time
-        postToUpdate.setEditTime(DateUtils.now());
-
-        return createOrUpdate(postToUpdate, tagIds, categoryIds);
-    }
-
-    @Override
-    public Post create(Post post) {
-        Post createdPost = super.create(post);
-
-        // Log the creation
-        LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
-        eventPublisher.publishEvent(logEvent);
-
+    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
+        PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds);
+        if(!autoSave){
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
         return createdPost;
     }
 
     @Override
-    public Post update(Post post) {
-        Post updatedPost = super.update(post);
-
-        // Log the creation
-        LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(), LogType.POST_EDITED, updatedPost.getTitle());
-        eventPublisher.publishEvent(logEvent);
-
+    public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
+        // Set edit time
+        postToUpdate.setEditTime(DateUtils.now());
+        PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds);
+        if(!autoSave){
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(), LogType.POST_EDITED, updatedPost.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
         return updatedPost;
     }
 
