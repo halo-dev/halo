@@ -136,19 +136,19 @@
                       tab="文章"
                       key="1"
                     >
-                      <recent-comment-tab type="post"></recent-comment-tab>
+                      <recent-comment-tab type="posts"></recent-comment-tab>
                     </a-tab-pane>
                     <a-tab-pane
                       tab="页面"
                       key="2"
                     >
-                      <recent-comment-tab type="sheet"></recent-comment-tab>
+                      <recent-comment-tab type="sheets"></recent-comment-tab>
                     </a-tab-pane>
                     <a-tab-pane
                       tab="日志"
                       key="3"
                     >
-                      <recent-comment-tab type="journal"></recent-comment-tab>
+                      <recent-comment-tab type="journals"></recent-comment-tab>
                     </a-tab-pane>
                   </a-tabs>
                 </div>

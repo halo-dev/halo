@@ -10,11 +10,17 @@
       :key="index"
     >
       <a-comment :avatar="'//gravatar.loli.net/avatar/'+item.gavatarMd5+'/?s=256&d=mp'">
-        <template slot="author">
+        <template slot="author" v-if="type==='posts'">
           {{ item.author }} 发表在 《<a
             href="javascript:void(0);"
             target="_blank"
           >{{ item.post.title }}</a>》
+        </template>
+        <template slot="author" v-else-if="type==='sheets'">
+          {{ item.author }} 发表在 《<a
+            href="javascript:void(0);"
+            target="_blank"
+          >{{ item.sheet.title }}</a>》
         </template>
         <template slot="actions">
           <span>回复</span>
@@ -44,9 +50,9 @@ export default {
     type: {
       type: String,
       required: false,
-      default: 'post',
+      default: 'posts',
       validator: function(value) {
-        return ['post', 'sheet', 'journal'].indexOf(value) !== -1
+        return ['posts', 'sheets', 'journals'].indexOf(value) !== -1
       }
     }
   },
@@ -70,26 +76,10 @@ export default {
   methods: {
     loadComments() {
       this.loading = true
-      switch (this.type) {
-        case 'post':
-          commentApi.latestPostComment(5, 'PUBLISHED').then(response => {
-            this.comments = response.data.data
-            this.loading = false
-          })
-          break
-        case 'sheet':
-          commentApi.latestSheetComment(5, 'PUBLISHED').then(response => {
-            this.comments = response.data.data
-            this.loading = false
-          })
-          break
-        case 'journal':
-          commentApi.latestJournalComment(5, 'PUBLISHED').then(response => {
-            this.comments = response.data.data
-            this.loading = false
-          })
-          break
-      }
+      commentApi.latestComment(this.type, 5, 'PUBLISHED').then(response => {
+        this.comments = response.data.data
+        this.loading = false
+      })
     }
   }
 }

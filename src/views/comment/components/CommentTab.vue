@@ -321,7 +321,7 @@ export default {
     type: {
       type: String,
       required: false,
-      default: 'post',
+      default: 'posts',
       validator: function(value) {
         return ['posts', 'sheets', 'journals'].indexOf(value) !== -1
       }
