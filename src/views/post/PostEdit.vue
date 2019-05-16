@@ -288,7 +288,7 @@ export default {
         this.options = response.data.data
       })
     },
-    createOrUpdatePost(createSuccess, updateSuccess) {
+    createOrUpdatePost(createSuccess, updateSuccess, autoSave) {
       // Set category ids
       this.postToStage.categoryIds = this.selectedCategoryIds
       // Set tag ids
@@ -296,7 +296,7 @@ export default {
 
       if (this.postToStage.id) {
         // Update the post
-        postApi.update(this.postToStage.id, this.postToStage).then(response => {
+        postApi.update(this.postToStage.id, this.postToStage, autoSave).then(response => {
           this.$log.debug('Updated post', response.data.data)
           if (updateSuccess) {
             updateSuccess()
@@ -304,7 +304,7 @@ export default {
         })
       } else {
         // Create the post
-        postApi.create(this.postToStage).then(response => {
+        postApi.create(this.postToStage, autoSave).then(response => {
           this.$log.debug('Created post', response.data.data)
           if (createSuccess) {
             createSuccess()
@@ -314,11 +314,15 @@ export default {
       }
     },
     savePost() {
-      this.createOrUpdatePost(() => this.$message.success('文章创建成功'), () => this.$message.success('文章更新成功'))
+      this.createOrUpdatePost(
+        () => this.$message.success('文章创建成功'),
+        () => this.$message.success('文章更新成功'),
+        false
+      )
     },
     autoSavePost() {
       if (this.postToStage.title != null && this.postToStage.originalContent != null) {
-        this.createOrUpdatePost()
+        this.createOrUpdatePost(null, null, true)
       }
     },
     toggleCategoryForm() {
