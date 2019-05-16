@@ -170,15 +170,15 @@ export default {
       this.visible = !this.visible
     },
     getComment() {
-      commentApi.latestPostComment(5, 'AUDITING').then(response => {
+      commentApi.latestComment('posts', 5, 'AUDITING').then(response => {
         this.postComments = response.data.data
         this.loadding = false
       })
-      commentApi.latestSheetComment(5, 'AUDITING').then(response => {
+      commentApi.latestComment('sheets', 5, 'AUDITING').then(response => {
         this.sheetComments = response.data.data
         this.loadding = false
       })
-      commentApi.latestJournalComment(5, 'AUDITING').then(response => {
+      commentApi.latestComment('journals', 5, 'AUDITING').then(response => {
         this.journalComments = response.data.data
         this.loadding = false
       })

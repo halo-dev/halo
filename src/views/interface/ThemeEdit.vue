@@ -95,7 +95,7 @@ export default {
         this.buttonDisabled = true
         return
       }
-      if (file.name === 'options.yaml' || file.name === 'options.yml') {
+      if (file.name === 'settings.yaml' || file.name === 'settings.yml' || file.name === 'theme.yaml' || file.name === 'theme.yml') {
         this.$confirm({
           title: '警告：请谨慎修改该配置文件',
           content: '修改之后可能会产生不可预料的问题',
