@@ -31,13 +31,6 @@ configurations {
     }
 }
 
-bootJar {
-    manifest {
-        attributes('Implementation-Title': 'Halo Application',
-                'Implementation-Version': version)
-    }
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -69,4 +62,51 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+// 拷贝依赖包
+task copyJar(type: Copy) {
+    from configurations.runtimeClasspath
+    into "$buildDir/libs/lib"
+}
+
+// 拷贝资源文件
+task copyResources(type: Copy) {
+    from "src/main/resources"
+    into "$buildDir/libs/resources"
+}
+
+// 拷贝test资源文件
+task copyTestResources(type: Copy) {
+    from "src/main/resources"
+    into "$buildDir/resources/test"
+}
+
+processResources {
+    // 分离资源文件
+    exclude { "**/*.*" }
+}
+
+processTestResources {
+    dependsOn copyTestResources
+}
+
+bootJar {
+    // 分离lib
+    excludes = ["*.jar"]
+
+    // 拷贝lib和resources
+    dependsOn copyJar
+    dependsOn copyResources
+
+    // 写入lib和resource的相对路径到manifest
+    def libs = configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
+    def resource = "resources/"
+
+    manifest {
+        attributes('Implementation-Title': 'Halo Application',
+                'Implementation-Version': version,
+                'Class-Path': "${libs} ${resource}"
+        )
+    }
 }
