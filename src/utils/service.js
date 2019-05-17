@@ -12,15 +12,49 @@ const service = axios.create({
   withCredentials: true
 })
 
+function setTokenToHeader(config) {
+  // set token
+  const token = store.getters.token
+  Vue.$log.debug('Got token from store', token)
+  if (token && token.access_token) {
+    config.headers['Admin-Authorization'] = token.access_token
+  }
+}
+
+async function reRequest(error) {
+  const config = error.response.config
+  setTokenToHeader(config)
+  const res = await axios.request(config)
+  return res
+}
+
+let refreshTask = null
+
+async function refreshToken(error) {
+  const refreshToken = store.getters.token.refresh_token
+  try {
+    if (refreshTask === null) {
+      refreshTask = store.dispatch('refreshToken', refreshToken)
+    }
+
+    await refreshTask
+  } catch (err) {
+    if (err.response && err.response.data && err.response.data.data === refreshToken) {
+      router.push({ name: 'Login' })
+    }
+    Vue.$log.error('Failed to refresh token', err)
+  } finally {
+    refreshTask = null
+  }
+  // Rerequest the request
+  return reRequest(error)
+}
+
 service.interceptors.request.use(
   config => {
     NProgress.start()
     // TODO set token
-    const token = store.getters.token
-    Vue.$log.debug('Got token from store', token)
-    if (token && token.access_token) {
-      config.headers['Admin-Authorization'] = token.access_token
-    }
+    setTokenToHeader(config)
     return config
   },
   error => {
@@ -57,11 +91,10 @@ service.interceptors.response.use(
       } else if (data.status === 401) {
         // TODO handle 401 status error
         if (store.getters.token && store.getters.token.access_token === data.data) {
-          // Token expired
-          // TODO Refresh token
-          store.dispatch('refreshToken', store.getters.token.refresh_token).then(response => {
-            Vue.$log.debug('Refresh token successfully')
-          })
+          const res = refreshToken(error)
+          if (res !== error) {
+            return res
+          }
         } else {
           // Login
           router.push({ name: 'Login' })
