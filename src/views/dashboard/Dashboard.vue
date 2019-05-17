@@ -144,12 +144,12 @@
                     >
                       <recent-comment-tab type="sheets"></recent-comment-tab>
                     </a-tab-pane>
-                    <a-tab-pane
+                    <!-- <a-tab-pane
                       tab="日志"
                       key="3"
                     >
                       <recent-comment-tab type="journals"></recent-comment-tab>
-                    </a-tab-pane>
+                    </a-tab-pane> -->
                   </a-tabs>
                 </div>
               </a-tab-pane>

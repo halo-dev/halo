@@ -15,7 +15,7 @@
                 v-if="isMobile()"
               >
                 <a-collapse-panel
-                  v-for="(item,index) in internalPages"
+                  v-for="(item,index) in internalSheets"
                   :key="index"
                 >
                   <a
@@ -31,7 +31,7 @@
 
               <a-table
                 :columns="internalColumns"
-                :dataSource="internalPages"
+                :dataSource="internalSheets"
                 :pagination="false"
                 :rowKey="page => page.id"
               >
@@ -58,7 +58,10 @@
                     <a href="javascript:void(0);">管理</a>
                   </router-link>
                   <a-divider type="vertical" />
-                  <a :href="options.blog_url+record.url" target="_blank">查看</a>
+                  <a
+                    :href="options.blog_url+record.url"
+                    target="_blank"
+                  >查看</a>
                 </span>
               </a-table>
             </a-tab-pane>
@@ -151,6 +154,10 @@ const internalColumns = [
     dataIndex: 'url'
   },
   {
+    title: '状态',
+    dataIndex: 'status'
+  },
+  {
     title: '操作',
     dataIndex: 'action',
     width: '150px',
@@ -187,21 +194,24 @@ const customColumns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
-const internalPages = [
+const internalSheets = [
   {
     id: '1',
     name: '友情链接',
-    url: '/links'
+    url: '/links',
+    status: '可用'
   },
   {
     id: '2',
     name: '图库页面',
-    url: '/photos'
+    url: '/photos',
+    status: '可用'
   },
   {
     id: '3',
     name: '日志页面',
-    url: '/journals'
+    url: '/journals',
+    status: '实验性'
   }
 ]
 export default {
@@ -211,7 +221,7 @@ export default {
       sheetStatus: sheetApi.sheetStatus,
       internalColumns,
       customColumns,
-      internalPages,
+      internalSheets,
       sheets: [],
       options: [],
       keys: ['blog_url']

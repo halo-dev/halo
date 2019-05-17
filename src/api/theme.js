@@ -124,4 +124,14 @@ themeApi.reload = () => {
   })
 }
 
+themeApi.exists = template => {
+  return service({
+    url: `${baseUrl}/activation/template/exists`,
+    method: 'get',
+    params: {
+      template: template
+    }
+  })
+}
+
 export default themeApi

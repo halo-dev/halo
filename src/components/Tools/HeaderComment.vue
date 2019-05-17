@@ -70,35 +70,6 @@
                 </a-list-item>
               </a-list>
             </a-tab-pane>
-            <a-tab-pane
-              tab="日志"
-              key="3"
-            >
-              <a-list :dataSource="converttedJournalComments">
-                <a-list-item
-                  slot="renderItem"
-                  slot-scope="item"
-                >
-                  <a-list-item-meta>
-                    <a-avatar
-                      style="background-color: white"
-                      slot="avatar"
-                      :src="'https://gravatar.loli.net/avatar/' + item.gavatarMd5 + '&d=mm'"
-                      size="large"
-                    />
-                    <template slot="title">
-                      <a
-                        :href="item.authorUrl"
-                        target="_blank"
-                      >{{ item.author }}</a>：<span v-html="item.content"></span>
-                    </template>
-                    <template slot="description">
-                      {{ item.createTime | timeAgo }}
-                    </template>
-                  </a-list-item-meta>
-                </a-list-item>
-              </a-list>
-            </a-tab-pane>
           </a-tabs>
         </div>
       </a-spin>
@@ -109,7 +80,7 @@
     >
       <a-badge
         dot
-        v-if="postComments.length > 0"
+        v-if="postComments.length > 0 || sheetComments.length > 0"
       >
         <a-icon type="bell" />
       </a-badge>
@@ -131,8 +102,7 @@ export default {
       loadding: false,
       visible: false,
       postComments: [],
-      sheetComments: [],
-      journalComments: []
+      sheetComments: []
     }
   },
   created() {
@@ -147,12 +117,6 @@ export default {
     },
     converttedSheetComments() {
       return this.sheetComments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
-        return comment
-      })
-    },
-    converttedJournalComments() {
-      return this.journalComments.map(comment => {
         comment.content = marked(comment.content, { sanitize: true })
         return comment
       })
@@ -175,10 +139,6 @@ export default {
       })
       commentApi.latestComment('sheets', 5, 'AUDITING').then(response => {
         this.sheetComments = response.data.data
-        this.loadding = false
-      })
-      commentApi.latestComment('journals', 5, 'AUDITING').then(response => {
-        this.journalComments = response.data.data
         this.loadding = false
       })
     }
