@@ -5,8 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.repository.SheetRepository;
@@ -45,13 +47,25 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public Sheet createBy(Sheet sheet) {
-        return createOrUpdateBy(sheet);
+    public Sheet createBy(Sheet sheet, boolean autoSave) {
+        Sheet createdSheet = createOrUpdateBy(sheet);
+        if (!autoSave) {
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED, createdSheet.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
+        return createdSheet;
     }
 
     @Override
-    public Sheet updateBy(Sheet sheet) {
-        return createOrUpdateBy(sheet);
+    public Sheet updateBy(Sheet sheet, boolean autoSave) {
+        Sheet updatedSheet = createOrUpdateBy(sheet);
+        if (!autoSave) {
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED, updatedSheet.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
+        return updatedSheet;
     }
 
     @Override
@@ -76,6 +90,15 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
             // Log it
             eventPublisher.publishEvent(new SheetVisitEvent(this, sheet.getId()));
         }
+
+        return sheet;
+    }
+
+    @Override
+    public Sheet removeById(Integer id) {
+        Sheet sheet = super.removeById(id);
+        // Log it
+        eventPublisher.publishEvent(new LogEvent(this, id.toString(), LogType.SHEET_DELETED, sheet.getTitle()));
 
         return sheet;
     }

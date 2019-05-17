@@ -15,7 +15,10 @@ public enum LogType implements ValueEnum<Integer> {
     LOGGED_OUT(30),
     LOGIN_FAILED(35),
     PASSWORD_UPDATED(40),
-    PROFILE_UPDATED(45);
+    PROFILE_UPDATED(45),
+    SHEET_PUBLISHED(50),
+    SHEET_EDITED(55),
+    SHEET_DELETED(60);
 
     private final Integer value;
 
