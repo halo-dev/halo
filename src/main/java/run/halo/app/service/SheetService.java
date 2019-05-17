@@ -18,21 +18,30 @@ public interface SheetService extends BasePostService<Sheet> {
     /**
      * Creates a sheet.
      *
-     * @param sheet sheet must not be null
+     * @param sheet    sheet must not be null
+     * @param autoSave autoSave
      * @return created sheet
      */
     @NonNull
-    Sheet createBy(@NonNull Sheet sheet);
+    Sheet createBy(@NonNull Sheet sheet, boolean autoSave);
 
     /**
      * Updates a sheet.
      *
-     * @param sheet sheet must not be null
+     * @param sheet    sheet must not be null
+     * @param autoSave autoSave
      * @return updated sheet
      */
     @NonNull
-    Sheet updateBy(@NonNull Sheet sheet);
+    Sheet updateBy(@NonNull Sheet sheet, boolean autoSave);
 
+    /**
+     * Gets by url
+     *
+     * @param status post status must not be null
+     * @param url    post url must not be blank
+     * @return sheet
+     */
     @Override
     Sheet getBy(PostStatus status, String url);
 
