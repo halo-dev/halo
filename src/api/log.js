@@ -65,6 +65,18 @@ logApi.logType = {
   PROFILE_UPDATED: {
     value: 45,
     text: '资料修改'
+  },
+  SHEET_PUBLISHED: {
+    value: 50,
+    text: '页面发布'
+  },
+  SHEET_EDITED: {
+    value: 50,
+    text: '页面修改'
+  },
+  SHEET_DELETED: {
+    value: 50,
+    text: '页面删除'
   }
 }
 

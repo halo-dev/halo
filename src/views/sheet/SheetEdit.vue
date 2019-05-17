@@ -216,16 +216,16 @@ export default {
     handlerRemoveThumb() {
       this.sheetToStage.thumbnail = null
     },
-    createOrUpdateSheet(createSuccess, updateSuccess) {
+    createOrUpdateSheet(createSuccess, updateSuccess, autoSave) {
       if (this.sheetToStage.id) {
-        sheetApi.update(this.sheetToStage.id, this.sheetToStage).then(response => {
+        sheetApi.update(this.sheetToStage.id, this.sheetToStage, autoSave).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
           if (updateSuccess) {
             updateSuccess()
           }
         })
       } else {
-        sheetApi.create(this.sheetToStage).then(response => {
+        sheetApi.create(this.sheetToStage, autoSave).then(response => {
           this.$log.debug('Created sheet', response.data.data)
           if (createSuccess) {
             createSuccess()
@@ -235,11 +235,15 @@ export default {
       }
     },
     saveSheet() {
-      this.createOrUpdateSheet(() => this.$message.success('页面创建成功'), () => this.$message.success('页面更新成功'))
+      this.createOrUpdateSheet(
+        () => this.$message.success('页面创建成功'),
+        () => this.$message.success('页面更新成功'),
+        false
+      )
     },
     autoSaveSheet() {
       if (this.sheetToStage.title != null && this.sheetToStage.originalContent != null) {
-        this.createOrUpdateSheet()
+        this.createOrUpdateSheet(null, null, true)
       }
     },
     handleSelectSheetThumb(data) {

@@ -18,19 +18,25 @@ sheetApi.get = sheetId => {
   })
 }
 
-sheetApi.create = sheetToCreate => {
+sheetApi.create = (sheetToCreate, autoSave) => {
   return service({
     url: baseUrl,
     method: 'post',
-    data: sheetToCreate
+    data: sheetToCreate,
+    params: {
+      autoSave: autoSave
+    }
   })
 }
 
-sheetApi.update = (sheetId, sheetToUpdate) => {
+sheetApi.update = (sheetId, sheetToUpdate, autoSave) => {
   return service({
     url: `${baseUrl}/${sheetId}`,
     method: 'put',
-    data: sheetToUpdate
+    data: sheetToUpdate,
+    params: {
+      autoSave: autoSave
+    }
   })
 }
 
