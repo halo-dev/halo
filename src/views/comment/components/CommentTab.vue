@@ -436,38 +436,44 @@ export default {
     handlePublishMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
+        return
       }
       for (let index = 0; index < this.selectedRowKeys.length; index++) {
         const element = this.selectedRowKeys[index]
         commentApi.updateStatus(this.type, element, 'PUBLISHED').then(response => {
           this.$log.debug(`commentId: ${element}, status: PUBLISHED`)
+          this.selectedRowKeys = []
+          this.loadComments()
         })
       }
-      this.loadComments()
     },
     handleRecycleMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
+        return
       }
       for (let index = 0; index < this.selectedRowKeys.length; index++) {
         const element = this.selectedRowKeys[index]
         commentApi.updateStatus(this.type, element, 'RECYCLE').then(response => {
           this.$log.debug(`commentId: ${element}, status: RECYCLE`)
+          this.selectedRowKeys = []
+          this.loadComments()
         })
       }
-      this.loadComments()
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
+        return
       }
       for (let index = 0; index < this.selectedRowKeys.length; index++) {
         const element = this.selectedRowKeys[index]
         commentApi.delete(this.type, element).then(response => {
           this.$log.debug(`delete: ${element}`)
+          this.selectedRowKeys = []
+          this.loadComments()
         })
       }
-      this.loadComments()
     },
     onReplyClose() {
       this.replyComment = {}

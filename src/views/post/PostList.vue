@@ -82,7 +82,7 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="handleDeleteMore"
+                @click="handlePublishMore"
               >
                 <span>发布</span>
               </a>
@@ -229,7 +229,47 @@
 <script>
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
-
+const columns = [
+  {
+    title: '标题',
+    dataIndex: 'title',
+    scopedSlots: { customRender: 'postTitle' }
+  },
+  {
+    title: '状态',
+    className: 'status',
+    dataIndex: 'statusProperty',
+    scopedSlots: { customRender: 'status' }
+  },
+  {
+    title: '分类目录',
+    dataIndex: 'categories',
+    scopedSlots: { customRender: 'categories' }
+  },
+  {
+    title: '标签',
+    dataIndex: 'tags',
+    scopedSlots: { customRender: 'tags' }
+  },
+  {
+    title: '评论量',
+    dataIndex: 'commentCount'
+  },
+  {
+    title: '访问量',
+    dataIndex: 'visits'
+  },
+  {
+    title: '更新时间',
+    dataIndex: 'updateTime',
+    scopedSlots: { customRender: 'updateTime' }
+  },
+  {
+    title: '操作',
+    width: '150px',
+    scopedSlots: { customRender: 'action' }
+  }
+]
 export default {
   name: 'PostList',
   components: {},
@@ -250,47 +290,7 @@ export default {
         status: null
       },
       // 表头
-      columns: [
-        {
-          title: '标题',
-          dataIndex: 'title',
-          scopedSlots: { customRender: 'postTitle' }
-        },
-        {
-          title: '状态',
-          className: 'status',
-          dataIndex: 'statusProperty',
-          scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: '分类目录',
-          dataIndex: 'categories',
-          scopedSlots: { customRender: 'categories' }
-        },
-        {
-          title: '标签',
-          dataIndex: 'tags',
-          scopedSlots: { customRender: 'tags' }
-        },
-        {
-          title: '评论量',
-          dataIndex: 'commentCount'
-        },
-        {
-          title: '访问量',
-          dataIndex: 'visits'
-        },
-        {
-          title: '更新时间',
-          dataIndex: 'updateTime',
-          scopedSlots: { customRender: 'updateTime' }
-        },
-        {
-          title: '操作',
-          width: '150px',
-          scopedSlots: { customRender: 'action' }
-        }
-      ],
+      columns,
       selectedRowKeys: [],
       selectedRows: [],
       categories: [],
@@ -365,21 +365,53 @@ export default {
         this.loadPosts()
       })
     },
-    handleRecycleMore() {
-      if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
-      }
-    },
-    handleDeleteMore() {
-      if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
-      }
-    },
     handleDeleteClick(postId) {
       postApi.delete(postId).then(response => {
         this.$message.success('删除成功！')
         this.loadPosts()
       })
+    },
+    handlePublishMore() {
+      if (this.selectedRowKeys.length <= 0) {
+        this.$message.success('请至少选择一项！')
+        return
+      }
+      for (let index = 0; index < this.selectedRowKeys.length; index++) {
+        const element = this.selectedRowKeys[index]
+        postApi.updateStatus(element, 'PUBLISHED').then(response => {
+          this.$log.debug(`postId: ${element}, status: PUBLISHED`)
+          this.selectedRowKeys = []
+          this.loadPosts()
+        })
+      }
+    },
+    handleRecycleMore() {
+      if (this.selectedRowKeys.length <= 0) {
+        this.$message.success('请至少选择一项！')
+        return
+      }
+      for (let index = 0; index < this.selectedRowKeys.length; index++) {
+        const element = this.selectedRowKeys[index]
+        postApi.updateStatus(element, 'RECYCLE').then(response => {
+          this.$log.debug(`postId: ${element}, status: RECYCLE`)
+          this.selectedRowKeys = []
+          this.loadPosts()
+        })
+      }
+    },
+    handleDeleteMore() {
+      if (this.selectedRowKeys.length <= 0) {
+        this.$message.success('请至少选择一项！')
+        return
+      }
+      for (let index = 0; index < this.selectedRowKeys.length; index++) {
+        const element = this.selectedRowKeys[index]
+        postApi.delete(element).then(response => {
+          this.$log.debug(`delete: ${element}`)
+          this.selectedRowKeys = []
+          this.loadPosts()
+        })
+      }
     }
   }
 }
