@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import cn.hutool.core.io.IORuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -258,5 +259,45 @@ public class FileUtils {
         } catch (IOException e) {
             log.warn("Failed to delete " + deletingPath);
         }
+    }
+
+    /**
+     * 删除文件或者文件夹
+     *
+     * @param path path
+     * @return boolean
+     * @throws IORuntimeException IORuntimeException
+     */
+    public static boolean del(Path path) throws IORuntimeException {
+        if (Files.notExists(path)) {
+            return true;
+        }
+        try {
+            if (Files.isDirectory(path)) {
+                Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                        if (e == null) {
+                            Files.delete(dir);
+                            return FileVisitResult.CONTINUE;
+                        } else {
+                            throw e;
+                        }
+                    }
+                });
+            } else {
+                Files.delete(path);
+            }
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
+        }
+        return true;
     }
 }
