@@ -2,7 +2,7 @@
 
     <#if settings.rss!true>
     <li>
-        <a target="_blank" href="${options.blog_url!}/atom.xml">
+        <a target="_blank" href="${ctx!}/atom.xml">
             <i class="fa fa-rss"></i>
         </a>
     </li>
