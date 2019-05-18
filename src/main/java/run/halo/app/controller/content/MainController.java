@@ -48,7 +48,7 @@ public class MainController {
         return HaloConst.HALO_VERSION;
     }
 
-    @GetMapping("/user/avatar")
+    @GetMapping("/avatar")
     public void avatar(HttpServletResponse response) throws IOException {
         User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("Can not find blog owner"));
         if (StringUtils.isNotEmpty(user.getAvatar())) {
@@ -56,7 +56,7 @@ public class MainController {
         }
     }
 
-    @GetMapping("/blog/logo")
+    @GetMapping("/logo")
     public void logo(HttpServletResponse response) throws IOException {
         String blogLogo = optionService.getByProperty(BlogProperties.BLOG_LOGO).orElse("").toString();
         if(StringUtils.isNotEmpty(blogLogo)){
