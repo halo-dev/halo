@@ -1,11 +1,11 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.lang.Assert;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.entity.Journal;
