@@ -3,7 +3,7 @@
         <div class="title">
             <img src="${options.blog_logo!'/${theme.folderName}/source/images/logo@2x.png'}" style="width:127px;<#if settings.avatar_circle!false>border-radius:50%</#if>" />
             <h3 title="">
-                <a href="${options.blog_url!}">${options.blog_title!'Anatole'}</a>
+                <a href="${ctx!}">${options.blog_title!'Anatole'}</a>
             </h3>
             <div class="description">
                 <#if settings.hitokoto!false>

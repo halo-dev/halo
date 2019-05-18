@@ -52,7 +52,7 @@
                                 <i class="fa fa-sun-o"></i>
                                 <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="${options.blog_url!}/archives/${post.url!}#comment_widget">Comments</a>
+                                <a href="${ctx!}/archives/${post.url!}#comment_widget">Comments</a>
                             </div>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${options.blog_url!}/archives/${post.url!} ,${options.blog_title!},${post.title!},;"
+                        <a href="http://twitter.com/home?status=${ctx!}/archives/${post.url!} ,${options.blog_title!},${post.title!},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
