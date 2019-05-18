@@ -140,4 +140,9 @@ public class ThemeController {
     public void reload() {
         themeService.reload();
     }
+
+    @GetMapping(value = "activation/template/exists")
+    public BaseResponse exists(@RequestParam(value = "template") String template) {
+        return BaseResponse.ok(themeService.templateExists(template));
+    }
 }
