@@ -7,7 +7,6 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
@@ -88,6 +87,7 @@ public class FreemarkerConfigAwareListener {
 
     private void loadOptionsConfig() throws TemplateModelException {
         configuration.setSharedVariable("options", optionService.listOptions());
+        configuration.setSharedVariable("ctx", optionService.getBlogBaseUrl());
         log.debug("Loaded options");
     }
 
