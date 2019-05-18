@@ -1,8 +1,8 @@
 package run.halo.app.event.post;
 
-import cn.hutool.core.lang.Assert;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 import run.halo.app.service.base.BasePostService;
 
 import java.util.Map;

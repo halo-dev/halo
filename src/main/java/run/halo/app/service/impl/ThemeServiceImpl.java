@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -28,7 +27,6 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.service.support.HaloMediaType;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
@@ -248,7 +246,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // Delete the folder
-            FileUtil.del(Paths.get(themeProperty.getThemePath()));
+            FileUtils.del(Paths.get(themeProperty.getThemePath()));
 
             // Delete theme cache
             eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
@@ -327,6 +325,16 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         return activatedTheme;
+    }
+
+    /**
+     * Sets activated theme.
+     *
+     * @param activatedTheme activated theme
+     */
+    private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
+        this.activatedTheme = activatedTheme;
+        this.activatedThemeId = Optional.ofNullable(activatedTheme).map(ThemeProperty::getId).orElse(null);
     }
 
     @Override
@@ -511,16 +519,6 @@ public class ThemeServiceImpl implements ThemeService {
     @NonNull
     private Path createTempPath() throws IOException {
         return Files.createTempDirectory("halo");
-    }
-
-    /**
-     * Sets activated theme.
-     *
-     * @param activatedTheme activated theme
-     */
-    private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
-        this.activatedTheme = activatedTheme;
-        this.activatedThemeId = Optional.ofNullable(activatedTheme).map(ThemeProperty::getId).orElse(null);
     }
 
     /**
