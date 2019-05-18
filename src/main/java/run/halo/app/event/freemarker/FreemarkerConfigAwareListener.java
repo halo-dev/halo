@@ -93,6 +93,7 @@ public class FreemarkerConfigAwareListener {
 
     private void loadThemeConfig() throws TemplateModelException {
         configuration.setSharedVariable("theme", themeService.getActivatedTheme());
+        configuration.setSharedVariable("static", themeService.getActivatedTheme().getFolderName());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }
