@@ -1,0 +1,28 @@
+language: node_js
+node_js:
+  - 'stable'
+cache: npm
+
+jobs:
+  include:
+    - stage: build
+      script:
+        - npm run build
+        - PACKAGE_VERSION=$(sed -nE 's/^\s*"version": "(.*?)",$/\1/p' package.json)
+        - echo "Halo admin version $PACKAGE_VERSION"
+        - zip -r dist/halo-admin-$PACKAGE_VERSION.zip dist
+    - stage: release
+      script: echo "Releasing to Github Release..."
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        file_glob: true
+        file: dist/*.zip
+        on:
+          tags: true
+stages:
+  - build
+  - name: release
+    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+branches:
+  only: /^v\d+\.\d+(\.\d+)?(-\S*)?$/
