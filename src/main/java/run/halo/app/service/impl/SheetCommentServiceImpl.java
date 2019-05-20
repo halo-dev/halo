@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
@@ -48,9 +49,12 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     }
 
     @Override
-    public void targetMustExist(Integer sheetId) {
-        if (sheetRepository.existsById(sheetId)) {
-            throw new NotFoundException("The sheet with id " + sheetId + " was not found");
+    public void validateTarget(Integer sheetId) {
+        Sheet sheet = sheetRepository.findById(sheetId)
+                .orElseThrow(() -> new NotFoundException("该页面不存在或已删除").setErrorData(sheetId));
+
+        if (sheet.getDisallowComment()) {
+            throw new BadRequestException("该页面已被禁止评论").setErrorData(sheetId);
         }
     }
 

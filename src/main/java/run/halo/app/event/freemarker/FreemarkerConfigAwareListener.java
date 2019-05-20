@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
@@ -92,8 +93,9 @@ public class FreemarkerConfigAwareListener {
     }
 
     private void loadThemeConfig() throws TemplateModelException {
-        configuration.setSharedVariable("theme", themeService.getActivatedTheme());
-        configuration.setSharedVariable("static", themeService.getActivatedTheme().getFolderName());
+        ThemeProperty activatedTheme = themeService.getActivatedTheme();
+        configuration.setSharedVariable("theme", activatedTheme);
+        configuration.setSharedVariable("static", activatedTheme.getFolderName());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }

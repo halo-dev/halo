@@ -1,5 +1,6 @@
 package run.halo.app.listener;
 
+import com.sun.nio.zipfs.JarFileSystemProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -80,6 +81,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             String themeClassPath = ResourceUtils.CLASSPATH_URL_PREFIX + ThemeService.THEME_FOLDER;
 
             URI themeUri = ResourceUtils.getURL(themeClassPath).toURI();
+
+            log.debug("Theme uri: [{}]", themeUri);
 
             Path source;
 
