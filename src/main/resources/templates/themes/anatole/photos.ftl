@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="${static!}/source/plugins/gallery/css/main.css" />
-    <noscript><link rel="stylesheet" href="/${static!}/plugins/gallery/css/noscript.css" /></noscript>
+    <noscript><link rel="stylesheet" href="${static!}/plugins/gallery/css/noscript.css" /></noscript>
 </head>
 <body class="is-loading-0 is-loading-1 is-loading-2">
 <div id="main">
