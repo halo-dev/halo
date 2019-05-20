@@ -223,7 +223,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         // Check post id
         if (!ServiceUtils.isEmptyId(comment.getPostId())) {
-            targetMustExist(comment.getPostId());
+            validateTarget(comment.getPostId());
         }
 
         // Check parent id

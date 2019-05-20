@@ -186,11 +186,11 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments, @Nullable Comparator<BaseCommentVO> comparator);
 
     /**
-     * Target must exist.
+     * Target validation.
      *
      * @param targetId target id must not be null (post id, sheet id or journal id)
      */
-    void targetMustExist(@NonNull Integer targetId);
+    void validateTarget(@NonNull Integer targetId);
 
     /**
      * Lists a page of top comment.
