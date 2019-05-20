@@ -98,6 +98,15 @@ public interface PostService extends BasePostService<Post> {
     List<ArchiveMonthVO> listMonthArchives();
 
     /**
+     * Import post from markdown document.
+     *
+     * @param markdown markdown document.
+     * @return imported post
+     */
+    @NonNull
+    Post importMarkdown(@NonNull String markdown);
+
+    /**
      * Converts to detail vo.
      *
      * @param post post must not be null

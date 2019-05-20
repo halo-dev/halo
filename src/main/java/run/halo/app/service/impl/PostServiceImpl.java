@@ -26,6 +26,7 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.service.*;
 import run.halo.app.utils.DateUtils;
+import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import javax.persistence.criteria.Predicate;
@@ -270,6 +271,19 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         archives.sort(new ArchiveMonthVO.ArchiveComparator());
 
         return archives;
+    }
+
+    @Override
+    public Post importMarkdown(String markdown) {
+        Assert.notNull(markdown, "Markdown document must not be null");
+
+        // Render markdown to html document.
+        String content = MarkdownUtils.renderMarkdown(markdown);
+
+        // Gets frontMatter
+        Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+
+        return null;
     }
 
     @Override
