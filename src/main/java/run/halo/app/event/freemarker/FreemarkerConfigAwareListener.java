@@ -88,14 +88,14 @@ public class FreemarkerConfigAwareListener {
 
     private void loadOptionsConfig() throws TemplateModelException {
         configuration.setSharedVariable("options", optionService.listOptions());
-        configuration.setSharedVariable("ctx", optionService.getBlogBaseUrl());
+        configuration.setSharedVariable("context", optionService.getBlogBaseUrl());
         log.debug("Loaded options");
     }
 
     private void loadThemeConfig() throws TemplateModelException {
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
         configuration.setSharedVariable("theme", activatedTheme);
-        configuration.setSharedVariable("static", activatedTheme.getFolderName());
+        configuration.setSharedVariable("static", optionService.getBlogBaseUrl() + "/" + activatedTheme.getFolderName());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }

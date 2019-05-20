@@ -2,7 +2,7 @@
 <@head title="${post.title!} · ${options.blog_title!'Anatole'}" keywords="${post.title!},${options.seo_keywords!'Anatole'},${tagWords!}" description="${post.summary!'Anatole'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
-    <link href="/${static!}/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
+    <link href="${static!}/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
     <style>
         code, tt {
             font-size: 1.2em;
@@ -52,11 +52,11 @@
                                 <i class="fa fa-sun-o"></i>
                                 <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="${ctx!}/archives/${post.url}#comment_widget">Comments</a>
+                                <a href="${context!}/archives/${post.url}#comment_widget">Comments</a>
                                 <#if tags?size gt 0>
                                     <i class="fa fa-tag"></i>
                                     <#list tags as tag>
-                                        <a href="${ctx!}/tags/${tag.slugName}" class="tag">&nbsp;${tag.name}</a>
+                                        <a href="${context!}/tags/${tag.slugName}" class="tag">&nbsp;${tag.name}</a>
                                     </#list>
                                 </#if>
                             </div>
@@ -73,7 +73,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${ctx!}/archives/${post.url} ,${options.blog_title!},${post.title},;"
+                        <a href="http://twitter.com/home?status=${context!}/archives/${post.url} ,${options.blog_title!},${post.title},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
@@ -81,12 +81,12 @@
                     <ul class="clearfix">
                         <#if nextPost??>
                             <li class="next pagbuttons">
-                                <a class="btn" role="navigation" href="${ctx!}/archives/${nextPost.url}" title="${nextPost.title}">下一篇</a>
+                                <a class="btn" role="navigation" href="${context!}/archives/${nextPost.url}" title="${nextPost.title}">下一篇</a>
                             </li>
                         </#if>
                         <#if prePost??>
                             <li class="pre pagbuttons">
-                                <a class="btn" role="navigation" href="${ctx!}/archives/${prePost.url}" title="${prePost.title}">上一篇</a>
+                                <a class="btn" role="navigation" href="${context!}/archives/${prePost.url}" title="${prePost.title}">上一篇</a>
                             </li>
                         </#if>
                     </ul>
@@ -99,5 +99,5 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="/${static!}/source/plugins/prism/prism.js"></script>
+<script type="text/javascript" src="${static!}/source/plugins/prism/prism.js"></script>
 <@footer></@footer>

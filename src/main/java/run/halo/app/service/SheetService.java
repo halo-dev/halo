@@ -46,6 +46,15 @@ public interface SheetService extends BasePostService<Sheet> {
     Sheet getBy(PostStatus status, String url);
 
     /**
+     * Import sheet from markdown document.
+     *
+     * @param markdown markdown document.
+     * @return imported sheet
+     */
+    @NonNull
+    Sheet importMarkdown(@NonNull String markdown);
+
+    /**
      * Converts to list dto page.
      *
      * @param sheetPage sheet page must not be nulls
@@ -53,6 +62,4 @@ public interface SheetService extends BasePostService<Sheet> {
      */
     @NonNull
     Page<SheetListVO> convertToListVo(@NonNull Page<Sheet> sheetPage);
-
-
 }
