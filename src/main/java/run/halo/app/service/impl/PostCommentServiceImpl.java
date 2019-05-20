@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
@@ -92,9 +93,12 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     }
 
     @Override
-    public void targetMustExist(Integer postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NotFoundException("The post with id " + postId + " was not found");
+    public void validateTarget(Integer postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("该文章不存在或已删除").setErrorData(postId));
+
+        if (post.getDisallowComment()) {
+            throw new BadRequestException("该文章已经被禁止评论").setErrorData(postId);
         }
     }
 }

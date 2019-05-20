@@ -47,9 +47,9 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
     }
 
     @Override
-    public void targetMustExist(Integer journalId) {
+    public void validateTarget(Integer journalId) {
         if (!journalRepository.existsById(journalId)) {
-            throw new NotFoundException("The journal with id " + journalId + " was not found");
+            throw new NotFoundException("该日志不存在或已删除").setErrorData(journalId);
         }
     }
 
