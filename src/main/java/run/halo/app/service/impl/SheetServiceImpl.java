@@ -15,6 +15,7 @@ import run.halo.app.repository.SheetRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
+import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.List;
@@ -92,6 +93,19 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         return sheet;
+    }
+
+    @Override
+    public Sheet importMarkdown(String markdown) {
+        Assert.notNull(markdown, "Markdown document must not be null");
+
+        // Render markdown to html document.
+        String content = MarkdownUtils.renderMarkdown(markdown);
+
+        // Gets frontMatter
+        Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+
+        return null;
     }
 
     @Override
