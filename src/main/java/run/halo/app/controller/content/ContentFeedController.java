@@ -106,7 +106,7 @@ public class ContentFeedController {
      * @param model model
      * @return String
      */
-    @GetMapping(value = "sitemap.html", produces = MediaType.TEXT_PLAIN_VALUE)
+    @GetMapping(value = "sitemap.html")
     public String sitemapHtml(Model model,
                               @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC) Pageable pageable) {
         model.addAttribute("posts", buildPosts(pageable));
