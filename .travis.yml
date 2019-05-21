@@ -7,9 +7,7 @@ jobs:
     - stage: build
       script:
         - npm run build
-        - "PACKAGE_VERSION=$(sed -nE 's/^\s*\"version\": \"(.*?)",$/\1/p' package.json)""
-        - echo "Halo admin version $PACKAGE_VERSION"
-        - zip -r dist/halo-admin-$PACKAGE_VERSION.zip dist
+        - scripts/zip_dist.sh
     - stage: release
       script: echo "Releasing to Github Release..."
       deploy:
