@@ -1,6 +1,5 @@
 language: node_js
 node_js: stable
-cache: npm
 
 jobs:
   include:
@@ -8,18 +7,18 @@ jobs:
       script:
         - npm run build
         - scripts/zip_dist.sh
-    - stage: release
-      script: echo "Releasing to Github Release..."
+        - ls -la dist
       deploy:
         provider: releases
         api_key: $GITHUB_OAUTH_TOKEN
         file_glob: true
         file: dist/*.zip
+        skip_cleanup: true
         on:
           tags: true
 stages:
   - build
-  - name: release
-    if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 branches:
-  only: /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+  only:
+    - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
