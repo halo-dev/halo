@@ -1,6 +1,5 @@
 language: node_js
-node_js:
-  - 'stable'
+node_js: stable
 cache: npm
 
 jobs:
@@ -8,7 +7,7 @@ jobs:
     - stage: build
       script:
         - npm run build
-        - PACKAGE_VERSION=$(sed -nE 's/^\s*"version": "(.*?)",$/\1/p' package.json)
+        - "PACKAGE_VERSION=$(sed -nE 's/^\s*\"version\": \"(.*?)",$/\1/p' package.json)""
         - echo "Halo admin version $PACKAGE_VERSION"
         - zip -r dist/halo-admin-$PACKAGE_VERSION.zip dist
     - stage: release
