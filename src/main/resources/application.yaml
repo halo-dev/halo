@@ -48,6 +48,9 @@ spring:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
+  mvc:
+    favicon:
+      enabled: false
 logging:
   level:
     run.halo.app: INFO
