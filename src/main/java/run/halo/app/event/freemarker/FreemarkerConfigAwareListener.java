@@ -78,6 +78,7 @@ public class FreemarkerConfigAwareListener {
         log.debug("Received option updated event");
 
         loadOptionsConfig();
+        loadThemeConfig();
     }
 
 
