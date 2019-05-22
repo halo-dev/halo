@@ -19,7 +19,7 @@
                   label="博客地址："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_url" />
+                  <a-input v-model="options.blog_url" placeholder="如：https://halo.run" />
                 </a-form-item>
                 <a-form-item
                   label="Logo："
@@ -90,12 +90,12 @@
                 >
                   <a-input v-model="options.seo_description" />
                 </a-form-item>
-                <a-form-item
+                <!-- <a-form-item
                   label="百度推送 Token： "
                   :wrapper-col="wrapperCol"
                 >
                   <a-input v-model="options.seo_baidu_token" />
-                </a-form-item>
+                </a-form-item> -->
                 <a-form-item
                   label="百度站点验证："
                   :wrapper-col="wrapperCol"
