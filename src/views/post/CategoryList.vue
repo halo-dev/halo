@@ -18,8 +18,8 @@
               <a-input v-model="categoryToCreate.name" />
             </a-form-item>
             <a-form-item
-              label="路径名称："
-              help="* 这是文章路径上显示的名称，最好为英文"
+              label="别名："
+              help="* 一般为单个分类页面的标识，最好为英文"
             >
               <a-input v-model="categoryToCreate.slugName" />
             </a-form-item>
@@ -103,12 +103,6 @@
             </span>
           </a-table>
         </a-card>
-        <a-card
-          title="分类树"
-          class="category-tree"
-        >
-          <category-tree :categories="categories" />
-        </a-card>
       </a-col>
     </a-row>
   </div>
@@ -116,7 +110,6 @@
 
 <script>
 import CategorySelectTree from './components/CategorySelectTree'
-import CategoryTree from './components/CategoryTree'
 import categoryApi from '@/api/category'
 
 const columns = [
@@ -125,7 +118,7 @@ const columns = [
     dataIndex: 'name'
   },
   {
-    title: '路径',
+    title: '别名',
     dataIndex: 'slugName'
   },
   {
@@ -143,7 +136,7 @@ const columns = [
   }
 ]
 export default {
-  components: { CategorySelectTree, CategoryTree },
+  components: { CategorySelectTree },
   data() {
     return {
       formType: 'create',

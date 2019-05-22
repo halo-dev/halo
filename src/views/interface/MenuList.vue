@@ -18,8 +18,8 @@
               <a-input v-model="menuToCreate.name" />
             </a-form-item>
             <a-form-item
-              label="路径："
-              help="* 菜单的路径"
+              label="地址："
+              help="* 菜单的地址"
             >
               <a-input v-model="menuToCreate.url" />
             </a-form-item>
@@ -138,7 +138,7 @@ const columns = [
     scopedSlots: { customRender: 'name' }
   },
   {
-    title: '路径',
+    title: '地址',
     dataIndex: 'url'
   },
   {

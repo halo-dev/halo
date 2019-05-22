@@ -18,8 +18,8 @@
               <a-input v-model="tagToCreate.name" />
             </a-form-item>
             <a-form-item
-              label="路径名称："
-              help="* 这是文章路径上显示的名称，最好为英文"
+              label="别名”"
+              help="* 一般为单个标签页面的标识，最好为英文"
             >
               <a-input v-model="tagToCreate.slugName" />
             </a-form-item>

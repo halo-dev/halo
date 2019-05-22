@@ -1,5 +1,21 @@
 @import './index.less';
 
+*{
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: #eee;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #1890ff;
+    cursor: pointer;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #eee;
+    cursor: pointer;
+  }
+}
+
 body {
   overflow-y: scroll;
   padding: 0 !important;
@@ -217,8 +233,6 @@ body {
             }
           }
         }
-
-        //
       }
     }
   }
