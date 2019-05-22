@@ -19,7 +19,7 @@
     <#if posts?? && posts?size gt 0>
         <#list posts as post>
             <item>
-                <title>${post.title!}</title>
+                <title><![CDATA[${post.title!}]]></title>
                 <link>${options.blog_url!}/archives/${post.url!}</link>
                 <comments>${options.blog_url!}/archives/${post.url!}#comments</comments>
                 <pubDate>${post.createTime!}</pubDate>
