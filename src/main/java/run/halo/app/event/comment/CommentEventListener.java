@@ -70,7 +70,7 @@ public class CommentEventListener {
 
         Map<String, Object> data = new HashMap<>();
 
-        if (newEvent.getSource() instanceof PostService) {
+        if (newEvent.getSource() instanceof PostCommentService) {
             // Get postComment id
             PostComment postComment = postCommentService.getById(newEvent.getCommentId());
 
@@ -85,7 +85,7 @@ public class CommentEventListener {
             data.put("page", post.getTitle());
             data.put("author", postComment.getAuthor());
             data.put("content", postComment.getContent());
-        } else if (newEvent.getSource() instanceof SheetService) {
+        } else if (newEvent.getSource() instanceof SheetCommentService) {
             SheetComment sheetComment = sheetCommentService.getById(newEvent.getCommentId());
 
             log.debug("Got sheet comment: [{}]", sheetComment);
@@ -99,7 +99,7 @@ public class CommentEventListener {
             data.put("page", sheet.getTitle());
             data.put("author", sheetComment.getAuthor());
             data.put("content", sheetComment.getContent());
-        } else if (newEvent.getSource() instanceof JournalService) {
+        } else if (newEvent.getSource() instanceof JournalCommentService) {
             JournalComment journalComment = journalCommentService.getById(newEvent.getCommentId());
 
             log.debug("Got journal comment: [{}]", journalComment);
