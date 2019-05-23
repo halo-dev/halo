@@ -1,7 +1,7 @@
 package run.halo.app.security.authentication;
 
-import run.halo.app.security.support.UserDetail;
 import org.springframework.lang.NonNull;
+import run.halo.app.security.support.UserDetail;
 
 /**
  * Authentication.

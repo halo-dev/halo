@@ -1,10 +1,10 @@
 package run.halo.app.model.dto;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Category;
-import lombok.Data;
 
 /**
  * Category output dto.

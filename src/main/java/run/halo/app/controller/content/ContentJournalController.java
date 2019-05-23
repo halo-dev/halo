@@ -70,8 +70,8 @@ public class ContentJournalController {
      */
     @GetMapping(value = "page/{page}")
     public String journals(Model model,
-                          @PathVariable(value = "page") Integer page,
-                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+                           @PathVariable(value = "page") Integer page,
+                           @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         log.debug("Requested journal page, sort info: [{}]", sort);
 
         int pageSize = optionService.getPostPageSize();

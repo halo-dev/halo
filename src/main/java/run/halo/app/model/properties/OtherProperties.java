@@ -17,7 +17,7 @@ public enum OtherProperties implements PropertyEnum {
     /**
      * 是否禁止爬虫
      */
-    SPIDER_DISABLED("spider_disabled",Boolean.class,"false");
+    SPIDER_DISABLED("spider_disabled", Boolean.class, "false");
 
     private final String value;
 

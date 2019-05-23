@@ -51,4 +51,5 @@ public enum CommentProperties implements PropertyEnum {
     @Override
     public String getValue() {
         return value;
-    }}
+    }
+}

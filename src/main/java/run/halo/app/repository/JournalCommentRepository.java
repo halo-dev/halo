@@ -1,12 +1,7 @@
 package run.halo.app.repository;
 
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.JournalComment;
-import run.halo.app.model.projection.CommentCountProjection;
 import run.halo.app.repository.base.BaseCommentRepository;
-
-import java.util.List;
 
 /**
  * Journal comment repository.

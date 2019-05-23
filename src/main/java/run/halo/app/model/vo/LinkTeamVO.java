@@ -1,8 +1,8 @@
 package run.halo.app.model.vo;
 
-import run.halo.app.model.dto.LinkDTO;
 import lombok.Data;
 import lombok.ToString;
+import run.halo.app.model.dto.LinkDTO;
 
 import java.util.List;
 

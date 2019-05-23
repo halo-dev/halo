@@ -25,7 +25,7 @@ public class MenuTagDirective implements TemplateDirectiveModel {
 
     private final MenuService menuService;
 
-    public MenuTagDirective(Configuration configuration,MenuService menuService) {
+    public MenuTagDirective(Configuration configuration, MenuService menuService) {
         this.menuService = menuService;
         configuration.setSharedVariable("menuTag", this);
     }
@@ -41,7 +41,7 @@ public class MenuTagDirective implements TemplateDirectiveModel {
                     env.setVariable("menus", builder.build().wrap(menuService.listAll()));
                     break;
                 case "tree":
-                    env.setVariable("menus",builder.build().wrap(menuService.listAsTree(Sort.by(DESC, "priority"))));
+                    env.setVariable("menus", builder.build().wrap(menuService.listAsTree(Sort.by(DESC, "priority"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(menuService.count()));
