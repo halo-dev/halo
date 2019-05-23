@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
+import { setDocumentTitle, domTitle } from '@/utils/domUtil'
 
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
@@ -11,6 +12,7 @@ const whiteList = ['Login', 'Install', 'NotFound'] // no redirect whitelist
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
+  to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${to.meta.title} - ${domTitle}`))
   Vue.$log.debug('Token', store.getters.token)
   if (store.getters.token) {
     if (to.name === 'Login') {
