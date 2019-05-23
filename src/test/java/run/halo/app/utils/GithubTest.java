@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -23,6 +24,7 @@ import java.util.Map;
  * @author johnniang
  * @date 19-5-21
  */
+@Ignore
 public class GithubTest {
 
     private final Path tempPath;

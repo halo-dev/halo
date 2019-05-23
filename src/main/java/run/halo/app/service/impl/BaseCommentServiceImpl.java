@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -55,13 +56,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extends AbstractCrudService<COMMENT, Long> implements BaseCommentService<COMMENT> {
 
-    private final BaseCommentRepository<COMMENT> baseCommentRepository;
-
     protected final OptionService optionService;
-
     protected final UserService userService;
-
     protected final ApplicationEventPublisher eventPublisher;
+    private final BaseCommentRepository<COMMENT> baseCommentRepository;
 
     public BaseCommentServiceImpl(BaseCommentRepository<COMMENT> baseCommentRepository,
                                   OptionService optionService,
@@ -245,6 +243,10 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         if (comment.getGavatarMd5() == null) {
             comment.setGavatarMd5(DigestUtils.md5Hex(comment.getEmail()));
+        }
+
+        if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
+            comment.setAuthorUrl(URLUtil.normalize(comment.getAuthorUrl()));
         }
 
         if (authentication != null) {
