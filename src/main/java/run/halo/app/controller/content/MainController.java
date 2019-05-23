@@ -63,4 +63,12 @@ public class MainController {
             response.sendRedirect(blogLogo);
         }
     }
+
+    @GetMapping("/favicon.ico")
+    public void favicon(HttpServletResponse response) throws IOException {
+        String favicon = optionService.getByProperty(BlogProperties.BLOG_FAVICON).orElse("").toString();
+        if (StringUtils.isNotEmpty(favicon)) {
+            response.sendRedirect(favicon);
+        }
+    }
 }
