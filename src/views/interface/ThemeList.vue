@@ -165,12 +165,14 @@
                       <a-input
                         v-model="themeSettings[item.name]"
                         :defaultValue="item.defaultValue"
+                        :placeholder="item.placeholder"
                         v-if="item.type == 'TEXT'"
                       />
                       <a-input
                         type="textarea"
                         :autosize="{ minRows: 5 }"
                         v-model="themeSettings[item.name]"
+                        :placeholder="item.placeholder"
                         v-else-if="item.type == 'TEXTAREA'"
                       />
                       <a-radio-group
