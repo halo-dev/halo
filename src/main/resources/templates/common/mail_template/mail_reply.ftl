@@ -17,13 +17,13 @@
                     <a href="${url!}">查看完整内容</a>
                 </p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">欢迎再度光临
-                    <a href="${options.blog_url!}">${options.blog_title!}</a>
+                    <a href="${context!}">${options.blog_title!}</a>
                 </p>
 
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">(此邮件由系统自动发出, 请勿回复。如有打扰，请见谅。)</p>
             </div>
             <p style="color: #6e6e6e;font-size:13px;line-height:24px;text-align:right;padding:0 32px">邮件发自：
-                <a href="${options.blog_url!}" style="color:#51a0e3;text-decoration:none">${options.blog_title!}</a>
+                <a href="${context!}" style="color:#51a0e3;text-decoration:none">${options.blog_title!}</a>
             </p>
         </div>
     </div>
