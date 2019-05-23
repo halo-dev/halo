@@ -16,38 +16,47 @@ sns:
       name: twitter
       label: Twitter
       type: text
+      placeholder: '只需填入 Twitter 用户名即可'
     facebook:
       name: facebook
       label: Facebook
       type: text
+      placeholder: '只需填入 Facebook 用户名即可'
     instagram:
       name: instagram
       label: Instagram
       type: text
+      placeholder: '只需填入 Instagram 用户名即可'
     dribbble:
       name: dribbble
       label: Dribbble
       type: text
+      placeholder: '只需填入 Dribbble 用户名即可'
     weibo:
       name: weibo
       label: 微博
       type: text
+      placeholder: '只需填入微博 Id 即可'
     email:
       name: email
       label: Email
       type: text
+      placeholder: '只需填入邮箱地址即可'
     github:
       name: github
       label: Github
       type: text
+      placeholder: '只需填入 Github 用户名即可'
     qq:
       name: qq
       label: QQ
       type: text
+      placeholder: '只需填入 QQ 号即可'
     telegram:
       name: telegram
       label: Telegram
       type: text
+      placeholder: '只需填入 Telegram Id 即可'
 style:
   label: 样式设置
   items:
@@ -114,3 +123,4 @@ style:
       name: custom
       label: 自定义样式
       type: textarea
+      placeholder: '不需要 <style></style> 标签'
