@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.text.StrBuilder;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -106,6 +107,33 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 
         return null;
+    }
+
+    @Override
+    public String exportMarkdown(Integer id) {
+        Assert.notNull(id, "sheet id must not be null");
+        Sheet sheet = getById(id);
+        return exportMarkdown(sheet);
+    }
+
+    @Override
+    public String exportMarkdown(Sheet sheet) {
+        Assert.notNull(sheet, "Sheet must not be null");
+
+        StrBuilder content = new StrBuilder("---\n");
+
+        content.append("type: ").append("sheet").append("\n");
+        content.append("title: ").append(sheet.getTitle()).append("\n");
+        content.append("permalink: ").append(sheet.getUrl()).append("\n");
+        content.append("thumbnail: ").append(sheet.getThumbnail()).append("\n");
+        content.append("status: ").append(sheet.getStatus()).append("\n");
+        content.append("date: ").append(sheet.getCreateTime()).append("\n");
+        content.append("updated: ").append(sheet.getEditTime()).append("\n");
+        content.append("comments: ").append(!sheet.getDisallowComment()).append("\n");
+
+        content.append("---\n\n");
+        content.append(sheet.getOriginalContent());
+        return content.toString();
     }
 
     @Override

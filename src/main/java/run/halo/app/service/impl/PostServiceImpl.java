@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -284,6 +285,51 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 
         return null;
+    }
+
+    @Override
+    public String exportMarkdown(Integer id) {
+        Assert.notNull(id, "Post id must not be null");
+        Post post = getById(id);
+        return exportMarkdown(post);
+    }
+
+    @Override
+    public String exportMarkdown(Post post) {
+        Assert.notNull(post, "Post must not be null");
+
+        StrBuilder content = new StrBuilder("---\n");
+
+        content.append("type: ").append("post").append("\n");
+        content.append("title: ").append(post.getTitle()).append("\n");
+        content.append("permalink: ").append(post.getUrl()).append("\n");
+        content.append("thumbnail: ").append(post.getThumbnail()).append("\n");
+        content.append("status: ").append(post.getStatus()).append("\n");
+        content.append("date: ").append(post.getCreateTime()).append("\n");
+        content.append("updated: ").append(post.getEditTime()).append("\n");
+        content.append("comments: ").append(!post.getDisallowComment()).append("\n");
+
+        List<Tag> tags = postTagService.listTagsBy(post.getId());
+
+        if (tags.size() > 0) {
+            content.append("tags:").append("\n");
+            for (Tag tag : tags) {
+                content.append("  - ").append(tag.getName()).append("\n");
+            }
+        }
+
+        List<Category> categories = postCategoryService.listCategoryBy(post.getId());
+
+        if (categories.size() > 0) {
+            content.append("categories:").append("\n");
+            for (Category category : categories) {
+                content.append("  - ").append(category.getName()).append("\n");
+            }
+        }
+
+        content.append("---\n\n");
+        content.append(post.getOriginalContent());
+        return content.toString();
     }
 
     @Override
