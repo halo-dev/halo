@@ -1,10 +1,5 @@
 package run.halo.app.security.resolver;
 
-import run.halo.app.exception.AuthenticationException;
-import run.halo.app.model.entity.User;
-import run.halo.app.security.authentication.Authentication;
-import run.halo.app.security.context.SecurityContextHolder;
-import run.halo.app.security.support.UserDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
@@ -12,6 +7,11 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import run.halo.app.exception.AuthenticationException;
+import run.halo.app.model.entity.User;
+import run.halo.app.security.authentication.Authentication;
+import run.halo.app.security.context.SecurityContextHolder;
+import run.halo.app.security.support.UserDetail;
 
 import java.util.Optional;
 

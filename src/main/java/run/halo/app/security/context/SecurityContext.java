@@ -1,6 +1,5 @@
 package run.halo.app.security.context;
 
-import run.halo.app.security.authentication.Authentication;
 import org.springframework.lang.Nullable;
 import run.halo.app.security.authentication.Authentication;
 

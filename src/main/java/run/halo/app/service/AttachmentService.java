@@ -59,6 +59,7 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
 
     /**
      * List all media type.
+     *
      * @return list of media type
      */
     List<String> listAllMediaType();

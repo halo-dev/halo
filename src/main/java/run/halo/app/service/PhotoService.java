@@ -48,7 +48,7 @@ public interface PhotoService extends CrudService<Photo, Integer> {
     /**
      * Pages photo output dtos.
      *
-     * @param pageable     page info must not be null
+     * @param pageable   page info must not be null
      * @param photoQuery photoQuery
      * @return a page of photo output dto
      */

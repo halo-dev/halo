@@ -32,11 +32,11 @@ public interface MailService {
     /**
      * Send mail with attachments
      *
-     * @param to           recipient
-     * @param subject      subject
-     * @param content      content
-     * @param templateName template name
-     * @param attachFilename    attachment path
+     * @param to             recipient
+     * @param subject        subject
+     * @param content        content
+     * @param templateName   template name
+     * @param attachFilename attachment path
      */
     void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilename);
 }

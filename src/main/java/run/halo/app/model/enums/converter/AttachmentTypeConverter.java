@@ -1,7 +1,6 @@
 package run.halo.app.model.enums.converter;
 
 import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.enums.AttachmentType;
 
 import javax.persistence.Converter;
 

@@ -41,6 +41,26 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
     }
 
     /**
+     * Executes a count query and transparently sums up all values returned.
+     *
+     * @param query must not be {@literal null}.
+     * @return
+     */
+    private static long executeCountQuery(TypedQuery<Long> query) {
+
+        Assert.notNull(query, "TypedQuery must not be null!");
+
+        List<Long> totals = query.getResultList();
+        long total = 0L;
+
+        for (Long element : totals) {
+            total += element == null ? 0 : element;
+        }
+
+        return total;
+    }
+
+    /**
      * Finds all domain by id list and the specified sort.
      *
      * @param ids  id list of domain must not be null
@@ -139,25 +159,5 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
             this.parameter = cb.parameter(Iterable.class);
             return path.in(this.parameter);
         }
-    }
-
-    /**
-     * Executes a count query and transparently sums up all values returned.
-     *
-     * @param query must not be {@literal null}.
-     * @return
-     */
-    private static long executeCountQuery(TypedQuery<Long> query) {
-
-        Assert.notNull(query, "TypedQuery must not be null!");
-
-        List<Long> totals = query.getResultList();
-        long total = 0L;
-
-        for (Long element : totals) {
-            total += element == null ? 0 : element;
-        }
-
-        return total;
     }
 }

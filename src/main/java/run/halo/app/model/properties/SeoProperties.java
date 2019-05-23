@@ -25,7 +25,7 @@ public enum SeoProperties implements PropertyEnum {
     private final String value;
 
     private final Class<?> type;
-    
+
     private final String defaultValue;
 
     SeoProperties(String value, Class<?> type, String defaultValue) {
@@ -47,4 +47,5 @@ public enum SeoProperties implements PropertyEnum {
     @Override
     public String getValue() {
         return value;
-    }}
+    }
+}
