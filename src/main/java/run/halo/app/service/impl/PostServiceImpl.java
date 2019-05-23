@@ -147,7 +147,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
         PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds);
-        if(!autoSave){
+        if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
             eventPublisher.publishEvent(logEvent);
@@ -160,7 +160,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
         PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds);
-        if(!autoSave){
+        if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(), LogType.POST_EDITED, updatedPost.getTitle());
             eventPublisher.publishEvent(logEvent);
@@ -349,7 +349,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .orElseGet(LinkedList::new)
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(tag -> new TagDTO().<TagDTO>convertFrom(tag))
+                    .map(tag -> (TagDTO) new TagDTO().convertFrom(tag))
                     .collect(Collectors.toList()));
 
             // Set categories
@@ -357,7 +357,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .orElseGet(LinkedList::new)
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(category -> new CategoryDTO().<CategoryDTO>convertFrom(category))
+                    .map(category -> (CategoryDTO) new CategoryDTO().convertFrom(category))
                     .collect(Collectors.toList()));
 
             // Set comment count
