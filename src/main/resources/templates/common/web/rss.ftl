@@ -2,7 +2,7 @@
 <rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
     <channel>
         <title>${options.blog_title!}</title>
-        <link>${options.blog_url!}</link>
+        <link>${context!}</link>
         <#if user.description??>
             <description>${user.description!}</description>
         </#if>
