@@ -20,11 +20,9 @@ public enum UpYunProperties implements PropertyEnum {
 
     OSS_SMALL_URL("oss_upyun_small_url", String.class, "");
 
-    private String value;
-
-    private Class<?> type;
-
     private final String defaultValue;
+    private String value;
+    private Class<?> type;
 
     UpYunProperties(String value, Class<?> type, String defaultValue) {
         this.defaultValue = defaultValue;

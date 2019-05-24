@@ -1,7 +1,6 @@
 package run.halo.app.service.support;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 
 import java.nio.charset.Charset;

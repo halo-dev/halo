@@ -23,6 +23,39 @@ public interface FileHandler {
     MediaType IMAGE_TYPE = MediaType.valueOf("image/*");
 
     /**
+     * Check whether media type provided is an image type.
+     *
+     * @param mediaType media type provided
+     * @return true if it is an image type
+     */
+    static boolean isImageType(@Nullable String mediaType) {
+        return mediaType != null && IMAGE_TYPE.includes(MediaType.valueOf(mediaType));
+    }
+
+    /**
+     * Check whether media type provided is an image type.
+     *
+     * @param mediaType media type provided
+     * @return true if it is an image type
+     */
+    static boolean isImageType(@Nullable MediaType mediaType) {
+        return mediaType != null && IMAGE_TYPE.includes(mediaType);
+    }
+
+    /**
+     * Normalize directory full name, ensure the end path separator.
+     *
+     * @param dir directory full name must not be blank
+     * @return normalized directory full name with end path separator
+     */
+    @NonNull
+    static String normalizeDirectory(@NonNull String dir) {
+        Assert.hasText(dir, "Directory full name must not be blank");
+
+        return StringUtils.appendIfMissing(dir, FILE_SEPARATOR);
+    }
+
+    /**
      * Uploads file.
      *
      * @param file multipart file must not be null
@@ -47,39 +80,4 @@ public interface FileHandler {
      * @return true if supported; false or else
      */
     boolean supportType(@Nullable AttachmentType type);
-
-
-    /**
-     * Check whether media type provided is an image type.
-     *
-     * @param mediaType media type provided
-     * @return true if it is an image type
-     */
-    static boolean isImageType(@Nullable String mediaType) {
-        return mediaType != null && IMAGE_TYPE.includes(MediaType.valueOf(mediaType));
-    }
-
-
-    /**
-     * Check whether media type provided is an image type.
-     *
-     * @param mediaType media type provided
-     * @return true if it is an image type
-     */
-    static boolean isImageType(@Nullable MediaType mediaType) {
-        return mediaType != null && IMAGE_TYPE.includes(mediaType);
-    }
-
-    /**
-     * Normalize directory full name, ensure the end path separator.
-     *
-     * @param dir directory full name must not be blank
-     * @return normalized directory full name with end path separator
-     */
-    @NonNull
-    static String normalizeDirectory(@NonNull String dir) {
-        Assert.hasText(dir, "Directory full name must not be blank");
-
-        return StringUtils.appendIfMissing(dir, FILE_SEPARATOR);
-    }
 }

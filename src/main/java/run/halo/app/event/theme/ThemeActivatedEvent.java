@@ -1,9 +1,6 @@
 package run.halo.app.event.theme;
 
 import org.springframework.context.ApplicationEvent;
-import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
-import run.halo.app.handler.theme.config.support.ThemeProperty;
 
 /**
  * Theme activated event.

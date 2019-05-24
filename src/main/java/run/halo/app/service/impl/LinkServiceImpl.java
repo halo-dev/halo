@@ -1,5 +1,12 @@
 package run.halo.app.service.impl;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.model.dto.LinkDTO;
 import run.halo.app.model.entity.Link;
@@ -9,13 +16,6 @@ import run.halo.app.repository.LinkRepository;
 import run.halo.app.service.LinkService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,7 +107,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
             return Collections.emptyList();
         }
 
-        return links.stream().map(link -> new LinkDTO().<LinkDTO>convertFrom(link))
+        return links.stream().map(link -> (LinkDTO) new LinkDTO().convertFrom(link))
                 .collect(Collectors.toList());
     }
 }

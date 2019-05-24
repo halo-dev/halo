@@ -122,6 +122,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
 
     /**
      * Lists latest posts.
+     *
      * @param top top number must not be less than 0
      * @return latest posts
      */

@@ -1,7 +1,6 @@
 package run.halo.app.model.params;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import run.halo.app.model.dto.base.InputConverter;

@@ -1,10 +1,10 @@
 package run.halo.app.repository;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.base.BaseRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Set;

@@ -1,6 +1,5 @@
 package run.halo.app.controller.base;
 
-import run.halo.app.model.support.BaseResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
