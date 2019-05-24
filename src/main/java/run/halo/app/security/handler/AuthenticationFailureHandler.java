@@ -1,7 +1,6 @@
 package run.halo.app.security.handler;
 
 import run.halo.app.exception.HaloException;
-import run.halo.app.exception.HaloException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

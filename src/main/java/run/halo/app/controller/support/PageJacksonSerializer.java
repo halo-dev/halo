@@ -1,6 +1,5 @@
 package run.halo.app.controller.support;
 
-import run.halo.app.model.support.CommentPage;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;

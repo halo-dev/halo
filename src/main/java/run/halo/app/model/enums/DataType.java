@@ -29,12 +29,6 @@ public enum DataType implements ValueEnum<Integer> {
         this.value = value;
     }
 
-
-    @Override
-    public Integer getValue() {
-        return value;
-    }
-
     /**
      * Data type of string.
      *
@@ -51,6 +45,11 @@ public enum DataType implements ValueEnum<Integer> {
         }
 
         return STRING;
+    }
+
+    @Override
+    public Integer getValue() {
+        return value;
     }
 
     /**

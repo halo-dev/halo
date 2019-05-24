@@ -1,6 +1,5 @@
 package run.halo.app.utils;
 
-import run.halo.app.exception.BeanUtilsException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.lang.NonNull;

@@ -94,6 +94,12 @@ public class InMemoryCacheStore extends StringCacheStore {
         log.debug("Removed key: [{}]", key);
     }
 
+    @PreDestroy
+    public void preDestroy() {
+        log.debug("Cancelling all timer tasks");
+        timer.cancel();
+    }
+
     /**
      * Cache cleaner.
      *
@@ -110,11 +116,5 @@ public class InMemoryCacheStore extends StringCacheStore {
                 }
             });
         }
-    }
-
-    @PreDestroy
-    public void preDestroy() {
-        log.debug("Cancelling all timer tasks");
-        timer.cancel();
     }
 }

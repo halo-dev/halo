@@ -115,6 +115,7 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setDataType(DataType.typeOf(dataType));
                 item.setType(InputType.typeOf(itemMap.get("type")));
                 item.setDefaultValue(itemMap.get("default"));
+                item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
 
                 // Handle options
                 item.setOptions(handleOptions(itemMap.get("options")));
@@ -140,6 +141,7 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setDataType(DataType.typeOf(dataType));
                 item.setType(InputType.typeOf(itemMap.get("type")));
                 item.setDefaultValue(itemMap.get("default"));
+                item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
 
                 // Handle options
                 item.setOptions(handleOptions(itemMap.get("options")));

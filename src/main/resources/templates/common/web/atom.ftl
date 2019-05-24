@@ -8,8 +8,8 @@
      xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
     <channel>
         <title>${options.blog_title!}</title>
-        <atom:link href="${options.blog_url!}/atom.xml" rel="self" type="application/rss+xml"/>
-        <link>${options.blog_url!}</link>
+        <atom:link href="${context!}/atom.xml" rel="self" type="application/rss+xml"/>
+        <link>${context!}</link>
         <description>${user.description!}</description>
         <language>zh-CN</language>
         <sy:updatePeriod>hourly</sy:updatePeriod>
@@ -19,9 +19,9 @@
     <#if posts?? && posts?size gt 0>
         <#list posts as post>
             <item>
-                <title>${post.title!}</title>
-                <link>${options.blog_url!}/archives/${post.url!}</link>
-                <comments>${options.blog_url!}/archives/${post.url!}#comments</comments>
+                <title><![CDATA[${post.title!}]]></title>
+                <link>${context!}/archives/${post.url!}</link>
+                <comments>${context!}/archives/${post.url!}#comments</comments>
                 <pubDate>${post.createTime!}</pubDate>
                 <dc:creator><![CDATA[${user.nickname!}]]></dc:creator>
 

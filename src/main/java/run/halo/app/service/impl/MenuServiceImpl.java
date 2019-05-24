@@ -153,7 +153,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         return menus.stream()
-                .map(menu -> new MenuDTO().<MenuDTO>convertFrom(menu))
+                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
                 .collect(Collectors.toList());
     }
 

@@ -1,7 +1,5 @@
 package run.halo.app.controller.content.api;
 
-import run.halo.app.model.vo.LinkTeamVO;
-import run.halo.app.service.LinkService;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

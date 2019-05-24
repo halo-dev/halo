@@ -33,15 +33,11 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Controller
 public class ContentFeedController {
 
-    private final PostService postService;
-
-    private final OptionService optionService;
-
-    private final FreeMarkerConfigurer freeMarker;
-
     private final static String UTF_8_SUFFIX = ";charset=UTF-8";
-
     private final static String XML_MEDIA_TYPE = MediaType.APPLICATION_XML_VALUE + UTF_8_SUFFIX;
+    private final PostService postService;
+    private final OptionService optionService;
+    private final FreeMarkerConfigurer freeMarker;
 
     public ContentFeedController(PostService postService,
                                  OptionService optionService,

@@ -1,7 +1,6 @@
 package run.halo.app.event.theme;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.event.options.OptionUpdatedEvent;

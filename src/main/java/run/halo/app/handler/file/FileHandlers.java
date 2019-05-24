@@ -1,9 +1,5 @@
 package run.halo.app.handler.file;
 
-import run.halo.app.exception.FileOperationException;
-import run.halo.app.model.entity.Attachment;
-import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.support.UploadResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
@@ -12,6 +8,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.exception.FileOperationException;
+import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.support.UploadResult;
 
 import java.util.Collection;
 import java.util.LinkedList;
