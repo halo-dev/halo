@@ -408,6 +408,7 @@ export default {
       }
     },
     handleUploadSuccess() {
+      this.uploadVisible = false;
       this.loadThemes()
     },
     handleEllipsisClick(theme) {
@@ -422,6 +423,7 @@ export default {
     handleFetching() {
       themeApi.fetching(this.fetchingUrl).then(response => {
         this.$message.success('上传成功')
+        this.uploadVisible = false;
         this.loadThemes()
       })
     },
