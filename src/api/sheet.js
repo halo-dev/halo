@@ -11,6 +11,13 @@ sheetApi.list = () => {
   })
 }
 
+sheetApi.listInternal = () => {
+  return service({
+    url: `${baseUrl}/internal`,
+    method: 'get'
+  })
+}
+
 sheetApi.get = sheetId => {
   return service({
     url: `${baseUrl}/${sheetId}`,

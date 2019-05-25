@@ -35,6 +35,20 @@
                 :pagination="false"
                 :rowKey="page => page.id"
               >
+                <template
+                  slot="status"
+                  slot-scope="status"
+                >
+                  <span v-if="status">可用</span>
+                  <span v-else>不可用
+                    <a-tooltip
+                      slot="action"
+                      title="当前主题没有对应模板"
+                    >
+                      <a-icon type="info-circle-o" />
+                    </a-tooltip>
+                  </span>
+                </template>
                 <span
                   slot="action"
                   slot-scope="text, record"
@@ -147,7 +161,7 @@ import optionApi from '@/api/option'
 const internalColumns = [
   {
     title: '页面名称',
-    dataIndex: 'name'
+    dataIndex: 'title'
   },
   {
     title: '访问路径',
@@ -155,7 +169,8 @@ const internalColumns = [
   },
   {
     title: '状态',
-    dataIndex: 'status'
+    dataIndex: 'status',
+    scopedSlots: { customRender: 'status' }
   },
   {
     title: '操作',
@@ -194,26 +209,6 @@ const customColumns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
-const internalSheets = [
-  {
-    id: '1',
-    name: '友情链接',
-    url: '/links',
-    status: '可用'
-  },
-  {
-    id: '2',
-    name: '图库页面',
-    url: '/photos',
-    status: '可用'
-  },
-  {
-    id: '3',
-    name: '日志页面',
-    url: '/journals',
-    status: '实验性'
-  }
-]
 export default {
   mixins: [mixin, mixinDevice],
   data() {
@@ -221,7 +216,7 @@ export default {
       sheetStatus: sheetApi.sheetStatus,
       internalColumns,
       customColumns,
-      internalSheets,
+      internalSheets: [],
       sheets: [],
       options: [],
       keys: ['blog_url']
@@ -237,12 +232,18 @@ export default {
   },
   created() {
     this.loadSheets()
+    this.loadInternalSheets()
     this.loadOptions()
   },
   methods: {
     loadSheets() {
       sheetApi.list().then(response => {
         this.sheets = response.data.data.content
+      })
+    },
+    loadInternalSheets() {
+      sheetApi.listInternal().then(response => {
+        this.internalSheets = response.data.data
       })
     },
     loadOptions() {
