@@ -188,7 +188,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         long pathCount = attachmentRepository.countByPath(attachment.getPath());
 
         if (pathCount > 0) {
-            throw new AlreadyExistsException("The attachment with path " + attachment.getPath() + " exists already");
+            throw new AlreadyExistsException("附件路径为 " + attachment.getPath() + " 已经存在");
         }
     }
 

@@ -4,7 +4,8 @@ package run.halo.app.model.properties;
  * Comment properties.
  *
  * @author johnniang
- * @date 4/1/19
+ * @author ryanwang
+ * @date 2019-04-01
  */
 public enum CommentProperties implements PropertyEnum {
 
@@ -22,9 +23,7 @@ public enum CommentProperties implements PropertyEnum {
 
     PAGE_SIZE("comment_page_size", Integer.class, "10"),
 
-    CONTENT_PLACEHOLDER("comment_content_placeholder", String.class, ""),
-
-    CUSTOM_STYLE("comment_custom_style", String.class, "");
+    CONTENT_PLACEHOLDER("comment_content_placeholder", String.class, "");
 
     private final String value;
 
