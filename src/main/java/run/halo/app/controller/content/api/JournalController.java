@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.JournalComment;
-import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
