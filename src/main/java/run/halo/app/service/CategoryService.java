@@ -37,6 +37,14 @@ public interface CategoryService extends CrudService<Category, Integer> {
     Category getBySlugName(@NonNull String slugName);
 
     /**
+     * Get Category by name.
+     *
+     * @param name name
+     * @return Category
+     */
+    Category getByName(@NonNull String name);
+
+    /**
      * Removes category and post categories.
      *
      * @param categoryId category id must not be null
