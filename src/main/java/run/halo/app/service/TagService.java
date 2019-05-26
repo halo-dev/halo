@@ -26,6 +26,14 @@ public interface TagService extends CrudService<Tag, Integer> {
     Tag getBySlugNameOfNonNull(@NonNull String slugName);
 
     /**
+     * Get tag by tag name.
+     *
+     * @param name name
+     * @return Tag
+     */
+    Tag getByName(@NonNull String name);
+
+    /**
      * Converts to tag dto.
      *
      * @param tag tag must not be null

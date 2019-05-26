@@ -155,6 +155,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     }
 
     @Override
+    public Category getByName(String name) {
+        return categoryRepository.getByName(name).orElse(null);
+    }
+
+    @Override
     public void removeCategoryAndPostCategoryBy(Integer categoryId) {
         // Remove category
         removeById(categoryId);

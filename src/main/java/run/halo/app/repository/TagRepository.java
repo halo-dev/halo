@@ -29,4 +29,11 @@ public interface TagRepository extends BaseRepository<Tag, Integer> {
      * @return Tag
      */
     Optional<Tag> getBySlugName(@NonNull String slugName);
+
+    /**
+     * Get tag by name
+     * @param name name
+     * @return Tag
+     */
+    Optional<Tag> getByName(@NonNull String name);
 }

@@ -36,4 +36,12 @@ public interface CategoryRepository extends BaseRepository<Category, Integer> {
      * @return Optional of Category
      */
     Optional<Category> getBySlugName(@NonNull String slugName);
+
+    /**
+     * Get category by name.
+     *
+     * @param name name
+     * @return Optional of Category
+     */
+    Optional<Category> getByName(@NonNull String name);
 }

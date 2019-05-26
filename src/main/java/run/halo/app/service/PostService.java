@@ -104,7 +104,7 @@ public interface PostService extends BasePostService<Post> {
      * @return imported post
      */
     @NonNull
-    Post importMarkdown(@NonNull String markdown);
+    PostDetailVO importMarkdown(@NonNull String markdown);
 
     /**
      * Export post to markdown file by post id.
