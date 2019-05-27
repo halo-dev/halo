@@ -1,6 +1,5 @@
 package run.halo.app.security.context;
 
-import run.halo.app.security.authentication.Authentication;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

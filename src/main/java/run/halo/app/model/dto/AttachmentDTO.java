@@ -1,9 +1,9 @@
 package run.halo.app.model.dto;
 
+import lombok.Data;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
-import lombok.Data;
 
 import java.util.Date;
 

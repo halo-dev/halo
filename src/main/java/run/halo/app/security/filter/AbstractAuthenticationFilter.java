@@ -31,18 +31,14 @@ import java.util.Set;
  */
 public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter {
 
+    protected final AntPathMatcher antPathMatcher;
+    protected final HaloProperties haloProperties;
+    protected final OptionService optionService;
     private AuthenticationFailureHandler failureHandler;
-
     /**
      * Exclude url patterns.
      */
     private Set<String> excludeUrlPatterns = new HashSet<>(2);
-
-    protected final AntPathMatcher antPathMatcher;
-
-    protected final HaloProperties haloProperties;
-
-    protected final OptionService optionService;
 
     protected AbstractAuthenticationFilter(HaloProperties haloProperties,
                                            OptionService optionService) {
@@ -71,17 +67,6 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     }
 
     /**
-     * Sets exclude url patterns.
-     *
-     * @param excludeUrlPatterns exclude urls
-     */
-    public void setExcludeUrlPatterns(@NonNull Collection<String> excludeUrlPatterns) {
-        Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
-
-        this.excludeUrlPatterns = new HashSet<>(excludeUrlPatterns);
-    }
-
-    /**
      * Adds exclude url patterns.
      *
      * @param excludeUrlPatterns exclude urls
@@ -102,6 +87,16 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         return excludeUrlPatterns;
     }
 
+    /**
+     * Sets exclude url patterns.
+     *
+     * @param excludeUrlPatterns exclude urls
+     */
+    public void setExcludeUrlPatterns(@NonNull Collection<String> excludeUrlPatterns) {
+        Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
+
+        this.excludeUrlPatterns = new HashSet<>(excludeUrlPatterns);
+    }
 
     /**
      * Gets authentication failure handler. (Default: @DefaultAuthenticationFailureHandler)

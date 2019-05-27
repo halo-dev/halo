@@ -97,7 +97,6 @@ public class PostController {
         return postCommentService.convertTo(postComments);
     }
 
-
     @GetMapping("{postId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("postId") Integer postId,

@@ -55,6 +55,24 @@ public interface SheetService extends BasePostService<Sheet> {
     Sheet importMarkdown(@NonNull String markdown);
 
     /**
+     * Export sheet to markdown file by sheet id.
+     *
+     * @param id sheet id
+     * @return markdown file content
+     */
+    @NonNull
+    String exportMarkdown(@NonNull Integer id);
+
+    /**
+     * Export sheet to markdown file by sheet.
+     *
+     * @param sheet current sheet
+     * @return markdown file content
+     */
+    @NonNull
+    String exportMarkdown(@NonNull Sheet sheet);
+
+    /**
      * Converts to list dto page.
      *
      * @param sheetPage sheet page must not be nulls

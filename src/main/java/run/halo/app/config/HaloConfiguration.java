@@ -8,7 +8,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.RestTemplate;
@@ -114,7 +113,7 @@ public class HaloConfiguration {
         ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService);
         apiFilter.addExcludeUrlPatterns(
                 "/api/content/*/comments",
-                "/api/content/**/comments/*"
+                "/api/content/**/comments/**"
         );
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();

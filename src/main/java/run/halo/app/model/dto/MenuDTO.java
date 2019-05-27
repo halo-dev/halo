@@ -1,8 +1,8 @@
 package run.halo.app.model.dto;
 
+import lombok.Data;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Menu;
-import lombok.Data;
 
 /**
  * Menu output dto.

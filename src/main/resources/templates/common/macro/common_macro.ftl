@@ -12,9 +12,7 @@
 
 <#-- favicon -->
 <#macro favicon>
-    <#if options.blog_favicon??>
-        <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon}">
-    </#if>
+    <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon!}">
 </#macro>
 
 <#-- 站点验证代码 -->

@@ -1,5 +1,12 @@
 package run.halo.app.handler.file;
 
+import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.ServiceException;
@@ -8,13 +15,6 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
-import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

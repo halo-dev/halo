@@ -1,9 +1,9 @@
 package run.halo.app.service;
 
+import org.springframework.data.domain.Page;
 import run.halo.app.model.dto.LogDTO;
 import run.halo.app.model.entity.Log;
 import run.halo.app.service.base.CrudService;
-import org.springframework.data.domain.Page;
 
 /**
  * Log service.
