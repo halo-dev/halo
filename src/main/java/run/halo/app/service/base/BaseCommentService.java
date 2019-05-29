@@ -220,19 +220,20 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      *
      * @param comment comment dto must not be null
      */
-    void filterIpAddress(@NonNull BaseCommentDTO comment);
+    <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment);
 
     /**
      * Filters comment ip address.
      *
      * @param comments comment dto list
      */
-    void filterIpAddress(@Nullable List<BaseCommentDTO> comments);
+    <T extends BaseCommentDTO> List<T> filterIpAddress(@Nullable List<T> comments);
 
     /**
      * Filters comment ip address.
      *
      * @param commentPage comment page
      */
-    void filterIpAddress(@NonNull Page<BaseCommentDTO> commentPage);
+    <T extends BaseCommentDTO> Page<T> filterIpAddress(@NonNull Page<T> commentPage);
+
 }

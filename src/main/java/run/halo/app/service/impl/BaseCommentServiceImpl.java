@@ -471,26 +471,50 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
-    public void filterIpAddress(BaseCommentDTO comment) {
+    public <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment) {
         Assert.notNull(comment, "Base comment dto must not be null");
 
         // Clear ip address
         comment.setIpAddress("");
+
+        // Handle base comment vo
+        if (comment instanceof BaseCommentVO) {
+            BaseCommentVO baseCommentVO = (BaseCommentVO) comment;
+            Queue<BaseCommentVO> commentQueue = new LinkedList<>();
+            commentQueue.offer(baseCommentVO);
+            while (!commentQueue.isEmpty()) {
+                BaseCommentVO current = commentQueue.poll();
+
+                // Clear ip address
+                current.setIpAddress("");
+
+                if (!CollectionUtils.isEmpty(current.getChildren())) {
+                    // Add children
+                    commentQueue.addAll(current.getChildren());
+                }
+            }
+        }
+
+        return comment;
     }
 
     @Override
-    public void filterIpAddress(List<BaseCommentDTO> comments) {
+    public <T extends BaseCommentDTO> List<T> filterIpAddress(List<T> comments) {
         if (CollectionUtils.isEmpty(comments)) {
-            return;
+            return Collections.emptyList();
         }
 
         comments.forEach(this::filterIpAddress);
+
+        return comments;
     }
 
     @Override
-    public void filterIpAddress(Page<BaseCommentDTO> commentPage) {
+    public <T extends BaseCommentDTO> Page<T> filterIpAddress(Page<T> commentPage) {
         Assert.notNull(commentPage, "Comment page must not be null");
         commentPage.forEach(this::filterIpAddress);
+
+        return commentPage;
     }
 
     /**
