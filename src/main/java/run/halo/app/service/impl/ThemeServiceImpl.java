@@ -440,10 +440,11 @@ public class ThemeServiceImpl implements ThemeService {
             // Create temp path
             Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
 
-            if (StringUtils.endsWithIgnoreCase(uri, ".git")) {
-                cloneFromGit(uri, themeTmpPath);
-            } else {
+            if (StringUtils.endsWithIgnoreCase(uri, ".zip")) {
                 downloadZipAndUnzip(uri, themeTmpPath);
+            } else {
+                uri = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
+                cloneFromGit(uri, themeTmpPath);
             }
 
             return add(themeTmpPath);
@@ -464,7 +465,7 @@ public class ThemeServiceImpl implements ThemeService {
      *
      * @param gitUrl     git url must not be blank
      * @param targetPath target path must not be null
-     * @throws GitAPIException
+     * @throws GitAPIException throws when clone error
      */
     private void cloneFromGit(@NonNull String gitUrl, @NonNull Path targetPath) throws GitAPIException {
         Assert.hasText(gitUrl, "Git url must not be blank");
@@ -486,7 +487,7 @@ public class ThemeServiceImpl implements ThemeService {
      *
      * @param zipUrl     zip url must not be null
      * @param targetPath target path must not be null
-     * @throws IOException
+     * @throws IOException throws when download zip or unzip error
      */
     private void downloadZipAndUnzip(@NonNull String zipUrl, @NonNull Path targetPath) throws IOException {
         Assert.hasText(zipUrl, "Zip url must not be blank");
@@ -514,7 +515,7 @@ public class ThemeServiceImpl implements ThemeService {
      * Creates temporary path.
      *
      * @return temporary path
-     * @throws IOException
+     * @throws IOException if an I/O error occurs or the temporary-file directory does not exist
      */
     @NonNull
     private Path createTempPath() throws IOException {
