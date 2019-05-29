@@ -214,4 +214,25 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull CommentStatus status, @NonNull Sort sort);
+
+    /**
+     * Filters comment ip address.
+     *
+     * @param comment comment dto must not be null
+     */
+    void filterIpAddress(@NonNull BaseCommentDTO comment);
+
+    /**
+     * Filters comment ip address.
+     *
+     * @param comments comment dto list
+     */
+    void filterIpAddress(@Nullable List<BaseCommentDTO> comments);
+
+    /**
+     * Filters comment ip address.
+     *
+     * @param commentPage comment page
+     */
+    void filterIpAddress(@NonNull Page<BaseCommentDTO> commentPage);
 }

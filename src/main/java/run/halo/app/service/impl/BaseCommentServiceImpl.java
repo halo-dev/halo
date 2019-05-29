@@ -470,6 +470,29 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         return childrenList;
     }
 
+    @Override
+    public void filterIpAddress(BaseCommentDTO comment) {
+        Assert.notNull(comment, "Base comment dto must not be null");
+
+        // Clear ip address
+        comment.setIpAddress("");
+    }
+
+    @Override
+    public void filterIpAddress(List<BaseCommentDTO> comments) {
+        if (CollectionUtils.isEmpty(comments)) {
+            return;
+        }
+
+        comments.forEach(this::filterIpAddress);
+    }
+
+    @Override
+    public void filterIpAddress(Page<BaseCommentDTO> commentPage) {
+        Assert.notNull(commentPage, "Comment page must not be null");
+        commentPage.forEach(this::filterIpAddress);
+    }
+
     /**
      * Get children comments recursively.
      *
