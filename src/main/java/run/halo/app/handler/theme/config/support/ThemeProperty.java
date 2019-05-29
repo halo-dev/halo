@@ -28,6 +28,8 @@ public class ThemeProperty {
      */
     private String website;
 
+    private String repo;
+
     /**
      * Theme description.
      */

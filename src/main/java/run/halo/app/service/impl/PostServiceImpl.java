@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -277,7 +278,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public PostDetailVO importMarkdown(String markdown) {
+    public PostDetailVO importMarkdown(String markdown, String filename) {
         Assert.notNull(markdown, "Markdown document must not be null");
 
         // Render markdown to html document.
@@ -345,8 +346,19 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
         }
 
+        if (null == post.getStatus()) {
+            post.setStatus(PostStatus.PUBLISHED);
+        }
+
+        if (StrUtil.isEmpty(post.getTitle())) {
+            post.setTitle(filename);
+        }
+
+        if (StrUtil.isEmpty(post.getUrl())) {
+            post.setUrl(DateUtil.format(new Date(), "yyyyMMddHHmmss"));
+        }
+
         post.setOriginalContent(markdown);
-        post.setFormatContent(content);
 
         return createBy(post, tagIds, categoryIds, false);
     }
