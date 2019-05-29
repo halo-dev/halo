@@ -178,12 +178,12 @@ export const asyncRouterMap = [
           //   component: () => import('@/views/system/BackupList'),
           //   meta: { title: '博客备份', hiddenHeaderContent: false }
           // },
-          // {
-          //   path: '/system/tools',
-          //   name: 'ToolList',
-          //   component: () => import('@/views/system/ToolList'),
-          //   meta: { title: '小工具', hiddenHeaderContent: false }
-          // },
+          {
+            path: '/system/tools',
+            name: 'ToolList',
+            component: () => import('@/views/system/ToolList'),
+            meta: { title: '小工具', hiddenHeaderContent: false }
+          },
           {
             path: '/system/about',
             name: 'About',
