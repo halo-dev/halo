@@ -22,14 +22,14 @@
                   >开源地址
                     <a-icon type="link" /></a>&nbsp;
                   <a
-                    href="https://docs.halo.run"
+                    href="https://halo.run/docs"
                     target="_blank"
                   >用户文档
                     <a-icon type="link" /></a>&nbsp;
                   <a
                     href="https://bbs.halo.run"
                     target="_blank"
-                  >问题反馈
+                  >在线社区
                     <a-icon type="link" /></a>&nbsp;
                 </template>
               </a-list-item-meta>
