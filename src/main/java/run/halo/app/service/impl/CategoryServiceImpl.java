@@ -16,6 +16,7 @@ import run.halo.app.repository.CategoryRepository;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.ServiceUtils;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -56,7 +57,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         }
 
         // Check parent id
-        if (category.getParentId() > 0) {
+        if (!ServiceUtils.isEmptyId(category.getParentId())) {
             count = categoryRepository.countById(category.getParentId());
 
             if (count == 0) {

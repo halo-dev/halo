@@ -31,6 +31,7 @@ public interface TagService extends CrudService<Tag, Integer> {
      * @param name name
      * @return Tag
      */
+    @Nullable
     Tag getByName(@NonNull String name);
 
     /**
