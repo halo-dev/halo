@@ -56,6 +56,17 @@ attachmentApi.upload = (formData, uploadProgress, cancelToken) => {
   })
 }
 
+attachmentApi.uploads = (formDatas, uploadProgress, cancelToken) => {
+  return service({
+    url: `${baseUrl}/uploads`,
+    timeout: 8640000, // 24 hours
+    data: formDatas, // form data
+    onUploadProgress: uploadProgress,
+    cancelToken: cancelToken,
+    method: 'post'
+  })
+}
+
 attachmentApi.type = {
   LOCAL: {
     type: 'local',
@@ -78,4 +89,5 @@ attachmentApi.type = {
     text: '阿里云'
   }
 }
+
 export default attachmentApi
