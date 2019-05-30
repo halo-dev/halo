@@ -308,10 +308,10 @@
                     <a-input v-model="options.oss_upyun_source" />
                   </a-form-item>
                   <a-form-item
-                    label="处理策略："
+                    label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_upyun_small_url" />
+                    <a-input v-model="options.oss_upyun_style_rule" />
                   </a-form-item>
                 </div>
                 <div
@@ -362,10 +362,10 @@
                     <a-input v-model="options.oss_qiniu_bucket" />
                   </a-form-item>
                   <a-form-item
-                    label="处理策略："
+                    label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_small_url" />
+                    <a-input v-model="options.oss_qiniu_style_rule" />
                   </a-form-item>
                 </div>
                 <div
@@ -373,16 +373,16 @@
                   v-show="aliyunFormHidden"
                 >
                   <a-form-item
-                    label="域名："
+                    label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-tooltip
-                      :trigger="['focus']"
-                      placement="right"
-                      title="需要加上 http:// 或者 https://"
-                    >
-                      <a-input v-model="options.oss_aliyun_endpoint" />
-                    </a-tooltip>
+                    <a-input v-model="options.oss_aliyun_bucket_name" />
+                  </a-form-item>
+                  <a-form-item
+                    label="EndPoint（地域节点）："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_aliyun_endpoint" />
                   </a-form-item>
                   <a-form-item
                     label="Access Key："
@@ -397,10 +397,10 @@
                     <a-input v-model="options.oss_aliyun_access_secret" />
                   </a-form-item>
                   <a-form-item
-                    label="Bucket："
+                    label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_bucket_name" />
+                    <a-input v-model="options.oss_aliyun_style_rule" />
                   </a-form-item>
                 </div>
                 <a-form-item>
