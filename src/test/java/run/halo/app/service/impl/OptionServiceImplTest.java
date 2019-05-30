@@ -80,7 +80,7 @@ public class OptionServiceImplTest {
     }
 
     private void getQiniuZoneTest(Zone actualZone, Option option) {
-        QnYunProperties zoneProperty = QnYunProperties.ZONE;
+        QnYunProperties zoneProperty = QnYunProperties.OSS_ZONE;
 
         // Given
 //        given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
