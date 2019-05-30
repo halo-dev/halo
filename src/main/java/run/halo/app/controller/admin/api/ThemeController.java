@@ -117,6 +117,13 @@ public class ThemeController {
         themeSettingService.save(settings, themeId);
     }
 
+    @PutMapping("{themeId}")
+    public ThemeProperty updateTheme(@PathVariable("themeId") String themeId,
+                                     @RequestPart(name = "file", required = false) MultipartFile file) {
+
+        return themeService.update(themeId);
+    }
+
     @DeleteMapping("{themeId}")
     @ApiOperation("Deletes a theme")
     public void deleteBy(@PathVariable("themeId") String themeId) {
@@ -145,4 +152,5 @@ public class ThemeController {
     public BaseResponse exists(@RequestParam(value = "template") String template) {
         return BaseResponse.ok(themeService.templateExists(template));
     }
+
 }

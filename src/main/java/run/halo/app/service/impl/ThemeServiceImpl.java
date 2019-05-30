@@ -3,7 +3,14 @@ package run.halo.app.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.MergeCommand;
+import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.transport.RemoteConfig;
+import org.eclipse.jgit.transport.URIish;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
@@ -32,7 +39,9 @@ import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -458,6 +467,87 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public void reload() {
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
+    }
+
+    @Override
+    public ThemeProperty update(String themeId) {
+        Assert.hasText(themeId, "Theme id must not be blank");
+
+        ThemeProperty updatingTheme = getThemeOfNonNullBy(themeId);
+
+        try {
+            pullFromGit(updatingTheme);
+        } catch (Exception e) {
+            throw new ThemeUpdateException("主题更新失败！您与主题作者可能同时更改了同一个文件，您也可以尝试删除主题并重新拉取最新的主题", e).setErrorData(themeId);
+        }
+
+        eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
+
+        return getThemeOfNonNullBy(themeId);
+    }
+
+    private void pullFromGit(@NonNull ThemeProperty themeProperty) throws IOException, GitAPIException, URISyntaxException {
+        Assert.notNull(themeProperty, "Theme property must not be null");
+
+        // Get branch
+        String branch = StringUtils.isBlank(themeProperty.getBranch()) ?
+                DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
+
+        File themeFolder = Paths.get(themeProperty.getThemePath()).toFile();
+        // Open the theme path
+        Git git;
+
+        try {
+            git = Git.open(themeFolder);
+        } catch (RepositoryNotFoundException e) {
+            // Repository is not initialized
+            git = Git.init().setDirectory(themeFolder).call();
+        }
+
+        // Force to set remote name
+        git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
+        RemoteConfig remoteConfig = git.remoteAdd()
+                .setName(THEME_PROVIDER_REMOTE_NAME)
+                .setUri(new URIish(themeProperty.getRepo()))
+                .call();
+
+        // Add all changes
+        git.add()
+                .addFilepattern(".")
+                .call();
+        // Commit the changes
+        git.commit().setMessage("Commit by halo automatically").call();
+
+        // Check out to specified branch
+        if (!StringUtils.equalsIgnoreCase(branch, git.getRepository().getBranch())) {
+            boolean present = git.branchList()
+                    .call()
+                    .stream()
+                    .map(Ref::getName)
+                    .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
+
+            git.checkout()
+                    .setCreateBranch(true)
+                    .setForced(!present)
+                    .setName(branch)
+                    .call();
+        }
+
+        // Pull with rebasing
+        PullResult pullResult = git.pull()
+                .setRemote(remoteConfig.getName())
+                .setRemoteBranchName(branch)
+                .setRebase(true)
+                .call();
+
+        if (!pullResult.isSuccessful()) {
+            log.debug("Rebase result: [{}]", pullResult.getRebaseResult());
+            log.debug("Merge result: [{}]", pullResult.getMergeResult());
+
+            throw new ThemeUpdateException("拉取失败！您与主题作者可能同时更改了同一个文件");
+        }
+        // Close git
+        git.close();
     }
 
     /**

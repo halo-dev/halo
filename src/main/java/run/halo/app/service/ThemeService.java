@@ -72,6 +72,16 @@ public interface ThemeService {
     String CUSTOM_SHEET_PREFIX = "sheet_";
 
     /**
+     * Theme provider remote name.
+     */
+    String THEME_PROVIDER_REMOTE_NAME = "theme-provider";
+
+    /**
+     * Default remote branch name.
+     */
+    String DEFAULT_REMOTE_BRANCH = "master";
+
+    /**
      * Get theme property by theme id.
      *
      * @param themeId must not be blank
@@ -241,4 +251,13 @@ public interface ThemeService {
      * Reloads themes
      */
     void reload();
+
+    /**
+     * Updates theme by theme id.
+     *
+     * @param themeId theme id must not be blank
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty update(@NonNull String themeId);
 }

@@ -1,6 +1,8 @@
 package run.halo.app.handler.theme.config.impl;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -18,7 +20,12 @@ import java.io.IOException;
 @Service
 public class YamlThemePropertyResolver implements ThemePropertyResolver {
 
-    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    private final ObjectMapper yamlMapper;
+
+    public YamlThemePropertyResolver() {
+        yamlMapper = new ObjectMapper(new YAMLFactory());
+        yamlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     @Override
     public ThemeProperty resolve(String content) throws IOException {
