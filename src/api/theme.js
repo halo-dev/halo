@@ -78,7 +78,7 @@ themeApi.getProperty = themeId => {
 themeApi.upload = (formData, uploadProgress, cancelToken) => {
   return service({
     url: `${baseUrl}/upload`,
-    timeout: 8640000, // 24 hours
+    timeout: 86400000, // 24 hours
     data: formData, // form data
     onUploadProgress: uploadProgress,
     cancelToken: cancelToken,
@@ -89,7 +89,7 @@ themeApi.upload = (formData, uploadProgress, cancelToken) => {
 themeApi.fetching = url => {
   return service({
     url: `${baseUrl}/fetching`,
-    timeout: 60,
+    timeout: 60000,
     params: {
       uri: url
     },
