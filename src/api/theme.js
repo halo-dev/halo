@@ -39,6 +39,14 @@ themeApi.getActivatedTheme = () => {
   })
 }
 
+themeApi.update = themeId => {
+  return service({
+    url: `${baseUrl}/${themeId}`,
+    timeout: 60000,
+    method: 'put'
+  })
+}
+
 themeApi.delete = key => {
   return service({
     url: `${baseUrl}/${key}`,

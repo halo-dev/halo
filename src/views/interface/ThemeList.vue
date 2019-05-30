@@ -35,23 +35,23 @@
                   <a-icon
                     type="unlock"
                     theme="twoTone"
-                  />已启用
+                  /> 已启用
                 </div>
                 <div
                   v-else
                   @click="handleActivateClick(item)"
                 >
-                  <a-icon type="lock" />启用
+                  <a-icon type="lock" /> 启用
                 </div>
                 <div @click="handleEditClick(item)">
-                  <a-icon type="setting" />设置
+                  <a-icon type="setting" /> 设置
                 </div>
                 <a-dropdown placement="topCenter">
                   <a
                     class="ant-dropdown-link"
                     href="#"
                   >
-                    <a-icon type="ellipsis" />更多
+                    <a-icon type="ellipsis" /> 更多
                   </a>
                   <a-menu slot="overlay">
                     <a-menu-item
@@ -65,11 +65,21 @@
                         okText="确定"
                         cancelText="取消"
                       >
-                        <a-icon type="delete" />删除
+                        <a-icon type="delete" /> 删除
                       </a-popconfirm>
                       <span v-else>
-                        <a-icon type="delete" />删除
+                        <a-icon type="delete" /> 删除
                       </span>
+                    </a-menu-item>
+                    <a-menu-item :key="2">
+                      <a-popconfirm
+                        :title="'确定更新【' + item.name + '】主题？'"
+                        @confirm="handleUpdateTheme(item.id)"
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <a-icon type="download" /> 更新
+                      </a-popconfirm>
                     </a-menu-item>
                   </a-menu>
                 </a-dropdown>
@@ -259,8 +269,34 @@
       <div class="custom-tab-wrapper">
         <a-tabs>
           <a-tab-pane
-            tab="本地上传"
+            tab="远程拉取"
             key="1"
+          >
+            <a-form layout="vertical">
+              <a-form-item label="远程地址：">
+                <a-input v-model="fetchingUrl" />
+              </a-form-item>
+              <a-form-item>
+                <a-button
+                  type="primary"
+                  @click="handleFetching"
+                  :loading="fetchButtonLoading"
+                >下载</a-button>
+              </a-form-item>
+            </a-form>
+            <a-alert
+              type="info"
+              closable
+            >
+              <template slot="message">
+                远程地址即主题仓库地址，如：https://github.com/halo-dev/halo-theme-quick-starter。<br>
+                更多主题请访问：<a target="_blank" href="https://halo.run/theme">https://halo.run/theme</a>
+              </template>
+            </a-alert>
+          </a-tab-pane>
+          <a-tab-pane
+            tab="本地上传"
+            key="2"
           >
             <upload
               name="file"
@@ -276,22 +312,6 @@
               <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
               <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
             </upload>
-          </a-tab-pane>
-          <a-tab-pane
-            tab="远程拉取"
-            key="2"
-          >
-            <a-form layout="vertical">
-              <a-form-item label="远程地址：">
-                <a-input v-model="fetchingUrl" />
-              </a-form-item>
-              <a-form-item>
-                <a-button
-                  type="primary"
-                  @click="handleFetching"
-                >确定</a-button>
-              </a-form-item>
-            </a-form>
           </a-tab-pane>
         </a-tabs>
       </div>
@@ -316,6 +336,7 @@ export default {
       themeLoading: false,
       optionLoading: true,
       uploadVisible: false,
+      fetchButtonLoading: false,
       wrapperCol: {
         xl: { span: 12 },
         lg: { span: 12 },
@@ -382,6 +403,12 @@ export default {
         this.loadThemes()
       })
     },
+    handleUpdateTheme(themeId) {
+      themeApi.update(themeId).then(response => {
+        this.$message.success('更新成功！')
+        this.loadThemes()
+      })
+    },
     handleDeleteTheme(key) {
       themeApi.delete(key).then(response => {
         this.$message.success('删除成功！')
@@ -421,9 +448,11 @@ export default {
       this.activeTheme(theme.id)
     },
     handleFetching() {
+      this.fetchButtonLoading = true
       themeApi.fetching(this.fetchingUrl).then(response => {
-        this.$message.success('上传成功')
+        this.$message.success('拉取成功')
         this.uploadVisible = false
+        this.fetchButtonLoading = false
         this.loadThemes()
       })
     },
