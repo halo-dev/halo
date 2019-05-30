@@ -12,6 +12,7 @@ import run.halo.app.utils.HaloUtils;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -49,6 +50,8 @@ public class PostParam implements InputConverter<Post> {
 
     @Min(value = 0, message = "Post top priority must not be less than {value}")
     private Integer topPriority = 0;
+
+    private Date createTime;
 
     private PostCreateFrom createFrom = PostCreateFrom.ADMIN;
 
