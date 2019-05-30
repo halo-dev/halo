@@ -7,10 +7,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -28,15 +25,15 @@ import java.util.Set;
 @Slf4j
 public class GitTest {
 
-    private static Path tempPath;
+    private Path tempPath;
 
-    @BeforeClass
-    public static void setUp() throws IOException {
+    @Before
+    public void setUp() throws IOException {
         tempPath = Files.createTempDirectory("git-test");
     }
 
-    @AfterClass
-    public static void destroy() throws IOException {
+    @After
+    public void destroy() throws IOException {
         FileUtils.deleteFolder(tempPath);
     }
 
