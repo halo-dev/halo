@@ -13,6 +13,8 @@ server:
     enabled: true
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
 spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
   devtools:
     add-properties: false
   output:
