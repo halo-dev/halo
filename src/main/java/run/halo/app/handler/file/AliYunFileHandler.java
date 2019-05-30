@@ -46,6 +46,7 @@ public class AliYunFileHandler implements FileHandler {
         String ossAccessKey = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_KEY).toString();
         String ossAccessSecret = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_SECRET).toString();
         String ossBucketName = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_BUCKET_NAME).toString();
+        String ossStyleRule = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_STYLE_RULE).toString();
         String ossSource = StringUtils.join("https://", ossBucketName, "." + ossEndPoint);
 
         // Init OSS client
@@ -78,7 +79,7 @@ public class AliYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(filePath);
+                uploadResult.setThumbPath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
             }
 
             return uploadResult;

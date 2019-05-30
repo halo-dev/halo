@@ -44,8 +44,8 @@ public class UpYunFileHandler implements FileHandler {
         String ossBucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
         String ossDomain = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_DOMAIN).toString();
         String ossOperator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
-        // small url can be null
-        String ossSmallUrl = optionService.getByPropertyOrDefault(UpYunProperties.OSS_SMALL_URL, String.class, "");
+        // style rule can be null
+        String ossStyleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_STYLE_RULE, String.class, "");
 
         // Create up yun
         UpYun upYun = new UpYun(ossBucket, ossOperator, ossPassword);
@@ -86,7 +86,7 @@ public class UpYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(StringUtils.isBlank(ossSmallUrl) ? filePath : filePath + ossSmallUrl);
+                uploadResult.setThumbPath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
             }
 
             return uploadResult;
