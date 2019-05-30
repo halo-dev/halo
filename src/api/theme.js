@@ -89,6 +89,7 @@ themeApi.upload = (formData, uploadProgress, cancelToken) => {
 themeApi.fetching = url => {
   return service({
     url: `${baseUrl}/fetching`,
+    timeout: 60,
     params: {
       uri: url
     },
