@@ -342,7 +342,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         if (exist) {
-            throw new AlreadyExistsException("The post url " + post.getUrl() + " has been exist");
+            throw new AlreadyExistsException("文章路径 " + post.getUrl() + " 已存在");
         }
     }
 

@@ -8,12 +8,17 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
+import run.halo.app.model.entity.SheetComment;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.SheetCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
+import run.halo.app.model.vo.CommentWithHasChildrenVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
+
+import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -39,13 +44,33 @@ public class SheetController {
         this.optionService = optionService;
     }
 
+    @GetMapping("{sheetId:\\d+}/comments/top_view")
+    public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("sheetId") Integer sheetId,
+                                                          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        Page<CommentWithHasChildrenVO> result = sheetCommentService.pageTopCommentsBy(sheetId, CommentStatus.PUBLISHED, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return sheetCommentService.filterIpAddress(result);
+    }
+
+    @GetMapping("{sheetId:\\d+}/comments/{commentParentId:\\d+}/children")
+    public List<BaseCommentDTO> listChildrenBy(@PathVariable("sheetId") Integer sheetId,
+                                               @PathVariable("commentParentId") Long commentParentId,
+                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        // Find all children comments
+        List<SheetComment> sheetComments = sheetCommentService.listChildrenBy(sheetId, commentParentId, CommentStatus.PUBLISHED, sort);
+        // Convert to base comment dto
+        List<BaseCommentDTO> result = sheetCommentService.convertTo(sheetComments);
+        return sheetCommentService.filterIpAddress(result);
+    }
+
 
     @GetMapping("{sheetId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("sheetId") Integer sheetId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                 @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService.pageVosBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentVO> result = sheetCommentService.pageVosBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return sheetCommentService.filterIpAddress(result);
     }
 
     @GetMapping("{sheetId:\\d+}/comments/list_view")
@@ -53,7 +78,8 @@ public class SheetController {
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService.pageWithParentVoBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentWithParentVO> result = sheetCommentService.pageWithParentVoBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return sheetCommentService.filterIpAddress(result);
     }
 
     @PostMapping("comments")

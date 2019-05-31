@@ -35,9 +35,10 @@
 
 ## 周边
 
-- 后台管理源码：<[https://github.com/halo-dev/halo-admin](https://github.com/halo-dev/halo-admin)>
+- 后台管理（halo-admin）：<[https://github.com/halo-dev/halo-admin](https://github.com/halo-dev/halo-admin)>
+- 独立评论模块（halo-comment）：<[https://github.com/halo-dev/halo-comment](https://github.com/halo-dev/halo-comment)>
+- 管理 APP（halo-app）：<[https://github.com/halo-dev/halo-app](https://github.com/halo-dev/halo-app)>
 - 主题仓库：<[https://halo.run/theme](https://halo.run/theme)>
-- 管理 APP：<[https://github.com/halo-dev/halo-app](https://github.com/halo-dev/halo-app)>
 
 ## 许可证
 

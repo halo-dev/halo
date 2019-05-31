@@ -50,7 +50,7 @@ public class SmmsFileHandler implements FileHandler {
 
         if (!FileHandler.isImageType(file.getContentType())) {
             log.error("Invalid extension: [{}]", file.getContentType());
-            throw new FileOperationException("Invalid extension for file " + file.getOriginalFilename() + ". Only \"jpeg, jpg, png, gif, bmp\" files are supported");
+            throw new FileOperationException("不支持的文件类型，仅支持 \"jpeg, jpg, png, gif, bmp\" 格式的图片");
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -65,7 +65,7 @@ public class SmmsFileHandler implements FileHandler {
             body.add("smfile", new HttpClientUtils.MultipartFileResource(file.getBytes(), file.getOriginalFilename()));
         } catch (IOException e) {
             log.error("Failed to get file input stream", e);
-            throw new FileOperationException("Failed to upload " + file.getOriginalFilename() + " file", e);
+            throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到 SM.MS 失败", e);
         }
 
         body.add("ssl", false);
@@ -79,7 +79,7 @@ public class SmmsFileHandler implements FileHandler {
         // Check status
         if (mapResponseEntity.getStatusCode().isError()) {
             log.error("Server response detail: [{}]", mapResponseEntity.toString());
-            throw new FileOperationException("Smms server response error. status: " + mapResponseEntity.getStatusCodeValue());
+            throw new FileOperationException("SM.MS 服务状态异常，状态码: " + mapResponseEntity.getStatusCodeValue());
         }
 
         // Get smms response
@@ -88,7 +88,7 @@ public class SmmsFileHandler implements FileHandler {
         // Check error
         if (!isResponseSuccessfully(smmsResponse)) {
             log.error("Smms response detail: [{}]", smmsResponse);
-            throw new FileOperationException(smmsResponse == null ? "Smms response is null" : smmsResponse.getMsg()).setErrorData(smmsResponse);
+            throw new FileOperationException(smmsResponse == null ? "SM.MS 服务返回内容为空" : smmsResponse.getMsg()).setErrorData(smmsResponse);
         }
 
         // Get response data
@@ -128,7 +128,7 @@ public class SmmsFileHandler implements FileHandler {
 
         if (responseEntity.getStatusCode().isError()) {
             log.debug("Smms server response error: [{}]", responseEntity.toString());
-            throw new FileOperationException("Smms server response error");
+            throw new FileOperationException("SM.MS 服务状态异常");
         }
 
         log.debug("Smms response detail: [{}]", responseEntity.getBody());
@@ -155,7 +155,7 @@ public class SmmsFileHandler implements FileHandler {
     @Data
     @ToString
     @NoArgsConstructor
-    static class SmmsResponse {
+    private static class SmmsResponse {
 
         private String code;
 
@@ -168,7 +168,7 @@ public class SmmsFileHandler implements FileHandler {
     @Data
     @ToString(callSuper = true)
     @NoArgsConstructor
-    static class SmmsResponseData {
+    private static class SmmsResponseData {
 
         private String filename;
 

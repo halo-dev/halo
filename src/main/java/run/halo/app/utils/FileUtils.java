@@ -64,7 +64,7 @@ public class FileUtils {
      *
      * @param deletingPath deleting path must not be null
      */
-    public static void deleteFolder(Path deletingPath) throws IOException {
+    public static void deleteFolder(@NonNull Path deletingPath) throws IOException {
         Assert.notNull(deletingPath, "Deleting path must not be null");
 
         log.debug("Deleting [{}]", deletingPath);
@@ -249,9 +249,9 @@ public class FileUtils {
     /**
      * Deletes folder quietly.
      *
-     * @param deletingPath deleting path must not be null
+     * @param deletingPath deleting path
      */
-    public static void deleteFolderQuietly(@NonNull Path deletingPath) {
+    public static void deleteFolderQuietly(@Nullable Path deletingPath) {
         try {
             if (deletingPath != null) {
                 FileUtils.deleteFolder(deletingPath);

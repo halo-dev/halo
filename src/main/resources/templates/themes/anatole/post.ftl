@@ -91,7 +91,7 @@
                         </#if>
                     </ul>
                 </div>
-                <div id="comment_widget">
+                <div id="comment_widget" style="margin: 30px;">
                     <#include "module/comment.ftl">
                     <@comment post=post type="post" />
                 </div>

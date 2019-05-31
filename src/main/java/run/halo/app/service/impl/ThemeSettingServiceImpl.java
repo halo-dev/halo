@@ -105,7 +105,7 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         try {
             configuration.setSharedVariable("settings", listAsMapBy(themeService.getActivatedThemeId()));
         } catch (TemplateModelException e) {
-            throw new ServiceException("Save theme settings error", e);
+            throw new ServiceException("主题设置保存失败", e);
         }
     }
 

@@ -171,7 +171,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         if (exist) {
-            throw new AlreadyExistsException("The menu name " + menu.getName() + " already exists");
+            throw new AlreadyExistsException("菜单 " + menu.getName() + " 已存在");
         }
     }
 }

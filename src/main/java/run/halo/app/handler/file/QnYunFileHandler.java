@@ -53,11 +53,11 @@ public class QnYunFileHandler implements FileHandler {
 
         // Get all config
         Zone zone = optionService.getQnYunZone();
-        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY).toString();
-        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET).toString();
-        String domain = optionService.getByPropertyOfNonNull(QnYunProperties.DOMAIN).toString();
-        String smallUrl = optionService.getByPropertyOrDefault(QnYunProperties.SMALL_URL, String.class, "");
+        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_ACCESS_KEY).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_SECRET_KEY).toString();
+        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_BUCKET).toString();
+        String domain = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_DOMAIN).toString();
+        String styleRule = optionService.getByPropertyOrDefault(QnYunProperties.OSS_STYLE_RULE, String.class, "");
 
         // Create configuration
         Configuration configuration = new Configuration(zone);
@@ -109,9 +109,10 @@ public class QnYunFileHandler implements FileHandler {
             result.setWidth(putSet.getWidth());
             result.setHeight(putSet.getHeight());
             result.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
+            result.setSize(file.getSize());
 
             if (isImageType(result.getMediaType())) {
-                result.setThumbPath(StringUtils.isBlank(smallUrl) ? filePath : filePath + smallUrl);
+                result.setThumbPath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
             }
 
             return result;
@@ -120,7 +121,7 @@ public class QnYunFileHandler implements FileHandler {
                 log.error("QnYun error response: [{}]", ((QiniuException) e).response);
             }
 
-            throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to QnYun", e);
+            throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到七牛云失败", e);
         }
     }
 
@@ -130,9 +131,9 @@ public class QnYunFileHandler implements FileHandler {
 
         // Get all config
         Zone zone = optionService.getQnYunZone();
-        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.SECRET_KEY).toString();
-        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.BUCKET).toString();
+        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_ACCESS_KEY).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_SECRET_KEY).toString();
+        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_BUCKET).toString();
 
         // Create configuration
         Configuration configuration = new Configuration(zone);

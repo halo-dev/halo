@@ -8,12 +8,17 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
+import run.halo.app.model.entity.JournalComment;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
+import run.halo.app.model.vo.CommentWithHasChildrenVO;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
+
+import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -39,12 +44,32 @@ public class JournalController {
         this.optionService = optionService;
     }
 
+    @GetMapping("{journalId:\\d+}/comments/top_view")
+    public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("journalId") Integer journalId,
+                                                          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        Page<CommentWithHasChildrenVO> result = journalCommentService.pageTopCommentsBy(journalId, CommentStatus.PUBLISHED, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return journalCommentService.filterIpAddress(result);
+    }
+
+    @GetMapping("{journalId:\\d+}/comments/{commentParentId:\\d+}/children")
+    public List<BaseCommentDTO> listChildrenBy(@PathVariable("journalId") Integer journalId,
+                                               @PathVariable("commentParentId") Long commentParentId,
+                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        // Find all children comments
+        List<JournalComment> postComments = journalCommentService.listChildrenBy(journalId, commentParentId, CommentStatus.PUBLISHED, sort);
+        // Convert to base comment dto
+        List<BaseCommentDTO> result = journalCommentService.convertTo(postComments);
+        return journalCommentService.filterIpAddress(result);
+    }
+
     @GetMapping("{journalId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("journalId") Integer journalId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                 @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentVO> result = journalCommentService.pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return journalCommentService.filterIpAddress(result);
     }
 
     @GetMapping("{journalId:\\d+}/comments/list_view")
@@ -52,7 +77,8 @@ public class JournalController {
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageWithParentVoBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentWithParentVO> result = journalCommentService.pageWithParentVoBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return journalCommentService.filterIpAddress(result);
     }
 
     @PostMapping("comments")

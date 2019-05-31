@@ -1,6 +1,9 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +32,7 @@ import run.halo.app.service.*;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
+import run.halo.app.utils.SlugUtils;
 
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -275,7 +279,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public Post importMarkdown(String markdown) {
+    public PostDetailVO importMarkdown(String markdown, String filename) {
         Assert.notNull(markdown, "Markdown document must not be null");
 
         // Render markdown to html document.
@@ -284,7 +288,80 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 
-        return null;
+        Post post = new Post();
+
+        List<String> elementValue;
+
+        Set<Integer> tagIds = new HashSet<>();
+
+        Set<Integer> categoryIds = new HashSet<>();
+        if (frontMatter.size() > 0) {
+            for (String key : frontMatter.keySet()) {
+                elementValue = frontMatter.get(key);
+                for (String ele : elementValue) {
+                    switch (key) {
+                        case "title":
+                            post.setTitle(ele);
+                            break;
+                        case "date":
+                            post.setCreateTime(DateUtil.parse(ele));
+                            break;
+                        case "updated":
+                            post.setUpdateTime(DateUtil.parse(ele));
+                            break;
+                        case "permalink":
+                            post.setUrl(ele);
+                            break;
+                        case "thumbnail":
+                            post.setThumbnail(ele);
+                            break;
+                        case "status":
+                            post.setStatus(PostStatus.valueOf(ele));
+                            break;
+                        case "comments":
+                            post.setDisallowComment(Boolean.parseBoolean(ele));
+                            break;
+                        case "tags":
+                            Tag tag = tagService.getByName(ele);
+                            if (null == tag) {
+                                tag = new Tag();
+                                tag.setName(ele);
+                                tag.setSlugName(SlugUtils.slugify(ele));
+                                tag = tagService.create(tag);
+                            }
+                            tagIds.add(tag.getId());
+                        case "categories":
+                            Category category = categoryService.getByName(ele);
+                            if (null == category) {
+                                category = new Category();
+                                category.setName(ele);
+                                category.setSlugName(SlugUtils.slugify(ele));
+                                category.setDescription(ele);
+                                category = categoryService.create(category);
+                            }
+                            categoryIds.add(category.getId());
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        if (null == post.getStatus()) {
+            post.setStatus(PostStatus.PUBLISHED);
+        }
+
+        if (StrUtil.isEmpty(post.getTitle())) {
+            post.setTitle(filename);
+        }
+
+        if (StrUtil.isEmpty(post.getUrl())) {
+            post.setUrl(DateUtil.format(new Date(), "yyyyMMddHHmmss" + RandomUtil.randomNumbers(5)));
+        }
+
+        post.setOriginalContent(markdown);
+
+        return createBy(post, tagIds, categoryIds, false);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
 
         if (count > 0) {
             // If the tag has exist already
-            throw new AlreadyExistsException("The tag has already exist").setErrorData(tag);
+            throw new AlreadyExistsException("该标签已存在").setErrorData(tag);
         }
 
         // Get tag name
@@ -58,6 +58,12 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     @Override
     public Tag getBySlugNameOfNonNull(String slugName) {
         return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("The tag does not exist").setErrorData(slugName));
+    }
+
+
+    @Override
+    public Tag getByName(String name) {
+        return tagRepository.getByName(name).orElse(null);
     }
 
     @Override
