@@ -106,7 +106,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         Assert.notNull(userId, "User id must not be blank");
 
         if (oldPassword.equals(newPassword)) {
-            throw new BadRequestException("There is nothing changed because new password is equal to old password");
+            throw new BadRequestException("新密码和旧密码不能相同");
         }
 
         // Get the user
@@ -114,7 +114,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
         // Check the user old password
         if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
-            throw new BadRequestException("Old password is mismatch").setErrorData(oldPassword);
+            throw new BadRequestException("旧密码错误").setErrorData(oldPassword);
         }
 
         // Set new password
