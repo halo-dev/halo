@@ -145,7 +145,7 @@ service.interceptors.response.use(
         message.error(data.message)
       }
     } else {
-      message.error('Server unavailable')
+      message.error('服务异常')
     }
 
     return Promise.reject(error)
