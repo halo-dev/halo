@@ -2,9 +2,10 @@ import axios from 'axios'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import Vue from 'vue'
-import { message } from 'ant-design-vue'
+import { message, notification } from 'ant-design-vue'
 import store from '@/store'
 import router from '@/router'
+import { isObject } from './util'
 
 const service = axios.create({
   baseURL: process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8090',
@@ -50,6 +51,16 @@ async function refreshToken(error) {
   return reRequest(error)
 }
 
+function getFieldValidationError(data) {
+  if (!isObject(data) || !isObject(data.data)) {
+    return null
+  }
+
+  const errorDetail = data.data
+
+  return Object.keys(errorDetail).map(key => errorDetail[key])
+}
+
 service.interceptors.request.use(
   config => {
     NProgress.start()
@@ -84,10 +95,33 @@ service.interceptors.response.use(
 
     const data = response ? response.data : null
     if (data) {
+      let handled = false
       // Business response
       Vue.$log.error('Business response status', data.status)
       if (data.status === 400) {
         // TODO handle 400 status error
+        const errorDetails = getFieldValidationError(data)
+        if (errorDetails) {
+          handled = true
+
+          notification.error({
+            message: data.message,
+            description: h => {
+              const errorNodes = errorDetails.map(errorDetail => {
+                return h('a-alert', {
+                  props: {
+                    message: errorDetail,
+                    banner: true,
+                    showIcon: false,
+                    type: 'error'
+                  }
+                })
+              })
+              return h('div', errorNodes)
+            },
+            duration: 10
+          })
+        }
       } else if (data.status === 401) {
         // TODO handle 401 status error
         if (store.getters.token && store.getters.token.access_token === data.data) {
@@ -107,7 +141,9 @@ service.interceptors.response.use(
         // TODO handle 500 status error
       }
 
-      message.error(data.message)
+      if (!handled) {
+        message.error(data.message)
+      }
     } else {
       message.error('Server unavailable')
     }

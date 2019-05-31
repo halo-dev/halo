@@ -50,3 +50,7 @@ export function timeAgo(time) {
     return moment(time).format('YYYY-MM-DD HH:mm')
   }
 }
+
+export function isObject(value) {
+  return value && typeof value === 'object' && value.constructor === Object
+}
