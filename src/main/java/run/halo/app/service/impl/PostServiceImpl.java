@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -355,7 +356,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         }
 
         if (StrUtil.isEmpty(post.getUrl())) {
-            post.setUrl(DateUtil.format(new Date(), "yyyyMMddHHmmss"));
+            post.setUrl(DateUtil.format(new Date(), "yyyyMMddHHmmss" + RandomUtil.randomNumbers(5)));
         }
 
         post.setOriginalContent(markdown);
