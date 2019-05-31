@@ -53,7 +53,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         if (count > 0) {
             log.error("Category has exist already: [{}]", category);
-            throw new AlreadyExistsException("The category has exist already");
+            throw new AlreadyExistsException("该分类已存在");
         }
 
         // Check parent id

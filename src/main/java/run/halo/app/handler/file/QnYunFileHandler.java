@@ -121,7 +121,7 @@ public class QnYunFileHandler implements FileHandler {
                 log.error("QnYun error response: [{}]", ((QiniuException) e).response);
             }
 
-            throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to QnYun", e);
+            throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到七牛云失败", e);
         }
     }
 

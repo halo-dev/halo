@@ -65,7 +65,7 @@ public class SmmsFileHandler implements FileHandler {
             body.add("smfile", new HttpClientUtils.MultipartFileResource(file.getBytes(), file.getOriginalFilename()));
         } catch (IOException e) {
             log.error("Failed to get file input stream", e);
-            throw new FileOperationException("Failed to upload " + file.getOriginalFilename() + " file", e);
+            throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到 SM.MS 失败", e);
         }
 
         body.add("ssl", false);
