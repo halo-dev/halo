@@ -50,7 +50,7 @@ public class JournalController {
     }
 
     @GetMapping
-    @ApiOperation("Gets latest journals")
+    @ApiOperation("Lists journals")
     public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                                JournalQuery journalQuery) {
         Page<Journal> journalPage = journalService.pageBy(journalQuery, pageable);
