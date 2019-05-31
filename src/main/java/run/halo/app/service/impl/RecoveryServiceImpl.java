@@ -128,7 +128,7 @@ public class RecoveryServiceImpl implements RecoveryService {
                 log.debug("Migrated posts: [{}]", posts);
             }
         } catch (IOException e) {
-            throw new ServiceException("Failed to read multipart file " + file.getOriginalFilename(), e);
+            throw new ServiceException("备份文件 " + file.getOriginalFilename() + " 读取失败", e);
         }
     }
 
