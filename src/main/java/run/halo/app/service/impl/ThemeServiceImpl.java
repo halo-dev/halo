@@ -248,7 +248,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         if (themeId.equals(getActivatedThemeId())) {
             // Prevent to delete the activated theme
-            throw new BadRequestException("You can't delete the activated theme").setErrorData(themeId);
+            throw new BadRequestException("不能删除正在使用的主题").setErrorData(themeId);
         }
 
         try {
@@ -258,7 +258,7 @@ public class ThemeServiceImpl implements ThemeService {
             // Delete theme cache
             eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
         } catch (Exception e) {
-            throw new ServiceException("Failed to delete theme folder", e).setErrorData(themeId);
+            throw new ServiceException("主题删除失败", e).setErrorData(themeId);
         }
     }
 
@@ -295,7 +295,7 @@ public class ThemeServiceImpl implements ThemeService {
 
             return Collections.emptyList();
         } catch (IOException e) {
-            throw new ServiceException("Failed to read options file", e);
+            throw new ServiceException("读取主题配置文件失败", e);
         }
     }
 
@@ -456,7 +456,7 @@ public class ThemeServiceImpl implements ThemeService {
 
             return add(themeTmpPath);
         } catch (IOException | GitAPIException e) {
-            throw new ServiceException("Failed to fetch theme from remote " + uri, e);
+            throw new ServiceException("主题拉取失败 " + uri, e);
         } finally {
             FileUtils.deleteFolderQuietly(tmpPath);
         }
@@ -587,7 +587,7 @@ public class ThemeServiceImpl implements ThemeService {
         log.debug("Download response: [{}]", downloadResponse.getStatusCode());
 
         if (downloadResponse.getStatusCode().isError() || downloadResponse.getBody() == null) {
-            throw new ServiceException("Failed to download " + zipUrl + ", status: " + downloadResponse.getStatusCode());
+            throw new ServiceException("下载失败 " + zipUrl + ", 状态码: " + downloadResponse.getStatusCode());
         }
 
         log.debug("Downloaded [{}]", zipUrl);

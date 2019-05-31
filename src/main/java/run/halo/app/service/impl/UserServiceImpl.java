@@ -148,7 +148,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         if (user.getExpireTime() != null && user.getExpireTime().after(now)) {
             long seconds = TimeUnit.MILLISECONDS.toSeconds(user.getExpireTime().getTime() - now.getTime());
             // If expired
-            throw new ForbiddenException("You have been temporarily disabled，please try again " + HaloUtils.timeFormat(seconds) + " later").setErrorData(seconds);
+            throw new ForbiddenException("账号已被停用，请 " + HaloUtils.timeFormat(seconds) + " 后重试").setErrorData(seconds);
         }
     }
 
@@ -164,7 +164,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     public User create(User user) {
         // Check user
         if (count() != 0) {
-            throw new BadRequestException("This blog already exists a blogger");
+            throw new BadRequestException("当前博客已有用户");
         }
 
         User createdUser = super.create(user);

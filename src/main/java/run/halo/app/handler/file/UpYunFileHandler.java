@@ -67,7 +67,7 @@ public class UpYunFileHandler implements FileHandler {
             // Write file
             boolean uploadSuccess = upYun.writeFile(upFilePath, file.getInputStream(), true, null);
             if (!uploadSuccess) {
-                throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to UpYun " + upFilePath);
+                throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到又拍云失败" + upFilePath);
             }
 
             String filePath = StringUtils.removeEnd(ossDomain, "/") + upFilePath;
@@ -118,7 +118,7 @@ public class UpYunFileHandler implements FileHandler {
                 log.warn("Failed to delete file " + filePath + " from UpYun");
             }
         } catch (Exception e) {
-            throw new FileOperationException("Failed to delete file " + key + " from UpYun", e);
+            throw new FileOperationException("附件从又拍云删除失败", e);
         }
     }
 

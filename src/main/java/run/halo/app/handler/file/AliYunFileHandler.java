@@ -114,7 +114,7 @@ public class AliYunFileHandler implements FileHandler {
         try {
             ossClient.deleteObject(new DeleteObjectsRequest(ossBucketName).withKey(key));
         } catch (Exception e) {
-            throw new FileOperationException("Failed to delete file " + key + " from AliYun", e);
+            throw new FileOperationException("附件 " + key + " 从阿里云删除失败", e);
         } finally {
             ossClient.shutdown();
         }

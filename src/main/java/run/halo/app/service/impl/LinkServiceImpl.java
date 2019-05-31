@@ -86,7 +86,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         boolean exist = existByName(linkParam.getName());
 
         if (exist) {
-            throw new AlreadyExistsException("Link name " + linkParam.getName() + " has already existed").setErrorData(linkParam.getName());
+            throw new AlreadyExistsException("友情链接 " + linkParam.getName() + " 已存在").setErrorData(linkParam.getName());
         }
 
         return create(linkParam.convertTo());
