@@ -89,7 +89,7 @@ export default {
     handleSelectFile(file) {
       const _this = this
       if (!file.editable) {
-        this.$message.info('该文件不支持修改')
+        this.$message.info('该文件不支持修改！')
         this.content = ''
         this.file = {}
         this.buttonDisabled = true
@@ -98,7 +98,7 @@ export default {
       if (file.name === 'settings.yaml' || file.name === 'settings.yml' || file.name === 'theme.yaml' || file.name === 'theme.yml') {
         this.$confirm({
           title: '警告：请谨慎修改该配置文件',
-          content: '修改之后可能会产生不可预料的问题',
+          content: '修改之后可能会产生不可预料的问题！',
           onCancel() {
             _this.content = ''
             _this.file = {}
@@ -114,7 +114,7 @@ export default {
     },
     handlerSaveContent() {
       themeApi.saveContent(this.file.path, this.content).then(response => {
-        this.$message.success('保存成功')
+        this.$message.success('保存成功！')
       })
     }
   }

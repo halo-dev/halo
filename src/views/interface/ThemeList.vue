@@ -429,9 +429,9 @@ export default {
     handleChange(info) {
       const status = info.file.status
       if (status === 'done') {
-        this.$message.success(`${info.file.name} 主题上传成功`)
+        this.$message.success(`${info.file.name} 主题上传成功！`)
       } else if (status === 'error') {
-        this.$message.error(`${info.file.name} 主题上传失败`)
+        this.$message.error(`${info.file.name} 主题上传失败！`)
       }
     },
     handleUploadSuccess() {
@@ -450,7 +450,7 @@ export default {
     handleFetching() {
       this.fetchButtonLoading = true
       themeApi.fetching(this.fetchingUrl).then(response => {
-        this.$message.success('拉取成功')
+        this.$message.success('拉取成功！')
         this.uploadVisible = false
         this.fetchButtonLoading = false
         this.loadThemes()

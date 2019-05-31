@@ -67,12 +67,12 @@ export default {
     ...mapActions(['login', 'loadUser']),
     handleLogin() {
       if (!this.username) {
-        this.$message.warn('用户名不能为空')
+        this.$message.warn('用户名不能为空！')
         return
       }
 
       if (!this.password) {
-        this.$message.warn('密码不能为空')
+        this.$message.warn('密码不能为空！')
         return
       }
 

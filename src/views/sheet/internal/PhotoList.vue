@@ -321,12 +321,12 @@ export default {
     handleCreateOrUpdate() {
       if (this.photo.id) {
         photoApi.update(this.photo.id, this.photo).then(response => {
-          this.$message.success('照片更新成功')
+          this.$message.success('照片更新成功！')
           this.loadPhotos()
         })
       } else {
         photoApi.create(this.photo).then(response => {
-          this.$message.success('照片添加成功')
+          this.$message.success('照片添加成功！')
           this.loadPhotos()
           this.photo = response.data.data
         })

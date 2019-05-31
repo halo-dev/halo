@@ -236,8 +236,8 @@ export default {
     },
     saveSheet() {
       this.createOrUpdateSheet(
-        () => this.$message.success('页面创建成功'),
-        () => this.$message.success('页面更新成功'),
+        () => this.$message.success('页面创建成功！'),
+        () => this.$message.success('页面更新成功！'),
         false
       )
     },

@@ -208,18 +208,6 @@ export const asyncRouterMap = [
  */
 export const constantRouterMap = [
   {
-    path: '/test',
-    component: BlankLayout,
-    redirect: '/test/home',
-    children: [
-      {
-        path: 'home',
-        name: 'TestHome',
-        component: () => import('@/views/Home')
-      }
-    ]
-  },
-  {
     path: '/login',
     name: 'Login',
     meta: { title: '登录' },

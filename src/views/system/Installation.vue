@@ -251,7 +251,7 @@ export default {
     install() {
       adminApi.install(this.installation).then(response => {
         this.$log.debug('Installation response', response)
-        this.$message.success('安装成功')
+        this.$message.success('安装成功！')
         setTimeout(() => {
           this.$router.push({ name: 'Dashboard' })
         }, 300)
@@ -273,7 +273,7 @@ export default {
       if (this.migrationData) {
         recoveryApi.migrate(this.migrationData).then(response => {
           this.$log.debug('Migrated successfullly')
-          this.$message.success('数据迁移成功')
+          this.$message.success('数据迁移成功！')
           this.install()
         })
       } else {

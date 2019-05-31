@@ -388,9 +388,6 @@ export default {
         this.options = response.data.data
       })
     },
-    handleEditComment(id) {
-      this.$message.success('编辑')
-    },
     handleEditStatusClick(commentId, status) {
       commentApi.updateStatus(this.type, commentId, status).then(response => {
         this.$message.success('操作成功！')

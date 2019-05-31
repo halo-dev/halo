@@ -211,7 +211,7 @@ export default {
     doUpdateAttachment() {
       attachmentApi.update(this.attachment.id, this.attachment).then(response => {
         this.$log.debug('Updated attachment', response.data.data)
-        this.$message.success('附件修改成功')
+        this.$message.success('附件修改成功！')
       })
       this.editable = false
     },
@@ -220,11 +220,11 @@ export default {
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
-          this.$message.success('复制成功')
+          this.$message.success('复制成功！')
         })
         .catch(err => {
           console.log('copy.err', err)
-          this.$message.error('复制失败')
+          this.$message.error('复制失败！')
         })
     },
     handleCopyMarkdownLink() {
@@ -232,11 +232,11 @@ export default {
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
-          this.$message.success('复制成功')
+          this.$message.success('复制成功！')
         })
         .catch(err => {
           console.log('copy.err', err)
-          this.$message.error('复制失败')
+          this.$message.error('复制失败！')
         })
     },
     handleAddToPhoto() {

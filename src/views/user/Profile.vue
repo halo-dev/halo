@@ -28,7 +28,7 @@
           </div>
           <div class="profile-center-detail">
             <p>
-              <a-icon type="link" /><a
+              <a-icon type="global" /><a
                 :href="options.blog_url"
                 target="method"
               >{{ options.blog_url }}</a>
@@ -205,7 +205,6 @@ export default {
         this.$message.error('确认密码和新密码不匹配！')
         return
       }
-
       userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {})
     },
     handleUpdateProfile() {

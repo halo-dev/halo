@@ -31,7 +31,7 @@
         <upload
           name="files"
           multiple
-          accept="application/markdown"
+          accept="text/markdown"
           :uploadHandler="uploadHandler"
           @change="handleChange"
         >
@@ -65,9 +65,9 @@ export default {
         console.log(info.file, info.fileList)
       }
       if (status === 'done') {
-        this.$message.success(`${info.file.name} 导入成功`)
+        this.$message.success(`${info.file.name} 导入成功！`)
       } else if (status === 'error') {
-        this.$message.error(`${info.file.name} 导入失败`)
+        this.$message.error(`${info.file.name} 导入失败！`)
       }
     }
   }
