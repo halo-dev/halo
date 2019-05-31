@@ -62,7 +62,7 @@ public class AliYunFileHandler implements FileHandler {
             // Upload
             PutObjectResult putObjectResult = ossClient.putObject(ossBucketName, upFilePath, file.getInputStream());
             if (putObjectResult == null) {
-                throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to AliYun " + upFilePath);
+                throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
             }
 
             // Response result

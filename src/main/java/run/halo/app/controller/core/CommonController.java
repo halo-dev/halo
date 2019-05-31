@@ -57,11 +57,7 @@ public class CommonController implements ErrorController {
             }
         }
 
-        if (statusCode == 500) {
-            return "redirect:/500";
-        } else {
-            return "redirect:/404";
-        }
+        return statusCode == 500 ? "redirect:/500" : "redirect:/404";
     }
 
     /**

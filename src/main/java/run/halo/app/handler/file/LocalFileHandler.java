@@ -162,7 +162,7 @@ public class LocalFileHandler implements FileHandler {
             return uploadResult;
         } catch (IOException e) {
             log.error("Failed to upload file to local: " + uploadPath, e);
-            throw new ServiceException("Failed to upload file to local").setErrorData(uploadPath);
+            throw new ServiceException("上传附件失败").setErrorData(uploadPath);
         }
     }
 

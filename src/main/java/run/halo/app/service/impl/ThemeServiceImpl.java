@@ -3,12 +3,10 @@ package run.halo.app.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.MergeCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.springframework.context.ApplicationEventPublisher;
@@ -371,7 +369,7 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.notNull(file, "Multipart file must not be null");
 
         if (!StringUtils.endsWithIgnoreCase(file.getOriginalFilename(), ".zip")) {
-            throw new UnsupportedMediaTypeException("Unsupported theme media type: " + file.getContentType()).setErrorData(file.getOriginalFilename());
+            throw new UnsupportedMediaTypeException("不支持的文件类型: " + file.getContentType()).setErrorData(file.getOriginalFilename());
         }
 
         ZipInputStream zis = null;
@@ -395,7 +393,7 @@ public class ThemeServiceImpl implements ThemeService {
             // Go to the base folder and add the theme into system
             return add(FileUtils.skipZipParentFolder(themeTempPath));
         } catch (IOException e) {
-            throw new ServiceException("Failed to upload theme file: " + file.getOriginalFilename(), e);
+            throw new ServiceException("上传主题失败: " + file.getOriginalFilename(), e);
         } finally {
             // Close zip input stream
             FileUtils.closeQuietly(zis);
