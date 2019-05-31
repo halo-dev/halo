@@ -174,7 +174,10 @@
                     slot="description"
                     v-if="editable"
                   >
-                    <a-input v-model="photo.takeTime" />
+                    <a-date-picker
+                      v-model="photo.takeTime"
+                      style="width:100%"
+                    />
                   </template>
                   <span
                     slot="description"
@@ -241,7 +244,7 @@
         @listenToSelect="selectPhotoThumb"
         :drawerWidth="460"
       />
-      <a-divider class="divider-transparent"/>
+      <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-button
           type="dashed"
