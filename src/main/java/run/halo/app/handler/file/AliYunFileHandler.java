@@ -46,6 +46,7 @@ public class AliYunFileHandler implements FileHandler {
         String ossAccessKey = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_KEY).toString();
         String ossAccessSecret = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_SECRET).toString();
         String ossBucketName = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_BUCKET_NAME).toString();
+        String ossStyleRule = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_STYLE_RULE).toString();
         String ossSource = StringUtils.join("https://", ossBucketName, "." + ossEndPoint);
 
         // Init OSS client
@@ -61,7 +62,7 @@ public class AliYunFileHandler implements FileHandler {
             // Upload
             PutObjectResult putObjectResult = ossClient.putObject(ossBucketName, upFilePath, file.getInputStream());
             if (putObjectResult == null) {
-                throw new FileOperationException("Failed to upload file " + file.getOriginalFilename() + " to AliYun " + upFilePath);
+                throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
             }
 
             // Response result
@@ -78,7 +79,7 @@ public class AliYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(filePath);
+                uploadResult.setThumbPath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
             }
 
             return uploadResult;
@@ -113,7 +114,7 @@ public class AliYunFileHandler implements FileHandler {
         try {
             ossClient.deleteObject(new DeleteObjectsRequest(ossBucketName).withKey(key));
         } catch (Exception e) {
-            throw new FileOperationException("Failed to delete file " + key + " from AliYun", e);
+            throw new FileOperationException("附件 " + key + " 从阿里云删除失败", e);
         } finally {
             ossClient.shutdown();
         }

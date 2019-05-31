@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
+import run.halo.app.model.dto.InternalSheetDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
@@ -16,9 +17,11 @@ import run.halo.app.repository.SheetRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
+import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +30,7 @@ import java.util.Set;
  * Sheet service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-24
  */
 @Service
@@ -38,14 +42,18 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     private final SheetCommentService sheetCommentService;
 
+    private final ThemeService themeService;
+
     public SheetServiceImpl(SheetRepository sheetRepository,
                             ApplicationEventPublisher eventPublisher,
                             SheetCommentService sheetCommentService,
-                            OptionService optionService) {
+                            OptionService optionService,
+                            ThemeService themeService) {
         super(sheetRepository, optionService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
+        this.themeService = themeService;
     }
 
     @Override
@@ -134,6 +142,39 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         content.append("---\n\n");
         content.append(sheet.getOriginalContent());
         return content.toString();
+    }
+
+    @Override
+    public List<InternalSheetDTO> listInternal() {
+
+        List<InternalSheetDTO> internalSheetDTOS = new ArrayList<>();
+
+        // links sheet
+        InternalSheetDTO linkSheet = new InternalSheetDTO();
+        linkSheet.setId(1);
+        linkSheet.setTitle("友情链接");
+        linkSheet.setUrl("/links");
+        linkSheet.setStatus(themeService.templateExists("links.ftl"));
+
+        // photos sheet
+        InternalSheetDTO photoSheet = new InternalSheetDTO();
+        photoSheet.setId(2);
+        photoSheet.setTitle("图库页面");
+        photoSheet.setUrl("/photos");
+        photoSheet.setStatus(themeService.templateExists("photos.ftl"));
+
+        // journals sheet
+        InternalSheetDTO journalSheet = new InternalSheetDTO();
+        journalSheet.setId(3);
+        journalSheet.setTitle("日志页面");
+        journalSheet.setUrl("/journals");
+        journalSheet.setStatus(themeService.templateExists("journals.ftl"));
+
+        internalSheetDTOS.add(linkSheet);
+        internalSheetDTOS.add(photoSheet);
+        internalSheetDTOS.add(journalSheet);
+
+        return internalSheetDTOS;
     }
 
     @Override

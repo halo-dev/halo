@@ -106,7 +106,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         Assert.notNull(userId, "User id must not be blank");
 
         if (oldPassword.equals(newPassword)) {
-            throw new BadRequestException("There is nothing changed because new password is equal to old password");
+            throw new BadRequestException("新密码和旧密码不能相同");
         }
 
         // Get the user
@@ -114,7 +114,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
         // Check the user old password
         if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
-            throw new BadRequestException("Old password is mismatch").setErrorData(oldPassword);
+            throw new BadRequestException("旧密码错误").setErrorData(oldPassword);
         }
 
         // Set new password
@@ -148,7 +148,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         if (user.getExpireTime() != null && user.getExpireTime().after(now)) {
             long seconds = TimeUnit.MILLISECONDS.toSeconds(user.getExpireTime().getTime() - now.getTime());
             // If expired
-            throw new ForbiddenException("You have been temporarily disabled，please try again " + HaloUtils.timeFormat(seconds) + " later").setErrorData(seconds);
+            throw new ForbiddenException("账号已被停用，请 " + HaloUtils.timeFormat(seconds) + " 后重试").setErrorData(seconds);
         }
     }
 
@@ -164,7 +164,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     public User create(User user) {
         // Check user
         if (count() != 0) {
-            throw new BadRequestException("This blog already exists a blogger");
+            throw new BadRequestException("当前博客已有用户");
         }
 
         User createdUser = super.create(user);

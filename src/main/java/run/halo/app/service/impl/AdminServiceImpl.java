@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -58,6 +59,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final StringCacheStore cacheStore;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     private final String driverClassName;
 
     public AdminServiceImpl(PostService postService,
@@ -70,6 +73,7 @@ public class AdminServiceImpl implements AdminService {
                             UserService userService,
                             LinkService linkService,
                             StringCacheStore cacheStore,
+                            ApplicationEventPublisher eventPublisher,
                             @Value("${spring.datasource.driver-class-name}") String driverClassName) {
         this.postService = postService;
         this.sheetService = sheetService;
@@ -81,6 +85,7 @@ public class AdminServiceImpl implements AdminService {
         this.userService = userService;
         this.linkService = linkService;
         this.cacheStore = cacheStore;
+        this.eventPublisher = eventPublisher;
         this.driverClassName = driverClassName;
     }
 
@@ -112,7 +117,7 @@ public class AdminServiceImpl implements AdminService {
 
         if (SecurityContextHolder.getContext().isAuthenticated()) {
             // If the user has been logged in
-            throw new BadRequestException("You have been logged in, do not log in repeatedly please");
+            throw new BadRequestException("您已登录，请不要重复登录");
         }
 
         // Generate new token
@@ -125,7 +130,7 @@ public class AdminServiceImpl implements AdminService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
-            throw new BadRequestException("You haven't logged in yet, so you can't log out");
+            throw new BadRequestException("您尚未登录，因此无法注销");
         }
 
         // Get current user

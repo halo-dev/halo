@@ -18,7 +18,7 @@ public enum UpYunProperties implements PropertyEnum {
 
     OSS_OPERATOR("oss_upyun_operator", String.class, ""),
 
-    OSS_SMALL_URL("oss_upyun_small_url", String.class, "");
+    OSS_STYLE_RULE("oss_upyun_style_rule", String.class, "");
 
     private final String defaultValue;
     private String value;

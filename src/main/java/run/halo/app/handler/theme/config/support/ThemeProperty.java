@@ -29,6 +29,16 @@ public class ThemeProperty {
     private String website;
 
     /**
+     * Theme remote branch.(default is master)
+     */
+    private String branch;
+
+    /**
+     * Theme repo url.
+     */
+    private String repo;
+
+    /**
      * Theme description.
      */
     private String description;
@@ -49,7 +59,7 @@ public class ThemeProperty {
     private Author author;
 
     /**
-     * Theme path.
+     * Theme full path.
      */
     private String themePath;
 

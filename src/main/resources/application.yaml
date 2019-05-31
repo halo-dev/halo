@@ -13,6 +13,8 @@ server:
     enabled: true
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
 spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
   devtools:
     add-properties: false
   output:
@@ -21,17 +23,17 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
-    # H2database 配置
+    # H2 Database 配置
     driver-class-name: org.h2.Driver
     url: jdbc:h2:file:~/.halo/db/halo
     username: admin
     password: 123456
 
-    # MySql 配置
-  #    driver-class-name: com.mysql.cj.jdbc.Driver
-  #    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-  #    username: root
-  #    password: 123456
+    # MySQL 配置
+  #  driver-class-name: com.mysql.cj.jdbc.Driver
+  #  url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+  #  username: root
+  #  password: 123456
 
   h2:
     console:

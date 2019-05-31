@@ -162,7 +162,7 @@ public class LocalFileHandler implements FileHandler {
             return uploadResult;
         } catch (IOException e) {
             log.error("Failed to upload file to local: " + uploadPath, e);
-            throw new ServiceException("Failed to upload file to local").setErrorData(uploadPath);
+            throw new ServiceException("上传附件失败").setErrorData(uploadPath);
         }
     }
 
@@ -177,7 +177,7 @@ public class LocalFileHandler implements FileHandler {
         try {
             Files.delete(path);
         } catch (IOException e) {
-            throw new FileOperationException("Failed to delete " + key + " file", e);
+            throw new FileOperationException("附件 " + key + " 删除失败", e);
         }
 
         // Delete thumb if necessary
@@ -197,7 +197,7 @@ public class LocalFileHandler implements FileHandler {
                 log.warn("Thumbnail: [{}] way not exist", thumbnailPath.toString());
             }
         } catch (IOException e) {
-            throw new FileOperationException("Failed to delete " + thumbnailName + " thumbnail", e);
+            throw new FileOperationException("附件缩略图 " + thumbnailName + " 删除失败", e);
         }
     }
 
