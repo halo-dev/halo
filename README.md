@@ -23,26 +23,36 @@
 
 ## 快速开始
 
-```bash
-# 下载最新的 Halo 安装包
-wget https://github.com/halo-dev/halo/releases/download/v1.0.0-beta.8/halo-1.0.0-beta.8.jar -O halo-latest.jar
+### 下载最新的 Halo 安装包
 
-# 启动 Halo
-nohup java -jar halo-latest.jar &
+```bash
+$ curl -L https://github.com/halo-dev/halo/releases/download/v1.0.0-beta.9/halo-1.0.0-beta.9.jar --output halo-latest.jar
 ```
 
-详细文档请移步：<[https://halo.run/docs](https://halo.run/docs)>
+或者
+
+```bash
+$ wget https://github.com/halo-dev/halo/releases/download/v1.0.0-beta.9/halo-1.0.0-beta.9.jar -O halo-latest.jar
+```
+
+### 启动 Halo
+
+```bash
+$ nohup java -jar halo-latest.jar &
+```
+
+详细文档请移步：<https://halo.run/docs>
 
 ## 博客示例
 
-请移步： <[https://github.com/halo-dev/halo/issues/26](https://github.com/halo-dev/halo/issues/26)>。
+请移步： <https://github.com/halo-dev/halo/issues/26>。
 
 ## 周边
 
-- 后台管理（halo-admin）：<[https://github.com/halo-dev/halo-admin](https://github.com/halo-dev/halo-admin)>
-- 独立评论模块（halo-comment）：<[https://github.com/halo-dev/halo-comment](https://github.com/halo-dev/halo-comment)>
-- 管理 APP（halo-app）：<[https://github.com/halo-dev/halo-app](https://github.com/halo-dev/halo-app)>
-- 主题仓库：<[https://halo.run/theme](https://halo.run/theme)>
+- 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
+- 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
+- 管理 APP（halo-app）：<https://github.com/halo-dev/halo-app>
+- 主题仓库：<https://halo.run/theme>
 
 ## 许可证
 
