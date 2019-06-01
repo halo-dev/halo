@@ -32,11 +32,16 @@
             <a-form
               layout="horizontal"
               v-show="stepCurrent == 0"
+              :form="bloggerForm"
             >
               <a-form-item class="animated fadeInUp">
                 <a-input
                   v-model="installation.username"
                   placeholder="用户名"
+                  v-decorator="[
+                    'username',
+                    {rules: [{ required: true, message: '请输入用户名' }]}
+                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -67,6 +72,10 @@
                 <a-input
                   v-model="installation.email"
                   placeholder="用户邮箱"
+                  v-decorator="[
+                    'email',
+                    {rules: [{ required: true, message: '请输入邮箱' }]}
+                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -83,6 +92,10 @@
                   v-model="installation.password"
                   type="password"
                   placeholder="用户密码"
+                  v-decorator="[
+                    'password',
+                    {rules: [{ required: true, message: '请输入密码' }]}
+                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -99,6 +112,10 @@
                   v-model="installation.confirmPassword"
                   type="password"
                   placeholder="确定密码"
+                  v-decorator="[
+                    'confirmPassword',
+                    {rules: [{ required: true, message: '请输入密码' }]}
+                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -182,7 +199,7 @@
                 <a-button
                   type="primary"
                   v-if="stepCurrent != 2"
-                  @click="stepCurrent++"
+                  @click="handleNextStep"
                 >下一步</a-button>
               </div>
               <a-button
@@ -201,6 +218,7 @@
 
 <script>
 import adminApi from '@/api/admin'
+import optionApi from '@/api/option'
 import recoveryApi from '@/api/recovery'
 
 export default {
@@ -225,13 +243,34 @@ export default {
       installation: {},
       migrationUploadName: 'file',
       migrationData: null,
-      stepCurrent: 0
+      stepCurrent: 0,
+      bloggerForm: this.$form.createForm(this),
+      keys: ['is_installed']
     }
   },
   created() {
+    this.verifyIsInstall()
     this.installation.url = window.location.protocol + '//' + window.location.host
   },
   methods: {
+    verifyIsInstall() {
+      optionApi.listAll(this.keys).then(response => {
+        if(response.data.data.is_installed){
+          this.$router.push({ name: 'Login' })
+        }
+      })
+    },
+    handleNextStep(e) {
+      e.preventDefault()
+      this.bloggerForm.validateFields((error, values) => {
+        console.log('error', error)
+        console.log('Received values of form: ', values)
+        if (error != null) {
+        } else {
+          this.stepCurrent++
+        }
+      })
+    },
     handleMigrationUpload(data) {
       this.$log.debug('Selected data', data)
       this.migrationData = data
