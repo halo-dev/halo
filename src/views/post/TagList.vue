@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="添加标签">
+        <a-card :title="title">
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -26,8 +26,32 @@
             <a-form-item>
               <a-button
                 type="primary"
-                @click="handleCreateTag"
+                @click="handleSaveClick"
+                v-if="formType==='create'"
               >保存</a-button>
+              <a-button-group v-else>
+                <a-button
+                  type="primary"
+                  @click="handleSaveClick"
+                >更新</a-button>
+                <a-button
+                  type="dashed"
+                  @click="handleAddTag"
+                  v-if="formType==='update'"
+                >返回添加</a-button>
+              </a-button-group>
+              <a-popconfirm
+                :title="'你确定要删除【' + tagToCreate.name + '】标签？'"
+                @confirm="handleDeleteTag(tagToCreate.id)"
+                okText="确定"
+                cancelText="取消"
+                v-if="formType==='update'"
+              >
+                <a-button
+                  type="danger"
+                  style="float:right"
+                >删除</a-button>
+              </a-popconfirm>
             </a-form-item>
           </a-form>
         </a-card>
@@ -50,9 +74,9 @@
               <span>{{ tag.postCount }} 篇文章</span>
             </template>
             <a-tag
-              closable
-              @close="handleDeleteTag(tag.id)"
               color="blue"
+              style="margin-bottom: 8px"
+              @click="handleEditTag(tag)"
             >{{ tag.name }}</a-tag>
           </a-tooltip>
         </a-card>
@@ -67,9 +91,17 @@ import tagApi from '@/api/tag'
 export default {
   data() {
     return {
+      formType: 'create',
       tags: [],
-      tagToCreate: {},
-      tagToUpdate: {}
+      tagToCreate: {}
+    }
+  },
+  computed: {
+    title() {
+      if (this.tagToCreate.id) {
+        return '修改标签'
+      }
+      return '添加标签'
     }
   },
   created() {
@@ -81,21 +113,39 @@ export default {
         this.tags = response.data.data
       })
     },
-    handleCreateTag() {
-      tagApi.create(this.tagToCreate).then(response => {
-        this.loadTags()
-      })
+    handleSaveClick() {
+      this.createOrUpdateTag()
     },
-    handleUpdateTag(tagId) {
-      tagApi.update(tagId, this.tagToUpdate).then(response => {
-        this.loadTags()
-      })
+    handleAddTag() {
+      this.formType = 'create'
+      this.tagToCreate = {}
+    },
+    handleEditTag(tag) {
+      this.tagToCreate = tag
+      this.formType = 'update'
     },
     handleDeleteTag(tagId) {
       tagApi.delete(tagId).then(response => {
         this.$message.success('删除成功！')
         this.loadTags()
+        this.handleAddTag()
       })
+    },
+    createOrUpdateTag() {
+      if (this.tagToCreate.id) {
+        tagApi.update(this.tagToCreate.id, this.tagToCreate).then(response => {
+          this.$message.success('更新成功！')
+          this.loadTags()
+          this.tagToCreate = {}
+        })
+      } else {
+        tagApi.create(this.tagToCreate).then(response => {
+          this.$message.success('保存成功！')
+          this.loadTags()
+          this.tagToCreate = {}
+        })
+      }
+      this.handleAddTag()
     }
   }
 }
