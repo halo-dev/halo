@@ -255,7 +255,7 @@ export default {
   methods: {
     verifyIsInstall() {
       optionApi.listAll(this.keys).then(response => {
-        if(response.data.data.is_installed){
+        if (response.data.data.is_installed) {
           this.$router.push({ name: 'Login' })
         }
       })
