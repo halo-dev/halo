@@ -56,4 +56,4 @@ spring:
 logging:
   level:
     run.halo.app: INFO
-  file: ./logs/log.log
+  path: ${user.home}/.halo/logs

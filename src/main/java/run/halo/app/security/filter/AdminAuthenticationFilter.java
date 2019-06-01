@@ -98,7 +98,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
 
         if (!optionalUserId.isPresent()) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("The token has been expired or not exist").setErrorData(token));
+            getFailureHandler().onFailure(request, response, new AuthenticationException("Token 已过期或不存在").setErrorData(token));
             return;
         }
 

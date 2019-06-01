@@ -223,7 +223,7 @@ public class ThemeServiceImpl implements ThemeService {
         try {
             return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new ServiceException("Failed to read file " + absolutePath, e);
+            throw new ServiceException("读取模板内容失败 " + absolutePath, e);
         }
     }
 
@@ -237,7 +237,7 @@ public class ThemeServiceImpl implements ThemeService {
         try {
             Files.write(path, content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new ServiceException("Failed to write file " + absolutePath, e);
+            throw new ServiceException("保存模板内容失败 " + absolutePath, e);
         }
     }
 
@@ -418,7 +418,7 @@ public class ThemeServiceImpl implements ThemeService {
                 .anyMatch(themeProperty -> themeProperty.getId().equalsIgnoreCase(tmpThemeProperty.getId()));
 
         if (isExist) {
-            throw new AlreadyExistsException("The theme with id " + tmpThemeProperty.getId() + " has already existed");
+            throw new AlreadyExistsException("当前安装的主题已存在");
         }
 
         // Copy the temporary path to current theme folder
@@ -722,7 +722,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @NonNull
     private Path getThemePropertyPath(@NonNull Path themePath) {
-        return getThemePropertyPathOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException(themePath + " dose not exist any theme property file").setErrorData(themePath));
+        return getThemePropertyPathOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件").setErrorData(themePath));
     }
 
     private Optional<ThemeProperty> getPropertyOfNullable(Path themePath) {
@@ -773,7 +773,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @NonNull
     private ThemeProperty getProperty(@NonNull Path themePath) {
-        return getPropertyOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException("Cannot resolve theme property").setErrorData(themePath));
+        return getPropertyOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException("该主题没有说明文件").setErrorData(themePath));
     }
 
     /**

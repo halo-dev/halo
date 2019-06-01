@@ -57,7 +57,7 @@ logging:
     org.hibernate: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: INFO
     org.hibernate.type.descriptor.sql.BasicExtractor: INFO
-  file: ./logs/log.log
+  path: ${user.home}/halo-dev/logs
 
 halo:
   doc-disabled: false

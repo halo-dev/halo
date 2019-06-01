@@ -65,7 +65,7 @@ public class CommentEventListener {
             return;
         }
 
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("Can not find blog owner"));
+        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("找不到博主信息"));
 
 
         Map<String, Object> data = new HashMap<>();
