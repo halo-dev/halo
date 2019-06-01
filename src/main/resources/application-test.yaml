@@ -54,7 +54,7 @@ logging:
   level:
     run.halo.app: DEBUG
     org.hibernate: ERROR
-  file: ./logs/log.log
+  path: ${user.home}/halo-test/logs
 
 halo:
   doc-disabled: false

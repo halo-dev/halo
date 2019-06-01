@@ -137,7 +137,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
         if (!isInstalled) {
             // If not installed
-            getFailureHandler().onFailure(request, response, new NotInstallException("The blog has not been initialized yet!"));
+            getFailureHandler().onFailure(request, response, new NotInstallException("当前博客还没有初始化"));
             return;
         }
 
