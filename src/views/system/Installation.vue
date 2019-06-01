@@ -94,7 +94,7 @@
                   placeholder="用户密码"
                   v-decorator="[
                     'password',
-                    {rules: [{ required: true, message: '请输入密码' }]}
+                    {rules: [{ required: true, message: '请输入密码（8-100位）' }]}
                   ]"
                 >
                   <a-icon
@@ -114,7 +114,7 @@
                   placeholder="确定密码"
                   v-decorator="[
                     'confirmPassword',
-                    {rules: [{ required: true, message: '请输入密码' }]}
+                    {rules: [{ required: true, message: '请确定密码' }]}
                   ]"
                 >
                   <a-icon
