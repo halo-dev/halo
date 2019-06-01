@@ -180,6 +180,7 @@ export default {
       categoryApi.delete(id).then(response => {
         this.$message.success('删除成功！')
         this.loadCategories()
+        this.handleAddCategory()
       })
     },
     createOrUpdateCategory() {
