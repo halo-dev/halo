@@ -113,7 +113,7 @@ export default {
       ],
       steps: [
         {
-          date: '2019-??-??',
+          date: '2019-06-01',
           content: '1.0 正式版发布'
         },
         {
