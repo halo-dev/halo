@@ -429,6 +429,11 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         // Get all comments
         Page<COMMENT> topCommentPage = baseCommentRepository.findAllByPostIdAndStatusAndParentId(targetId, status, 0L, pageable);
 
+        if (topCommentPage.isEmpty()) {
+            // If the comments is empty
+            return ServiceUtils.buildEmptyPageImpl(topCommentPage);
+        }
+
         // Get top comment ids
         Set<Long> topCommentIds = ServiceUtils.fetchProperty(topCommentPage.getContent(), BaseComment::getId);
 
