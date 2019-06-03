@@ -18,7 +18,7 @@
               </template>
               <div class="avatar">
                 <img
-                  :src="user.avatar || 'https://gravatar.loli.net/avatar/?s=256&d=mm'"
+                  :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
                   @click="()=>this.attachmentDrawerVisible = true"
                 >
               </div>

@@ -88,25 +88,25 @@ export default {
       developers: [
         {
           name: 'Ryan Wang',
-          avatar: 'https://gravatar.loli.net/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm',
+          avatar: '//cn.gravatar.com/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm',
           website: 'https://ryanc.cc',
           github: 'https://github.com/ruibaby'
         },
         {
           name: 'John Niang',
-          avatar: 'https://gravatar.loli.net/avatar/1dcf60ef27363dae539385d5bae9b2bd?s=256&d=mm',
+          avatar: '//cn.gravatar.com/avatar/1dcf60ef27363dae539385d5bae9b2bd?s=256&d=mm',
           website: 'https://johnniang.me',
           github: 'https://github.com/johnniang'
         },
         {
           name: 'Aquan',
-          avatar: 'https://gravatar.loli.net/avatar/3958035fa354403fa9ca3fca36b08068?s=256&d=mm',
+          avatar: '//cn.gravatar.com/avatar/3958035fa354403fa9ca3fca36b08068?s=256&d=mm',
           website: 'https://blog.eunji.cn',
           github: 'https://github.com/aquanlerou'
         },
         {
           name: 'appdev',
-          avatar: 'https://gravatar.loli.net/avatar/08cf681fb7c6ad1b4fe70a8269c2103c?s=256&d=mm',
+          avatar: '//cn.gravatar.com/avatar/08cf681fb7c6ad1b4fe70a8269c2103c?s=256&d=mm',
           website: 'https://www.apkdv.com',
           github: 'https://github.com/appdev'
         }
