@@ -1,6 +1,5 @@
 plugins {
     id 'org.springframework.boot' version '2.1.3.RELEASE'
-    id "io.freefair.lombok" version "3.1.4"
     id 'java'
 }
 
@@ -25,7 +24,12 @@ configurations {
         exclude module: 'spring-boot-starter-tomcat'
     }
 
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
     developmentOnly
+
     runtimeClasspath {
         extendsFrom developmentOnly
     }
@@ -69,6 +73,9 @@ dependencies {
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
