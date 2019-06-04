@@ -25,12 +25,6 @@ configurations {
         exclude module: 'spring-boot-starter-tomcat'
     }
 
-    annotationProcessor
-
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-
     developmentOnly
 
     runtimeClasspath {
