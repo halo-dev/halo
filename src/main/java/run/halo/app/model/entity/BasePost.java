@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Data
 @Entity(name = "BasePost")
-@Table(name = "posts", indexes = @Index(columnList = "url"))
+@Table(name = "posts")
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
