@@ -69,8 +69,8 @@ public class SwaggerConfiguration {
         return buildApiDocket("run.halo.app.content.api",
                 "run.halo.app.controller.content.api",
                 "/api/content/**")
-                .securitySchemes(portalApiKeys())
-                .securityContexts(portalSecurityContext())
+                .securitySchemes(contentApiKeys())
+                .securityContexts(contentSecurityContext())
                 .enable(!haloProperties.isDocDisabled());
     }
 
@@ -137,14 +137,14 @@ public class SwaggerConfiguration {
         );
     }
 
-    private List<ApiKey> portalApiKeys() {
+    private List<ApiKey> contentApiKeys() {
         return Arrays.asList(
-                new ApiKey("Token from header", ApiAuthenticationFilter.API_TOKEN_HEADER_NAME, In.HEADER.name()),
-                new ApiKey("Token from query", ApiAuthenticationFilter.API_TOKEN_QUERY_NAME, In.QUERY.name())
+                new ApiKey("Access key from header", ApiAuthenticationFilter.API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
+                new ApiKey("Access key from query", ApiAuthenticationFilter.API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())
         );
     }
 
-    private List<SecurityContext> portalSecurityContext() {
+    private List<SecurityContext> contentSecurityContext() {
         return Collections.singletonList(
                 SecurityContext.builder()
                         .securityReferences(defaultAuth())
