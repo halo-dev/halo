@@ -522,7 +522,7 @@
               </span>
               <a-form layout="vertical">
                 <a-form-item
-                  label="API服务："
+                  label="API 服务："
                   :wrapper-col="wrapperCol"
                 >
                   <a-switch v-model="options.api_enabled" />
