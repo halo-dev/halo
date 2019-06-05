@@ -14,7 +14,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "tags", indexes = @Index(columnList = "slug_name"))
+@Table(name = "tags")
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Tag extends BaseEntity {

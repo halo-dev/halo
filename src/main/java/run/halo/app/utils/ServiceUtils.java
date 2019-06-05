@@ -1,8 +1,6 @@
 package run.halo.app.utils;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -134,6 +132,21 @@ public class ServiceUtils {
     @NonNull
     public static Pageable buildLatestPageable(int top) {
         return buildLatestPageable(top, "createTime");
+    }
+
+    /**
+     * Build empty page result.
+     *
+     * @param page page info must not be null
+     * @param <T>  target page result type
+     * @param <S>  source page result type
+     * @return empty page result
+     */
+    @NonNull
+    public static <T, S> Page<T> buildEmptyPageImpl(@NonNull Page<S> page) {
+        Assert.notNull(page, "Page result must not be null");
+
+        return new PageImpl<>(Collections.emptyList(), page.getPageable(), page.getTotalElements());
     }
 
     /**

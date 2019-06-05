@@ -10,7 +10,7 @@ public enum OtherProperties implements PropertyEnum {
 
     API_ENABLED("api_enabled", Boolean.class, "false"),
 
-    API_TOKEN("api_token", String.class, ""),
+    API_ACCESS_KEY("api_access_key", String.class, ""),
 
     STATISTICS_CODE("statistics_code", String.class, ""),
 
