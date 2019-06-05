@@ -69,13 +69,12 @@
       title="上传附件"
       v-model="uploadVisible"
       :footer="null"
+      :afterClose="onUploadClose"
     >
       <upload
         name="file"
         multiple
-        accept="image/*"
         :uploadHandler="attachmentUploadHandler"
-        @success="handleAttachmentUploadSuccess"
       >
         <p class="ant-upload-drag-icon">
           <a-icon type="inbox" />
@@ -183,8 +182,8 @@ export default {
       this.pagination.size = pageSize
       this.loadAttachments()
     },
-    handleAttachmentUploadSuccess() {
-      this.$message.success('上传成功！')
+    onUploadClose() {
+      this.loadSkeleton()
       this.loadAttachments()
     },
     handleDelete() {

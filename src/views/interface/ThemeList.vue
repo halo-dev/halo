@@ -1,33 +1,63 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row :gutter="12" type="flex" align="middle">
+    <a-row
+      :gutter="12"
+      type="flex"
+      align="middle"
+    >
       <a-col :span="24">
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
           :dataSource="themes"
           :loading="themeLoading"
         >
-          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-            <a-card hoverable :title="item.name" :bodyStyle="{ padding: 0 }">
+          <a-list-item
+            slot="renderItem"
+            slot-scope="item, index"
+            :key="index"
+          >
+            <a-card
+              hoverable
+              :title="item.name"
+              :bodyStyle="{ padding: 0 }"
+            >
               <div class="theme-thumb">
-                <img :alt="item.name" :src="item.screenshots">
+                <img
+                  :alt="item.name"
+                  :src="item.screenshots"
+                >
               </div>
-              <template class="ant-card-actions" slot="actions">
+              <template
+                class="ant-card-actions"
+                slot="actions"
+              >
                 <div v-if="item.activated">
-                  <a-icon type="unlock" theme="twoTone"/>已启用
+                  <a-icon
+                    type="unlock"
+                    theme="twoTone"
+                  />已启用
                 </div>
-                <div v-else @click="handleActivateClick(item)">
-                  <a-icon type="lock"/>启用
+                <div
+                  v-else
+                  @click="handleActivateClick(item)"
+                >
+                  <a-icon type="lock" />启用
                 </div>
                 <div @click="handleEditClick(item)">
-                  <a-icon type="setting"/>设置
+                  <a-icon type="setting" />设置
                 </div>
                 <a-dropdown placement="topCenter">
-                  <a class="ant-dropdown-link" href="#">
-                    <a-icon type="ellipsis"/>更多
+                  <a
+                    class="ant-dropdown-link"
+                    href="#"
+                  >
+                    <a-icon type="ellipsis" />更多
                   </a>
                   <a-menu slot="overlay">
-                    <a-menu-item :key="1" :disabled="item.activated">
+                    <a-menu-item
+                      :key="1"
+                      :disabled="item.activated"
+                    >
                       <a-popconfirm
                         v-if="!item.activated"
                         :title="'确定删除【' + item.name + '】主题？'"
@@ -35,10 +65,10 @@
                         okText="确定"
                         cancelText="取消"
                       >
-                        <a-icon type="delete"/>删除
+                        <a-icon type="delete" />删除
                       </a-popconfirm>
                       <span v-else>
-                        <a-icon type="delete"/>删除
+                        <a-icon type="delete" />删除
                       </span>
                     </a-menu-item>
                     <a-menu-item :key="2">
@@ -48,7 +78,7 @@
                         okText="确定"
                         cancelText="取消"
                       >
-                        <a-icon type="download"/>更新
+                        <a-icon type="download" />更新
                       </a-popconfirm>
                     </a-menu-item>
                   </a-menu>
@@ -68,11 +98,28 @@
       :visible="visible"
       destroyOnClose
     >
-      <a-row :gutter="12" type="flex">
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 10}">
+      <a-row
+        :gutter="12"
+        type="flex"
+      >
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 10}"
+          >
             <a-card :bordered="false">
-              <img :alt="themeProperty.name" :src="themeProperty.screenshots" slot="cover">
+              <img
+                :alt="themeProperty.name"
+                :src="themeProperty.screenshots"
+                slot="cover"
+              >
               <a-card-meta :description="themeProperty.description">
                 <template slot="title">
                   <a
@@ -86,16 +133,33 @@
                   size="large"
                   slot="avatar"
                 />
-                <a-avatar v-else size="large" slot="avatar">{{ themeProperty.author.name }}</a-avatar>
+                <a-avatar
+                  v-else
+                  size="large"
+                  slot="avatar"
+                >{{ themeProperty.author.name }}</a-avatar>
               </a-card-meta>
             </a-card>
           </a-skeleton>
         </a-col>
-        <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24"
-style="padding-bottom: 50px;">
-          <a-skeleton active :loading="optionLoading" :paragraph="{rows: 20}">
+        <a-col
+          :xl="12"
+          :lg="12"
+          :md="12"
+          :sm="24"
+          :xs="24"
+          style="padding-bottom: 50px;"
+        >
+          <a-skeleton
+            active
+            :loading="optionLoading"
+            :paragraph="{rows: 20}"
+          >
             <div class="card-container">
-              <a-tabs type="card" defaultActiveKey="0">
+              <a-tabs
+                type="card"
+                defaultActiveKey="0"
+              >
                 <a-tab-pane
                   v-for="(group, index) in themeConfiguration"
                   :key="index.toString()"
@@ -153,10 +217,11 @@ style="padding-bottom: 50px;">
         </a-col>
       </a-row>
 
-      <footer-tool-bar
-        :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
-      >
-        <a-button type="primary" @click="handleSaveSettings">保存</a-button>
+      <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
+        <a-button
+          type="primary"
+          @click="handleSaveSettings"
+        >保存</a-button>
         <a-button
           type="dashed"
           @click="()=>this.attachmentDrawerVisible = true"
@@ -164,11 +229,19 @@ style="padding-bottom: 50px;">
         >附件库</a-button>
       </footer-tool-bar>
 
-      <AttachmentDrawer v-model="attachmentDrawerVisible"/>
+      <AttachmentDrawer v-model="attachmentDrawerVisible" />
     </a-drawer>
     <div class="upload-button">
-      <a-dropdown placement="topLeft" :trigger="['click']">
-        <a-button type="primary" shape="circle" icon="plus" size="large"></a-button>
+      <a-dropdown
+        placement="topLeft"
+        :trigger="['click']"
+      >
+        <a-button
+          type="primary"
+          shape="circle"
+          icon="plus"
+          size="large"
+        ></a-button>
         <a-menu slot="overlay">
           <a-menu-item>
             <a
@@ -178,7 +251,11 @@ style="padding-bottom: 50px;">
             >安装主题</a>
           </a-menu-item>
           <a-menu-item>
-            <a rel="noopener noreferrer" href="javascript:void(0);" @click="handleReload">刷新列表</a>
+            <a
+              rel="noopener noreferrer"
+              href="javascript:void(0);"
+              @click="handleReload"
+            >刷新列表</a>
           </a-menu-item>
         </a-menu>
       </a-dropdown>
@@ -191,24 +268,40 @@ style="padding-bottom: 50px;">
     >
       <div class="custom-tab-wrapper">
         <a-tabs>
-          <a-tab-pane tab="远程拉取" key="1">
+          <a-tab-pane
+            tab="远程拉取"
+            key="1"
+          >
             <a-form layout="vertical">
               <a-form-item label="远程地址：">
-                <a-input v-model="fetchingUrl"/>
+                <a-input v-model="fetchingUrl" />
               </a-form-item>
               <a-form-item>
-                <a-button type="primary" @click="handleFetching" :loading="fetchButtonLoading">下载</a-button>
+                <a-button
+                  type="primary"
+                  @click="handleFetching"
+                  :loading="fetchButtonLoading"
+                >下载</a-button>
               </a-form-item>
             </a-form>
-            <a-alert type="info" closable>
+            <a-alert
+              type="info"
+              closable
+            >
               <template slot="message">
                 远程地址即主题仓库地址，如：https://github.com/halo-dev/halo-theme-quick-starter。
                 <br>更多主题请访问：
-                <a target="_blank" href="https://halo.run/theme">https://halo.run/theme</a>
+                <a
+                  target="_blank"
+                  href="https://halo.run/theme"
+                >https://halo.run/theme</a>
               </template>
             </a-alert>
           </a-tab-pane>
-          <a-tab-pane tab="本地上传" key="2">
+          <a-tab-pane
+            tab="本地上传"
+            key="2"
+          >
             <upload
               name="file"
               multiple
@@ -218,7 +311,7 @@ style="padding-bottom: 50px;">
               @success="handleUploadSuccess"
             >
               <p class="ant-upload-drag-icon">
-                <a-icon type="inbox"/>
+                <a-icon type="inbox" />
               </p>
               <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
               <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>

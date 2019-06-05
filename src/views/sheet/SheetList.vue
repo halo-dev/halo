@@ -76,13 +76,13 @@
                     :href="options.blog_url+record.url"
                     target="_blank"
                     v-if="record.status"
-                  >查看</a>
+                  >访问</a>
                   <a
                     :href="options.blog_url+record.url"
                     target="_blank"
                     disabled
                     v-else
-                  >查看</a>
+                  >访问</a>
                 </span>
               </a-table>
             </a-tab-pane>

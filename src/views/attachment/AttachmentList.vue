@@ -128,12 +128,12 @@
       title="上传附件"
       v-model="uploadVisible"
       :footer="null"
+      :afterClose="onUploadClose"
     >
       <upload
         name="file"
         multiple
         :uploadHandler="uploadHandler"
-        @success="handleUploadSuccess"
       >
         <p class="ant-upload-drag-icon">
           <a-icon type="inbox" />
@@ -223,10 +223,6 @@ export default {
       this.selectAttachment = attachment
       this.drawerVisiable = true
     },
-    handleUploadSuccess() {
-      this.loadAttachments()
-      this.loadMediaTypes()
-    },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
       this.pagination.page = page
@@ -242,6 +238,10 @@ export default {
     handleQuery() {
       this.queryParam.page = 0
       this.loadAttachments()
+    },
+    onUploadClose(){
+      this.loadAttachments()
+      this.loadMediaTypes()
     }
   }
 }
