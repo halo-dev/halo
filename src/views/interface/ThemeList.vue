@@ -46,7 +46,10 @@
                 <div @click="handleEditClick(item)">
                   <a-icon type="setting" />设置
                 </div>
-                <a-dropdown placement="topCenter">
+                <a-dropdown
+                  placement="topCenter"
+                  :trigger="['click']"
+                >
                   <a
                     class="ant-dropdown-link"
                     href="#"
