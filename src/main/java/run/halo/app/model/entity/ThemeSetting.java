@@ -14,7 +14,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "theme_settings", indexes = {@Index(columnList = "setting_key")})
+@Table(name = "theme_settings")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ThemeSetting extends BaseEntity {
