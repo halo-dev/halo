@@ -239,7 +239,7 @@ export default {
       this.queryParam.page = 0
       this.loadAttachments()
     },
-    onUploadClose(){
+    onUploadClose() {
       this.loadAttachments()
       this.loadMediaTypes()
     }
