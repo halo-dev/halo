@@ -39,7 +39,7 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
                     env.setVariable("photos", builder.build().wrap(photoService.listAll()));
                     break;
                 case "listTeams":
-                    env.setVariable("teams", builder.build().wrap(photoService.listDtos(Sort.by(DESC, "createTime"))));
+                    env.setVariable("teams", builder.build().wrap(photoService.listTeamVos(Sort.by(DESC, "createTime"))));
                     break;
                 case "listByTeam":
                     String team = params.get("team").toString();
