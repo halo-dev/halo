@@ -63,7 +63,9 @@ function getFieldValidationError(data) {
 
 service.interceptors.request.use(
   config => {
-    NProgress.start()
+    if (!config.mute) {
+      NProgress.start()
+    }
     // TODO set token
     setTokenToHeader(config)
     return config
