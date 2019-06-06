@@ -7,9 +7,7 @@
     <div class="analysis-card-container">
       <div class="meta">
         <span class="analysis-card-title">
-          <slot name="title">
-            {{ title }}
-          </slot>
+          <slot name="title">{{ title }}</slot>
         </span>
         <span class="analysis-card-action">
           <slot name="action"></slot>
@@ -17,7 +15,13 @@
       </div>
       <div class="number">
         <slot name="number">
-          <span>{{ typeof number === 'function' && number() || number }}</span>
+          <!-- <span>{{ typeof number === 'function' && number() || number }}</span> -->
+          <countTo
+            :startVal="0"
+            :endVal="typeof number === 'function' && number() || number"
+            :duration="4000"
+            :autoplay="true"
+          ></countTo>
         </slot>
       </div>
     </div>
@@ -25,8 +29,12 @@
 </template>
 
 <script>
+import countTo from 'vue-count-to'
 export default {
   name: 'AnalysisCard',
+  components: {
+    countTo
+  },
   props: {
     title: {
       type: String,

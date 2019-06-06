@@ -1,102 +1,58 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col
-        :xl="6"
-        :lg="6"
-        :md="12"
-        :sm="12"
-        :xs="12"
-        :style="{ marginBottom: '12px' }"
-      >
-        <analysis-card
-          :loading="countsLoading"
-          title="文章"
-          :number="countsData.postCount"
-        >
-          <router-link
-            :to="{ name:'PostList' }"
-            slot="action"
-          >
-            <a-icon type="link" />
+      <a-col :xl="6" :lg="6" :md="12" :sm="12" :xs="12"
+:style="{ marginBottom: '12px' }">
+        <analysis-card :loading="countsLoading" title="文章" :number="countsData.postCount">
+          <router-link :to="{ name:'PostList' }" slot="action">
+            <a-icon type="link"/>
           </router-link>
         </analysis-card>
       </a-col>
-      <a-col
-        :xl="6"
-        :lg="6"
-        :md="12"
-        :sm="12"
-        :xs="12"
-        :style="{ marginBottom: '12px' }"
-      >
-        <analysis-card
-          :loading="countsLoading"
-          title="评论"
-          :number="countsData.commentCount"
-        >
-          <router-link
-            :to="{ name:'Comments' }"
-            slot="action"
-          >
-            <a-icon type="link" />
+      <a-col :xl="6" :lg="6" :md="12" :sm="12" :xs="12"
+:style="{ marginBottom: '12px' }">
+        <analysis-card :loading="countsLoading" title="评论" :number="countsData.commentCount">
+          <router-link :to="{ name:'Comments' }" slot="action">
+            <a-icon type="link"/>
           </router-link>
         </analysis-card>
       </a-col>
-      <a-col
-        :xl="6"
-        :lg="6"
-        :md="12"
-        :sm="12"
-        :xs="12"
-        :style="{ marginBottom: '12px' }"
-      >
-        <analysis-card
-          :loading="countsLoading"
-          title="总访问"
-          :number="countsData.visitCount"
-        >
+      <a-col :xl="6" :lg="6" :md="12" :sm="12" :xs="12"
+:style="{ marginBottom: '12px' }">
+        <!-- <analysis-card :loading="countsLoading" title="总访问" :number="countsData.visitCount">
+          <a-tooltip slot="action">
+        <template slot="title">文章总访问共 {{ countsData.visitCount }} 次</template>-->
+        <analysis-card :loading="countsLoading" title="总访问" :number="countsData.visitCount">
           <a-tooltip slot="action">
             <template slot="title">
-              文章总访问共 {{ countsData.visitCount }} 次
+              文章总访问共
+              <countTo :startVal="0" :endVal="countsData.visitCount" :duration="3000"></countTo>次
             </template>
+            <!-- <countTo :startVal="0" :endVal="countsData.visitCount" :duration="3000"></countTo> -->
+            <!-- <template>
+              <countTo :startVal="0" :endVal="countsData.visitCount" :duration="3000"></countTo>
+            </template>-->
             <a href="javascript:void(0);">
-              <a-icon type="info-circle-o" /></a>
+              <a-icon type="info-circle-o"/>
+            </a>
           </a-tooltip>
         </analysis-card>
       </a-col>
-      <a-col
-        :xl="6"
-        :lg="6"
-        :md="12"
-        :sm="12"
-        :xs="12"
-        :style="{ marginBottom: '12px' }"
-      >
-        <analysis-card
-          :loading="countsLoading"
-          title="建立天数"
-          :number="countsData.establishDays"
-        >
+      <a-col :xl="6" :lg="6" :md="12" :sm="12" :xs="12"
+:style="{ marginBottom: '12px' }">
+        <analysis-card :loading="countsLoading" title="建立天数" :number="countsData.establishDays">
           <a-tooltip slot="action">
-            <template slot="title">
-              博客建立于 {{ countsData.birthday | moment }}
-            </template>
+            <template slot="title">博客建立于 {{ countsData.birthday | moment }}</template>
             <a href="javascript:void(0);">
-              <a-icon type="info-circle-o" /></a>
+              <a-icon type="info-circle-o"/>
+            </a>
           </a-tooltip>
         </analysis-card>
       </a-col>
     </a-row>
     <a-row :gutter="12">
-      <a-col
-        :xl="8"
-        :lg="8"
-        :md="12"
-        :sm="24"
-        :xs="24"
-        :style="{ marginBottom: '12px' }"
-      >
+      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24"
+:style="{ marginBottom: '12px' }">
         <a-card
           :loading="activityLoading"
           :bordered="false"
@@ -105,16 +61,9 @@
         >
           <div class="card-container">
             <a-tabs type="card">
-              <a-tab-pane
-                key="1"
-                tab="最近文章"
-              >
+              <a-tab-pane key="1" tab="最近文章">
                 <a-list :dataSource="postData">
-                  <a-list-item
-                    slot="renderItem"
-                    slot-scope="item, index"
-                    :key="index"
-                  >
+                  <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
                     <a-list-item-meta>
                       <a
                         slot="title"
@@ -126,22 +75,13 @@
                   </a-list-item>
                 </a-list>
               </a-tab-pane>
-              <a-tab-pane
-                key="2"
-                tab="最近评论"
-              >
+              <a-tab-pane key="2" tab="最近评论">
                 <div class="custom-tab-wrapper">
                   <a-tabs>
-                    <a-tab-pane
-                      tab="文章"
-                      key="1"
-                    >
+                    <a-tab-pane tab="文章" key="1">
                       <recent-comment-tab type="posts"></recent-comment-tab>
                     </a-tab-pane>
-                    <a-tab-pane
-                      tab="页面"
-                      key="2"
-                    >
+                    <a-tab-pane tab="页面" key="2">
                       <recent-comment-tab type="sheets"></recent-comment-tab>
                     </a-tab-pane>
                     <!-- <a-tab-pane
@@ -149,7 +89,7 @@
                       key="3"
                     >
                       <recent-comment-tab type="journals"></recent-comment-tab>
-                    </a-tab-pane> -->
+                    </a-tab-pane>-->
                   </a-tabs>
                 </div>
               </a-tab-pane>
@@ -157,25 +97,13 @@
           </div>
         </a-card>
       </a-col>
-      <a-col
-        :xl="8"
-        :lg="8"
-        :md="12"
-        :sm="24"
-        :xs="24"
-        :style="{ marginBottom: '12px' }"
-      >
-        <a-card
-          :bordered="false"
-          :loading="writeLoading"
-          :bodyStyle="{ padding: '16px' }"
-        >
+      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24"
+:style="{ marginBottom: '12px' }">
+        <a-card :bordered="false" :loading="writeLoading" :bodyStyle="{ padding: '16px' }">
           <template slot="title">
-            速记 <a-tooltip
-              slot="action"
-              title="内容将保存到页面/所有页面/日志页面"
-            >
-              <a-icon type="info-circle-o" />
+            速记
+            <a-tooltip slot="action" title="内容将保存到页面/所有页面/日志页面">
+              <a-icon type="info-circle-o"/>
             </a-tooltip>
           </template>
           <a-form layout="vertical">
@@ -188,45 +116,24 @@
               />
             </a-form-item>
             <a-form-item>
-              <a-button
-                type="primary"
-                @click="handleCreateJournalClick"
-              >保存</a-button>
+              <a-button type="primary" @click="handleCreateJournalClick">保存</a-button>
             </a-form-item>
           </a-form>
         </a-card>
       </a-col>
-      <a-col
-        :xl="8"
-        :lg="8"
-        :md="12"
-        :sm="24"
-        :xs="24"
-        :style="{ marginBottom: '12px' }"
-      >
-        <a-card
-          :loading="logLoading"
-          :bordered="false"
-          :bodyStyle="{ padding: '16px' }"
-        >
+      <a-col :xl="8" :lg="8" :md="12" :sm="24" :xs="24"
+:style="{ marginBottom: '12px' }">
+        <a-card :loading="logLoading" :bordered="false" :bodyStyle="{ padding: '16px' }">
           <template slot="title">
-            操作记录 <a-tooltip
-              slot="action"
-              title="更多"
-            >
-              <a
-                href="javascript:void(0);"
-                @click="handleShowLogDrawer"
-              >
-                <a-icon type="ellipsis" /></a>
+            操作记录
+            <a-tooltip slot="action" title="更多">
+              <a href="javascript:void(0);" @click="handleShowLogDrawer">
+                <a-icon type="ellipsis"/>
+              </a>
             </a-tooltip>
           </template>
           <a-list :dataSource="formattedLogDatas">
-            <a-list-item
-              slot="renderItem"
-              slot-scope="item, index"
-              :key="index"
-            >
+            <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
               <a-list-item-meta :description="item.createTime | timeAgo">
                 <span slot="title">{{ item.type }}</span>
               </a-list-item-meta>
@@ -245,17 +152,10 @@
       destroyOnClose
       @close="()=>this.logDrawerVisiable = false"
     >
-      <a-row
-        type="flex"
-        align="middle"
-      >
+      <a-row type="flex" align="middle">
         <a-col :span="24">
           <a-list :dataSource="formattedLogsDatas">
-            <a-list-item
-              slot="renderItem"
-              slot-scope="item, index"
-              :key="index"
-            >
+            <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
               <a-list-item-meta :description="item.createTime | timeAgo">
                 <span slot="title">{{ item.type }}</span>
               </a-list-item-meta>
@@ -274,17 +174,11 @@
               />
             </div>
           </a-list>
-
         </a-col>
       </a-row>
-      <a-divider class="divider-transparent" />
+      <a-divider class="divider-transparent"/>
       <div class="bottom-control">
-        <a-popconfirm
-          title="你确定要清空所有操作日志？"
-          okText="确定"
-          @confirm="handleClearLogs"
-          cancelText="取消"
-        >
+        <a-popconfirm title="你确定要清空所有操作日志？" okText="确定" @confirm="handleClearLogs" cancelText="取消">
           <a-button type="danger">清空操作日志</a-button>
         </a-popconfirm>
       </div>
@@ -303,16 +197,19 @@ import postApi from '@/api/post'
 import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'
+import countTo from 'vue-count-to'
 export default {
   name: 'Dashboard',
   mixins: [mixin, mixinDevice],
   components: {
     PageView,
     AnalysisCard,
-    RecentCommentTab
+    RecentCommentTab,
+    countTo
   },
   data() {
     return {
+      startVal: 0,
       logType: logApi.logType,
       activityLoading: true,
       writeLoading: true,
