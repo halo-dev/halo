@@ -17,9 +17,9 @@
         <slot name="number">
           <!-- <span>{{ typeof number === 'function' && number() || number }}</span> -->
           <countTo
-            :startVal="0"
+            :startVal="startNumber"
             :endVal="typeof number === 'function' && number() || number"
-            :duration="4000"
+            :duration="3000"
             :autoplay="true"
           ></countTo>
         </slot>
@@ -38,16 +38,28 @@ export default {
   props: {
     title: {
       type: String,
+      required: false,
       default: ''
     },
     number: {
-      type: [Function, Number, String],
+      type: Number,
       required: false,
-      default: null
+      default: 0
     },
     loading: {
       type: Boolean,
+      required: false,
       default: false
+    }
+  },
+  data() {
+    return {
+      startNumber: 0
+    }
+  },
+  watch: {
+    number: function(newValue, oldValue) {
+      this.startNumber = oldValue
     }
   }
 }
