@@ -116,10 +116,6 @@ public class HaloUtilsTest {
 
         desensitization = HaloUtils.desensitize(plainText, -1, -1);
         assertThat(desensitization, equalTo("********"));
-
-        plainText = " ";
-        desensitization = HaloUtils.desensitize(plainText, 1, 1);
-        assertThat(desensitization, equalTo("********"));
     }
 
     @Test(expected = IllegalArgumentException.class)
