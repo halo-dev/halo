@@ -53,11 +53,11 @@ public class CommonController implements ErrorController {
             if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
                 // TODO May cause unknown-reason problem
                 // if Ftl was not found then redirect to /404
-                return "redirect:/404";
+                return contentNotFround();
             }
         }
 
-        return statusCode == 500 ? "redirect:/500" : "redirect:/404";
+        return statusCode == 500 ? contentInternalError() : contentNotFround();
     }
 
     /**
