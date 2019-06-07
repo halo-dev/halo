@@ -49,7 +49,7 @@ public class ContentCategoryController {
     /**
      * Render category list page
      *
-     * @return template path: theme/{theme}/categories.ftl
+     * @return template path: themes/{theme}/categories.ftl
      */
     @GetMapping
     public String categories() {
@@ -61,7 +61,7 @@ public class ContentCategoryController {
      *
      * @param model    model
      * @param slugName slugName
-     * @return template path: theme/{theme}/category.ftl
+     * @return template path: themes/{theme}/category.ftl
      */
     @GetMapping(value = "{slugName}")
     public String categories(Model model,
@@ -75,7 +75,7 @@ public class ContentCategoryController {
      * @param model    model
      * @param slugName slugName
      * @param page     current page number
-     * @return template path: theme/{theme}/category.ftl
+     * @return template path: themes/{theme}/category.ftl
      */
     @GetMapping("{slugName}/page/{page}")
     public String categories(Model model,

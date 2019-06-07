@@ -48,7 +48,7 @@ public class ContentSearchController {
      *
      * @param model   model
      * @param keyword keyword
-     * @return template path : themes/{theme}/search
+     * @return template path : themes/{theme}/search.ftl
      */
     @GetMapping
     public String search(Model model,
@@ -61,7 +61,7 @@ public class ContentSearchController {
      *
      * @param model   model
      * @param keyword keyword
-     * @return template path :themes/{theme}/search
+     * @return template path :themes/{theme}/search.ftl
      */
     @GetMapping(value = "page/{page}")
     public String search(Model model,

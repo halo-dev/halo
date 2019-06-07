@@ -53,7 +53,7 @@ public class ContentTagController {
     /**
      * All of tags
      *
-     * @return template path: themes/{theme}/tags
+     * @return template path: themes/{theme}/tags.ftl
      */
     @GetMapping
     public String tags() {
@@ -65,7 +65,7 @@ public class ContentTagController {
      *
      * @param model    model
      * @param slugName slug name
-     * @return template path: themes/{theme}/tag
+     * @return template path: themes/{theme}/tag.ftl
      */
     @GetMapping(value = "{slugName}")
     public String tags(Model model,
@@ -79,7 +79,7 @@ public class ContentTagController {
      * @param model    model
      * @param slugName slug name
      * @param page     current page
-     * @return template path: themes/{theme}/tag
+     * @return template path: themes/{theme}/tag.ftl
      */
     @GetMapping(value = "{slugName}/page/{page}")
     public String tags(Model model,
