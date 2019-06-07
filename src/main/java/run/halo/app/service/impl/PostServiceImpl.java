@@ -330,6 +330,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                                 tag = tagService.create(tag);
                             }
                             tagIds.add(tag.getId());
+                            break;
                         case "categories":
                             Category category = categoryService.getByName(ele);
                             if (null == category) {
