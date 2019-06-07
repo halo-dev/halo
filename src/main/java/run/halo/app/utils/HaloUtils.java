@@ -22,6 +22,44 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 public class HaloUtils {
 
     /**
+     * Desensitizes the plain text.
+     *
+     * @param plainText plain text must not be null
+     * @param leftSize  left size
+     * @param rightSize right size
+     * @return desensitization
+     */
+    public static String desensitize(@NonNull String plainText, int leftSize, int rightSize) {
+        Assert.hasText(plainText, "Plain text must not be blank");
+
+        if (leftSize < 0) {
+            leftSize = 0;
+        }
+
+        if (leftSize > plainText.length()) {
+            leftSize = plainText.length();
+        }
+
+        if (rightSize < 0) {
+            rightSize = 0;
+        }
+
+        if (rightSize > plainText.length()) {
+            rightSize = plainText.length();
+        }
+
+        if (plainText.length() < leftSize + rightSize) {
+            rightSize = plainText.length() - leftSize;
+        }
+
+        int remainSize = plainText.length() - rightSize - leftSize;
+
+        String left = StringUtils.left(plainText, leftSize);
+        String right = StringUtils.right(plainText, rightSize);
+        return StringUtils.rightPad(left, remainSize + leftSize, '*') + right;
+    }
+
+    /**
      * Changes file separator to url separator.
      *
      * @param pathname full path name must not be blank.
