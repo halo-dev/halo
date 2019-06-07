@@ -1,4 +1,4 @@
-<#include "/common/macro/common_macro.ftl">
+<#import "/common/macro/common_macro.ftl" as common>
 <#macro head title,keywords,description>
 <!DOCTYPE html>
 <html>
@@ -14,8 +14,7 @@
     <meta name="author" content="${user.nickname!}" />
     <meta name="keywords" content="${keywords!}"/>
     <meta name="description" content="${description!}" />
-    <@verification />
-    <@favicon />
+    <@common.globalHeader />
     <link href="${static!}/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="${static!}/source/css/blog_basic.min.css?version=88107691fe">
     <link href="${static!}/source/css/style.min.css" type="text/css" rel="stylesheet" />
@@ -77,7 +76,7 @@
 	  xhr.send();
     </#if>
 </script>
-<@statistics />
+<@common.statistics />
 </body>
 </html>
 </#macro>
