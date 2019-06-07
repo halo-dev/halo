@@ -34,7 +34,7 @@ public class ContentSheetController {
     /**
      * Render photo page
      *
-     * @return template path: themes/{theme}/gallery.ftl
+     * @return template path: themes/{theme}/photos.ftl
      */
     @GetMapping(value = "/photos")
     public String photos() {
