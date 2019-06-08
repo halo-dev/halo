@@ -52,7 +52,8 @@ public class ContentCategoryController {
      * @return template path: themes/{theme}/categories.ftl
      */
     @GetMapping
-    public String categories() {
+    public String categories(Model model) {
+        model.addAttribute("is_categories", true);
         return themeService.render("categories");
     }
 
@@ -89,7 +90,7 @@ public class ContentCategoryController {
         Page<Post> posts = postCategoryService.pagePostBy(category.getId(), pageable);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
-        model.addAttribute("is_categories", true);
+        model.addAttribute("is_category", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("category", category);

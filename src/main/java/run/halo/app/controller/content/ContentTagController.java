@@ -56,7 +56,8 @@ public class ContentTagController {
      * @return template path: themes/{theme}/tags.ftl
      */
     @GetMapping
-    public String tags() {
+    public String tags(Model model) {
+        model.addAttribute("is_tags", true);
         return themeService.render("tags");
     }
 
@@ -93,7 +94,7 @@ public class ContentTagController {
         Page<PostListVO> posts = postService.convertToListVo(postPage);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
-        model.addAttribute("is_tags", true);
+        model.addAttribute("is_tag", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("tag", tag);

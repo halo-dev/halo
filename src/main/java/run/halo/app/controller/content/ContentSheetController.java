@@ -60,7 +60,6 @@ public class ContentSheetController {
      */
     @GetMapping(value = "/s/{url}")
     public String sheet(@PathVariable(value = "url") String url,
-                        @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                         Model model) {
         Sheet sheet = sheetService.getBy(PostStatus.PUBLISHED, url);
 
