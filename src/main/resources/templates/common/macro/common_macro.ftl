@@ -10,6 +10,10 @@
     ${options.blog_footer_info!}
 </#macro>
 
+<#macro custom_head>
+    ${options.blog_custom_head!}
+</#macro>
+
 <#-- favicon -->
 <#macro favicon>
     <#if options.blog_favicon?? && options.blog_favicon!=''>
@@ -49,6 +53,7 @@
 
 <#macro globalHeader>
     <meta name="generator" content="Halo ${version!}" />
+    <@custom_head />
     <@verification />
     <@favicon />
 </#macro>
