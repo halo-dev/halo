@@ -12,6 +12,7 @@ import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
@@ -90,6 +91,7 @@ public class FreemarkerConfigAwareListener {
     private void loadOptionsConfig() throws TemplateModelException {
         configuration.setSharedVariable("options", optionService.listOptions());
         configuration.setSharedVariable("context", optionService.getBlogBaseUrl());
+        configuration.setSharedVariable("version", HaloConst.HALO_VERSION);
         log.debug("Loaded options");
     }
 

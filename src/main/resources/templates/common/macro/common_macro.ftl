@@ -12,7 +12,9 @@
 
 <#-- favicon -->
 <#macro favicon>
-    <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon!}">
+    <#if options.blog_favicon?? && options.blog_favicon!=''>
+        <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon!}">
+    </#if>
 </#macro>
 
 <#-- 站点验证代码 -->
@@ -46,11 +48,12 @@
 </#macro>
 
 <#macro globalHeader>
-    <@favicon />
+    <meta name="generator" content="Halo ${version!}" />
     <@verification />
+    <@favicon />
 </#macro>
 
 <#macro globalFooter>
-    <@statistics />
     <@footer_info />
+    <@statistics />
 </#macro>
