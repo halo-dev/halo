@@ -69,14 +69,14 @@ public class ContentSearchController {
                          @PathVariable(value = "page") Integer page,
                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
-        final Page<Post> posts = postService.pageBy(keyword, pageable);
+        final Page<Post> postPage = postService.pageBy(keyword, pageable);
 
-        final Page<PostListVO> postPage = postService.convertToListVo(posts);
+        final Page<PostListVO> posts = postService.convertToListVo(postPage);
 
-        final int[] rainbow = PageUtil.rainbow(page, postPage.getTotalPages(), 3);
+        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("posts", postPage);
+        model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         return themeService.render("search");
     }
