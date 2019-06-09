@@ -87,7 +87,8 @@ public class ContentTagController {
                        @PathVariable("slugName") String slugName,
                        @PathVariable("page") Integer page,
                        @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        Tag tag = tagService.getBySlugNameOfNonNull(slugName);
+        // Get tag by slug name
+        final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
         Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), pageable);
