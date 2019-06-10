@@ -340,6 +340,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                                 category = categoryService.create(category);
                             }
                             categoryIds.add(category.getId());
+                            break;
                         default:
                             break;
                     }
