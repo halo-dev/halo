@@ -1,6 +1,7 @@
 package run.halo.app.model.dto;
 
 import lombok.Data;
+import run.halo.app.model.enums.Mode;
 
 /**
  * Theme controller.
@@ -17,5 +18,5 @@ public class EnvironmentDTO {
 
     private String version;
 
-    private String mode;
+    private Mode mode;
 }

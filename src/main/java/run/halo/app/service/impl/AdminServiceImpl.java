@@ -15,6 +15,7 @@ import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.enums.Mode;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.support.HaloConst;
@@ -78,7 +79,7 @@ public class AdminServiceImpl implements AdminService {
                             StringCacheStore cacheStore,
                             ApplicationEventPublisher eventPublisher,
                             @Value("${spring.datasource.driver-class-name}") String driverClassName,
-                            @Value("${spring.profiles.active}") String mode) {
+                            @Value("${spring.profiles.active:prod}") String mode) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.attachmentService = attachmentService;
@@ -194,11 +195,7 @@ public class AdminServiceImpl implements AdminService {
 
         environmentDTO.setVersion(HaloConst.HALO_VERSION);
 
-        if (StringUtils.isNotEmpty(mode)) {
-            environmentDTO.setMode(StringUtils.equals("dev", mode) ? "development" : "production");
-        } else {
-            environmentDTO.setMode("test");
-        }
+        environmentDTO.setMode(Mode.valueFrom(this.mode));
 
         return environmentDTO;
     }
@@ -214,9 +211,8 @@ public class AdminServiceImpl implements AdminService {
         User user = userService.getById(userId);
 
         // Remove all token
-        cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class).ifPresent(accessToken -> {
-            cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken));
-        });
+        cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class)
+                .ifPresent(accessToken -> cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken)));
         cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
         cacheStore.delete(SecurityUtils.buildAccessTokenKey(user));
         cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
