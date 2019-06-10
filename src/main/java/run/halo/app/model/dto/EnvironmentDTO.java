@@ -16,4 +16,6 @@ public class EnvironmentDTO {
     private long startTime;
 
     private String version;
+
+    private String mode;
 }
