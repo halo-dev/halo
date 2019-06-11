@@ -456,12 +456,16 @@ export default {
     },
     handleFetching() {
       this.fetchButtonLoading = true
-      themeApi.fetching(this.fetchingUrl).then(response => {
-        this.$message.success('拉取成功！')
-        this.uploadVisible = false
-        this.fetchButtonLoading = false
-        this.loadThemes()
-      })
+      themeApi
+        .fetching(this.fetchingUrl)
+        .then(response => {
+          this.$message.success('拉取成功！')
+          this.uploadVisible = false
+          this.loadThemes()
+        })
+        .finally(() => {
+          this.fetchButtonLoading = false
+        })
     },
     handleReload() {
       themeApi.reload().then(response => {
