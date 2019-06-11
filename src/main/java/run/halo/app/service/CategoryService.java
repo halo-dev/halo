@@ -42,6 +42,7 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * @param name name
      * @return Category
      */
+    @Nullable
     Category getByName(@NonNull String name);
 
     /**

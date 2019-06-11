@@ -34,7 +34,7 @@ public class CommentTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "latest":
                     int top = Integer.parseInt(params.get("top").toString());
-                    env.setVariable("categories", builder.build().wrap(postCommentService.pageLatest(top)));
+                    env.setVariable("comments", builder.build().wrap(postCommentService.pageLatest(top)));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(postCommentService.count()));

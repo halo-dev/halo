@@ -24,7 +24,7 @@
                 <a href="https://github.com/halo-dev/halo" target="_blank">Proudly published with Halo&#65281;</a>
             </div>
             <div class="footer_text">
-                <@footer_info></@footer_info>
+                <@common.footer_info />
             </div>
         </a>
     </div>

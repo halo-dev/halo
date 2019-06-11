@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author johnniang
  */
-@RestControllerAdvice
+@RestControllerAdvice({"run.halo.app.controller.admin.api", "run.halo.app.controller.content.api"})
 @Slf4j
 public class ControllerExceptionHandler {
 

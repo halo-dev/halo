@@ -23,7 +23,7 @@ public class HaloConst {
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
 
     /**
-     * version constant
+     * Version constant. (Available in production environment)
      */
     public static final String HALO_VERSION;
 

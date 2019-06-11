@@ -53,10 +53,11 @@ public class ContentTagController {
     /**
      * All of tags
      *
-     * @return template path: themes/{theme}/tags
+     * @return template path: themes/{theme}/tags.ftl
      */
     @GetMapping
-    public String tags() {
+    public String tags(Model model) {
+        model.addAttribute("is_tags", true);
         return themeService.render("tags");
     }
 
@@ -65,7 +66,7 @@ public class ContentTagController {
      *
      * @param model    model
      * @param slugName slug name
-     * @return template path: themes/{theme}/tag
+     * @return template path: themes/{theme}/tag.ftl
      */
     @GetMapping(value = "{slugName}")
     public String tags(Model model,
@@ -79,21 +80,22 @@ public class ContentTagController {
      * @param model    model
      * @param slugName slug name
      * @param page     current page
-     * @return template path: themes/{theme}/tag
+     * @return template path: themes/{theme}/tag.ftl
      */
     @GetMapping(value = "{slugName}/page/{page}")
     public String tags(Model model,
                        @PathVariable("slugName") String slugName,
                        @PathVariable("page") Integer page,
                        @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        Tag tag = tagService.getBySlugNameOfNonNull(slugName);
+        // Get tag by slug name
+        final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
         Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
-        model.addAttribute("is_tags", true);
+        model.addAttribute("is_tag", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("tag", tag);

@@ -53,7 +53,7 @@ public class ContentJournalController {
      * Render journal page.
      *
      * @param model model
-     * @return template path: theme/{theme}/journal.ftl
+     * @return template path: themes/{theme}/journals.ftl
      */
     @GetMapping
     public String journals(Model model) {
@@ -66,7 +66,7 @@ public class ContentJournalController {
      *
      * @param model model
      * @param page  current page number
-     * @return template path: theme/{theme}/journal.ftl
+     * @return template path: themes/{theme}/journals.ftl
      */
     @GetMapping(value = "page/{page}")
     public String journals(Model model,
