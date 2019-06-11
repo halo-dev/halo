@@ -51,7 +51,7 @@ public class ContentIndexController {
      * Render blog index
      *
      * @param model model
-     * @return template path: /{theme}/post.ftl
+     * @return template path: themes/{theme}/index.ftl
      */
     @GetMapping
     public String index(Model model) {
@@ -63,7 +63,7 @@ public class ContentIndexController {
      *
      * @param model model
      * @param page  current page number
-     * @return template path: /{theme}/post.ftl
+     * @return template path: themes/{theme}/index.ftl
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,

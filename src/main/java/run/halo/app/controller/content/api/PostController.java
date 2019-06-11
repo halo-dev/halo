@@ -59,6 +59,14 @@ public class PostController {
         return postService.convertToSimple(postPage);
     }
 
+    @PostMapping(value = "search")
+    @ApiOperation("Lists posts by keyword")
+    public Page<BasePostSimpleDTO> pageBy(@RequestParam(value = "keyword") String keyword,
+                                          @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+        Page<Post> postPage = postService.pageBy(keyword, pageable);
+        return postService.convertToSimple(postPage);
+    }
+
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
     public BasePostDetailDTO getBy(@PathVariable("postId") Integer postId,

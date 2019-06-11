@@ -10,9 +10,15 @@
     ${options.blog_footer_info!}
 </#macro>
 
+<#macro custom_head>
+    ${options.blog_custom_head!}
+</#macro>
+
 <#-- favicon -->
 <#macro favicon>
-    <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon!}">
+    <#if options.blog_favicon?? && options.blog_favicon!=''>
+        <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon!}">
+    </#if>
 </#macro>
 
 <#-- 站点验证代码 -->
@@ -46,11 +52,13 @@
 </#macro>
 
 <#macro globalHeader>
-    <@favicon />
+    <meta name="generator" content="Halo ${version!}" />
+    <@custom_head />
     <@verification />
+    <@favicon />
 </#macro>
 
 <#macro globalFooter>
-    <@statistics />
     <@footer_info />
+    <@statistics />
 </#macro>

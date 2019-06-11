@@ -1,13 +1,15 @@
 plugins {
     id 'org.springframework.boot' version '2.1.3.RELEASE'
+    id "io.freefair.lombok" version "3.6.6"
     id 'java'
+    id 'war'
 }
 
 apply plugin: 'io.spring.dependency-management'
 
 group = 'run.halo.app'
 archivesBaseName = 'halo'
-version = '1.0.0'
+version = '1.0.1'
 sourceCompatibility = '1.8'
 description = 'Halo, personal blog system developed in Java.'
 
@@ -22,10 +24,6 @@ repositories {
 configurations {
     implementation {
         exclude module: 'spring-boot-starter-tomcat'
-    }
-
-    compileOnly {
-        extendsFrom annotationProcessor
     }
 
     developmentOnly
