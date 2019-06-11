@@ -66,7 +66,7 @@ public class ContentArchiveController {
      * Render post archives page.
      *
      * @param model model
-     * @return template path : theme/{theme}/archives.ftl
+     * @return template path : themes/{theme}/archives.ftl
      */
     @GetMapping
     public String archives(Model model) {
@@ -77,7 +77,7 @@ public class ContentArchiveController {
      * Render post archives page.
      *
      * @param model model
-     * @return template path : theme/{theme}/archives.ftl
+     * @return template path : themes/{theme}/archives.ftl
      */
     @GetMapping(value = "page/{page}")
     public String archives(Model model,
@@ -102,7 +102,7 @@ public class ContentArchiveController {
      * @param url   post slug url.
      * @param cp    comment page number
      * @param model model
-     * @return template path: theme/{theme}/post.ftl
+     * @return template path: themes/{theme}/post.ftl
      */
     @GetMapping("{url}")
     public String post(@PathVariable("url") String url,

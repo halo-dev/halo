@@ -29,6 +29,7 @@ import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Mvc configuration.
@@ -119,6 +120,11 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
         configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
+
+        Properties properties = new Properties();
+        properties.setProperty("auto_import","/common/macro/common_macro.ftl as common");
+
+        configurer.setFreemarkerSettings(properties);
 
         // Predefine configuration
         freemarker.template.Configuration configuration = configurer.createConfiguration();

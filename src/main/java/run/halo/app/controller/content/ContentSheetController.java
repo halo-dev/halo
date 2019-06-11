@@ -4,7 +4,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
@@ -34,7 +33,7 @@ public class ContentSheetController {
     /**
      * Render photo page
      *
-     * @return template path: themes/{theme}/gallery.ftl
+     * @return template path: themes/{theme}/photos.ftl
      */
     @GetMapping(value = "/photos")
     public String photos() {
@@ -60,7 +59,6 @@ public class ContentSheetController {
      */
     @GetMapping(value = "/s/{url}")
     public String sheet(@PathVariable(value = "url") String url,
-                        @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                         Model model) {
         Sheet sheet = sheetService.getBy(PostStatus.PUBLISHED, url);
 

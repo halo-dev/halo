@@ -38,7 +38,7 @@ wget https://github.com/halo-dev/halo/releases/download/v1.0.1/halo-1.0.1.jar -O
 ### 启动 Halo
 
 ```bash
-nohup java -jar halo-latest.jar &
+nohup java -jar halo-latest.jar >/dev/null 2>&1&
 ```
 
 详细文档请移步：<https://halo.run/docs>

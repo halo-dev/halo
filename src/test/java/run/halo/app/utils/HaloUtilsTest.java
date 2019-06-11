@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Test;
 
@@ -14,6 +15,7 @@ import static org.junit.Assert.assertThat;
  * @author johnniang
  * @date 3/29/19
  */
+@Slf4j
 public class HaloUtilsTest {
 
     @Test
@@ -91,5 +93,34 @@ public class HaloUtilsTest {
     @Test(expected = IllegalArgumentException.class)
     public void pluralizeLabelExceptionTest() {
         HaloUtils.pluralize(1, null, null);
+    }
+
+    @Test
+    public void desensitizeSuccessTest() {
+        String plainText = "12345678";
+
+        String desensitization = HaloUtils.desensitize(plainText, 1, 1);
+        assertThat(desensitization, equalTo("1******8"));
+
+        desensitization = HaloUtils.desensitize(plainText, 2, 3);
+        assertThat(desensitization, equalTo("12***678"));
+
+        desensitization = HaloUtils.desensitize(plainText, 2, 6);
+        assertThat(desensitization, equalTo("12345678"));
+
+        desensitization = HaloUtils.desensitize(plainText, 2, 7);
+        assertThat(desensitization, equalTo("12345678"));
+
+        desensitization = HaloUtils.desensitize(plainText, 0, 0);
+        assertThat(desensitization, equalTo("********"));
+
+        desensitization = HaloUtils.desensitize(plainText, -1, -1);
+        assertThat(desensitization, equalTo("********"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void desensitizeFailureTest() {
+        String plainText = " ";
+        HaloUtils.desensitize(plainText, 1, 1);
     }
 }

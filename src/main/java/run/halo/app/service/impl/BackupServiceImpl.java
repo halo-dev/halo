@@ -8,6 +8,7 @@ import run.halo.app.service.BackupService;
 import run.halo.app.service.PostService;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Backup service implementation.
@@ -28,7 +29,7 @@ public class BackupServiceImpl implements BackupService {
     public BasePostDetailDTO importMarkdowns(MultipartFile file) throws IOException {
 
         // Read markdown content.
-        String markdown = IoUtil.read(file.getInputStream(), "UTF-8");
+        String markdown = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);
 
         // TODO sheet import
 

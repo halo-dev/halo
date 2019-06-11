@@ -29,10 +29,7 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.service.*;
-import run.halo.app.utils.DateUtils;
-import run.halo.app.utils.MarkdownUtils;
-import run.halo.app.utils.ServiceUtils;
-import run.halo.app.utils.SlugUtils;
+import run.halo.app.utils.*;
 
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -326,20 +323,24 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             if (null == tag) {
                                 tag = new Tag();
                                 tag.setName(ele);
-                                tag.setSlugName(SlugUtils.slugify(ele));
+                                String slugName = SlugUtils.slugify(ele);
+                                tag.setSlugName(HaloUtils.initializeUrlIfBlank(slugName));
                                 tag = tagService.create(tag);
                             }
                             tagIds.add(tag.getId());
+                            break;
                         case "categories":
                             Category category = categoryService.getByName(ele);
                             if (null == category) {
                                 category = new Category();
                                 category.setName(ele);
-                                category.setSlugName(SlugUtils.slugify(ele));
+                                String slugName = SlugUtils.slugify(ele);
+                                category.setSlugName(HaloUtils.initializeUrlIfBlank(slugName));
                                 category.setDescription(ele);
                                 category = categoryService.create(category);
                             }
                             categoryIds.add(category.getId());
+                            break;
                         default:
                             break;
                     }
