@@ -200,11 +200,26 @@
                 placeholder="写点什么吧..."
               />
             </a-form-item>
+						
+						<!-- 日志图片上传 -->
+						<a-form-item v-show="showMoreOptions">
+							<UploadPhoto></UploadPhoto>
+							<!-- <a-collapse :bordered="false">
+								<a-collapse-panel key="1">
+									
+								</a-collapse-panel>
+							</a-collapse> -->
+						</a-form-item>
+						
             <a-form-item>
-              <a-button
-                type="primary"
-                @click="handleCreateJournalClick"
-              >保存</a-button>
+								 <a-button
+									type="primary"
+									@click="handleCreateJournalClick"
+								>保存</a-button>
+								<a href="javascript:;" class="more-options-btn"
+									type="default"
+									@click="handleUploadPhotoWallClick"
+								>更多选项<a-icon type="down" /></a>
             </a-form-item>
           </a-form>
         </a-card>
@@ -318,6 +333,7 @@ import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'
 import countTo from 'vue-count-to'
+import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
 export default {
   name: 'Dashboard',
   mixins: [mixin, mixinDevice],
@@ -325,10 +341,12 @@ export default {
     PageView,
     AnalysisCard,
     RecentCommentTab,
-    countTo
+    countTo,
+		UploadPhoto
   },
   data() {
     return {
+			showMoreOptions: false,
       startVal: 0,
       logType: logApi.logType,
       activityLoading: true,
@@ -431,6 +449,10 @@ export default {
         this.journal = {}
       })
     },
+		handleUploadPhotoWallClick(){
+			// 是否显示上传照片墙组件
+			this.showMoreOptions = !this.showMoreOptions
+		},
     handleShowLogDrawer() {
       this.logDrawerVisiable = true
       this.loadLogs()
@@ -458,3 +480,11 @@ export default {
   }
 }
 </script>
+
+<style scoped="scoped">
+	.more-options-btn{
+		margin-left: 15px;
+		text-decoration: none;
+	}
+	
+</style>

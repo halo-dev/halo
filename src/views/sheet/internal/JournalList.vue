@@ -156,6 +156,15 @@
             v-model="journal.content"
           />
         </a-form-item>
+				<a-form-item v-show="showMoreOptions">
+					<UploadPhoto @success="handlerPhotoUploadSuccess"></UploadPhoto>
+				</a-form-item>
+				<a-form-item>
+					<a href="javascript:;" class="more-options-btn"
+						type="default"
+						@click="handleUploadPhotoWallClick"
+					>更多选项<a-icon type="down" /></a>
+				</a-form-item>
       </a-form>
     </a-modal>
 
@@ -231,12 +240,13 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import journalApi from '@/api/journal'
 import journalCommentApi from '@/api/journalComment'
 import userApi from '@/api/user'
-
+import UploadPhoto from '@/components/Upload/UploadPhoto.vue'
 export default {
   mixins: [mixin, mixinDevice],
-  components: { JournalCommentTree },
+  components: { JournalCommentTree, UploadPhoto },
   data() {
     return {
+			showMoreOptions: false,
       title: '发表',
       listLoading: false,
       visible: false,
@@ -255,10 +265,15 @@ export default {
       },
       journals: [],
       comments: [],
-      journal: {},
+      journal: {
+				id: null,
+				content: '',
+				photos: []
+			},
+			journalPhotos: [],
       selectComment: null,
       replyComment: {},
-      user: {}
+      user: {},
     }
   },
   created() {
@@ -266,6 +281,22 @@ export default {
     this.loadUser()
   },
   methods: {
+		handlerPhotoUploadSuccess(response, file){
+			var callData = response.data.data
+			var photo = {
+				name: callData.name,
+				url: callData.path,
+				thumbnail: callData.thumbPath,
+				suffix: callData.suffix,
+				width: callData.width,
+				height: callData.height
+			}
+			this.journalPhotos.push(photo)
+		},
+		handleUploadPhotoWallClick(){
+			// 是否显示上传照片墙组件
+			this.showMoreOptions = !this.showMoreOptions
+		},
     loadJournals(isSearch) {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -330,6 +361,9 @@ export default {
       })
     },
     createOrUpdateJournal() {
+			// 给属性填充数据
+			this.journal.photos = this.journalPhotos
+			
       if (this.journal.id) {
         journalApi.update(this.journal.id, this.journal).then(response => {
           this.$message.success('更新成功！')
@@ -356,3 +390,10 @@ export default {
   }
 }
 </script>
+<style scoped="scoped">
+	.more-options-btn{
+		margin-left: 15px;
+		text-decoration: none;
+	}
+	
+</style>
