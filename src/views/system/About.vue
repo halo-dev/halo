@@ -14,6 +14,7 @@
                   <ul>
                     <li>版本：{{ environments.version }}</li>
                     <li>数据库：{{ environments.database }}</li>
+                    <li>运行模式：{{ environments.mode }}</li>
                     <li>启动时间：{{ environments.startTime | moment }}</li>
                   </ul>
                   <a
