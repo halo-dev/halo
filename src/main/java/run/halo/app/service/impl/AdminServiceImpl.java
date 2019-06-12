@@ -2,15 +2,17 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
@@ -24,11 +26,20 @@ import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.token.AuthToken;
 import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.*;
+import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.HaloUtils;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+
+import static run.halo.app.model.support.HaloConst.*;
 
 /**
  * Admin service implementation.
@@ -61,7 +72,9 @@ public class AdminServiceImpl implements AdminService {
 
     private final StringCacheStore cacheStore;
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final RestTemplate restTemplate;
+
+    private final HaloProperties haloProperties;
 
     private final String driverClassName;
 
@@ -77,7 +90,8 @@ public class AdminServiceImpl implements AdminService {
                             UserService userService,
                             LinkService linkService,
                             StringCacheStore cacheStore,
-                            ApplicationEventPublisher eventPublisher,
+                            RestTemplate restTemplate,
+                            HaloProperties haloProperties,
                             @Value("${spring.datasource.driver-class-name}") String driverClassName,
                             @Value("${spring.profiles.active:prod}") String mode) {
         this.postService = postService;
@@ -90,7 +104,8 @@ public class AdminServiceImpl implements AdminService {
         this.userService = userService;
         this.linkService = linkService;
         this.cacheStore = cacheStore;
-        this.eventPublisher = eventPublisher;
+        this.restTemplate = restTemplate;
+        this.haloProperties = haloProperties;
         this.driverClassName = driverClassName;
         this.mode = mode;
     }
@@ -218,6 +233,101 @@ public class AdminServiceImpl implements AdminService {
         cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
 
         return buildAuthToken(user);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void updateAdminAssets() {
+        // Request github api
+        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(HaloConst.HALO_ADMIN_RELEASES_LATEST, Map.class);
+
+        if (responseEntity == null ||
+                responseEntity.getStatusCode().isError() ||
+                responseEntity.getBody() == null) {
+            log.debug("Failed to request remote url: [{}]", HALO_ADMIN_RELEASES_LATEST);
+            throw new ServiceException("系统无法访问到 Github 的 API").setErrorData(HALO_ADMIN_RELEASES_LATEST);
+        }
+
+        Object assetsObject = responseEntity.getBody().get("assets");
+
+        if (assetsObject instanceof List) {
+            try {
+                List assets = (List) assetsObject;
+                Map assetMap = (Map) assets.stream()
+                        .filter(assetPredicate())
+                        .findFirst()
+                        .orElseThrow(() -> new ServiceException("Halo admin 最新版暂无资源文件，请稍后再试"));
+
+                Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
+                // Download the assets
+                ResponseEntity<byte[]> downloadResponseEntity = restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
+
+                if (downloadResponseEntity == null ||
+                        downloadResponseEntity.getStatusCode().isError() ||
+                        downloadResponseEntity.getBody() == null) {
+                    throw new ServiceException("Failed to request remote url: " + browserDownloadUrl.toString()).setErrorData(browserDownloadUrl.toString());
+                }
+
+                String adminTargetName = haloProperties.getWorkDir() + HALO_ADMIN_RELATIVE_PATH;
+
+                Path adminPath = Paths.get(adminTargetName);
+                Path adminBackupPath = Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
+
+                backupAndClearAdminAssetsIfPresent(adminPath, adminBackupPath);
+
+                // Create temp folder
+                Path assetTempPath = FileUtils.createTempDirectory()
+                        .resolve(assetMap.getOrDefault("name", "halo-admin-latest.zip").toString());
+
+                // Unzip
+                FileUtils.unzip(downloadResponseEntity.getBody(), assetTempPath);
+
+                // Copy it to template/admin folder
+                FileUtils.copyFolder(FileUtils.tryToSkipZipParentFolder(assetTempPath), adminPath);
+            } catch (Throwable t) {
+                log.error("Failed to update halo admin", t);
+                throw new ServiceException("更新 Halo admin 失败");
+            }
+        } else {
+            throw new ServiceException("Github API 返回内容有误").setErrorData(assetsObject);
+        }
+    }
+
+    @NonNull
+    @SuppressWarnings("unchecked")
+    private Predicate<Object> assetPredicate() {
+        return asset -> {
+            if (!(asset instanceof Map)) {
+                return false;
+            }
+            Map aAssetMap = (Map) asset;
+            // Get content-type
+            String contentType = aAssetMap.getOrDefault("content_type", "").toString();
+
+            Object name = aAssetMap.getOrDefault("name", "");
+            return name.toString().matches(HALO_ADMIN_VERSION_REGEX) && contentType.equalsIgnoreCase("application/zip");
+        };
+    }
+
+    private void backupAndClearAdminAssetsIfPresent(@NonNull Path sourcePath, @NonNull Path backupPath) throws IOException {
+        Assert.notNull(sourcePath, "Source path must not be null");
+        Assert.notNull(backupPath, "Backup path must not be null");
+
+        if (!FileUtils.isEmpty(sourcePath)) {
+            // Clone this assets
+            Path adminPathBackup = Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
+
+            // Delete backup
+            FileUtils.deleteFolder(backupPath);
+
+            // Copy older assets into backup
+            FileUtils.copyFolder(sourcePath, backupPath);
+
+            // Delete older assets
+            FileUtils.deleteFolder(sourcePath);
+        } else {
+            FileUtils.createIfAbsent(sourcePath);
+        }
     }
 
     /**

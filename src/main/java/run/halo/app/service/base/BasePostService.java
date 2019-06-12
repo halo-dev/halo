@@ -182,7 +182,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     @Transactional
     void increaseLike(@NonNull Integer postId);
 
-
     /**
      * Creates or updates by post.
      *

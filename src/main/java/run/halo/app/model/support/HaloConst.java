@@ -82,6 +82,20 @@ public class HaloConst {
      */
     public static String USER_SESSION_KEY = "user_session";
 
+    /**
+     * Github Api url for halo-admin release.
+     */
+    public final static String HALO_ADMIN_RELEASES_LATEST = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
+
+    /**
+     * Halo admin version regex.
+     */
+    public final static String HALO_ADMIN_VERSION_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
+
+    public final static String HALO_ADMIN_RELATIVE_PATH = "templates/admin/";
+
+    public final static String HALO_ADMIN_RELATIVE_BACKUP_PATH = "templates/admin-backup/";
+
     static {
         // Set version
         HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
