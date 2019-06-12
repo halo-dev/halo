@@ -162,6 +162,7 @@
               <a-tabs
                 type="card"
                 defaultActiveKey="0"
+                v-if="themeConfiguration.length>0"
               >
                 <a-tab-pane
                   v-for="(group, index) in themeConfiguration"
@@ -215,6 +216,11 @@
                   </a-form>
                 </a-tab-pane>
               </a-tabs>
+              <a-alert
+                message="当前主题暂无设置选项"
+                banner
+                v-else
+              />
             </div>
           </a-skeleton>
         </a-col>
