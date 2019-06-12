@@ -9,7 +9,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'run.halo.app'
 archivesBaseName = 'halo'
-version = '1.0.2-beta.1'
+version = '1.0.2'
 sourceCompatibility = '1.8'
 description = 'Halo, personal blog system developed in Java.'
 
