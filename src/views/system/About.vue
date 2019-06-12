@@ -12,7 +12,8 @@
                 </h3>
                 <template slot="description">
                   <ul>
-                    <li>版本：{{ environments.version }}</li>
+                    <li>Halo server 版本：{{ environments.version }}</li>
+                    <li>Halo admin 版本：{{ version }}</li>
                     <li>数据库：{{ environments.database }}</li>
                     <li>运行模式：{{ environments.mode }}</li>
                     <li>启动时间：{{ environments.startTime | moment }}</li>
@@ -41,18 +42,23 @@
                   开发者
                 </h3>
                 <template slot="description">
-                  <a-tooltip
-                    placement="top"
+                  <a
+                    :href="item.github"
                     v-for="(item,index) in developers"
-                    :title="item.name"
                     :key="index"
+                    target="_blank"
                   >
-                    <a-avatar
-                      size="large"
-                      :src="item.avatar"
-                      :style="{ marginRight: '10px' }"
-                    />
-                  </a-tooltip>
+                    <a-tooltip
+                      placement="top"
+                      :title="item.name"
+                    >
+                      <a-avatar
+                        size="large"
+                        :src="item.avatar"
+                        :style="{ marginRight: '10px' }"
+                      />
+                    </a-tooltip>
+                  </a>
                 </template>
               </a-list-item-meta>
             </a-list-item>
@@ -85,6 +91,7 @@ import adminApi from '@/api/admin'
 export default {
   data() {
     return {
+      version: this.VERSION,
       environments: {},
       developers: [
         {
