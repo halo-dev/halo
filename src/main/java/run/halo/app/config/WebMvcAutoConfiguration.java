@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_PATH;
+
 /**
  * Mvc configuration.
  *
@@ -93,7 +95,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/backup/**")
                 .addResourceLocations(workDir + "backup/");
         registry.addResourceHandler("/admin/**")
-                .addResourceLocations(workDir + "templates/admin/")
+                .addResourceLocations(workDir + HALO_ADMIN_RELATIVE_PATH)
                 .addResourceLocations("classpath:/admin/");
 
         if (!haloProperties.isDocDisabled()) {
@@ -122,7 +124,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         configurer.setDefaultEncoding("UTF-8");
 
         Properties properties = new Properties();
-        properties.setProperty("auto_import","/common/macro/common_macro.ftl as common");
+        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common");
 
         configurer.setFreemarkerSettings(properties);
 

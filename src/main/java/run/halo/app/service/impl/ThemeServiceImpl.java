@@ -36,8 +36,6 @@ import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.GitUtils;
 import run.halo.app.utils.HaloUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -378,7 +376,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // Create temp directory
-            tempPath = createTempPath();
+            tempPath = FileUtils.createTempDirectory();
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             Path themeTempPath = tempPath.resolve(basename);
 
@@ -392,7 +390,7 @@ public class ThemeServiceImpl implements ThemeService {
             FileUtils.unzip(zis, themeTempPath);
 
             // Go to the base folder and add the theme into system
-            return add(FileUtils.skipZipParentFolder(themeTempPath));
+            return add(FileUtils.tryToSkipZipParentFolder(themeTempPath));
         } catch (IOException e) {
             throw new ServiceException("上传主题失败: " + file.getOriginalFilename(), e);
         } finally {
@@ -447,7 +445,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // Create temp path
-            tmpPath = createTempPath();
+            tmpPath = FileUtils.createTempDirectory();
             // Create temp path
             Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
 
@@ -570,22 +568,8 @@ public class ThemeServiceImpl implements ThemeService {
 
         log.debug("Downloaded [{}]", zipUrl);
 
-        // New zip input stream
-        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(downloadResponse.getBody()));
-
         // Unzip it
-        FileUtils.unzip(zis, targetPath);
-    }
-
-    /**
-     * Creates temporary path.
-     *
-     * @return temporary path
-     * @throws IOException if an I/O error occurs or the temporary-file directory does not exist
-     */
-    @NonNull
-    private Path createTempPath() throws IOException {
-        return Files.createTempDirectory("halo");
+        FileUtils.unzip(downloadResponse.getBody(), targetPath);
     }
 
     /**

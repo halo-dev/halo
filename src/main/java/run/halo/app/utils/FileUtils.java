@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.exception.ForbiddenException;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
@@ -88,7 +89,7 @@ public class FileUtils {
     }
 
     /**
-     * Unzip content to the target path.
+     * Unzips content to the target path.
      *
      * @param zis        zip input stream must not be null
      * @param targetPath target path must not be null and not empty
@@ -125,14 +126,29 @@ public class FileUtils {
         }
     }
 
+
     /**
-     * Skips zip parent folder. (Go into base folder)
+     * Unzips content to the target path.
+     *
+     * @param bytes      zip bytes array must not be null
+     * @param targetPath target path must not be null and not empty
+     * @throws IOException
+     */
+    public static void unzip(@NonNull byte[] bytes, @NonNull Path targetPath) throws IOException {
+        Assert.notNull(bytes, "Zip bytes must not be null");
+
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
+        unzip(zis, targetPath);
+    }
+
+    /**
+     * Try to skip zip parent folder. (Go into base folder)
      *
      * @param unzippedPath unzipped path must not be null
      * @return path containing base files
      * @throws IOException
      */
-    public static Path skipZipParentFolder(@NonNull Path unzippedPath) throws IOException {
+    public static Path tryToSkipZipParentFolder(@NonNull Path unzippedPath) throws IOException {
         Assert.notNull(unzippedPath, "Unzipped folder must not be  null");
 
         // TODO May cause a latent problem.
@@ -172,6 +188,10 @@ public class FileUtils {
      */
     public static boolean isEmpty(@NonNull Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
+
+        if (!Files.isDirectory(path) || Files.notExists(path)) {
+            return true;
+        }
 
         try (Stream<Path> pathStream = Files.list(path)) {
             return pathStream.count() == 0;
@@ -275,4 +295,15 @@ public class FileUtils {
         }
     }
 
+
+    /**
+     * Creates temp directory.
+     *
+     * @return temp directory path
+     * @throws IOException if an I/O error occurs or the temporary-file directory does not exist
+     */
+    @NonNull
+    public static Path createTempDirectory() throws IOException {
+        return Files.createTempDirectory("halo");
+    }
 }
