@@ -51,4 +51,12 @@ adminApi.refreshToken = refreshToken => {
     method: 'post'
   })
 }
+
+adminApi.updateAdminAssets = () => {
+  return service({
+    url: `${baseUrl}/halo-admin`,
+    method: 'put',
+    timeout: 600 * 1000
+  })
+}
 export default adminApi

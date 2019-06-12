@@ -3,83 +3,88 @@
     <a-row>
       <a-col :span="24">
         <a-card :bordered="false">
+          <a-card
+            title="环境信息"
+            :bordered="false"
+            class="environment-info"
+          >
+            <a-popconfirm
+              slot="extra"
+              placement="left"
+              okText="是"
+              cancelText="否"
+              @confirm="confirmUpdate"
+            >
+              <template slot="title">
+                <p>确认更新 <b>Halo admin</b> 吗？</p>
+              </template>
+              <a-icon
+                type="cloud-download"
+                slot="icon"
+              ></a-icon>
+              <a-button
+                :loading="updating"
+                type="dashed"
+                shape="circle"
+                icon="cloud-download"
+              >
+              </a-button>
+            </a-popconfirm>
 
-          <a-list itemLayout="horizontal">
-            <a-list-item>
-              <a-list-item-meta>
-                <h3 slot="title">
-                  环境信息
-                </h3>
-                <template slot="description">
-                  <ul>
-                    <li>Halo server 版本：{{ environments.version }}</li>
-                    <li>Halo admin 版本：{{ version }}</li>
-                    <li>数据库：{{ environments.database }}</li>
-                    <li>运行模式：{{ environments.mode }}</li>
-                    <li>启动时间：{{ environments.startTime | moment }}</li>
-                  </ul>
-                  <a
-                    href="https://github.com/halo-dev"
-                    target="_blank"
-                  >开源地址
-                    <a-icon type="link" /></a>&nbsp;
-                  <a
-                    href="https://halo.run/docs"
-                    target="_blank"
-                  >用户文档
-                    <a-icon type="link" /></a>&nbsp;
-                  <a
-                    href="https://bbs.halo.run"
-                    target="_blank"
-                  >在线社区
-                    <a-icon type="link" /></a>&nbsp;
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <h3 slot="title">
-                  开发者
-                </h3>
-                <template slot="description">
-                  <a
-                    :href="item.github"
-                    v-for="(item,index) in developers"
-                    :key="index"
-                    target="_blank"
-                  >
-                    <a-tooltip
-                      placement="top"
-                      :title="item.name"
-                    >
-                      <a-avatar
-                        size="large"
-                        :src="item.avatar"
-                        :style="{ marginRight: '10px' }"
-                      />
-                    </a-tooltip>
-                  </a>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
+            <ul>
+              <li>版本：{{ environments.version }}</li>
+              <li>数据库：{{ environments.database }}</li>
+              <li>运行模式：{{ environments.mode }}</li>
+              <li>启动时间：{{ environments.startTime | moment }}</li>
+            </ul>
 
-            <a-list-item>
-              <a-list-item-meta>
-                <h3 slot="title">
-                  时间轴
-                </h3>
-                <template slot="description">
-                  <a-timeline>
-                    <a-timeline-item>...</a-timeline-item>
-                    <a-timeline-item
-                      v-for="(item, index) in steps"
-                      :key="index"
-                    >{{ item.date }} {{ item.content }}</a-timeline-item>
-                  </a-timeline>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-          </a-list>
+            <a
+              href="https://github.com/halo-dev"
+              target="_blank"
+            >开源地址
+              <a-icon type="link" /></a>
+            <a
+              href="https://halo.run/docs"
+              target="_blank"
+            >用户文档
+              <a-icon type="link" /></a>
+            <a
+              href="https://bbs.halo.run"
+              target="_blank"
+            >在线社区
+              <a-icon type="link" /></a>
+          </a-card>
+
+          <a-card
+            title="开发者"
+            :bordered="false"
+          >
+            <a-tooltip
+              placement="top"
+              v-for="(item,index) in developers"
+              :title="item.name"
+              :key="index"
+            >
+              <a-avatar
+                size="large"
+                :src="item.avatar"
+                :style="{ marginRight: '10px' }"
+              />
+            </a-tooltip>
+          </a-card>
+
+          <a-card
+            title="时间轴"
+            :bordered="false"
+          >
+            <a-timeline>
+              <a-timeline-item>...</a-timeline-item>
+              <a-timeline-item
+                v-for="(item, index) in steps"
+                :key="index"
+              >{{ item.date }} {{ item.content }}</a-timeline-item>
+            </a-timeline>
+          </a-card>
         </a-card>
       </a-col>
     </a-row>
@@ -88,6 +93,7 @@
 
 <script>
 import adminApi from '@/api/admin'
+
 export default {
   data() {
     return {
@@ -160,17 +166,37 @@ export default {
           date: '2018-03-21',
           content: '确定命名为 Halo，并上传到 Github'
         }
-      ]
+      ],
+      updating: false
     }
   },
   created() {
     this.getEnvironments()
+  },
+  computed: {
+    updateText() {
+      return this.updating ? '更新中...' : '更新'
+    }
   },
   methods: {
     getEnvironments() {
       adminApi.environments().then(response => {
         this.environments = response.data.data
       })
+    },
+    confirmUpdate() {
+      this.updating = true
+      adminApi
+        .updateAdminAssets()
+        .then(response => {
+          this.$notification.success({
+            message: '更新成功',
+            description: '请刷新后体验最新版本！'
+          })
+        })
+        .finally(() => {
+          this.updating = false
+        })
     }
   }
 }
@@ -180,5 +206,16 @@ ul {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.environment-info {
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    margin-right: 10px;
+  }
 }
 </style>
