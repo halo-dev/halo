@@ -11,12 +11,12 @@
             <a-popconfirm
               slot="extra"
               placement="left"
-              okText="是"
-              cancelText="否"
+              okText="确定"
+              cancelText="取消"
               @confirm="confirmUpdate"
             >
               <template slot="title">
-                <p>确认更新 <b>Halo admin</b> 吗？</p>
+                <p>确定更新 <b>Halo admin</b> 吗？</p>
               </template>
               <a-icon
                 type="cloud-download"
@@ -32,7 +32,8 @@
             </a-popconfirm>
 
             <ul>
-              <li>版本：{{ environments.version }}</li>
+              <li>Server 版本：{{ environments.version }}</li>
+              <li>Admin 版本：{{ adminVersion }}</li>
               <li>数据库：{{ environments.database }}</li>
               <li>运行模式：{{ environments.mode }}</li>
               <li>启动时间：{{ environments.startTime | moment }}</li>
@@ -59,18 +60,23 @@
             title="开发者"
             :bordered="false"
           >
-            <a-tooltip
-              placement="top"
+            <a
+              :href="item.github"
               v-for="(item,index) in developers"
-              :title="item.name"
               :key="index"
+              target="_blank"
             >
-              <a-avatar
-                size="large"
-                :src="item.avatar"
-                :style="{ marginRight: '10px' }"
-              />
-            </a-tooltip>
+              <a-tooltip
+                placement="top"
+                :title="item.name"
+              >
+                <a-avatar
+                  size="large"
+                  :src="item.avatar"
+                  :style="{ marginRight: '10px' }"
+                />
+              </a-tooltip>
+            </a>
           </a-card>
 
           <a-card
@@ -93,11 +99,10 @@
 
 <script>
 import adminApi from '@/api/admin'
-
 export default {
   data() {
     return {
-      version: this.VERSION,
+      adminVersion: this.VERSION,
       environments: {},
       developers: [
         {
