@@ -226,7 +226,10 @@
         </a-col>
       </a-row>
 
-      <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
+      <footer-tool-bar
+        v-if="themeConfiguration.length>0"
+        :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
+      >
         <a-button
           type="primary"
           @click="handleSaveSettings"
