@@ -41,9 +41,10 @@ public class GithubTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void getLatestReleaseTest() throws Throwable {
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(API_URL, Map.class);
-        System.out.println("Reponse: " + responseEntity);
+        System.out.println("Response: " + responseEntity);
         Object assetsObject = responseEntity.getBody().get("assets");
         System.out.println("Assets class: " + assetsObject.getClass());
         System.out.println("Assets: " + assetsObject);

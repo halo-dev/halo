@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
 import java.util.UUID;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
