@@ -64,4 +64,9 @@ public interface AdminService {
      */
     @NonNull
     AuthToken refreshToken(@NonNull String refreshToken);
+
+    /**
+     * Updates halo admin assets.
+     */
+    void updateAdminAssets();
 }

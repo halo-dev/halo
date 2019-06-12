@@ -1,6 +1,5 @@
 package run.halo.app.utils;
 
-import io.micrometer.core.annotation.TimedSet;
 import org.junit.Test;
 
 import java.nio.file.Path;

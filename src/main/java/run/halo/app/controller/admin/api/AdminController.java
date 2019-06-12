@@ -67,4 +67,10 @@ public class AdminController {
         return adminService.refreshToken(refreshToken);
     }
 
+    @PutMapping("halo-admin")
+    @ApiOperation("Updates halo-admin manually")
+    public void updateAdmin() {
+        adminService.updateAdminAssets();
+    }
+
 }
