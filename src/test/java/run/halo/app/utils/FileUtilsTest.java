@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.equalTo;
 
@@ -27,26 +28,29 @@ public class FileUtilsTest {
         // Create test folders
         Files.createDirectories(testPath);
 
-        System.out.println("Walk path list");
-        List<Path> walkList = Files.walk(tempDirectory).collect(Collectors.toList());
-        walkList.forEach(System.out::println);
-        Assert.assertThat(walkList.size(), equalTo(4));
+        try (Stream<Path> pathStream = Files.walk(tempDirectory)) {
+            List<Path> walkList = pathStream.collect(Collectors.toList());
+            walkList.forEach(System.out::println);
+            Assert.assertThat(walkList.size(), equalTo(4));
+        }
 
+        try (Stream<Path> pathStream = Files.walk(tempDirectory, 1)) {
+            List<Path> walkList = pathStream.collect(Collectors.toList());
+            walkList.forEach(System.out::println);
+            Assert.assertThat(walkList.size(), equalTo(2));
+        }
 
-        System.out.println("Walk 1 deep path list");
-        List<Path> walk1DeepList = Files.walk(tempDirectory, 1).collect(Collectors.toList());
-        walk1DeepList.forEach(System.out::println);
-        Assert.assertThat(walk1DeepList.size(), equalTo(2));
+        try (Stream<Path> pathStream = Files.list(tempDirectory)) {
+            List<Path> walkList = pathStream.collect(Collectors.toList());
+            walkList.forEach(System.out::println);
+            Assert.assertThat(walkList.size(), equalTo(1));
+        }
 
-        System.out.println("List path list");
-        List<Path> listList = Files.list(tempDirectory).collect(Collectors.toList());
-        listList.forEach(System.out::println);
-        Assert.assertThat(listList.size(), equalTo(1));
-
-        System.out.println("List test path list");
-        List<Path> testPathList = Files.list(testPath).collect(Collectors.toList());
-        testPathList.forEach(System.out::println);
-        Assert.assertThat(testPathList.size(), equalTo(0));
+        try (Stream<Path> pathStream = Files.list(testPath)) {
+            List<Path> walkList = pathStream.collect(Collectors.toList());
+            walkList.forEach(System.out::println);
+            Assert.assertThat(walkList.size(), equalTo(0));
+        }
 
         // Delete it
         FileUtils.deleteFolder(tempDirectory);

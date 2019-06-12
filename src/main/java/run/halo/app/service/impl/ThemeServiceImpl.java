@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
@@ -34,6 +33,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.FilenameUtils;
+import run.halo.app.utils.GitUtils;
 import run.halo.app.utils.HaloUtils;
 
 import java.io.ByteArrayInputStream;
@@ -46,6 +46,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
 
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
@@ -127,15 +128,17 @@ public class ThemeServiceImpl implements ThemeService {
 
         Optional<ThemeProperty[]> themePropertiesOptional = cacheStore.getAny(THEMES_CACHE_KEY, ThemeProperty[].class);
 
-        try {
-            if (themePropertiesOptional.isPresent()) {
-                // Convert to theme properties
-                ThemeProperty[] themeProperties = themePropertiesOptional.get();
-                return new HashSet<>(Arrays.asList(themeProperties));
-            }
+        if (themePropertiesOptional.isPresent()) {
+            // Convert to theme properties
+            ThemeProperty[] themeProperties = themePropertiesOptional.get();
+            return new HashSet<>(Arrays.asList(themeProperties));
+        }
+
+        try (Stream<Path> pathStream = Files.list(getBasePath())) {
 
             // List and filter sub folders
-            List<Path> themePaths = Files.list(getBasePath()).filter(path -> Files.isDirectory(path)).collect(Collectors.toList());
+            List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path))
+                    .collect(Collectors.toList());
 
             if (CollectionUtils.isEmpty(themePaths)) {
                 return Collections.emptySet();
@@ -172,9 +175,8 @@ public class ThemeServiceImpl implements ThemeService {
         // Get the theme path
         Path themePath = Paths.get(getThemeOfNonNullBy(themeId).getThemePath());
 
-        try {
-            return Files.list(themePath)
-                    .filter(path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), CUSTOM_SHEET_PREFIX))
+        try (Stream<Path> pathStream = Files.list(themePath)) {
+            return pathStream.filter(path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), CUSTOM_SHEET_PREFIX))
                     .map(path -> {
                         // Remove prefix
                         String customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), CUSTOM_SHEET_PREFIX);
@@ -253,8 +255,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             // Delete the folder
-            FileUtils.del(Paths.get(themeProperty.getThemePath()));
-
+            FileUtils.deleteFolder(Paths.get(themeProperty.getThemePath()));
             // Delete theme cache
             eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
         } catch (Exception e) {
@@ -408,7 +409,10 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.isTrue(Files.isDirectory(themeTmpPath), "Theme temporary path must be a directory");
 
         log.debug("Children path of [{}]:", themeTmpPath);
-        Files.list(themeTmpPath).forEach(path -> log.debug(path.toString()));
+
+        try (Stream<Path> pathStream = Files.list(themeTmpPath)) {
+            pathStream.forEach(path -> log.debug(path.toString()));
+        }
 
         // Check property config
         ThemeProperty tmpThemeProperty = getProperty(themeTmpPath);
@@ -451,7 +455,8 @@ public class ThemeServiceImpl implements ThemeService {
                 downloadZipAndUnzip(uri, themeTmpPath);
             } else {
                 uri = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
-                cloneFromGit(uri, themeTmpPath);
+                // Clone from git
+                GitUtils.cloneFromGit(uri, themeTmpPath);
             }
 
             return add(themeTmpPath);
@@ -491,83 +496,56 @@ public class ThemeServiceImpl implements ThemeService {
         String branch = StringUtils.isBlank(themeProperty.getBranch()) ?
                 DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
 
-        File themeFolder = Paths.get(themeProperty.getThemePath()).toFile();
-        // Open the theme path
-        Git git;
+        Git git = null;
 
         try {
-            git = Git.open(themeFolder);
-        } catch (RepositoryNotFoundException e) {
-            // Repository is not initialized
-            git = Git.init().setDirectory(themeFolder).call();
-        }
-
-        // Force to set remote name
-        git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
-        RemoteConfig remoteConfig = git.remoteAdd()
-                .setName(THEME_PROVIDER_REMOTE_NAME)
-                .setUri(new URIish(themeProperty.getRepo()))
-                .call();
-
-        // Add all changes
-        git.add()
-                .addFilepattern(".")
-                .call();
-        // Commit the changes
-        git.commit().setMessage("Commit by halo automatically").call();
-
-        // Check out to specified branch
-        if (!StringUtils.equalsIgnoreCase(branch, git.getRepository().getBranch())) {
-            boolean present = git.branchList()
-                    .call()
-                    .stream()
-                    .map(Ref::getName)
-                    .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
-
-            git.checkout()
-                    .setCreateBranch(true)
-                    .setForced(!present)
-                    .setName(branch)
+            git = GitUtils.openOrInit(Paths.get(themeProperty.getThemePath()));
+            // Force to set remote name
+            git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
+            RemoteConfig remoteConfig = git.remoteAdd()
+                    .setName(THEME_PROVIDER_REMOTE_NAME)
+                    .setUri(new URIish(themeProperty.getRepo()))
                     .call();
+
+            // Add all changes
+            git.add()
+                    .addFilepattern(".")
+                    .call();
+            // Commit the changes
+            git.commit().setMessage("Commit by halo automatically").call();
+
+            // Check out to specified branch
+            if (!StringUtils.equalsIgnoreCase(branch, git.getRepository().getBranch())) {
+                boolean present = git.branchList()
+                        .call()
+                        .stream()
+                        .map(Ref::getName)
+                        .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
+
+                git.checkout()
+                        .setCreateBranch(true)
+                        .setForced(!present)
+                        .setName(branch)
+                        .call();
+            }
+
+            // Pull with rebasing
+            PullResult pullResult = git.pull()
+                    .setRemote(remoteConfig.getName())
+                    .setRemoteBranchName(branch)
+                    .setRebase(true)
+                    .call();
+
+            if (!pullResult.isSuccessful()) {
+                log.debug("Rebase result: [{}]", pullResult.getRebaseResult());
+                log.debug("Merge result: [{}]", pullResult.getMergeResult());
+
+                throw new ThemeUpdateException("拉取失败！您与主题作者可能同时更改了同一个文件");
+            }
+        } finally {
+            GitUtils.closeQuietly(git);
         }
 
-        // Pull with rebasing
-        PullResult pullResult = git.pull()
-                .setRemote(remoteConfig.getName())
-                .setRemoteBranchName(branch)
-                .setRebase(true)
-                .call();
-
-        if (!pullResult.isSuccessful()) {
-            log.debug("Rebase result: [{}]", pullResult.getRebaseResult());
-            log.debug("Merge result: [{}]", pullResult.getMergeResult());
-
-            throw new ThemeUpdateException("拉取失败！您与主题作者可能同时更改了同一个文件");
-        }
-        // Close git
-        git.close();
-    }
-
-    /**
-     * Clones theme from git.
-     *
-     * @param gitUrl     git url must not be blank
-     * @param targetPath target path must not be null
-     * @throws GitAPIException throws when clone error
-     */
-    private void cloneFromGit(@NonNull String gitUrl, @NonNull Path targetPath) throws GitAPIException {
-        Assert.hasText(gitUrl, "Git url must not be blank");
-        Assert.notNull(targetPath, "Target path must not be null");
-
-        log.debug("Cloning git repo [{}] to [{}]", gitUrl, targetPath);
-
-        // Clone it
-        Git.cloneRepository()
-                .setURI(gitUrl)
-                .setDirectory(targetPath.toFile())
-                .call();
-
-        log.debug("Cloned git repo [{}]", gitUrl);
     }
 
     /**
@@ -625,10 +603,10 @@ public class ThemeServiceImpl implements ThemeService {
             return null;
         }
 
-        try {
+        try (Stream<Path> pathStream = Files.list(topPath)) {
             List<ThemeFile> themeFiles = new LinkedList<>();
 
-            Files.list(topPath).forEach(path -> {
+            pathStream.forEach(path -> {
                 // Build theme file
                 ThemeFile themeFile = new ThemeFile();
                 themeFile.setName(path.getFileName().toString());
@@ -787,12 +765,13 @@ public class ThemeServiceImpl implements ThemeService {
     private Optional<String> getScreenshotsFileName(@NonNull Path themePath) throws IOException {
         Assert.notNull(themePath, "Theme path must not be null");
 
-        return Files.list(themePath)
-                .filter(path -> Files.isRegularFile(path)
-                        && Files.isReadable(path)
-                        && FilenameUtils.getBasename(path.toString()).equalsIgnoreCase(THEME_SCREENSHOTS_NAME))
-                .findFirst()
-                .map(path -> path.getFileName().toString());
+        try (Stream<Path> pathStream = Files.list(themePath)) {
+            return pathStream.filter(path -> Files.isRegularFile(path)
+                    && Files.isReadable(path)
+                    && FilenameUtils.getBasename(path.toString()).equalsIgnoreCase(THEME_SCREENSHOTS_NAME))
+                    .findFirst()
+                    .map(path -> path.getFileName().toString());
+        }
     }
 
     /**
