@@ -244,7 +244,8 @@ public class AdminServiceImpl implements AdminService {
         if (responseEntity == null ||
                 responseEntity.getStatusCode().isError() ||
                 responseEntity.getBody() == null) {
-            throw new ServiceException("Failed to request remote url: " + HALO_ADMIN_RELEASES_LATEST).setErrorData(HALO_ADMIN_RELEASES_LATEST);
+            log.debug("Failed to request remote url: [{}]", HALO_ADMIN_RELEASES_LATEST);
+            throw new ServiceException("系统无法访问到 Github 的 API").setErrorData(HALO_ADMIN_RELEASES_LATEST);
         }
 
         Object assetsObject = responseEntity.getBody().get("assets");
@@ -284,10 +285,11 @@ public class AdminServiceImpl implements AdminService {
                 // Copy it to template/admin folder
                 FileUtils.copyFolder(FileUtils.tryToSkipZipParentFolder(assetTempPath), adminPath);
             } catch (Throwable t) {
-                throw new ServiceException(t.getMessage(), t);
+                log.error("Failed to update halo admin", t);
+                throw new ServiceException("更新 Halo admin 失败");
             }
         } else {
-            throw new ServiceException("Github response error").setErrorData(assetsObject);
+            throw new ServiceException("Github API 返回内容有误").setErrorData(assetsObject);
         }
     }
 
