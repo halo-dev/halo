@@ -200,26 +200,26 @@
                 placeholder="写点什么吧..."
               />
             </a-form-item>
-						
-						<!-- 日志图片上传 -->
-						<a-form-item v-show="showMoreOptions">
-							<UploadPhoto></UploadPhoto>
-							<!-- <a-collapse :bordered="false">
-								<a-collapse-panel key="1">
-									
-								</a-collapse-panel>
-							</a-collapse> -->
-						</a-form-item>
-						
+
+            <!-- 日志图片上传 -->
+            <a-form-item v-show="showMoreOptions">
+              <UploadPhoto
+                @success="handlerPhotoUploadSuccess"
+                :photoList="photoList"
+              ></UploadPhoto>
+            </a-form-item>
+
             <a-form-item>
-								 <a-button
-									type="primary"
-									@click="handleCreateJournalClick"
-								>保存</a-button>
-								<a href="javascript:;" class="more-options-btn"
-									type="default"
-									@click="handleUploadPhotoWallClick"
-								>更多选项<a-icon type="down" /></a>
+              <a-button
+                type="primary"
+                @click="handleCreateJournalClick"
+              >保存</a-button>
+              <a
+                href="javascript:;"
+                class="more-options-btn"
+                type="default"
+                @click="handleUploadPhotoWallClick"
+              >更多选项<a-icon type="down" /></a>
             </a-form-item>
           </a-form>
         </a-card>
@@ -342,11 +342,12 @@ export default {
     AnalysisCard,
     RecentCommentTab,
     countTo,
-		UploadPhoto
+    UploadPhoto
   },
   data() {
     return {
-			showMoreOptions: false,
+      photoList: [],
+      showMoreOptions: false,
       startVal: 0,
       logType: logApi.logType,
       activityLoading: true,
@@ -357,7 +358,11 @@ export default {
       postData: [],
       logData: [],
       countsData: {},
-      journal: {},
+      journal: {
+        content: '',
+        photos: []
+      },
+      journalPhotos: [], // 日志图片集合最多九张
       logs: [],
       options: [],
       keys: ['blog_url'],
@@ -416,6 +421,18 @@ export default {
     next()
   },
   methods: {
+    handlerPhotoUploadSuccess(response, file) {
+      var callData = response.data.data
+      var photo = {
+        name: callData.name,
+        url: callData.path,
+        thumbnail: callData.thumbPath,
+        suffix: callData.suffix,
+        width: callData.width,
+        height: callData.height
+      }
+      this.journalPhotos.push(photo)
+    },
     loadOptions() {
       optionApi.listAll(this.keys).then(response => {
         this.options = response.data.data
@@ -444,15 +461,20 @@ export default {
       this.$router.push({ name: 'PostEdit', query: { postId: post.id } })
     },
     handleCreateJournalClick() {
+      // 给属性填充数据
+      this.journal.photos = this.journalPhotos
+
       journalApi.create(this.journal).then(response => {
         this.$message.success('发表成功！')
         this.journal = {}
+        this.photoList = []
+        this.showMoreOptions = false
       })
     },
-		handleUploadPhotoWallClick(){
-			// 是否显示上传照片墙组件
-			this.showMoreOptions = !this.showMoreOptions
-		},
+    handleUploadPhotoWallClick() {
+      // 是否显示上传照片墙组件
+      this.showMoreOptions = !this.showMoreOptions
+    },
     handleShowLogDrawer() {
       this.logDrawerVisiable = true
       this.loadLogs()
@@ -486,5 +508,4 @@ export default {
 		margin-left: 15px;
 		text-decoration: none;
 	}
-	
 </style>
