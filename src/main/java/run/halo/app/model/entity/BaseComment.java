@@ -50,10 +50,10 @@ public class BaseComment extends BaseEntity {
     private String authorUrl;
 
     /**
-     * Gavatar md5
+     * Gravatar md5
      */
-    @Column(name = "gavatar_md5", columnDefinition = "varchar(128) default ''")
-    private String gavatarMd5;
+    @Column(name = "gravatar_md5", columnDefinition = "varchar(128) default ''")
+    private String gravatarMd5;
 
     /**
      * Comment content.
@@ -117,8 +117,8 @@ public class BaseComment extends BaseEntity {
             authorUrl = "";
         }
 
-        if (gavatarMd5 == null) {
-            gavatarMd5 = "";
+        if (gravatarMd5 == null) {
+            gravatarMd5 = "";
         }
 
         if (status == null) {
