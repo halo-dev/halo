@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     avatar() {
-      return `//cn.gravatar.com/avatar/${this.comment.gavatarMd5}/?s=256&d=mp`
+      return `//cn.gravatar.com/avatar/${this.comment.gravatarMd5}/?s=256&d=mp`
     }
   },
   methods: {

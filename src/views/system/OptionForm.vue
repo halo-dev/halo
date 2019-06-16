@@ -177,7 +177,7 @@
                   label="评论者头像："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-select v-model="options.comment_gavatar_default">
+                  <a-select v-model="options.comment_gravatar_default">
                     <a-select-option value="mm">默认</a-select-option>
                     <a-select-option value="identicon">抽象几何图形</a-select-option>
                     <a-select-option value="monsterid">小怪物</a-select-option>
