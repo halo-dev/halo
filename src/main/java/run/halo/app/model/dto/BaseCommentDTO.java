@@ -29,7 +29,7 @@ public class BaseCommentDTO implements OutputConverter<BaseCommentDTO, BaseComme
 
     private String authorUrl;
 
-    private String gavatarMd5;
+    private String gravatarMd5;
 
     private String content;
 
