@@ -62,12 +62,8 @@ public class PostParam implements InputConverter<Post> {
     @Override
     public Post convertTo() {
         if (StringUtils.isBlank(url)) {
-            url = HaloUtils.normalizeUrl(title);
-        } else {
-            url = HaloUtils.normalizeUrl(url);
+            url = title;
         }
-
-        url = HaloUtils.initializeUrlIfBlank(url);
 
         Post post = InputConverter.super.convertTo();
         // Crypt password
@@ -81,12 +77,8 @@ public class PostParam implements InputConverter<Post> {
     @Override
     public void update(Post post) {
         if (StringUtils.isBlank(url)) {
-            url = HaloUtils.normalizeUrl(title);
-        } else {
-            url = HaloUtils.normalizeUrl(url);
+            url = title;
         }
-
-        url = HaloUtils.initializeUrlIfBlank(url);
 
         InputConverter.super.update(post);
 
