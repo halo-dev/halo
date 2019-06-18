@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.NestedServletException;
 import run.halo.app.exception.HaloException;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FilenameUtils;
 
@@ -69,20 +70,7 @@ public class CommonController extends AbstractErrorController {
 
         log.error("Error path: [{}], status: [{}]", getErrorPath(), status);
 
-        Object throwableObject = request.getAttribute("javax.servlet.error.exception");
-
-        if (throwableObject != null) {
-            Throwable throwable = (Throwable) throwableObject;
-            log.error("Captured an exception", throwable);
-
-            if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
-                // TODO May cause unknown-reason problem
-                // if Ftl was not found then redirect to /404
-                return contentNotFound();
-            }
-
-            handleCustomException(request);
-        }
+        handleCustomException(request);
 
         Map<String, Object> errorDetail = Collections.unmodifiableMap(getErrorAttributes(request, isIncludeStackTrace(request)));
         model.addAttribute("error", errorDetail);
@@ -164,6 +152,7 @@ public class CommonController extends AbstractErrorController {
         }
 
         Throwable throwable = (Throwable) throwableObject;
+        log.error("Captured an exception", throwable);
 
         if (throwable instanceof NestedServletException) {
             Throwable rootCause = ((NestedServletException) throwable).getRootCause();
@@ -173,7 +162,14 @@ public class CommonController extends AbstractErrorController {
                 request.setAttribute("javax.servlet.error.exception", rootCause);
                 request.setAttribute("javax.servlet.error.message", haloException.getMessage());
             }
+        } else if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
+            request.setAttribute("javax.servlet.error.status_code", HttpStatus.NOT_FOUND.value());
+
+            NotFoundException viewNotFound = new NotFoundException("该路径没有对应的模板");
+            request.setAttribute("javax.servlet.error.exception", viewNotFound);
+            request.setAttribute("javax.servlet.error.message", viewNotFound.getMessage());
         }
+
     }
 
     /**
