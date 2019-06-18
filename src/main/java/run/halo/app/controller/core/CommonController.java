@@ -2,13 +2,22 @@ package run.halo.app.controller.core;
 
 import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.boot.autoconfigure.web.ErrorProperties;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.service.ThemeService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Error page Controller
@@ -18,18 +27,25 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Slf4j
 @Controller
-public class CommonController implements ErrorController {
+@RequestMapping("${server.error.path:${error.path:/error}}")
+public class CommonController extends AbstractErrorController {
 
-    private static final String ERROR_PATH = "/error";
-
-    private static final String NOT_FROUND_TEMPLATE = "404.ftl";
+    private static final String NOT_FOUND_TEMPLATE = "404.ftl";
 
     private static final String INTERNAL_ERROR_TEMPLATE = "500.ftl";
 
+    private static final String ERROR_TEMPLATE = "common/error/error";
+
     private final ThemeService themeService;
 
-    public CommonController(ThemeService themeService) {
+    private final ErrorProperties errorProperties;
+
+    public CommonController(ThemeService themeService,
+                            ErrorAttributes errorAttributes,
+                            ServerProperties serverProperties) {
+        super(errorAttributes);
         this.themeService = themeService;
+        this.errorProperties = serverProperties.getError();
     }
 
     /**
@@ -38,11 +54,11 @@ public class CommonController implements ErrorController {
      * @param request request
      * @return String
      */
-    @GetMapping(value = ERROR_PATH)
-    public String handleError(HttpServletRequest request) {
-        final Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+    @GetMapping
+    public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
+        HttpStatus status = getStatus(request);
 
-        log.error("Error path: [{}], status: [{}]", getErrorPath(), statusCode);
+        log.error("Error path: [{}], status: [{}]", getErrorPath(), status);
 
         // Get the exception
         Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
@@ -57,7 +73,18 @@ public class CommonController implements ErrorController {
             }
         }
 
-        return statusCode == 500 ? contentInternalError() : contentNotFround();
+        Map<String, Object> errorDetail = Collections.unmodifiableMap(getErrorAttributes(request, isIncludeStackTrace(request)));
+        model.addAttribute("error", errorDetail);
+
+        log.debug("Error detail: [{}]", errorDetail);
+
+        if (status.equals(HttpStatus.INTERNAL_SERVER_ERROR)) {
+            return contentInternalError();
+        } else if (status.equals(HttpStatus.NOT_FOUND)) {
+            return contentNotFround();
+        } else {
+            return defaultErrorHandler();
+        }
     }
 
     /**
@@ -67,8 +94,8 @@ public class CommonController implements ErrorController {
      */
     @GetMapping(value = "/404")
     public String contentNotFround() {
-        if (!themeService.templateExists(NOT_FROUND_TEMPLATE)) {
-            return "common/error/404";
+        if (!themeService.templateExists(NOT_FOUND_TEMPLATE)) {
+            return defaultErrorHandler();
         }
         StrBuilder path = new StrBuilder("themes/");
         path.append(themeService.getActivatedTheme().getFolderName());
@@ -84,12 +111,17 @@ public class CommonController implements ErrorController {
     @GetMapping(value = "/500")
     public String contentInternalError() {
         if (!themeService.templateExists(INTERNAL_ERROR_TEMPLATE)) {
-            return "common/error/500";
+            return defaultErrorHandler();
         }
+
         StrBuilder path = new StrBuilder("themes/");
         path.append(themeService.getActivatedTheme().getFolderName());
         path.append("/500");
         return path.toString();
+    }
+
+    public String defaultErrorHandler() {
+        return ERROR_TEMPLATE;
     }
 
     /**
@@ -99,6 +131,23 @@ public class CommonController implements ErrorController {
      */
     @Override
     public String getErrorPath() {
-        return ERROR_PATH;
+        return this.errorProperties.getPath();
+    }
+
+    /**
+     * Determine if the stacktrace attribute should be included.
+     *
+     * @param request the source request
+     * @return if the stacktrace attribute should be included
+     */
+    protected boolean isIncludeStackTrace(HttpServletRequest request) {
+        ErrorProperties.IncludeStacktrace include = errorProperties.getIncludeStacktrace();
+        if (include == ErrorProperties.IncludeStacktrace.ALWAYS) {
+            return true;
+        }
+        if (include == ErrorProperties.IncludeStacktrace.ON_TRACE_PARAM) {
+            return getTraceParameter(request);
+        }
+        return false;
     }
 }
