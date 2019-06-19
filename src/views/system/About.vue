@@ -45,7 +45,7 @@
             >开源地址
               <a-icon type="link" /></a>
             <a
-              href="https://halo.run/docs"
+              href="https://halo.run/guide"
               target="_blank"
             >用户文档
               <a-icon type="link" /></a>
