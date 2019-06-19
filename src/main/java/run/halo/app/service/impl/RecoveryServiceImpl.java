@@ -346,7 +346,7 @@ public class RecoveryServiceImpl implements RecoveryService {
             baseComment.setEmail(commentMap.getOrDefault("commentAuthorEmail", "").toString());
             baseComment.setIpAddress(commentMap.getOrDefault("commentAuthorIp", "").toString());
             baseComment.setAuthorUrl(commentMap.getOrDefault("commentAuthorUrl", "").toString());
-            baseComment.setGavatarMd5(commentMap.getOrDefault("commentAuthorAvatarMd5", "").toString());
+            baseComment.setGravatarMd5(commentMap.getOrDefault("commentAuthorAvatarMd5", "").toString());
             baseComment.setContent(commentMap.getOrDefault("commentContent", "").toString());
             baseComment.setUserAgent(commentMap.getOrDefault("commentAgent", "").toString());
             baseComment.setIsAdmin(getBooleanOrDefault(commentMap.getOrDefault("isAdmin", "").toString(), false));

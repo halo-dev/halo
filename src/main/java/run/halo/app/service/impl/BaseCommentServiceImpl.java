@@ -241,8 +241,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             comment.setUserAgent(ServletUtils.getHeaderIgnoreCase(HttpHeaders.USER_AGENT));
         }
 
-        if (comment.getGavatarMd5() == null) {
-            comment.setGavatarMd5(DigestUtils.md5Hex(comment.getEmail()));
+        if (comment.getGravatarMd5() == null) {
+            comment.setGravatarMd5(DigestUtils.md5Hex(comment.getEmail()));
         }
 
         if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
