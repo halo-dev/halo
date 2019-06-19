@@ -122,4 +122,11 @@ public interface UserService extends CrudService<User, Integer> {
      * @param plainPassword plain password must not be blank
      */
     void setPassword(@NonNull User user, @NonNull String plainPassword);
+
+    /**
+     * Set user default avatar，use Gravatar(http://cn.gravatar.com)
+     *
+     * @param user user must not be null
+     */
+    void setDefaultAvatar(@NonNull User user);
 }

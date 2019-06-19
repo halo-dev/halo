@@ -41,7 +41,7 @@ wget https://github.com/halo-dev/halo/releases/download/v1.0.2/halo-1.0.2.jar -O
 nohup java -jar halo-latest.jar >/dev/null 2>&1&
 ```
 
-详细文档请移步：<https://halo.run/docs>
+详细文档请移步：<https://halo.run/guide>
 
 ## 博客示例
 

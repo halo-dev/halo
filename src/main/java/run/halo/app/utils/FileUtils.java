@@ -66,24 +66,15 @@ public class FileUtils {
     public static void deleteFolder(@NonNull Path deletingPath) throws IOException {
         Assert.notNull(deletingPath, "Deleting path must not be null");
 
+        if (Files.notExists(deletingPath)) {
+            return;
+        }
+
         log.info("Deleting [{}]", deletingPath);
 
         // Delete folder recursively
         org.eclipse.jgit.util.FileUtils.delete(deletingPath.toFile(),
                 org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
-
-//        try (Stream<Path> pathStream = Files.walk(deletingPath)) {
-//            pathStream.sorted(Comparator.reverseOrder())
-//                    .peek(path -> log.debug("Try to delete [{}]", path.toString()))
-//                    .forEach(path -> {
-//                        try {
-//                            Files.delete(path);
-//                            log.debug("Deleted [{}] successfully", path.toString());
-//                        } catch (IOException e) {
-//                            throw new ServiceException("Failed to delete " + path.toString(), e).setErrorData(deletingPath.toString());
-//                        }
-//                    });
-//        }
 
         log.info("Deleted [{}] successfully", deletingPath);
     }

@@ -196,6 +196,8 @@ public class InstallController {
             installParam.update(user);
             // Set password manually
             userService.setPassword(user, installParam.getPassword());
+            // Set default avatar
+            userService.setDefaultAvatar(user);
             // Update user
             return userService.update(user);
         }).orElseGet(() -> userService.createBy(installParam));
