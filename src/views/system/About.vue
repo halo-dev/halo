@@ -4,10 +4,18 @@
       <a-col :span="24">
         <a-card :bordered="false">
           <a-card
-            title="环境信息"
             :bordered="false"
             class="environment-info"
           >
+            <template slot="title">
+              环境信息
+              <a
+                href="javascript:void(0);"
+                @click="handleCopyEnvironments"
+              >
+                <a-icon type="copy" />
+              </a>
+            </template>
             <a-popconfirm
               slot="extra"
               placement="left"
@@ -201,6 +209,21 @@ export default {
         })
         .finally(() => {
           this.updating = false
+        })
+    },
+    handleCopyEnvironments() {
+      const text = `Server 版本：${this.environments.version}
+Admin 版本：${this.adminVersion}
+数据库：${this.environments.database}
+运行模式：${this.environments.mode}`
+      this.$copyText(text)
+        .then(message => {
+          console.log('copy', message)
+          this.$message.success('复制成功！')
+        })
+        .catch(err => {
+          console.log('copy.err', err)
+          this.$message.error('复制失败！')
         })
     }
   }

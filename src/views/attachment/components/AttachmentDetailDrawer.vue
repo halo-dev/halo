@@ -91,11 +91,11 @@
               <a-list-item-meta :description="attachment.path">
                 <span slot="title">
                   普通链接：
-                  <a href="javascript:void(0);">
-                    <a-icon
-                      type="copy"
-                      @click="handleCopyNormalLink"
-                    />
+                  <a
+                    href="javascript:void(0);"
+                    @click="handleCopyNormalLink"
+                  >
+                    <a-icon type="copy" />
                   </a>
                 </span>
               </a-list-item-meta>
@@ -105,11 +105,11 @@
                 <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
                 <span slot="title">
                   Markdown 格式：
-                  <a href="javascript:void(0);">
-                    <a-icon
-                      type="copy"
-                      @click="handleCopyMarkdownLink"
-                    />
+                  <a
+                    href="javascript:void(0);"
+                    @click="handleCopyMarkdownLink"
+                  >
+                    <a-icon type="copy" />
                   </a>
                 </span>
               </a-list-item-meta>
@@ -118,7 +118,7 @@
         </a-skeleton>
       </a-col>
     </a-row>
-    <a-divider class="divider-transparent"/>
+    <a-divider class="divider-transparent" />
     <div class="bottom-control">
       <a-popconfirm
         title="你确定要添加到图库？"
