@@ -8,7 +8,7 @@
       <a-col :span="24">
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
-          :dataSource="themes"
+          :dataSource="sortedThemes"
           :loading="themeLoading"
         >
           <a-list-item
@@ -362,7 +362,7 @@ export default {
       attachmentDrawerVisible: false,
       themes: [],
       visible: false,
-      themeConfiguration: null,
+      themeConfiguration: [],
       themeSettings: [],
       themeProperty: null,
       fetchingUrl: null,
@@ -370,8 +370,11 @@ export default {
     }
   },
   computed: {
-    activatedTheme() {
-      return this.themes.find(theme => theme.activated)
+    sortedThemes() {
+      const data = this.themes.slice(0)
+      return data.sort(function(a, b) {
+        return b.activated - a.activated
+      })
     }
   },
   created() {
@@ -439,7 +442,7 @@ export default {
     onClose() {
       this.visible = false
       this.optionLoading = false
-      this.themeConfiguration = null
+      this.themeConfiguration = []
       this.themeProperty = null
     },
     handleChange(info) {
