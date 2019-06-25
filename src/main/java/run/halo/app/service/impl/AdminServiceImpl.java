@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
@@ -17,6 +19,7 @@ import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.Mode;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
@@ -76,6 +79,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final HaloProperties haloProperties;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     private final String driverClassName;
 
     private final String mode;
@@ -92,6 +97,7 @@ public class AdminServiceImpl implements AdminService {
                             StringCacheStore cacheStore,
                             RestTemplate restTemplate,
                             HaloProperties haloProperties,
+                            ApplicationEventPublisher eventPublisher,
                             @Value("${spring.datasource.driver-class-name}") String driverClassName,
                             @Value("${spring.profiles.active:prod}") String mode) {
         this.postService = postService;
@@ -106,6 +112,7 @@ public class AdminServiceImpl implements AdminService {
         this.cacheStore = cacheStore;
         this.restTemplate = restTemplate;
         this.haloProperties = haloProperties;
+        this.eventPublisher = eventPublisher;
         this.driverClassName = driverClassName;
         this.mode = mode;
     }
@@ -126,6 +133,8 @@ public class AdminServiceImpl implements AdminService {
                     userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
         } catch (NotFoundException e) {
             log.error("Failed to find user by name: " + username, e);
+            eventPublisher.publishEvent(new LogEvent(this, "", LogType.LOGIN_FAILED, loginParam.getUsername()));
+
             throw new BadRequestException(mismatchTip);
         }
 
@@ -133,6 +142,8 @@ public class AdminServiceImpl implements AdminService {
 
         if (!userService.passwordMatch(user, loginParam.getPassword())) {
             // If the password is mismatch
+            eventPublisher.publishEvent(new LogEvent(this, "", LogType.LOGIN_FAILED, loginParam.getUsername()));
+
             throw new BadRequestException(mismatchTip);
         }
 
@@ -140,6 +151,9 @@ public class AdminServiceImpl implements AdminService {
             // If the user has been logged in
             throw new BadRequestException("您已登录，请不要重复登录");
         }
+
+        // Log it then login successful
+        eventPublisher.publishEvent(new LogEvent(this, user.getUsername(), LogType.LOGGED_IN, user.getNickname()));
 
         // Generate new token
         return buildAuthToken(user);
@@ -169,6 +183,8 @@ public class AdminServiceImpl implements AdminService {
             cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
             cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
         });
+
+        eventPublisher.publishEvent(new LogEvent(this, user.getUsername(), LogType.LOGGED_OUT, user.getNickname()));
 
         log.info("You have been logged out, looking forward to your next visit!");
     }
