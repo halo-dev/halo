@@ -1,24 +1,16 @@
 package run.halo.app.model.properties;
 
 /**
- * SEO properties.
+ * Api properties.
  *
- * @author johnniang
  * @author ryanwang
- * @date 4/1/19
+ * @date 2019-06-25
  */
-public enum SeoProperties implements PropertyEnum {
+public enum ApiProperties implements PropertyEnum {
 
-    KEYWORDS("seo_keywords", String.class, ""),
+    API_ENABLED("api_enabled", Boolean.class, "false"),
 
-    DESCRIPTION("seo_description", String.class, ""),
-
-    BAIDU_TOKEN("seo_baidu_token", String.class, ""),
-
-    /**
-     * 是否禁止爬虫
-     */
-    SPIDER_DISABLED("seo_spider_disabled", Boolean.class, "false");
+    API_ACCESS_KEY("api_access_key", String.class, "");
 
     private final String value;
 
@@ -26,7 +18,7 @@ public enum SeoProperties implements PropertyEnum {
 
     private final String defaultValue;
 
-    SeoProperties(String value, Class<?> type, String defaultValue) {
+    ApiProperties(String value, Class<?> type, String defaultValue) {
         this.value = value;
         this.type = type;
         this.defaultValue = defaultValue;
