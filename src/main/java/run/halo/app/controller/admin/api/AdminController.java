@@ -2,11 +2,13 @@ package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
+import run.halo.app.model.support.BaseResponse;
 import run.halo.app.security.token.AuthToken;
 import run.halo.app.service.AdminService;
 
@@ -16,6 +18,7 @@ import javax.validation.Valid;
  * Admin controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/19/19
  */
 @Slf4j
@@ -73,4 +76,9 @@ public class AdminController {
         adminService.updateAdminAssets();
     }
 
+    @GetMapping("spring/logs")
+    @ApiOperation("Get application logs")
+    public BaseResponse<String> getSpringLogs() {
+        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(),adminService.getSpringLogs());
+    }
 }
