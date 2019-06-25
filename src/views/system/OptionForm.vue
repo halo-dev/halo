@@ -19,7 +19,10 @@
                   label="博客地址："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_url" placeholder="如：https://halo.run" />
+                  <a-input
+                    v-model="options.blog_url"
+                    placeholder="如：https://halo.run"
+                  />
                 </a-form-item>
                 <a-form-item
                   label="Logo："
@@ -73,6 +76,12 @@
               </span>
               <a-form layout="vertical">
                 <a-form-item
+                  label="屏蔽搜索引擎："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-switch v-model="options.seo_spider_disabled" />
+                </a-form-item>
+                <a-form-item
                   label="关键词： "
                   :wrapper-col="wrapperCol"
                 >
@@ -96,30 +105,6 @@
                 >
                   <a-input v-model="options.seo_baidu_token" />
                 </a-form-item> -->
-                <a-form-item
-                  label="百度站点验证："
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-input v-model="options.seo_verification_baidu" />
-                </a-form-item>
-                <a-form-item
-                  label="Google 站点验证："
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-input v-model="options.seo_verification_google" />
-                </a-form-item>
-                <a-form-item
-                  label="Bing 站点验证："
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-input v-model="options.seo_verification_bing" />
-                </a-form-item>
-                <a-form-item
-                  label="360 站点验证："
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-input v-model="options.seo_verification_qihu" />
-                </a-form-item>
                 <a-form-item>
                   <a-button
                     type="primary"
@@ -516,9 +501,9 @@
                 </a-tabs>
               </div>
             </a-tab-pane>
-            <a-tab-pane key="other">
+            <a-tab-pane key="api">
               <span slot="tab">
-                <a-icon type="align-left" />其他设置
+                <a-icon type="align-left" />API 设置
               </span>
               <a-form layout="vertical">
                 <a-form-item
@@ -533,12 +518,19 @@
                 >
                   <a-input v-model="options.api_access_key" />
                 </a-form-item>
-                <a-form-item
-                  label="屏蔽搜索引擎："
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-switch v-model="options.spider_disabled" />
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    @click="handleSaveOptions"
+                  >保存</a-button>
                 </a-form-item>
+              </a-form>
+            </a-tab-pane>
+            <a-tab-pane key="other">
+              <span slot="tab">
+                <a-icon type="align-left" />其他设置
+              </span>
+              <a-form layout="vertical">
                 <a-form-item
                   label="自定义 head："
                   :wrapper-col="wrapperCol"
