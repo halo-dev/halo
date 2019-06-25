@@ -21,20 +21,9 @@
     </#if>
 </#macro>
 
-<#-- 站点验证代码 -->
+<#-- 站点验证代码，已废弃 -->
 <#macro verification>
-    <#if options.seo_verification_google??>
-        <meta name="google-site-verification" content="${options.seo_verification_google}"/>
-    </#if>
-    <#if options.seo_verification_bing??>
-        <meta name="msvalidate.01" content="${options.seo_verification_bing}"/>
-    </#if>
-    <#if options.seo_verification_baidu??>
-        <meta name="baidu-site-verification" content="${options.seo_verification_baidu}"/>
-    </#if>
-    <#if options.seo_verification_qihu??>
-        <meta name="360-site-verification" content="${options.seo_verification_qihu}"/>
-    </#if>
+
 </#macro>
 
 <#-- 时间格式化 几...前 -->
@@ -53,7 +42,7 @@
 
 <#-- global head -->
 <#macro head>
-    <#if options.spider_disabled!false>
+    <#if options.seo_spider_disabled!false>
         <meta name="robots" content="none">
     </#if>
     <meta name="generator" content="Halo ${version!}"/>
