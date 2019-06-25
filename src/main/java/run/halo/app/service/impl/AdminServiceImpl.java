@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.lang.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,7 @@ import run.halo.app.service.*;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.HaloUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -372,5 +374,20 @@ public class AdminServiceImpl implements AdminService {
         cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
 
         return token;
+    }
+
+    /**
+     * Get spring logs.
+     *
+     * @return recently logs.
+     */
+    @Override
+    public String getSpringLogs() {
+        File file = new File(haloProperties.getWorkDir(), LOGS_PATH);
+        if (!file.exists()) {
+            return "暂无日志";
+        }
+        FileReader reader = new FileReader(file);
+        return reader.readString();
     }
 }

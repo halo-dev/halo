@@ -26,6 +26,8 @@ public interface AdminService {
 
     String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
 
+    String LOGS_PATH = "logs/spring.log";
+
     /**
      * Authenticates.
      *
@@ -69,4 +71,10 @@ public interface AdminService {
      * Updates halo admin assets.
      */
     void updateAdminAssets();
+
+    /**
+     * Get spring logs.
+     * @return recently logs.
+     */
+    String getSpringLogs();
 }
