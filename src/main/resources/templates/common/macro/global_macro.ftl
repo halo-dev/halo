@@ -24,16 +24,16 @@
 <#-- 站点验证代码 -->
 <#macro verification>
     <#if options.seo_verification_google??>
-        <meta name="google-site-verification" content="${options.seo_verification_google}" />
+        <meta name="google-site-verification" content="${options.seo_verification_google}"/>
     </#if>
     <#if options.seo_verification_bing??>
-        <meta name="msvalidate.01" content="${options.seo_verification_bing}" />
+        <meta name="msvalidate.01" content="${options.seo_verification_bing}"/>
     </#if>
     <#if options.seo_verification_baidu??>
-        <meta name="baidu-site-verification" content="${options.seo_verification_baidu}" />
+        <meta name="baidu-site-verification" content="${options.seo_verification_baidu}"/>
     </#if>
     <#if options.seo_verification_qihu??>
-        <meta name="360-site-verification" content="${options.seo_verification_qihu}" />
+        <meta name="360-site-verification" content="${options.seo_verification_qihu}"/>
     </#if>
 </#macro>
 
@@ -51,17 +51,28 @@
     </#if>
 </#macro>
 
+<#-- global head -->
 <#macro head>
     <#if options.spider_disabled!false>
-    <meta name="robots" content="none">
+        <meta name="robots" content="none">
     </#if>
-    <meta name="generator" content="Halo ${version!}" />
+    <meta name="generator" content="Halo ${version!}"/>
     <@custom_head />
     <@verification />
     <@favicon />
 </#macro>
 
+<#-- global footer -->
 <#macro footer>
     <@footer_info />
     <@statistics />
+</#macro>
+
+<#-- post comment module -->
+<#macro comment post,type>
+    <#if !post.disallowComment!false>
+        <script src="//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
+        <script src="//cdn.jsdelivr.net/gh/halo-dev/halo-comment@1.0.2/dist/halo-comment.min.js"></script>
+        <halo-comment id="${post.id}" type="${type}"/>
+    </#if>
 </#macro>

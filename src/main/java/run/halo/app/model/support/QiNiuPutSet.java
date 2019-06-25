@@ -17,6 +17,7 @@ public class QiNiuPutSet {
      * 文件hash值
      */
     public String hash;
+
     /**
      * 文件名
      */
