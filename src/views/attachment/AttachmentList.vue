@@ -99,7 +99,8 @@
               @click="handleShowDetailDrawer(item)"
             >
               <div class="attach-thumb">
-                <img :src="item.thumbPath">
+                <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
+                <img :src="item.thumbPath" v-show="handleJudgeMediaType(item)">
               </div>
               <a-card-meta>
                 <ellipsis
@@ -242,6 +243,23 @@ export default {
     onUploadClose() {
       this.loadAttachments()
       this.loadMediaTypes()
+    },
+    handleJudgeMediaType(attachment) {
+      var mediaType = attachment.mediaType
+      // 判断文件类型
+      if (mediaType) {
+        var prefix = mediaType.split('/')[0]
+
+        if (prefix === 'image') {
+          // 是图片
+          return true
+        } else {
+          // 非图片
+          return false
+        }
+      }
+      // 没有获取到文件返回false
+      return false
     }
   }
 }
@@ -262,12 +280,19 @@ export default {
   position: relative;
   padding-bottom: 56%;
   overflow: hidden;
-  img {
+  img, span{
     width: 100%;
     height: 100%;
     position: absolute;
     top: 0;
     left: 0;
+  }
+  span {
+    display: flex;
+    font-size: 12px;
+    align-items: center;
+    justify-content: center;
+    color: #9b9ea0;
   }
 }
 

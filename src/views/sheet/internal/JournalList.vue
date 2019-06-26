@@ -6,18 +6,12 @@
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword" />
+                    <a-input v-model="queryParam.keyword"/>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="状态">
                     <a-select placeholder="请选择状态">
                       <a-select-option value="1">公开</a-select-option>
@@ -25,32 +19,19 @@
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
-                    <a-button
-                      type="primary"
-                      @click="loadJournals(true)"
-                    >查询</a-button>
-                    <a-button
-                      style="margin-left: 8px;"
-                      @click="resetParam"
-                    >重置</a-button>
+                    <a-button type="primary" @click="loadJournals(true)">查询</a-button>
+                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
           <div class="table-operator">
-            <a-button
-              type="primary"
-              icon="plus"
-              @click="handleNew"
-            >写日志</a-button>
+            <a-button type="primary" icon="plus" @click="handleNew">写日志</a-button>
           </div>
-          <a-divider />
+          <a-divider/>
           <div style="margin-top:15px">
             <a-list
               itemLayout="vertical"
@@ -58,42 +39,46 @@
               :dataSource="journals"
               :loading="listLoading"
             >
-              <a-list-item
-                slot="renderItem"
-                slot-scope="item, index"
-                :key="index"
-              >
+              <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+                <!-- 日志图片集合 -->
+                <a-card
+                  hoverable
+                  v-for="(photo, photoIndex) in item.photos"
+                  :key="photoIndex"
+                  class="photo-card"
+                  @click="handlerPhotoPreview(photo)"
+                >
+                  <img alt="example" :src="photo.thumbnail" slot="cover">
+                </a-card>
+
+                <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancelPreview">
+                  <img
+                    :alt="previewPhoto.name + previewPhoto.description"
+                    style="width: 100%"
+                    :src="previewPhoto.url"
+                  >
+                </a-modal>
+
                 <template slot="actions">
                   <span>
                     <a href="javascript:void(0);">
-                      <a-icon
-                        type="like-o"
-                        style="margin-right: 8px"
-                      />{{ item.likes }}
+                      <a-icon type="like-o" style="margin-right: 8px"/>
+                      {{ item.likes }}
                     </a>
                   </span>
                   <span>
-                    <a
-                      href="javascript:void(0);"
-                      @click="handleCommentShow(item)"
-                    >
-
-                      <a-icon
-                        type="message"
-                        style="margin-right: 8px"
-                      />{{ item.commentCount }}
+                    <a href="javascript:void(0);" @click="handleCommentShow(item)">
+                      <a-icon type="message" style="margin-right: 8px"/>
+                      {{ item.commentCount }}
                     </a>
                   </span>
                   <!-- <span>
                     From 微信
-                  </span> -->
+                  </span>-->
                 </template>
                 <template slot="extra">
-                  <a
-                    href="javascript:void(0);"
-                    @click="handleEdit(item)"
-                  >编辑</a>
-                  <a-divider type="vertical" />
+                  <a href="javascript:void(0);" @click="handleEdit(item)">编辑</a>
+                  <a-divider type="vertical"/>
                   <a-popconfirm
                     title="你确定要删除这条日志？"
                     @confirm="handleDelete(item.id)"
@@ -103,13 +88,10 @@
                     <a href="javascript:void(0);">删除</a>
                   </a-popconfirm>
                 </template>
+
                 <a-list-item-meta :description="item.content">
                   <span slot="title">{{ item.createTime | moment }}</span>
-                  <a-avatar
-                    slot="avatar"
-                    size="large"
-                    :src="user.avatar"
-                  />
+                  <a-avatar slot="avatar" size="large" :src="user.avatar"/>
                 </a-list-item-meta>
               </a-list-item>
               <div class="page-wrapper">
@@ -132,29 +114,35 @@
     <!-- 编辑日志弹窗 -->
     <a-modal v-model="visible">
       <template slot="title">
-        {{ title }} <a-tooltip
-          slot="action"
-          title="只能输入250字"
-        >
-          <a-icon type="info-circle-o" />
+        {{ title }}
+        <a-tooltip slot="action" title="只能输入250字">
+          <a-icon type="info-circle-o"/>
         </a-tooltip>
       </template>
       <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="createOrUpdateJournal"
-        >
-          发布
-        </a-button>
+        <a-button key="submit" type="primary" @click="createOrUpdateJournal">发布</a-button>
       </template>
       <a-form layout="vertical">
         <a-form-item>
-          <a-input
-            type="textarea"
-            :autosize="{ minRows: 8 }"
-            v-model="journal.content"
-          />
+          <a-input type="textarea" :autosize="{ minRows: 8 }" v-model="journal.content"/>
+        </a-form-item>
+        <a-form-item v-show="showMoreOptions">
+          <UploadPhoto
+            @success="handlerPhotoUploadSuccess"
+            :photoList="photoList"
+            :plusPhotoVisible="plusPhotoVisible"
+          ></UploadPhoto>
+        </a-form-item>
+        <a-form-item>
+          <a
+            href="javascript:;"
+            class="more-options-btn"
+            type="default"
+            @click="handleUploadPhotoWallClick"
+          >
+            更多选项
+            <a-icon type="down"/>
+          </a>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -166,21 +154,11 @@
       v-model="selectCommentVisible"
     >
       <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleReplyComment"
-        >
-          回复
-        </a-button>
+        <a-button key="submit" type="primary" @click="handleReplyComment">回复</a-button>
       </template>
       <a-form layout="vertical">
         <a-form-item>
-          <a-input
-            type="textarea"
-            :autosize="{ minRows: 8 }"
-            v-model="replyComment.content"
-          />
+          <a-input type="textarea" :autosize="{ minRows: 8 }" v-model="replyComment.content"/>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -194,23 +172,16 @@
       destroyOnClose
       @close="()=>this.commentVisiable = false"
     >
-      <a-row
-        type="flex"
-        align="middle"
-      >
+      <a-row type="flex" align="middle">
         <a-col :span="24">
           <a-comment>
-            <a-avatar
-              :src="user.avatar"
-              :alt="user.nickname"
-              slot="avatar"
-            />
+            <a-avatar :src="user.avatar" :alt="user.nickname" slot="avatar"/>
             <p slot="content">{{ journal.content }}</p>
 
             <span slot="datetime">{{ journal.createTime | moment }}</span>
           </a-comment>
         </a-col>
-        <a-divider />
+        <a-divider/>
         <a-col :span="24">
           <journal-comment-tree
             v-for="(comment,index) in comments"
@@ -231,12 +202,22 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import journalApi from '@/api/journal'
 import journalCommentApi from '@/api/journalComment'
 import userApi from '@/api/user'
-
+import UploadPhoto from '@/components/Upload/UploadPhoto.vue'
 export default {
   mixins: [mixin, mixinDevice],
-  components: { JournalCommentTree },
+  components: { JournalCommentTree, UploadPhoto },
   data() {
     return {
+      plusPhotoVisible: true,
+      photoList: [], // 编辑图片时回显所需对象
+      previewVisible: false,
+      showMoreOptions: false,
+      previewPhoto: {
+        // 图片预览信息临时对象
+        name: '',
+        description: '',
+        url: ''
+      },
       title: '发表',
       listLoading: false,
       visible: false,
@@ -255,7 +236,12 @@ export default {
       },
       journals: [],
       comments: [],
-      journal: {},
+      journal: {
+        id: undefined,
+        content: '',
+        photos: []
+      },
+      journalPhotos: [], // 日志图片集合最多九张
       selectComment: null,
       replyComment: {},
       user: {}
@@ -266,6 +252,30 @@ export default {
     this.loadUser()
   },
   methods: {
+    handleCancelPreview() {
+      this.previewVisible = false
+    },
+    handlerPhotoPreview(photo) {
+      // 日志图片预览
+      this.previewVisible = true
+      this.previewPhoto = photo
+    },
+    handlerPhotoUploadSuccess(response, file) {
+      var callData = response.data.data
+      var photo = {
+        name: callData.name,
+        url: callData.path,
+        thumbnail: callData.thumbPath,
+        suffix: callData.suffix,
+        width: callData.width,
+        height: callData.height
+      }
+      this.journalPhotos.push(photo)
+    },
+    handleUploadPhotoWallClick() {
+      // 是否显示上传照片墙组件
+      this.showMoreOptions = !this.showMoreOptions
+    },
     loadJournals(isSearch) {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -289,11 +299,19 @@ export default {
       this.title = '新建'
       this.visible = true
       this.journal = {}
+
+      // 显示图片上传框
+      this.plusPhotoVisible = true
+      this.photoList = []
     },
     handleEdit(item) {
       this.title = '编辑'
       this.journal = item
       this.visible = true
+
+      // 为编辑时需要回显图片数组赋值,并隐藏图片上传框
+      this.plusPhotoVisible = false
+      this.photoList = item.photos
     },
     handleDelete(id) {
       journalApi.delete(id).then(response => {
@@ -330,6 +348,9 @@ export default {
       })
     },
     createOrUpdateJournal() {
+      // 给属性填充数据
+      this.journal.photos = this.journalPhotos
+
       if (this.journal.id) {
         journalApi.update(this.journal.id, this.journal).then(response => {
           this.$message.success('更新成功！')
@@ -339,6 +360,7 @@ export default {
         journalApi.create(this.journal).then(response => {
           this.$message.success('发表成功！')
           this.loadJournals()
+          this.photoList = []
         })
       }
       this.visible = false
@@ -356,3 +378,16 @@ export default {
   }
 }
 </script>
+<style scoped="scoped">
+.more-options-btn {
+  margin-left: 15px;
+  text-decoration: none;
+}
+
+/* 日志图片卡片样式 */
+.photo-card {
+  width: 104px;
+  display: inline-block;
+  margin-right: 5px;
+}
+</style>

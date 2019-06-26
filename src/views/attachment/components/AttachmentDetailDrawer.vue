@@ -18,7 +18,15 @@
           :paragraph="{rows: 8}"
         >
           <div class="attach-detail-img">
-            <img :src="attachment.path">
+            <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
+            <img :src="attachment.path" v-show="photoPreviewVisible">
+            <video-player
+              class="video-player-box"
+              v-show="videoPreviewVisible"
+              ref="videoPlayer"
+              :options="playerOptions"
+              :playsinline="true">
+            </video-player>
           </div>
         </a-skeleton>
       </a-col>
@@ -74,7 +82,7 @@
                 <span slot="title">附件大小：</span>
               </a-list-item-meta>
             </a-list-item>
-            <a-list-item>
+            <a-list-item v-if="photoPreviewVisible">
               <a-list-item-meta :description="attachment.height+'x'+attachment.width">
                 <span slot="title">图片尺寸：</span>
               </a-list-item-meta>
@@ -100,7 +108,7 @@
                 </span>
               </a-list-item-meta>
             </a-list-item>
-            <a-list-item>
+            <a-list-item v-if="photoPreviewVisible">
               <a-list-item-meta>
                 <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
                 <span slot="title">
@@ -148,15 +156,40 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import attachmentApi from '@/api/attachment'
 import photoApi from '@/api/photo'
+import 'video.js/dist/video-js.css'
+import { videoPlayer } from 'vue-video-player'
 
 export default {
   name: 'AttachmentDetailDrawer',
   mixins: [mixin, mixinDevice],
+  components: {
+    videoPlayer
+  },
   data() {
     return {
       detailLoading: true,
       editable: false,
-      photo: {}
+      photo: {},
+      photoPreviewVisible: false,
+      videoPreviewVisible: false,
+      nonsupportPreviewVisible: false,
+      playerOptions: {
+        // videojs options
+        muted: true,
+        language: 'zh-CN',
+        aspectRatio: '16:9',
+        fluid: true,
+        controls: true,
+        loop: false,
+        playbackRates: [0.7, 1.0, 1.5, 2.0],
+        sources: [{
+          type: 'video/mp4',
+          src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
+        }],
+        poster: '/static/images/author.jpg',
+        width: document.documentElement.clientWidth,
+        notSupportedMessage: '此视频暂无法播放，请稍后再试'
+      }
     }
   },
   model: {
@@ -182,12 +215,23 @@ export default {
   created() {
     this.loadSkeleton()
   },
+  computed: {
+    player() {
+      return this.$refs.videoPlayer.player
+    }
+  },
   watch: {
     visiable: function(newValue, oldValue) {
       this.$log.debug('old value', oldValue)
       this.$log.debug('new value', newValue)
       if (newValue) {
         this.loadSkeleton()
+      }
+    },
+    attachment: function(newValue, oldValue) {
+      if (newValue) {
+        var attachment = newValue
+        this.handleJudgeMediaType(attachment)
       }
     }
   },
@@ -250,13 +294,56 @@ export default {
     },
     onClose() {
       this.$emit('close', false)
+    },
+    handleJudgeMediaType(attachment) {
+      var mediaType = attachment.mediaType
+      // 判断文件类型
+      if (mediaType) {
+        var prefix = mediaType.split('/')[0]
+
+        if (prefix === 'video' || prefix === 'flv') {
+          this.videoPreviewVisible = true
+          this.photoPreviewVisible = false
+          this.nonsupportPreviewVisible = false
+          // 设置视频地址
+          this.$set(this.playerOptions.sources, 0, {
+            type: mediaType,
+            src: attachment.path
+          })
+          console.log(this.playerOptions.sources)
+        } else if (prefix === 'image') {
+          this.photoPreviewVisible = true
+          this.videoPreviewVisible = false
+          this.nonsupportPreviewVisible = false
+        } else {
+          this.nonsupportPreviewVisible = true
+          this.videoPreviewVisible = false
+          this.photoPreviewVisible = false
+        }
+      }
     }
+    // handleDownLoadPhoto(attachment) {
+    //   var path = attachment.path
+
+    //   var index = path.lastIndexOf('/')
+    //   var filename = path.substr(index+1, path.length)
+    //   //  chrome/firefox
+    //   var aTag = document.createElement('a')
+    //   aTag.download = filename
+    //   aTag.href = path//URL.createObjectURL(blob)
+    //   aTag.target = '_blank'
+    //   aTag.click()
+    //   URL.revokeObjectURL(aTag.href)
+    // }
   }
 }
 </script>
 
 <style scope>
 .attach-detail-img img {
+  width: 100%;
+}
+.video-player-box {
   width: 100%;
 }
 </style>

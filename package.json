@@ -21,12 +21,13 @@
     "vue": "^2.6.10",
     "vue-clipboard2": "^0.3.0",
     "vue-codemirror-lite": "^1.0.4",
+    "vue-count-to": "^1.0.13",
     "vue-cropper": "0.4.9",
     "vue-ls": "^3.2.1",
     "vue-router": "^3.0.6",
+    "vue-video-player": "^5.0.2",
     "vuejs-logger": "^1.5.3",
-    "vuex": "^3.1.1",
-    "vue-count-to": "^1.0.13"
+    "vuex": "^3.1.1"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.4.4",
