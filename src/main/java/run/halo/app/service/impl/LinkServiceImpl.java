@@ -36,12 +36,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         this.linkRepository = linkRepository;
     }
 
-    /**
-     * List link dtos.
-     *
-     * @param sort sort
-     * @return all links
-     */
     @Override
     public List<LinkDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");

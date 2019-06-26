@@ -85,13 +85,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         return listAll(pageable);
     }
 
-    /**
-     * Gets sheet by post status and url.
-     *
-     * @param status post status must not be null
-     * @param url    sheet url must not be blank
-     * @return sheet info
-     */
     @Override
     public Sheet getBy(PostStatus status, String url) {
         Sheet sheet = super.getBy(status, url);

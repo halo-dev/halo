@@ -376,11 +376,6 @@ public class AdminServiceImpl implements AdminService {
         return token;
     }
 
-    /**
-     * Get spring logs.
-     *
-     * @return recently logs.
-     */
     @Override
     public String getSpringLogs() {
         File file = new File(haloProperties.getWorkDir(), LOGS_PATH);

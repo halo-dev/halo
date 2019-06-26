@@ -51,12 +51,6 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         return create(menuParam.convertTo());
     }
 
-    /**
-     * Lists as menu tree.
-     *
-     * @param sort sort info must not be null
-     * @return a menu tree
-     */
     @Override
     public List<MenuVO> listAsTree(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
