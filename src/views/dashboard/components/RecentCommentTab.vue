@@ -9,7 +9,7 @@
       slot-scope="item, index"
       :key="index"
     >
-      <a-comment :avatar="'//cn.gravatar.com/avatar/'+item.gavatarMd5+'/?s=256&d=mp'">
+      <a-comment :avatar="'//cn.gravatar.com/avatar/'+item.gravatarMd5+'/?s=256&d=mp'">
         <template
           slot="author"
           v-if="type==='posts'"

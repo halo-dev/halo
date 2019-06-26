@@ -8,7 +8,7 @@
       <a-col :span="24">
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
-          :dataSource="themes"
+          :dataSource="sortedThemes"
           :loading="themeLoading"
         >
           <a-list-item
@@ -35,16 +35,23 @@
                   <a-icon
                     type="unlock"
                     theme="twoTone"
+                    style="margin-right:3px"
                   />已启用
                 </div>
                 <div
                   v-else
                   @click="handleActivateClick(item)"
                 >
-                  <a-icon type="lock" />启用
+                  <a-icon
+                    type="lock"
+                    style="margin-right:3px"
+                  />启用
                 </div>
                 <div @click="handleEditClick(item)">
-                  <a-icon type="setting" />设置
+                  <a-icon
+                    type="setting"
+                    style="margin-right:3px"
+                  />设置
                 </div>
                 <a-dropdown
                   placement="topCenter"
@@ -54,7 +61,10 @@
                     class="ant-dropdown-link"
                     href="#"
                   >
-                    <a-icon type="ellipsis" />更多
+                    <a-icon
+                      type="ellipsis"
+                      style="margin-right:3px"
+                    />更多
                   </a>
                   <a-menu slot="overlay">
                     <a-menu-item
@@ -68,10 +78,16 @@
                         okText="确定"
                         cancelText="取消"
                       >
-                        <a-icon type="delete" />删除
+                        <a-icon
+                          type="delete"
+                          style="margin-right:3px"
+                        />删除
                       </a-popconfirm>
                       <span v-else>
-                        <a-icon type="delete" />删除
+                        <a-icon
+                          type="delete"
+                          style="margin-right:3px"
+                        />删除
                       </span>
                     </a-menu-item>
                     <a-menu-item :key="2">
@@ -81,7 +97,10 @@
                         okText="确定"
                         cancelText="取消"
                       >
-                        <a-icon type="download" />更新
+                        <a-icon
+                          type="download"
+                          style="margin-right:3px"
+                        />更新
                       </a-popconfirm>
                     </a-menu-item>
                   </a-menu>
@@ -362,7 +381,7 @@ export default {
       attachmentDrawerVisible: false,
       themes: [],
       visible: false,
-      themeConfiguration: null,
+      themeConfiguration: [],
       themeSettings: [],
       themeProperty: null,
       fetchingUrl: null,
@@ -370,8 +389,11 @@ export default {
     }
   },
   computed: {
-    activatedTheme() {
-      return this.themes.find(theme => theme.activated)
+    sortedThemes() {
+      const data = this.themes.slice(0)
+      return data.sort(function(a, b) {
+        return b.activated - a.activated
+      })
     }
   },
   created() {
@@ -439,7 +461,7 @@ export default {
     onClose() {
       this.visible = false
       this.optionLoading = false
-      this.themeConfiguration = null
+      this.themeConfiguration = []
       this.themeProperty = null
     },
     handleChange(info) {

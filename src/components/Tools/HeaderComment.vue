@@ -25,7 +25,7 @@
                     <a-avatar
                       style="background-color: white"
                       slot="avatar"
-                      :src="'//cn.gravatar.com/avatar/' + item.gavatarMd5 + '&d=mm'"
+                      :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
                       size="large"
                     />
                     <template slot="title">
@@ -54,7 +54,7 @@
                     <a-avatar
                       style="background-color: white"
                       slot="avatar"
-                      :src="'//cn.gravatar.com/avatar/' + item.gavatarMd5 + '&d=mm'"
+                      :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
                       size="large"
                     />
                     <template slot="title">

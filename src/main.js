@@ -10,8 +10,10 @@ import './permission'
 import '@/utils/filter' // global filter
 import './components'
 import animated from 'animate.css'
+import { version } from '../package.json'
 
 Vue.config.productionTip = false
+Vue.prototype.VERSION = version
 
 Vue.use(router)
 Vue.use(animated)
