@@ -78,24 +78,11 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         return getByUsername(username).orElseThrow(() -> new NotFoundException("The username dose not exist").setErrorData(username));
     }
 
-    /**
-     * Gets user by email.
-     *
-     * @param email email must not be blank
-     * @return an optional user
-     */
     @Override
     public Optional<User> getByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    /**
-     * Gets non null user by email.
-     *
-     * @param email email
-     * @return user info
-     * @throws NotFoundException throws when the username does not exist
-     */
     @Override
     public User getByEmailOfNonNull(String email) {
         return getByEmail(email).orElseThrow(() -> new NotFoundException("The email dose not exist").setErrorData(email));
