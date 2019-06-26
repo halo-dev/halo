@@ -18,7 +18,8 @@
           :paragraph="{rows: 8}"
         >
           <div class="attach-detail-img">
-            <img :src="attachment.path">
+            <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
+            <img :src="attachment.path" v-if="photoPreviewVisible">
           </div>
         </a-skeleton>
       </a-col>
@@ -74,7 +75,7 @@
                 <span slot="title">附件大小：</span>
               </a-list-item-meta>
             </a-list-item>
-            <a-list-item>
+            <a-list-item v-if="photoPreviewVisible">
               <a-list-item-meta :description="attachment.height+'x'+attachment.width">
                 <span slot="title">图片尺寸：</span>
               </a-list-item-meta>
@@ -100,7 +101,7 @@
                 </span>
               </a-list-item-meta>
             </a-list-item>
-            <a-list-item>
+            <a-list-item v-if="photoPreviewVisible">
               <a-list-item-meta>
                 <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
                 <span slot="title">
@@ -156,7 +157,10 @@ export default {
     return {
       detailLoading: true,
       editable: false,
-      photo: {}
+      photo: {},
+      photoPreviewVisible: false,
+      vedioPreviewVisible: false,
+      nonsupportPreviewVisible: false
     }
   },
   model: {
@@ -188,6 +192,13 @@ export default {
       this.$log.debug('new value', newValue)
       if (newValue) {
         this.loadSkeleton()
+      }
+    },
+    attachment: function(newValue, oldValue) {
+      if (newValue) {
+        var attachment = newValue
+        var mediaType = attachment.mediaType
+        this.handleJudgeMediaType(mediaType)
       }
     }
   },
@@ -250,6 +261,24 @@ export default {
     },
     onClose() {
       this.$emit('close', false)
+    },
+    handleJudgeMediaType(mediaType) {
+      // 判断文件类型
+      if(mediaType) {
+        var prefix = mediaType.split('/')[0]
+        
+        if(prefix === 'video' || prefix==='flv') {
+          this.vedioPreviewVisible = true
+          this.nonsupportPreviewVisible = false
+        } else if(prefix === 'image') {
+           this.photoPreviewVisible = true
+           this.nonsupportPreviewVisible = false
+        } else {
+          this.nonsupportPreviewVisible = true
+          this.vedioPreviewVisible = false
+          this.photoPreviewVisible = false
+        }
+      }
     }
   }
 }
