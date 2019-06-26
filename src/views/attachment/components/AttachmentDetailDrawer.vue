@@ -20,11 +20,13 @@
           <div class="attach-detail-img">
             <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
             <img :src="attachment.path" v-show="photoPreviewVisible">
-            <video-player  class="video-player-box" v-show="videoPreviewVisible"
-                 ref="videoPlayer"
-                 :options="playerOptions"
-                 :playsinline="true">
-              </video-player>
+            <video-player
+              class="video-player-box"
+              v-show="videoPreviewVisible"
+              ref="videoPlayer"
+              :options="playerOptions"
+              :playsinline="true">
+            </video-player>
           </div>
         </a-skeleton>
       </a-col>
@@ -179,13 +181,12 @@ export default {
         fluid: true,
         controls: true,
         loop: false,
-        muted: false,
         playbackRates: [0.7, 1.0, 1.5, 2.0],
         sources: [{
-          type: "video/mp4",
-          src: "https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm"
+          type: 'video/mp4',
+          src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
         }],
-        poster: "/static/images/author.jpg",
+        poster: '/static/images/author.jpg',
         width: document.documentElement.clientWidth,
         notSupportedMessage: '此视频暂无法播放，请稍后再试'
       }
@@ -297,10 +298,10 @@ export default {
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType
       // 判断文件类型
-      if(mediaType) {
+      if (mediaType) {
         var prefix = mediaType.split('/')[0]
-        
-        if(prefix === 'video' || prefix==='flv') {
+
+        if (prefix === 'video' || prefix === 'flv') {
           this.videoPreviewVisible = true
           this.photoPreviewVisible = false
           this.nonsupportPreviewVisible = false
@@ -310,10 +311,10 @@ export default {
             src: attachment.path
           })
           console.log(this.playerOptions.sources)
-        } else if(prefix === 'image') {
-           this.photoPreviewVisible = true
-           this.videoPreviewVisible = false
-           this.nonsupportPreviewVisible = false
+        } else if (prefix === 'image') {
+          this.photoPreviewVisible = true
+          this.videoPreviewVisible = false
+          this.nonsupportPreviewVisible = false
         } else {
           this.nonsupportPreviewVisible = true
           this.videoPreviewVisible = false
@@ -321,6 +322,19 @@ export default {
         }
       }
     }
+    // handleDownLoadPhoto(attachment) {
+    //   var path = attachment.path
+
+    //   var index = path.lastIndexOf('/')
+    //   var filename = path.substr(index+1, path.length)
+    //   //  chrome/firefox
+    //   var aTag = document.createElement('a')
+    //   aTag.download = filename
+    //   aTag.href = path//URL.createObjectURL(blob)
+    //   aTag.target = '_blank'
+    //   aTag.click()
+    //   URL.revokeObjectURL(aTag.href)
+    // }
   }
 }
 </script>

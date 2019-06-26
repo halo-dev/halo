@@ -247,18 +247,18 @@ export default {
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType
       // 判断文件类型
-      if(mediaType) {
+      if (mediaType) {
         var prefix = mediaType.split('/')[0]
-        
-        if(prefix === 'image') {
+
+        if (prefix === 'image') {
           // 是图片
-           return true
+          return true
         } else {
-           // 非图片
+          // 非图片
           return false
         }
       }
-      //没有获取到文件返回false
+      // 没有获取到文件返回false
       return false
     }
   }
