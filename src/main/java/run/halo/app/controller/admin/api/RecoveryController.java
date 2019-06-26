@@ -40,7 +40,7 @@ public class RecoveryController {
             @ApiParam("This file content type should be json")
             @RequestPart("file") MultipartFile file) {
         if (optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false)) {
-            throw new BadRequestException("不能在博客初始化完成之后迁移数据");
+            throw new BadRequestException("无法在博客初始化完成之后迁移数据");
         }
 
         recoveryService.migrateFromV0_4_3(file);

@@ -135,7 +135,7 @@ public class AdminServiceImpl implements AdminService {
                     userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
         } catch (NotFoundException e) {
             log.error("Failed to find user by name: " + username, e);
-            eventPublisher.publishEvent(new LogEvent(this, "", LogType.LOGIN_FAILED, loginParam.getUsername()));
+            eventPublisher.publishEvent(new LogEvent(this, loginParam.getUsername(), LogType.LOGIN_FAILED, loginParam.getUsername()));
 
             throw new BadRequestException(mismatchTip);
         }
@@ -144,7 +144,7 @@ public class AdminServiceImpl implements AdminService {
 
         if (!userService.passwordMatch(user, loginParam.getPassword())) {
             // If the password is mismatch
-            eventPublisher.publishEvent(new LogEvent(this, "", LogType.LOGIN_FAILED, loginParam.getUsername()));
+            eventPublisher.publishEvent(new LogEvent(this, loginParam.getUsername(), LogType.LOGIN_FAILED, loginParam.getUsername()));
 
             throw new BadRequestException(mismatchTip);
         }
