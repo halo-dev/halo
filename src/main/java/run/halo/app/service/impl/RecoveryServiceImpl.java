@@ -218,6 +218,10 @@ public class RecoveryServiceImpl implements RecoveryService {
         // Handle comments
         List<BaseComment> baseComments = handleComment(commentsObject, createdPost.getId());
 
+        // TODO Handle categories
+
+        // TODO Handle tags
+
         List<PostComment> postComments = baseComments.stream()
                 .map(baseComment -> BeanUtils.transformFrom(baseComment, PostComment.class))
                 .collect(Collectors.toList());
