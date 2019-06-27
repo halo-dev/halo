@@ -11,10 +11,11 @@ import run.halo.app.service.base.CrudService;
 import java.util.List;
 
 /**
- * Menu service.
+ * Menu service interface.
  *
  * @author johnniang
  * @author ryanwang
+ * @date 2019-03-14
  */
 public interface MenuService extends CrudService<Menu, Integer> {
 

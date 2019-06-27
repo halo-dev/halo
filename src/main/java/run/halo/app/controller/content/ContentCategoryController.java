@@ -85,7 +85,7 @@ public class ContentCategoryController {
                              @PathVariable("page") Integer page,
                              @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         // Get category by slug name
-        final Category category = categoryService.getBySlugName(slugName);
+        final Category category = categoryService.getBySlugNameOfNonNull(slugName);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), pageable);

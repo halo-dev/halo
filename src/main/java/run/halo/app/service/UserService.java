@@ -11,9 +11,10 @@ import run.halo.app.service.base.CrudService;
 import java.util.Optional;
 
 /**
- * User service.
+ * User service interface.
  *
  * @author johnniang
+ * @date 2019-03-14
  */
 public interface UserService extends CrudService<User, Integer> {
 

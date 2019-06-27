@@ -58,7 +58,7 @@ public class CategoryController {
     public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
                                                @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
         // Get category by slug name
-        Category category = categoryService.getBySlugName(slugName);
+        Category category = categoryService.getBySlugNameOfNonNull(slugName);
 
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), pageable);
         return postService.convertToSimple(postPage);

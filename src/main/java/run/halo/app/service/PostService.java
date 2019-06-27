@@ -17,10 +17,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Post service.
+ * Post service interface.
  *
  * @author johnniang
  * @author ryanwang
+ * @date 2019-03-14
  */
 public interface PostService extends BasePostService<Post> {
 

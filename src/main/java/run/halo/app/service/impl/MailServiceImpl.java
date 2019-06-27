@@ -20,7 +20,7 @@ import java.util.Properties;
  * Mail service implementation.
  *
  * @author ryanwang
- * @date : 2019-03-17
+ * @date 2019-03-17
  */
 @Slf4j
 @Service

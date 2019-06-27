@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * MenuService implementation class
+ * MenuService implementation class.
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implements MenuService {
