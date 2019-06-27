@@ -280,7 +280,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(markdown, "Markdown document must not be null");
 
         // Render markdown to html document.
-        String content = MarkdownUtils.renderMarkdown(markdown);
+        String content = MarkdownUtils.renderHtml(markdown);
 
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
@@ -462,8 +462,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
             if (StringUtils.isBlank(postListVO.getSummary())) {
-                // Set summary
-                postListVO.setSummary(convertToSummary(post.getOriginalContent()));
+                // TODO Set summary
             }
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);

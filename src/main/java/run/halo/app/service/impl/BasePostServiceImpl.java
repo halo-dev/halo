@@ -212,7 +212,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(post, "Post must not be null");
 
         // Render content
-        post.setFormatContent(MarkdownUtils.renderMarkdown(post.getOriginalContent()));
+        post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
 
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
@@ -275,7 +275,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         // Set summary
         if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
-            basePostSimpleDTO.setSummary(convertToSummary(post.getOriginalContent()));
+            // TODO build post summary
         }
 
         return basePostSimpleDTO;
@@ -348,14 +348,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     @NonNull
     protected String convertToSummary(@Nullable String markdownContent) {
-        // Render text content
-        String textContent = MarkdownUtils.renderText(markdownContent);
-
         // Get summary length
         Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
-        // Set summary
-        return StringUtils.substring(textContent, 0, summaryLength);
+        // TODO build summary.
+        return "";
     }
 
 }

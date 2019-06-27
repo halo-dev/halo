@@ -102,11 +102,12 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Assert.notNull(markdown, "Markdown document must not be null");
 
         // Render markdown to html document.
-        String content = MarkdownUtils.renderMarkdown(markdown);
+        String content = MarkdownUtils.renderHtml(markdown);
 
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 
+        // TODO
         return null;
     }
 
