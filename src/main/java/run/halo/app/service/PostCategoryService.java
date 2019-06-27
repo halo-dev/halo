@@ -21,7 +21,7 @@ import java.util.Set;
  * Post category service interface.
  *
  * @author johnniang
- * @date 3/19/19
+ * @date 2019-03-19
  */
 public interface PostCategoryService extends CrudService<PostCategory, Integer> {
 

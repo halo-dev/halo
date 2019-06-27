@@ -40,7 +40,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Base post service implementation.
  *
  * @author johnniang
- * @date 19-4-24
+ * @date 2019-04-24
  */
 @Slf4j
 public abstract class BasePostServiceImpl<POST extends BasePost> extends AbstractCrudService<POST, Integer> implements BasePostService<POST> {

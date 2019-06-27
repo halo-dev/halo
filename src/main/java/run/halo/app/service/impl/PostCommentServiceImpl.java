@@ -32,7 +32,8 @@ import java.util.stream.Collectors;
  * PostCommentService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @author johnniang
+ * @date 2019-03-14
  */
 @Slf4j
 @Service

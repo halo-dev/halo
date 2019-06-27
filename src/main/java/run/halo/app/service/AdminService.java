@@ -7,11 +7,11 @@ import run.halo.app.model.params.LoginParam;
 import run.halo.app.security.token.AuthToken;
 
 /**
- * Admin service.
+ * Admin service interface.
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-29
+ * @date 2019-04-29
  */
 public interface AdminService {
 

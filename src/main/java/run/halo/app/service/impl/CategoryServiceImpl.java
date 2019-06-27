@@ -24,9 +24,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * CategoryService implementation class
+ * CategoryService implementation class.
  *
  * @author ryanwang
+ * @author johnniang
  * @date : 2019-03-14
  */
 @Slf4j
@@ -146,7 +147,12 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     @Override
     public Category getBySlugName(String slugName) {
-        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该分类已存在").setErrorData(slugName));
+        return categoryRepository.getBySlugName(slugName).orElse(null);
+    }
+
+    @Override
+    public Category getBySlugNameOfNonNull(String slugName) {
+        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该分类不存在").setErrorData(slugName));
     }
 
     @Override

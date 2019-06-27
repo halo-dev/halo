@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Post tag service implementation.
  *
  * @author johnniang
- * @date 3/19/19
+ * @date 2019-03-19
  */
 @Service
 public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> implements PostTagService {

@@ -51,7 +51,7 @@ import static run.halo.app.model.support.HaloConst.*;
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-29
+ * @date 2019-04-29
  */
 @Slf4j
 @Service

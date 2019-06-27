@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * PhotoService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implements PhotoService {

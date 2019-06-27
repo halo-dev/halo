@@ -31,10 +31,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
- * UserService implementation class
+ * UserService implementation class.
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @author johnniang
+ * @date 2019-03-14
  */
 @Service
 public class UserServiceImpl extends AbstractCrudService<User, Integer> implements UserService {

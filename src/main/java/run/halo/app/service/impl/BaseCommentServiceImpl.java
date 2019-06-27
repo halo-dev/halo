@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * Base comment service implementation.
  *
  * @author johnniang
- * @date 19-4-24
+ * @date 2019-04-24
  */
 @Slf4j
 public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extends AbstractCrudService<COMMENT, Long> implements BaseCommentService<COMMENT> {

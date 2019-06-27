@@ -17,10 +17,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * TagService implementation class
+ * TagService implementation class.
  *
+ * @author johnniang
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Slf4j
 @Service
@@ -51,9 +52,13 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
 
     @Override
     public Tag getBySlugNameOfNonNull(String slugName) {
-        return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该标签已存在").setErrorData(slugName));
+        return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该标签不存在").setErrorData(slugName));
     }
 
+    @Override
+    public Tag getBySlugName(String slugName) {
+        return tagRepository.getBySlugName(slugName).orElse(null);
+    }
 
     @Override
     public Tag getByName(String name) {

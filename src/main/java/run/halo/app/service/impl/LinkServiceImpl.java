@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * LinkService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implements LinkService {
