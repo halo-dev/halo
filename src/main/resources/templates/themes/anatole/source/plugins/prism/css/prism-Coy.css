@@ -1,13 +1,13 @@
-/* PrismJS 1.14.0
-http://prismjs.com/download.html#themes=prism-coy&languages=markup+css+clike+javascript+abap+actionscript+ada+apacheconf+apl+applescript+c+arff+asciidoc+asm6502+aspnet+autohotkey+autoit+bash+basic+batch+bison+brainfuck+bro+cpp+csharp+arduino+coffeescript+clojure+ruby+csp+css-extras+d+dart+diff+django+docker+eiffel+elixir+elm+markup-templating+erlang+fsharp+flow+fortran+gedcom+gherkin+git+glsl+go+graphql+groovy+haml+handlebars+haskell+haxe+http+hpkp+hsts+ichigojam+icon+inform7+ini+io+j+java+jolie+json+julia+keyman+kotlin+latex+less+liquid+lisp+livescript+lolcode+lua+makefile+markdown+erb+matlab+mel+mizar+monkey+n4js+nasm+nginx+nim+nix+nsis+objectivec+ocaml+opencl+oz+parigp+parser+pascal+perl+php+php-extras+sql+powershell+processing+prolog+properties+protobuf+pug+puppet+pure+python+q+qore+r+jsx+typescript+renpy+reason+rest+rip+roboconf+crystal+rust+sas+sass+scss+scala+scheme+smalltalk+smarty+plsql+soy+stylus+swift+tcl+textile+twig+tsx+vbnet+velocity+verilog+vhdl+vim+visual-basic+wasm+wiki+xeora+xojo+yaml&plugins=line-numbers */
+/* PrismJS 1.15.0
+https://prismjs.com/download.html#themes=prism-coy&languages=markup+css+clike+javascript+apacheconf+applescript+c+csharp+autohotkey+bash+basic+cpp+aspnet+arduino+ruby+css-extras+d+dart+django+docker+markup-templating+git+go+groovy+less+haskell+http+hpkp+hsts+ini+java+javastacktrace+json+julia+kotlin+latex+markdown+lua+makefile+nginx+objectivec+opencl+perl+php+php-extras+sql+powershell+properties+scss+pure+python+r+jsx+typescript+rust+sass+stylus+scala+scheme+plsql+pug+swift+yaml+haml+toml+tsx+vbnet+velocity+vim+visual-basic */
 /**
  * prism.js Coy theme for JavaScript, CoffeeScript, CSS and HTML
  * Based on https://github.com/tshedor/workshop-wp-theme (Example: http://workshop.kansan.com/category/sessions/basics or http://workshop.timshedor.com/category/sessions/basics);
  * @author Tim  Shedor
  */
 
-code[class*="lang-"],
-pre[class*="lang-"] {
+code[class*="language-"],
+pre[class*="language-"] {
 	color: black;
 	background: none;
 	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -29,13 +29,13 @@ pre[class*="lang-"] {
 }
 
 /* Code blocks */
-pre[class*="lang-"] {
+pre[class*="language-"] {
 	position: relative;
 	margin: .5em 0;
 	overflow: visible;
 	padding: 0;
 }
-pre[class*="lang-"]>code {
+pre[class*="language-"]>code {
 	position: relative;
 	border-left: 10px solid #358ccb;
 	box-shadow: -1px 0px 0px 0px #358ccb, 0px 0px 0px 1px #dfdfdf;
@@ -46,7 +46,7 @@ pre[class*="lang-"]>code {
 	background-attachment: local;
 }
 
-code[class*="lang"] {
+code[class*="language"] {
 	max-height: inherit;
 	height: inherit;
 	padding: 0 1em;
@@ -54,9 +54,9 @@ code[class*="lang"] {
 	overflow: auto;
 }
 
-/* Margin bottom to accomodate shadow */
-:not(pre) > code[class*="lang-"],
-pre[class*="lang-"] {
+/* Margin bottom to accommodate shadow */
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
 	background-color: #fdfdfd;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -65,7 +65,7 @@ pre[class*="lang-"] {
 }
 
 /* Inline code */
-:not(pre) > code[class*="lang-"] {
+:not(pre) > code[class*="language-"] {
 	position: relative;
 	padding: .2em;
 	border-radius: 0.3em;
@@ -75,8 +75,8 @@ pre[class*="lang-"] {
 	white-space: normal;
 }
 
-pre[class*="lang-"]:before,
-pre[class*="lang-"]:after {
+pre[class*="language-"]:before,
+pre[class*="language-"]:after {
 	content: '';
 	z-index: -2;
 	display: block;
@@ -94,8 +94,8 @@ pre[class*="lang-"]:after {
 	transform: rotate(-2deg);
 }
 
-:not(pre) > code[class*="lang-"]:after,
-pre[class*="lang-"]:after {
+:not(pre) > code[class*="language-"]:after,
+pre[class*="language-"]:after {
 	right: 0.75em;
 	left: auto;
 	-webkit-transform: rotate(2deg);
@@ -158,7 +158,7 @@ pre[class*="lang-"]:after {
 	color: #e90;
 }
 
-.lang-css .token.string,
+.language-css .token.string,
 .style .token.string {
 	color: #a67f59;
 	background: rgba(255, 255, 255, 0.5);
@@ -184,8 +184,8 @@ pre[class*="lang-"]:after {
 }
 
 @media screen and (max-width: 767px) {
-	pre[class*="lang-"]:before,
-	pre[class*="lang-"]:after {
+	pre[class*="language-"]:before,
+	pre[class*="language-"]:after {
 		bottom: 14px;
 		box-shadow: none;
 	}
@@ -200,20 +200,20 @@ pre[class*="lang-"]:after {
 }
 
 /* Plugin styles: Line Numbers */
-pre[class*="lang-"].line-numbers {
+pre[class*="language-"].line-numbers.line-numbers {
 	padding-left: 0;
 }
 
-pre[class*="lang-"].line-numbers code {
+pre[class*="language-"].line-numbers.line-numbers code {
 	padding-left: 3.8em;
 }
 
-pre[class*="lang-"].line-numbers .line-numbers-rows {
+pre[class*="language-"].line-numbers.line-numbers .line-numbers-rows {
 	left: 0;
 }
 
 /* Plugin styles: Line Highlight */
-pre[class*="lang-"][data-line] {
+pre[class*="language-"][data-line] {
 	padding-top: 0;
 	padding-bottom: 0;
 	padding-left: 0;
@@ -226,44 +226,3 @@ pre .line-highlight {
 	margin-top: 0;
 }
 
-pre.line-numbers {
-	position: relative;
-	padding-left: 3.8em;
-	counter-reset: linenumber;
-}
-
-pre.line-numbers > code {
-	position: relative;
-    white-space: inherit;
-}
-
-.line-numbers .line-numbers-rows {
-	position: absolute;
-	pointer-events: none;
-	top: 0;
-	font-size: 100%;
-	left: -3.8em;
-	width: 3em; /* works for line-numbers below 1000 lines */
-	letter-spacing: -1px;
-	border-right: 1px solid #999;
-
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-
-}
-
-	.line-numbers-rows > span {
-		pointer-events: none;
-		display: block;
-		counter-increment: linenumber;
-	}
-
-		.line-numbers-rows > span:before {
-			content: counter(linenumber);
-			color: #999;
-			display: block;
-			padding-right: 0.8em;
-			text-align: right;
-		}
