@@ -81,13 +81,11 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String workDir = FILE_PROTOCOL + haloProperties.getWorkDir();
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations(workDir + "static/");
         registry.addResourceHandler("/**")
                 .addResourceLocations(workDir + "templates/themes/")
                 .addResourceLocations(workDir + "templates/admin/")
-                .addResourceLocations("classpath:/admin/");
+                .addResourceLocations("classpath:/admin/")
+                .addResourceLocations(workDir + "static/");
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler("/backup/**")
