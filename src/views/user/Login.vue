@@ -48,23 +48,61 @@
             :style="{'animation-delay': '0.3s'}"
           >登录</a-button>
         </a-row>
+
+        <a-row>
+          <a
+            class="tip"
+            @click="handleApiModifyModalOpen"
+          >
+            > 更改博客 API 地址
+          </a>
+        </a-row>
+
+        <a-modal
+          title="更改博客 API 地址"
+          :visible="apiModifyVisiable"
+          @ok="handleApiModifyOk"
+          @cancel="handleApiModifyCancel"
+        >
+          <a-form>
+            <a-form-item extra="如果 halo-admin 不是独立部署，请不要更改此 url">
+              <a-input v-model="apiUrl"></a-input>
+            </a-form-item>
+
+            <a-form-item>
+              <a-button @click="handleApiUrlRestore">
+                恢复默认
+              </a-button>
+            </a-form-item>
+          </a-form>
+        </a-modal>
       </a-form>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   data() {
     return {
       username: null,
-      password: null
+      password: null,
+      apiModifyVisiable: false,
+      defaultApiBefore: window.location.protocol + '//',
+      apiUrl: window.location.host
     }
+  },
+  computed: {
+    ...mapGetters({ defaultApiUrl: 'apiUrl' })
   },
   methods: {
     ...mapActions(['login', 'loadUser']),
+    ...mapMutations({
+      setApiUrl: 'SET_API_URL',
+      restoreApiUrl: 'RESTORE_API_URL'
+    }),
     handleLogin() {
       if (!this.username) {
         this.$message.warn('用户名不能为空！')
@@ -89,11 +127,26 @@ export default {
       } else {
         this.$router.replace({ name: 'Dashboard' })
       }
+    },
+    handleApiModifyModalOpen() {
+      this.apiUrl = this.defaultApiUrl
+      this.apiModifyVisiable = true
+    },
+    handleApiModifyOk() {
+      this.setApiUrl(this.apiUrl)
+      this.apiModifyVisiable = false
+    },
+    handleApiModifyCancel() {
+      this.apiModifyVisiable = false
+    },
+    handleApiUrlRestore() {
+      this.restoreApiUrl()
+      this.apiUrl = this.defaultApiUrl
     }
   }
 }
 </script>
-<style>
+<style lang="less">
 body {
   height: 100%;
   background-color: #f5f5f5;
@@ -107,6 +160,12 @@ body {
   width: 320px;
   padding: 16px 32px 32px 32px;
   box-shadow: -4px 7px 46px 2px rgba(0, 0, 0, 0.1);
+  .tip {
+    font-size: 0.6rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    float: right;
+  }
 }
 .loginLogo {
   margin-bottom: 20px;

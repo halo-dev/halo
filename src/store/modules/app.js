@@ -7,7 +7,8 @@ import {
   DEFAULT_FIXED_HEADER,
   DEFAULT_FIXED_SIDEMENU,
   DEFAULT_FIXED_HEADER_HIDDEN,
-  DEFAULT_CONTENT_WIDTH_TYPE
+  DEFAULT_CONTENT_WIDTH_TYPE,
+  API_URL
 } from '@/store/mutation-types'
 
 const app = {
@@ -20,14 +21,23 @@ const app = {
     fixedHeader: false,
     fixSiderbar: false,
     autoHideHeader: false,
-    color: null
+    color: null,
+    apiUrl: null
   },
   mutations: {
+    SET_API_URL: (state, apiUrl) => {
+      state.apiUrl = apiUrl
+      Vue.ls.set(API_URL, apiUrl)
+    },
+    RESTORE_API_URL: state => {
+      state.apiUrl = null
+      Vue.ls.set(API_URL, null)
+    },
     SET_SIDEBAR_TYPE: (state, type) => {
       state.sidebar = type
       Vue.ls.set(SIDEBAR_TYPE, type)
     },
-    CLOSE_SIDEBAR: (state) => {
+    CLOSE_SIDEBAR: state => {
       Vue.ls.set(SIDEBAR_TYPE, true)
       state.sidebar = false
     },
