@@ -12,7 +12,7 @@ const getters = {
     if (state.app.apiUrl) {
       return state.app.apiUrl
     }
-    return `${window.location.protocol}\\\\${window.location.host}`
+    return `${window.location.protocol}//${window.location.host}`
   }
 }
 

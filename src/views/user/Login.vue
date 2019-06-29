@@ -51,21 +51,22 @@
 
         <a-row>
           <a
-            class="tip"
             @click="handleApiModifyModalOpen"
+            class="tip animated fadeInUp"
+            :style="{'animation-delay': '0.4s'}"
           >
-            > 更改博客 API 地址
+            API 设置
           </a>
         </a-row>
 
         <a-modal
-          title="更改博客 API 地址"
+          title="API 设置"
           :visible="apiModifyVisiable"
           @ok="handleApiModifyOk"
           @cancel="handleApiModifyCancel"
         >
           <a-form>
-            <a-form-item extra="如果 halo-admin 不是独立部署，请不要更改此 url">
+            <a-form-item extra="如果 halo admin 不是独立部署，请不要更改此 API">
               <a-input v-model="apiUrl"></a-input>
             </a-form-item>
 
@@ -161,9 +162,8 @@ body {
   padding: 16px 32px 32px 32px;
   box-shadow: -4px 7px 46px 2px rgba(0, 0, 0, 0.1);
   .tip {
-    font-size: 0.6rem;
     cursor: pointer;
-    margin-top: 1rem;
+    margin-top: .5rem;
     float: right;
   }
 }
