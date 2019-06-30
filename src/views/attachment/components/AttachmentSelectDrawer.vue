@@ -47,8 +47,14 @@
           @change="handlePaginationChange"
         ></a-pagination>
       </div>
-      <a-divider class="divider-transparent"/>
+      <a-divider class="divider-transparent" />
       <div class="bottom-control">
+        <a-button
+          type="dashed"
+          style="marginRight: 8px"
+          v-if="isChooseAvatar"
+          @click="handleSelectGravatar"
+        >使用 Gravatar</a-button>
         <a-button
           @click="handleShowUploadModal"
           type="primary"
@@ -103,6 +109,11 @@ export default {
       type: String,
       required: false,
       default: '选择附件'
+    },
+    isChooseAvatar: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data() {
@@ -149,6 +160,9 @@ export default {
     },
     handleSelectAttachment(item) {
       this.$emit('listenToSelect', item)
+    },
+    handleSelectGravatar() {
+      this.$emit('listenToSelectGravatar')
     },
     handlePaginationChange(page, pageSize) {
       this.pagination.page = page
