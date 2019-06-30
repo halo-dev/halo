@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -24,6 +23,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BasePostService;
 import run.halo.app.utils.DateUtils;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
@@ -40,6 +40,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Base post service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-04-24
  */
 @Slf4j
@@ -275,7 +276,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         // Set summary
         if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
-            // TODO build post summary
+            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
         }
 
         return basePostSimpleDTO;
@@ -347,12 +348,14 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @NonNull
-    protected String convertToSummary(@Nullable String markdownContent) {
+    protected String generateSummary(@NonNull String htmlContent) {
+        Assert.notNull(htmlContent, "html content must not be null");
+
+        String text = HaloUtils.cleanHtmlTag(htmlContent);
+
         // Get summary length
         Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
-        // TODO build summary.
-        return "";
+        return StringUtils.substring(text, 0, summaryLength);
     }
-
 }
