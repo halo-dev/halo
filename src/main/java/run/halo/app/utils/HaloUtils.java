@@ -8,7 +8,6 @@ import org.springframework.util.Assert;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Path;
 import java.util.UUID;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
@@ -17,10 +16,13 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  * Common utils
  *
  * @author ryanwang
+ * @author johnniang
  * @date : 2017/12/22
  */
 @Slf4j
 public class HaloUtils {
+
+    private static final String RE_HTML_MARK = "(<[^<]*?>)|(<[\\s]*?/[^<]*?>)|(<[^<]*?/[\\s]*?>)";
 
     /**
      * Desensitizes the plain text.
@@ -191,5 +193,15 @@ public class HaloUtils {
             machineAddress = InetAddress.getLoopbackAddress();
         }
         return machineAddress.getHostAddress();
+    }
+
+    /**
+     * Clean all html tag
+     *
+     * @param content html document
+     * @return text before cleaned
+     */
+    public static String cleanHtmlTag(String content) {
+        return content.replaceAll(RE_HTML_MARK, "");
     }
 }

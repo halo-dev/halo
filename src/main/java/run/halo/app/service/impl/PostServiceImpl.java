@@ -463,7 +463,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
             if (StringUtils.isBlank(postListVO.getSummary())) {
-                // TODO Set summary
+                postListVO.setSummary(generateSummary(post.getFormatContent()));
             }
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
