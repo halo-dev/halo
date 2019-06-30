@@ -127,7 +127,7 @@
             target="_blank"
           >{{ post.title }}</a>
           <a
-            v-else
+            v-if="type === 'sheets'"
             slot="sheet"
             slot-scope="sheet"
             :href="options.blog_url+'/s/'+sheet.url"
