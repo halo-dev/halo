@@ -408,7 +408,11 @@ export default {
       this.selectComment = comment
       this.replyCommentVisible = true
       this.replyComment.parentId = comment.id
-      this.replyComment.postId = comment.post.id
+      if (this.type === 'posts') {
+        this.replyComment.postId = comment.post.id
+      } else {
+        this.replyComment.postId = comment.sheet.id
+      }
     },
     handleCreateClick() {
       commentApi.create(this.type, this.replyComment).then(response => {
