@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -46,6 +47,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     }
 
     @Override
+    @Transactional
     public Category create(Category category) {
         Assert.notNull(category, "Category to create must not be null");
 
@@ -161,6 +163,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     }
 
     @Override
+    @Transactional
     public void removeCategoryAndPostCategoryBy(Integer categoryId) {
         // Remove category
         removeById(categoryId);

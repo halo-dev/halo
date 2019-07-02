@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -35,6 +36,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     }
 
     @Override
+    @Transactional
     public Tag create(Tag tag) {
         // Check if the tag is exist
         long count = tagRepository.countByNameOrSlugName(tag.getName(), tag.getSlugName());
