@@ -18,6 +18,7 @@ import java.util.List;
  * @author ryanwang
  * @date : 2019-03-14
  */
+@Transactional(readOnly = true)
 public interface CategoryService extends CrudService<Category, Integer> {
 
     /**
