@@ -508,4 +508,7 @@ export default {
 		margin-left: 15px;
 		text-decoration: none;
 	}
+  a {
+    text-decoration: none;
+  }
 </style>

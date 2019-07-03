@@ -659,7 +659,7 @@ a {
   text-decoration: none;
 }
 .post-title {
-  width: 100px;
+  max-width: 100px;
   display: block;
   white-space: nowrap;
   overflow: hidden;
