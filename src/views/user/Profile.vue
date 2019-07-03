@@ -138,7 +138,9 @@
     <AttachmentSelectDrawer
       v-model="attachmentDrawerVisible"
       @listenToSelect="handleSelectAvatar"
+      @listenToSelectGravatar="handleSelectGravatar"
       title="选择头像"
+      isChooseAvatar
     />
   </div>
 </template>
@@ -149,6 +151,7 @@ import userApi from '@/api/user'
 import adminApi from '@/api/admin'
 import optionApi from '@/api/option'
 import { mapMutations } from 'vuex'
+import MD5 from 'md5.js'
 
 export default {
   components: {
@@ -216,6 +219,10 @@ export default {
     },
     handleSelectAvatar(data) {
       this.user.avatar = data.path
+      this.attachmentDrawerVisible = false
+    },
+    handleSelectGravatar() {
+      this.user.avatar = '//cn.gravatar.com/avatar/' + new MD5().update(this.user.email).digest('hex') + '&d=mm'
       this.attachmentDrawerVisible = false
     }
   }

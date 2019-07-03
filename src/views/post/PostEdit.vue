@@ -199,7 +199,6 @@ import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { toolbars } from '@/core/const'
 import 'mavon-editor/dist/css/index.css'
-import tagApi from '@/api/tag'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import optionApi from '@/api/option'
@@ -226,7 +225,6 @@ export default {
       postSettingVisible: false,
       thumDrawerVisible: false,
       categoryForm: false,
-      tags: [],
       categories: [],
       selectedCategoryIds: [],
       selectedTagIds: [],
@@ -238,7 +236,6 @@ export default {
     }
   },
   created() {
-    this.loadTags()
     this.loadCategories()
     this.loadOptions()
     clearInterval(this.timer)
@@ -273,11 +270,6 @@ export default {
     })
   },
   methods: {
-    loadTags() {
-      tagApi.listAll(true).then(response => {
-        this.tags = response.data.data
-      })
-    },
     loadCategories() {
       categoryApi.listAll().then(response => {
         this.categories = response.data.data
@@ -364,16 +356,5 @@ export default {
 .v-note-wrapper {
   z-index: 1000;
   min-height: 580px;
-}
-
-.post-thum {
-  .img {
-    width: 100%;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  .post-thum-remove {
-    margin-top: 16px;
-  }
 }
 </style>
