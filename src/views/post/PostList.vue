@@ -128,12 +128,27 @@
           :loading="postsLoading"
           :pagination="false"
         >
-          <ellipsis
+          <!-- ellipsis内嵌a标签后文本会被置空
+           <ellipsis
             :length="25"
             tooltip
             slot="postTitle"
-            slot-scope="postTitle"
-          >{{ postTitle }}</ellipsis>
+            slot-scope="text,record"
+          >
+          {{ text }}
+          </ellipsis> -->
+          <span
+            slot="postTitle"
+            slot-scope="text,record"
+            class="post-title"
+          >
+            <a
+              :href="options.blog_url+'/archives/'+record.url"
+              target="_blank"
+            >
+              <a-tooltip placement="topLeft" :title="'点击预览 '+text">{{ text }}</a-tooltip>
+            </a>
+          </span>
           <span
             slot="status"
             slot-scope="statusProperty"
@@ -639,3 +654,15 @@ export default {
   }
 }
 </script>
+<style scoped>
+a {
+  text-decoration: none;
+}
+.post-title {
+  width: 100px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
