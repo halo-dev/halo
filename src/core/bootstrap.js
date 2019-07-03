@@ -10,7 +10,8 @@ import {
   DEFAULT_FIXED_HEADER_HIDDEN,
   DEFAULT_FIXED_SIDEMENU,
   DEFAULT_CONTENT_WIDTH_TYPE,
-  USER
+  USER,
+  API_URL
 } from '@/store/mutation-types'
 import config from '@/config/defaultSettings'
 
@@ -25,6 +26,7 @@ export default function Initializer() {
   store.commit('TOGGLE_COLOR', Vue.ls.get(DEFAULT_COLOR, config.primaryColor))
   store.commit('SET_TOKEN', Vue.ls.get(ACCESS_TOKEN))
   store.commit('SET_USER', Vue.ls.get(USER))
+  store.commit('SET_API_URL', Vue.ls.get(API_URL))
 
   // last step
 }
