@@ -300,4 +300,3 @@ a{
   text-overflow: ellipsis;
 }
 </style>
-

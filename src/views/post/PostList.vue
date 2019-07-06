@@ -408,6 +408,7 @@ const columns = [
   {
     title: '标题',
     dataIndex: 'title',
+    width: '150px',
     scopedSlots: { customRender: 'postTitle' }
   },
   {
@@ -659,7 +660,7 @@ a {
   text-decoration: none;
 }
 .post-title {
-  max-width: 100px;
+  max-width: 150px;
   display: block;
   white-space: nowrap;
   overflow: hidden;
