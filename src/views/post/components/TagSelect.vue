@@ -42,7 +42,14 @@ export default {
   },
   created() {
     this.loadTags()
-    this.selectedTagNames = this.tagIds.map(tagId => this.tagIdMap[tagId].name)
+  },
+  watch: {
+    tags(newValue, oldValue) {
+      // 解决tags未赋上值就使用导致的取值报错问题
+      if (newValue) {
+        this.selectedTagNames = this.tagIds.map(tagId => this.tagIdMap[tagId].name)
+      }
+    }
   },
   computed: {
     tagIdMap() {
