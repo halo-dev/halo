@@ -202,24 +202,24 @@
             </a-form-item>
 
             <!-- 日志图片上传 -->
-            <a-form-item v-show="showMoreOptions">
+            <!-- <a-form-item v-show="showMoreOptions">
               <UploadPhoto
                 @success="handlerPhotoUploadSuccess"
                 :photoList="photoList"
               ></UploadPhoto>
-            </a-form-item>
+            </a-form-item> -->
 
             <a-form-item>
               <a-button
                 type="primary"
                 @click="handleCreateJournalClick"
               >保存</a-button>
-              <a
+              <!-- <a
                 href="javascript:;"
                 class="more-options-btn"
                 type="default"
                 @click="handleUploadPhotoWallClick"
-              >更多选项<a-icon type="down" /></a>
+              >更多选项<a-icon type="down" /></a> -->
             </a-form-item>
           </a-form>
         </a-card>

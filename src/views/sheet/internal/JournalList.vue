@@ -41,7 +41,7 @@
             >
               <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
                 <!-- 日志图片集合 -->
-                <a-card
+                <!-- <a-card
                   hoverable
                   v-for="(photo, photoIndex) in item.photos"
                   :key="photoIndex"
@@ -49,7 +49,7 @@
                   @click="handlerPhotoPreview(photo)"
                 >
                   <img alt="example" :src="photo.thumbnail" slot="cover">
-                </a-card>
+                </a-card> -->
 
                 <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancelPreview">
                   <img
@@ -126,7 +126,7 @@
         <a-form-item>
           <a-input type="textarea" :autosize="{ minRows: 8 }" v-model="journal.content"/>
         </a-form-item>
-        <a-form-item v-show="showMoreOptions">
+        <!-- <a-form-item v-show="showMoreOptions">
           <UploadPhoto
             @success="handlerPhotoUploadSuccess"
             :photoList="photoList"
@@ -143,7 +143,7 @@
             更多选项
             <a-icon type="down"/>
           </a>
-        </a-form-item>
+        </a-form-item> -->
       </a-form>
     </a-modal>
 
