@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Admin page.
+ * Main controller.
  *
  * @author ryanwang
  * @date : 2019-04-23

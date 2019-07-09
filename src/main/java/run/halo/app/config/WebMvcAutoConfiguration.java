@@ -81,13 +81,11 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String workDir = FILE_PROTOCOL + haloProperties.getWorkDir();
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations(workDir + "static/");
         registry.addResourceHandler("/**")
                 .addResourceLocations(workDir + "templates/themes/")
                 .addResourceLocations(workDir + "templates/admin/")
-                .addResourceLocations("classpath:/admin/");
+                .addResourceLocations("classpath:/admin/")
+                .addResourceLocations(workDir + "static/");
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler("/backup/**")
@@ -122,7 +120,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         configurer.setDefaultEncoding("UTF-8");
 
         Properties properties = new Properties();
-        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common");
+        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
 
         configurer.setFreemarkerSettings(properties);
 

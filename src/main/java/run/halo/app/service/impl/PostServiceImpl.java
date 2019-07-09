@@ -45,6 +45,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  *
  * @author johnniang
  * @author ryanwang
+ * @date 2019-03-14
  */
 @Slf4j
 @Service
@@ -280,7 +281,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(markdown, "Markdown document must not be null");
 
         // Render markdown to html document.
-        String content = MarkdownUtils.renderMarkdown(markdown);
+        String content = MarkdownUtils.renderHtml(markdown);
 
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
@@ -462,8 +463,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
             if (StringUtils.isBlank(postListVO.getSummary())) {
-                // Set summary
-                postListVO.setSummary(convertToSummary(post.getOriginalContent()));
+                postListVO.setSummary(generateSummary(post.getFormatContent()));
             }
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);

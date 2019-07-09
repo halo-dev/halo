@@ -3,6 +3,7 @@ package run.halo.app.model.freemarker.tag;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.stereotype.Component;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
@@ -57,11 +58,11 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     break;
                 case "listByCategoryId":
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
-                    env.setVariable("posts", builder.build().wrap(postCategoryService.listPostBy(categoryId)));
+                    env.setVariable("posts", builder.build().wrap(postCategoryService.listPostBy(categoryId, PostStatus.PUBLISHED)));
                     break;
                 case "listByTagId":
                     Integer tagId = Integer.parseInt(params.get("tagId").toString());
-                    env.setVariable("posts", builder.build().wrap(postTagService.listPostsBy(tagId)));
+                    env.setVariable("posts", builder.build().wrap(postTagService.listPostsBy(tagId, PostStatus.PUBLISHED)));
                     break;
                 default:
                     break;

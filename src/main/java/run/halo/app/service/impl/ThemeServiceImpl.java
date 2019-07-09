@@ -53,7 +53,7 @@ import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
  * Theme service implementation.
  *
  * @author ryanwang
- * @date : 2019/3/26
+ * @date 2019-03-26
  */
 @Slf4j
 @Service
