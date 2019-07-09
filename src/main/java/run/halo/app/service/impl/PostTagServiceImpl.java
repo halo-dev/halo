@@ -10,6 +10,7 @@ import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.PostTagRepository;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * Post tag service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-03-19
  */
 @Service
@@ -114,12 +116,35 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     }
 
     @Override
+    public List<Post> listPostsBy(Integer tagId, PostStatus status) {
+        Assert.notNull(tagId, "Tag id must not be null");
+        Assert.notNull(tagId, "Post status must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
     public Page<Post> pagePostsBy(Integer tagId, Pageable pageable) {
         Assert.notNull(tagId, "Tag id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
+    }
+
+    @Override
+    public Page<Post> pagePostsBy(Integer tagId, PostStatus status, Pageable pageable) {
+        Assert.notNull(tagId, "Tag id must not be null");
+        Assert.notNull(tagId, "Post status must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
 
         return postRepository.findAllByIdIn(postIds, pageable);
     }

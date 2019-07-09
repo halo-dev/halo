@@ -10,6 +10,7 @@ import run.halo.app.model.dto.CategoryWithPostCountDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.repository.PostCategoryRepository;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * Post category service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-03-19
  */
 @Service
@@ -94,12 +96,35 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
+    public List<Post> listPostBy(Integer categoryId, PostStatus status) {
+        Assert.notNull(categoryId, "Category id must not be null");
+        Assert.notNull(categoryId, "Post status must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
     public Page<Post> pagePostBy(Integer categoryId, Pageable pageable) {
         Assert.notNull(categoryId, "Category id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
         Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
+    }
+
+    @Override
+    public Page<Post> pagePostBy(Integer categoryId, PostStatus status, Pageable pageable) {
+        Assert.notNull(categoryId, "Category id must not be null");
+        Assert.notNull(categoryId, "Post status must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
 
         return postRepository.findAllByIdIn(postIds, pageable);
     }
