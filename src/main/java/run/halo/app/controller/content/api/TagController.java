@@ -12,6 +12,7 @@ import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
@@ -24,6 +25,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Portal tag controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 4/2/19
  */
 @RestController("ApiContentTagController")
@@ -63,7 +65,7 @@ public class TagController {
         Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
         // Get posts, convert and return
-        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), pageable);
+        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         return postService.convertToSimple(postPage);
     }
 }
