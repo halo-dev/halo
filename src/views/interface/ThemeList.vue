@@ -427,9 +427,7 @@ export default {
         this.themeConfiguration = response.data.data
         themeApi.fetchSettings(theme.id).then(response => {
           this.themeSettings = response.data.data
-
           setTimeout(() => {
-            this.visible = true
             this.optionLoading = false
           }, 300)
         })

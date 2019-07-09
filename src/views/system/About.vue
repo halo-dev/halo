@@ -136,9 +136,23 @@ export default {
           avatar: '//cn.gravatar.com/avatar/08cf681fb7c6ad1b4fe70a8269c2103c?s=256&d=mm',
           website: 'https://www.apkdv.com',
           github: 'https://github.com/appdev'
+        },
+        {
+          name: 'guqing',
+          avatar: '//cn.gravatar.com/avatar/ad062ba572c8b006bfd2cbfc43fdee5e?s=256&d=mm',
+          website: 'http://www.guqing.xyz',
+          github: 'https://github.com/guqing'
         }
       ],
       steps: [
+        {
+          date: '2019-07-09',
+          content: 'Halo v1.0.3 发布'
+        },
+        {
+          date: '2019-07-08',
+          content: 'Star 数达到 6500'
+        },
         {
           date: '2019-06-01',
           content: '1.0 正式版发布'

@@ -97,13 +97,24 @@
                 :pagination="false"
               >
                 <span
+                  slot="sheetTitle"
+                  slot-scope="text,record"
+                  class="sheet-title"
+                >
+                  <a
+                    :href="options.blog_url+'/s/'+record.url"
+                    target="_blank"
+                  >
+                    <a-tooltip placement="topLeft" :title="'点击预览 '+text">{{ text }}</a-tooltip>
+                  </a>
+                </span>
+                <span
                   slot="status"
                   slot-scope="statusProperty"
                 >
                   <a-badge :status="statusProperty.status" />
                   {{ statusProperty.text }}
                 </span>
-
                 <span
                   slot="updateTime"
                   slot-scope="updateTime"
@@ -189,7 +200,8 @@ const internalColumns = [
 const customColumns = [
   {
     title: '标题',
-    dataIndex: 'title'
+    dataIndex: 'title',
+    scopedSlots: { customRender: 'sheetTitle' }
   },
   {
     title: '状态',
@@ -276,3 +288,15 @@ export default {
   }
 }
 </script>
+<style scoped>
+a{
+  text-decoration: none;
+}
+.sheet-title{
+  max-width: 300px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

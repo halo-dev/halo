@@ -260,7 +260,7 @@ export default {
       this.editable = false
     },
     handleCopyNormalLink() {
-      const text = `${this.attachment.path}`
+      const text = `${encodeURI(this.attachment.path)}`
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
@@ -272,7 +272,7 @@ export default {
         })
     },
     handleCopyMarkdownLink() {
-      const text = `![${this.attachment.name}](${this.attachment.path})`
+      const text = `![${this.attachment.name}](${encodeURI(this.attachment.path)})`
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
