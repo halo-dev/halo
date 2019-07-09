@@ -79,6 +79,13 @@ public class MenuController {
     @DeleteMapping("{menuId:\\d+}")
     @ApiOperation("Deletes a menu")
     public MenuDTO deleteBy(@PathVariable("menuId") Integer menuId) {
+        List<Menu> menus = menuService.listByParentId(menuId);
+        if (null != menus && menus.size() > 0) {
+            menus.forEach(menu -> {
+                menu.setParentId(0);
+                menuService.update(menu);
+            });
+        }
         return new MenuDTO().convertFrom(menuService.removeById(menuId));
     }
 }

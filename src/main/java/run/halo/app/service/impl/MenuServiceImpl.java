@@ -72,6 +72,13 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
+    public List<Menu> listByParentId(Integer id) {
+        Assert.notNull(id, "Menu parent id must not be null");
+
+        return menuRepository.findByParentId(id);
+    }
+
+    @Override
     public Menu create(Menu menu) {
         nameMustNotExist(menu);
 
