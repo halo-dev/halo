@@ -12,7 +12,7 @@ import java.util.Map;
  * Theme setting service interface.
  *
  * @author johnniang
- * @date 4/8/19
+ * @date 2019-04-08
  */
 public interface ThemeSettingService {
 

@@ -3,10 +3,10 @@ package run.halo.app.service;
 import java.util.Map;
 
 /**
- * Mail server
+ * Mail service interface.
  *
  * @author ryanwang
- * @date : 2019-03-17
+ * @date 2019-03-17
  */
 public interface MailService {
 

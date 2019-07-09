@@ -20,7 +20,7 @@ import java.util.Properties;
  * Mail service implementation.
  *
  * @author ryanwang
- * @date : 2019-03-17
+ * @date 2019-03-17
  */
 @Slf4j
 @Service
@@ -37,13 +37,6 @@ public class MailServiceImpl implements MailService {
 
     }
 
-    /**
-     * Sends a simple email
-     *
-     * @param to      recipient
-     * @param subject subject
-     * @param content content
-     */
     @Override
     public void sendMail(String to, String subject, String content) {
         loadConfig();
@@ -63,14 +56,6 @@ public class MailServiceImpl implements MailService {
         }
     }
 
-    /**
-     * Sends template mail
-     *
-     * @param to           recipient
-     * @param subject      subject
-     * @param content      content
-     * @param templateName template name
-     */
     @Override
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         loadConfig();
@@ -93,15 +78,6 @@ public class MailServiceImpl implements MailService {
         }
     }
 
-    /**
-     * Sends mail with attachments
-     *
-     * @param to             recipient
-     * @param subject        subject
-     * @param content        content
-     * @param templateName   template name
-     * @param attachFilename attachment path
-     */
     @Override
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilename) {
         loadConfig();

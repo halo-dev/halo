@@ -22,7 +22,7 @@ import run.halo.app.service.ThemeService;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Search Controller
+ * Search controller.
  *
  * @author ryanwang
  * @date : 2019-04-21

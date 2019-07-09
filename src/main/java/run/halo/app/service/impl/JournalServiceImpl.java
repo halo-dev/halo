@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-24
+ * @date 2019-04-24
  */
 @Service
 public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> implements JournalService {

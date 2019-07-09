@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -24,9 +25,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * CategoryService implementation class
+ * CategoryService implementation class.
  *
  * @author ryanwang
+ * @author johnniang
  * @date : 2019-03-14
  */
 @Slf4j
@@ -45,6 +47,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     }
 
     @Override
+    @Transactional
     public Category create(Category category) {
         Assert.notNull(category, "Category to create must not be null");
 
@@ -144,15 +147,14 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         return topCategory;
     }
 
-    /**
-     * Get category by slug name
-     *
-     * @param slugName slug name
-     * @return Category
-     */
     @Override
     public Category getBySlugName(String slugName) {
-        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该分类已存在").setErrorData(slugName));
+        return categoryRepository.getBySlugName(slugName).orElse(null);
+    }
+
+    @Override
+    public Category getBySlugNameOfNonNull(String slugName) {
+        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该分类不存在").setErrorData(slugName));
     }
 
     @Override
@@ -161,6 +163,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     }
 
     @Override
+    @Transactional
     public void removeCategoryAndPostCategoryBy(Integer categoryId) {
         // Remove category
         removeById(categoryId);
