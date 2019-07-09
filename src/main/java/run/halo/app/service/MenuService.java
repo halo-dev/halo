@@ -44,4 +44,12 @@ public interface MenuService extends CrudService<Menu, Integer> {
      * @return a menu tree
      */
     List<MenuVO> listAsTree(Sort sort);
+
+    /**
+     * Lists menu by parent id.
+     *
+     * @param id id
+     * @return a list of menu
+     */
+    List<Menu> listByParentId(@NonNull Integer id);
 }
