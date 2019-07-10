@@ -30,15 +30,15 @@ public enum Mode {
     @Nullable
     @JsonCreator
     public static Mode valueFrom(@Nullable String value) {
-        if (StringUtils.isBlank(value) || value.equalsIgnoreCase("prod")) {
+        if (StringUtils.isBlank(value) || "prod".equalsIgnoreCase(value)) {
             return Mode.PRODUCTION;
         }
 
-        if (value.equalsIgnoreCase("dev")) {
+        if ("dev".equalsIgnoreCase(value)) {
             return Mode.DEVELOPMENT;
         }
 
-        if (value.equalsIgnoreCase("test")) {
+        if ("test".equalsIgnoreCase(value)) {
             return Mode.TEST;
         }
 

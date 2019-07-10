@@ -323,7 +323,7 @@ public class AdminServiceImpl implements AdminService {
             String contentType = aAssetMap.getOrDefault("content_type", "").toString();
 
             Object name = aAssetMap.getOrDefault("name", "");
-            return name.toString().matches(HALO_ADMIN_VERSION_REGEX) && contentType.equalsIgnoreCase("application/zip");
+            return name.toString().matches(HALO_ADMIN_VERSION_REGEX) && "application/zip".equalsIgnoreCase(contentType);
         };
     }
 

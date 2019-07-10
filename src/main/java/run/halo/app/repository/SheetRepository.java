@@ -25,5 +25,6 @@ public interface SheetRepository extends BasePostRepository<Sheet> {
     Long countLike();
 
     @NonNull
+    @Override
     Optional<Sheet> getByUrlAndStatus(@NonNull String url, @NonNull PostStatus status);
 }
