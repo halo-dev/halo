@@ -80,7 +80,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
             Path source;
 
-            if (themeUri.getScheme().equalsIgnoreCase("jar")) {
+            if ("jar".equalsIgnoreCase(themeUri.getScheme())) {
                 // Create new file system for jar
                 FileSystem fileSystem = FileSystems.newFileSystem(themeUri, Collections.emptyMap());
                 source = fileSystem.getPath("/BOOT-INF/classes/" + ThemeService.THEME_FOLDER);

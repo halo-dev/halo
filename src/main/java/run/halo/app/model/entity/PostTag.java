@@ -44,8 +44,12 @@ public class PostTag extends BaseEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PostTag postTag = (PostTag) o;
         return Objects.equals(postId, postTag.postId) &&
                 Objects.equals(tagId, postTag.tagId);

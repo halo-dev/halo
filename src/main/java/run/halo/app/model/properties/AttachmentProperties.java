@@ -10,6 +10,9 @@ import run.halo.app.model.enums.AttachmentType;
  */
 public enum AttachmentProperties implements PropertyEnum {
 
+    /**
+     * attachment_type
+     */
     ATTACHMENT_TYPE("attachment_type", AttachmentType.class, AttachmentType.LOCAL.name());
 
     private final String value;

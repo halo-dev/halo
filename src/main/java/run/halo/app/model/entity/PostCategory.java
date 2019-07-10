@@ -43,8 +43,12 @@ public class PostCategory extends BaseEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PostCategory that = (PostCategory) o;
         return categoryId.equals(that.categoryId) &&
                 postId.equals(that.postId);

@@ -200,7 +200,7 @@ public class RecoveryServiceImpl implements RecoveryService {
             String postType = postMap.getOrDefault("postType", "post").toString();
 
             try {
-                if (postType.equalsIgnoreCase("post")) {
+                if ("post".equalsIgnoreCase(postType)) {
                     // Handle post
                     result.add(handlePost(post, postMap));
                 } else {
