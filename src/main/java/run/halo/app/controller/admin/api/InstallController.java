@@ -144,9 +144,9 @@ public class InstallController {
 
         PostCommentParam commentParam = new PostCommentParam();
         commentParam.setAuthor("Halo Bot");
-        commentParam.setAuthorUrl("https://github.com/halo-dev/halo");
+        commentParam.setAuthorUrl("https://halo.run");
         commentParam.setContent("欢迎使用 Halo，这是你的第一条评论。");
-        commentParam.setEmail("i@ryanc.cc");
+        commentParam.setEmail("halo@halo.run");
         commentParam.setPostId(post.getId());
         return postCommentService.create(commentParam.convertTo());
     }
