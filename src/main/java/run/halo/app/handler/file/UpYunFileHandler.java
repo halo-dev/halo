@@ -100,7 +100,7 @@ public class UpYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String ossSource = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE).toString();
+        // String ossSource = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE).toString();
         String ossPassword = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
         String ossBucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
         String ossOperator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
@@ -111,11 +111,10 @@ public class UpYunFileHandler implements FileHandler {
         upYun.setApiDomain(UpYun.ED_AUTO);
 
         try {
-            String filePath = ossSource + key;
             // Delete the file
-            boolean deleteResult = upYun.deleteFile(filePath);
+            boolean deleteResult = upYun.deleteFile(key);
             if (!deleteResult) {
-                log.warn("Failed to delete file " + filePath + " from UpYun");
+                log.warn("Failed to delete file " + key + " from UpYun");
             }
         } catch (Exception e) {
             throw new FileOperationException("附件从又拍云删除失败", e);
