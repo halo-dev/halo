@@ -137,7 +137,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public Page<POST> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
-        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "editTime"));
+        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "createTime"));
 
         return listAll(latestPageable);
     }
@@ -152,7 +152,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public List<POST> listLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
-        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "editTime"));
+        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "createTime"));
         return basePostRepository.findAllByStatus(PostStatus.PUBLISHED, latestPageable).getContent();
     }
 

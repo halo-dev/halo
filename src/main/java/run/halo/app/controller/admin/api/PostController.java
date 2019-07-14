@@ -38,7 +38,7 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<PostListVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+    public Page<PostListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
                                    PostQuery postQuery) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage);
@@ -54,7 +54,7 @@ public class PostController {
     @ApiOperation("Gets a page of post by post status")
     public Page<? extends BasePostSimpleDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
                                                           @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
-                                                          @PageableDefault(sort = "editTime", direction = DESC) Pageable pageable) {
+                                                          @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> posts = postService.pageBy(status, pageable);
 
         if (more) {
