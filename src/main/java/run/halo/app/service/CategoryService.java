@@ -65,6 +65,12 @@ public interface CategoryService extends CrudService<Category, Integer> {
     @Transactional
     void removeCategoryAndPostCategoryBy(Integer categoryId);
 
+    /**
+     * List categories by parent id.
+     * @param id parent id.
+     * @return list of category.
+     */
+    List<Category> listByParentId(@NonNull Integer id);
 
     /**
      * Converts to category dto.
