@@ -12,11 +12,13 @@
         </div>
         <div id="editor">
           <mavon-editor
+            ref="md"
             v-model="sheetToStage.originalContent"
             :boxShadow="false"
             :toolbars="toolbars"
             :ishljs="true"
             :autofocus="false"
+            @imgAdd="pictureUploadHandle"
           />
         </div>
       </a-col>
@@ -136,6 +138,7 @@ import 'mavon-editor/dist/css/index.css'
 import sheetApi from '@/api/sheet'
 import themeApi from '@/api/theme'
 import optionApi from '@/api/option'
+import attachmentApi from '@/api/attachment'
 export default {
   components: {
     mavonEditor,
@@ -256,6 +259,21 @@ export default {
           this.autoSaveSheet()
         }, 15000)
       }
+    },
+    pictureUploadHandle(pos, $file) {
+      var formdata = new FormData()
+      formdata.append('file', $file)
+      attachmentApi.upload(formdata).then((response) => {
+        var responseObject = response.data
+
+        if (responseObject.status === 200) {
+          var MavonEditor = this.$refs.md
+          MavonEditor.$img2Url(pos, responseObject.data.path)
+          this.$message.success('图片上传成功')
+        } else {
+          this.$message.error('图片上传失败：' + responseObject.message)
+        }
+      })
     }
   }
 }

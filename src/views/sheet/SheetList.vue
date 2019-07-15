@@ -116,9 +116,9 @@
                   {{ statusProperty.text }}
                 </span>
                 <span
-                  slot="updateTime"
-                  slot-scope="updateTime"
-                >{{ updateTime | timeAgo }}</span>
+                  slot="createTime"
+                  slot-scope="createTime"
+                >{{ createTime | timeAgo }}</span>
 
                 <span
                   slot="action"
@@ -218,9 +218,9 @@ const customColumns = [
     dataIndex: 'visits'
   },
   {
-    title: '更新时间',
-    dataIndex: 'updateTime',
-    scopedSlots: { customRender: 'updateTime' }
+    title: '发布时间',
+    dataIndex: 'createTime',
+    scopedSlots: { customRender: 'createTime' }
   },
   {
     title: '操作',
