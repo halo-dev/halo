@@ -18,7 +18,8 @@ const toolbars = {
   trash: true, // 清空
   navigation: true, // 导航目录
   subfield: true, // 单双栏模式
-  preview: true // 预览
+  preview: true, // 预览
+  imagelink: true // 图片链接
 }
 
 export { toolbars }
