@@ -44,7 +44,7 @@ public class SheetController {
 
     @GetMapping
     @ApiOperation("Gets a page of sheet")
-    public Page<SheetListVO> pageBy(@PageableDefault(sort = "editTime", direction = DESC) Pageable pageable) {
+    public Page<SheetListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(pageable);
         return sheetService.convertToListVo(sheetPage);
     }
