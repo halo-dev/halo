@@ -250,7 +250,7 @@ export default {
       }
     },
     handleSelectSheetThumb(data) {
-      this.sheetToStage.thumbnail = data.path
+      this.sheetToStage.thumbnail = encodeURI(data.path)
       this.thumDrawerVisible = false
     },
     autoSaveTimer() {
@@ -268,7 +268,7 @@ export default {
 
         if (responseObject.status === 200) {
           var MavonEditor = this.$refs.md
-          MavonEditor.$img2Url(pos, responseObject.data.path)
+          MavonEditor.$img2Url(pos, encodeURI(responseObject.data.path))
           this.$message.success('图片上传成功')
         } else {
           this.$message.error('图片上传失败：' + responseObject.message)

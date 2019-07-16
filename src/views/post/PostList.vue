@@ -620,7 +620,7 @@ export default {
       })
     },
     handleSelectPostThumb(data) {
-      this.selectedPost.thumbnail = data.path
+      this.selectedPost.thumbnail = encodeURI(data.path)
       this.thumDrawerVisible = false
     },
     handlerRemoveThumb() {

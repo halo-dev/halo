@@ -649,7 +649,7 @@ export default {
       }
     },
     handleSelectLogo(data) {
-      this.options.blog_logo = data.path
+      this.options.blog_logo = encodeURI(data.path)
       this.logoDrawerVisible = false
     },
     handleTestMailClick() {
@@ -658,7 +658,7 @@ export default {
       })
     },
     handleSelectFavicon(data) {
-      this.options.blog_favicon = data.path
+      this.options.blog_favicon = encodeURI(data.path)
       this.faviconDrawerVisible = false
     }
   }
