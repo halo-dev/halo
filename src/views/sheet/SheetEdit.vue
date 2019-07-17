@@ -48,18 +48,7 @@
                   >
                     <a-input v-model="sheetToStage.url" />
                   </a-form-item>
-                  <a-form-item label="开启评论：">
-                    <a-radio-group
-                      v-model="sheetToStage.disallowComment"
-                      :defaultValue="false"
-                    >
-                      <a-radio :value="false">开启</a-radio>
-                      <a-radio :value="true">关闭</a-radio>
-                    </a-radio-group>
-                  </a-form-item>
-                  <a-form-item
-                    label="发表时间："
-                  >
+                  <a-form-item label="发表时间：">
                     <a-date-picker
                       showTime
                       :defaultValue="pickerDefaultValue"
@@ -68,6 +57,15 @@
                       @change="onChange"
                       @ok="onOk"
                     />
+                  </a-form-item>
+                  <a-form-item label="开启评论：">
+                    <a-radio-group
+                      v-model="sheetToStage.disallowComment"
+                      :defaultValue="false"
+                    >
+                      <a-radio :value="false">开启</a-radio>
+                      <a-radio :value="true">关闭</a-radio>
+                    </a-radio-group>
                   </a-form-item>
                   <a-form-item label="自定义模板：">
                     <a-select v-model="sheetToStage.template">
@@ -285,7 +283,7 @@ export default {
     pictureUploadHandle(pos, $file) {
       var formdata = new FormData()
       formdata.append('file', $file)
-      attachmentApi.upload(formdata).then((response) => {
+      attachmentApi.upload(formdata).then(response => {
         var responseObject = response.data
 
         if (responseObject.status === 200) {
