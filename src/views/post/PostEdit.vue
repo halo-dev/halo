@@ -57,7 +57,6 @@
                   @ok="onOk"
                 />
               </a-form-item>
-             
               <a-form-item label="开启评论：">
                 <a-radio-group
                   v-model="postToStage.disallowComment"
@@ -387,10 +386,9 @@ export default {
       })
     },
     onChange(value, dateString) {
-      this.postToStage.createTime =  value.valueOf()
+      this.postToStage.createTime = value.valueOf()
     },
     onOk(value) {
-      var dateString = value.format('YYYY-MM-DD HH:mm:ss')
       this.postToStage.createTime = value.valueOf()
     }
   }
