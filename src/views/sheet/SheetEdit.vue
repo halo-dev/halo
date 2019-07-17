@@ -57,6 +57,18 @@
                       <a-radio :value="true">关闭</a-radio>
                     </a-radio-group>
                   </a-form-item>
+                  <a-form-item
+                    label="发表时间："
+                  >
+                    <a-date-picker
+                      showTime
+                      :defaultValue="pickerDefaultValue"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      placeholder="Select Publish Time"
+                      @change="onChange"
+                      @ok="onOk"
+                    />
+                  </a-form-item>
                   <a-form-item label="自定义模板：">
                     <a-select v-model="sheetToStage.template">
                       <a-select-option
@@ -139,6 +151,7 @@ import sheetApi from '@/api/sheet'
 import themeApi from '@/api/theme'
 import optionApi from '@/api/option'
 import attachmentApi from '@/api/attachment'
+import moment from 'moment'
 export default {
   components: {
     mavonEditor,
@@ -196,6 +209,15 @@ export default {
         })
       }
     })
+  },
+  computed: {
+    pickerDefaultValue() {
+      if (this.sheetToStage.createTime) {
+        var date = new Date(this.sheetToStage.createTime)
+        return moment(date, 'YYYY-MM-DD HH:mm:ss')
+      }
+      return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
+    }
   },
   methods: {
     loadCustomTpls() {
@@ -274,6 +296,12 @@ export default {
           this.$message.error('图片上传失败：' + responseObject.message)
         }
       })
+    },
+    onChange(value, dateString) {
+      this.sheetToStage.createTime = value.valueOf()
+    },
+    onOk(value) {
+      this.sheetToStage.createTime = value.valueOf()
     }
   }
 }

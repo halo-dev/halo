@@ -288,6 +288,10 @@ export default {
   },
   computed: {
     pickerDefaultValue() {
+      if (this.postToStage.createTime) {
+        var date = new Date(this.postToStage.createTime)
+        return moment(date, 'YYYY-MM-DD HH:mm:ss')
+      }
       return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
     }
   },
