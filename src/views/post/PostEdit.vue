@@ -44,6 +44,20 @@
               >
                 <a-input v-model="postToStage.url" />
               </a-form-item>
+
+              <a-form-item
+                label="发表时间："
+              >
+                <a-date-picker
+                  showTime
+                  :defaultValue="pickerDefaultValue"
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="Select Publish Time"
+                  @change="onChange"
+                  @ok="onOk"
+                />
+              </a-form-item>
+             
               <a-form-item label="开启评论：">
                 <a-radio-group
                   v-model="postToStage.disallowComment"
@@ -205,6 +219,7 @@ import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import optionApi from '@/api/option'
 import attachmentApi from '@/api/attachment'
+import moment from 'moment'
 export default {
   components: {
     TagSelect,
@@ -271,6 +286,11 @@ export default {
         })
       }
     })
+  },
+  computed: {
+    pickerDefaultValue() {
+      return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
+    }
   },
   methods: {
     loadCategories() {
@@ -365,6 +385,13 @@ export default {
           this.$message.error('图片上传失败：' + responseObject.message)
         }
       })
+    },
+    onChange(value, dateString) {
+      this.postToStage.createTime =  value.valueOf()
+    },
+    onOk(value) {
+      var dateString = value.format('YYYY-MM-DD HH:mm:ss')
+      this.postToStage.createTime = value.valueOf()
     }
   }
 }
