@@ -4,9 +4,14 @@
       :href="options.blog_url"
       target="_blank"
     >
-      <span class="action">
-        <a-icon type="link" />
-      </span>
+      <a-tooltip
+        placement="bottom"
+        title="点击跳转到首页"
+      >
+        <span class="action">
+          <a-icon type="link" />
+        </span>
+      </a-tooltip>
     </a>
     <a
       href="javascript:void(0)"
