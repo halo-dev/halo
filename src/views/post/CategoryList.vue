@@ -92,14 +92,34 @@
                 @click="handleEditCategory(record)"
               >编辑</a>
               <a-divider type="vertical" />
-              <a-popconfirm
-                :title="'你确定要删除【' + record.name + '】分类？'"
-                @confirm="handleDeleteCategory(record.id)"
-                okText="确定"
-                cancelText="取消"
-              >
-                <a href="javascript:;">删除</a>
-              </a-popconfirm>
+              <a-dropdown :trigger="['click']">
+                <a
+                  href="javascript:void(0);"
+                  class="ant-dropdown-link"
+                >更多</a>
+                <a-menu slot="overlay">
+                  <a-menu-item key="1">
+                    <a-popconfirm
+                      :title="'你确定要添加【' + record.name + '】到菜单？'"
+                      @confirm="handleCategoryToMenu(record)"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:void(0);">添加到菜单</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item key="2">
+                    <a-popconfirm
+                      :title="'你确定要删除【' + record.name + '】分类？'"
+                      @confirm="handleDeleteCategory(record.id)"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:void(0);">删除</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                </a-menu>
+              </a-dropdown>
             </span>
           </a-table>
         </a-card>
@@ -111,6 +131,7 @@
 <script>
 import CategorySelectTree from './components/CategorySelectTree'
 import categoryApi from '@/api/category'
+import menuApi from '@/api/menu'
 
 const columns = [
   {
@@ -142,6 +163,7 @@ export default {
       formType: 'create',
       categories: [],
       categoryToCreate: {},
+      menu: {},
       loading: false,
       columns
     }
@@ -198,6 +220,14 @@ export default {
         })
       }
       this.handleAddCategory()
+    },
+    handleCategoryToMenu(category) {
+      this.menu['name'] = category.name
+      this.menu['url'] = `/categories/${category.slugName}`
+      menuApi.create(this.menu).then(response => {
+        this.$message.success('添加到菜单成功！')
+        this.menu = {}
+      })
     }
   }
 }

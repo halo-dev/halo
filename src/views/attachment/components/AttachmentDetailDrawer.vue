@@ -290,6 +290,7 @@ export default {
       this.photo['takeTime'] = new Date().getTime()
       photoApi.create(this.photo).then(response => {
         this.$message.success('添加成功！')
+        this.photo = {}
       })
     },
     onClose() {
