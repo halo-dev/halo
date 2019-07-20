@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
+ * Category controller.
+ *
  * @author ryanwang
  * @date : 2019/3/20
  */
@@ -85,10 +88,10 @@ public class ContentCategoryController {
                              @PathVariable("page") Integer page,
                              @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         // Get category by slug name
-        final Category category = categoryService.getBySlugName(slugName);
+        final Category category = categoryService.getBySlugNameOfNonNull(slugName);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), pageable);
+        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 

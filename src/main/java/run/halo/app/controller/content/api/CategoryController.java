@@ -11,6 +11,7 @@ import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
@@ -58,9 +59,9 @@ public class CategoryController {
     public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
                                                @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
         // Get category by slug name
-        Category category = categoryService.getBySlugName(slugName);
+        Category category = categoryService.getBySlugNameOfNonNull(slugName);
 
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), pageable);
+        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         return postService.convertToSimple(postPage);
     }
 }

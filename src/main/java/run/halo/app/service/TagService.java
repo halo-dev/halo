@@ -8,11 +8,12 @@ import run.halo.app.service.base.CrudService;
 
 import java.util.List;
 
-
 /**
- * Tag service.
+ * Tag service interface.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-14
  */
 public interface TagService extends CrudService<Tag, Integer> {
 
@@ -24,6 +25,15 @@ public interface TagService extends CrudService<Tag, Integer> {
      */
     @NonNull
     Tag getBySlugNameOfNonNull(@NonNull String slugName);
+
+    /**
+     * Get tag by slug name
+     *
+     * @param slugName slug name
+     * @return tag
+     */
+    @NonNull
+    Tag getBySlugName(@NonNull String slugName);
 
     /**
      * Get tag by tag name.

@@ -9,7 +9,7 @@ import java.util.List;
  * Trace service interface.
  *
  * @author johnniang
- * @date 19-6-18
+ * @date 2019-06-18
  */
 public interface TraceService {
 

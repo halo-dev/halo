@@ -147,16 +147,22 @@ public class SwaggerConfiguration {
     private List<SecurityContext> contentSecurityContext() {
         return Collections.singletonList(
                 SecurityContext.builder()
-                        .securityReferences(defaultAuth())
+                        .securityReferences(contentApiAuth())
                         .forPaths(PathSelectors.regex("/api/content/.*"))
                         .build()
         );
     }
 
     private List<SecurityReference> defaultAuth() {
-        AuthorizationScope[] authorizationScopes = {new AuthorizationScope("global", "accessEverything")};
+        AuthorizationScope[] authorizationScopes = {new AuthorizationScope("Admin api", "Access admin api")};
         return Arrays.asList(new SecurityReference("Token from header", authorizationScopes),
                 new SecurityReference("Token from query", authorizationScopes));
+    }
+
+    private List<SecurityReference> contentApiAuth() {
+        AuthorizationScope[] authorizationScopes = {new AuthorizationScope("content api", "Access content api")};
+        return Arrays.asList(new SecurityReference("Access key from header", authorizationScopes),
+                new SecurityReference("Access key from query", authorizationScopes));
     }
 
     private ApiInfo apiInfo() {

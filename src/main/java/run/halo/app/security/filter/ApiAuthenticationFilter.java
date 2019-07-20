@@ -8,8 +8,8 @@ import org.springframework.util.Assert;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.model.properties.ApiProperties;
 import run.halo.app.model.properties.CommentProperties;
-import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.service.OptionService;
 
 import javax.servlet.FilterChain;
@@ -48,7 +48,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         // Get api_enable from option
-        Boolean apiEnabled = optionService.getByPropertyOrDefault(OtherProperties.API_ENABLED, Boolean.class, false);
+        Boolean apiEnabled = optionService.getByPropertyOrDefault(ApiProperties.API_ENABLED, Boolean.class, false);
 
         if (!apiEnabled) {
             getFailureHandler().onFailure(request, response, new ForbiddenException("API has been disabled by blogger currently"));
@@ -65,7 +65,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         // Get access key from option
-        Optional<String> optionalAccessKey = optionService.getByProperty(OtherProperties.API_ACCESS_KEY, String.class);
+        Optional<String> optionalAccessKey = optionService.getByProperty(ApiProperties.API_ACCESS_KEY, String.class);
 
         if (!optionalAccessKey.isPresent()) {
             // If the access key is not set

@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * MenuService implementation class
+ * MenuService implementation class.
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implements MenuService {
@@ -51,12 +51,6 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         return create(menuParam.convertTo());
     }
 
-    /**
-     * Lists as menu tree.
-     *
-     * @param sort sort info must not be null
-     * @return a menu tree
-     */
     @Override
     public List<MenuVO> listAsTree(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");

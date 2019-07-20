@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * Journal comment service implementation.
  *
  * @author johnniang
- * @date 19-4-25
+ * @date 2019-04-25
  */
 @Service
 public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalComment> implements JournalCommentService {

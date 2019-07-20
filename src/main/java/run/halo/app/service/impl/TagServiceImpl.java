@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -17,10 +18,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * TagService implementation class
+ * TagService implementation class.
  *
+ * @author johnniang
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Slf4j
 @Service
@@ -34,6 +36,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     }
 
     @Override
+    @Transactional
     public Tag create(Tag tag) {
         // Check if the tag is exist
         long count = tagRepository.countByNameOrSlugName(tag.getName(), tag.getSlugName());
@@ -49,17 +52,15 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         return super.create(tag);
     }
 
-    /**
-     * Get tag by slug name
-     *
-     * @param slugName slug name
-     * @return Tag
-     */
     @Override
     public Tag getBySlugNameOfNonNull(String slugName) {
-        return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该标签已存在").setErrorData(slugName));
+        return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该标签不存在").setErrorData(slugName));
     }
 
+    @Override
+    public Tag getBySlugName(String slugName) {
+        return tagRepository.getBySlugName(slugName).orElse(null);
+    }
 
     @Override
     public Tag getByName(String name) {

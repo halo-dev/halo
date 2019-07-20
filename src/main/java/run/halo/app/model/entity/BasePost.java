@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.enums.PostCreateFrom;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.utils.MarkdownUtils;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -54,7 +53,7 @@ public class BasePost extends BaseEntity {
     /**
      * Rendered content.
      *
-     * @see MarkdownUtils#renderMarkdown(String)
+     * @see run.halo.app.utils.MarkdownUtils#renderHtml(String)
      */
     @Column(name = "format_content", columnDefinition = "text not null")
     private String formatContent;

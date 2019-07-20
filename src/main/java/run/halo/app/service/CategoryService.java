@@ -15,7 +15,10 @@ import java.util.List;
  * Category service.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date : 2019-03-14
  */
+@Transactional(readOnly = true)
 public interface CategoryService extends CrudService<Category, Integer> {
 
     /**
@@ -35,6 +38,15 @@ public interface CategoryService extends CrudService<Category, Integer> {
      */
     @NonNull
     Category getBySlugName(@NonNull String slugName);
+
+    /**
+     * Get category by slug name
+     *
+     * @param slugName slug name
+     * @return Category
+     */
+    @NonNull
+    Category getBySlugNameOfNonNull(String slugName);
 
     /**
      * Get Category by name.

@@ -154,6 +154,7 @@ public interface PropertyEnum extends ValueEnum<String> {
         propertyEnumClasses.add(QnYunProperties.class);
         propertyEnumClasses.add(SeoProperties.class);
         propertyEnumClasses.add(UpYunProperties.class);
+        propertyEnumClasses.add(ApiProperties.class);
 
         Map<String, PropertyEnum> result = new HashMap<>();
 
