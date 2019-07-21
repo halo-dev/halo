@@ -388,6 +388,41 @@
                     <a-input v-model="options.oss_aliyun_style_rule" />
                   </a-form-item>
                 </div>
+                <div
+                        class="baiduyunForm"
+                        v-show="baiduyunFormHidden"
+                >
+                  <a-form-item
+                          label="Bucket："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_baiduyun_bucket_name" />
+                  </a-form-item>
+                  <a-form-item
+                          label="EndPoint（地域节点）："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_baiduyun_endpoint" />
+                  </a-form-item>
+                  <a-form-item
+                          label="Access Key："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_baiduyun_access_key" />
+                  </a-form-item>
+                  <a-form-item
+                          label="Access Secret："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_baiduyun_access_secret" />
+                  </a-form-item>
+                  <a-form-item
+                          label="缩略图处理策略："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_baiduyun_style_rule" />
+                  </a-form-item>
+                </div>
                 <a-form-item>
                   <a-button
                     type="primary"
@@ -599,6 +634,7 @@ export default {
       upyunFormHidden: false,
       qnyunFormHidden: false,
       aliyunFormHidden: false,
+      baiduyunFormHidden: false,
       logoDrawerVisible: false,
       faviconDrawerVisible: false,
       options: [],
@@ -630,21 +666,31 @@ export default {
           this.upyunFormHidden = false
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
+          this.baiduyunFormHidden = false
           break
         case 'UPYUN':
           this.upyunFormHidden = true
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
+          this.baiduyunFormHidden = false
           break
         case 'QNYUN':
           this.qnyunFormHidden = true
           this.upyunFormHidden = false
           this.aliyunFormHidden = false
+          this.baiduyunFormHidden = false
           break
         case 'ALIYUN':
           this.aliyunFormHidden = true
           this.qnyunFormHidden = false
           this.upyunFormHidden = false
+          this.baiduyunFormHidden = false
+          break
+        case 'BAIDUYUN':
+          this.aliyunFormHidden = false
+          this.qnyunFormHidden = false
+          this.upyunFormHidden = false
+          this.baiduyunFormHidden = true
           break
       }
     },
