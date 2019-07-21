@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.upyun:java-sdk:4.0.1'
     implementation 'com.qiniu:qiniu-java-sdk:7.2.18'
     implementation 'com.aliyun.oss:aliyun-sdk-oss:3.4.2'
+    implementation 'com.baidubce:bce-java-sdk:0.10.36'
     implementation 'net.coobird:thumbnailator:0.4.8'
     implementation 'io.springfox:springfox-swagger2:2.9.2'
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
