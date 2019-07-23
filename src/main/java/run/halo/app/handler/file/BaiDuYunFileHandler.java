@@ -52,7 +52,7 @@ public class BaiDuYunFileHandler implements FileHandler {
 
 
         BosClientConfiguration config = new BosClientConfiguration();
-        config.setCredentials(new DefaultBceCredentials(ossAccessKey,ossAccessSecret));
+        config.setCredentials(new DefaultBceCredentials(ossAccessKey, ossAccessSecret));
         config.setEndpoint(ossEndPoint);
 
         // Init OSS client
@@ -90,17 +90,10 @@ public class BaiDuYunFileHandler implements FileHandler {
 
             return uploadResult;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new FileOperationException("附件 " + file.getOriginalFilename() + " 上传失败(百度云)", e);
         } finally {
             client.shutdown();
         }
-
-        // Build result
-        UploadResult result = new UploadResult();
-
-        log.info("File: [{}] uploaded successfully", file.getOriginalFilename());
-
-        return result;
     }
 
     @Override
@@ -115,14 +108,14 @@ public class BaiDuYunFileHandler implements FileHandler {
         String ossSource = StringUtils.join("https://", ossBucketName, "." + ossEndPoint);
 
         BosClientConfiguration config = new BosClientConfiguration();
-        config.setCredentials(new DefaultBceCredentials(ossAccessKey,ossAccessSecret));
+        config.setCredentials(new DefaultBceCredentials(ossAccessKey, ossAccessSecret));
         config.setEndpoint(ossEndPoint);
 
         // Init OSS client
         BosClient client = new BosClient(config);
 
         try {
-            client.deleteObject(ossBucketName,key);
+            client.deleteObject(ossBucketName, key);
         } catch (Exception e) {
             throw new FileOperationException("附件 " + key + " 从百度云删除失败", e);
         } finally {
