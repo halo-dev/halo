@@ -423,6 +423,47 @@
                     <a-input v-model="options.oss_baiduyun_style_rule" />
                   </a-form-item>
                 </div>
+                <div
+                        class="tencentyunForm"
+                        v-show="tencentyunFormHidden"
+                >
+                  <a-form-item
+                          label="Bucket："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_tencentyun_bucket_name" />
+                  </a-form-item>
+                  <a-form-item
+                          label="区域："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-select v-model="oss_tencentyun_region">
+                      <a-select-option value="ap-beijing-1">北京一区</a-select-option>
+                      <a-select-option value="ap-beijing">北京</a-select-option>
+                      <a-select-option value="ap-shanghai">上海（华东）</a-select-option>
+                      <a-select-option value="ap-guangzhou">广州（华南）</a-select-option>
+                      <a-select-option value="ap-chengdu">成都（西南）</a-select-option>
+                      <a-select-option value="ap-chongqing">重庆</a-select-option>
+                    </a-select>
+                  <a-form-item
+                          label="SecretId："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_tencentyun_access_key" />
+                  </a-form-item>
+                  <a-form-item
+                          label="SecretKey："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_tencentyun_access_secret" />
+                  </a-form-item>
+                  <a-form-item
+                          label="缩略图处理策略："
+                          :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_tencentyun_style_rule" />
+                  </a-form-item>
+                </div>
                 <a-form-item>
                   <a-button
                     type="primary"
@@ -635,6 +676,7 @@ export default {
       qnyunFormHidden: false,
       aliyunFormHidden: false,
       baiduyunFormHidden: false,
+      tencentyunFormHidden: false,
       logoDrawerVisible: false,
       faviconDrawerVisible: false,
       options: [],
@@ -667,30 +709,42 @@ export default {
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
           this.baiduyunFormHidden = false
+          this.tencentyunFormHidden = false
           break
         case 'UPYUN':
           this.upyunFormHidden = true
           this.qnyunFormHidden = false
           this.aliyunFormHidden = false
           this.baiduyunFormHidden = false
+          this.tencentyunFormHidden = false
           break
         case 'QNYUN':
           this.qnyunFormHidden = true
           this.upyunFormHidden = false
           this.aliyunFormHidden = false
           this.baiduyunFormHidden = false
+          this.tencentyunFormHidden = false
           break
         case 'ALIYUN':
           this.aliyunFormHidden = true
           this.qnyunFormHidden = false
           this.upyunFormHidden = false
           this.baiduyunFormHidden = false
+          this.tencentyunFormHidden = false
           break
         case 'BAIDUYUN':
           this.aliyunFormHidden = false
           this.qnyunFormHidden = false
           this.upyunFormHidden = false
           this.baiduyunFormHidden = true
+          this.tencentyunFormHidden = false
+          break
+        case 'TENCENTYUN':
+          this.aliyunFormHidden = false
+          this.qnyunFormHidden = false
+          this.upyunFormHidden = false
+          this.baiduyunFormHidden = false
+          this.tencentyunFormHidden = true
           break
       }
     },
