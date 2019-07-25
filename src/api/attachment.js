@@ -94,11 +94,7 @@ attachmentApi.type = {
   },
   TENCENTYUN: {
     type: 'tencentyun',
-<<<<<<< HEAD
-    text: '百度云'
-=======
     text: '腾讯云'
->>>>>>> dev
   }
 }
 
