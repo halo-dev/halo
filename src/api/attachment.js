@@ -87,6 +87,14 @@ attachmentApi.type = {
   ALIYUN: {
     type: 'aliyun',
     text: '阿里云'
+  },
+  BAIDUYUN: {
+    type: 'baiduyun',
+    text: '百度云'
+  },
+  TENCENTYUN: {
+    type: 'tencentyun',
+    text: '百度云'
   }
 }
 

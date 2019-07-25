@@ -218,7 +218,7 @@ export default {
       })
     },
     handleSelectAvatar(data) {
-      this.user.avatar = data.path
+      this.user.avatar = encodeURI(data.path)
       this.attachmentDrawerVisible = false
     },
     handleSelectGravatar() {

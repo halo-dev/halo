@@ -13,11 +13,13 @@
 
         <div id="editor">
           <mavon-editor
+            ref="md"
             v-model="postToStage.originalContent"
             :boxShadow="false"
             :toolbars="toolbars"
             :ishljs="true"
             :autofocus="false"
+            @imgAdd="pictureUploadHandle"
           />
         </div>
       </a-col>
@@ -41,6 +43,19 @@
                 :help="options.blog_url+'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
               >
                 <a-input v-model="postToStage.url" />
+              </a-form-item>
+
+              <a-form-item
+                label="发表时间："
+              >
+                <a-date-picker
+                  showTime
+                  :defaultValue="pickerDefaultValue"
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="Select Publish Time"
+                  @change="onChange"
+                  @ok="onOk"
+                />
               </a-form-item>
               <a-form-item label="开启评论：">
                 <a-radio-group
@@ -202,6 +217,8 @@ import 'mavon-editor/dist/css/index.css'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import optionApi from '@/api/option'
+import attachmentApi from '@/api/attachment'
+import moment from 'moment'
 export default {
   components: {
     TagSelect,
@@ -268,6 +285,15 @@ export default {
         })
       }
     })
+  },
+  computed: {
+    pickerDefaultValue() {
+      if (this.postToStage.createTime) {
+        var date = new Date(this.postToStage.createTime)
+        return moment(date, 'YYYY-MM-DD HH:mm:ss')
+      }
+      return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
+    }
   },
   methods: {
     loadCategories() {
@@ -338,7 +364,7 @@ export default {
       })
     },
     handleSelectPostThumb(data) {
-      this.postToStage.thumbnail = data.path
+      this.postToStage.thumbnail = encodeURI(data.path)
       this.thumDrawerVisible = false
     },
     autoSaveTimer() {
@@ -347,6 +373,27 @@ export default {
           this.autoSavePost()
         }, 15000)
       }
+    },
+    pictureUploadHandle(pos, $file) {
+      var formdata = new FormData()
+      formdata.append('file', $file)
+      attachmentApi.upload(formdata).then((response) => {
+        var responseObject = response.data
+
+        if (responseObject.status === 200) {
+          var MavonEditor = this.$refs.md
+          MavonEditor.$img2Url(pos, encodeURI(responseObject.data.path))
+          this.$message.success('图片上传成功')
+        } else {
+          this.$message.error('图片上传失败：' + responseObject.message)
+        }
+      })
+    },
+    onChange(value, dateString) {
+      this.postToStage.createTime = value.valueOf()
+    },
+    onOk(value) {
+      this.postToStage.createTime = value.valueOf()
     }
   }
 }

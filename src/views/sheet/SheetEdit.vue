@@ -12,11 +12,13 @@
         </div>
         <div id="editor">
           <mavon-editor
+            ref="md"
             v-model="sheetToStage.originalContent"
             :boxShadow="false"
             :toolbars="toolbars"
             :ishljs="true"
             :autofocus="false"
+            @imgAdd="pictureUploadHandle"
           />
         </div>
       </a-col>
@@ -45,6 +47,16 @@
                     :help="options.blog_url+'/s/'+ (sheetToStage.url ? sheetToStage.url : '{auto_generate}')"
                   >
                     <a-input v-model="sheetToStage.url" />
+                  </a-form-item>
+                  <a-form-item label="发表时间：">
+                    <a-date-picker
+                      showTime
+                      :defaultValue="pickerDefaultValue"
+                      format="YYYY-MM-DD HH:mm:ss"
+                      placeholder="Select Publish Time"
+                      @change="onChange"
+                      @ok="onOk"
+                    />
                   </a-form-item>
                   <a-form-item label="开启评论：">
                     <a-radio-group
@@ -136,6 +148,8 @@ import 'mavon-editor/dist/css/index.css'
 import sheetApi from '@/api/sheet'
 import themeApi from '@/api/theme'
 import optionApi from '@/api/option'
+import attachmentApi from '@/api/attachment'
+import moment from 'moment'
 export default {
   components: {
     mavonEditor,
@@ -194,6 +208,15 @@ export default {
       }
     })
   },
+  computed: {
+    pickerDefaultValue() {
+      if (this.sheetToStage.createTime) {
+        var date = new Date(this.sheetToStage.createTime)
+        return moment(date, 'YYYY-MM-DD HH:mm:ss')
+      }
+      return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
+    }
+  },
   methods: {
     loadCustomTpls() {
       themeApi.customTpls().then(response => {
@@ -247,7 +270,7 @@ export default {
       }
     },
     handleSelectSheetThumb(data) {
-      this.sheetToStage.thumbnail = data.path
+      this.sheetToStage.thumbnail = encodeURI(data.path)
       this.thumDrawerVisible = false
     },
     autoSaveTimer() {
@@ -256,6 +279,27 @@ export default {
           this.autoSaveSheet()
         }, 15000)
       }
+    },
+    pictureUploadHandle(pos, $file) {
+      var formdata = new FormData()
+      formdata.append('file', $file)
+      attachmentApi.upload(formdata).then(response => {
+        var responseObject = response.data
+
+        if (responseObject.status === 200) {
+          var MavonEditor = this.$refs.md
+          MavonEditor.$img2Url(pos, encodeURI(responseObject.data.path))
+          this.$message.success('图片上传成功')
+        } else {
+          this.$message.error('图片上传失败：' + responseObject.message)
+        }
+      })
+    },
+    onChange(value, dateString) {
+      this.sheetToStage.createTime = value.valueOf()
+    },
+    onOk(value) {
+      this.sheetToStage.createTime = value.valueOf()
     }
   }
 }

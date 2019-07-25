@@ -364,7 +364,7 @@ export default {
       this.thumDrawerVisible = true
     },
     selectPhotoThumb(data) {
-      this.photo.url = data.path
+      this.photo.url = encodeURI(data.path)
       this.thumDrawerVisible = false
     },
     resetParam() {

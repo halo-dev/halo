@@ -105,7 +105,10 @@
                     :href="options.blog_url+'/s/'+record.url"
                     target="_blank"
                   >
-                    <a-tooltip placement="topLeft" :title="'点击预览 '+text">{{ text }}</a-tooltip>
+                    <a-tooltip
+                      placement="topLeft"
+                      :title="'点击预览 '+text"
+                    >{{ text }}</a-tooltip>
                   </a>
                 </span>
                 <span
@@ -116,9 +119,9 @@
                   {{ statusProperty.text }}
                 </span>
                 <span
-                  slot="updateTime"
-                  slot-scope="updateTime"
-                >{{ updateTime | timeAgo }}</span>
+                  slot="createTime"
+                  slot-scope="createTime"
+                >{{ createTime | timeAgo }}</span>
 
                 <span
                   slot="action"
@@ -161,7 +164,25 @@
                   >
                     <a href="javascript:;">删除</a>
                   </a-popconfirm>
-
+                  <a-divider type="vertical" />
+                  <a-dropdown :trigger="['click']">
+                    <a
+                      href="javascript:void(0);"
+                      class="ant-dropdown-link"
+                    >更多</a>
+                    <a-menu slot="overlay">
+                      <a-menu-item key="1">
+                        <a-popconfirm
+                          :title="'你确定要添加【' + sheet.title + '】到菜单？'"
+                          @confirm="handleSheetToMenu(sheet)"
+                          okText="确定"
+                          cancelText="取消"
+                        >
+                          <a href="javascript:void(0);">添加到菜单</a>
+                        </a-popconfirm>
+                      </a-menu-item>
+                    </a-menu>
+                  </a-dropdown>
                 </span>
               </a-table>
             </a-tab-pane>
@@ -176,6 +197,8 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import sheetApi from '@/api/sheet'
 import optionApi from '@/api/option'
+import menuApi from '@/api/menu'
+
 const internalColumns = [
   {
     title: '页面名称',
@@ -218,13 +241,13 @@ const customColumns = [
     dataIndex: 'visits'
   },
   {
-    title: '更新时间',
-    dataIndex: 'updateTime',
-    scopedSlots: { customRender: 'updateTime' }
+    title: '发布时间',
+    dataIndex: 'createTime',
+    scopedSlots: { customRender: 'createTime' }
   },
   {
     title: '操作',
-    width: '150px',
+    width: '180px',
     scopedSlots: { customRender: 'action' }
   }
 ]
@@ -238,6 +261,7 @@ export default {
       internalSheets: [],
       sheets: [],
       options: [],
+      menu: {},
       keys: ['blog_url']
     }
   },
@@ -284,15 +308,23 @@ export default {
         this.$message.success('删除成功！')
         this.loadSheets()
       })
+    },
+    handleSheetToMenu(sheet) {
+      this.menu['name'] = sheet.title
+      this.menu['url'] = `/s/${sheet.url}`
+      menuApi.create(this.menu).then(response => {
+        this.$message.success('添加到菜单成功！')
+        this.menu = {}
+      })
     }
   }
 }
 </script>
 <style scoped>
-a{
+a {
   text-decoration: none;
 }
-.sheet-title{
+.sheet-title {
   max-width: 300px;
   display: block;
   white-space: nowrap;
