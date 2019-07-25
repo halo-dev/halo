@@ -94,7 +94,7 @@ attachmentApi.type = {
   },
   TENCENTYUN: {
     type: 'tencentyun',
-    text: '百度云'
+    text: '腾讯云'
   }
 }
 
