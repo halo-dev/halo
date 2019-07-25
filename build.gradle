@@ -24,6 +24,7 @@ repositories {
 configurations {
     implementation {
         exclude module: 'spring-boot-starter-tomcat'
+        exclude module: 'slf4j-log4j12'
     }
 
     developmentOnly
@@ -55,6 +56,7 @@ dependencies {
     implementation 'com.qiniu:qiniu-java-sdk:7.2.18'
     implementation 'com.aliyun.oss:aliyun-sdk-oss:3.4.2'
     implementation 'com.baidubce:bce-java-sdk:0.10.36'
+    implementation 'com.qcloud:cos_api:5.5.7'
     implementation 'net.coobird:thumbnailator:0.4.8'
     implementation 'io.springfox:springfox-swagger2:2.9.2'
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
