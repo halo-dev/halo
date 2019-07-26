@@ -54,6 +54,11 @@ public class TencentYunFileHandler implements FileHandler {
         String ossStyleRule = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_STYLE_RULE).toString();
         String ossSource = StringUtils.join("https://", ossBucketName, ".cos." + ossRegion+".myqcloud.com");
 
+        //get file attribute
+        long size = file.getSize();
+        String contentType = file.getContentType();
+
+
 
         COSCredentials cred = new BasicCOSCredentials(ossAccessKey, ossAccessSecret);
         Region region = new Region(ossRegion);
@@ -74,6 +79,10 @@ public class TencentYunFileHandler implements FileHandler {
 
             // Upload
             ObjectMetadata objectMetadata = new ObjectMetadata();
+            //提前告知输入流的长度, 否则可能导致 oom
+            objectMetadata.setContentLength(size);
+            // 设置 Content type, 默认是 application/octet-stream
+            objectMetadata.setContentType(contentType);
             PutObjectResult putObjectResponseFromInputStream = cosClient.putObject(ossBucketName, upFilePath, file.getInputStream(),objectMetadata);
             if (putObjectResponseFromInputStream == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到腾讯云失败 ");
