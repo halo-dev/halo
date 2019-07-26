@@ -389,55 +389,55 @@
                   </a-form-item>
                 </div>
                 <div
-                        class="baiduyunForm"
-                        v-show="baiduyunFormHidden"
+                  class="baiduyunForm"
+                  v-show="baiduyunFormHidden"
                 >
                   <a-form-item
-                          label="Bucket："
-                          :wrapper-col="wrapperCol"
+                    label="Bucket："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_baiduyun_bucket_name" />
                   </a-form-item>
                   <a-form-item
-                          label="EndPoint（地域节点）："
-                          :wrapper-col="wrapperCol"
+                    label="EndPoint（地域节点）："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_baiduyun_endpoint" />
                   </a-form-item>
                   <a-form-item
-                          label="Access Key："
-                          :wrapper-col="wrapperCol"
+                    label="Access Key："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_baiduyun_access_key" />
                   </a-form-item>
                   <a-form-item
-                          label="Access Secret："
-                          :wrapper-col="wrapperCol"
+                    label="Access Secret："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_baiduyun_access_secret" />
                   </a-form-item>
                   <a-form-item
-                          label="缩略图处理策略："
-                          :wrapper-col="wrapperCol"
+                    label="缩略图处理策略："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_baiduyun_style_rule" />
                   </a-form-item>
                 </div>
                 <div
-                        class="tencentyunForm"
-                        v-show="tencentyunFormHidden"
+                  class="tencentyunForm"
+                  v-show="tencentyunFormHidden"
                 >
                   <a-form-item
-                          label="Bucket："
-                          :wrapper-col="wrapperCol"
+                    label="Bucket："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_tencentyun_bucket_name" />
                   </a-form-item>
                   <a-form-item
-                          label="区域："
-                          :wrapper-col="wrapperCol"
+                    label="区域："
+                    :wrapper-col="wrapperCol"
                   >
-                    <a-select v-model="oss_tencentyun_region">
+                    <a-select v-model="options.oss_tencentyun_region">
                       <a-select-option value="ap-beijing-1">北京一区</a-select-option>
                       <a-select-option value="ap-beijing">北京</a-select-option>
                       <a-select-option value="ap-shanghai">上海（华东）</a-select-option>
@@ -445,21 +445,22 @@
                       <a-select-option value="ap-chengdu">成都（西南）</a-select-option>
                       <a-select-option value="ap-chongqing">重庆</a-select-option>
                     </a-select>
+                  </a-form-item>
                   <a-form-item
-                          label="SecretId："
-                          :wrapper-col="wrapperCol"
+                    label="Secret Id："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_tencentyun_access_key" />
                   </a-form-item>
                   <a-form-item
-                          label="SecretKey："
-                          :wrapper-col="wrapperCol"
+                    label="Secret Key："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_tencentyun_access_secret" />
                   </a-form-item>
                   <a-form-item
-                          label="缩略图处理策略："
-                          :wrapper-col="wrapperCol"
+                    label="缩略图处理策略："
+                    :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_tencentyun_style_rule" />
                   </a-form-item>
