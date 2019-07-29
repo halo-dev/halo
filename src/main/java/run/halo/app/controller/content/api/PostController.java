@@ -20,6 +20,7 @@ import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.CommentWithHasChildrenVO;
+import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
@@ -69,22 +70,22 @@ public class PostController {
 
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
-    public BasePostDetailDTO getBy(@PathVariable("postId") Integer postId,
+    public PostDetailVO getBy(@PathVariable("postId") Integer postId,
                                    @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
                                    @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
-        BasePostDetailDTO detailDTO = postService.convertToDetail(postService.getById(postId));
+        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getById(postId));
 
         if (formatDisabled) {
             // Clear the format content
-            detailDTO.setFormatContent(null);
+            postDetailVO.setFormatContent(null);
         }
 
         if (sourceDisabled) {
             // Clear the original content
-            detailDTO.setOriginalContent(null);
+            postDetailVO.setOriginalContent(null);
         }
 
-        return detailDTO;
+        return postDetailVO;
     }
 
     @GetMapping("{postId:\\d+}/comments/top_view")
