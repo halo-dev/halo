@@ -16,8 +16,6 @@ import run.halo.app.model.enums.PostType;
 @EqualsAndHashCode(callSuper = true)
 public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
-    private PostType type;
-
     private String summary;
 
     private String thumbnail;

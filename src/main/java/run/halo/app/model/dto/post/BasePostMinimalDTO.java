@@ -28,8 +28,6 @@ public class BasePostMinimalDTO implements OutputConverter<BasePostMinimalDTO, B
 
     private String url;
 
-    private PostType type;
-
     private Date updateTime;
 
     private Date createTime;
