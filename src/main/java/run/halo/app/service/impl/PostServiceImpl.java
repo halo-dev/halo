@@ -194,9 +194,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         log.debug("Created post categories: [{}]", postCategories);
 
         // Convert to post detail vo
-        return convertTo(post,
-                () -> ServiceUtils.fetchProperty(postTags, PostTag::getTagId),
-                () -> ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId));
+        return convertTo(post, tags, categories);
     }
 
     @Override
@@ -397,7 +395,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
         }
 
-        List<Category> categories = postCategoryService.listCategoryBy(post.getId());
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
 
         if (categories.size() > 0) {
             content.append("categories:").append("\n");
@@ -413,9 +411,13 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     public PostDetailVO convertToDetailVo(Post post) {
-        return convertTo(post,
-                () -> postTagService.listTagIdsByPostId(post.getId()),
-                () -> postCategoryService.listCategoryIdsByPostId(post.getId()));
+        // List tags
+        List<Tag> tags = postTagService.listTagsBy(post.getId());
+        // List categories
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
+
+        // Convert to detail vo
+        return convertTo(post, tags, categories);
     }
 
     @Override
@@ -494,22 +496,29 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     /**
      * Converts to post detail vo.
      *
-     * @param post                  post must not be null
-     * @param tagIdSetSupplier      tag id set supplier
-     * @param categoryIdSetSupplier category id set supplier
+     * @param post       post must not be null
+     * @param tags       tags
+     * @param categories categories
      * @return post detail vo
      */
     @NonNull
-    private PostDetailVO convertTo(@NonNull Post post, @Nullable Supplier<Set<Integer>> tagIdSetSupplier, @Nullable Supplier<Set<Integer>> categoryIdSetSupplier) {
+    private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Tag> tags, @Nullable List<Category> categories) {
         Assert.notNull(post, "Post must not be null");
 
+        // Convert to base detail vo
         PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
 
+        // Extract ids
+        Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);
+        Set<Integer> categoryIds = ServiceUtils.fetchProperty(categories, Category::getId);
+
         // Get post tag ids
-        postDetailVO.setTagIds(tagIdSetSupplier == null ? Collections.emptySet() : tagIdSetSupplier.get());
+        postDetailVO.setTagIds(tagIds);
+        postDetailVO.setTags(tagService.convertTo(tags));
 
         // Get post category ids
-        postDetailVO.setCategoryIds(categoryIdSetSupplier == null ? Collections.emptySet() : categoryIdSetSupplier.get());
+        postDetailVO.setCategoryIds(categoryIds);
+        postDetailVO.setCategories(categoryService.convertTo(categories));
 
         return postDetailVO;
     }
