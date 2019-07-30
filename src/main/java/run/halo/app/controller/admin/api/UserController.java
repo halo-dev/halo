@@ -45,6 +45,7 @@ public class UserController {
         return new UserDTO().convertFrom(userService.update(user));
     }
 
+    //修改密码接口
     @PutMapping("profiles/password")
     public BaseResponse updatePassword(@RequestBody @Valid PasswordParam passwordParam, User user) {
         userService.updatePassword(passwordParam.getOldPassword(), passwordParam.getNewPassword(), user.getId());
