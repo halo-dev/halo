@@ -2,7 +2,7 @@
 
 <#-- 统计代码 -->
 <#macro statistics>
-    ${options.statistics_code!}
+    ${options.blog_statistics_code!}
 </#macro>
 
 <#-- 页脚信息 -->
@@ -10,27 +10,20 @@
     ${options.blog_footer_info!}
 </#macro>
 
+<#macro custom_head>
+    ${options.blog_custom_head!}
+</#macro>
+
 <#-- favicon -->
 <#macro favicon>
-    <#if options.blog_favicon??>
-        <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon}">
+    <#if options.blog_favicon?? && options.blog_favicon!=''>
+        <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon!}">
     </#if>
 </#macro>
 
-<#-- 站点验证代码 -->
+<#-- 站点验证代码，已废弃 -->
 <#macro verification>
-    <#if options.blog_verification_google??>
-        <meta name="google-site-verification" content="${options.blog_verification_google}" />
-    </#if>
-    <#if options.blog_verification_bing??>
-        <meta name="msvalidate.01" content="${options.blog_verification_bing}" />
-    </#if>
-    <#if options.blog_verification_baidu??>
-        <meta name="baidu-site-verification" content="${options.blog_verification_baidu}" />
-    </#if>
-    <#if options.blog_verification_qihu??>
-        <meta name="360-site-verification" content="${options.blog_verification_qihu}" />
-    </#if>
+
 </#macro>
 
 <#-- 时间格式化 几...前 -->
@@ -45,4 +38,19 @@
         <#t><#elseif ct gt 0>${ct?int} 秒前
         <#t><#else>刚刚
     </#if>
+</#macro>
+
+<#macro globalHeader>
+    <#if options.seo_spider_disabled!false>
+        <meta name="robots" content="none">
+    </#if>
+    <meta name="generator" content="Halo ${version!}"/>
+    <@custom_head />
+    <@verification />
+    <@favicon />
+</#macro>
+
+<#macro globalFooter>
+    <@footer_info />
+    <@statistics />
 </#macro>

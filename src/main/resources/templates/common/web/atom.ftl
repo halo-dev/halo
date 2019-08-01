@@ -8,39 +8,39 @@
      xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
     <channel>
         <title>${options.blog_title!}</title>
-        <atom:link href="${options.blog_url!}/atom.xml" rel="self" type="application/rss+xml"/>
-        <link>${options.blog_url!}</link>
-        <description>${user.userDesc!}</description>
+        <atom:link href="${context!}/atom.xml" rel="self" type="application/rss+xml"/>
+        <link>${context!}</link>
+        <description>${user.description!}</description>
         <language>zh-CN</language>
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>
-        <generator>https://github.com/ruibaby/halo</generator>
+        <generator>https://github.com/halo-dev/halo</generator>
     </channel>
     <#if posts?? && posts?size gt 0>
         <#list posts as post>
             <item>
-                <title>${post.postTitle!}</title>
-                <link>${options.blog_url!}/archives/${post.postUrl!}</link>
-                <comments>${options.blog_url!}/archives/${post.postUrl!}#comments</comments>
-                <pubDate>${post.postDate}</pubDate>
-                <dc:creator><![CDATA[${user.userDisplayName!}]]></dc:creator>
+                <title><![CDATA[${post.title!}]]></title>
+                <link>${context!}/archives/${post.url!}</link>
+                <comments>${context!}/archives/${post.url!}#comments</comments>
+                <pubDate>${post.createTime!}</pubDate>
+                <dc:creator><![CDATA[${user.nickname!}]]></dc:creator>
 
                 <#if post.categories?? && post.categories?size gt 0>
                     <#list post.categories as cate>
-                        <category><![CDATA[${cate.cateName!}]]></category>
+                        <category><![CDATA[${cate.name!}]]></category>
                     </#list>
                 </#if>
                 <description>
                     <![CDATA[
-                        ${post.postSummary!}
+                        ${post.summary!}
                     ]]>
                 </description>
                 <content:encoded>
                     <![CDATA[
-                        ${post.postContent!}
+                        ${post.summary!}
                     ]]>
                 </content:encoded>
-                <slash:comments>${post.comments?size}</slash:comments>
+                <slash:comments>${post.commentCount!0}</slash:comments>
             </item>
         </#list>
     </#if>

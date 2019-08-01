@@ -20,8 +20,8 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 
         #myTable {
             list-style: none;
-            margin: 10px 0px 10px 0px;
-            padding: 0px;
+            margin: 10px 0 10px 0;
+            padding: 0;
             width: 100%;
             min-width: 804px;
         }
@@ -80,7 +80,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 
         #footer {
             padding: 2px;
-            margin: 0px;
+            margin: 0;
             font-size: 8pt;
             color: gray;
             min-width: 900px;
@@ -103,7 +103,6 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             margin-top: 10px;
         }
 
-        /* 窗口缩小到768px以下时 */
         @media (max-width: 768px) {
             .T2-h, .T3-h, .T4-h, .T2, .T3, .T4 {
                 display: none;
@@ -118,7 +117,6 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             }
         }
 
-        /* 窗口放大到768px以上时 */
         @media (min-width: 768px) {
 
         }
@@ -126,7 +124,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 </head>
 <body>
 <h2 style="text-align: center; margin-top: 20px">${options.blog_title!} 网站地图 </h2>
-<div id="nav"><a href="${options.blog_url!}"><strong>${options.blog_title!}</strong></a> &raquo; <a href="${options.blog_url!}/sitemap.html">站点地图</a></div>
+<div id="nav"><a href="${context!}"><strong>${options.blog_title!}</strong></a> &raquo; <a href="${context!}/sitemap.html">站点地图</a></div>
 <div id="content">
     <h3>最新文章</h3>
     <ul id="myTable">
@@ -138,7 +136,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
         </li>
         <div class="myClear"></div>
         <li>
-            <div class="T1 pull-left"><a href="${options.blog_url!}" title="${options.blog_title!}">${options.blog_title!}</a></div>
+            <div class="T1 pull-left"><a href="${context!}" title="${options.blog_title!}">${options.blog_title!}</a></div>
             <div class="T2 pull-right">${options.blog_start!}</div>
             <div class="T3 pull-right">daily</div>
             <div class="T4 pull-right">1</div>
@@ -147,8 +145,8 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
         <#if posts?? && posts?size gt 0>
             <#list posts as post>
                 <li>
-                    <div class="T1 pull-left"><a href="${options.blog_url!}/archives/${post.postUrl!}" title="${post.postTitle!}">${post.postTitle!} | ${options.blog_title!}</a></div>
-                    <div class="T2 pull-right">${post.postDate?string('yyyy-MM-dd')}</div>
+                    <div class="T1 pull-left"><a href="${context!}/archives/${post.url!}" title="${post.title!}">${post.title!} | ${options.blog_title!}</a></div>
+                    <div class="T2 pull-right">${post.createTime?string('yyyy-MM-dd')}</div>
                     <div class="T3 pull-right">daily</div>
                     <div class="T4 pull-right">0.6</div>
                 </li>
@@ -160,41 +158,41 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 <div id="content">
     <h3>分类目录</h3>
     <ul id="myTable">
-        <@commonTag method="categories">
+        <@categoryTag method="list">
             <#if categories?? && categories?size gt 0>
                 <#list categories as cate>
                     <li>
-                        <div class="T1 pull-left"><a href="${options.blog_url}/categories/${cate.cateUrl!}" title="前端编程">${cate.cateName} | ${options.blog_title!}</a></div>
-                        <div class="T2 pull-right">${options.blog_start!}</div>
+                        <div class="T1 pull-left"><a href="${options.blog_url}/categories/${cate.slugName!}" title="${cate.name}">${cate.name} | ${options.blog_title!}</a></div>
+                        <div class="T2 pull-right">${cate.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
                     </li>
                     <div class="myClear"></div>
                 </#list>
             </#if>
-        </@commonTag>
+        </@categoryTag>
     </ul>
 </div>
 <div id="content">
     <h3>标签目录</h3>
     <ul id="myTable">
-        <@commonTag method="tags">
+        <@tagTag method="list">
             <#if tags?? && tags?size gt 0>
                 <#list tags as tag>
                     <li>
-                        <div class="T1 pull-left"><a href="${options.blog_url}/tags/${tag.tagUrl!}" title="前端编程">${tag.tagName} | ${options.blog_title!}</a></div>
-                        <div class="T2 pull-right">${options.blog_start!}</div>
+                        <div class="T1 pull-left"><a href="${options.blog_url}/tags/${tag.slugName!}" title="${tag.name}">${tag.name} | ${options.blog_title!}</a></div>
+                        <div class="T2 pull-right">${tag.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
                     </li>
                     <div class="myClear"></div>
                 </#list>
             </#if>
-        </@commonTag>
+        </@tagTag>
     </ul>
 </div>
 <div id="footer">
-    该文件由<a href="${options.blog_url!}" title="${options.blog_title!}">${options.blog_title!}</a>网站自动生成。
+    该文件由<a href="${context!}" title="${options.blog_title!}">${options.blog_title!}</a>网站自动生成。
 </div>
 </body>
 </html>

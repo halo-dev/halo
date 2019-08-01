@@ -9,54 +9,51 @@ server:
   servlet:
     session:
       timeout: 86400s
+  compression:
+    enabled: true
+    mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
 spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  devtools:
+    add-properties: false
   output:
     ansi:
       enabled: always
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
-    # H2database 配置
+    # H2 Database 配置
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/halo/halo
+    url: jdbc:h2:file:~/.halo/db/halo
     username: admin
     password: 123456
 
-    #MySql配置
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-#    username: root
-#    password: 123456
+    # MySQL 配置
+  #  driver-class-name: com.mysql.cj.jdbc.Driver
+  #  url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+  #  username: root
+  #  password: 123456
 
   h2:
     console:
       settings:
-        web-allow-others: true
+        web-allow-others: false
       path: /h2-console
-      enabled: true
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
-  freemarker:
-    allow-request-override: false
-    cache: false
-    check-template-location: true
-    charset: utf-8
-    content-type: text/html
-    expose-request-attributes: false
-    expose-session-attributes: false
-    expose-spring-macro-helpers: true
-    suffix: .ftl
-    settings:
-      auto_import: /spring.ftl as spring
+    open-in-view: false
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-
-  # 多语言资源文件路径
-  messages:
-    basename: i18n/messages
+      max-file-size: 10240MB
+      max-request-size: 10240MB
+  mvc:
+    favicon:
+      enabled: false
 logging:
-  file: ./logs/log.log
+  level:
+    run.halo.app: INFO
+  path: ${user.home}/.halo/logs
