@@ -15,8 +15,8 @@ import java.util.List;
  * @author johnniang
  * @date 19-6-18
  */
-@RestController
-@RequestMapping("/api/admin/traces")
+//@RestController
+//@RequestMapping("/api/admin/traces")
 public class TraceController {
 
     private final TraceService traceService;

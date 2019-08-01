@@ -18,8 +18,8 @@ import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.support.HaloConst;
 
@@ -66,7 +66,7 @@ public class MarkdownUtils {
     /**
      * Render Markdown content
      *
-     * @param content content
+     * @param markdown content
      * @return String
      */
     public static String renderHtml(String markdown) {
@@ -107,7 +107,7 @@ public class MarkdownUtils {
     /**
      * Get front-matter
      *
-     * @param content content
+     * @param markdown content
      * @return Map
      */
     public static Map<String, List<String>> getFrontMatter(String markdown) {

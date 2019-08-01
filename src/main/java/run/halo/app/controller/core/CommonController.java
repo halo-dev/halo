@@ -68,7 +68,7 @@ public class CommonController extends AbstractErrorController {
     public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
         HttpStatus status = getStatus(request);
 
-        log.error("Error path: [{}], status: [{}]", getErrorPath(), status);
+//        log.error("Error path: [{}], status: [{}]", getErrorPath(), status);
 
         handleCustomException(request);
 

@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.trace.http.HttpTrace;
 import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import java.util.List;
  * @author johnniang
  * @date 2019-06-18
  */
-@Service
+//@Service
 public class TraceServiceImpl implements TraceService {
 
     private final HttpTraceRepository httpTraceRepository;

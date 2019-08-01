@@ -403,6 +403,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         };
     }
 
+    @Override
     @NonNull
     public List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments, @Nullable Comparator<BaseCommentVO> comparator) {
         if (CollectionUtils.isEmpty(comments)) {

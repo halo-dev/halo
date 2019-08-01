@@ -1,5 +1,5 @@
 server:
-  port: 8090
+  port: 8080
   use-forward-headers: true
   undertow:
     io-threads: 2
@@ -23,24 +23,24 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
-    # H2 Database 配置
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/.halo/db/halo
-    username: admin
-    password: 123456
+    # H2database 配置
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:file:~/halo/halo
+#    username: admin
+#    password: 123456
 
-    # MySQL 配置
-  #  driver-class-name: com.mysql.cj.jdbc.Driver
-  #  url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-  #  username: root
-  #  password: 123456
+    #MySql配置
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.93.184.44:3306/halo?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: halo
+    password: Shuyumeng2!
 
-  h2:
-    console:
-      settings:
-        web-allow-others: false
-      path: /h2-console
-      enabled: false
+#  h2:
+#    console:
+#      settings:
+#        web-allow-others: true
+#      path: /h2-console
+#      enabled: true
   jpa:
     hibernate:
       ddl-auto: update
@@ -55,5 +55,6 @@ spring:
       enabled: false
 logging:
   level:
-    run.halo.app: INFO
-  path: ${user.home}/.halo/logs
+    root: info
+    run.halo.app: info
+#  path: ${user.home}/.halo/logs
