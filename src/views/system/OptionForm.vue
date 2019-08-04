@@ -250,8 +250,25 @@
                   </a-select>
                 </a-form-item>
                 <div
+                  class="smmsForm"
+                  v-show="smmsFormVisible"
+                >
+                  <a-form-item
+                    label="Secret Token："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-tooltip
+                      :trigger="['focus']"
+                      placement="right"
+                      title="需要到 sm.ms 官网注册"
+                    >
+                      <a-input v-model="options.smms_api_secret_token" />
+                    </a-tooltip>
+                  </a-form-item>
+                </div>
+                <div
                   class="upyunForm"
-                  v-show="upyunFormHidden"
+                  v-show="upyunFormVisible"
                 >
                   <a-form-item
                     label="域名："
@@ -301,7 +318,7 @@
                 </div>
                 <div
                   class="qnyunForm"
-                  v-show="qnyunFormHidden"
+                  v-show="qnyunFormVisible"
                 >
                   <a-form-item
                     label="区域："
@@ -355,7 +372,7 @@
                 </div>
                 <div
                   class="aliyunForm"
-                  v-show="aliyunFormHidden"
+                  v-show="aliyunFormVisible"
                 >
                   <a-form-item
                     label="Bucket："
@@ -390,7 +407,7 @@
                 </div>
                 <div
                   class="baiduyunForm"
-                  v-show="baiduyunFormHidden"
+                  v-show="baiduyunFormVisible"
                 >
                   <a-form-item
                     label="Bucket："
@@ -425,7 +442,7 @@
                 </div>
                 <div
                   class="tencentyunForm"
-                  v-show="tencentyunFormHidden"
+                  v-show="tencentyunFormVisible"
                 >
                   <a-form-item
                     label="Bucket："
@@ -673,11 +690,12 @@ export default {
         sm: { span: 12 },
         xs: { span: 24 }
       },
-      upyunFormHidden: false,
-      qnyunFormHidden: false,
-      aliyunFormHidden: false,
-      baiduyunFormHidden: false,
-      tencentyunFormHidden: false,
+      smmsFormVisible: false,
+      upyunFormVisible: false,
+      qnyunFormVisible: false,
+      aliyunFormVisible: false,
+      baiduyunFormVisible: false,
+      tencentyunFormVisible: false,
       logoDrawerVisible: false,
       faviconDrawerVisible: false,
       options: [],
@@ -705,47 +723,60 @@ export default {
     handleAttachChange(e) {
       switch (e) {
         case 'LOCAL':
+          this.upyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
+          this.smmsFormVisible = false
+          break
         case 'SMMS':
-          this.upyunFormHidden = false
-          this.qnyunFormHidden = false
-          this.aliyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = true
+          this.upyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'UPYUN':
-          this.upyunFormHidden = true
-          this.qnyunFormHidden = false
-          this.aliyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.upyunFormVisible = true
+          this.qnyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'QNYUN':
-          this.qnyunFormHidden = true
-          this.upyunFormHidden = false
-          this.aliyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.qnyunFormVisible = true
+          this.upyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'ALIYUN':
-          this.aliyunFormHidden = true
-          this.qnyunFormHidden = false
-          this.upyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.aliyunFormVisible = true
+          this.qnyunFormVisible = false
+          this.upyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'BAIDUYUN':
-          this.aliyunFormHidden = false
-          this.qnyunFormHidden = false
-          this.upyunFormHidden = false
-          this.baiduyunFormHidden = true
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.aliyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.upyunFormVisible = false
+          this.baiduyunFormVisible = true
+          this.tencentyunFormVisible = false
           break
         case 'TENCENTYUN':
-          this.aliyunFormHidden = false
-          this.qnyunFormHidden = false
-          this.upyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = true
+          this.smmsFormVisible = false
+          this.aliyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.upyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = true
           break
       }
     },
