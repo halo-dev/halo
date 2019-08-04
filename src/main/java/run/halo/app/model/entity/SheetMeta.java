@@ -11,6 +11,6 @@ import javax.persistence.Entity;
  * @date 2019-08-04
  */
 @Entity(name = "SheetMeta")
-@DiscriminatorValue("0")
+@DiscriminatorValue("1")
 public class SheetMeta extends BaseMeta {
 }
