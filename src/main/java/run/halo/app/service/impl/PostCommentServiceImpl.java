@@ -62,6 +62,14 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     }
 
     @Override
+    public PostCommentWithPostVO convertToWithPostVo(PostComment comment) {
+        Assert.notNull(comment, "PostComment must not be null");
+        PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
+        postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postRepository.getOne(comment.getPostId())));
+        return postCommentWithPostVO;
+    }
+
+    @Override
     public List<PostCommentWithPostVO> convertToWithPostVo(List<PostComment> postComments) {
         if (CollectionUtils.isEmpty(postComments)) {
             return Collections.emptyList();
