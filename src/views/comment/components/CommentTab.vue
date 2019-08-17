@@ -203,6 +203,13 @@
             >
               <a href="javascript:;">删除</a>
             </a-popconfirm>
+
+            <a-divider type="vertical" />
+
+            <a
+              href="javascript:;"
+              @click="handleShowDetailDrawer(record)"
+            >详情</a>
           </span>
         </a-table>
         <div class="page-wrapper">
@@ -243,12 +250,19 @@
         </a-form-item>
       </a-form>
     </a-modal>
+    <CommentDetail
+      v-model="commentDetailVisible"
+      v-if="selectComment"
+      :comment="selectComment"
+      :type="this.type"
+    />
   </div>
 </template>
 <script>
 import commentApi from '@/api/comment'
 import optionApi from '@/api/option'
 import marked from 'marked'
+import CommentDetail from './CommentDetail'
 const postColumns = [
   {
     title: '昵称',
@@ -263,22 +277,25 @@ const postColumns = [
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
+    width: '100px',
     scopedSlots: { customRender: 'status' }
   },
   {
     title: '评论文章',
     dataIndex: 'post',
+    width: '200px',
     scopedSlots: { customRender: 'post' }
   },
   {
     title: '日期',
     dataIndex: 'createTime',
+    width: '170px',
     scopedSlots: { customRender: 'createTime' }
   },
   {
     title: '操作',
     dataIndex: 'action',
-    width: '150px',
+    width: '180px',
     scopedSlots: { customRender: 'action' }
   }
 ]
@@ -296,27 +313,33 @@ const sheetColumns = [
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
+    width: '100px',
     scopedSlots: { customRender: 'status' }
   },
   {
     title: '评论页面',
     dataIndex: 'sheet',
+    width: '200px',
     scopedSlots: { customRender: 'sheet' }
   },
   {
     title: '日期',
     dataIndex: 'createTime',
+    width: '150px',
     scopedSlots: { customRender: 'createTime' }
   },
   {
     title: '操作',
     dataIndex: 'action',
-    width: '150px',
+    width: '180px',
     scopedSlots: { customRender: 'action' }
   }
 ]
 export default {
   name: 'CommentTab',
+  components: {
+    CommentDetail
+  },
   props: {
     type: {
       type: String,
@@ -351,7 +374,8 @@ export default {
       loading: false,
       commentStatus: commentApi.commentStatus,
       options: [],
-      keys: ['blog_url']
+      keys: ['blog_url'],
+      commentDetailVisible: false
     }
   },
   created() {
@@ -492,6 +516,10 @@ export default {
           name: comment.author
         }
       }
+    },
+    handleShowDetailDrawer(comment) {
+      this.selectComment = comment
+      this.commentDetailVisible = true
     }
   }
 }

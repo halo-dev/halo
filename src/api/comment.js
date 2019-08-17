@@ -45,6 +45,14 @@ commentApi.create = (target, comment) => {
   })
 }
 
+commentApi.update = (target, commentId, comment) => {
+  return service({
+    url: `${baseUrl}/${target}/comments/${commentId}`,
+    data: comment,
+    method: 'put'
+  })
+}
+
 /**
  * Creates a comment.
  * @param {String} target

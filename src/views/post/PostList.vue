@@ -415,6 +415,7 @@ const columns = [
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
+    width: '100px',
     scopedSlots: { customRender: 'status' }
   },
   {
@@ -428,7 +429,8 @@ const columns = [
     scopedSlots: { customRender: 'tags' }
   },
   {
-    title: '评论量',
+    title: '评论',
+    width: '70px',
     dataIndex: 'commentCount'
   },
   {
@@ -438,6 +440,7 @@ const columns = [
   {
     title: '发布时间',
     dataIndex: 'createTime',
+    width: '170px',
     scopedSlots: { customRender: 'createTime' }
   },
   {
