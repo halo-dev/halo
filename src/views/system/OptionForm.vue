@@ -60,6 +60,7 @@
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="options.blog_footer_info"
+                    placeholder="支持 HTML 格式的文本"
                   />
                 </a-form-item>
                 <a-form-item>
@@ -85,13 +86,10 @@
                   label="关键词： "
                   :wrapper-col="wrapperCol"
                 >
-                  <a-tooltip
-                    :trigger="['focus']"
-                    placement="right"
-                    title="多个关键词以英文逗号隔开"
-                  >
-                    <a-input v-model="options.seo_keywords" />
-                  </a-tooltip>
+                  <a-input
+                    v-model="options.seo_keywords"
+                    placeholder="多个关键词以英文状态下的逗号隔开"
+                  />
                 </a-form-item>
                 <a-form-item
                   label="博客描述："
@@ -257,13 +255,10 @@
                     label="Secret Token："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-tooltip
-                      :trigger="['focus']"
-                      placement="right"
-                      title="需要到 sm.ms 官网注册"
-                    >
-                      <a-input v-model="options.smms_api_secret_token" />
-                    </a-tooltip>
+                    <a-input
+                      v-model="options.smms_api_secret_token"
+                      placeholder="需要到 sm.ms 官网注册后获取"
+                    />
                   </a-form-item>
                 </div>
                 <div
@@ -535,13 +530,10 @@
                         label="邮箱密码："
                         :wrapper-col="wrapperCol"
                       >
-                        <a-tooltip
-                          :trigger="['focus']"
-                          placement="right"
-                          title="部分邮箱可能是授权码"
-                        >
-                          <a-input v-model="options.email_password" />
-                        </a-tooltip>
+                        <a-input
+                          v-model="options.email_password"
+                          placeholder="部分邮箱可能是授权码"
+                        />
                       </a-form-item>
                       <a-form-item
                         label="发件人："
@@ -633,6 +625,7 @@
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="options.blog_custom_head"
+                    placeholder="将放置于每个页面的<head></head>标签中"
                   />
                 </a-form-item>
                 <a-form-item
@@ -643,8 +636,20 @@
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="options.blog_statistics_code"
+                    placeholder="第三方网站统计的代码，如：Google Analytics、百度统计、CNZZ 等"
                   />
                 </a-form-item>
+                <!-- <a-form-item
+                  label="黑名单 IP："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.blog_ip_blacklist"
+                    placeholder="多个 IP 地址换行隔开"
+                  />
+                </a-form-item> -->
                 <a-form-item>
                   <a-button
                     type="primary"
