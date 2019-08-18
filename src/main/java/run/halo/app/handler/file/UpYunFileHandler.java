@@ -23,6 +23,7 @@ import java.util.Objects;
  * Up Yun file handler.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/27/19
  */
 @Slf4j
@@ -46,6 +47,7 @@ public class UpYunFileHandler implements FileHandler {
         String ossOperator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
         // style rule can be null
         String ossStyleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_STYLE_RULE, String.class, "");
+        String ossThumbnailStyleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Create up yun
         UpYun upYun = new UpYun(ossBucket, ossOperator, ossPassword);
@@ -75,7 +77,7 @@ public class UpYunFileHandler implements FileHandler {
             // Build upload result
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
-            uploadResult.setFilePath(filePath);
+            uploadResult.setFilePath(StringUtils.isBlank(filePath) ? filePath : filePath + ossStyleRule);
             uploadResult.setKey(upFilePath);
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
@@ -86,7 +88,7 @@ public class UpYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
+                uploadResult.setThumbPath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossThumbnailStyleRule);
             }
 
             return uploadResult;
