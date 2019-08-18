@@ -8,7 +8,6 @@ const user = {
     token: null,
     name: '',
     avatar: '',
-    roles: [],
     info: {},
     user: {}
   },
@@ -22,9 +21,6 @@ const user = {
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
-    },
-    SET_ROLES: (state, roles) => {
-      state.roles = roles
     },
     SET_INFO: (state, info) => {
       state.info = info
