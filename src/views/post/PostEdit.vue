@@ -12,7 +12,7 @@
         </div>
 
         <div id="editor">
-          <mavon-editor
+          <halo-editor
             ref="md"
             v-model="postToStage.originalContent"
             :boxShadow="false"
@@ -206,14 +206,14 @@
 <script>
 import CategoryTree from './components/CategoryTree'
 import TagSelect from './components/TagSelect'
-import { mavonEditor } from 'mavon-editor'
+import { haloEditor } from 'halo-editor'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import CategorySelectTree from './components/CategorySelectTree'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { toolbars } from '@/core/const'
-import 'mavon-editor/dist/css/index.css'
+import 'halo-editor/dist/css/index.css'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import optionApi from '@/api/option'
@@ -222,7 +222,7 @@ import moment from 'moment'
 export default {
   components: {
     TagSelect,
-    mavonEditor,
+    haloEditor,
     CategoryTree,
     FooterToolBar,
     AttachmentDrawer,
@@ -381,8 +381,8 @@ export default {
         var responseObject = response.data
 
         if (responseObject.status === 200) {
-          var MavonEditor = this.$refs.md
-          MavonEditor.$img2Url(pos, encodeURI(responseObject.data.path))
+          var HaloEditor = this.$refs.md
+          HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
           this.$message.success('图片上传成功')
         } else {
           this.$message.error('图片上传失败：' + responseObject.message)
@@ -401,7 +401,6 @@ export default {
 
 <style lang="less" scoped>
 .v-note-wrapper {
-  z-index: 1000;
   min-height: 580px;
 }
 </style>

@@ -11,7 +11,7 @@
           />
         </div>
         <div id="editor">
-          <mavon-editor
+          <halo-editor
             ref="md"
             v-model="sheetToStage.originalContent"
             :boxShadow="false"
@@ -138,13 +138,13 @@
 </template>
 
 <script>
-import { mavonEditor } from 'mavon-editor'
+import { haloEditor } from 'halo-editor'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { toolbars } from '@/core/const'
-import 'mavon-editor/dist/css/index.css'
+import 'halo-editor/dist/css/index.css'
 import sheetApi from '@/api/sheet'
 import themeApi from '@/api/theme'
 import optionApi from '@/api/option'
@@ -152,7 +152,7 @@ import attachmentApi from '@/api/attachment'
 import moment from 'moment'
 export default {
   components: {
-    mavonEditor,
+    haloEditor,
     FooterToolBar,
     AttachmentDrawer,
     AttachmentSelectDrawer
@@ -287,8 +287,8 @@ export default {
         var responseObject = response.data
 
         if (responseObject.status === 200) {
-          var MavonEditor = this.$refs.md
-          MavonEditor.$img2Url(pos, encodeURI(responseObject.data.path))
+          var HaloEditor = this.$refs.md
+          HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
           this.$message.success('图片上传成功')
         } else {
           this.$message.error('图片上传失败：' + responseObject.message)
@@ -306,18 +306,6 @@ export default {
 </script>
 <style lang="less" scoped>
 .v-note-wrapper {
-  z-index: 1000;
   min-height: 580px;
-}
-
-.sheet-thum {
-  .img {
-    width: 100%;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  .sheet-thum-remove {
-    margin-top: 16px;
-  }
 }
 </style>
