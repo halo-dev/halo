@@ -305,10 +305,16 @@
                     <a-input v-model="options.oss_upyun_source" />
                   </a-form-item>
                   <a-form-item
-                    label="缩略图处理策略："
+                    label="图片处理策略："
                     :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_upyun_style_rule" />
+                  </a-form-item>
+                  <a-form-item
+                    label="缩略图处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_upyun_thumbnail_style_rule" />
                   </a-form-item>
                 </div>
                 <div
