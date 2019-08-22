@@ -90,7 +90,10 @@
                         />删除
                       </span>
                     </a-menu-item>
-                    <a-menu-item :key="2">
+                    <a-menu-item
+                      :key="2"
+                      v-if="item.repo"
+                    >
                       <a-popconfirm
                         :title="'确定更新【' + item.name + '】主题？'"
                         @confirm="handleUpdateTheme(item.id)"
@@ -98,10 +101,19 @@
                         cancelText="取消"
                       >
                         <a-icon
-                          type="download"
+                          type="cloud"
                           style="margin-right:3px"
-                        />更新
+                        />在线更新
                       </a-popconfirm>
+                    </a-menu-item>
+                    <a-menu-item
+                      :key="3"
+                      @click="handleShowUpdateNewThemeModal(item)"
+                    >
+                      <a-icon
+                        type="file"
+                        style="margin-right:3px"
+                      />从主题包更新
                     </a-menu-item>
                   </a-menu>
                 </a-dropdown>
@@ -278,7 +290,7 @@
             <a
               rel="noopener noreferrer"
               href="javascript:void(0);"
-              @click="()=>this.uploadVisible = true"
+              @click="()=>this.uploadThemeVisible = true"
             >安装主题</a>
           </a-menu-item>
           <a-menu-item>
@@ -293,7 +305,7 @@
     </div>
     <a-modal
       title="安装主题"
-      v-model="uploadVisible"
+      v-model="uploadThemeVisible"
       :footer="null"
       :bodyStyle="{ padding: '0 24px 24px' }"
     >
@@ -338,18 +350,38 @@
               multiple
               accept="application/zip"
               :uploadHandler="uploadHandler"
-              @change="handleChange"
+              @change="handleUploadChange"
               @success="handleUploadSuccess"
             >
               <p class="ant-upload-drag-icon">
                 <a-icon type="inbox" />
               </p>
-              <p class="ant-upload-text">点击选择主题或将主题拖拽到此处</p>
+              <p class="ant-upload-text">点击选择主题包或将主题包拖拽到此处</p>
               <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
             </upload>
           </a-tab-pane>
         </a-tabs>
       </div>
+    </a-modal>
+    <a-modal
+      title="更新主题"
+      v-model="uploadNewThemeVisible"
+      :footer="null"
+    >
+      <UpdateTheme
+        name="file"
+        :themeId="prepareUpdateTheme.id"
+        accept="application/zip"
+        :uploadHandler="updateByUploadHandler"
+        @change="handleNewThemeUploadChange"
+        @success="handleUploadSuccess"
+      >
+        <p class="ant-upload-drag-icon">
+          <a-icon type="inbox" />
+        </p>
+        <p class="ant-upload-text">点击选择主题包或将主题包拖拽到此处</p>
+        <p class="ant-upload-hint">请选择最新的主题包，仅支持 ZIP 格式的文件</p>
+      </UpdateTheme>
     </a-modal>
   </div>
 </template>
@@ -370,7 +402,8 @@ export default {
     return {
       themeLoading: false,
       optionLoading: true,
-      uploadVisible: false,
+      uploadThemeVisible: false,
+      uploadNewThemeVisible: false,
       fetchButtonLoading: false,
       wrapperCol: {
         xl: { span: 12 },
@@ -385,7 +418,9 @@ export default {
       themeSettings: [],
       themeProperty: null,
       fetchingUrl: null,
-      uploadHandler: themeApi.upload
+      uploadHandler: themeApi.upload,
+      updateByUploadHandler: themeApi.updateByUpload,
+      prepareUpdateTheme: {}
     }
   },
   computed: {
@@ -462,7 +497,7 @@ export default {
       this.themeConfiguration = []
       this.themeProperty = null
     },
-    handleChange(info) {
+    handleUploadChange(info) {
       const status = info.file.status
       if (status === 'done') {
         this.$message.success(`${info.file.name} 主题上传成功！`)
@@ -470,8 +505,21 @@ export default {
         this.$message.error(`${info.file.name} 主题上传失败！`)
       }
     },
+    handleNewThemeUploadChange(info) {
+      const status = info.file.status
+      if (status === 'done') {
+        this.$message.success(`${info.file.name} 主题更新成功！`)
+      } else if (status === 'error') {
+        this.$message.error(`${info.file.name} 主题更新失败！`)
+      }
+    },
     handleUploadSuccess() {
-      this.uploadVisible = false
+      if (this.uploadThemeVisible) {
+        this.uploadThemeVisible = false
+      }
+      if (this.uploadNewThemeVisible) {
+        this.uploadNewThemeVisible = false
+      }
       this.loadThemes()
     },
     handleEllipsisClick(theme) {
@@ -489,7 +537,7 @@ export default {
         .fetching(this.fetchingUrl)
         .then(response => {
           this.$message.success('拉取成功！')
-          this.uploadVisible = false
+          this.uploadThemeVisible = false
           this.loadThemes()
         })
         .finally(() => {
@@ -501,6 +549,11 @@ export default {
         this.loadThemes()
         this.$message.success('刷新成功！')
       })
+    },
+    handleShowUpdateNewThemeModal(item) {
+      console.log(item)
+      this.prepareUpdateTheme = item
+      this.uploadNewThemeVisible = true
     }
   }
 }

@@ -41,7 +41,7 @@ themeApi.getActivatedTheme = () => {
 
 themeApi.update = themeId => {
   return service({
-    url: `${baseUrl}/${themeId}`,
+    url: `${baseUrl}/fetching/${themeId}`,
     timeout: 60000,
     method: 'put'
   })
@@ -91,6 +91,17 @@ themeApi.upload = (formData, uploadProgress, cancelToken) => {
     onUploadProgress: uploadProgress,
     cancelToken: cancelToken,
     method: 'post'
+  })
+}
+
+themeApi.updateByUpload = (formData, uploadProgress, cancelToken, themeId) => {
+  return service({
+    url: `${baseUrl}/upload/${themeId}`,
+    timeout: 86400000, // 24 hours
+    data: formData, // form data
+    onUploadProgress: uploadProgress,
+    cancelToken: cancelToken,
+    method: 'put'
   })
 }
 
