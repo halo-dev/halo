@@ -117,13 +117,6 @@ public class ThemeController {
         themeSettingService.save(settings, themeId);
     }
 
-    @PutMapping("{themeId}")
-    public ThemeProperty updateTheme(@PathVariable("themeId") String themeId,
-                                     @RequestPart(name = "file", required = false) MultipartFile file) {
-
-        return themeService.update(themeId);
-    }
-
     @DeleteMapping("{themeId}")
     @ApiOperation("Deletes a theme")
     public void deleteBy(@PathVariable("themeId") String themeId) {
@@ -136,10 +129,23 @@ public class ThemeController {
         return themeService.upload(file);
     }
 
+    @PutMapping("upload/{themeId}")
+    public ThemeProperty updateThemeByUpload(@PathVariable("themeId") String themeId,
+                                             @RequestPart("file") MultipartFile file) {
+        return themeService.update(themeId, file);
+    }
+
     @PostMapping("fetching")
     @ApiOperation("Fetches a new theme")
     public ThemeProperty fetchTheme(@RequestParam("uri") String uri) {
         return themeService.fetch(uri);
+    }
+
+    @PutMapping("fetching/{themeId}")
+    public ThemeProperty updateThemeByFetching(@PathVariable("themeId") String themeId,
+                                               @RequestPart(name = "file", required = false) MultipartFile file) {
+
+        return themeService.update(themeId);
     }
 
     @PostMapping("reload")

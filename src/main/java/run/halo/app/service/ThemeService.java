@@ -24,6 +24,7 @@ public interface ThemeService {
     /**
      * Theme property file name.
      */
+    @Deprecated
     String THEME_PROPERTY_FILE_NAME = "theme.yaml";
 
     /**
@@ -236,6 +237,7 @@ public interface ThemeService {
      *
      * @param themeTmpPath theme temporary path must not be null
      * @return theme property
+     * @throws IOException IOException
      */
     @NonNull
     ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
@@ -262,4 +264,13 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty update(@NonNull String themeId);
+
+    /**
+     * Updates theme by theme id.
+     *
+     * @param themeId theme id must not be blank
+     * @param file    multipart file must not be null
+     * @return theme info
+     */
+    ThemeProperty update(@NonNull String themeId, @NonNull MultipartFile file);
 }
