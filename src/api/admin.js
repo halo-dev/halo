@@ -12,6 +12,13 @@ adminApi.counts = () => {
   })
 }
 
+adminApi.isInstalled = () => {
+  return service({
+    url: `${baseUrl}/is_installed`,
+    method: 'get'
+  })
+}
+
 adminApi.environments = () => {
   return service({
     url: `${baseUrl}/environments`,
