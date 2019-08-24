@@ -52,7 +52,7 @@
                   showTime
                   :defaultValue="pickerDefaultValue"
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="Select Publish Time"
+                  placeholder="选择文章发表时间"
                   @change="onChange"
                   @ok="onOk"
                 />

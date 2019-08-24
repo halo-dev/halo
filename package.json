@@ -17,6 +17,7 @@
     "marked": "^0.6.3",
     "moment": "^2.24.0",
     "nprogress": "^0.2.0",
+    "verte": "^0.0.12",
     "viser-vue": "^2.4.6",
     "vue": "^2.6.10",
     "vue-clipboard2": "^0.3.0",

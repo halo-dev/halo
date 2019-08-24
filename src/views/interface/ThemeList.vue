@@ -243,6 +243,20 @@
                           :value="option.value"
                         >{{ option.label }}</a-select-option>
                       </a-select>
+                      <verte
+                        picker="square"
+                        model="hex"
+                        v-model="themeSettings[item.name]"
+                        :defaultValue="item.defaultValue"
+                        v-else-if="item.type == 'COLOR'"
+                        style="display: inline-block;height: 24px;"
+                      ></verte>
+                      <a-input
+                        v-model="themeSettings[item.name]"
+                        :defaultValue="item.defaultValue"
+                        :placeholder="item.placeholder"
+                        v-else
+                      />
                     </a-form-item>
                   </a-form>
                 </a-tab-pane>
@@ -391,11 +405,14 @@ import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import themeApi from '@/api/theme'
+import Verte from 'verte'
+import 'verte/dist/verte.css'
 
 export default {
   components: {
     AttachmentDrawer,
-    FooterToolBar
+    FooterToolBar,
+    Verte
   },
   mixins: [mixin, mixinDevice],
   data() {

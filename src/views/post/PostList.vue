@@ -146,7 +146,10 @@
               :href="options.blog_url+'/archives/'+record.url"
               target="_blank"
             >
-              <a-tooltip placement="topLeft" :title="'点击预览 '+text">{{ text }}</a-tooltip>
+              <a-tooltip
+                placement="topLeft"
+                :title="'点击预览【'+text+'】'"
+              >{{ text }}</a-tooltip>
             </a>
           </span>
           <span
@@ -182,7 +185,14 @@
           <span
             slot="createTime"
             slot-scope="createTime"
-          >{{ createTime | timeAgo }}</span>
+          >
+            <a-tooltip placement="top">
+              <template slot="title">
+                {{ createTime | moment }}
+              </template>
+              {{ createTime | timeAgo }}
+            </a-tooltip>
+          </span>
 
           <span
             slot="action"
@@ -419,7 +429,7 @@ const columns = [
     scopedSlots: { customRender: 'status' }
   },
   {
-    title: '分类目录',
+    title: '分类',
     dataIndex: 'categories',
     scopedSlots: { customRender: 'categories' }
   },

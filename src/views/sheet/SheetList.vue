@@ -111,6 +111,7 @@
                     >{{ text }}</a-tooltip>
                   </a>
                 </span>
+
                 <span
                   slot="status"
                   slot-scope="statusProperty"
@@ -118,10 +119,18 @@
                   <a-badge :status="statusProperty.status" />
                   {{ statusProperty.text }}
                 </span>
+
                 <span
                   slot="createTime"
                   slot-scope="createTime"
-                >{{ createTime | timeAgo }}</span>
+                >
+                  <a-tooltip placement="top">
+                    <template slot="title">
+                      {{ createTime | moment }}
+                    </template>
+                    {{ createTime | timeAgo }}
+                  </a-tooltip>
+                </span>
 
                 <span
                   slot="action"
