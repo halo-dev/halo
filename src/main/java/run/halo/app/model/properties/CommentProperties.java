@@ -23,7 +23,9 @@ public enum CommentProperties implements PropertyEnum {
 
     PAGE_SIZE("comment_page_size", Integer.class, "10"),
 
-    CONTENT_PLACEHOLDER("comment_content_placeholder", String.class, "");
+    CONTENT_PLACEHOLDER("comment_content_placeholder", String.class, ""),
+
+    INTERNAL_PLUGIN_JS("comment_internal_plugin_js", String.class, "//cdn.jsdelivr.net/gh/halo-dev/halo-comment@latest/dist/halo-comment.min.js");
 
     private final String value;
 
