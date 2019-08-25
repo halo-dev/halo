@@ -195,6 +195,17 @@
                   <a-switch v-model="options.comment_api_enabled" />
                 </a-form-item>
                 <a-form-item
+                  label="评论模块 JS："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 2 }"
+                    v-model="options.comment_internal_plugin_js"
+                    placeholder="该设置仅对内置的评论模块有效"
+                  />
+                </a-form-item>
+                <a-form-item
                   label="每页显示条数： "
                   :wrapper-col="wrapperCol"
                 >
