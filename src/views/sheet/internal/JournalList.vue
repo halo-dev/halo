@@ -11,14 +11,14 @@
                     <a-input v-model="queryParam.keyword"/>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <!-- <a-col :md="6" :sm="24">
                   <a-form-item label="状态">
                     <a-select placeholder="请选择状态">
                       <a-select-option value="1">公开</a-select-option>
                       <a-select-option value="0">私密</a-select-option>
                     </a-select>
                   </a-form-item>
-                </a-col>
+                </a-col> -->
                 <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
                     <a-button type="primary" @click="loadJournals(true)">查询</a-button>
