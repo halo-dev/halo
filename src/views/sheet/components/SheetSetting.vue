@@ -121,10 +121,10 @@ export default {
       customTpls: []
     }
   },
-  model: {
-    prop: 'visible',
-    event: 'close'
-  },
+  // model: {
+  //   prop: 'visible',
+  //   event: 'close'
+  // },
   props: {
     sheet: {
       type: Object,

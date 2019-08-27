@@ -31,7 +31,7 @@
       :post="postToStage"
       :tagIds="selectedTagIds"
       :categoryIds="selectedCategoryIds"
-      v-model="postSettingVisible"
+      :visible="postSettingVisible"
       @close="onPostSettingsClose"
       @onRefreshPost="onRefreshPostFromSetting"
       @onRefreshTagIds="onRefreshTagIdsFromSetting"

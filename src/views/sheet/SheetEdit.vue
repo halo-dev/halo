@@ -28,7 +28,7 @@
 
     <SheetSetting
       :sheet="sheetToStage"
-      v-model="sheetSettingVisible"
+      :visible="sheetSettingVisible"
       @close="onSheetSettingsClose"
       @onRefreshSheet="onRefreshSheetFromSetting"
     />
