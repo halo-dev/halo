@@ -8,169 +8,175 @@
     destroyOnClose
     :visible="visiable"
   >
-    <div class="post-setting-drawer-content">
-      <div :style="{ marginBottom: '16px' }">
-        <h3 class="post-setting-drawer-title">基本设置</h3>
-        <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
-            <a-form-item
-              label="文章标题："
-              v-if="needTitle"
-            >
-              <a-input v-model="selectedPost.title" />
-            </a-form-item>
-            <a-form-item
-              label="文章路径："
-              :help="options.blog_url+'/archives/' + (selectedPost.url ? selectedPost.url : '{auto_generate}')"
-            >
-              <a-input v-model="selectedPost.url" />
-            </a-form-item>
-
-            <a-form-item label="发表时间：">
-              <a-date-picker
-                showTime
-                :defaultValue="pickerDefaultValue"
-                format="YYYY-MM-DD HH:mm:ss"
-                placeholder="选择文章发表时间"
-                @change="onPostDateChange"
-                @ok="onPostDateOk"
-              />
-            </a-form-item>
-            <a-form-item label="开启评论：">
-              <a-radio-group
-                v-model="selectedPost.disallowComment"
-                :defaultValue="false"
-              >
-                <a-radio :value="false">开启</a-radio>
-                <a-radio :value="true">关闭</a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-form>
-        </div>
-      </div>
-      <a-divider />
-
-      <div :style="{ marginBottom: '16px' }">
-        <h3 class="post-setting-drawer-title">分类目录</h3>
-        <div class="post-setting-drawer-item">
-          <category-tree
-            v-model="selectedCategoryIds"
-            :categories="categories"
-          />
-          <div>
+    <a-skeleton
+      active
+      :loading="settingLoading"
+      :paragraph="{ rows: 24 }"
+    >
+      <div class="post-setting-drawer-content">
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">基本设置</h3>
+          <div class="post-setting-drawer-item">
             <a-form layout="vertical">
-              <a-form-item v-if="categoryFormVisible">
-                <category-select-tree
-                  :categories="categories"
-                  v-model="categoryToCreate.parentId"
+              <a-form-item
+                label="文章标题："
+                v-if="needTitle"
+              >
+                <a-input v-model="selectedPost.title" />
+              </a-form-item>
+              <a-form-item
+                label="文章路径："
+                :help="options.blog_url+'/archives/' + (selectedPost.url ? selectedPost.url : '{auto_generate}')"
+              >
+                <a-input v-model="selectedPost.url" />
+              </a-form-item>
+
+              <a-form-item label="发表时间：">
+                <a-date-picker
+                  showTime
+                  :defaultValue="pickerDefaultValue"
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="选择文章发表时间"
+                  @change="onPostDateChange"
+                  @ok="onPostDateOk"
                 />
               </a-form-item>
-              <a-form-item v-if="categoryFormVisible">
-                <a-input
-                  placeholder="分类名称"
-                  v-model="categoryToCreate.name"
-                />
-              </a-form-item>
-              <a-form-item v-if="categoryFormVisible">
-                <a-input
-                  placeholder="分类路径"
-                  v-model="categoryToCreate.slugNames"
-                />
-              </a-form-item>
-              <a-form-item>
-                <a-button
-                  type="primary"
-                  style="marginRight: 8px"
-                  v-if="categoryFormVisible"
-                  @click="handlerCreateCategory"
-                >保存</a-button>
-                <a-button
-                  type="dashed"
-                  style="marginRight: 8px"
-                  v-if="!categoryFormVisible"
-                  @click="toggleCategoryForm"
-                >新增</a-button>
-                <a-button
-                  v-if="categoryFormVisible"
-                  @click="toggleCategoryForm"
-                >取消</a-button>
+              <a-form-item label="开启评论：">
+                <a-radio-group
+                  v-model="selectedPost.disallowComment"
+                  :defaultValue="false"
+                >
+                  <a-radio :value="false">开启</a-radio>
+                  <a-radio :value="true">关闭</a-radio>
+                </a-radio-group>
               </a-form-item>
             </a-form>
           </div>
         </div>
-      </div>
-      <a-divider />
+        <a-divider />
 
-      <div :style="{ marginBottom: '16px' }">
-        <h3 class="post-setting-drawer-title">标签</h3>
-        <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
-            <a-form-item>
-              <TagSelect v-model="selectedTagIds" />
-            </a-form-item>
-          </a-form>
-        </div>
-      </div>
-      <a-divider />
-
-      <div :style="{ marginBottom: '16px' }">
-        <h3 class="post-setting-drawer-title">摘要</h3>
-        <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
-            <a-form-item>
-              <a-input
-                type="textarea"
-                :autosize="{ minRows: 5 }"
-                v-model="selectedPost.summary"
-                placeholder="不填写则会自动生成"
-              />
-            </a-form-item>
-          </a-form>
-        </div>
-      </div>
-      <a-divider />
-
-      <div :style="{ marginBottom: '16px' }">
-        <h3 class="post-setting-drawer-title">缩略图</h3>
-        <div class="post-setting-drawer-item">
-          <div class="post-thum">
-            <img
-              class="img"
-              :src="selectedPost.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
-              @click="()=>this.thumDrawerVisible=true"
-            >
-            <a-button
-              class="post-thum-remove"
-              type="dashed"
-              @click="handlerRemoveThumb"
-            >移除</a-button>
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">分类目录</h3>
+          <div class="post-setting-drawer-item">
+            <category-tree
+              v-model="selectedCategoryIds"
+              :categories="categories"
+            />
+            <div>
+              <a-form layout="vertical">
+                <a-form-item v-if="categoryFormVisible">
+                  <category-select-tree
+                    :categories="categories"
+                    v-model="categoryToCreate.parentId"
+                  />
+                </a-form-item>
+                <a-form-item v-if="categoryFormVisible">
+                  <a-input
+                    placeholder="分类名称"
+                    v-model="categoryToCreate.name"
+                  />
+                </a-form-item>
+                <a-form-item v-if="categoryFormVisible">
+                  <a-input
+                    placeholder="分类路径"
+                    v-model="categoryToCreate.slugNames"
+                  />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    style="marginRight: 8px"
+                    v-if="categoryFormVisible"
+                    @click="handlerCreateCategory"
+                  >保存</a-button>
+                  <a-button
+                    type="dashed"
+                    style="marginRight: 8px"
+                    v-if="!categoryFormVisible"
+                    @click="toggleCategoryForm"
+                  >新增</a-button>
+                  <a-button
+                    v-if="categoryFormVisible"
+                    @click="toggleCategoryForm"
+                  >取消</a-button>
+                </a-form-item>
+              </a-form>
+            </div>
           </div>
         </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">标签</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item>
+                <TagSelect v-model="selectedTagIds" />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">摘要</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item>
+                <a-input
+                  type="textarea"
+                  :autosize="{ minRows: 5 }"
+                  v-model="selectedPost.summary"
+                  placeholder="不填写则会自动生成"
+                />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">缩略图</h3>
+          <div class="post-setting-drawer-item">
+            <div class="post-thum">
+              <img
+                class="img"
+                :src="selectedPost.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
+                @click="()=>this.thumDrawerVisible=true"
+              >
+              <a-button
+                class="post-thum-remove"
+                type="dashed"
+                @click="handlerRemoveThumb"
+              >移除</a-button>
+            </div>
+          </div>
+        </div>
+        <a-divider class="divider-transparent" />
       </div>
-      <a-divider class="divider-transparent" />
-    </div>
-    <AttachmentSelectDrawer
-      v-model="thumDrawerVisible"
-      @listenToSelect="handleSelectPostThumb"
-      :drawerWidth="460"
-    />
-    <div class="bottom-control">
-      <a-button
-        style="marginRight: 8px"
-        @click="handleDraftClick"
-        v-if="saveDraftButton"
-      >保存草稿</a-button>
-      <a-button
-        @click="handlePublishClick"
-        type="primary"
-        v-if="savePublishButton"
-      >发布</a-button>
-      <a-button
-        @click="handlePublishClick"
-        type="primary"
-        v-if="saveButton"
-      >保存</a-button>
-    </div>
+      <AttachmentSelectDrawer
+        v-model="thumDrawerVisible"
+        @listenToSelect="handleSelectPostThumb"
+        :drawerWidth="460"
+      />
+      <div class="bottom-control">
+        <a-button
+          style="marginRight: 8px"
+          @click="handleDraftClick"
+          v-if="saveDraftButton"
+        >保存草稿</a-button>
+        <a-button
+          @click="handlePublishClick"
+          type="primary"
+          v-if="savePublishButton"
+        >发布</a-button>
+        <a-button
+          @click="handlePublishClick"
+          type="primary"
+          v-if="saveButton"
+        >保存</a-button>
+      </div>
+    </a-skeleton>
   </a-drawer>
 </template>
 <script>
@@ -196,6 +202,7 @@ export default {
     return {
       thumDrawerVisible: false,
       categoryFormVisible: false,
+      settingLoading: true,
       options: [],
       keys: ['blog_url'],
       selectedPost: this.post,
@@ -249,6 +256,7 @@ export default {
     }
   },
   created() {
+    this.loadSkeleton()
     this.loadOptions()
     this.loadCategories()
   },
@@ -270,6 +278,11 @@ export default {
     },
     selectedCategoryIds(val) {
       this.$emit('onRefreshCategoryIds', val)
+    },
+    visiable: function(newValue, oldValue) {
+      if (newValue) {
+        this.loadSkeleton()
+      }
     }
   },
   computed: {
@@ -282,6 +295,12 @@ export default {
     }
   },
   methods: {
+    loadSkeleton() {
+      this.settingLoading = true
+      setTimeout(() => {
+        this.settingLoading = false
+      }, 500)
+    },
     loadOptions() {
       optionApi.listAll(this.keys).then(response => {
         this.options = response.data.data

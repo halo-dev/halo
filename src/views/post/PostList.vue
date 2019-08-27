@@ -490,11 +490,11 @@ export default {
       }
     },
     handleShowPostSettings(post) {
-      this.postSettingVisible = true
       postApi.get(post.id).then(response => {
         this.selectedPost = response.data.data
         this.selectedTagIds = this.selectedPost.tagIds
         this.selectedCategoryIds = this.selectedPost.categoryIds
+        this.postSettingVisible = true
       })
     },
     // 关闭文章设置抽屉
