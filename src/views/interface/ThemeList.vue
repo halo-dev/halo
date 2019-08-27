@@ -245,13 +245,9 @@
 <script>
 import ThemeSetting from './components/ThemeSetting'
 import themeApi from '@/api/theme'
-import Verte from 'verte'
-import 'verte/dist/verte.css'
-
 export default {
   components: {
-    ThemeSetting,
-    Verte
+    ThemeSetting
   },
   data() {
     return {

@@ -130,6 +130,19 @@
                     <a-input
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
+                      v-else-if="item.type == 'ATTACHMENT'"
+                    >
+                      <a
+                        href="javascript:void(0);"
+                        slot="addonAfter"
+                        @click="handleShowSelectAttachment(item.name)"
+                      >
+                        <a-icon type="picture" />
+                      </a>
+                    </a-input>
+                    <a-input
+                      v-model="themeSettings[item.name]"
+                      :defaultValue="item.defaultValue"
                       :placeholder="item.placeholder"
                       v-else
                     />
@@ -147,6 +160,13 @@
       </a-col>
     </a-row>
 
+    <AttachmentSelectDrawer
+      v-model="attachmentDrawerVisible"
+      @listenToSelect="handleSelectAttachment"
+      title="选择附件"
+      isChooseAvatar
+    />
+
     <footer-tool-bar
       v-if="themeConfiguration.length>0"
       :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
@@ -162,20 +182,25 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
+import Verte from 'verte'
+import 'verte/dist/verte.css'
 import themeApi from '@/api/theme'
 export default {
   name: 'ThemeSetting',
   mixins: [mixin, mixinDevice],
   components: {
     AttachmentSelectDrawer,
-    FooterToolBar
+    FooterToolBar,
+    Verte
   },
   data() {
     return {
+      attachmentDrawerVisible: false,
       selectedTheme: this.theme,
       themeConfiguration: [],
       themeSettings: [],
       settingLoading: true,
+      selectedField: '',
       wrapperCol: {
         xl: { span: 12 },
         lg: { span: 12 },
@@ -237,6 +262,14 @@ export default {
     },
     onClose() {
       this.$emit('close', false)
+    },
+    handleShowSelectAttachment(field) {
+      this.selectedField = field
+      this.attachmentDrawerVisible = true
+    },
+    handleSelectAttachment(data) {
+      this.themeSettings[this.selectedField] = encodeURI(data.path)
+      this.attachmentDrawerVisible = false
     }
   }
 }
