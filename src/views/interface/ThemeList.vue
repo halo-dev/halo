@@ -126,7 +126,7 @@
 
     <ThemeSetting
       :theme="selectedTheme"
-      v-model="themeSettingVisible"
+      v-if="themeSettingVisible"
       @close="onThemeSettingsClose"
     />
 
