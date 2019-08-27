@@ -144,7 +144,7 @@
       </upload>
     </a-modal>
     <AttachmentDetailDrawer
-      v-model="drawerVisiable"
+      v-model="drawerVisible"
       v-if="selectAttachment"
       :attachment="selectAttachment"
       :addToPhoto="true"
@@ -188,7 +188,7 @@ export default {
         attachmentType: null
       },
       uploadHandler: attachmentApi.upload,
-      drawerVisiable: false
+      drawerVisible: false
     }
   },
   computed: {
@@ -222,7 +222,7 @@ export default {
     },
     handleShowDetailDrawer(attachment) {
       this.selectAttachment = attachment
-      this.drawerVisiable = true
+      this.drawerVisible = true
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)

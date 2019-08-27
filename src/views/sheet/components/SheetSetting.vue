@@ -6,7 +6,7 @@
     closable
     destroyOnClose
     @close="onClose"
-    :visible="visiable"
+    :visible="visible"
   >
     <a-skeleton
       active
@@ -122,7 +122,7 @@ export default {
     }
   },
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
@@ -130,7 +130,7 @@ export default {
       type: Object,
       required: true
     },
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: true
@@ -148,7 +148,7 @@ export default {
     selectedSheet(val) {
       this.$emit('onRefreshSheet', val)
     },
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
       }

@@ -262,7 +262,7 @@ UA 信息：${navigator.userAgent}`
             return
           }
           const title = '新版本提醒'
-          const content = '检测到新版本：' + data.name + '，点击下方按钮下载最新版本。'
+          const content = '检测到新版本：' + data.name + '，点击下方按钮查看最新版本。'
           const url = data.html_url
           this.$notification.open({
             message: title,

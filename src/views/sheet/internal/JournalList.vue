@@ -244,9 +244,9 @@
       title="评论列表"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="commentVisiable"
+      :visible="commentVisible"
       destroyOnClose
-      @close="()=>this.commentVisiable = false"
+      @close="()=>this.commentVisible = false"
     >
       <a-row
         type="flex"
@@ -305,7 +305,7 @@ export default {
       title: '发表',
       listLoading: false,
       visible: false,
-      commentVisiable: false,
+      commentVisible: false,
       selectCommentVisible: false,
       pagination: {
         page: 1,
@@ -409,7 +409,7 @@ export default {
       this.journal = journal
       journalApi.commentTree(this.journal.id).then(response => {
         this.comments = response.data.data.content
-        this.commentVisiable = true
+        this.commentVisible = true
       })
     },
     handleCommentReplyClick(comment) {

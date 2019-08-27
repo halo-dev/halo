@@ -61,7 +61,7 @@
 
         <a-modal
           title="API 设置"
-          :visible="apiModifyVisiable"
+          :visible="apiModifyVisible"
           @ok="handleApiModifyOk"
           @cancel="handleApiModifyCancel"
         >
@@ -90,7 +90,7 @@ export default {
     return {
       username: null,
       password: null,
-      apiModifyVisiable: false,
+      apiModifyVisible: false,
       defaultApiBefore: window.location.protocol + '//',
       apiUrl: window.location.host
     }
@@ -131,14 +131,14 @@ export default {
     },
     handleApiModifyModalOpen() {
       this.apiUrl = this.defaultApiUrl
-      this.apiModifyVisiable = true
+      this.apiModifyVisible = true
     },
     handleApiModifyOk() {
       this.setApiUrl(this.apiUrl)
-      this.apiModifyVisiable = false
+      this.apiModifyVisible = false
     },
     handleApiModifyCancel() {
-      this.apiModifyVisiable = false
+      this.apiModifyVisible = false
     },
     handleApiUrlRestore() {
       this.restoreApiUrl()

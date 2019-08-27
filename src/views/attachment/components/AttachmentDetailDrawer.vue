@@ -3,7 +3,7 @@
     title="附件详情"
     :width="isMobile()?'100%':'460'"
     closable
-    :visible="visiable"
+    :visible="visible"
     destroyOnClose
     @close="onClose"
   >
@@ -193,7 +193,7 @@ export default {
     }
   },
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
@@ -206,7 +206,7 @@ export default {
       required: false,
       default: false
     },
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: true
@@ -221,7 +221,7 @@ export default {
     }
   },
   watch: {
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       this.$log.debug('old value', oldValue)
       this.$log.debug('new value', newValue)
       if (newValue) {

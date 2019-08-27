@@ -4,9 +4,9 @@
     :width="isMobile()?'100%':'460'"
     placement="right"
     closable
-    @close="onClose"
     destroyOnClose
-    :visible="visiable"
+    @close="onClose"
+    :visible="visible"
   >
     <a-skeleton
       active
@@ -213,7 +213,7 @@ export default {
     }
   },
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
@@ -229,7 +229,7 @@ export default {
       type: Array,
       required: true
     },
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: true
@@ -279,7 +279,7 @@ export default {
     selectedCategoryIds(val) {
       this.$emit('onRefreshCategoryIds', val)
     },
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
       }

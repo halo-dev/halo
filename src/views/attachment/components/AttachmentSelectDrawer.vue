@@ -4,7 +4,7 @@
       :title="title"
       :width="isMobile()?'100%':drawerWidth"
       closable
-      :visible="visiable"
+      :visible="visible"
       destroyOnClose
       @close="onClose"
     >
@@ -91,11 +91,11 @@ export default {
   name: 'AttachmentSelectDrawer',
   mixins: [mixin, mixinDevice],
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: false
@@ -134,7 +134,7 @@ export default {
     this.loadAttachments()
   },
   watch: {
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
       }

@@ -4,7 +4,7 @@
       title="附件库"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="visiable"
+      :visible="visible"
       destroyOnClose
       @close="onClose"
     >
@@ -51,7 +51,7 @@
       </div>
 
       <AttachmentDetailDrawer
-        v-model="detailVisiable"
+        v-model="detailVisible"
         v-if="selectedAttachment"
         :attachment="selectedAttachment"
         @delete="handleDelete"
@@ -98,11 +98,11 @@ export default {
     AttachmentDetailDrawer
   },
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: false
@@ -111,7 +111,7 @@ export default {
   data() {
     return {
       attachmentType: attachmentApi.type,
-      detailVisiable: false,
+      detailVisible: false,
       attachmentDrawerVisible: false,
       uploadVisible: false,
       skeletonLoading: true,
@@ -144,7 +144,7 @@ export default {
     this.loadAttachments()
   },
   watch: {
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
       }
@@ -163,7 +163,7 @@ export default {
     handleShowDetailDrawer(attachment) {
       this.selectedAttachment = attachment
       this.$log.debug('Show detail of', attachment)
-      this.detailVisiable = true
+      this.detailVisible = true
     },
     loadAttachments(isSearch) {
       this.queryParam.page = this.pagination.page - 1

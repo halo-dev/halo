@@ -104,7 +104,7 @@
       title="图片详情"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="drawerVisiable"
+      :visible="drawerVisible"
       destroyOnClose
       @close="onDrawerClose"
     >
@@ -283,7 +283,7 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      drawerVisiable: false,
+      drawerVisible: false,
       drawerLoading: false,
       listLoading: true,
       thumDrawerVisible: false,
@@ -338,7 +338,7 @@ export default {
     },
     showDrawer(photo) {
       this.photo = photo
-      this.drawerVisiable = true
+      this.drawerVisible = true
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
@@ -348,7 +348,7 @@ export default {
     },
     handleAddClick() {
       this.editable = true
-      this.drawerVisiable = true
+      this.drawerVisible = true
     },
     handleEditClick() {
       this.editable = true
@@ -372,7 +372,7 @@ export default {
       this.loadPhotos()
     },
     onDrawerClose() {
-      this.drawerVisiable = false
+      this.drawerVisible = false
       this.photo = {}
       this.editable = false
     }

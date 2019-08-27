@@ -47,7 +47,7 @@
                     style="margin-right:3px"
                   />启用
                 </div>
-                <div @click="handleEditClick(item)">
+                <div @click="handleShowThemeSetting(item)">
                   <a-icon
                     type="setting"
                     style="margin-right:3px"
@@ -123,171 +123,13 @@
         </a-list>
       </a-col>
     </a-row>
-    <a-drawer
-      v-if="themeProperty"
-      :title="themeProperty.name + ' 主题设置'"
-      width="100%"
-      closable
-      @close="onClose"
-      :visible="visible"
-      destroyOnClose
-    >
-      <a-row
-        :gutter="12"
-        type="flex"
-      >
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-        >
-          <a-skeleton
-            active
-            :loading="optionLoading"
-            :paragraph="{rows: 10}"
-          >
-            <a-card :bordered="false">
-              <img
-                :alt="themeProperty.name"
-                :src="themeProperty.screenshots"
-                slot="cover"
-              >
-              <a-card-meta :description="themeProperty.description">
-                <template slot="title">
-                  <a
-                    :href="themeProperty.author.website"
-                    target="_blank"
-                  >{{ themeProperty.author.name }}</a>
-                </template>
-                <a-avatar
-                  v-if="themeProperty.logo"
-                  :src="themeProperty.logo"
-                  size="large"
-                  slot="avatar"
-                />
-                <a-avatar
-                  v-else
-                  size="large"
-                  slot="avatar"
-                >{{ themeProperty.author.name }}</a-avatar>
-              </a-card-meta>
-            </a-card>
-          </a-skeleton>
-        </a-col>
-        <a-col
-          :xl="12"
-          :lg="12"
-          :md="12"
-          :sm="24"
-          :xs="24"
-          style="padding-bottom: 50px;"
-        >
-          <a-skeleton
-            active
-            :loading="optionLoading"
-            :paragraph="{rows: 20}"
-          >
-            <div class="card-container">
-              <a-tabs
-                type="card"
-                defaultActiveKey="0"
-                v-if="themeConfiguration.length>0"
-              >
-                <a-tab-pane
-                  v-for="(group, index) in themeConfiguration"
-                  :key="index.toString()"
-                  :tab="group.label"
-                >
-                  <a-form layout="vertical">
-                    <a-form-item
-                      v-for="(item, index1) in group.items"
-                      :label="item.label + '：'"
-                      :key="index1"
-                      :wrapper-col="wrapperCol"
-                    >
-                      <a-input
-                        v-model="themeSettings[item.name]"
-                        :defaultValue="item.defaultValue"
-                        :placeholder="item.placeholder"
-                        v-if="item.type == 'TEXT'"
-                      />
-                      <a-input
-                        type="textarea"
-                        :autosize="{ minRows: 5 }"
-                        v-model="themeSettings[item.name]"
-                        :placeholder="item.placeholder"
-                        v-else-if="item.type == 'TEXTAREA'"
-                      />
-                      <a-radio-group
-                        v-decorator="['radio-group']"
-                        :defaultValue="item.defaultValue"
-                        v-model="themeSettings[item.name]"
-                        v-else-if="item.type == 'RADIO'"
-                      >
-                        <a-radio
-                          v-for="(option, index2) in item.options"
-                          :key="index2"
-                          :value="option.value"
-                        >{{ option.label }}</a-radio>
-                      </a-radio-group>
-                      <a-select
-                        v-model="themeSettings[item.name]"
-                        :defaultValue="item.defaultValue"
-                        v-else-if="item.type == 'SELECT'"
-                      >
-                        <a-select-option
-                          v-for="option in item.options"
-                          :key="option.value"
-                          :value="option.value"
-                        >{{ option.label }}</a-select-option>
-                      </a-select>
-                      <verte
-                        picker="square"
-                        model="hex"
-                        v-model="themeSettings[item.name]"
-                        :defaultValue="item.defaultValue"
-                        v-else-if="item.type == 'COLOR'"
-                        style="display: inline-block;height: 24px;"
-                      ></verte>
-                      <a-input
-                        v-model="themeSettings[item.name]"
-                        :defaultValue="item.defaultValue"
-                        :placeholder="item.placeholder"
-                        v-else
-                      />
-                    </a-form-item>
-                  </a-form>
-                </a-tab-pane>
-              </a-tabs>
-              <a-alert
-                message="当前主题暂无设置选项"
-                banner
-                v-else
-              />
-            </div>
-          </a-skeleton>
-        </a-col>
-      </a-row>
 
-      <footer-tool-bar
-        v-if="themeConfiguration.length>0"
-        :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
-      >
-        <a-button
-          type="primary"
-          @click="handleSaveSettings"
-        >保存</a-button>
-        <a-button
-          type="dashed"
-          @click="()=>this.attachmentDrawerVisible = true"
-          style="margin-left: 8px;"
-        >附件库</a-button>
-      </footer-tool-bar>
+    <ThemeSetting
+      :theme="selectedTheme"
+      v-model="themeSettingVisible"
+      @close="onThemeSettingsClose"
+    />
 
-      <AttachmentDrawer v-model="attachmentDrawerVisible" />
-    </a-drawer>
     <div class="upload-button">
       <a-dropdown
         placement="topLeft"
@@ -401,39 +243,25 @@
 </template>
 
 <script>
-import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
-import FooterToolBar from '@/components/FooterToolbar'
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import ThemeSetting from './components/ThemeSetting'
 import themeApi from '@/api/theme'
 import Verte from 'verte'
 import 'verte/dist/verte.css'
 
 export default {
   components: {
-    AttachmentDrawer,
-    FooterToolBar,
+    ThemeSetting,
     Verte
   },
-  mixins: [mixin, mixinDevice],
   data() {
     return {
       themeLoading: false,
-      optionLoading: true,
       uploadThemeVisible: false,
       uploadNewThemeVisible: false,
       fetchButtonLoading: false,
-      wrapperCol: {
-        xl: { span: 12 },
-        lg: { span: 12 },
-        sm: { span: 24 },
-        xs: { span: 24 }
-      },
-      attachmentDrawerVisible: false,
       themes: [],
-      visible: false,
-      themeConfiguration: [],
-      themeSettings: [],
-      themeProperty: null,
+      themeSettingVisible: false,
+      selectedTheme: {},
       fetchingUrl: null,
       uploadHandler: themeApi.upload,
       updateByUploadHandler: themeApi.updateByUpload,
@@ -451,17 +279,17 @@ export default {
   created() {
     this.loadThemes()
   },
-  destroyed: function() {
-    if (this.visible) {
-      this.visible = false
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.visible) {
-      this.visible = false
-    }
-    next()
-  },
+  // destroyed: function() {
+  //   if (this.visible) {
+  //     this.visible = false
+  //   }
+  // },
+  // beforeRouteLeave(to, from, next) {
+  //   if (this.visible) {
+  //     this.visible = false
+  //   }
+  //   next()
+  // },
   methods: {
     loadThemes() {
       this.themeLoading = true
@@ -470,21 +298,7 @@ export default {
         this.themeLoading = false
       })
     },
-    settingDrawer(theme) {
-      this.visible = true
-      this.optionLoading = true
-      this.themeProperty = theme
 
-      themeApi.fetchConfiguration(theme.id).then(response => {
-        this.themeConfiguration = response.data.data
-        themeApi.fetchSettings(theme.id).then(response => {
-          this.themeSettings = response.data.data
-          setTimeout(() => {
-            this.optionLoading = false
-          }, 300)
-        })
-      })
-    },
     activeTheme(themeId) {
       themeApi.active(themeId).then(response => {
         this.$message.success('设置成功！')
@@ -503,16 +317,9 @@ export default {
         this.loadThemes()
       })
     },
-    handleSaveSettings() {
-      themeApi.saveSettings(this.themeProperty.id, this.themeSettings).then(response => {
-        this.$message.success('保存成功！')
-      })
-    },
-    onClose() {
-      this.visible = false
-      this.optionLoading = false
-      this.themeConfiguration = []
-      this.themeProperty = null
+    onThemeSettingsClose() {
+      this.themeSettingVisible = false
+      this.selectedTheme = {}
     },
     handleUploadChange(info) {
       const status = info.file.status
@@ -538,9 +345,6 @@ export default {
         this.uploadNewThemeVisible = false
       }
       this.loadThemes()
-    },
-    handleEllipsisClick(theme) {
-      this.$log.debug('Ellipsis clicked', theme)
     },
     handleEditClick(theme) {
       this.settingDrawer(theme)
@@ -571,6 +375,10 @@ export default {
       console.log(item)
       this.prepareUpdateTheme = item
       this.uploadNewThemeVisible = true
+    },
+    handleShowThemeSetting(theme) {
+      this.selectedTheme = theme
+      this.themeSettingVisible = true
     }
   }
 }

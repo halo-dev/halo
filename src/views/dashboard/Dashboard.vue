@@ -271,9 +271,9 @@
       title="操作日志"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="logDrawerVisiable"
+      :visible="logDrawerVisible"
       destroyOnClose
-      @close="()=>this.logDrawerVisiable = false"
+      @close="()=>this.logDrawerVisible = false"
     >
       <a-row
         type="flex"
@@ -354,7 +354,7 @@ export default {
       writeLoading: true,
       logLoading: true,
       countsLoading: true,
-      logDrawerVisiable: false,
+      logDrawerVisible: false,
       postData: [],
       logData: [],
       countsData: {},
@@ -476,7 +476,7 @@ export default {
       this.showMoreOptions = !this.showMoreOptions
     },
     handleShowLogDrawer() {
-      this.logDrawerVisiable = true
+      this.logDrawerVisible = true
       this.loadLogs()
     },
     loadLogs() {
