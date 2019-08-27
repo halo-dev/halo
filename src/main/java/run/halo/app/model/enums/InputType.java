@@ -21,7 +21,9 @@ public enum InputType {
 
     TEXTAREA,
 
-    COLOR;
+    COLOR,
+
+    ATTACHMENT;
 
     /**
      * Convert type to input type.
