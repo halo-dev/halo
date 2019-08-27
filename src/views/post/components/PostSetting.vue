@@ -154,11 +154,6 @@
         </div>
         <a-divider class="divider-transparent" />
       </div>
-      <AttachmentSelectDrawer
-        v-model="thumDrawerVisible"
-        @listenToSelect="handleSelectPostThumb"
-        :drawerWidth="460"
-      />
       <div class="bottom-control">
         <a-button
           style="marginRight: 8px"
@@ -177,6 +172,11 @@
         >保存</a-button>
       </div>
     </a-skeleton>
+    <AttachmentSelectDrawer
+      v-model="thumDrawerVisible"
+      @listenToSelect="handleSelectPostThumb"
+      :drawerWidth="460"
+    />
   </a-drawer>
 </template>
 <script>
