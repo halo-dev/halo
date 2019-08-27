@@ -19,6 +19,8 @@
             :ishljs="true"
             :autofocus="false"
             @imgAdd="handleAttachmentUpload"
+            @keydown.ctrl.83.native="handleSaveDraft"
+            @keydown.meta.83.native="handleSaveDraft"
           />
         </div>
       </a-col>
@@ -34,7 +36,12 @@
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
+        type="danger"
+        @click="handleSaveDraft"
+      >保存草稿</a-button>
+      <a-button
         type="primary"
+        style="margin-left: 8px;"
         @click="handleShowSheetSetting"
       >发布</a-button>
       <a-button
@@ -48,6 +55,7 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import moment from 'moment'
 import { toolbars } from '@/core/const'
 import SheetSetting from './components/SheetSetting'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
@@ -74,26 +82,8 @@ export default {
       },
       attachmentDrawerVisible: false,
       sheetSettingVisible: false,
-      sheetToStage: {},
-      timer: null
+      sheetToStage: {}
     }
-  },
-  created() {
-    clearInterval(this.timer)
-    this.timer = null
-    this.autoSaveTimer()
-  },
-  destroyed: function() {
-    clearInterval(this.timer)
-    this.timer = null
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.timer !== null) {
-      clearInterval(this.timer)
-    }
-    // Auto save the sheet
-    this.autoSaveSheet()
-    next()
   },
   beforeRouteEnter(to, from, next) {
     // Get sheetId id from query
@@ -109,6 +99,20 @@ export default {
     })
   },
   methods: {
+    handleSaveDraft() {
+      this.sheetToStage.status = 'DRAFT'
+      if (!this.sheetToStage.title) {
+        this.sheetToStage.title = moment(new Date())
+      }
+      if (!this.sheetToStage.originalContent) {
+        this.sheetToStage.originalContent = '开始编辑...'
+      }
+      this.createOrUpdateSheet(
+        () => this.$message.success('保存草稿成功！'),
+        () => this.$message.success('保存草稿成功！'),
+        false
+      )
+    },
     createOrUpdateSheet(createSuccess, updateSuccess, autoSave) {
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage, autoSave).then(response => {
@@ -125,18 +129,6 @@ export default {
           }
           this.sheetToStage = response.data.data
         })
-      }
-    },
-    autoSaveSheet() {
-      if (this.sheetToStage.title != null && this.sheetToStage.originalContent != null) {
-        this.createOrUpdateSheet(null, null, true)
-      }
-    },
-    autoSaveTimer() {
-      if (this.timer == null) {
-        this.timer = setInterval(() => {
-          this.autoSaveSheet()
-        }, 15000)
       }
     },
     handleAttachmentUpload(pos, $file) {

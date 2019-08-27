@@ -20,6 +20,8 @@
             :ishljs="true"
             :autofocus="false"
             @imgAdd="handleAttachmentUpload"
+            @keydown.ctrl.83.native="handleSaveDraft"
+            @keydown.meta.83.native="handleSaveDraft"
           />
         </div>
       </a-col>
@@ -40,8 +42,13 @@
 
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
+        type="danger"
+        @click="handleSaveDraft"
+      >保存草稿</a-button>
+      <a-button
         type="primary"
         @click="handleShowPostSetting"
+        style="margin-left: 8px;"
       >发布</a-button>
       <a-button
         type="dashed"
@@ -54,6 +61,7 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import moment from 'moment'
 import PostSetting from './components/PostSetting'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
@@ -83,26 +91,8 @@ export default {
       postSettingVisible: false,
       postToStage: {},
       selectedTagIds: [],
-      selectedCategoryIds: [],
-      timer: null
+      selectedCategoryIds: []
     }
-  },
-  created() {
-    clearInterval(this.timer)
-    this.timer = null
-    this.autoSaveTimer()
-  },
-  destroyed: function() {
-    clearInterval(this.timer)
-    this.timer = null
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.timer !== null) {
-      clearInterval(this.timer)
-    }
-    // Auto save the post
-    this.autoSavePost()
-    next()
   },
   beforeRouteEnter(to, from, next) {
     // Get post id from query
@@ -119,6 +109,20 @@ export default {
     })
   },
   methods: {
+    handleSaveDraft() {
+      this.postToStage.status = 'DRAFT'
+      if (!this.postToStage.title) {
+        this.postToStage.title = moment(new Date())
+      }
+      if (!this.postToStage.originalContent) {
+        this.postToStage.originalContent = '开始编辑...'
+      }
+      this.createOrUpdatePost(
+        () => this.$message.success('保存草稿成功！'),
+        () => this.$message.success('保存草稿成功！'),
+        false
+      )
+    },
     createOrUpdatePost(createSuccess, updateSuccess, autoSave) {
       if (this.postToStage.id) {
         // Update the post
@@ -137,18 +141,6 @@ export default {
           }
           this.postToStage = response.data.data
         })
-      }
-    },
-    autoSavePost() {
-      if (this.postToStage.title != null && this.postToStage.originalContent != null) {
-        this.createOrUpdatePost(null, null, true)
-      }
-    },
-    autoSaveTimer() {
-      if (this.timer == null) {
-        this.timer = setInterval(() => {
-          this.autoSavePost()
-        }, 15000)
       }
     },
     handleAttachmentUpload(pos, $file) {
