@@ -107,7 +107,7 @@
                   >
                     <a-tooltip
                       placement="topLeft"
-                      :title="'点击预览 '+text"
+                      :title="'点击访问【'+text+'】'"
                     >{{ text }}</a-tooltip>
                   </a>
                 </span>

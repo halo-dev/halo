@@ -138,14 +138,14 @@
         <div :style="{ marginBottom: '16px' }">
           <h3 class="post-setting-drawer-title">缩略图</h3>
           <div class="post-setting-drawer-item">
-            <div class="post-thum">
+            <div class="post-thumb">
               <img
                 class="img"
                 :src="selectedPost.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
-                @click="()=>this.thumDrawerVisible=true"
+                @click="()=>this.thumbDrawerVisible=true"
               >
               <a-button
-                class="post-thum-remove"
+                class="post-thumb-remove"
                 type="dashed"
                 @click="handlerRemoveThumb"
               >移除</a-button>
@@ -156,7 +156,7 @@
       </div>
     </a-skeleton>
     <AttachmentSelectDrawer
-      v-model="thumDrawerVisible"
+      v-model="thumbDrawerVisible"
       @listenToSelect="handleSelectPostThumb"
       :drawerWidth="460"
     />
@@ -200,7 +200,7 @@ export default {
   },
   data() {
     return {
-      thumDrawerVisible: false,
+      thumbDrawerVisible: false,
       categoryFormVisible: false,
       settingLoading: true,
       options: [],
@@ -313,7 +313,7 @@ export default {
     },
     handleSelectPostThumb(data) {
       this.selectedPost.thumbnail = encodeURI(data.path)
-      this.thumDrawerVisible = false
+      this.thumbDrawerVisible = false
     },
     handlerRemoveThumb() {
       this.selectedPost.thumbnail = null

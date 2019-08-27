@@ -41,7 +41,7 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="primary"
-        @click="handleShowPostSettings"
+        @click="handleShowPostSetting"
       >发布</a-button>
       <a-button
         type="dashed"
@@ -166,7 +166,7 @@ export default {
         }
       })
     },
-    handleShowPostSettings() {
+    handleShowPostSetting() {
       this.postSettingVisible = true
     },
     // 关闭文章设置抽屉
@@ -186,8 +186,5 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-.v-note-wrapper {
-  min-height: 580px;
-}
+<style lang="less">
 </style>
