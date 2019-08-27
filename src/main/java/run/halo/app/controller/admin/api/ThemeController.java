@@ -52,6 +52,11 @@ public class ThemeController {
         return themeService.listThemeFolderBy(themeService.getActivatedThemeId());
     }
 
+    @GetMapping("{themeId}/files")
+    public List<ThemeFile> listFiles(@PathVariable("themeId") String themeId){
+        return themeService.listThemeFolderBy(themeId);
+    }
+
     @GetMapping("files/content")
     public BaseResponse<String> getContentBy(@RequestParam(name = "path") String path) {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(path));

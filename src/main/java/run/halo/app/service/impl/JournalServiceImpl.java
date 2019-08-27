@@ -118,6 +118,10 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
         return (Specification<Journal>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
+            if (journalQuery.getType() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), journalQuery.getType()));
+            }
+
             if (journalQuery.getKeyword() != null) {
                 // Format like condition
                 String likeCondition = String.format("%%%s%%", StringUtils.strip(journalQuery.getKeyword()));
