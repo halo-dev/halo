@@ -259,8 +259,8 @@
 
     <PostSetting
       :post="selectedPost"
-      :selectedTagIds="selectedTagIds"
-      :selectedCategoryIds="selectedCategoryIds"
+      :tagIds="selectedTagIds"
+      :categoryIds="selectedCategoryIds"
       :needTitle="true"
       :saveDraftButton="false"
       :savePublishButton="false"
@@ -268,6 +268,8 @@
       v-model="postSettingVisible"
       @close="onPostSettingsClose"
       @onRefreshPost="onRefreshPostFromSetting"
+      @onRefreshTagIds="onRefreshTagIdsFromSetting"
+      @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
     />
   </div>
 </template>
@@ -502,6 +504,12 @@ export default {
     },
     onRefreshPostFromSetting(post) {
       this.selectedPost = post
+    },
+    onRefreshTagIdsFromSetting(tagIds) {
+      this.selectedTagIds = tagIds
+    },
+    onRefreshCategoryIdsFromSetting(categoryIds) {
+      this.selectedCategoryIds = categoryIds
     }
   }
 }

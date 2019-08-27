@@ -27,11 +27,13 @@
 
     <PostSetting
       :post="postToStage"
-      :selectedTagIds="selectedTagIds"
-      :selectedCategoryIds="selectedCategoryIds"
+      :tagIds="selectedTagIds"
+      :categoryIds="selectedCategoryIds"
       v-model="postSettingVisible"
       @close="onPostSettingsClose"
       @onRefreshPost="onRefreshPostFromSetting"
+      @onRefreshTagIds="onRefreshTagIdsFromSetting"
+      @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
@@ -173,6 +175,12 @@ export default {
     },
     onRefreshPostFromSetting(post) {
       this.postToStage = post
+    },
+    onRefreshTagIdsFromSetting(tagIds) {
+      this.selectedTagIds = tagIds
+    },
+    onRefreshCategoryIdsFromSetting(categoryIds) {
+      this.selectedCategoryIds = categoryIds
     }
   }
 }

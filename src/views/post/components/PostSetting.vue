@@ -17,13 +17,13 @@
               label="文章标题："
               v-if="needTitle"
             >
-              <a-input v-model="post.title" />
+              <a-input v-model="selectedPost.title" />
             </a-form-item>
             <a-form-item
               label="文章路径："
-              :help="options.blog_url+'/archives/' + (post.url ? post.url : '{auto_generate}')"
+              :help="options.blog_url+'/archives/' + (selectedPost.url ? selectedPost.url : '{auto_generate}')"
             >
-              <a-input v-model="post.url" />
+              <a-input v-model="selectedPost.url" />
             </a-form-item>
 
             <a-form-item label="发表时间：">
@@ -38,7 +38,7 @@
             </a-form-item>
             <a-form-item label="开启评论：">
               <a-radio-group
-                v-model="post.disallowComment"
+                v-model="selectedPost.disallowComment"
                 :defaultValue="false"
               >
                 <a-radio :value="false">开启</a-radio>
@@ -121,7 +121,7 @@
               <a-input
                 type="textarea"
                 :autosize="{ minRows: 5 }"
-                v-model="post.summary"
+                v-model="selectedPost.summary"
                 placeholder="不填写则会自动生成"
               />
             </a-form-item>
@@ -136,7 +136,7 @@
           <div class="post-thum">
             <img
               class="img"
-              :src="post.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
+              :src="selectedPost.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
               @click="()=>this.thumDrawerVisible=true"
             >
             <a-button
@@ -198,6 +198,9 @@ export default {
       categoryFormVisible: false,
       options: [],
       keys: ['blog_url'],
+      selectedPost: this.post,
+      selectedTagIds: this.tagIds,
+      selectedCategoryIds: this.categoryIds,
       categories: [],
       categoryToCreate: {}
     }
@@ -211,11 +214,11 @@ export default {
       type: Object,
       required: true
     },
-    selectedTagIds: {
+    tagIds: {
       type: Array,
       required: true
     },
-    selectedCategoryIds: {
+    categoryIds: {
       type: Array,
       required: true
     },
@@ -249,10 +252,30 @@ export default {
     this.loadOptions()
     this.loadCategories()
   },
+  watch: {
+    post(val) {
+      this.selectedPost = val
+    },
+    selectedPost(val) {
+      this.$emit('onRefreshPost', val)
+    },
+    tagIds(val) {
+      this.selectedTagIds = val
+    },
+    selectedTagIds(val) {
+      this.$emit('onRefreshTagIds', val)
+    },
+    categoryIds(val) {
+      this.selectedCategoryIds = val
+    },
+    selectedCategoryIds(val) {
+      this.$emit('onRefreshCategoryIds', val)
+    }
+  },
   computed: {
     pickerDefaultValue() {
-      if (this.post.createTime) {
-        var date = new Date(this.post.createTime)
+      if (this.selectedPost.createTime) {
+        var date = new Date(this.selectedPost.createTime)
         return moment(date, 'YYYY-MM-DD HH:mm:ss')
       }
       return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
@@ -270,11 +293,11 @@ export default {
       })
     },
     handleSelectPostThumb(data) {
-      this.post.thumbnail = encodeURI(data.path)
+      this.selectedPost.thumbnail = encodeURI(data.path)
       this.thumDrawerVisible = false
     },
     handlerRemoveThumb() {
-      this.post.thumbnail = null
+      this.selectedPost.thumbnail = null
     },
     handlerCreateCategory() {
       categoryApi.create(this.categoryToCreate).then(response => {
@@ -286,11 +309,11 @@ export default {
       this.categoryFormVisible = !this.categoryFormVisible
     },
     handleDraftClick() {
-      this.post.status = 'DRAFT'
+      this.selectedPost.status = 'DRAFT'
       this.savePost()
     },
     handlePublishClick() {
-      this.post.status = 'PUBLISHED'
+      this.selectedPost.status = 'PUBLISHED'
       this.savePost()
     },
     savePost() {
@@ -302,13 +325,13 @@ export default {
     },
     createOrUpdatePost(createSuccess, updateSuccess, autoSave) {
       // Set category ids
-      this.post.categoryIds = this.selectedCategoryIds
+      this.selectedPost.categoryIds = this.selectedCategoryIds
       // Set tag ids
-      this.post.tagIds = this.selectedTagIds
+      this.selectedPost.tagIds = this.selectedTagIds
 
-      if (this.post.id) {
+      if (this.selectedPost.id) {
         // Update the post
-        postApi.update(this.post.id, this.post, autoSave).then(response => {
+        postApi.update(this.selectedPost.id, this.selectedPost, autoSave).then(response => {
           this.$log.debug('Updated post', response.data.data)
           if (updateSuccess) {
             updateSuccess()
@@ -316,24 +339,23 @@ export default {
         })
       } else {
         // Create the post
-        postApi.create(this.post, autoSave).then(response => {
+        postApi.create(this.selectedPost, autoSave).then(response => {
           this.$log.debug('Created post', response.data.data)
           if (createSuccess) {
             createSuccess()
           }
-          this.post = response.data.data
+          this.selectedPost = response.data.data
         })
       }
-      this.$emit('onRefreshPost', this.post)
     },
     onClose() {
       this.$emit('close', false)
     },
     onPostDateChange(value, dateString) {
-      this.post.createTime = value.valueOf()
+      this.selectedPost.createTime = value.valueOf()
     },
     onPostDateOk(value) {
-      this.post.createTime = value.valueOf()
+      this.selectedPost.createTime = value.valueOf()
     }
   }
 }
