@@ -154,29 +154,29 @@
         </div>
         <a-divider class="divider-transparent" />
       </div>
-      <div class="bottom-control">
-        <a-button
-          style="marginRight: 8px"
-          @click="handleDraftClick"
-          v-if="saveDraftButton"
-        >保存草稿</a-button>
-        <a-button
-          @click="handlePublishClick"
-          type="primary"
-          v-if="savePublishButton"
-        >发布</a-button>
-        <a-button
-          @click="handlePublishClick"
-          type="primary"
-          v-if="saveButton"
-        >保存</a-button>
-      </div>
     </a-skeleton>
     <AttachmentSelectDrawer
       v-model="thumDrawerVisible"
       @listenToSelect="handleSelectPostThumb"
       :drawerWidth="460"
     />
+    <div class="bottom-control">
+      <a-button
+        style="marginRight: 8px"
+        @click="handleDraftClick"
+        v-if="saveDraftButton"
+      >保存草稿</a-button>
+      <a-button
+        @click="handlePublishClick"
+        type="primary"
+        v-if="savePublishButton"
+      >发布</a-button>
+      <a-button
+        @click="handlePublishClick"
+        type="primary"
+        v-if="saveButton"
+      >保存</a-button>
+    </div>
   </a-drawer>
 </template>
 <script>
