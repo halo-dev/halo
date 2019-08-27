@@ -212,10 +212,11 @@ export default {
       categoryToCreate: {}
     }
   },
-  model: {
-    prop: 'visible',
-    event: 'close'
-  },
+  // TODO delete this commented code
+  // model: {
+  //   prop: 'visible',
+  //   event: 'close'
+  // },
   props: {
     post: {
       type: Object,

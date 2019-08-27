@@ -267,7 +267,7 @@
       :saveDraftButton="false"
       :savePublishButton="false"
       :saveButton="true"
-      v-model="postSettingVisible"
+      :visible="postSettingVisible"
       @close="onPostSettingsClose"
       @onRefreshPost="onRefreshPostFromSetting"
       @onRefreshTagIds="onRefreshTagIdsFromSetting"
