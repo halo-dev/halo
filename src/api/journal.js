@@ -42,4 +42,13 @@ journalApi.commentTree = journalId => {
   })
 }
 
+journalApi.journalType = {
+  PUBLIC: {
+    text: '公开'
+  },
+  PRIVATE: {
+    text: '私密'
+  }
+}
+
 export default journalApi

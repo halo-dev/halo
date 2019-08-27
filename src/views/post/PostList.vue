@@ -169,6 +169,7 @@
               v-for="(category,index) in categoriesOfPost"
               :key="index"
               color="blue"
+              style="margin-bottom: 8px"
             >{{ category.name }}</a-tag>
           </span>
 
@@ -180,6 +181,7 @@
               v-for="(tag, index) in tags"
               :key="index"
               color="green"
+              style="margin-bottom: 8px"
             >{{ tag.name }}</a-tag>
           </span>
 
@@ -313,7 +315,8 @@ const columns = [
     dataIndex: 'commentCount'
   },
   {
-    title: '访问量',
+    title: '访问',
+    width: '70px',
     dataIndex: 'visits'
   },
   {
