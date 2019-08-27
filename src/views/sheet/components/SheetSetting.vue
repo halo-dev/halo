@@ -29,7 +29,7 @@
                   showTime
                   :defaultValue="pickerDefaultValue"
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="Select Publish Time"
+                  placeholder="选择页面发表时间"
                   @change="onSheetDateChange"
                   @ok="onSheetDateOk"
                 />
