@@ -4,34 +4,40 @@ package run.halo.app.model.properties;
  * BaiDuYun properties.
  *
  * @author wangya
+ * @author ryanwang
  * @date 2019-07-19
  */
 public enum BaiDuYunProperties implements PropertyEnum {
 
     /**
-     * BaiDuyun oss endpoint.
+     * Baidu yun bos endpoint.
      */
-    OSS_ENDPOINT("oss_baiduyun_endpoint", String.class, ""),
+    BOS_ENDPOINT("bos_baiduyun_endpoint", String.class, ""),
 
     /**
-     * BaiDuyun oss bucket name.
+     * Baidu yun bos bucket name.
      */
-    OSS_BUCKET_NAME("oss_baiduyun_bucket_name", String.class, ""),
+    BOS_BUCKET_NAME("bos_baiduyun_bucket_name", String.class, ""),
 
     /**
-     * BaiDuyun oss access key.
+     * Baidu yun bos access key.
      */
-    OSS_ACCESS_KEY("oss_baiduyun_access_key", String.class, ""),
+    BOS_ACCESS_KEY("bos_baiduyun_access_key", String.class, ""),
 
     /**
-     * BaiDuyun oss access secret.
+     * Baidu yun bos secret key.
      */
-    OSS_ACCESS_SECRET("oss_baiduyun_access_secret", String.class, ""),
+    BOS_SECRET_KEY("bos_baiduyun_secret_key", String.class, ""),
 
     /**
-     * BaiDuyun oss style rule
+     * Baidu yun bos style rule.
      */
-    OSS_STYLE_RULE("oss_baiduyun_style_rule", String.class, "");
+    BOS_STYLE_RULE("bos_baiduyun_style_rule", String.class, ""),
+
+    /**
+     * Baidu yun bos thumbnail style rule.
+     */
+    BOS_THUMBNAIL_STYLE_RULE("bos_baiduyun_thumbnail_style_rule", String.class, "");
 
     private final String value;
 

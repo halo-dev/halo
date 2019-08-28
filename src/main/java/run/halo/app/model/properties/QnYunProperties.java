@@ -4,6 +4,7 @@ package run.halo.app.model.properties;
  * Qi niu yun properties.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/26/19
  */
 public enum QnYunProperties implements PropertyEnum {
@@ -18,7 +19,9 @@ public enum QnYunProperties implements PropertyEnum {
 
     OSS_BUCKET("oss_qiniu_bucket", String.class, ""),
 
-    OSS_STYLE_RULE("oss_qiniu_style_rule", String.class, "");
+    OSS_STYLE_RULE("oss_qiniu_style_rule", String.class, ""),
+
+    OSS_THUMBNAIL_STYLE_RULE("oss_qiniu_thumbnail_style_rule", String.class, "");
 
     private final String value;
 
