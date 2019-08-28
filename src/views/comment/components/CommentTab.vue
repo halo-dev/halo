@@ -204,12 +204,12 @@
               <a href="javascript:;">删除</a>
             </a-popconfirm>
 
-            <a-divider type="vertical" />
+            <!-- <a-divider type="vertical" />
 
             <a
               href="javascript:;"
               @click="handleShowDetailDrawer(record)"
-            >详情</a>
+            >详情</a> -->
           </span>
         </a-table>
         <div class="page-wrapper">

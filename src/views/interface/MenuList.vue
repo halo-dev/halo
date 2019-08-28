@@ -43,6 +43,12 @@
               <a-input v-model="menuToCreate.icon" />
             </a-form-item>
             <a-form-item
+              label="分组："
+              :style="{ display: fieldExpand ? 'block' : 'none' }"
+            >
+              <a-input v-model="menuToCreate.team" />
+            </a-form-item>
+            <a-form-item
               label="打开方式："
               :style="{ display: fieldExpand ? 'block' : 'none' }"
             >
@@ -142,6 +148,10 @@ const columns = [
     dataIndex: 'url'
   },
   {
+    title: '分组',
+    dataIndex: 'team'
+  },
+  {
     title: '排序',
     dataIndex: 'priority'
   },
@@ -159,7 +169,9 @@ export default {
       loading: false,
       columns,
       menus: [],
-      menuToCreate: {},
+      menuToCreate: {
+        target: '_self'
+      },
       fieldExpand: false
     }
   },
