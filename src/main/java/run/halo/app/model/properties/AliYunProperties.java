@@ -4,6 +4,7 @@ package run.halo.app.model.properties;
  * AliYun properties.
  *
  * @author MyFaith
+ * @author ryanwang
  * @date 2019-04-04 00:00:56
  */
 public enum AliYunProperties implements PropertyEnum {
@@ -31,7 +32,12 @@ public enum AliYunProperties implements PropertyEnum {
     /**
      * Aliyun oss style rule
      */
-    OSS_STYLE_RULE("oss_aliyun_style_rule", String.class, "");
+    OSS_STYLE_RULE("oss_aliyun_style_rule", String.class, ""),
+
+    /**
+     * Aliyun oss thumbnail style rule
+     */
+    OSS_THUMBNAIL_STYLE_RULE("oss_aliyun_thumbnail_style_rule", String.class, "");
 
     private final String value;
 

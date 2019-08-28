@@ -1,7 +1,6 @@
 package run.halo.app.handler.file;
 
 
-
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -30,6 +29,7 @@ import java.util.Objects;
  * TencentYun file handler.
  *
  * @author wangya
+ * @author ryanwang
  * @date 2019-07-25
  */
 @Slf4j
@@ -47,21 +47,18 @@ public class TencentYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
-        String ossRegion = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_REGION).toString();
-        String ossAccessKey = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_ACCESS_KEY).toString();
-        String ossAccessSecret = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_ACCESS_SECRET).toString();
-        String ossBucketName = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_BUCKET_NAME).toString();
-        String ossStyleRule = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_STYLE_RULE).toString();
-        String ossSource = StringUtils.join("https://", ossBucketName, ".cos." + ossRegion+".myqcloud.com");
+        String cosRegion = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_REGION).toString();
+        String cosSecretId = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_ID).toString();
+        String cosSecretKey = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_KEY).toString();
+        String cosBucketName = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_BUCKET_NAME).toString();
+        String cosSource = StringUtils.join("https://", cosBucketName, ".cos." + cosRegion + ".myqcloud.com");
 
         //get file attribute
         long size = file.getSize();
         String contentType = file.getContentType();
 
-
-
-        COSCredentials cred = new BasicCOSCredentials(ossAccessKey, ossAccessSecret);
-        Region region = new Region(ossRegion);
+        COSCredentials cred = new BasicCOSCredentials(cosSecretId, cosSecretKey);
+        Region region = new Region(cosRegion);
         ClientConfig clientConfig = new ClientConfig(region);
 
 
@@ -69,13 +66,12 @@ public class TencentYunFileHandler implements FileHandler {
         COSClient cosClient = new COSClient(cred, clientConfig);
 
 
-
         try {
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(ossSource, "/"), upFilePath);
+            String filePath = StringUtils.join(StringUtils.appendIfMissing(cosSource, "/"), upFilePath);
 
             // Upload
             ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -83,7 +79,7 @@ public class TencentYunFileHandler implements FileHandler {
             objectMetadata.setContentLength(size);
             // 设置 Content type, 默认是 application/octet-stream
             objectMetadata.setContentType(contentType);
-            PutObjectResult putObjectResponseFromInputStream = cosClient.putObject(ossBucketName, upFilePath, file.getInputStream(),objectMetadata);
+            PutObjectResult putObjectResponseFromInputStream = cosClient.putObject(cosBucketName, upFilePath, file.getInputStream(), objectMetadata);
             if (putObjectResponseFromInputStream == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到腾讯云失败 ");
             }
@@ -102,7 +98,7 @@ public class TencentYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
+                uploadResult.setThumbPath(filePath);
             }
 
             return uploadResult;
@@ -118,22 +114,20 @@ public class TencentYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String ossRegion = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_REGION).toString();
-        String ossAccessKey = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_ACCESS_KEY).toString();
-        String ossAccessSecret = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_ACCESS_SECRET).toString();
-        String ossBucketName = optionService.getByPropertyOfNonNull(TencentYunProperties.OSS_BUCKET_NAME).toString();
-        String ossSource = StringUtils.join("https://", ossBucketName, ".cos." + ossRegion+".myqcloud.com");
+        String cosRegion = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_REGION).toString();
+        String cosSecretId = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_ID).toString();
+        String cosSecretKey = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_KEY).toString();
+        String cosBucketName = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_BUCKET_NAME).toString();
 
-        COSCredentials cred = new BasicCOSCredentials(ossAccessKey, ossAccessSecret);
-        Region region = new Region(ossRegion);
+        COSCredentials cred = new BasicCOSCredentials(cosSecretId, cosSecretKey);
+        Region region = new Region(cosRegion);
         ClientConfig clientConfig = new ClientConfig(region);
-
 
         // Init OSS client
         COSClient cosClient = new COSClient(cred, clientConfig);
 
         try {
-            cosClient.deleteObject(ossBucketName, key);
+            cosClient.deleteObject(cosBucketName, key);
         } catch (Exception e) {
             throw new FileOperationException("附件 " + key + " 从腾讯云删除失败", e);
         } finally {

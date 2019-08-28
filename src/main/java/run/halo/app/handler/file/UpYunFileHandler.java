@@ -77,7 +77,7 @@ public class UpYunFileHandler implements FileHandler {
             // Build upload result
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
-            uploadResult.setFilePath(StringUtils.isBlank(filePath) ? filePath : filePath + ossStyleRule);
+            uploadResult.setFilePath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
             uploadResult.setKey(upFilePath);
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
@@ -88,7 +88,7 @@ public class UpYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossThumbnailStyleRule);
+                uploadResult.setThumbPath(StringUtils.isBlank(ossThumbnailStyleRule) ? filePath : filePath + ossThumbnailStyleRule);
             }
 
             return uploadResult;
@@ -102,7 +102,6 @@ public class UpYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        // String ossSource = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE).toString();
         String ossPassword = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
         String ossBucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
         String ossOperator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();

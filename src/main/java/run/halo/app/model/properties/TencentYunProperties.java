@@ -4,34 +4,30 @@ package run.halo.app.model.properties;
  * TencentYun properties.
  *
  * @author wangya
+ * @author ryanwang
  * @date 2019-07-25
  */
 public enum TencentYunProperties implements PropertyEnum {
 
     /**
-     * Tencentyun oss endpoint.
+     * Tencentyun cos endpoint.
      */
-    OSS_REGION("oss_tencentyun_region", String.class, ""),
+    COS_REGION("cos_tencentyun_region", String.class, ""),
 
     /**
-     * Tencentyun oss bucket name.
+     * Tencentyun cos bucket name.
      */
-    OSS_BUCKET_NAME("oss_tencentyun_bucket_name", String.class, ""),
+    COS_BUCKET_NAME("cos_tencentyun_bucket_name", String.class, ""),
 
     /**
-     * Tencentyun oss access key.
+     * Tencentyun cos secret id.
      */
-    OSS_ACCESS_KEY("oss_tencentyun_access_key", String.class, ""),
+    COS_SECRET_ID("cos_tencentyun_secret_id", String.class, ""),
 
     /**
-     * Tencentyun oss access secret.
+     * Tencentyun cos secret key.
      */
-    OSS_ACCESS_SECRET("oss_tencentyun_access_secret", String.class, ""),
-
-    /**
-     * Tencentyun oss style rule
-     */
-    OSS_STYLE_RULE("oss_tencentyun_style_rule", String.class, "");
+    COS_SECRET_KEY("cos_tencentyun_secret_key", String.class, "");
 
     private final String value;
 

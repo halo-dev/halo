@@ -35,6 +35,7 @@ import static run.halo.app.handler.file.FileHandler.isImageType;
  * Qi niu yun file handler.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/27/19
  */
 @Slf4j
@@ -58,6 +59,7 @@ public class QnYunFileHandler implements FileHandler {
         String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_BUCKET).toString();
         String domain = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_DOMAIN).toString();
         String styleRule = optionService.getByPropertyOrDefault(QnYunProperties.OSS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(QnYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Create configuration
         Configuration configuration = new Configuration(zone);
@@ -103,7 +105,7 @@ public class QnYunFileHandler implements FileHandler {
             // Build upload result
             UploadResult result = new UploadResult();
             result.setFilename(basename);
-            result.setFilePath(filePath);
+            result.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
             result.setKey(putSet.getKey());
             result.setSuffix(extension);
             result.setWidth(putSet.getWidth());
@@ -112,7 +114,7 @@ public class QnYunFileHandler implements FileHandler {
             result.setSize(file.getSize());
 
             if (isImageType(result.getMediaType())) {
-                result.setThumbPath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
+                result.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
             }
 
             return result;
