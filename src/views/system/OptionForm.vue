@@ -376,10 +376,16 @@
                     <a-input v-model="options.oss_qiniu_bucket" />
                   </a-form-item>
                   <a-form-item
-                    label="缩略图处理策略："
+                    label="图片处理策略："
                     :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_qiniu_style_rule" />
+                  </a-form-item>
+                  <a-form-item
+                    label="缩略图处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_qiniu_thumbnail_style_rule" />
                   </a-form-item>
                 </div>
                 <div
@@ -411,10 +417,16 @@
                     <a-input v-model="options.oss_aliyun_access_secret" />
                   </a-form-item>
                   <a-form-item
-                    label="缩略图处理策略："
+                    label="图片处理策略："
                     :wrapper-col="wrapperCol"
                   >
                     <a-input v-model="options.oss_aliyun_style_rule" />
+                  </a-form-item>
+                  <a-form-item
+                    label="缩略图处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.oss_aliyun_thumbnail_style_rule" />
                   </a-form-item>
                 </div>
                 <div
@@ -425,31 +437,37 @@
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_bucket_name" />
+                    <a-input v-model="options.bos_baiduyun_bucket_name" />
                   </a-form-item>
                   <a-form-item
                     label="EndPoint（地域节点）："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_endpoint" />
+                    <a-input v-model="options.bos_baiduyun_endpoint" />
                   </a-form-item>
                   <a-form-item
                     label="Access Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_access_key" />
+                    <a-input v-model="options.bos_baiduyun_access_key" />
                   </a-form-item>
                   <a-form-item
-                    label="Access Secret："
+                    label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_access_secret" />
+                    <a-input v-model="options.bos_baiduyun_secret_key" />
+                  </a-form-item>
+                  <a-form-item
+                    label="图片处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input v-model="options.bos_baiduyun_style_rule" />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_style_rule" />
+                    <a-input v-model="options.bos_baiduyun_thumbnail_style_rule" />
                   </a-form-item>
                 </div>
                 <div
@@ -460,13 +478,13 @@
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_tencentyun_bucket_name" />
+                    <a-input v-model="options.cos_tencentyun_bucket_name" />
                   </a-form-item>
                   <a-form-item
                     label="区域："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-select v-model="options.oss_tencentyun_region">
+                    <a-select v-model="options.cos_tencentyun_region">
                       <a-select-option value="ap-beijing-1">北京一区</a-select-option>
                       <a-select-option value="ap-beijing">北京</a-select-option>
                       <a-select-option value="ap-shanghai">上海（华东）</a-select-option>
@@ -479,19 +497,13 @@
                     label="Secret Id："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_tencentyun_access_key" />
+                    <a-input v-model="options.cos_tencentyun_secret_id" />
                   </a-form-item>
                   <a-form-item
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_tencentyun_access_secret" />
-                  </a-form-item>
-                  <a-form-item
-                    label="缩略图处理策略："
-                    :wrapper-col="wrapperCol"
-                  >
-                    <a-input v-model="options.oss_tencentyun_style_rule" />
+                    <a-input v-model="options.cos_tencentyun_secret_key" />
                   </a-form-item>
                 </div>
                 <a-form-item>
@@ -872,58 +884,58 @@ export default {
           }
           break
         case 'BAIDUYUN':
-          if (!this.options.oss_baiduyun_bucket_name) {
+          if (!this.options.bos_baiduyun_bucket_name) {
             this.$notification['error']({
               message: '提示',
               description: 'Bucket 不能为空！'
             })
             return
           }
-          if (!this.options.oss_baiduyun_endpoint) {
+          if (!this.options.bos_baiduyun_endpoint) {
             this.$notification['error']({
               message: '提示',
               description: 'EndPoint（地域节点） 不能为空！'
             })
             return
           }
-          if (!this.options.oss_baiduyun_access_key) {
+          if (!this.options.bos_baiduyun_access_key) {
             this.$notification['error']({
               message: '提示',
               description: 'Access Key 不能为空！'
             })
             return
           }
-          if (!this.options.oss_baiduyun_access_secret) {
+          if (!this.options.bos_baiduyun_secret_key) {
             this.$notification['error']({
               message: '提示',
-              description: 'Access Secret 不能为空！'
+              description: 'Secret Key 不能为空！'
             })
             return
           }
           break
         case 'TENCENTYUN':
-          if (!this.options.oss_tencentyun_bucket_name) {
+          if (!this.options.cos_tencentyun_bucket_name) {
             this.$notification['error']({
               message: '提示',
               description: 'Bucket 不能为空！'
             })
             return
           }
-          if (!this.options.oss_tencentyun_region) {
+          if (!this.options.cos_tencentyun_region) {
             this.$notification['error']({
               message: '提示',
               description: '区域不能为空！'
             })
             return
           }
-          if (!this.options.oss_tencentyun_access_key) {
+          if (!this.options.cos_tencentyun_secret_id) {
             this.$notification['error']({
               message: '提示',
               description: 'Secret Id 不能为空！'
             })
             return
           }
-          if (!this.options.oss_tencentyun_access_secret) {
+          if (!this.options.cos_tencentyun_secret_key) {
             this.$notification['error']({
               message: '提示',
               description: 'Secret Key 不能为空！'
