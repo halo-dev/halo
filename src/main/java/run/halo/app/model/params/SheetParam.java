@@ -11,6 +11,7 @@ import run.halo.app.utils.HaloUtils;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * @author johnniang
@@ -34,6 +35,8 @@ public class SheetParam implements InputConverter<Sheet> {
     private String thumbnail;
 
     private Boolean disallowComment = false;
+
+    private Date createTime;
 
     @Size(max = 255, message = "Length of password must not be more than {max}")
     private String password;
