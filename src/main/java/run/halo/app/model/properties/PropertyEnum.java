@@ -57,7 +57,7 @@ public interface PropertyEnum extends ValueEnum<String> {
         }
 
         if (type.isAssignableFrom(Double.class)) {
-            return (T) Byte.valueOf(value);
+            return (T) Double.valueOf(value);
         }
 
         if (type.isAssignableFrom(Float.class)) {
