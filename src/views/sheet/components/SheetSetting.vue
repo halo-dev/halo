@@ -19,6 +19,12 @@
           <div class="post-setting-drawer-item">
             <a-form layout="vertical">
               <a-form-item
+                label="页面标题："
+                v-if="needTitle"
+              >
+                <a-input v-model="selectedSheet.title" />
+              </a-form-item>
+              <a-form-item
                 label="页面路径："
                 :help="options.blog_url+'/s/'+ (selectedSheet.url ? selectedSheet.url : '{auto_generate}')"
               >
@@ -129,6 +135,11 @@ export default {
     sheet: {
       type: Object,
       required: true
+    },
+    needTitle: {
+      type: Boolean,
+      required: false,
+      default: false
     },
     visible: {
       type: Boolean,

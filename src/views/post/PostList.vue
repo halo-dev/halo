@@ -504,6 +504,7 @@ export default {
     onPostSettingsClose() {
       this.postSettingVisible = false
       this.selectedPost = {}
+      this.loadPosts()
     },
     onRefreshPostFromSetting(post) {
       this.selectedPost = post

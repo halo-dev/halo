@@ -95,15 +95,17 @@
                 :columns="customColumns"
                 :dataSource="formattedSheets"
                 :pagination="false"
+                :loading="sheetsLoading"
               >
                 <span
                   slot="sheetTitle"
                   slot-scope="text,record"
-                  class="sheet-title"
+                  style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                 >
                   <a
                     :href="options.blog_url+'/s/'+record.url"
                     target="_blank"
+                    style="text-decoration: none;"
                   >
                     <a-tooltip
                       placement="topLeft"
@@ -181,6 +183,12 @@
                     >更多</a>
                     <a-menu slot="overlay">
                       <a-menu-item key="1">
+                        <a
+                          href="javascript:void(0);"
+                          @click="handleShowSheetSettings(sheet)"
+                        >设置</a>
+                      </a-menu-item>
+                      <a-menu-item key="2">
                         <a-popconfirm
                           :title="'你确定要添加【' + sheet.title + '】到菜单？'"
                           @confirm="handleSheetToMenu(sheet)"
@@ -199,11 +207,21 @@
         </div>
       </a-col>
     </a-row>
+
+    <SheetSetting
+      :sheet="selectedSheet"
+      :visible="sheetSettingVisible"
+      :needTitle="true"
+      @close="onSheetSettingsClose"
+      @onRefreshSheet="onRefreshSheetFromSetting"
+    />
+
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import SheetSetting from './components/SheetSetting'
 import sheetApi from '@/api/sheet'
 import optionApi from '@/api/option'
 import menuApi from '@/api/menu'
@@ -262,11 +280,17 @@ const customColumns = [
 ]
 export default {
   mixins: [mixin, mixinDevice],
+  components: {
+    SheetSetting
+  },
   data() {
     return {
+      sheetsLoading: false,
       sheetStatus: sheetApi.sheetStatus,
       internalColumns,
       customColumns,
+      selectedSheet: {},
+      sheetSettingVisible: false,
       internalSheets: [],
       sheets: [],
       options: [],
@@ -289,8 +313,10 @@ export default {
   },
   methods: {
     loadSheets() {
+      this.sheetsLoading = true
       sheetApi.list().then(response => {
         this.sheets = response.data.data.content
+        this.sheetsLoading = false
       })
     },
     loadInternalSheets() {
@@ -325,19 +351,23 @@ export default {
         this.$message.success('添加到菜单成功！')
         this.menu = {}
       })
+    },
+    handleShowSheetSettings(sheet) {
+      sheetApi.get(sheet.id).then(response => {
+        this.selectedSheet = response.data.data
+        this.sheetSettingVisible = true
+      })
+    },
+    onSheetSettingsClose() {
+      this.sheetSettingVisible = false
+      this.selectedSheet = {}
+      this.loadSheets()
+    },
+    onRefreshSheetFromSetting(sheet) {
+      this.selectedSheet = sheet
     }
   }
 }
 </script>
 <style scoped>
-a {
-  text-decoration: none;
-}
-.sheet-title {
-  max-width: 300px;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 </style>
