@@ -60,6 +60,12 @@ public class Menu extends BaseEntity {
     @Column(name = "parent_id", columnDefinition = "int default 0")
     private Integer parentId;
 
+    /**
+     * Menu team name.
+     */
+    @Column(name = "team", columnDefinition = "varchar(255) default ''")
+    private String team;
+
     @Override
     public void prePersist() {
         super.prePersist();
@@ -80,6 +86,10 @@ public class Menu extends BaseEntity {
 
         if (parentId == null) {
             parentId = 0;
+        }
+
+        if(team == null){
+            team = "";
         }
     }
 }
