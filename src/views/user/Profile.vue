@@ -211,6 +211,27 @@ export default {
       userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {})
     },
     handleUpdateProfile() {
+      if (!this.user.username) {
+        this.$notification['error']({
+          message: '提示',
+          description: '用户名不能为空！'
+        })
+        return
+      }
+      if (!this.user.nickname) {
+        this.$notification['error']({
+          message: '提示',
+          description: '用户昵称不能为空！'
+        })
+        return
+      }
+      if (!this.user.email) {
+        this.$notification['error']({
+          message: '提示',
+          description: '邮箱不能为空！'
+        })
+        return
+      }
       userApi.updateProfile(this.user).then(response => {
         this.user = response.data.data
         this.setUser(Object.assign({}, this.user))

@@ -275,37 +275,43 @@
       destroyOnClose
       @close="()=>this.logDrawerVisible = false"
     >
-      <a-row
-        type="flex"
-        align="middle"
+      <a-skeleton
+        active
+        :loading="logsLoading"
+        :paragraph="{rows: 18}"
       >
-        <a-col :span="24">
-          <a-list :dataSource="formattedLogsDatas">
-            <a-list-item
-              slot="renderItem"
-              slot-scope="item, index"
-              :key="index"
-            >
-              <a-list-item-meta :description="item.createTime | timeAgo">
-                <span slot="title">{{ item.type }}</span>
-              </a-list-item-meta>
-              <div>{{ item.content }}</div>
-            </a-list-item>
+        <a-row
+          type="flex"
+          align="middle"
+        >
+          <a-col :span="24">
+            <a-list :dataSource="formattedLogsDatas">
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item, index"
+                :key="index"
+              >
+                <a-list-item-meta :description="item.createTime | timeAgo">
+                  <span slot="title">{{ item.type }}</span>
+                </a-list-item-meta>
+                <div>{{ item.content }}</div>
+              </a-list-item>
 
-            <div class="page-wrapper">
-              <a-pagination
-                class="pagination"
-                :total="logPagination.total"
-                :defaultPageSize="logPagination.size"
-                :pageSizeOptions="['50', '100','150','200']"
-                showSizeChanger
-                @showSizeChange="onPaginationChange"
-                @change="onPaginationChange"
-              />
-            </div>
-          </a-list>
-        </a-col>
-      </a-row>
+              <div class="page-wrapper">
+                <a-pagination
+                  class="pagination"
+                  :total="logPagination.total"
+                  :defaultPageSize="logPagination.size"
+                  :pageSizeOptions="['50', '100','150','200']"
+                  showSizeChanger
+                  @showSizeChange="onPaginationChange"
+                  @change="onPaginationChange"
+                />
+              </div>
+            </a-list>
+          </a-col>
+        </a-row>
+      </a-skeleton>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-popconfirm
@@ -353,6 +359,7 @@ export default {
       activityLoading: true,
       writeLoading: true,
       logLoading: true,
+      logsLoading: true,
       countsLoading: true,
       logDrawerVisible: false,
       postData: [],
@@ -462,12 +469,18 @@ export default {
     },
     handleCreateJournalClick() {
       // 给属性填充数据
-      this.journal.photos = this.journalPhotos
-
+      // this.journal.photos = this.journalPhotos
+      if (!this.journal.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '内容不能为空！'
+        })
+        return
+      }
       journalApi.create(this.journal).then(response => {
         this.$message.success('发表成功！')
         this.journal = {}
-        this.photoList = []
+        // this.photoList = []
         this.showMoreOptions = false
       })
     },
@@ -480,6 +493,10 @@ export default {
       this.loadLogs()
     },
     loadLogs() {
+      this.logsLoading = true
+      setTimeout(() => {
+        this.logsLoading = false
+      }, 500)
       this.logPagination.page = this.logPagination.page - 1
       logApi.pageBy(this.logPagination).then(response => {
         this.logs = response.data.data.content
@@ -504,11 +521,11 @@ export default {
 </script>
 
 <style scoped="scoped">
-	.more-options-btn{
-		margin-left: 15px;
-		text-decoration: none;
-	}
-  a {
-    text-decoration: none;
-  }
+.more-options-btn {
+  margin-left: 15px;
+  text-decoration: none;
+}
+a {
+  text-decoration: none;
+}
 </style>

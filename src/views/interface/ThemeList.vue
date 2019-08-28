@@ -349,6 +349,13 @@ export default {
       this.activeTheme(theme.id)
     },
     handleFetching() {
+      if (!this.fetchingUrl) {
+        this.$notification['error']({
+          message: '提示',
+          description: '远程地址不能为空！'
+        })
+        return
+      }
       this.fetchButtonLoading = true
       themeApi
         .fetching(this.fetchingUrl)

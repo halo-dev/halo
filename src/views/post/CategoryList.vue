@@ -206,6 +206,13 @@ export default {
       })
     },
     createOrUpdateCategory() {
+      if (!this.categoryToCreate.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '分类名称不能为空！'
+        })
+        return
+      }
       if (this.categoryToCreate.id) {
         categoryApi.update(this.categoryToCreate.id, this.categoryToCreate).then(response => {
           this.$message.success('更新成功！')

@@ -250,12 +250,12 @@
         </a-form-item>
       </a-form>
     </a-modal>
-    <CommentDetail
+    <!-- <CommentDetail
       v-model="commentDetailVisible"
       v-if="selectComment"
       :comment="selectComment"
       :type="this.type"
-    />
+    /> -->
   </div>
 </template>
 <script>
@@ -439,6 +439,13 @@ export default {
       }
     },
     handleCreateClick() {
+      if (!this.replyComment.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '评论内容不能为空！'
+        })
+        return
+      }
       commentApi.create(this.type, this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}

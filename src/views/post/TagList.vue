@@ -132,6 +132,13 @@ export default {
       })
     },
     createOrUpdateTag() {
+      if (!this.tagToCreate.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '标签名称不能为空！'
+        })
+        return
+      }
       if (this.tagToCreate.id) {
         tagApi.update(this.tagToCreate.id, this.tagToCreate).then(response => {
           this.$message.success('更新成功！')

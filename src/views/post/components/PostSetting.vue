@@ -320,6 +320,13 @@ export default {
       this.selectedPost.thumbnail = null
     },
     handlerCreateCategory() {
+      if (!this.categoryToCreate.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '分类名称不能为空！'
+        })
+        return
+      }
       categoryApi.create(this.categoryToCreate).then(response => {
         this.loadCategories()
         this.categoryToCreate = {}
@@ -338,12 +345,26 @@ export default {
     },
     savePost() {
       this.createOrUpdatePost(
-        () => this.$message.success('文章创建成功'),
-        () => this.$message.success('文章更新成功'),
+        () => this.$message.success('文章发布成功'),
+        () => this.$message.success('文章发布成功'),
         false
       )
     },
     createOrUpdatePost(createSuccess, updateSuccess, autoSave) {
+      if (!this.selectedPost.title) {
+        this.$notification['error']({
+          message: '提示',
+          description: '文章标题不能为空！'
+        })
+        return
+      }
+      if (!this.selectedPost.originalContent) {
+        this.$notification['error']({
+          message: '提示',
+          description: '文章内容不能为空！'
+        })
+        return
+      }
       // Set category ids
       this.selectedPost.categoryIds = this.selectedCategoryIds
       // Set tag ids

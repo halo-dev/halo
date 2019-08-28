@@ -208,12 +208,26 @@ export default {
     },
     saveSheet() {
       this.createOrUpdateSheet(
-        () => this.$message.success('页面创建成功！'),
-        () => this.$message.success('页面更新成功！'),
+        () => this.$message.success('页面发布成功！'),
+        () => this.$message.success('页面发布成功！'),
         false
       )
     },
     createOrUpdateSheet(createSuccess, updateSuccess, autoSave) {
+      if (!this.selectedSheet.title) {
+        this.$notification['error']({
+          message: '提示',
+          description: '页面标题不能为空！'
+        })
+        return
+      }
+      if (!this.selectedSheet.originalContent) {
+        this.$notification['error']({
+          message: '提示',
+          description: '页面内容不能为空！'
+        })
+        return
+      }
       if (this.selectedSheet.id) {
         sheetApi.update(this.selectedSheet.id, this.selectedSheet, autoSave).then(response => {
           this.$log.debug('Updated sheet', response.data.data)

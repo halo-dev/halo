@@ -736,6 +736,260 @@ export default {
       })
     },
     handleSaveOptions() {
+      if (!this.options.blog_title) {
+        this.$notification['error']({
+          message: '提示',
+          description: '博客标题不能为空！'
+        })
+        return
+      }
+
+      if (!this.options.blog_url) {
+        this.$notification['error']({
+          message: '提示',
+          description: '博客地址不能为空！'
+        })
+        return
+      }
+
+      // 新评论通知和回复通知验证
+      if (this.options.comment_new_notice || this.options.comment_reply_notice) {
+        if (!this.options.email_enabled) {
+          this.$notification['error']({
+            message: '提示',
+            description: '新评论通知或回复通知需要打开和配置 SMTP 服务！'
+          })
+          return
+        }
+      }
+
+      // 附件配置验证
+      switch (this.options.attachment_type) {
+        case 'SMMS':
+          if (!this.options.smms_api_secret_token) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Token不能为空！'
+            })
+            return
+          }
+          break
+        case 'UPYUN':
+          if (!this.options.oss_upyun_domain) {
+            this.$notification['error']({
+              message: '提示',
+              description: '域名不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_bucket) {
+            this.$notification['error']({
+              message: '提示',
+              description: '空间名称不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_operator) {
+            this.$notification['error']({
+              message: '提示',
+              description: '操作员名称不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_password) {
+            this.$notification['error']({
+              message: '提示',
+              description: '操作员密码不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_source) {
+            this.$notification['error']({
+              message: '提示',
+              description: '文件目录不能为空！'
+            })
+            return
+          }
+          break
+        case 'QNYUN':
+          if (!this.options.oss_qiniu_domain) {
+            this.$notification['error']({
+              message: '提示',
+              description: '域名不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_qiniu_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_qiniu_secret_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_qiniu_bucket) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          break
+        case 'ALIYUN':
+          if (!this.options.oss_aliyun_bucket_name) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_aliyun_endpoint) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'EndPoint（地域节点） 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_aliyun_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_aliyun_access_secret) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Secret 不能为空！'
+            })
+            return
+          }
+          break
+        case 'BAIDUYUN':
+          if (!this.options.oss_baiduyun_bucket_name) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_baiduyun_endpoint) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'EndPoint（地域节点） 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_baiduyun_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_baiduyun_access_secret) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Secret 不能为空！'
+            })
+            return
+          }
+          break
+        case 'TENCENTYUN':
+          if (!this.options.oss_tencentyun_bucket_name) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_tencentyun_region) {
+            this.$notification['error']({
+              message: '提示',
+              description: '区域不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_tencentyun_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Id 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_tencentyun_access_secret) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Key 不能为空！'
+            })
+            return
+          }
+          break
+      }
+
+      // SMTP 配置验证
+      if (this.options.email_enabled) {
+        if (!this.options.email_host) {
+          this.$notification['error']({
+            message: '提示',
+            description: 'SMTP 地址不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_protocol) {
+          this.$notification['error']({
+            message: '提示',
+            description: '发送协议不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_ssl_port) {
+          this.$notification['error']({
+            message: '提示',
+            description: 'SSL 端口不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_username) {
+          this.$notification['error']({
+            message: '提示',
+            description: '邮箱账号不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_password) {
+          this.$notification['error']({
+            message: '提示',
+            description: '邮箱密码不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_from_name) {
+          this.$notification['error']({
+            message: '提示',
+            description: '发件人不能为空！'
+          })
+          return
+        }
+      }
+
+      // API 配置验证
+      if (this.options.api_enabled) {
+        if (!this.options.api_access_key) {
+          this.$notification['error']({
+            message: '提示',
+            description: 'Access key 不能为空！'
+          })
+          return
+        }
+      }
+
       optionApi.save(this.options).then(response => {
         this.loadOptions()
         this.loadUser()
@@ -807,6 +1061,27 @@ export default {
       this.logoDrawerVisible = false
     },
     handleTestMailClick() {
+      if (!this.mailParam.to) {
+        this.$notification['error']({
+          message: '提示',
+          description: '收件人不能为空！'
+        })
+        return
+      }
+      if (!this.mailParam.subject) {
+        this.$notification['error']({
+          message: '提示',
+          description: '主题不能为空！'
+        })
+        return
+      }
+      if (!this.mailParam.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '内容不能为空！'
+        })
+        return
+      }
       mailApi.testMail(this.mailParam).then(response => {
         this.$message.info(response.data.message)
       })
