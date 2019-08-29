@@ -12,7 +12,9 @@ public enum PostProperties implements PropertyEnum {
 
     RSS_PAGE_SIZE("rss_page_size", Integer.class, "20"),
 
-    INDEX_PAGE_SIZE("post_index_page_size", Integer.class, "10");
+    INDEX_PAGE_SIZE("post_index_page_size", Integer.class, "10"),
+
+    INDEX_SORT("post_index_sort",String.class,"createTime");
 
     private final String value;
 
