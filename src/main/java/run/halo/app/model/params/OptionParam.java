@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
- * Optiona param.
+ * Optional param.
  *
  * @author johnniang
  * @date 3/20/19
