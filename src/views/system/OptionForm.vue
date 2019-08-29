@@ -117,6 +117,16 @@
               </span>
               <a-form layout="vertical">
                 <a-form-item
+                  label="首页文章排序："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-select v-model="options.post_index_sort">
+                    <a-select-option value="createTime">创建时间</a-select-option>
+                    <a-select-option value="editTime">最后编辑时间</a-select-option>
+                    <a-select-option value="visits">点击量</a-select-option>
+                  </a-select>
+                </a-form-item>
+                <a-form-item
                   label="首页显示条数："
                   :wrapper-col="wrapperCol"
                 >
