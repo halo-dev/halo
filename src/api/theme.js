@@ -11,9 +11,16 @@ themeApi.listAll = () => {
   })
 }
 
-themeApi.listFiles = () => {
+themeApi.listFilesActivated = () => {
   return service({
-    url: `${baseUrl}/files`,
+    url: `${baseUrl}/activation/files`,
+    method: 'get'
+  })
+}
+
+themeApi.listFiles = themeId => {
+  return service({
+    url: `${baseUrl}/${themeId}/files`,
     method: 'get'
   })
 }

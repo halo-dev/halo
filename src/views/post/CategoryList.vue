@@ -240,8 +240,5 @@ export default {
 }
 </script>
 
-<style scoped>
-.category-tree {
-  margin-top: 1rem;
-}
+<style>
 </style>

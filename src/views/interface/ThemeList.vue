@@ -387,7 +387,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @keyframes scaleDraw {
   0% {
     transform: scale(1);

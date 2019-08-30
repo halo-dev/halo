@@ -701,28 +701,16 @@ body {
   }
 }
 
-.post-thumb {
+.post-thumb,.sheet-thumb {
   .img {
     width: 100%;
     cursor: pointer;
     border-radius: 4px;
-  }
-
-  .post-thumb-remove {
-    margin-top: 16px;
   }
 }
 
-.sheet-thumb {
-  .img {
-    width: 100%;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-
-  .sheet-thumb-remove {
-    margin-top: 16px;
-  }
+.post-thumb-remove,.sheet-thumb-remove {
+  margin-top: 16px;
 }
 
 .ant-calendar-picker {
@@ -732,5 +720,22 @@ body {
 #editor {
   .v-note-wrapper {
     min-height: 580px;
+  }
+}
+
+.attach-item {
+  width: 50%;
+  margin: 0 auto;
+  position: relative;
+  padding-bottom: 28%;
+  overflow: hidden;
+  float: left;
+  cursor: pointer;
+  img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 }

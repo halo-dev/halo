@@ -185,20 +185,4 @@ export default {
 </script>
 
 <style lang="less" scope>
-.attach-item {
-  width: 50%;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 28%;
-  overflow: hidden;
-  float: left;
-  cursor: pointer;
-  img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
 </style>

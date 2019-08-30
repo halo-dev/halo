@@ -35,7 +35,20 @@
         :xs="24"
         :style="{'padding-bottom':'12px'}"
       >
-        <a-card :title="activatedTheme.name+' 主题'">
+        <a-card>
+          <template slot="title">
+            <a-select
+              style="width: 100%"
+              @change="onSelectTheme"
+              v-model="selectedTheme.id"
+            >
+              <a-select-option
+                v-for="(theme,index) in themes"
+                :key="index"
+                :value="theme.id"
+              >{{ theme.name }} <a-icon v-if="theme.activated" type="check"/></a-select-option>
+            </a-select>
+          </template>
           <theme-file
             :files="files"
             @listenToSelect="handleSelectFile"
@@ -68,22 +81,34 @@ export default {
       files: [],
       file: {},
       content: '',
-      activatedTheme: {}
+      themes: [],
+      selectedTheme: {}
     }
   },
   created() {
-    this.loadFiles()
     this.loadActivatedTheme()
+    this.loadFiles()
+    this.loadThemes()
   },
   methods: {
+    loadActivatedTheme() {
+      themeApi.getActivatedTheme().then(response => {
+        this.selectedTheme = response.data.data
+      })
+    },
     loadFiles() {
-      themeApi.listFiles().then(response => {
+      themeApi.listFilesActivated().then(response => {
         this.files = response.data.data
       })
     },
-    loadActivatedTheme() {
-      themeApi.getActivatedTheme().then(response => {
-        this.activatedTheme = response.data.data
+    loadThemes() {
+      themeApi.listAll().then(response => {
+        this.themes = response.data.data
+      })
+    },
+    onSelectTheme(themeId) {
+      themeApi.listFiles(themeId).then(response => {
+        this.files = response.data.data
       })
     },
     handleSelectFile(file) {
@@ -95,7 +120,12 @@ export default {
         this.buttonDisabled = true
         return
       }
-      if (file.name === 'settings.yaml' || file.name === 'settings.yml' || file.name === 'theme.yaml' || file.name === 'theme.yml') {
+      if (
+        file.name === 'settings.yaml' ||
+        file.name === 'settings.yml' ||
+        file.name === 'theme.yaml' ||
+        file.name === 'theme.yml'
+      ) {
         this.$confirm({
           title: '警告：请谨慎修改该配置文件',
           content: '修改之后可能会产生不可预料的问题！',
