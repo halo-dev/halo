@@ -628,7 +628,7 @@
             </a-tab-pane>
             <a-tab-pane key="api">
               <span slot="tab">
-                <a-icon type="align-left" />API 设置
+                <a-icon type="thunderbolt" />API 设置
               </span>
               <a-form layout="vertical">
                 <a-form-item

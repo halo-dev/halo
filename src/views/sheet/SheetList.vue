@@ -123,6 +123,30 @@
                 </span>
 
                 <span
+                  slot="commentCount"
+                  slot-scope="commentCount"
+                >
+                  <a-badge
+                    :count="commentCount"
+                    :numberStyle="{backgroundColor: '#f38181'} "
+                    :showZero="true"
+                    :overflowCount="999"
+                  />
+                </span>
+
+                <span
+                  slot="visits"
+                  slot-scope="visits"
+                >
+                  <a-badge
+                    :count="visits"
+                    :numberStyle="{backgroundColor: '#00e0ff'} "
+                    :showZero="true"
+                    :overflowCount="9999"
+                  />
+                </span>
+
+                <span
                   slot="createTime"
                   slot-scope="createTime"
                 >
@@ -261,11 +285,13 @@ const customColumns = [
   },
   {
     title: '评论量',
-    dataIndex: 'commentCount'
+    dataIndex: 'commentCount',
+    scopedSlots: { customRender: 'commentCount' }
   },
   {
     title: '访问量',
-    dataIndex: 'visits'
+    dataIndex: 'visits',
+    scopedSlots: { customRender: 'visits' }
   },
   {
     title: '发布时间',

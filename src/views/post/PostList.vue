@@ -133,7 +133,12 @@
             slot-scope="text,record"
             style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
-            <a-icon type="pushpin" v-if="record.topPriority!=0" theme="twoTone" twoToneColor="red" />
+            <a-icon
+              type="pushpin"
+              v-if="record.topPriority!=0"
+              theme="twoTone"
+              twoToneColor="red"
+            />
             <a
               :href="options.blog_url+'/archives/'+record.url"
               target="_blank"
@@ -175,6 +180,30 @@
               color="green"
               style="margin-bottom: 8px"
             >{{ tag.name }}</a-tag>
+          </span>
+
+          <span
+            slot="commentCount"
+            slot-scope="commentCount"
+          >
+            <a-badge
+              :count="commentCount"
+              :numberStyle="{backgroundColor: '#f38181'} "
+              :showZero="true"
+              :overflowCount="999"
+            />
+          </span>
+
+          <span
+            slot="visits"
+            slot-scope="visits"
+          >
+            <a-badge
+              :count="visits"
+              :numberStyle="{backgroundColor: '#00e0ff'} "
+              :showZero="true"
+              :overflowCount="9999"
+            />
           </span>
 
           <span
@@ -304,12 +333,14 @@ const columns = [
   {
     title: '评论',
     width: '70px',
-    dataIndex: 'commentCount'
+    dataIndex: 'commentCount',
+    scopedSlots: { customRender: 'commentCount' }
   },
   {
     title: '访问',
     width: '70px',
-    dataIndex: 'visits'
+    dataIndex: 'visits',
+    scopedSlots: { customRender: 'visits' }
   },
   {
     title: '发布时间',
