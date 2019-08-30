@@ -2,8 +2,11 @@ package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -24,6 +27,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Post controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/19/19
  */
 @RestController
@@ -38,8 +42,13 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<PostListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
+    public Page<PostListVO> pageBy(Integer page, Integer size,
+                                   @SortDefault.SortDefaults({
+                                           @SortDefault(sort = "topPriority", direction = DESC),
+                                           @SortDefault(sort = "createTime", direction = DESC)
+                                   }) Sort sort,
                                    PostQuery postQuery) {
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage);
     }
