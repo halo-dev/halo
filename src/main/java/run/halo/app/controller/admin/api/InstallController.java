@@ -1,5 +1,7 @@
 package run.halo.app.controller.admin.api;
 
+import cn.hutool.core.text.StrBuilder;
+import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -196,11 +198,15 @@ public class InstallController {
             installParam.update(user);
             // Set password manually
             userService.setPassword(user, installParam.getPassword());
-            // Set default avatar
-            userService.setDefaultAvatar(user);
             // Update user
             return userService.update(user);
-        }).orElseGet(() -> userService.createBy(installParam));
+        }).orElseGet(() -> {
+            StrBuilder gravatar = new StrBuilder("//cn.gravatar.com/avatar/");
+            gravatar.append(SecureUtil.md5(installParam.getEmail()));
+            gravatar.append("?s=256&d=mm");
+            installParam.setAvatar(gravatar.toString());
+            return userService.createBy(installParam);
+        });
     }
 
     private void initSettings(InstallParam installParam) {

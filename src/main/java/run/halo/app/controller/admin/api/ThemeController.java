@@ -47,7 +47,7 @@ public class ThemeController {
         return themeService.getThemes();
     }
 
-    @GetMapping("files")
+    @GetMapping("activation/files")
     public List<ThemeFile> listFiles() {
         return themeService.listThemeFolderBy(themeService.getActivatedThemeId());
     }
