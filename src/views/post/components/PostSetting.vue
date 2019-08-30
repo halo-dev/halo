@@ -50,6 +50,15 @@
                   <a-radio :value="true">关闭</a-radio>
                 </a-radio-group>
               </a-form-item>
+              <a-form-item label="是否置顶：">
+                <a-radio-group
+                  v-model="selectedPost.topPriority"
+                  :defaultValue="0"
+                >
+                  <a-radio :value="1">是</a-radio>
+                  <a-radio :value="0">否</a-radio>
+                </a-radio-group>
+              </a-form-item>
             </a-form>
           </div>
         </div>

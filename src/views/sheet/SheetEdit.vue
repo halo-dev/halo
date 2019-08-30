@@ -102,7 +102,7 @@ export default {
     handleSaveDraft() {
       this.sheetToStage.status = 'DRAFT'
       if (!this.sheetToStage.title) {
-        this.sheetToStage.title = moment(new Date())
+        this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
       if (!this.sheetToStage.originalContent) {
         this.sheetToStage.originalContent = '开始编辑...'

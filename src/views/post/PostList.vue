@@ -128,20 +128,12 @@
           :loading="postsLoading"
           :pagination="false"
         >
-          <!-- ellipsis内嵌a标签后文本会被置空
-           <ellipsis
-            :length="25"
-            tooltip
-            slot="postTitle"
-            slot-scope="text,record"
-          >
-          {{ text }}
-          </ellipsis> -->
           <span
             slot="postTitle"
             slot-scope="text,record"
             style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
+            <a-icon type="pushpin" v-if="record.topPriority!=0" theme="twoTone" twoToneColor="red" />
             <a
               :href="options.blog_url+'/archives/'+record.url"
               target="_blank"

@@ -112,7 +112,7 @@ export default {
     handleSaveDraft() {
       this.postToStage.status = 'DRAFT'
       if (!this.postToStage.title) {
-        this.postToStage.title = moment(new Date())
+        this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
       if (!this.postToStage.originalContent) {
         this.postToStage.originalContent = '开始编辑...'
