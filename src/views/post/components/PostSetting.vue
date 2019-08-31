@@ -339,6 +339,7 @@ export default {
       categoryApi.create(this.categoryToCreate).then(response => {
         this.loadCategories()
         this.categoryToCreate = {}
+        this.toggleCategoryForm()
       })
     },
     toggleCategoryForm() {

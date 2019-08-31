@@ -6,7 +6,7 @@
         :md="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :bordered="false">
+        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
           <div class="profile-center-avatarHolder">
             <a-tooltip
               placement="right"

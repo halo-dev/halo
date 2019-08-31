@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title">
+        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -64,7 +64,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="所有标签">
+        <a-card title="所有标签" :bodyStyle="{ padding: '16px' }">
           <a-tooltip
             placement="topLeft"
             v-for="tag in tags"

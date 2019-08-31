@@ -18,6 +18,7 @@
         :md="12"
         :sm="24"
         :xs="24"
+        v-if="!viewMode"
       >
         <a-skeleton
           active
@@ -53,9 +54,9 @@
         </a-skeleton>
       </a-col>
       <a-col
-        :xl="12"
-        :lg="12"
-        :md="12"
+        :xl="formColValue"
+        :lg="formColValue"
+        :md="formColValue"
         :sm="24"
         :xs="24"
         style="padding-bottom: 50px;"
@@ -158,19 +159,55 @@
           </div>
         </a-skeleton>
       </a-col>
+
+      <a-col
+        :xl="20"
+        :lg="20"
+        :md="20"
+        :sm="24"
+        :xs="24"
+        v-if="viewMode"
+      >
+        <a-card
+          :bordered="true"
+          :bodyStyle="{ padding: 0}"
+        >
+          <iframe
+            id="themeViewIframe"
+            title="主题预览"
+            frameborder="0"
+            scrolling="auto"
+            border="0"
+            :src="options.blog_url"
+            style="width:100%;height:1000px;overflow-y:hidden;"
+          > </iframe>
+        </a-card>
+      </a-col>
     </a-row>
 
     <AttachmentSelectDrawer
       v-model="attachmentDrawerVisible"
       @listenToSelect="handleSelectAttachment"
       title="选择附件"
-      isChooseAvatar
     />
 
     <footer-tool-bar
       v-if="themeConfiguration.length>0"
-      :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}"
+      :style="{ width : '100%'}"
     >
+      <a-button
+        v-if="theme.activated && viewMode"
+        type="primary"
+        @click="toggleViewMode"
+        style="marginRight: 8px"
+        ghost
+      >普通模式</a-button>
+      <a-button
+        v-else-if="theme.activated && !viewMode"
+        type="dashed"
+        @click="toggleViewMode"
+        style="marginRight: 8px"
+      >预览模式</a-button>
       <a-button
         type="primary"
         @click="handleSaveSettings"
@@ -185,6 +222,7 @@ import FooterToolBar from '@/components/FooterToolbar'
 import Verte from 'verte'
 import 'verte/dist/verte.css'
 import themeApi from '@/api/theme'
+import optionApi from '@/api/option'
 export default {
   name: 'ThemeSetting',
   mixins: [mixin, mixinDevice],
@@ -206,7 +244,11 @@ export default {
         lg: { span: 12 },
         sm: { span: 24 },
         xs: { span: 24 }
-      }
+      },
+      viewMode: false,
+      formColValue: 12,
+      options: [],
+      keys: ['blog_url']
     }
   },
   model: {
@@ -227,6 +269,7 @@ export default {
   created() {
     this.loadSkeleton()
     this.initData()
+    this.loadOptions()
   },
   watch: {
     visible: function(newValue, oldValue) {
@@ -258,6 +301,9 @@ export default {
     handleSaveSettings() {
       themeApi.saveSettings(this.selectedTheme.id, this.themeSettings).then(response => {
         this.$message.success('保存成功！')
+        if (this.viewMode) {
+          document.getElementById('themeViewIframe').contentWindow.location.reload(true)
+        }
       })
     },
     onClose() {
@@ -270,6 +316,31 @@ export default {
     handleSelectAttachment(data) {
       this.themeSettings[this.selectedField] = encodeURI(data.path)
       this.attachmentDrawerVisible = false
+    },
+    toggleViewMode() {
+      if (!this.viewMode) {
+        this.formColValue = 4
+        this.wrapperCol = {
+          xl: { span: 24 },
+          lg: { span: 24 },
+          sm: { span: 24 },
+          xs: { span: 24 }
+        }
+      } else {
+        this.formColValue = 12
+        this.wrapperCol = {
+          xl: { span: 12 },
+          lg: { span: 12 },
+          sm: { span: 24 },
+          xs: { span: 24 }
+        }
+      }
+      this.viewMode = !this.viewMode
+    },
+    loadOptions() {
+      optionApi.listAll(this.keys).then(response => {
+        this.options = response.data.data
+      })
     }
   }
 }

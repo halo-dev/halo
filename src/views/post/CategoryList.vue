@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title">
+        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -68,7 +68,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '1rem' }"
       >
-        <a-card title="分类列表">
+        <a-card title="分类列表" :bodyStyle="{ padding: '16px' }">
           <a-table
             :columns="columns"
             :dataSource="categories"

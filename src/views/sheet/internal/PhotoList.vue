@@ -9,7 +9,7 @@
         :span="24"
         class="search-box"
       >
-        <a-card :bordered="false">
+        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">

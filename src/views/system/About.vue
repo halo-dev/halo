@@ -2,10 +2,14 @@
   <div class="page-header-index-wide">
     <a-row>
       <a-col :span="24">
-        <a-card :bordered="false">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <a-card
             :bordered="false"
             class="environment-info"
+            :bodyStyle="{ padding: '16px' }"
           >
             <template slot="title">
               环境信息
@@ -70,6 +74,7 @@
           <a-card
             title="开发者"
             :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
           >
             <a
               :href="item.github"
@@ -93,6 +98,7 @@
           <a-card
             title="时间轴"
             :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
           >
             <a-timeline>
               <a-timeline-item>...</a-timeline-item>

@@ -1,6 +1,9 @@
 <template>
   <div class="comment-tab-wrapper">
-    <a-card :bordered="false">
+    <a-card
+      :bordered="false"
+      :bodyStyle="{ padding: 0 }"
+    >
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">

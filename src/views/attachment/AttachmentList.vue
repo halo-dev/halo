@@ -9,7 +9,10 @@
         :span="24"
         class="search-box"
       >
-        <a-card :bordered="false">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
@@ -100,7 +103,10 @@
             >
               <div class="attach-thumb">
                 <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
-                <img :src="item.thumbPath" v-show="handleJudgeMediaType(item)">
+                <img
+                  :src="item.thumbPath"
+                  v-show="handleJudgeMediaType(item)"
+                >
               </div>
               <a-card-meta>
                 <ellipsis
@@ -280,7 +286,8 @@ export default {
   position: relative;
   padding-bottom: 56%;
   overflow: hidden;
-  img, span{
+  img,
+  span {
     width: 100%;
     height: 100%;
     position: absolute;

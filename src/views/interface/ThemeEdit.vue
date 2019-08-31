@@ -9,7 +9,7 @@
         :xs="24"
         :style="{'padding-bottom':'12px'}"
       >
-        <a-card>
+        <a-card :bodyStyle="{ padding: '16px' }">
           <a-form layout="vertical">
             <a-form-item>
               <codemirror
@@ -35,7 +35,7 @@
         :xs="24"
         :style="{'padding-bottom':'12px'}"
       >
-        <a-card>
+        <a-card :bodyStyle="{ padding: '16px' }">
           <template slot="title">
             <a-select
               style="width: 100%"

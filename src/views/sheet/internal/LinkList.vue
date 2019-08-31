@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title">
+        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
           <a-form layout="horizontal">
             <a-form-item label="网站名称：">
               <a-input v-model="link.name" />
@@ -65,7 +65,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="所有友情链接">
+        <a-card title="所有友情链接" :bodyStyle="{ padding: '16px' }">
           <a-table
             :columns="columns"
             :dataSource="links"
