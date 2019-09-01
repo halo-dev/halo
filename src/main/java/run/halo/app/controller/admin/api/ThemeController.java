@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.model.params.ThemeContentParam;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.ThemeService;
@@ -63,9 +64,8 @@ public class ThemeController {
     }
 
     @PutMapping("files/content")
-    public void updateContentBy(@RequestParam(name = "path") String path,
-                                @RequestBody String content) {
-        themeService.saveTemplateContent(path, content);
+    public void updateContentBy(@RequestBody ThemeContentParam param) {
+        themeService.saveTemplateContent(param.getPath(), param.getContent());
     }
 
     @GetMapping("files/custom")
