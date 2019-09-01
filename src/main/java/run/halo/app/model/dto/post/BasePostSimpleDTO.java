@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.enums.PostCreateFrom;
-import run.halo.app.model.enums.PostType;
 
 /**
  * Base page simple output dto.

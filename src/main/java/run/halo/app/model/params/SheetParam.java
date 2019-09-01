@@ -14,7 +14,10 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
+ * Sheet param.
+ *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-24
  */
 @Data
@@ -57,6 +60,10 @@ public class SheetParam implements InputConverter<Sheet> {
 
         url = HaloUtils.initializeUrlIfBlank(url);
 
+        if (null == thumbnail) {
+            thumbnail = "";
+        }
+
         Sheet sheet = InputConverter.super.convertTo();
         // Crypt password
         if (StringUtils.isNotBlank(password)) {
@@ -75,6 +82,10 @@ public class SheetParam implements InputConverter<Sheet> {
         }
 
         url = HaloUtils.initializeUrlIfBlank(url);
+
+        if (null == thumbnail) {
+            thumbnail = "";
+        }
 
         InputConverter.super.update(sheet);
 
