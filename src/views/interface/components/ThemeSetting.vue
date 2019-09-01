@@ -167,6 +167,7 @@
         :sm="24"
         :xs="24"
         v-if="viewMode"
+        style="padding-bottom: 50px;"
       >
         <a-card
           :bordered="true"
@@ -179,7 +180,8 @@
             scrolling="auto"
             border="0"
             :src="options.blog_url"
-            style="width:100%;height:1000px;overflow-y:hidden;"
+            width="100%"
+            :height="clientHeight-165"
           > </iframe>
         </a-card>
       </a-col>
@@ -196,14 +198,14 @@
       :style="{ width : '100%'}"
     >
       <a-button
-        v-if="theme.activated && viewMode"
+        v-if="!this.isMobile() && theme.activated && viewMode"
         type="primary"
         @click="toggleViewMode"
         style="marginRight: 8px"
         ghost
       >普通模式</a-button>
       <a-button
-        v-else-if="theme.activated && !viewMode"
+        v-else-if="!this.isMobile() && theme.activated && !viewMode"
         type="dashed"
         @click="toggleViewMode"
         style="marginRight: 8px"
@@ -248,7 +250,8 @@ export default {
       viewMode: false,
       formColValue: 12,
       options: [],
-      keys: ['blog_url']
+      keys: ['blog_url'],
+      clientHeight: document.documentElement.clientHeight
     }
   },
   model: {
@@ -285,6 +288,11 @@ export default {
         this.settingLoading = false
       }, 500)
     },
+    loadOptions() {
+      optionApi.listAll(this.keys).then(response => {
+        this.options = response.data.data
+      })
+    },
     initData() {
       this.settingLoading = true
 
@@ -318,7 +326,8 @@ export default {
       this.attachmentDrawerVisible = false
     },
     toggleViewMode() {
-      if (!this.viewMode) {
+      this.viewMode = !this.viewMode
+      if (this.viewMode) {
         this.formColValue = 4
         this.wrapperCol = {
           xl: { span: 24 },
@@ -335,12 +344,6 @@ export default {
           xs: { span: 24 }
         }
       }
-      this.viewMode = !this.viewMode
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     }
   }
 }

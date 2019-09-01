@@ -6,10 +6,6 @@
     :checkedKeys="categoryIds"
     @check="onCheck"
   >
-    <span
-      slot="title0010"
-      style="color: #1890ff"
-    >sss</span>
   </a-tree>
 </template>
 

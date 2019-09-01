@@ -520,12 +520,12 @@ export default {
 }
 </script>
 
-<style scoped="scoped">
-.more-options-btn {
+<style lang="less" scoped>
+/* .more-options-btn {
   margin-left: 15px;
   text-decoration: none;
 }
 a {
   text-decoration: none;
-}
+} */
 </style>
