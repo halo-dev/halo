@@ -1,4 +1,4 @@
-package run.halo.app.controller.base;
+package run.halo.app.core;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;

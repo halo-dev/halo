@@ -80,7 +80,6 @@ public class HaloConfiguration {
      *
      * @return Log filter registration bean
      */
-    @Bean
     public FilterRegistrationBean<LogFilter> logFilter() {
         FilterRegistrationBean<LogFilter> logFilter = new FilterRegistrationBean<>();
 

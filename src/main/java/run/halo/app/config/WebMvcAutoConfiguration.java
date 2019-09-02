@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.controller.support.PageJacksonSerializer;
+import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;

@@ -1,4 +1,4 @@
-package run.halo.app.controller.support;
+package run.halo.app.core;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
