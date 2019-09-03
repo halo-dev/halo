@@ -177,6 +177,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Create or update post
         post = super.createOrUpdateBy(post);
 
+        postTagService.removeByPostId(post.getId());
+
+        postCategoryService.removeByPostId(post.getId());
+
         // List all tags
         List<Tag> tags = tagService.listAllByIds(tagIds);
 
