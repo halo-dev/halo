@@ -221,11 +221,6 @@ export default {
       categoryToCreate: {}
     }
   },
-  // TODO delete this commented code
-  // model: {
-  //   prop: 'visible',
-  //   event: 'close'
-  // },
   props: {
     post: {
       type: Object,
@@ -386,6 +381,7 @@ export default {
           this.$log.debug('Updated post', response.data.data)
           if (updateSuccess) {
             updateSuccess()
+            this.$router.push({ name: 'PostList' })
           }
         })
       } else {
@@ -394,6 +390,7 @@ export default {
           this.$log.debug('Created post', response.data.data)
           if (createSuccess) {
             createSuccess()
+            this.$router.push({ name: 'PostList' })
           }
           this.selectedPost = response.data.data
         })
