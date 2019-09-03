@@ -194,7 +194,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public StatisticDTO getCount() {
         StatisticDTO statisticDTO = new StatisticDTO();
-        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
+        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED) + sheetService.countByStatus(PostStatus.PUBLISHED));
         statisticDTO.setAttachmentCount(attachmentService.count());
 
         // Handle comment count

@@ -62,7 +62,7 @@ public class PostParam implements InputConverter<Post> {
     @Override
     public Post convertTo() {
         if (StringUtils.isBlank(url)) {
-            url = title;
+            url = title.replace(".","");
         }
         if (null == thumbnail) {
             thumbnail = "";
@@ -80,7 +80,7 @@ public class PostParam implements InputConverter<Post> {
     @Override
     public void update(Post post) {
         if (StringUtils.isBlank(url)) {
-            url = title;
+            url = title.replace(".","");
         }
         if (null == thumbnail) {
             thumbnail = "";
