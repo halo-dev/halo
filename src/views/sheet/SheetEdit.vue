@@ -98,6 +98,23 @@ export default {
       }
     })
   },
+  destroyed: function() {
+    if (this.sheetSettingVisible) {
+      this.sheetSettingVisible = false
+    }
+    if (this.attachmentDrawerVisible) {
+      this.attachmentDrawerVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.sheetSettingVisible) {
+      this.sheetSettingVisible = false
+    }
+    if (this.attachmentDrawerVisible) {
+      this.attachmentDrawerVisible = false
+    }
+    next()
+  },
   methods: {
     handleSaveDraft() {
       this.sheetToStage.status = 'DRAFT'
@@ -158,5 +175,3 @@ export default {
   }
 }
 </script>
-<style lang="less">
-</style>

@@ -15,7 +15,6 @@
       </div>
       <div class="number">
         <slot name="number">
-          <!-- <span>{{ typeof number === 'function' && number() || number }}</span> -->
           <countTo
             :startVal="startNumber"
             :endVal="typeof number === 'function' && number() || number"
@@ -64,37 +63,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.analysis-card-container {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  .meta {
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    color: rgba(0, 0, 0, 0.45);
-    font-size: 14px;
-    line-height: 22px;
-    .analysis-card-action {
-      cursor: pointer;
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-  }
-}
-.number {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-all;
-  white-space: nowrap;
-  color: #000;
-  margin-top: 4px;
-  margin-bottom: 0;
-  font-size: 32px;
-  line-height: 38px;
-  height: 38px;
-}
-</style>

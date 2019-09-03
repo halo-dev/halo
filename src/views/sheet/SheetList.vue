@@ -245,8 +245,8 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import SheetSetting from './components/SheetSetting'
 import { mapGetters } from 'vuex'
+import SheetSetting from './components/SheetSetting'
 import sheetApi from '@/api/sheet'
 import menuApi from '@/api/menu'
 
@@ -335,6 +335,17 @@ export default {
     this.loadSheets()
     this.loadInternalSheets()
   },
+  destroyed: function() {
+    if (this.sheetSettingVisible) {
+      this.sheetSettingVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.sheetSettingVisible) {
+      this.sheetSettingVisible = false
+    }
+    next()
+  },
   methods: {
     loadSheets() {
       this.sheetsLoading = true
@@ -388,5 +399,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-</style>

@@ -46,7 +46,12 @@
                 v-for="(theme,index) in themes"
                 :key="index"
                 :value="theme.id"
-              >{{ theme.name }} <a-icon v-if="theme.activated" type="check"/></a-select-option>
+              >{{ theme.name }}
+                <a-icon
+                  v-if="theme.activated"
+                  type="check"
+                />
+              </a-select-option>
             </a-select>
           </template>
           <theme-file

@@ -148,7 +148,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scope>
 body {
   height: 100%;
   background-color: #f5f5f5;

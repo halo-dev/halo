@@ -275,17 +275,17 @@ export default {
   created() {
     this.loadThemes()
   },
-  // destroyed: function() {
-  //   if (this.visible) {
-  //     this.visible = false
-  //   }
-  // },
-  // beforeRouteLeave(to, from, next) {
-  //   if (this.visible) {
-  //     this.visible = false
-  //   }
-  //   next()
-  // },
+  destroyed: function() {
+    if (this.themeSettingVisible) {
+      this.themeSettingVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.themeSettingVisible) {
+      this.themeSettingVisible = false
+    }
+    next()
+  },
   methods: {
     loadThemes() {
       this.themeLoading = true

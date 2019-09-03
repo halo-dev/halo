@@ -22,6 +22,7 @@
             <img
               :src="attachment.path"
               v-show="photoPreviewVisible"
+              style="width: 100%;"
             >
             <video-player
               class="video-player-box"
@@ -29,6 +30,7 @@
               ref="videoPlayer"
               :options="playerOptions"
               :playsinline="true"
+              style="width: 100%;"
             >
             </video-player>
           </div>
@@ -158,10 +160,10 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { videoPlayer } from 'vue-video-player'
+import 'video.js/dist/video-js.css'
 import attachmentApi from '@/api/attachment'
 import photoApi from '@/api/photo'
-import 'video.js/dist/video-js.css'
-import { videoPlayer } from 'vue-video-player'
 
 export default {
   name: 'AttachmentDetailDrawer',
@@ -352,12 +354,3 @@ export default {
   }
 }
 </script>
-
-<style scope>
-.attach-detail-img img {
-  width: 100%;
-}
-.video-player-box {
-  width: 100%;
-}
-</style>

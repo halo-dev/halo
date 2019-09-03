@@ -56,11 +56,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.ant-tree-child-tree {
-  li {
-    overflow: hidden;
-  }
-}
-</style>

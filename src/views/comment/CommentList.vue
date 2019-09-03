@@ -26,10 +26,6 @@ export default {
   components: {
     PageView,
     CommentTab
-  },
-  data() {
-    return {}
-  },
-  methods: {}
+  }
 }
 </script>

@@ -749,6 +749,23 @@ export default {
   mounted() {
     this.loadFormOptions()
   },
+  destroyed: function() {
+    if (this.faviconDrawerVisible) {
+      this.faviconDrawerVisible = false
+    }
+    if (this.logoDrawerVisible) {
+      this.logoDrawerVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.faviconDrawerVisible) {
+      this.faviconDrawerVisible = false
+    }
+    if (this.logoDrawerVisible) {
+      this.logoDrawerVisible = false
+    }
+    next()
+  },
   methods: {
     ...mapActions(['loadUser', 'loadOptions']),
     loadFormOptions() {

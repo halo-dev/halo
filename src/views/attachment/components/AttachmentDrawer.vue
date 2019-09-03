@@ -88,8 +88,8 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import attachmentApi from '@/api/attachment'
 import AttachmentDetailDrawer from './AttachmentDetailDrawer'
+import attachmentApi from '@/api/attachment'
 
 export default {
   name: 'AttachmentDrawer',
@@ -195,6 +195,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scope>
-</style>

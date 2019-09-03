@@ -328,13 +328,13 @@
 </template>
 
 <script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import RecentCommentTab from './components/RecentCommentTab'
 import countTo from 'vue-count-to'
 import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
-import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
 
 import postApi from '@/api/post'
 import logApi from '@/api/log'

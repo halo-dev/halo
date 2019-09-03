@@ -108,6 +108,23 @@ export default {
       }
     })
   },
+  destroyed: function() {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+    if (this.attachmentDrawerVisible) {
+      this.attachmentDrawerVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+    if (this.attachmentDrawerVisible) {
+      this.attachmentDrawerVisible = false
+    }
+    next()
+  },
   methods: {
     handleSaveDraft() {
       this.postToStage.status = 'DRAFT'
@@ -177,6 +194,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-</style>

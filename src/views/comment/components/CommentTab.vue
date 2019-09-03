@@ -263,9 +263,9 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import commentApi from '@/api/comment'
-import marked from 'marked'
 import CommentDetail from './CommentDetail'
+import marked from 'marked'
+import commentApi from '@/api/comment'
 const postColumns = [
   {
     title: '昵称',

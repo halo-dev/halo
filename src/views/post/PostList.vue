@@ -408,6 +408,17 @@ export default {
     this.loadPosts()
     this.loadCategories()
   },
+  destroyed: function() {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+    next()
+  },
   methods: {
     loadPosts() {
       this.postsLoading = true
@@ -537,5 +548,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-</style>

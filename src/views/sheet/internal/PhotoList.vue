@@ -272,8 +272,8 @@
 </template>
 
 <script>
-import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import photoApi from '@/api/photo'
 
 export default {

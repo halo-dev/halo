@@ -219,9 +219,9 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
-import { mapGetters } from 'vuex'
 import Verte from 'verte'
 import 'verte/dist/verte.css'
 import themeApi from '@/api/theme'
@@ -343,5 +343,3 @@ export default {
   }
 }
 </script>
-<style lang="less" scoped>
-</style>

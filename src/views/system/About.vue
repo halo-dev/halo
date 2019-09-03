@@ -312,5 +312,3 @@ UA 信息：${navigator.userAgent}`
   }
 }
 </script>
-<style lang="less">
-</style>

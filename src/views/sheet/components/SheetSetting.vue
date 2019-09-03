@@ -125,10 +125,6 @@ export default {
       customTpls: []
     }
   },
-  // model: {
-  //   prop: 'visible',
-  //   event: 'close'
-  // },
   props: {
     sheet: {
       type: Object,
@@ -250,5 +246,3 @@ export default {
   }
 }
 </script>
-<style lang="less">
-</style>
