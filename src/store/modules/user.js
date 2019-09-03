@@ -9,26 +9,12 @@ import userApi from '@/api/user'
 const user = {
   state: {
     token: null,
-    name: '',
-    avatar: '',
-    info: {},
     user: {}
   },
   mutations: {
     SET_TOKEN: (state, token) => {
       Vue.ls.set(ACCESS_TOKEN, token)
       state.token = token
-    },
-    SET_NAME: (state, {
-      name
-    }) => {
-      state.name = name
-    },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar
-    },
-    SET_INFO: (state, info) => {
-      state.info = info
     },
     CLEAR_TOKEN: state => {
       Vue.ls.remove(ACCESS_TOKEN)

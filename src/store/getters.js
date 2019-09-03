@@ -4,8 +4,6 @@ const getters = {
   color: state => state.app.color,
   token: state => state.user.token,
   user: state => state.user.user,
-  avatar: state => state.user.avatar,
-  nickname: state => state.user.name,
   addRouters: state => state.permission.addRouters,
   apiUrl: state => {
     if (state.app.apiUrl) {
