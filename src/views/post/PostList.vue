@@ -1,6 +1,9 @@
 <template>
   <div class="page-header-index-wide">
-    <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+    <a-card
+      :bordered="false"
+      :bodyStyle="{ padding: '16px' }"
+    >
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
@@ -303,9 +306,9 @@ import PostSetting from './components/PostSetting'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import TagSelect from './components/TagSelect'
 import CategoryTree from './components/CategoryTree'
+import { mapGetters } from 'vuex'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
-import optionApi from '@/api/option'
 const columns = [
   {
     title: '标题',
@@ -389,9 +392,7 @@ export default {
       postSettingVisible: false,
       selectedPost: {},
       selectedTagIds: [],
-      selectedCategoryIds: [],
-      options: [],
-      keys: ['blog_url']
+      selectedCategoryIds: []
     }
   },
   computed: {
@@ -400,11 +401,11 @@ export default {
         post.statusProperty = this.postStatus[post.status]
         return post
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   created() {
     this.loadPosts()
-    this.loadOptions()
     this.loadCategories()
   },
   methods: {
@@ -423,11 +424,6 @@ export default {
     loadCategories() {
       categoryApi.listAll().then(response => {
         this.categories = response.data.data
-      })
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
       })
     },
     handleEditClick(post) {

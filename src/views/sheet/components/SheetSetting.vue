@@ -108,7 +108,7 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import moment from 'moment'
 import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
-import optionApi from '@/api/option'
+import { mapGetters } from 'vuex'
 import themeApi from '@/api/theme'
 import sheetApi from '@/api/sheet'
 export default {
@@ -121,8 +121,6 @@ export default {
     return {
       thumbDrawerVisible: false,
       settingLoading: true,
-      options: [],
-      keys: ['blog_url'],
       selectedSheet: this.sheet,
       customTpls: []
     }
@@ -149,7 +147,6 @@ export default {
   },
   created() {
     this.loadSkeleton()
-    this.loadOptions()
     this.loadCustomTpls()
   },
   watch: {
@@ -172,7 +169,8 @@ export default {
         return moment(date, 'YYYY-MM-DD HH:mm:ss')
       }
       return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
-    }
+    },
+    ...mapGetters(['options'])
   },
   methods: {
     loadSkeleton() {
@@ -180,11 +178,6 @@ export default {
       setTimeout(() => {
         this.settingLoading = false
       }, 500)
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     },
     loadCustomTpls() {
       themeApi.customTpls().then(response => {

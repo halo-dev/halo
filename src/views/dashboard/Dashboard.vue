@@ -331,15 +331,15 @@
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import RecentCommentTab from './components/RecentCommentTab'
+import countTo from 'vue-count-to'
+import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import optionApi from '@/api/option'
+import { mapGetters } from 'vuex'
 
 import postApi from '@/api/post'
 import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'
-import countTo from 'vue-count-to'
-import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
 export default {
   name: 'Dashboard',
   mixins: [mixin, mixinDevice],
@@ -371,8 +371,6 @@ export default {
       },
       journalPhotos: [], // 日志图片集合最多九张
       logs: [],
-      options: [],
-      keys: ['blog_url'],
       logPagination: {
         page: 1,
         size: 50,
@@ -385,11 +383,6 @@ export default {
     this.getCounts()
     this.listLatestPosts()
     this.listLatestLogs()
-    this.loadOptions()
-
-    // this.interval = setInterval(() => {
-    //   this.getCounts()
-    // }, 5000)
   },
   computed: {
     formattedPostData() {
@@ -410,7 +403,8 @@ export default {
         log.type = this.logType[log.type].text
         return log
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
@@ -439,11 +433,6 @@ export default {
         height: callData.height
       }
       this.journalPhotos.push(photo)
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     },
     listLatestPosts() {
       postApi.listLatest(5).then(response => {

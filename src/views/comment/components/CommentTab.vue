@@ -262,8 +262,8 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
-import optionApi from '@/api/option'
 import marked from 'marked'
 import CommentDetail from './CommentDetail'
 const postColumns = [
@@ -376,14 +376,11 @@ export default {
       replyComment: {},
       loading: false,
       commentStatus: commentApi.commentStatus,
-      options: [],
-      keys: ['blog_url'],
       commentDetailVisible: false
     }
   },
   created() {
     this.loadComments()
-    this.loadOptions()
   },
   computed: {
     formattedComments() {
@@ -392,7 +389,8 @@ export default {
         comment.content = marked(comment.content, { sanitize: true })
         return comment
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   methods: {
     loadComments() {
@@ -409,11 +407,6 @@ export default {
     handleQuery() {
       this.queryParam.page = 0
       this.loadComments()
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     },
     handleEditStatusClick(commentId, status) {
       commentApi.updateStatus(this.type, commentId, status).then(response => {

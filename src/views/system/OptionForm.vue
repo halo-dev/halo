@@ -716,10 +716,10 @@
 </template>
 <script>
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
+import { mapActions } from 'vuex'
 import optionApi from '@/api/option'
 import mailApi from '@/api/mail'
 import attachmentApi from '@/api/attachment'
-import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -747,11 +747,11 @@ export default {
     }
   },
   mounted() {
-    this.loadOptions()
+    this.loadFormOptions()
   },
   methods: {
-    ...mapActions(['loadUser']),
-    loadOptions() {
+    ...mapActions(['loadUser', 'loadOptions']),
+    loadFormOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
         this.handleAttachChange(this.options['attachment_type'])
@@ -1013,6 +1013,7 @@ export default {
       }
 
       optionApi.save(this.options).then(response => {
+        this.loadFormOptions()
         this.loadOptions()
         this.loadUser()
         this.$message.success('保存成功！')

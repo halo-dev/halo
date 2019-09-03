@@ -126,8 +126,8 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
-import optionApi from '@/api/option'
 export default {
   name: 'CommentDetail',
   mixins: [mixin, mixinDevice],
@@ -166,7 +166,9 @@ export default {
   },
   created() {
     this.loadSkeleton()
-    this.loadOptions()
+  },
+  computed: {
+    ...mapGetters(['options'])
   },
   watch: {
     visible: function(newValue, oldValue) {
@@ -183,11 +185,6 @@ export default {
       setTimeout(() => {
         this.detailLoading = false
       }, 500)
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     },
     handleEditComment() {
       this.editable = true

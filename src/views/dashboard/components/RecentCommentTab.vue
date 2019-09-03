@@ -54,8 +54,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
-import optionApi from '@/api/option'
 
 import marked from 'marked'
 export default {
@@ -73,9 +73,7 @@ export default {
   data() {
     return {
       comments: [],
-      loading: false,
-      options: [],
-      keys: ['blog_url']
+      loading: false
     }
   },
   computed: {
@@ -84,18 +82,13 @@ export default {
         comment.content = marked(comment.content, { sanitize: true })
         return comment
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   created() {
     this.loadComments()
-    this.loadOptions()
   },
   methods: {
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
-    },
     loadComments() {
       this.loading = true
       commentApi.latestComment(this.type, 5, 'PUBLISHED').then(response => {

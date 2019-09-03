@@ -221,10 +221,10 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
+import { mapGetters } from 'vuex'
 import Verte from 'verte'
 import 'verte/dist/verte.css'
 import themeApi from '@/api/theme'
-import optionApi from '@/api/option'
 export default {
   name: 'ThemeSetting',
   mixins: [mixin, mixinDevice],
@@ -249,8 +249,6 @@ export default {
       },
       viewMode: false,
       formColValue: 12,
-      options: [],
-      keys: ['blog_url'],
       clientHeight: document.documentElement.clientHeight
     }
   },
@@ -272,7 +270,6 @@ export default {
   created() {
     this.loadSkeleton()
     this.initData()
-    this.loadOptions()
   },
   watch: {
     visible: function(newValue, oldValue) {
@@ -281,17 +278,15 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['options'])
+  },
   methods: {
     loadSkeleton() {
       this.settingLoading = true
       setTimeout(() => {
         this.settingLoading = false
       }, 500)
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     },
     initData() {
       this.settingLoading = true

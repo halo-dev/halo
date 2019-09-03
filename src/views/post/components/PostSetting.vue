@@ -195,7 +195,7 @@ import CategoryTree from './CategoryTree'
 import CategorySelectTree from './CategorySelectTree'
 import TagSelect from './TagSelect'
 import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
-import optionApi from '@/api/option'
+import { mapGetters } from 'vuex'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 export default {
@@ -212,8 +212,6 @@ export default {
       thumbDrawerVisible: false,
       categoryFormVisible: false,
       settingLoading: true,
-      options: [],
-      keys: ['blog_url'],
       selectedPost: this.post,
       selectedTagIds: this.tagIds,
       selectedCategoryIds: this.categoryIds,
@@ -262,7 +260,6 @@ export default {
   },
   created() {
     this.loadSkeleton()
-    this.loadOptions()
     this.loadCategories()
   },
   watch: {
@@ -297,7 +294,8 @@ export default {
         return moment(date, 'YYYY-MM-DD HH:mm:ss')
       }
       return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
-    }
+    },
+    ...mapGetters(['options'])
   },
   methods: {
     loadSkeleton() {
@@ -305,11 +303,6 @@ export default {
       setTimeout(() => {
         this.settingLoading = false
       }, 500)
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     },
     loadCategories() {
       categoryApi.listAll().then(response => {

@@ -63,7 +63,6 @@
 import HeaderComment from './HeaderComment'
 import SettingDrawer from '@/components/SettingDrawer/SettingDrawer'
 import { mapActions, mapGetters } from 'vuex'
-import optionApi from '@/api/option'
 
 export default {
   name: 'UserMenu',
@@ -73,19 +72,14 @@ export default {
   },
   data() {
     return {
-      optionVisible: true,
-      options: [],
-      keys: ['blog_url']
+      optionVisible: true
     }
   },
   mounted() {
     this.optionVisible = this.$refs.drawer.visible
   },
-  created() {
-    this.loadOptions()
-  },
   computed: {
-    ...mapGetters(['user'])
+    ...mapGetters(['user', 'options'])
   },
   methods: {
     ...mapActions(['logout']),
@@ -114,11 +108,6 @@ export default {
     showOptionModal() {
       this.optionVisible = this.$refs.drawer.visible
       this.$refs.drawer.toggle()
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     }
   }
 }

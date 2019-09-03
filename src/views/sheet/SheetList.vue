@@ -246,8 +246,8 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import SheetSetting from './components/SheetSetting'
+import { mapGetters } from 'vuex'
 import sheetApi from '@/api/sheet'
-import optionApi from '@/api/option'
 import menuApi from '@/api/menu'
 
 const internalColumns = [
@@ -319,9 +319,7 @@ export default {
       sheetSettingVisible: false,
       internalSheets: [],
       sheets: [],
-      options: [],
-      menu: {},
-      keys: ['blog_url']
+      menu: {}
     }
   },
   computed: {
@@ -330,12 +328,12 @@ export default {
         sheet.statusProperty = this.sheetStatus[sheet.status]
         return sheet
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   created() {
     this.loadSheets()
     this.loadInternalSheets()
-    this.loadOptions()
   },
   methods: {
     loadSheets() {
@@ -348,11 +346,6 @@ export default {
     loadInternalSheets() {
       sheetApi.listInternal().then(response => {
         this.internalSheets = response.data.data
-      })
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
       })
     },
     handleEditClick(sheet) {
