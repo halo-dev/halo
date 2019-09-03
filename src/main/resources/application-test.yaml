@@ -1,16 +1,8 @@
 server:
   port: 8090
   use-forward-headers: true
-  undertow:
-    io-threads: 2
-    worker-threads: 36
-    buffer-size: 1024
-    directBuffers: true
-  servlet:
-    session:
-      timeout: 86400s
   compression:
-    enabled: true
+    enabled: false
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
 spring:
   jackson:
@@ -47,7 +39,9 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-
+  mvc:
+    favicon:
+      enabled: false
   cache:
     type: none
 logging:

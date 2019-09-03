@@ -53,12 +53,8 @@ public class SheetParam implements InputConverter<Sheet> {
     @Override
     public Sheet convertTo() {
         if (StringUtils.isBlank(url)) {
-            url = HaloUtils.normalizeUrl(title);
-        } else {
-            url = HaloUtils.normalizeUrl(url);
+            url = title.replace(".","");
         }
-
-        url = HaloUtils.initializeUrlIfBlank(url);
 
         if (null == thumbnail) {
             thumbnail = "";
@@ -76,12 +72,8 @@ public class SheetParam implements InputConverter<Sheet> {
     @Override
     public void update(Sheet sheet) {
         if (StringUtils.isBlank(url)) {
-            url = HaloUtils.normalizeUrl(title);
-        } else {
-            url = HaloUtils.normalizeUrl(url);
+            url = title.replace(".","");
         }
-
-        url = HaloUtils.initializeUrlIfBlank(url);
 
         if (null == thumbnail) {
             thumbnail = "";
