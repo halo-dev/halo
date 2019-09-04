@@ -157,8 +157,7 @@
             slot="status"
             slot-scope="statusProperty"
           >
-            <a-badge :status="statusProperty.status" />
-            {{ statusProperty.text }}
+            <a-badge :status="statusProperty.status" :text="statusProperty.text" />
           </span>
 
           <span

@@ -147,7 +147,7 @@ service.interceptors.response.use(
         message.error(data.message)
       }
     } else {
-      message.error('服务异常')
+      message.error('网络异常')
     }
 
     return Promise.reject(error)

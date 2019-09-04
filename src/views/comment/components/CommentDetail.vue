@@ -46,8 +46,7 @@
             <a-list-item>
               <a-list-item-meta>
                 <span slot="description">
-                  <a-badge :status="comment.statusProperty.status" />
-                  {{ comment.statusProperty.text }}
+                  <a-badge :status="comment.statusProperty.status" :text="comment.statusProperty.text"/>
                 </span>
                 <span slot="title">评论状态：</span>
               </a-list-item-meta>
