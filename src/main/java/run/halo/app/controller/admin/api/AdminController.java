@@ -8,6 +8,7 @@ import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
+import run.halo.app.model.params.ResetPasswordParam;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.security.token.AuthToken;
@@ -55,6 +56,18 @@ public class AdminController {
     @CacheLock(autoDelete = false)
     public void logout() {
         adminService.clearToken();
+    }
+
+    @PostMapping("password/code")
+    @ApiOperation("Send reset password verify code.")
+    public void sendResetCode(@RequestBody @Valid ResetPasswordParam param) {
+        adminService.sendResetPasswordCode(param);
+    }
+
+    @PutMapping("password/reset")
+    @ApiOperation("Reset password by verify code.")
+    public void resetPassword(@RequestBody @Valid ResetPasswordParam param) {
+        adminService.resetPasswordByCode(param);
     }
 
     @PostMapping("refresh/{refreshToken}")
