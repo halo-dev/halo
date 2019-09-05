@@ -1,5 +1,6 @@
 package run.halo.app.controller.admin.api;
 
+import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
@@ -16,10 +18,14 @@ import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -36,8 +42,16 @@ public class PostController {
 
     private final PostService postService;
 
-    public PostController(PostService postService) {
+    private final StringCacheStore cacheStore;
+
+    private final OptionService optionService;
+
+    public PostController(PostService postService,
+                          StringCacheStore cacheStore,
+                          OptionService optionService) {
         this.postService = postService;
+        this.cacheStore = cacheStore;
+        this.optionService = optionService;
     }
 
     @GetMapping
@@ -125,4 +139,20 @@ public class PostController {
         postService.removeById(postId);
     }
 
+    @GetMapping("preview/{postId:\\d+}")
+    public void preview(@PathVariable("postId") Integer postId,
+                        HttpServletResponse response) throws IOException {
+        Post post = postService.getById(postId);
+
+        String token = IdUtil.simpleUUID();
+
+        // cache preview token
+        cacheStore.putAny("preview-post-token-" + postId, token, 10, TimeUnit.MINUTES);
+
+        // build preview post url
+        String url = String.format("%s/preview/post/%s?token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
+
+        // redirect to preview url
+        response.sendRedirect(url);
+    }
 }

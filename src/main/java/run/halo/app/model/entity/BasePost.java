@@ -10,9 +10,10 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Post entity.
+ * Post base entity.
  *
  * @author johnniang
+ * @author ryanwang
  */
 @Data
 @Entity(name = "BasePost")
@@ -167,6 +168,10 @@ public class BasePost extends BaseEntity {
 
         if (likes == null || likes < 0) {
             likes = 0L;
+        }
+
+        if (formatContent == null) {
+            formatContent = "";
         }
     }
 
