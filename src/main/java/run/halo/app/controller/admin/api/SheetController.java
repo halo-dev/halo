@@ -1,20 +1,26 @@
 package run.halo.app.controller.admin.api;
 
+import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.InternalSheetDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.SheetParam;
 import run.halo.app.model.vo.SheetListVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -31,8 +37,16 @@ public class SheetController {
 
     private final SheetService sheetService;
 
-    public SheetController(SheetService sheetService) {
+    private final StringCacheStore cacheStore;
+
+    private final OptionService optionService;
+
+    public SheetController(SheetService sheetService,
+                           StringCacheStore cacheStore,
+                           OptionService optionService) {
         this.sheetService = sheetService;
+        this.cacheStore = cacheStore;
+        this.optionService = optionService;
     }
 
     @GetMapping("{sheetId:\\d+}")
@@ -96,5 +110,22 @@ public class SheetController {
     public BasePostDetailDTO deleteBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.removeById(sheetId);
         return sheetService.convertToDetail(sheet);
+    }
+
+    @GetMapping("preview/{sheetId:\\d+}")
+    public void preview(@PathVariable("sheetId") Integer sheetId,
+                        HttpServletResponse response) throws IOException {
+        Sheet sheet = sheetService.getById(sheetId);
+
+        String token = IdUtil.simpleUUID();
+
+        // cache preview token
+        cacheStore.putAny("preview-sheet-token-" + sheetId, token, 10, TimeUnit.MINUTES);
+
+        // build preview sheet url
+        String url = String.format("%s/preview/s/%s?token=%s", optionService.getBlogBaseUrl(), sheet.getUrl(), token);
+
+        // redirect to preview url
+        response.sendRedirect(url);
     }
 }

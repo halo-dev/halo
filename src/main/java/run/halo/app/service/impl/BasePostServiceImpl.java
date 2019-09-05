@@ -213,7 +213,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(post, "Post must not be null");
 
         // Render content
-        post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+        if (post.getStatus() == PostStatus.PUBLISHED) {
+            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+        }
 
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
