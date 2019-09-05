@@ -14,6 +14,7 @@ import java.util.Optional;
  * User service interface.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-03-14
  */
 public interface UserService extends CrudService<User, Integer> {
@@ -125,9 +126,11 @@ public interface UserService extends CrudService<User, Integer> {
     void setPassword(@NonNull User user, @NonNull String plainPassword);
 
     /**
-     * Set user default avatar，use Gravatar(http://cn.gravatar.com)
+     * verify user's email and username
      *
-     * @param user user must not be null
+     * @param username username must not be null
+     * @param password password must not be null
+     * @return boolean
      */
-    void setDefaultAvatar(@NonNull User user);
+    boolean verifyUser(@NonNull String username, @NonNull String password);
 }
