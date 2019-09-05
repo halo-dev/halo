@@ -660,7 +660,7 @@
                   label="CDN 加速域名："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_cdn_domain" placeholder="请确保 CDN 已经缓存了静态资源"/>
+                  <a-input v-model="options.blog_cdn_domain" placeholder="请确保已经正确配置好了 CDN"/>
                 </a-form-item>
                 <a-form-item
                   label="自定义 head："

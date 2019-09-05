@@ -40,6 +40,10 @@
         @click="handleSaveDraft"
       >保存草稿</a-button>
       <a-button
+        @click="handlePreview"
+        style="margin-left: 8px;"
+      >预览</a-button>
+      <a-button
         type="primary"
         style="margin-left: 8px;"
         @click="handleShowSheetSetting"
@@ -55,6 +59,7 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import moment from 'moment'
 import { toolbars } from '@/core/const'
 import SheetSetting from './components/SheetSetting'
@@ -115,6 +120,9 @@ export default {
     }
     next()
   },
+  computed: {
+    ...mapGetters(['options'])
+  },
   methods: {
     handleSaveDraft() {
       this.sheetToStage.status = 'DRAFT'
@@ -165,6 +173,27 @@ export default {
     },
     handleShowSheetSetting() {
       this.sheetSettingVisible = true
+    },
+    handlePreview() {
+      this.sheetToStage.status = 'DRAFT'
+      if (!this.sheetToStage.title) {
+        this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+      }
+      if (!this.sheetToStage.originalContent) {
+        this.sheetToStage.originalContent = '开始编辑...'
+      }
+      if (this.sheetToStage.id) {
+        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
+          this.$log.debug('Updated sheet', response.data.data)
+          window.open(`${this.options.blog_url}/api/admin/sheets/preview/${this.sheetToStage.id}`, '_blank')
+        })
+      } else {
+        sheetApi.create(this.sheetToStage, false).then(response => {
+          this.$log.debug('Created sheet', response.data.data)
+          this.sheetToStage = response.data.data
+          window.open(`${this.options.blog_url}/api/admin/sheets/preview/${this.sheetToStage.id}`, '_blank')
+        })
+      }
     },
     onSheetSettingsClose() {
       this.sheetSettingVisible = false

@@ -46,6 +46,10 @@
         @click="handleSaveDraft"
       >保存草稿</a-button>
       <a-button
+        @click="handlePreview"
+        style="margin-left: 8px;"
+      >预览</a-button>
+      <a-button
         type="primary"
         @click="handleShowPostSetting"
         style="margin-left: 8px;"
@@ -61,6 +65,7 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import moment from 'moment'
 import PostSetting from './components/PostSetting'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
@@ -125,6 +130,9 @@ export default {
     }
     next()
   },
+  computed: {
+    ...mapGetters(['options'])
+  },
   methods: {
     handleSaveDraft() {
       this.postToStage.status = 'DRAFT'
@@ -177,6 +185,29 @@ export default {
     },
     handleShowPostSetting() {
       this.postSettingVisible = true
+    },
+    handlePreview() {
+      this.postToStage.status = 'DRAFT'
+      if (!this.postToStage.title) {
+        this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+      }
+      if (!this.postToStage.originalContent) {
+        this.postToStage.originalContent = '开始编辑...'
+      }
+      if (this.postToStage.id) {
+        // Update the post
+        postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
+          this.$log.debug('Updated post', response.data.data)
+          window.open(`${this.options.blog_url}/api/admin/posts/preview/${this.postToStage.id}`, '_blank')
+        })
+      } else {
+        // Create the post
+        postApi.create(this.postToStage, false).then(response => {
+          this.$log.debug('Created post', response.data.data)
+          this.postToStage = response.data.data
+          window.open(`${this.options.blog_url}/api/admin/posts/preview/${this.postToStage.id}`, '_blank')
+        })
+      }
     },
     // 关闭文章设置抽屉
     onPostSettingsClose() {
