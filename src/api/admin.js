@@ -59,6 +59,22 @@ adminApi.refreshToken = refreshToken => {
   })
 }
 
+adminApi.sendResetCode = param => {
+  return service({
+    url: `${baseUrl}/password/code`,
+    data: param,
+    method: 'post'
+  })
+}
+
+adminApi.resetPassword = param => {
+  return service({
+    url: `${baseUrl}/password/reset`,
+    data: param,
+    method: 'put'
+  })
+}
+
 adminApi.updateAdminAssets = () => {
   return service({
     url: `${baseUrl}/halo-admin`,

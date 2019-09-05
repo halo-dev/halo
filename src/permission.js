@@ -1,14 +1,19 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-import { setDocumentTitle, domTitle } from '@/utils/domUtil'
+import {
+  setDocumentTitle,
+  domTitle
+} from '@/utils/domUtil'
 
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 
-NProgress.configure({ showSpinner: false }) // NProgress Configuration
+NProgress.configure({
+  showSpinner: false
+}) // NProgress Configuration
 
-const whiteList = ['Login', 'Install', 'NotFound'] // no redirect whitelist
+const whiteList = ['Login', 'Install', 'NotFound', 'ResetPassword'] // no redirect whitelist
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
@@ -16,7 +21,9 @@ router.beforeEach((to, from, next) => {
   Vue.$log.debug('Token', store.getters.token)
   if (store.getters.token) {
     if (to.name === 'Login') {
-      next({ name: 'Dashboard' })
+      next({
+        name: 'Dashboard'
+      })
       NProgress.done()
       return
     }
@@ -35,6 +42,11 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  next({ name: 'Login', query: { redirect: to.fullPath } })
+  next({
+    name: 'Login',
+    query: {
+      redirect: to.fullPath
+    }
+  })
   NProgress.done()
 })

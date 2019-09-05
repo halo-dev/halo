@@ -219,6 +219,12 @@ export const constantRouterMap = [
     component: () => import('@/views/system/Installation')
   },
   {
+    path: '/password/reset',
+    name: 'ResetPassword',
+    meta: { title: '重置密码' },
+    component: () => import('@/views/user/ResetPassword')
+  },
+  {
     path: '/404',
     name: 'NotFound',
     component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')

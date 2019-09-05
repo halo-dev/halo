@@ -1,9 +1,9 @@
 <template>
-  <div class="container">
-    <div class="loginLogo animated fadeInUp">
+  <div class="container-wrapper">
+    <div class="halo-logo animated fadeInUp">
       <span>Halo</span>
     </div>
-    <div class="loginBody animated">
+    <div class="animated">
       <a-form
         layout="vertical"
         @keyup.enter.native="handleLogin"
@@ -39,17 +39,27 @@
             />
           </a-input>
         </a-form-item>
-        <a-row>
+        <a-form-item
+          class="animated fadeInUp"
+          :style="{'animation-delay': '0.3s'}"
+        >
           <a-button
             type="primary"
             :block="true"
             @click="handleLogin"
-            class="animated fadeInUp"
-            :style="{'animation-delay': '0.3s'}"
           >登录</a-button>
-        </a-row>
+        </a-form-item>
 
         <a-row>
+          <router-link :to="{ name:'ResetPassword' }">
+            <a
+              class="tip animated fadeInRight"
+              v-if="resetPasswordButton"
+              href="javascript:void(0);"
+            >
+              找回密码
+            </a>
+          </router-link>
           <a
             @click="handleApiModifyModalOpen"
             class="tip animated fadeInUp"
@@ -92,11 +102,20 @@ export default {
       password: null,
       apiModifyVisible: false,
       defaultApiBefore: window.location.protocol + '//',
-      apiUrl: window.location.host
+      apiUrl: window.location.host,
+      resetPasswordButton: false
     }
   },
   computed: {
     ...mapGetters({ defaultApiUrl: 'apiUrl' })
+  },
+  created() {
+    const _this = this
+    document.addEventListener('keydown', function(e) {
+      if (e.keyCode === 72 && e.altKey && e.shiftKey) {
+        _this.toggleHidden()
+      }
+    })
   },
   methods: {
     ...mapActions(['login', 'loadUser', 'loadOptions']),
@@ -144,49 +163,53 @@ export default {
     handleApiUrlRestore() {
       this.restoreApiUrl()
       this.apiUrl = this.defaultApiUrl
+    },
+    toggleHidden() {
+      this.resetPasswordButton = !this.resetPasswordButton
     }
   }
 }
 </script>
-<style lang="less" scope>
+<style lang="less">
 body {
   height: 100%;
   background-color: #f5f5f5;
 }
-.container {
-  background: #f7f7f7;
+
+.container-wrapper {
+  background: #ffffff;
   position: absolute;
+  border-radius: 5px;
   top: 45%;
   left: 50%;
   margin: -160px 0 0 -160px;
   width: 320px;
-  padding: 16px 32px 32px 32px;
+  padding: 18px 28px 28px 28px;
   box-shadow: -4px 7px 46px 2px rgba(0, 0, 0, 0.1);
+
+  .halo-logo {
+    margin-bottom: 20px;
+    text-align: center;
+    span {
+      vertical-align: text-bottom;
+      font-size: 38px;
+      display: inline-block;
+      font-weight: 600;
+      color: #1790fe;
+      background-image: linear-gradient(-20deg, #6e45e2 0%, #88d3ce 100%);
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      small {
+        margin-left: 5px;
+        font-size: 35%;
+      }
+    }
+  }
   .tip {
     cursor: pointer;
-    margin-top: .5rem;
+    margin-left: 0.5rem;
     float: right;
   }
-}
-.loginLogo {
-  margin-bottom: 20px;
-  text-align: center;
-}
-.loginLogo span {
-  vertical-align: text-bottom;
-  font-size: 36px;
-  display: inline-block;
-  font-weight: 600;
-  color: #1790fe;
-  background-image: -webkit-gradient(
-    linear,
-    37.219838% 34.532506%,
-    36.425669% 93.178216%,
-    from(#36c8f5),
-    to(#1790fe),
-    color-stop(0.37, #1790fe)
-  );
-  -webkit-text-fill-color: transparent;
-  -webkit-background-clip: text;
 }
 </style>
