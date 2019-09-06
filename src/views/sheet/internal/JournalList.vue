@@ -118,8 +118,11 @@
                       {{ item.commentCount }}
                     </a>
                   </span>
-                  <span v-if="item.type=='PRIVATE'">
-                    <a href="javascript:void(0);" disabled>
+                  <span v-if="item.type=='INTIMATE'">
+                    <a
+                      href="javascript:void(0);"
+                      disabled
+                    >
                       <a-icon type="lock" />
                     </a>
                   </span>
@@ -399,7 +402,7 @@ export default {
     handleEdit(item) {
       this.title = '编辑'
       this.journal = item
-      this.isPublic = item.type !== 'PRIVATE'
+      this.isPublic = item.type !== 'INTIMATE'
       this.visible = true
       // 为编辑时需要回显图片数组赋值,并隐藏图片上传框
       // this.plusPhotoVisible = false
@@ -442,7 +445,15 @@ export default {
     createOrUpdateJournal() {
       // 给属性填充数据
       // this.journal.photos = this.journalPhotos
-      this.journal.type = this.isPublic ? 'PUBLIC' : 'PRIVATE'
+      this.journal.type = this.isPublic ? 'PUBLIC' : 'INTIMATE'
+
+      if (!this.journal.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '发布内容不能为空！'
+        })
+        return
+      }
 
       if (this.journal.id) {
         journalApi.update(this.journal.id, this.journal).then(response => {

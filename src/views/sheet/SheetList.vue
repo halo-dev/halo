@@ -89,7 +89,7 @@
                     v-if="record.status=='PUBLISHED'"
                   >
                     <a-tooltip
-                      placement="topLeft"
+                      placement="top"
                       :title="'点击访问【'+text+'】'"
                     >{{ text }}</a-tooltip>
                   </a>

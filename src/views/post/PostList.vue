@@ -92,7 +92,7 @@
             </a-menu-item>
             <a-menu-item
               key="2"
-              v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='DRAFT'"
+              v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='DRAFT' || queryParam.status === 'INTIMATE'"
             >
               <a
                 href="javascript:void(0);"
@@ -149,7 +149,18 @@
               v-if="record.status=='PUBLISHED'"
             >
               <a-tooltip
-                placement="topLeft"
+                placement="top"
+                :title="'点击访问【'+text+'】'"
+              >{{ text }}</a-tooltip>
+            </a>
+            <a
+              :href="options.blog_url+'/archives/'+record.url+'/password'"
+              target="_blank"
+              style="text-decoration: none;"
+              v-else-if="record.status == 'INTIMATE'"
+            >
+              <a-tooltip
+                placement="top"
                 :title="'点击访问【'+text+'】'"
               >{{ text }}</a-tooltip>
             </a>
@@ -250,7 +261,7 @@
             <a
               href="javascript:;"
               @click="handleEditClick(post)"
-              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
+              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT' || post.status === 'INTIMATE'"
             >编辑</a>
             <a-popconfirm
               :title="'你确定要发布【' + post.title + '】文章？'"
@@ -269,7 +280,7 @@
               @confirm="handleEditStatusClick(post.id,'RECYCLE')"
               okText="确定"
               cancelText="取消"
-              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
+              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT' || post.status === 'INTIMATE'"
             >
               <a href="javascript:;">回收站</a>
             </a-popconfirm>

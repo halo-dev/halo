@@ -30,6 +30,12 @@
               >
                 <a-input v-model="selectedPost.url" />
               </a-form-item>
+              <a-form-item label="访问密码：">
+                <a-input
+                  type="password"
+                  v-model="selectedPost.password"
+                />
+              </a-form-item>
 
               <a-form-item label="发表时间：">
                 <a-date-picker

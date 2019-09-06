@@ -377,7 +377,10 @@
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_secret_key" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_qiniu_secret_key"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="Bucket："
@@ -424,7 +427,10 @@
                     label="Access Secret："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_access_secret" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_aliyun_access_secret"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="图片处理策略："
@@ -465,7 +471,10 @@
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.bos_baiduyun_secret_key" />
+                    <a-input
+                      type="password"
+                      v-model="options.bos_baiduyun_secret_key"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="图片处理策略："
@@ -513,7 +522,10 @@
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.cos_tencentyun_secret_key" />
+                    <a-input
+                      type="password"
+                      v-model="options.cos_tencentyun_secret_key"
+                    />
                   </a-form-item>
                 </div>
                 <a-form-item>
@@ -571,6 +583,7 @@
                       >
                         <a-input
                           v-model="options.email_password"
+                          type="password"
                           placeholder="部分邮箱可能是授权码"
                         />
                       </a-form-item>
@@ -660,7 +673,10 @@
                   label="CDN 加速域名："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.blog_cdn_domain" placeholder="请确保已经正确配置好了 CDN"/>
+                  <a-input
+                    v-model="options.blog_cdn_domain"
+                    placeholder="请确保已经正确配置好了 CDN"
+                  />
                 </a-form-item>
                 <a-form-item
                   label="自定义 head："

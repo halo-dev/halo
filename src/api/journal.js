@@ -46,7 +46,7 @@ journalApi.journalType = {
   PUBLIC: {
     text: '公开'
   },
-  PRIVATE: {
+  INTIMATE: {
     text: '私密'
   }
 }

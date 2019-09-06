@@ -81,6 +81,11 @@ postApi.postStatus = {
     color: 'red',
     status: 'error',
     text: '回收站'
+  },
+  INTIMATE: {
+    color: 'blue',
+    status: 'success',
+    text: '私密'
   }
 }
 export default postApi
