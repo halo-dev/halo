@@ -245,7 +245,7 @@ public class AdminServiceImpl implements AdminService {
             throw new ServiceException("验证码不正确");
         }
 
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("找不到博主信息"));
+        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
 
         // reset password
         userService.setPassword(user, param.getPassword());

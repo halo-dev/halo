@@ -33,6 +33,6 @@ public class SheetMetaServiceImpl extends BaseMetaServiceImpl<SheetMeta> impleme
     @Override
     public void validateTarget(Integer sheetId) {
         sheetRepository.findById(sheetId)
-                .orElseThrow(() -> new NotFoundException("该页面不存在或已删除").setErrorData(sheetId));
+                .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
     }
 }

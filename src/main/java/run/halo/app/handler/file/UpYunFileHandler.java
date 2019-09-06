@@ -118,7 +118,7 @@ public class UpYunFileHandler implements FileHandler {
                 log.warn("Failed to delete file " + key + " from UpYun");
             }
         } catch (Exception e) {
-            throw new FileOperationException("附件从又拍云删除失败", e);
+            throw new FileOperationException("附件 " + key + " 从又拍云删除失败", e);
         }
     }
 

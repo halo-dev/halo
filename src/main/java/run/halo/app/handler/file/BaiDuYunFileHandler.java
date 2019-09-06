@@ -43,14 +43,14 @@ public class BaiDuYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
+        String bosDomain = optionService.getByPropertyOrDefault(BaiDuYunProperties.BOS_DOMAIN, String.class, "");
         String bosEndPoint = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_ENDPOINT).toString();
         String bosAccessKey = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_ACCESS_KEY).toString();
         String bosSecretKey = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_SECRET_KEY).toString();
         String bosBucketName = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_BUCKET_NAME).toString();
         String bosStyleRule = optionService.getByPropertyOrDefault(BaiDuYunProperties.BOS_STYLE_RULE, String.class, "");
-        String bosThumbnailStyleRule = optionService.getByPropertyOrDefault(BaiDuYunProperties.BOS_STYLE_RULE, String.class, "");
+        String bosThumbnailStyleRule = optionService.getByPropertyOrDefault(BaiDuYunProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "");
         String bosSource = StringUtils.join("https://", bosBucketName, "." + bosEndPoint);
-
 
         BosClientConfiguration config = new BosClientConfiguration();
         config.setCredentials(new DefaultBceCredentials(bosAccessKey, bosSecretKey));
@@ -64,7 +64,7 @@ public class BaiDuYunFileHandler implements FileHandler {
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(bosSource, "/"), upFilePath);
+            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(bosDomain) ? bosDomain : bosSource, "/"), upFilePath);
 
             // Upload
             PutObjectResponse putObjectResponseFromInputStream = client.putObject(bosBucketName, upFilePath, file.getInputStream());

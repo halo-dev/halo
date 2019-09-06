@@ -43,13 +43,14 @@ public class AliYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
+        String ossDomain = optionService.getByPropertyOrDefault(AliYunProperties.OSS_DOMAIN, String.class, "");
         String ossEndPoint = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ENDPOINT).toString();
         String ossAccessKey = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_KEY).toString();
         String ossAccessSecret = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_SECRET).toString();
         String ossBucketName = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_BUCKET_NAME).toString();
         String ossSource = StringUtils.join("https://", ossBucketName, "." + ossEndPoint);
-        String ossStyleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_STYLE_RULE,String.class,"");
-        String ossThumbnailStyleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_THUMBNAIL_STYLE_RULE,String.class,"");
+        String ossStyleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_STYLE_RULE, String.class, "");
+        String ossThumbnailStyleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(ossEndPoint, ossAccessKey, ossAccessSecret);
@@ -59,7 +60,7 @@ public class AliYunFileHandler implements FileHandler {
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(ossSource, "/"), upFilePath);
+            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(ossDomain) ? ossDomain : ossSource, "/"), upFilePath);
 
             // Upload
             PutObjectResult putObjectResult = ossClient.putObject(ossBucketName, upFilePath, file.getInputStream());

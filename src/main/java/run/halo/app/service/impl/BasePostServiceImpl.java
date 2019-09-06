@@ -78,7 +78,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public POST getByUrl(String url) {
         Assert.hasText(url, "Url must not be blank");
 
-        return basePostRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("该文章不存在").setErrorData(url));
+        return basePostRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -88,7 +88,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         Optional<POST> postOptional = basePostRepository.getByUrlAndStatus(url, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("The post with status " + status + " and url " + url + " was not existed").setErrorData(url));
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -175,7 +175,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     @Override
     public void increaseVisit(long visits, Integer postId) {
         Assert.isTrue(visits > 0, "Visits to increase must not be less than 1");
-        Assert.notNull(postId, "Goods id must not be null");
+        Assert.notNull(postId, "Post id must not be null");
 
         long affectedRows = basePostRepository.updateVisit(visits, postId);
 

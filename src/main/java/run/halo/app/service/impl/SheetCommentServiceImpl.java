@@ -52,7 +52,7 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     @Override
     public void validateTarget(Integer sheetId) {
         Sheet sheet = sheetRepository.findById(sheetId)
-                .orElseThrow(() -> new NotFoundException("该页面不存在或已删除").setErrorData(sheetId));
+                .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
 
         if (sheet.getDisallowComment()) {
             throw new BadRequestException("该页面已被禁止评论").setErrorData(sheetId);

@@ -50,7 +50,7 @@ public class MainController {
 
     @GetMapping("/avatar")
     public void avatar(HttpServletResponse response) throws IOException {
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("找不到博主信息"));
+        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         if (StringUtils.isNotEmpty(user.getAvatar())) {
             response.sendRedirect(user.getAvatar());
         }
