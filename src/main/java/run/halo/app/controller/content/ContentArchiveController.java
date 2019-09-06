@@ -2,7 +2,6 @@ package run.halo.app.controller.content;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.PageUtil;
-import cn.hutool.crypto.digest.BCrypt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -185,7 +184,7 @@ public class ContentArchiveController {
             throw new ForbiddenException("没有查询到该文章信息");
         }
 
-        if (BCrypt.checkpw(password, post.getPassword())) {
+        if (password.equals(post.getPassword())) {
             String token = IdUtil.simpleUUID();
             cacheStore.putAny(token, token, 10, TimeUnit.SECONDS);
 

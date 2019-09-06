@@ -60,13 +60,7 @@ public class SheetParam implements InputConverter<Sheet> {
             thumbnail = "";
         }
 
-        Sheet sheet = InputConverter.super.convertTo();
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            sheet.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        }
-
-        return sheet;
+        return InputConverter.super.convertTo();
     }
 
     @Override
@@ -80,10 +74,5 @@ public class SheetParam implements InputConverter<Sheet> {
         }
 
         InputConverter.super.update(sheet);
-
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            sheet.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        }
     }
 }

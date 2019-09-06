@@ -68,13 +68,7 @@ public class PostParam implements InputConverter<Post> {
             thumbnail = "";
         }
 
-        Post post = InputConverter.super.convertTo();
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        }
-
-        return post;
+        return InputConverter.super.convertTo();
     }
 
     @Override
@@ -87,10 +81,5 @@ public class PostParam implements InputConverter<Post> {
         }
 
         InputConverter.super.update(post);
-
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        }
     }
 }
