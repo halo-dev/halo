@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
+import run.halo.app.model.enums.JournalType;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.model.params.JournalQuery;
 import run.halo.app.service.base.CrudService;
@@ -48,6 +49,16 @@ public interface JournalService extends CrudService<Journal, Integer> {
      */
     @NonNull
     Page<Journal> pageBy(@NonNull JournalQuery journalQuery, @NonNull Pageable pageable);
+
+    /**
+     * Lists by type.
+     *
+     * @param type     journal type must not be null
+     * @param pageable page info must not be null
+     * @return a page of journal
+     */
+    @NonNull
+    Page<Journal> pageBy(@NonNull JournalType type, @NonNull Pageable pageable);
 
     /**
      * Converts to journal dto.
