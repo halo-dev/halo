@@ -119,7 +119,10 @@
             slot="status"
             slot-scope="statusProperty"
           >
-            <a-badge :status="statusProperty.status" :text="statusProperty.text"/>
+            <a-badge
+              :status="statusProperty.status"
+              :text="statusProperty.text"
+            />
           </span>
           <a
             v-if="type==='posts'"
@@ -405,6 +408,7 @@ export default {
     },
     handleQuery() {
       this.queryParam.page = 0
+      this.pagination.current = 1
       this.loadComments()
     },
     handleEditStatusClick(commentId, status) {

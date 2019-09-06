@@ -488,6 +488,7 @@ export default {
     },
     handleQuery() {
       this.queryParam.page = 0
+      this.pagination.current = 1
       this.loadPosts()
     },
     handleEditStatusClick(postId, status) {

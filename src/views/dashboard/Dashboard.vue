@@ -406,6 +406,11 @@ export default {
     },
     ...mapGetters(['options'])
   },
+  destroyed: function() {
+    if (this.logDrawerVisible) {
+      this.logDrawerVisible = false
+    }
+  },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.interval = setInterval(() => {
@@ -418,6 +423,9 @@ export default {
       clearInterval(this.interval)
       this.interval = null
       this.$log.debug('Cleared interval')
+    }
+    if (this.logDrawerVisible) {
+      this.logDrawerVisible = false
     }
     next()
   },

@@ -70,7 +70,7 @@
       </a-col>
       <a-col :span="24">
         <a-list
-          :grid="{ gutter: 12, xs: 1, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
+          :grid="{ gutter: 12, xs: 2, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
           :dataSource="photos"
           :loading="listLoading"
         >
@@ -89,7 +89,7 @@
               </div>
               <a-card-meta>
                 <ellipsis
-                  :length="isMobile()?36:16"
+                  :length="isMobile()?12:16"
                   tooltip
                   slot="description"
                 >{{ item.name }}</ellipsis>
