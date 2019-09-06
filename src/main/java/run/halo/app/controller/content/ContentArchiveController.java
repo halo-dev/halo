@@ -13,15 +13,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import run.halo.app.cache.StringCacheStore;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
+import run.halo.app.utils.MarkdownUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -38,8 +41,6 @@ public class ContentArchiveController {
 
     private final PostService postService;
 
-    private final PostCommentService postCommentService;
-
     private final ThemeService themeService;
 
     private final PostCategoryService postCategoryService;
@@ -48,18 +49,20 @@ public class ContentArchiveController {
 
     private final OptionService optionService;
 
+    private final StringCacheStore cacheStore;
+
     public ContentArchiveController(PostService postService,
-                                    PostCommentService postCommentService,
                                     ThemeService themeService,
                                     PostCategoryService postCategoryService,
                                     PostTagService postTagService,
-                                    OptionService optionService) {
+                                    OptionService optionService,
+                                    StringCacheStore cacheStore) {
         this.postService = postService;
-        this.postCommentService = postCommentService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
         this.postTagService = postTagService;
         this.optionService = optionService;
+        this.cacheStore = cacheStore;
     }
 
     /**
@@ -99,34 +102,46 @@ public class ContentArchiveController {
     /**
      * Render post page.
      *
-     * @param url   post slug url.
-     * @param cp    comment page number
-     * @param model model
+     * @param url     post slug url.
+     * @param preview preview
+     * @param token   preview token
+     * @param model   model
      * @return template path: themes/{theme}/post.ftl
      */
     @GetMapping("{url}")
     public String post(@PathVariable("url") String url,
-                       @RequestParam(value = "cp", defaultValue = "1") Integer cp,
-                       @SortDefault(sort = "createTime", direction = DESC) Sort sort,
+                       @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
+                       @RequestParam(value = "token", required = false) String token,
                        Model model) {
-        Post post = postService.getBy(PostStatus.PUBLISHED, url);
+        Post post = postService.getBy(preview ? PostStatus.DRAFT : PostStatus.PUBLISHED, url);
+
+        if (preview) {
+            // render markdown to html when preview post
+            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+
+            // verify token
+            String cachedToken = cacheStore.getAny("preview-post-token-" + post.getId(), String.class).orElseThrow(() -> new ForbiddenException("该文章的预览链接不存在或已过期"));
+
+            if (!cachedToken.equals(token)) {
+                throw new ForbiddenException("该文章的预览链接不存在或已过期");
+            }
+        }
 
         postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
         postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
 
-
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
-
-        Page<BaseCommentVO> comments = postCommentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
-        final int[] pageRainbow = PageUtil.rainbow(cp, comments.getTotalPages(), 3);
 
         model.addAttribute("is_post", true);
         model.addAttribute("post", post);
         model.addAttribute("categories", categories);
         model.addAttribute("tags", tags);
-        model.addAttribute("comments", comments);
-        model.addAttribute("pageRainbow", pageRainbow);
+
+        if (preview) {
+            // refresh timeUnit
+            cacheStore.putAny("preview-post-token-" + post.getId(), token, 10, TimeUnit.MINUTES);
+        }
 
         return themeService.render("post");
     }

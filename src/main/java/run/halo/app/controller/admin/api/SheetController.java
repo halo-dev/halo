@@ -123,7 +123,7 @@ public class SheetController {
         cacheStore.putAny("preview-sheet-token-" + sheetId, token, 10, TimeUnit.MINUTES);
 
         // build preview sheet url
-        String url = String.format("%s/preview/s/%s?token=%s", optionService.getBlogBaseUrl(), sheet.getUrl(), token);
+        String url = String.format("%s/s/%s?preview=true&token=%s", optionService.getBlogBaseUrl(), sheet.getUrl(), token);
 
         // redirect to preview url
         response.sendRedirect(url);
