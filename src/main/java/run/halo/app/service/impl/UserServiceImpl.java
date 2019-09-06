@@ -184,7 +184,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public boolean verifyUser(String username, String password) {
-        User user = getCurrentUser().orElseThrow(() -> new ServiceException("找不到博主信息"));
+        User user = getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         return user.getUsername().equals(username) && user.getEmail().equals(password);
     }
 }

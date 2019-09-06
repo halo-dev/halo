@@ -10,6 +10,11 @@ package run.halo.app.model.properties;
 public enum TencentYunProperties implements PropertyEnum {
 
     /**
+     * Tencentyun cos domain.
+     */
+    COS_DOMAIN("cos_tencentyun_domain",String.class,""),
+
+    /**
      * Tencentyun cos endpoint.
      */
     COS_REGION("cos_tencentyun_region", String.class, ""),

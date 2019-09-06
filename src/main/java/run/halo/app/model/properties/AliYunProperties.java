@@ -10,6 +10,11 @@ package run.halo.app.model.properties;
 public enum AliYunProperties implements PropertyEnum {
 
     /**
+     * Aliyun oss domain
+     */
+    OSS_DOMAIN("oss_aliyun_domain",String.class,""),
+
+    /**
      * Aliyun oss endpoint.
      */
     OSS_ENDPOINT("oss_aliyun_endpoint", String.class, ""),

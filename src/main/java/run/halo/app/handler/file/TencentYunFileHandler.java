@@ -47,6 +47,7 @@ public class TencentYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
+        String cosDomain = optionService.getByPropertyOrDefault(TencentYunProperties.COS_DOMAIN, String.class, "");
         String cosRegion = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_REGION).toString();
         String cosSecretId = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_ID).toString();
         String cosSecretKey = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_KEY).toString();
@@ -71,7 +72,7 @@ public class TencentYunFileHandler implements FileHandler {
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(cosSource, "/"), upFilePath);
+            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(cosDomain) ? cosDomain : cosSource, "/"), upFilePath);
 
             // Upload
             ObjectMetadata objectMetadata = new ObjectMetadata();

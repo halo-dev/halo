@@ -79,7 +79,6 @@ public class QnYunFileHandler implements FileHandler {
         // Create temp path
         Path tmpPath = Paths.get(System.getProperty("java.io.tmpdir"), bucket);
 
-
         try {
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -149,7 +148,7 @@ public class QnYunFileHandler implements FileHandler {
             bucketManager.delete(bucket, key);
         } catch (QiniuException e) {
             log.error("QnYun error response: [{}]", e.response);
-            throw new FileOperationException("Failed to delete file with " + key + " key", e);
+            throw new FileOperationException("附件 " + key + " 从七牛云删除失败", e);
         }
     }
 

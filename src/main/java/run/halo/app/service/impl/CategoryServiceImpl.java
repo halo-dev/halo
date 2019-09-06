@@ -154,7 +154,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     @Override
     public Category getBySlugNameOfNonNull(String slugName) {
-        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该分类不存在").setErrorData(slugName));
+        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slugName));
     }
 
     @Override

@@ -38,7 +38,7 @@ public class ControllerExceptionHandler {
         if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
             baseResponse = handleBaseException(e.getCause());
         }
-        baseResponse.setMessage("Failed to validate request parameter");
+        baseResponse.setMessage("字段验证错误，请完善后重试！");
         return baseResponse;
     }
 
@@ -46,7 +46,7 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
-        baseResponse.setMessage(String.format("Missing request parameter, required %s type %s parameter", e.getParameterType(), e.getParameterName()));
+        baseResponse.setMessage(String.format("请求字段缺失, 类型为 %s，名称为 %s", e.getParameterType(), e.getParameterName()));
         return baseResponse;
     }
 
@@ -92,7 +92,7 @@ public class ControllerExceptionHandler {
     public BaseResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        baseResponse.setMessage("Required request body is missing");
+        baseResponse.setMessage("缺失请求主体");
         return baseResponse;
     }
 
