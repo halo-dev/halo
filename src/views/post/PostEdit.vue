@@ -142,28 +142,17 @@ export default {
       if (!this.postToStage.originalContent) {
         this.postToStage.originalContent = '开始编辑...'
       }
-      this.createOrUpdatePost(
-        () => this.$message.success('保存草稿成功！'),
-        () => this.$message.success('保存草稿成功！'),
-        false
-      )
-    },
-    createOrUpdatePost(createSuccess, updateSuccess, autoSave) {
       if (this.postToStage.id) {
         // Update the post
-        postApi.update(this.postToStage.id, this.postToStage, autoSave).then(response => {
+        postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
           this.$log.debug('Updated post', response.data.data)
-          if (updateSuccess) {
-            updateSuccess()
-          }
+          this.$message.success('保存草稿成功！')
         })
       } else {
         // Create the post
-        postApi.create(this.postToStage, autoSave).then(response => {
+        postApi.create(this.postToStage, false).then(response => {
           this.$log.debug('Created post', response.data.data)
-          if (createSuccess) {
-            createSuccess()
-          }
+          this.$message.success('保存草稿成功！')
           this.postToStage = response.data.data
         })
       }
@@ -177,7 +166,7 @@ export default {
         if (responseObject.status === 200) {
           var HaloEditor = this.$refs.md
           HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
-          this.$message.success('图片上传成功')
+          this.$message.success('图片上传成功！')
         } else {
           this.$message.error('图片上传失败：' + responseObject.message)
         }

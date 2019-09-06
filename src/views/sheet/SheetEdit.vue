@@ -132,26 +132,15 @@ export default {
       if (!this.sheetToStage.originalContent) {
         this.sheetToStage.originalContent = '开始编辑...'
       }
-      this.createOrUpdateSheet(
-        () => this.$message.success('保存草稿成功！'),
-        () => this.$message.success('保存草稿成功！'),
-        false
-      )
-    },
-    createOrUpdateSheet(createSuccess, updateSuccess, autoSave) {
       if (this.sheetToStage.id) {
-        sheetApi.update(this.sheetToStage.id, this.sheetToStage, autoSave).then(response => {
+        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
-          if (updateSuccess) {
-            updateSuccess()
-          }
+          this.$message.success('保存草稿成功！')
         })
       } else {
-        sheetApi.create(this.sheetToStage, autoSave).then(response => {
+        sheetApi.create(this.sheetToStage, false).then(response => {
           this.$log.debug('Created sheet', response.data.data)
-          if (createSuccess) {
-            createSuccess()
-          }
+          this.$message.success('保存草稿成功！')
           this.sheetToStage = response.data.data
         })
       }
@@ -165,7 +154,7 @@ export default {
         if (responseObject.status === 200) {
           var HaloEditor = this.$refs.md
           HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
-          this.$message.success('图片上传成功')
+          this.$message.success('图片上传成功！')
         } else {
           this.$message.error('图片上传失败：' + responseObject.message)
         }

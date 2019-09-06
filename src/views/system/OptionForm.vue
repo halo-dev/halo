@@ -95,14 +95,12 @@
                   label="博客描述："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.seo_description" />
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.seo_description"
+                  />
                 </a-form-item>
-                <!-- <a-form-item
-                  label="百度推送 Token： "
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-input v-model="options.seo_baidu_token" />
-                </a-form-item> -->
                 <a-form-item>
                   <a-button
                     type="primary"
@@ -287,16 +285,13 @@
                   v-show="upyunFormVisible"
                 >
                   <a-form-item
-                    label="域名："
+                    label="绑定域名："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-tooltip
-                      :trigger="['focus']"
-                      placement="right"
-                      title="需要加上 http:// 或者 https://"
-                    >
-                      <a-input v-model="options.oss_upyun_domain" />
-                    </a-tooltip>
+                    <a-input
+                      v-model="options.oss_upyun_domain"
+                      placeholder="需要加上 http:// 或者 https://"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="空间名称："
@@ -329,19 +324,34 @@
                     label="图片处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_upyun_style_rule" />
+                    <a-input
+                      v-model="options.oss_upyun_style_rule"
+                      placeholder="间隔标识符+图片处理版本名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_upyun_thumbnail_style_rule" />
+                    <a-input
+                      v-model="options.oss_upyun_thumbnail_style_rule"
+                      placeholder="间隔标识符+图片处理版本名称，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
                   class="qnyunForm"
                   v-show="qnyunFormVisible"
                 >
+                  <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_qiniu_domain"
+                      placeholder="需要加上 http:// 或者 https://"
+                    />
+                  </a-form-item>
                   <a-form-item
                     label="区域："
                     :wrapper-col="wrapperCol"
@@ -354,18 +364,6 @@
                       <a-select-option value="na0">北美</a-select-option>
                       <a-select-option value="as0">东南亚</a-select-option>
                     </a-select>
-                  </a-form-item>
-                  <a-form-item
-                    label="域名："
-                    :wrapper-col="wrapperCol"
-                  >
-                    <a-tooltip
-                      :trigger="['focus']"
-                      placement="right"
-                      title="需要加上 http:// 或者 https://"
-                    >
-                      <a-input v-model="options.oss_qiniu_domain" />
-                    </a-tooltip>
                   </a-form-item>
                   <a-form-item
                     label="Access Key："
@@ -386,19 +384,28 @@
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_bucket" />
+                    <a-input
+                      v-model="options.oss_qiniu_bucket"
+                      placeholder="存储空间名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="图片处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_style_rule" />
+                    <a-input
+                      v-model="options.oss_qiniu_style_rule"
+                      placeholder="样式分隔符+图片处理样式名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_thumbnail_style_rule" />
+                    <a-input
+                      v-model="options.oss_qiniu_thumbnail_style_rule"
+                      placeholder="样式分隔符+图片处理样式名称，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
@@ -406,10 +413,22 @@
                   v-show="aliyunFormVisible"
                 >
                   <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_aliyun_domain"
+                      placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
+                    />
+                  </a-form-item>
+                  <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_bucket_name" />
+                    <a-input
+                      v-model="options.oss_aliyun_bucket_name"
+                      placeholder="存储空间名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="EndPoint（地域节点）："
@@ -436,13 +455,19 @@
                     label="图片处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_style_rule" />
+                    <a-input
+                      v-model="options.oss_aliyun_style_rule"
+                      placeholder="请到阿里云控制台的图片处理获取"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_thumbnail_style_rule" />
+                    <a-input
+                      v-model="options.oss_aliyun_thumbnail_style_rule"
+                      placeholder="请到阿里云控制台的图片处理获取，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
@@ -450,10 +475,22 @@
                   v-show="baiduyunFormVisible"
                 >
                   <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.bos_baiduyun_domain"
+                      placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
+                    />
+                  </a-form-item>
+                  <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.bos_baiduyun_bucket_name" />
+                    <a-input
+                      v-model="options.bos_baiduyun_bucket_name"
+                      placeholder="存储空间名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="EndPoint（地域节点）："
@@ -480,13 +517,19 @@
                     label="图片处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.bos_baiduyun_style_rule" />
+                    <a-input
+                      v-model="options.bos_baiduyun_style_rule"
+                      placeholder="请到百度云控制台的图片处理获取"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.bos_baiduyun_thumbnail_style_rule" />
+                    <a-input
+                      v-model="options.bos_baiduyun_thumbnail_style_rule"
+                      placeholder="请到百度云控制台的图片处理获取，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
@@ -494,10 +537,22 @@
                   v-show="tencentyunFormVisible"
                 >
                   <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.cos_tencentyun_domain"
+                      placeholder="如不填写，路径根域名将为 Bucket + 区域地址"
+                    />
+                  </a-form-item>
+                  <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.cos_tencentyun_bucket_name" />
+                    <a-input
+                      v-model="options.cos_tencentyun_bucket_name"
+                      placeholder="存储桶名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="区域："
