@@ -9,26 +9,6 @@
                 <a-icon type="pushpin" />内置页面
               </span>
 
-              <!-- TODO 移动端展示 -->
-              <!-- <a-collapse
-                :bordered="false"
-                v-if="isMobile()"
-              >
-                <a-collapse-panel
-                  v-for="(item,index) in internalSheets"
-                  :key="index"
-                >
-                  <a
-                    href="javascript:void(0);"
-                    slot="header"
-                  > {{ item.name }} </a>
-                  <div>
-                    访问路径：{{ item.url }}
-                    操作：{{ item.url }}
-                  </div>
-                </a-collapse-panel>
-              </a-collapse> -->
-
               <a-table
                 :columns="internalColumns"
                 :dataSource="internalSheets"
@@ -106,11 +86,31 @@
                     :href="options.blog_url+'/s/'+record.url"
                     target="_blank"
                     style="text-decoration: none;"
+                    v-if="record.status=='PUBLISHED'"
                   >
                     <a-tooltip
                       placement="topLeft"
                       :title="'点击访问【'+text+'】'"
                     >{{ text }}</a-tooltip>
+                  </a>
+                  <a
+                    :href="`${options.blog_url}/api/admin/sheets/preview/${record.id}`"
+                    target="_blank"
+                    style="text-decoration: none;"
+                    v-else-if="record.status=='DRAFT'"
+                  >
+                    <a-tooltip
+                      placement="topLeft"
+                      :title="'点击预览【'+text+'】'"
+                    >{{ text }}</a-tooltip>
+                  </a>
+                  <a
+                    href="javascript:void(0);"
+                    style="text-decoration: none;"
+                    disabled
+                    v-else
+                  >
+                    {{ text }}
                   </a>
                 </span>
 
@@ -118,7 +118,10 @@
                   slot="status"
                   slot-scope="statusProperty"
                 >
-                  <a-badge :status="statusProperty.status" :text="statusProperty.text"/>
+                  <a-badge
+                    :status="statusProperty.status"
+                    :text="statusProperty.text"
+                  />
                 </span>
 
                 <span

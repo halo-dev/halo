@@ -146,18 +146,41 @@
               :href="options.blog_url+'/archives/'+record.url"
               target="_blank"
               style="text-decoration: none;"
+              v-if="record.status=='PUBLISHED'"
             >
               <a-tooltip
                 placement="topLeft"
                 :title="'点击访问【'+text+'】'"
               >{{ text }}</a-tooltip>
             </a>
+            <a
+              :href="`${options.blog_url}/api/admin/posts/preview/${record.id}`"
+              target="_blank"
+              style="text-decoration: none;"
+              v-else-if="record.status=='DRAFT'"
+            >
+              <a-tooltip
+                placement="topLeft"
+                :title="'点击预览【'+text+'】'"
+              >{{ text }}</a-tooltip>
+            </a>
+            <a
+              href="javascript:void(0);"
+              style="text-decoration: none;"
+              disabled
+              v-else
+            >
+              {{ text }}
+            </a>
           </span>
           <span
             slot="status"
             slot-scope="statusProperty"
           >
-            <a-badge :status="statusProperty.status" :text="statusProperty.text" />
+            <a-badge
+              :status="statusProperty.status"
+              :text="statusProperty.text"
+            />
           </span>
 
           <span
