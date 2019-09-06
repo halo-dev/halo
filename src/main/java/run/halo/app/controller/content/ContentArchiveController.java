@@ -1,6 +1,8 @@
 package run.halo.app.controller.content;
 
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.PageUtil;
+import cn.hutool.crypto.digest.BCrypt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,11 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -111,10 +111,19 @@ public class ContentArchiveController {
     @GetMapping("{url}")
     public String post(@PathVariable("url") String url,
                        @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
+                       @RequestParam(value = "intimate", required = false, defaultValue = "false") boolean intimate,
                        @RequestParam(value = "token", required = false) String token,
                        Model model) {
-        Post post = postService.getBy(preview ? PostStatus.DRAFT : PostStatus.PUBLISHED, url);
+        Post post;
+        if (preview) {
+            post = postService.getBy(PostStatus.DRAFT, url);
+        } else if (intimate) {
+            post = postService.getBy(PostStatus.INTIMATE, url);
+        } else {
+            post = postService.getBy(PostStatus.PUBLISHED, url);
+        }
 
+        // if this is a preview url.
         if (preview) {
             // render markdown to html when preview post
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
@@ -124,6 +133,15 @@ public class ContentArchiveController {
 
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("该文章的预览链接不存在或已过期");
+            }
+        }
+
+        // if this is a intimate url.
+        if (intimate) {
+            // verify token
+            String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
+            if (!cachedToken.equals(token)) {
+                throw new ForbiddenException("您没有该文章的访问权限");
             }
         }
 
@@ -144,5 +162,38 @@ public class ContentArchiveController {
         }
 
         return themeService.render("post");
+    }
+
+    @GetMapping(value = "{url}/password")
+    public String password(@PathVariable("url") String url,
+                           Model model) {
+        Post post = postService.getBy(PostStatus.INTIMATE, url);
+        if (null == post) {
+            throw new ForbiddenException("没有查询到该文章信息");
+        }
+
+        model.addAttribute("url", url);
+        return "common/template/post_password";
+    }
+
+    @PostMapping(value = "{url}/password")
+    @CacheLock
+    public String password(@PathVariable("url") String url,
+                           @RequestParam(value = "password") String password) {
+        Post post = postService.getBy(PostStatus.INTIMATE, url);
+        if (null == post) {
+            throw new ForbiddenException("没有查询到该文章信息");
+        }
+
+        if (BCrypt.checkpw(password, post.getPassword())) {
+            String token = IdUtil.simpleUUID();
+            cacheStore.putAny(token, token, 10, TimeUnit.SECONDS);
+
+            String redirect = String.format("%s/archives/%s?intimate=true&token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
+            return "redirect:" + redirect;
+        } else {
+            String redirect = String.format("%s/archives/%s/password", optionService.getBlogBaseUrl(), post.getUrl());
+            return "redirect:" + redirect;
+        }
     }
 }
