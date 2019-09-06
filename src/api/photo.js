@@ -35,4 +35,11 @@ photoApi.delete = photoId => {
   })
 }
 
+photoApi.listTeams = () => {
+  return service({
+    url: `${baseUrl}/teams`,
+    method: 'get'
+  })
+}
+
 export default photoApi

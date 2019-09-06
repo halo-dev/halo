@@ -252,6 +252,7 @@ export default {
       this.queryParam.mediaType = null
       this.queryParam.attachmentType = null
       this.loadAttachments()
+      this.loadMediaTypes()
     },
     handleQuery() {
       this.queryParam.page = 0

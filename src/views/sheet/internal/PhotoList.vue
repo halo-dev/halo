@@ -9,7 +9,10 @@
         :span="24"
         class="search-box"
       >
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
@@ -26,9 +29,15 @@
                   :sm="24"
                 >
                   <a-form-item label="分组">
-                    <a-select>
-                      <a-select-option value="11">11</a-select-option>
-                      <a-select-option value="22">22</a-select-option>
+                    <a-select
+                      v-model="queryParam.team"
+                      @change="loadPhotos(true)"
+                    >
+                      <a-select-option
+                        v-for="(item,index) in teams"
+                        :key="index"
+                        :value="item"
+                      >{{ item }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -80,7 +89,7 @@
               </div>
               <a-card-meta>
                 <ellipsis
-                  :length="isMobile()?36:18"
+                  :length="isMobile()?36:16"
                   tooltip
                   slot="description"
                 >{{ item.name }}</ellipsis>
@@ -289,6 +298,7 @@ export default {
       thumDrawerVisible: false,
       photo: {},
       photos: [],
+      teams: [],
       editable: false,
       pagination: {
         page: 1,
@@ -299,12 +309,14 @@ export default {
         page: 0,
         size: 18,
         sort: null,
-        keyword: null
+        keyword: null,
+        team: null
       }
     }
   },
   created() {
     this.loadPhotos()
+    this.loadTeams()
   },
   methods: {
     loadPhotos(isSearch) {
@@ -319,6 +331,11 @@ export default {
         this.photos = response.data.data.content
         this.pagination.total = response.data.data.total
         this.listLoading = false
+      })
+    },
+    loadTeams() {
+      photoApi.listTeams().then(response => {
+        this.teams = response.data.data
       })
     },
     handleCreateOrUpdate() {
@@ -365,11 +382,14 @@ export default {
     },
     selectPhotoThumb(data) {
       this.photo.url = encodeURI(data.path)
+      this.photo.thumbnail = encodeURI(data.thumbPath)
       this.thumDrawerVisible = false
     },
     resetParam() {
       this.queryParam.keyword = null
+      this.queryParam.team = null
       this.loadPhotos()
+      this.loadTeams()
     },
     onDrawerClose() {
       this.drawerVisible = false
