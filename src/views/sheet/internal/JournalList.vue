@@ -2,7 +2,10 @@
   <div class="page-header-index-wide">
     <a-row>
       <a-col :span="24">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
@@ -22,6 +25,7 @@
                     <a-select
                       placeholder="请选择状态"
                       v-model="queryParam.type"
+                      @change="loadJournals(true)"
                     >
                       <a-select-option
                         v-for="type in Object.keys(journalType)"
@@ -80,7 +84,7 @@
                   <img alt="example" :src="photo.thumbnail" slot="cover">
                 </a-card> -->
 
-                <a-modal
+                <!-- <a-modal
                   :visible="previewVisible"
                   :footer="null"
                   @cancel="handleCancelPreview"
@@ -90,7 +94,7 @@
                     style="width: 100%"
                     :src="previewPhoto.url"
                   >
-                </a-modal>
+                </a-modal> -->
 
                 <template slot="actions">
                   <span>
@@ -112,6 +116,16 @@
                         style="margin-right: 8px"
                       />
                       {{ item.commentCount }}
+                    </a>
+                  </span>
+                  <span v-if="item.type=='PRIVATE'">
+                    <a href="javascript:void(0);" disabled>
+                      <a-icon type="lock" />
+                    </a>
+                  </span>
+                  <span v-else>
+                    <a href="javascript:void(0);">
+                      <a-icon type="unlock" />
                     </a>
                   </span>
                   <!-- <span>
@@ -282,9 +296,9 @@
 <script>
 import JournalCommentTree from './components/JournalCommentTree'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import journalApi from '@/api/journal'
 import journalCommentApi from '@/api/journalComment'
-import userApi from '@/api/user'
 import UploadPhoto from '@/components/Upload/UploadPhoto.vue'
 export default {
   mixins: [mixin, mixinDevice],
@@ -292,9 +306,9 @@ export default {
   data() {
     return {
       journalType: journalApi.journalType,
-      plusPhotoVisible: true,
-      photoList: [], // 编辑图片时回显所需对象
-      previewVisible: false,
+      // plusPhotoVisible: true,
+      // photoList: [], // 编辑图片时回显所需对象
+      // previewVisible: false,
       showMoreOptions: false,
       previewPhoto: {
         // 图片预览信息临时对象
@@ -321,47 +335,44 @@ export default {
       },
       journals: [],
       comments: [],
-      journal: {
-        id: undefined,
-        content: '',
-        photos: []
-      },
+      journal: {},
       isPublic: true,
       journalPhotos: [], // 日志图片集合最多九张
       selectComment: null,
-      replyComment: {},
-      user: {}
+      replyComment: {}
     }
   },
   created() {
     this.loadJournals()
-    this.loadUser()
+  },
+  computed: {
+    ...mapGetters(['user'])
   },
   methods: {
-    handleCancelPreview() {
-      this.previewVisible = false
-    },
-    handlerPhotoPreview(photo) {
-      // 日志图片预览
-      this.previewVisible = true
-      this.previewPhoto = photo
-    },
-    handlerPhotoUploadSuccess(response, file) {
-      var callData = response.data.data
-      var photo = {
-        name: callData.name,
-        url: callData.path,
-        thumbnail: callData.thumbPath,
-        suffix: callData.suffix,
-        width: callData.width,
-        height: callData.height
-      }
-      this.journalPhotos.push(photo)
-    },
-    handleUploadPhotoWallClick() {
-      // 是否显示上传照片墙组件
-      this.showMoreOptions = !this.showMoreOptions
-    },
+    // handleCancelPreview() {
+    //   this.previewVisible = false
+    // },
+    // handlerPhotoPreview(photo) {
+    //   // 日志图片预览
+    //   this.previewVisible = true
+    //   this.previewPhoto = photo
+    // },
+    // handlerPhotoUploadSuccess(response, file) {
+    //   var callData = response.data.data
+    //   var photo = {
+    //     name: callData.name,
+    //     url: callData.path,
+    //     thumbnail: callData.thumbPath,
+    //     suffix: callData.suffix,
+    //     width: callData.width,
+    //     height: callData.height
+    //   }
+    //   this.journalPhotos.push(photo)
+    // },
+    // handleUploadPhotoWallClick() {
+    //   // 是否显示上传照片墙组件
+    //   this.showMoreOptions = !this.showMoreOptions
+    // },
     loadJournals(isSearch) {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -376,28 +387,23 @@ export default {
         this.listLoading = false
       })
     },
-    loadUser() {
-      userApi.getProfile().then(response => {
-        this.user = response.data.data
-      })
-    },
     handleNew() {
       this.title = '新建'
       this.visible = true
       this.journal = {}
 
       // 显示图片上传框
-      this.plusPhotoVisible = true
-      this.photoList = []
+      // this.plusPhotoVisible = true
+      // this.photoList = []
     },
     handleEdit(item) {
       this.title = '编辑'
       this.journal = item
+      this.isPublic = item.type !== 'PRIVATE'
       this.visible = true
-
       // 为编辑时需要回显图片数组赋值,并隐藏图片上传框
-      this.plusPhotoVisible = false
-      this.photoList = item.photos
+      // this.plusPhotoVisible = false
+      // this.photoList = item.photos
     },
     handleDelete(id) {
       journalApi.delete(id).then(response => {
@@ -448,7 +454,7 @@ export default {
         journalApi.create(this.journal).then(response => {
           this.$message.success('发表成功！')
           this.loadJournals()
-          this.photoList = []
+          // this.photoList = []
           this.isPublic = true
         })
       }
