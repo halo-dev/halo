@@ -22,7 +22,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Photo controller
  *
  * @author ryanwang
- * @date : 2019/3/21
+ * @date : 2019-3-21
  */
 @RestController
 @RequestMapping("/api/admin/photos")
@@ -91,5 +91,11 @@ public class PhotoController {
 
         // Update menu in database
         return new PhotoDTO().convertFrom(photoService.update(photo));
+    }
+
+    @GetMapping("teams")
+    @ApiOperation("Lists all of photo teams")
+    public List<String> listTeams() {
+        return photoService.listAllTeams();
     }
 }
