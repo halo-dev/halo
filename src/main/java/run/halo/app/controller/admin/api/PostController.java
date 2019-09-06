@@ -150,7 +150,7 @@ public class PostController {
         cacheStore.putAny("preview-post-token-" + postId, token, 10, TimeUnit.MINUTES);
 
         // build preview post url
-        String url = String.format("%s/preview/post/%s?token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
+        String url = String.format("%s/archives/%s?preview=true&token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
 
         // redirect to preview url
         response.sendRedirect(url);
