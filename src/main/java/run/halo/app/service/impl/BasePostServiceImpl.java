@@ -217,6 +217,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         }
 
+        // if password is not empty,change status to intimate
+        if (StringUtils.isNotEmpty(post.getPassword()) && post.getStatus() != PostStatus.DRAFT) {
+            post.setStatus(PostStatus.INTIMATE);
+        }
+
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created

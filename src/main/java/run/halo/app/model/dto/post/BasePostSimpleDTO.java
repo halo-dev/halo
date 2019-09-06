@@ -23,6 +23,8 @@ public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
     private Boolean disallowComment;
 
+    private String password;
+
     private String template;
 
     private Integer topPriority = 0;
