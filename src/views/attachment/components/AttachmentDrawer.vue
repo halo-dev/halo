@@ -36,7 +36,11 @@
               :key="index"
               @click="handleShowDetailDrawer(item)"
             >
-              <img :src="item.thumbPath">
+              <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
+                <img
+                  :src="item.thumbPath"
+                  v-show="handleJudgeMediaType(item)"
+                >
             </div>
           </a-col>
         </a-skeleton>
@@ -183,6 +187,23 @@ export default {
     },
     handleDelete() {
       this.loadAttachments()
+    },
+    handleJudgeMediaType(attachment) {
+      var mediaType = attachment.mediaType
+      // 判断文件类型
+      if (mediaType) {
+        var prefix = mediaType.split('/')[0]
+
+        if (prefix === 'image') {
+          // 是图片
+          return true
+        } else {
+          // 非图片
+          return false
+        }
+      }
+      // 没有获取到文件返回false
+      return false
     },
     onClose() {
       this.$emit('close', false)

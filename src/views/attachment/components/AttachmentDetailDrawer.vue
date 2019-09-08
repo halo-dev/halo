@@ -19,11 +19,13 @@
         >
           <div class="attach-detail-img">
             <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
-            <img
-              :src="attachment.path"
-              v-show="photoPreviewVisible"
-              style="width: 100%;"
-            >
+            <a :href="attachment.path" target="_blank">
+              <img
+                :src="attachment.path"
+                v-show="photoPreviewVisible"
+                style="width: 100%;"
+              >
+            </a>
             <video-player
               class="video-player-box"
               v-show="videoPreviewVisible"

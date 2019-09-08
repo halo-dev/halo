@@ -715,19 +715,37 @@ body {
 
 .attach-item {
   width: 50%;
+  padding-bottom: 28%;
+  float: left;
+}
+
+.attach-thumb {
+  width: 100%;
+  padding-bottom: 56%;
+}
+
+.attach-item,
+.attach-thumb {
   margin: 0 auto;
   position: relative;
-  padding-bottom: 28%;
   overflow: hidden;
-  float: left;
   cursor: pointer;
 
-  img {
+  img,
+  span {
     width: 100%;
     height: 100%;
     position: absolute;
     top: 0;
     left: 0;
+  }
+
+  span {
+    display: flex;
+    font-size: 12px;
+    align-items: center;
+    justify-content: center;
+    color: #9b9ea0;
   }
 }
 
@@ -735,6 +753,7 @@ body {
   position: relative;
   overflow: hidden;
   width: 100%;
+
   .meta {
     position: relative;
     overflow: hidden;
@@ -742,6 +761,7 @@ body {
     color: rgba(0, 0, 0, 0.45);
     font-size: 14px;
     line-height: 22px;
+
     .analysis-card-action {
       cursor: pointer;
       position: absolute;
@@ -749,6 +769,7 @@ body {
       right: 0;
     }
   }
+
   .number {
     overflow: hidden;
     text-overflow: ellipsis;
