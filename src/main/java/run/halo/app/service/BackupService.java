@@ -19,5 +19,5 @@ public interface BackupService {
      * @param file file
      * @return post info
      */
-    BasePostDetailDTO importMarkdowns(MultipartFile file) throws IOException;
+    BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException;
 }
