@@ -21,9 +21,7 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -140,8 +138,7 @@ public class PostController {
     }
 
     @GetMapping("preview/{postId:\\d+}")
-    public void preview(@PathVariable("postId") Integer postId,
-                        HttpServletResponse response) throws IOException {
+    public String preview(@PathVariable("postId") Integer postId) {
         Post post = postService.getById(postId);
 
         String token = IdUtil.simpleUUID();
@@ -149,10 +146,7 @@ public class PostController {
         // cache preview token
         cacheStore.putAny("preview-post-token-" + postId, token, 10, TimeUnit.MINUTES);
 
-        // build preview post url
-        String redirect = String.format("%s/archives/%s?preview=true&token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
-
-        // redirect to preview url
-        response.sendRedirect(redirect);
+        // build preview post url and return
+        return String.format("%s/archives/%s?preview=true&token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
     }
 }

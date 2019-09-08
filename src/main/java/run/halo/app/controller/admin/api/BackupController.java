@@ -29,14 +29,9 @@ public class BackupController {
         this.backupService = backupService;
     }
 
-    @PostMapping("import/markdowns")
-    @ApiOperation("Import markdowns")
-    public List<BasePostDetailDTO> backupMarkdowns(@RequestPart("files") MultipartFile[] files) throws IOException {
-        List<BasePostDetailDTO> result = new LinkedList<>();
-        for (MultipartFile file : files) {
-            BasePostDetailDTO post = backupService.importMarkdowns(file);
-            result.add(post);
-        }
-        return result;
+    @PostMapping("import/markdown")
+    @ApiOperation("Import markdown")
+    public BasePostDetailDTO backupMarkdowns(@RequestPart("file") MultipartFile file) throws IOException {
+        return backupService.importMarkdown(file);
     }
 }
