@@ -1,5 +1,9 @@
 package run.halo.app.controller.content;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,11 +14,16 @@ import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.model.vo.BaseCommentVO;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
 
 import java.util.concurrent.TimeUnit;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Content sheet controller.
@@ -30,13 +39,21 @@ public class ContentSheetController {
 
     private final ThemeService themeService;
 
+    private final SheetCommentService sheetCommentService;
+
+    private final OptionService optionService;
+
     private final StringCacheStore cacheStore;
 
     public ContentSheetController(SheetService sheetService,
                                   ThemeService themeService,
+                                  SheetCommentService sheetCommentService,
+                                  OptionService optionService,
                                   StringCacheStore cacheStore) {
         this.sheetService = sheetService;
         this.themeService = themeService;
+        this.sheetCommentService = sheetCommentService;
+        this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
 
@@ -73,6 +90,8 @@ public class ContentSheetController {
     public String sheet(@PathVariable(value = "url") String url,
                         @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
                         @RequestParam(value = "token", required = false) String token,
+                        @RequestParam(value = "cp", defaultValue = "1") Integer cp,
+                        @SortDefault(sort = "createTime", direction = DESC) Sort sort,
                         Model model) {
         Sheet sheet = sheetService.getBy(preview ? PostStatus.DRAFT : PostStatus.PUBLISHED, url);
 
@@ -88,10 +107,14 @@ public class ContentSheetController {
             }
         }
 
+        Page<BaseCommentVO> comments = sheetCommentService.pageVosBy(sheet.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
+
+
         // sheet and post all can use
         model.addAttribute("sheet", sheetService.convertToDetail(sheet));
         model.addAttribute("post", sheetService.convertToDetail(sheet));
         model.addAttribute("is_sheet", true);
+        model.addAttribute("comments", comments);
 
         if (preview) {
             // refresh timeUnit

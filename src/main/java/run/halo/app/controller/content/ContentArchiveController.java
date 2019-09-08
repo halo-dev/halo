@@ -18,6 +18,7 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
@@ -46,6 +47,8 @@ public class ContentArchiveController {
 
     private final PostTagService postTagService;
 
+    private final PostCommentService postCommentService;
+
     private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
@@ -54,12 +57,14 @@ public class ContentArchiveController {
                                     ThemeService themeService,
                                     PostCategoryService postCategoryService,
                                     PostTagService postTagService,
+                                    PostCommentService postCommentService,
                                     OptionService optionService,
                                     StringCacheStore cacheStore) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
         this.postTagService = postTagService;
+        this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
@@ -112,6 +117,8 @@ public class ContentArchiveController {
                        @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
                        @RequestParam(value = "intimate", required = false, defaultValue = "false") boolean intimate,
                        @RequestParam(value = "token", required = false) String token,
+                       @RequestParam(value = "cp", defaultValue = "1") Integer cp,
+                       @SortDefault(sort = "createTime", direction = DESC) Sort sort,
                        Model model) {
         Post post;
         if (preview) {
@@ -150,10 +157,13 @@ public class ContentArchiveController {
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
 
+        Page<BaseCommentVO> comments = postCommentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
+
         model.addAttribute("is_post", true);
-        model.addAttribute("post", post);
+        model.addAttribute("post", postService.convertToDetailVo(post));
         model.addAttribute("categories", categories);
         model.addAttribute("tags", tags);
+        model.addAttribute("comments", comments);
 
         if (preview) {
             // refresh timeUnit
