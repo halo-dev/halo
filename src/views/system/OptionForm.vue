@@ -252,6 +252,30 @@
               </span>
               <a-form layout="vertical">
                 <a-form-item
+                  label="上传图片时预览："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-switch v-model="options.attachment_upload_image_preview_enable" />
+                </a-form-item>
+                <a-form-item
+                  label="最大上传文件数："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="number"
+                    v-model="options.attachment_upload_max_files"
+                  />
+                </a-form-item>
+                <a-form-item
+                  label="同时上传文件数："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="number"
+                    v-model="options.attachment_upload_max_parallel_uploads"
+                  />
+                </a-form-item>
+                <a-form-item
                   label="存储位置："
                   :wrapper-col="wrapperCol"
                 >

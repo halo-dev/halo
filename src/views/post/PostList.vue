@@ -143,10 +143,10 @@
               twoToneColor="red"
             />
             <a
+              v-if="record.status=='PUBLISHED'"
               :href="options.blog_url+'/archives/'+record.url"
               target="_blank"
               style="text-decoration: none;"
-              v-if="record.status=='PUBLISHED'"
             >
               <a-tooltip
                 placement="top"
@@ -154,10 +154,10 @@
               >{{ text }}</a-tooltip>
             </a>
             <a
+              v-else-if="record.status == 'INTIMATE'"
               :href="options.blog_url+'/archives/'+record.url+'/password'"
               target="_blank"
               style="text-decoration: none;"
-              v-else-if="record.status == 'INTIMATE'"
             >
               <a-tooltip
                 placement="top"
@@ -165,10 +165,10 @@
               >{{ text }}</a-tooltip>
             </a>
             <a
-              :href="`${options.blog_url}/api/admin/posts/preview/${record.id}`"
-              target="_blank"
-              style="text-decoration: none;"
               v-else-if="record.status=='DRAFT'"
+              href="javascript:void(0)"
+              style="text-decoration: none;"
+              @click="handlePreview(record.id)"
             >
               <a-tooltip
                 placement="topLeft"
@@ -176,10 +176,10 @@
               >{{ text }}</a-tooltip>
             </a>
             <a
+              v-else
               href="javascript:void(0);"
               style="text-decoration: none;"
               disabled
-              v-else
             >
               {{ text }}
             </a>
@@ -562,6 +562,11 @@ export default {
         this.selectedTagIds = this.selectedPost.tagIds
         this.selectedCategoryIds = this.selectedPost.categoryIds
         this.postSettingVisible = true
+      })
+    },
+    handlePreview(postId) {
+      postApi.preview(postId).then(response => {
+        window.open(response.data, '_blank')
       })
     },
     // 关闭文章设置抽屉

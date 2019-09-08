@@ -66,6 +66,13 @@ postApi.delete = postId => {
   })
 }
 
+postApi.preview = postId => {
+  return service({
+    url: `${baseUrl}/preview/${postId}`,
+    method: 'get'
+  })
+}
+
 postApi.postStatus = {
   PUBLISHED: {
     color: 'green',

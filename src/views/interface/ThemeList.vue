@@ -162,8 +162,10 @@
     <a-modal
       title="安装主题"
       v-model="uploadThemeVisible"
+      destroyOnClose
       :footer="null"
       :bodyStyle="{ padding: '0 24px 24px' }"
+      :afterClose="onThemeUploadClose"
     >
       <div class="custom-tab-wrapper">
         <a-tabs>
@@ -201,20 +203,15 @@
             tab="本地上传"
             key="2"
           >
-            <upload
+            <FilePondUpload
+              ref="upload"
               name="file"
-              multiple
               accept="application/zip"
+              label="点击选择主题包或将主题包拖拽到此处<br>仅支持 ZIP 格式的文件"
               :uploadHandler="uploadHandler"
-              @change="handleUploadChange"
               @success="handleUploadSuccess"
             >
-              <p class="ant-upload-drag-icon">
-                <a-icon type="inbox" />
-              </p>
-              <p class="ant-upload-text">点击选择主题包或将主题包拖拽到此处</p>
-              <p class="ant-upload-hint">支持单个或批量上传，仅支持 ZIP 格式的文件</p>
-            </upload>
+            </FilePondUpload>
           </a-tab-pane>
         </a-tabs>
       </div>
@@ -223,21 +220,20 @@
       title="更新主题"
       v-model="uploadNewThemeVisible"
       :footer="null"
+      destroyOnClose
+      :afterClose="onThemeUploadClose"
     >
-      <UpdateTheme
+      <FilePondUpload
+        ref="updateByupload"
         name="file"
-        :themeId="prepareUpdateTheme.id"
         accept="application/zip"
+        label="点击选择主题更新包或将主题更新包拖拽到此处<br>仅支持 ZIP 格式的文件"
         :uploadHandler="updateByUploadHandler"
-        @change="handleNewThemeUploadChange"
+        :filed="prepareUpdateTheme.id"
+        :multiple="false"
         @success="handleUploadSuccess"
       >
-        <p class="ant-upload-drag-icon">
-          <a-icon type="inbox" />
-        </p>
-        <p class="ant-upload-text">点击选择主题包或将主题包拖拽到此处</p>
-        <p class="ant-upload-hint">请选择最新的主题包，仅支持 ZIP 格式的文件</p>
-      </UpdateTheme>
+      </FilePondUpload>
     </a-modal>
   </div>
 </template>
@@ -313,26 +309,6 @@ export default {
         this.loadThemes()
       })
     },
-    onThemeSettingsClose() {
-      this.themeSettingVisible = false
-      this.selectedTheme = {}
-    },
-    handleUploadChange(info) {
-      const status = info.file.status
-      if (status === 'done') {
-        this.$message.success(`${info.file.name} 主题上传成功！`)
-      } else if (status === 'error') {
-        this.$message.error(`${info.file.name} 主题上传失败！`)
-      }
-    },
-    handleNewThemeUploadChange(info) {
-      const status = info.file.status
-      if (status === 'done') {
-        this.$message.success(`${info.file.name} 主题更新成功！`)
-      } else if (status === 'error') {
-        this.$message.error(`${info.file.name} 主题更新失败！`)
-      }
-    },
     handleUploadSuccess() {
       if (this.uploadThemeVisible) {
         this.uploadThemeVisible = false
@@ -375,13 +351,25 @@ export default {
       })
     },
     handleShowUpdateNewThemeModal(item) {
-      console.log(item)
       this.prepareUpdateTheme = item
       this.uploadNewThemeVisible = true
     },
     handleShowThemeSetting(theme) {
       this.selectedTheme = theme
       this.themeSettingVisible = true
+    },
+    onThemeUploadClose() {
+      if (this.uploadThemeVisible) {
+        this.$refs.upload.handleClearFileList()
+      }
+      if (this.uploadNewThemeVisible) {
+        this.$refs.updateByupload.handleClearFileList()
+      }
+      this.loadThemes()
+    },
+    onThemeSettingsClose() {
+      this.themeSettingVisible = false
+      this.selectedTheme = {}
     }
   }
 }

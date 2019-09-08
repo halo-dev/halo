@@ -174,13 +174,17 @@ export default {
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
-          window.open(`${this.options.blog_url}/api/admin/sheets/preview/${this.sheetToStage.id}`, '_blank')
+          sheetApi.preview(this.sheetToStage.id).then(response => {
+            window.open(response.data, '_blank')
+          })
         })
       } else {
         sheetApi.create(this.sheetToStage, false).then(response => {
           this.$log.debug('Created sheet', response.data.data)
           this.sheetToStage = response.data.data
-          window.open(`${this.options.blog_url}/api/admin/sheets/preview/${this.sheetToStage.id}`, '_blank')
+          sheetApi.preview(this.sheetToStage.id).then(response => {
+            window.open(response.data, '_blank')
+          })
         })
       }
     },

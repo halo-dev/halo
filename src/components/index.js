@@ -4,13 +4,13 @@ import Vue from 'vue'
 import Ellipsis from '@/components/Ellipsis'
 import FooterToolbar from '@/components/FooterToolbar'
 import Upload from '@/components/Upload/Upload'
-import UpdateTheme from '@/components/Upload/UpdateTheme'
+import FilePondUpload from '@/components/Upload/FilePondUpload'
 
 const _components = {
   Ellipsis,
   FooterToolbar,
   Upload,
-  UpdateTheme
+  FilePondUpload
 }
 
 const components = {}

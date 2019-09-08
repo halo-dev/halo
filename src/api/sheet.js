@@ -61,6 +61,13 @@ sheetApi.delete = sheetId => {
   })
 }
 
+sheetApi.preview = sheetId => {
+  return service({
+    url: `${baseUrl}/preview/${sheetId}`,
+    method: 'get'
+  })
+}
+
 sheetApi.sheetStatus = {
   PUBLISHED: {
     color: 'green',

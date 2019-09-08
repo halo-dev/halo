@@ -136,18 +136,12 @@
       v-model="uploadVisible"
       :footer="null"
       :afterClose="onUploadClose"
+      destroyOnClose
     >
-      <upload
-        name="file"
-        multiple
+      <FilePondUpload
+        ref="upload"
         :uploadHandler="uploadHandler"
-      >
-        <p class="ant-upload-drag-icon">
-          <a-icon type="inbox" />
-        </p>
-        <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
-        <p class="ant-upload-hint">支持单个或批量上传</p>
-      </upload>
+      ></FilePondUpload>
     </a-modal>
     <AttachmentDetailDrawer
       v-model="drawerVisible"
@@ -193,8 +187,8 @@ export default {
         mediaType: null,
         attachmentType: null
       },
-      uploadHandler: attachmentApi.upload,
-      drawerVisible: false
+      drawerVisible: false,
+      uploadHandler: attachmentApi.upload
     }
   },
   computed: {
@@ -260,6 +254,7 @@ export default {
       this.loadAttachments()
     },
     onUploadClose() {
+      this.$refs.upload.handleClearFileList()
       this.loadAttachments()
       this.loadMediaTypes()
     },

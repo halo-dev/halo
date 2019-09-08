@@ -56,7 +56,7 @@
         :attachment="selectedAttachment"
         @delete="handleDelete"
       />
-      <a-divider class="divider-transparent"/>
+      <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-button
           @click="handleShowUploadModal"
@@ -70,18 +70,12 @@
       v-model="uploadVisible"
       :footer="null"
       :afterClose="onUploadClose"
+      destroyOnClose
     >
-      <upload
-        name="file"
-        multiple
-        :uploadHandler="attachmentUploadHandler"
-      >
-        <p class="ant-upload-drag-icon">
-          <a-icon type="inbox" />
-        </p>
-        <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
-        <p class="ant-upload-hint">支持单个或批量上传</p>
-      </upload>
+      <FilePondUpload
+        ref="upload"
+        :uploadHandler="uploadHandler"
+      ></FilePondUpload>
     </a-modal>
   </div>
 </template>
@@ -128,7 +122,7 @@ export default {
       },
       attachments: [],
       selectedAttachment: {},
-      attachmentUploadHandler: attachmentApi.upload
+      uploadHandler: attachmentApi.upload
     }
   },
   computed: {
@@ -183,6 +177,7 @@ export default {
       this.loadAttachments()
     },
     onUploadClose() {
+      this.$refs.upload.handleClearFileList()
       this.loadSkeleton()
       this.loadAttachments()
     },

@@ -83,10 +83,10 @@
                   style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                 >
                   <a
+                    v-if="record.status=='PUBLISHED'"
                     :href="options.blog_url+'/s/'+record.url"
                     target="_blank"
                     style="text-decoration: none;"
-                    v-if="record.status=='PUBLISHED'"
                   >
                     <a-tooltip
                       placement="top"
@@ -94,10 +94,10 @@
                     >{{ text }}</a-tooltip>
                   </a>
                   <a
-                    :href="`${options.blog_url}/api/admin/sheets/preview/${record.id}`"
-                    target="_blank"
-                    style="text-decoration: none;"
                     v-else-if="record.status=='DRAFT'"
+                    href="javascript:void(0)"
+                    style="text-decoration: none;"
+                    @click="handlePreview(record.id)"
                   >
                     <a-tooltip
                       placement="topLeft"
@@ -105,10 +105,10 @@
                     >{{ text }}</a-tooltip>
                   </a>
                   <a
+                    v-else
                     href="javascript:void(0);"
                     style="text-decoration: none;"
                     disabled
-                    v-else
                   >
                     {{ text }}
                   </a>
@@ -388,6 +388,11 @@ export default {
       sheetApi.get(sheet.id).then(response => {
         this.selectedSheet = response.data.data
         this.sheetSettingVisible = true
+      })
+    },
+    handlePreview(sheetId) {
+      sheetApi.preview(sheetId).then(response => {
+        window.open(response.data, '_blank')
       })
     },
     onSheetSettingsClose() {

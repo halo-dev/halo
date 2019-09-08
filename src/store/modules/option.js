@@ -3,7 +3,12 @@ import {
   OPTIONS
 } from '@/store/mutation-types'
 import optionApi from '@/api/option'
-const keys = ['blog_url']
+const keys = [
+  'blog_url',
+  'attachment_upload_image_preview_enable',
+  'attachment_upload_max_parallel_uploads',
+  'attachment_upload_max_files'
+]
 const option = {
   state: {
     options: []

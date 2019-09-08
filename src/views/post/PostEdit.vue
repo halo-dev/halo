@@ -187,14 +187,18 @@ export default {
         // Update the post
         postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
           this.$log.debug('Updated post', response.data.data)
-          window.open(`${this.options.blog_url}/api/admin/posts/preview/${this.postToStage.id}`, '_blank')
+          postApi.preview(this.postToStage.id).then(response => {
+            window.open(response.data, '_blank')
+          })
         })
       } else {
         // Create the post
         postApi.create(this.postToStage, false).then(response => {
           this.$log.debug('Created post', response.data.data)
           this.postToStage = response.data.data
-          window.open(`${this.options.blog_url}/api/admin/posts/preview/${this.postToStage.id}`, '_blank')
+          postApi.preview(this.postToStage.id).then(response => {
+            window.open(response.data, '_blank')
+          })
         })
       }
     },

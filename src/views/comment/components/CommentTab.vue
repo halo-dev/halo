@@ -235,6 +235,7 @@
       :title="'回复给：'+selectComment.author"
       v-model="replyCommentVisible"
       @close="onReplyClose"
+      destroyOnClose
     >
       <template slot="footer">
         <a-button
