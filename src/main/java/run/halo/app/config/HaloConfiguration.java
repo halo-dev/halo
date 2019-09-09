@@ -149,7 +149,9 @@ public class HaloConfiguration {
                 "/api/admin/refresh/*",
                 "/api/admin/installations",
                 "/api/admin/recoveries/migrations/*",
-                "/api/admin/is_installed"
+                "/api/admin/is_installed",
+                "/api/admin/password/code",
+                "/api/admin/password/reset"
         );
         adminAuthenticationFilter.setFailureHandler(
                 failureHandler);
