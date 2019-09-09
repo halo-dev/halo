@@ -55,17 +55,19 @@ public class ControllerLogAop {
             return;
         }
 
-        boolean hasServletArg = false;
+        boolean shouldNotLog = false;
         for (Object arg : args) {
-            if (arg instanceof HttpServletRequest ||
+            if (arg == null ||
+                    arg instanceof HttpServletRequest ||
                     arg instanceof HttpServletResponse ||
-                    arg instanceof MultipartFile) {
-                hasServletArg = true;
+                    arg instanceof MultipartFile ||
+                    arg.getClass().isAssignableFrom(MultipartFile[].class)) {
+                shouldNotLog = true;
                 break;
             }
         }
 
-        if (!hasServletArg) {
+        if (!shouldNotLog) {
             String requestBody = JsonUtils.objectToJson(args);
             log.debug("{}.{} Parameters: [{}]", clazzName, methodName, requestBody);
         }

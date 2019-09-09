@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -173,6 +174,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
     public void increaseVisit(long visits, Integer postId) {
         Assert.isTrue(visits > 0, "Visits to increase must not be less than 1");
         Assert.notNull(postId, "Post id must not be null");
@@ -186,6 +188,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
     public void increaseLike(long likes, Integer postId) {
         Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
         Assert.notNull(postId, "Goods id must not be null");
@@ -199,16 +202,19 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
     public void increaseVisit(Integer postId) {
         increaseVisit(1L, postId);
     }
 
     @Override
+    @Transactional
     public void increaseLike(Integer postId) {
         increaseLike(1L, postId);
     }
 
     @Override
+    @Transactional
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
 
