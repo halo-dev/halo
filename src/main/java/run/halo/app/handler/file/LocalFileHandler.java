@@ -1,9 +1,7 @@
 package run.halo.app.handler.file;
 
-import cn.hutool.core.img.ImgUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +13,8 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -151,15 +149,15 @@ public class LocalFileHandler implements FileHandler {
                 // Create the thumbnail
                 Files.createFile(thumbnailPath);
 
-                // Generate thumbnail
-                generateThumbnail(uploadPath, thumbnailPath);
-
                 // Read as image
-                BufferedImage image = ImageIO.read(Files.newInputStream(uploadPath));
+                BufferedImage originalImage = ImageUtils.readImage(uploadPath.toFile());
+
+                // Generate thumbnail
+                generateThumbnail(originalImage, thumbnailPath, extension);
 
                 // Set width and height
-                uploadResult.setWidth(image.getWidth());
-                uploadResult.setHeight(image.getHeight());
+                uploadResult.setWidth(originalImage.getWidth());
+                uploadResult.setHeight(originalImage.getHeight());
                 // Set thumb path
                 uploadResult.setThumbPath(thumbnailSubFilePath);
             } else {
@@ -213,21 +211,18 @@ public class LocalFileHandler implements FileHandler {
         return AttachmentType.LOCAL.equals(type);
     }
 
-    /**
-     * Generates thumbnail image.
-     *
-     * @param imagePath image path must not be null
-     * @param thumbPath thumbnail path must not be null
-     * @throws IOException throws if image provided is not valid
-     */
-    private void generateThumbnail(@NonNull Path imagePath, @NonNull Path thumbPath) throws IOException {
-        Assert.notNull(imagePath, "Image path must not be null");
+
+    private void generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) throws IOException {
+        Assert.notNull(originalImage, "Image must not be null");
         Assert.notNull(thumbPath, "Thumb path must not be null");
 
-        log.info("Generating thumbnail: [{}] for image: [{}]", thumbPath.getFileName(), imagePath.getFileName());
-
         // Convert to thumbnail and copy the thumbnail
-        ImgUtil.scale(imagePath.toFile(), thumbPath.toFile(), 0.1f);
+        log.debug("Trying to generate thumbnail: [{}]", thumbPath.toString());
+        log.debug("Got original image");
+        log.debug("Generating thumbnail image, and trying to write the thumbnail to [{}]", thumbPath.toString());
+        ImageUtils.compress(originalImage, 0.1f, Files.newOutputStream(thumbPath));
+        log.debug("Wrote thumbnail to [{}]", thumbPath.toString());
     }
+
 
 }
