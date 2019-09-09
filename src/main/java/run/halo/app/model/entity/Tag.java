@@ -33,7 +33,7 @@ public class Tag extends BaseEntity {
     /**
      * Tag slug name.
      */
-    @Column(name = "slug_name", columnDefinition = "varchar(255) not null")
+    @Column(name = "slug_name", columnDefinition = "varchar(255) not null", unique = true)
     private String slugName;
 
     @Override

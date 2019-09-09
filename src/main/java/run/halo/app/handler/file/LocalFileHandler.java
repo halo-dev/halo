@@ -1,7 +1,7 @@
 package run.halo.app.handler.file;
 
+import cn.hutool.core.img.ImgUtil;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,8 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  * Local file handler.
  *
  * @author johnniang
- * @date 3/27/19
+ * @author ryanwang
+ * @date 2019-03-27
  */
 @Slf4j
 @Component
@@ -47,11 +48,13 @@ public class LocalFileHandler implements FileHandler {
     /**
      * Thumbnail width.
      */
+    @Deprecated
     private final static int THUMB_WIDTH = 256;
 
     /**
      * Thumbnail height.
      */
+    @Deprecated
     private final static int THUMB_HEIGHT = 256;
 
     private final OptionService optionService;
@@ -135,8 +138,11 @@ public class LocalFileHandler implements FileHandler {
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSize(file.getSize());
 
+            // TODO refactor this: if image is svg ext. extension
+            boolean isSvg = "svg".equals(extension);
+
             // Check file type
-            if (FileHandler.isImageType(uploadResult.getMediaType())) {
+            if (FileHandler.isImageType(uploadResult.getMediaType()) && !isSvg) {
                 // Upload a thumbnail
                 String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
                 String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
@@ -154,9 +160,10 @@ public class LocalFileHandler implements FileHandler {
                 // Set width and height
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-
                 // Set thumb path
                 uploadResult.setThumbPath(thumbnailSubFilePath);
+            } else {
+                uploadResult.setThumbPath(subFilePath);
             }
 
             return uploadResult;
@@ -220,7 +227,7 @@ public class LocalFileHandler implements FileHandler {
         log.info("Generating thumbnail: [{}] for image: [{}]", thumbPath.getFileName(), imagePath.getFileName());
 
         // Convert to thumbnail and copy the thumbnail
-        Thumbnails.of(imagePath.toFile()).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
+        ImgUtil.scale(imagePath.toFile(), thumbPath.toFile(), 0.1f);
     }
 
 }
