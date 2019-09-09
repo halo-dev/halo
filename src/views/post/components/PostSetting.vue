@@ -40,7 +40,7 @@
                     slot="addonAfter"
                     @click="togglePasswordVisible"
                   >
-                    <a-icon type="eye" />
+                    <a-icon type="eye-invisible" />
                   </a>
                 </a-input>
                 <a-input
@@ -53,7 +53,7 @@
                     slot="addonAfter"
                     @click="togglePasswordVisible"
                   >
-                    <a-icon type="eye-invisible" />
+                    <a-icon type="eye" />
                   </a>
                 </a-input>
               </a-form-item>

@@ -203,7 +203,12 @@ export default {
         this.$message.error('确认密码和新密码不匹配！')
         return
       }
-      userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {})
+      userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {
+        this.$message.success('密码修改成功！')
+        this.passwordParam.oldPassword = null
+        this.passwordParam.newPassword = null
+        this.passwordParam.confirmPassword = null
+      })
     },
     handleUpdateProfile() {
       if (!this.user.username) {

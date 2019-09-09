@@ -37,10 +37,10 @@
               @click="handleShowDetailDrawer(item)"
             >
               <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
-                <img
-                  :src="item.thumbPath"
-                  v-show="handleJudgeMediaType(item)"
-                >
+              <img
+                :src="item.thumbPath"
+                v-show="handleJudgeMediaType(item)"
+              >
             </div>
           </a-col>
         </a-skeleton>
