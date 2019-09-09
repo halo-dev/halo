@@ -42,7 +42,7 @@ public class BasePost extends BaseEntity {
     /**
      * Post url.
      */
-    @Column(name = "url", columnDefinition = "varchar(255) not null")
+    @Column(name = "url", columnDefinition = "varchar(255) not null", unique = true)
     private String url;
 
     /**
