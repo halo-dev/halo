@@ -152,15 +152,19 @@ public class LocalFileHandler implements FileHandler {
 
                     // Read as image
                     BufferedImage originalImage = ImageIO.read(uploadPath.toFile());
-
-                    // Generate thumbnail
-                    generateThumbnail(originalImage, thumbnailPath, extension);
-
                     // Set width and height
                     uploadResult.setWidth(originalImage.getWidth());
                     uploadResult.setHeight(originalImage.getHeight());
-                    // Set thumb path
-                    uploadResult.setThumbPath(thumbnailSubFilePath);
+
+                    // Generate thumbnail
+                    boolean result = generateThumbnail(originalImage, thumbnailPath, extension);
+                    if (result) {
+                        // Set thumb path
+                        uploadResult.setThumbPath(thumbnailSubFilePath);
+                    } else {
+                        // If generate error
+                        uploadResult.setThumbPath(subFilePath);
+                    }
                 } finally {
                     lock.unlock();
                 }
@@ -203,7 +207,7 @@ public class LocalFileHandler implements FileHandler {
         try {
             boolean deleteResult = Files.deleteIfExists(thumbnailPath);
             if (!deleteResult) {
-                log.warn("Thumbnail: [{}] way not exist", thumbnailPath.toString());
+                log.warn("Thumbnail: [{}] may not exist", thumbnailPath.toString());
             }
         } catch (IOException e) {
             throw new FileOperationException("附件缩略图 " + thumbnailName + " 删除失败", e);
@@ -215,19 +219,24 @@ public class LocalFileHandler implements FileHandler {
         return AttachmentType.LOCAL.equals(type);
     }
 
-
-    private void generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) throws IOException {
+    private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
         Assert.notNull(originalImage, "Image must not be null");
         Assert.notNull(thumbPath, "Thumb path must not be null");
 
 
+        boolean result = false;
         // Create the thumbnail
-        Files.createFile(thumbPath);
-
-        // Convert to thumbnail and copy the thumbnail
-        log.debug("Trying to generate thumbnail: [{}]", thumbPath.toString());
-        Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
-        log.debug("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
+        try {
+            Files.createFile(thumbPath);
+            // Convert to thumbnail and copy the thumbnail
+            log.debug("Trying to generate thumbnail: [{}]", thumbPath.toString());
+            Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
+            log.debug("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
+            result = true;
+        } catch (Throwable t) {
+            log.warn("Failed to generate thumbnail: [{}]", thumbPath);
+        }
+        return result;
     }
 
 }
