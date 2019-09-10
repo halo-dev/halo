@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import com.google.common.io.Files;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
@@ -21,6 +22,8 @@ import java.util.Iterator;
 public class ImageUtils {
 
     private ImageUtils() {
+        ImageIO.setUseCache(true);
+        ImageIO.setCacheDirectory(Files.createTempDir());
     }
 
 
