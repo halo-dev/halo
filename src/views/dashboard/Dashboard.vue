@@ -129,10 +129,30 @@
                   >
                     <a-list-item-meta>
                       <a
+                        v-if="item.status=='PUBLISHED'"
                         slot="title"
                         :href="options.blog_url+'/archives/'+item.url"
                         target="_blank"
                       >{{ item.title }}</a>
+                      <a
+                        v-else-if="item.status == 'INTIMATE'"
+                        slot="title"
+                        :href="options.blog_url+'/archives/'+item.url+'/password'"
+                        target="_blank"
+                      >{{ item.title }}</a>
+                      <a
+                        v-else-if="item.status=='DRAFT'"
+                        slot="title"
+                        href="javascript:void(0)"
+                        @click="handlePostPreview(item.id)"
+                      >{{ item.title }}</a>
+                      <a
+                        v-else
+                        href="javascript:void(0);"
+                        disabled
+                      >
+                        {{ text }}
+                      </a>
                     </a-list-item-meta>
                     <div>{{ item.createTime | timeAgo }}</div>
                   </a-list-item>
@@ -505,6 +525,11 @@ export default {
         this.$message.success('清除成功！')
         this.loadLogs()
         this.listLatestLogs()
+      })
+    },
+    handlePostPreview(postId) {
+      postApi.preview(postId).then(response => {
+        window.open(response.data, '_blank')
       })
     },
     onPaginationChange(page, pageSize) {

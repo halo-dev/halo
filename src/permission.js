@@ -29,6 +29,10 @@ router.beforeEach((to, from, next) => {
     }
     // TODO Get installation status
 
+    if (!store.getters.options) {
+      store.dispatch('loadOptions').then()
+    }
+
     next()
     NProgress.done()
     return
