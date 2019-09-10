@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -36,6 +37,7 @@ import java.security.NoSuchAlgorithmException;
  */
 @Configuration
 @EnableConfigurationProperties(HaloProperties.class)
+@Slf4j
 public class HaloConfiguration {
 
     private final static int TIMEOUT = 5000;
