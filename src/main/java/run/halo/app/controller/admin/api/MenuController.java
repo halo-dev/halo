@@ -40,7 +40,7 @@ public class MenuController {
 
     @GetMapping("tree_view")
     @ApiOperation("List as category tree")
-    public List<MenuVO> listAsTree(@SortDefault(sort = "name", direction = ASC) Sort sort) {
+    public List<MenuVO> listAsTree(@SortDefault(sort = "priority", direction = ASC) Sort sort) {
         return menuService.listAsTree(sort);
     }
 
