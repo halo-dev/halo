@@ -235,7 +235,7 @@ public class FileUtils {
             return;
         }
 
-        throw new ForbiddenException("You cannot access " + pathToCheck).setErrorData(pathToCheck);
+        throw new ForbiddenException("你没有权限访问 " + pathToCheck).setErrorData(pathToCheck);
     }
 
     /**
