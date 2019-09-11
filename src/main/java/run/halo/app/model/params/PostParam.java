@@ -7,7 +7,6 @@ import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostCreateFrom;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.utils.HaloUtils;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -19,6 +18,7 @@ import java.util.Set;
  * Post param.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/21/19
  */
 @Data
@@ -62,29 +62,24 @@ public class PostParam implements InputConverter<Post> {
     @Override
     public Post convertTo() {
         if (StringUtils.isBlank(url)) {
-            url = title;
+            url = title.replace(".","");
+        }
+        if (null == thumbnail) {
+            thumbnail = "";
         }
 
-        Post post = InputConverter.super.convertTo();
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        }
-
-        return post;
+        return InputConverter.super.convertTo();
     }
 
     @Override
     public void update(Post post) {
         if (StringUtils.isBlank(url)) {
-            url = title;
+            url = title.replace(".","");
+        }
+        if (null == thumbnail) {
+            thumbnail = "";
         }
 
         InputConverter.super.update(post);
-
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            post.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        }
     }
 }

@@ -105,7 +105,7 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public ThemeProperty getThemeOfNonNullBy(String themeId) {
-        return getThemeBy(themeId).orElseThrow(() -> new NotFoundException("Theme with id: " + themeId + " was not found").setErrorData(themeId));
+        return getThemeBy(themeId).orElseThrow(() -> new NotFoundException("没有找到 id 为 " + themeId + " 的主题").setErrorData(themeId));
     }
 
     @Override
@@ -228,9 +228,36 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public String getTemplateContent(String themeId, String absolutePath) {
+        checkDirectory(themeId, absolutePath);
+
+        // Read file
+        Path path = Paths.get(absolutePath);
+        try {
+            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ServiceException("读取模板内容失败 " + absolutePath, e);
+        }
+    }
+
+    @Override
     public void saveTemplateContent(String absolutePath, String content) {
         // Check the path
         checkDirectory(absolutePath);
+
+        // Write file
+        Path path = Paths.get(absolutePath);
+        try {
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new ServiceException("保存模板内容失败 " + absolutePath, e);
+        }
+    }
+
+    @Override
+    public void saveTemplateContent(String themeId, String absolutePath, String content) {
+        // Check the path
+        checkDirectory(themeId, absolutePath);
 
         // Write file
         Path path = Paths.get(absolutePath);
@@ -487,6 +514,59 @@ public class ThemeServiceImpl implements ThemeService {
         return getThemeOfNonNullBy(themeId);
     }
 
+    @Override
+    public ThemeProperty update(String themeId, MultipartFile file) {
+        Assert.hasText(themeId, "Theme id must not be blank");
+        Assert.notNull(themeId, "Theme file must not be blank");
+
+        if (!StringUtils.endsWithIgnoreCase(file.getOriginalFilename(), ".zip")) {
+            throw new UnsupportedMediaTypeException("不支持的文件类型: " + file.getContentType()).setErrorData(file.getOriginalFilename());
+        }
+
+        ThemeProperty updatingTheme = getThemeOfNonNullBy(themeId);
+
+        ZipInputStream zis = null;
+        Path tempPath = null;
+
+        try {
+            // Create temp directory
+            tempPath = FileUtils.createTempDirectory();
+
+            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            Path themeTempPath = tempPath.resolve(basename);
+
+            // Check directory traversal
+            FileUtils.checkDirectoryTraversal(tempPath, themeTempPath);
+
+            // New zip input stream
+            zis = new ZipInputStream(file.getInputStream());
+
+            // Unzip to temp path
+            FileUtils.unzip(zis, themeTempPath);
+
+            Path preparePath = FileUtils.tryToSkipZipParentFolder(themeTempPath);
+
+            ThemeProperty prepareThemeProperty = getProperty(preparePath);
+
+            if (!prepareThemeProperty.getId().equals(updatingTheme.getId())) {
+                throw new ServiceException("上传的主题包不是该主题的更新包: " + file.getOriginalFilename());
+            }
+
+            // Coping new theme files to old theme folder.
+            FileUtils.copyFolder(preparePath, Paths.get(updatingTheme.getThemePath()));
+
+            // Gets theme property again.
+            return getProperty(Paths.get(updatingTheme.getThemePath()));
+        } catch (IOException e) {
+            throw new ServiceException("更新主题失败: " + file.getOriginalFilename(), e);
+        } finally {
+            // Close zip input stream
+            FileUtils.closeQuietly(zis);
+            // Delete folder after testing
+            FileUtils.deleteFolderQuietly(tempPath);
+        }
+    }
+
     private void pullFromGit(@NonNull ThemeProperty themeProperty) throws IOException, GitAPIException, URISyntaxException {
         Assert.notNull(themeProperty, "Theme property must not be null");
 
@@ -652,6 +732,17 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     /**
+     * Check if directory is valid or not.
+     *
+     * @param themeId      themeId must not be blank
+     * @param absoluteName throws when the given absolute directory name is invalid
+     */
+    private void checkDirectory(@NonNull String themeId, @NonNull String absoluteName) {
+        ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
+        FileUtils.checkDirectoryTraversal(themeProperty.getThemePath(), absoluteName);
+    }
+
+    /**
      * Gets property path of nullable.
      *
      * @param themePath theme path.
@@ -735,7 +826,7 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @NonNull
     private ThemeProperty getProperty(@NonNull Path themePath) {
-        return getPropertyOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException("该主题没有说明文件").setErrorData(themePath));
+        return getPropertyOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件").setErrorData(themePath));
     }
 
     /**

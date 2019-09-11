@@ -34,7 +34,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a list of category
      */
     @NonNull
-    List<Category> listCategoryBy(@NonNull Integer postId);
+    List<Category> listCategoriesBy(@NonNull Integer postId);
 
     /**
      * List category list map by post id collection.

@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
@@ -55,7 +55,7 @@ public class ContentIndexController {
      */
     @GetMapping
     public String index(Model model) {
-        return this.index(model, 1, Sort.by(DESC, "topPriority").and(Sort.by(DESC, "createTime")));
+        return this.index(model, 1);
     }
 
     /**
@@ -67,14 +67,10 @@ public class ContentIndexController {
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,
-                        @PathVariable(value = "page") Integer page,
-                        @SortDefault.SortDefaults({
-                                @SortDefault(sort = "topPriority", direction = DESC),
-                                @SortDefault(sort = "createTime", direction = DESC)
-                        }) Sort sort) {
-        log.debug("Requested index page, sort info: [{}]", sort);
+                        @PathVariable(value = "page") Integer page) {
+        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
         int pageSize = optionService.getPostPageSize();
-        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, sort);
+        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);

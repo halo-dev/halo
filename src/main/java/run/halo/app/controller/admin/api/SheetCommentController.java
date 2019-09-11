@@ -13,6 +13,7 @@ import run.halo.app.model.params.SheetCommentParam;
 import run.halo.app.model.vo.SheetCommentWithSheetVO;
 import run.halo.app.service.SheetCommentService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -21,6 +22,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Sheet comment controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-25
  */
 @RestController
@@ -37,14 +39,14 @@ public class SheetCommentController {
     public Page<SheetCommentWithSheetVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                                 CommentQuery commentQuery) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageBy(commentQuery, pageable);
-        return sheetCommentService.convertToWithPostVo(sheetCommentPage);
+        return sheetCommentService.convertToWithSheetVo(sheetCommentPage);
     }
 
     @GetMapping("latest")
     public List<SheetCommentWithSheetVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
                                                     @RequestParam(name = "status", required = false) CommentStatus status) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top, status);
-        return sheetCommentService.convertToWithPostVo(sheetCommentPage.getContent());
+        return sheetCommentService.convertToWithSheetVo(sheetCommentPage.getContent());
     }
 
     @PostMapping
@@ -68,5 +70,22 @@ public class SheetCommentController {
     public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
         SheetComment deletedSheetComment = sheetCommentService.removeById(commentId);
         return sheetCommentService.convertTo(deletedSheetComment);
+    }
+
+    @GetMapping("{commentId:\\d+}")
+    @ApiOperation("Gets a post comment by comment id")
+    public SheetCommentWithSheetVO getBy(@PathVariable("commentId") Long commentId) {
+        SheetComment comment = sheetCommentService.getById(commentId);
+        return sheetCommentService.convertToWithSheetVo(comment);
+    }
+
+    @PutMapping("{commentId:\\d+}")
+    public BaseCommentDTO updateBy(@Valid @RequestBody SheetCommentParam commentParam,
+                                   @PathVariable("commentId") Long commentId) {
+        SheetComment commentToUpdate = sheetCommentService.getById(commentId);
+
+        commentParam.update(commentToUpdate);
+
+        return sheetCommentService.convertTo(sheetCommentService.update(commentToUpdate));
     }
 }

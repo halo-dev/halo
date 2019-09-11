@@ -31,7 +31,7 @@ public class Category extends BaseEntity {
     /**
      * Category slug name.
      */
-    @Column(name = "slug_name", columnDefinition = "varchar(50) not null")
+    @Column(name = "slug_name", columnDefinition = "varchar(50) not null", unique = true)
     private String slugName;
 
     /**

@@ -1,7 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.text.StrBuilder;
-import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.BCrypt;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -16,6 +14,7 @@ import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.params.UserParam;
@@ -184,11 +183,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     }
 
     @Override
-    public void setDefaultAvatar(User user) {
-        Assert.notNull(user, "User must not be null");
-        StrBuilder gravatar = new StrBuilder("//cn.gravatar.com/avatar/");
-        gravatar.append(SecureUtil.md5(user.getEmail()));
-        gravatar.append("?s=256&d=mm");
-        user.setAvatar(gravatar.toString());
+    public boolean verifyUser(String username, String password) {
+        User user = getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
+        return user.getUsername().equals(username) && user.getEmail().equals(password);
     }
 }

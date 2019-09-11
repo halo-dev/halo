@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.model.params.ThemeContentParam;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.ThemeService;
@@ -47,9 +48,14 @@ public class ThemeController {
         return themeService.getThemes();
     }
 
-    @GetMapping("files")
+    @GetMapping("activation/files")
     public List<ThemeFile> listFiles() {
         return themeService.listThemeFolderBy(themeService.getActivatedThemeId());
+    }
+
+    @GetMapping("{themeId}/files")
+    public List<ThemeFile> listFiles(@PathVariable("themeId") String themeId) {
+        return themeService.listThemeFolderBy(themeId);
     }
 
     @GetMapping("files/content")
@@ -57,10 +63,21 @@ public class ThemeController {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(path));
     }
 
+    @GetMapping("{themeId}/files/content")
+    public BaseResponse<String> getContentBy(@PathVariable("themeId") String themeId,
+                                             @RequestParam(name = "path") String path) {
+        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(themeId, path));
+    }
+
     @PutMapping("files/content")
-    public void updateContentBy(@RequestParam(name = "path") String path,
-                                @RequestBody String content) {
-        themeService.saveTemplateContent(path, content);
+    public void updateContentBy(@RequestBody ThemeContentParam param) {
+        themeService.saveTemplateContent(param.getPath(), param.getContent());
+    }
+
+    @PutMapping("{themeId}/files/content")
+    public void updateContentBy(@PathVariable("themeId") String themeId,
+                                @RequestBody ThemeContentParam param) {
+        themeService.saveTemplateContent(themeId, param.getPath(), param.getContent());
     }
 
     @GetMapping("files/custom")
@@ -117,13 +134,6 @@ public class ThemeController {
         themeSettingService.save(settings, themeId);
     }
 
-    @PutMapping("{themeId}")
-    public ThemeProperty updateTheme(@PathVariable("themeId") String themeId,
-                                     @RequestPart(name = "file", required = false) MultipartFile file) {
-
-        return themeService.update(themeId);
-    }
-
     @DeleteMapping("{themeId}")
     @ApiOperation("Deletes a theme")
     public void deleteBy(@PathVariable("themeId") String themeId) {
@@ -136,10 +146,23 @@ public class ThemeController {
         return themeService.upload(file);
     }
 
+    @PutMapping("upload/{themeId}")
+    public ThemeProperty updateThemeByUpload(@PathVariable("themeId") String themeId,
+                                             @RequestPart("file") MultipartFile file) {
+        return themeService.update(themeId, file);
+    }
+
     @PostMapping("fetching")
     @ApiOperation("Fetches a new theme")
     public ThemeProperty fetchTheme(@RequestParam("uri") String uri) {
         return themeService.fetch(uri);
+    }
+
+    @PutMapping("fetching/{themeId}")
+    public ThemeProperty updateThemeByFetching(@PathVariable("themeId") String themeId,
+                                               @RequestPart(name = "file", required = false) MultipartFile file) {
+
+        return themeService.update(themeId);
     }
 
     @PostMapping("reload")

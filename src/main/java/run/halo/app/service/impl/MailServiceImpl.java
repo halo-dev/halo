@@ -52,7 +52,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], content: [{}]",
                     to, fromUsername, subject, content);
-            throw new EmailException("Failed to send email to " + to, e);
+            throw new EmailException("发送邮件到 " + to + " 失败，请检查 SMTP 服务配置是否正确", e);
         }
     }
 
@@ -74,7 +74,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], template name: [{}], content: [{}]",
                     to, fromUsername, subject, templateName, content);
-            throw new EmailException("Failed to send template email to " + to, e).setErrorData(templateName);
+            throw new EmailException("发送模板邮件到 " + to + " 失败，请检查 SMTP 服务配置是否正确", e);
         }
     }
 
@@ -97,7 +97,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], template name: [{}], attachment: [{}], content: [{}]",
                     to, fromUsername, subject, templateName, attachFilename, content);
-            throw new EmailException("Failed to send attachment email to " + to, e);
+            throw new EmailException("发送附件邮件到 " + to + " 失败，请检查 SMTP 服务配置是否正确", e);
         }
     }
 

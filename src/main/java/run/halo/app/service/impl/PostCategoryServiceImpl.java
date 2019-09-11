@@ -48,7 +48,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
-    public List<Category> listCategoryBy(Integer postId) {
+    public List<Category> listCategoriesBy(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
         // Find all category ids

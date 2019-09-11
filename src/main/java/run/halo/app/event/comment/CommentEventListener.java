@@ -65,7 +65,7 @@ public class CommentEventListener {
             return;
         }
 
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("找不到博主信息"));
+        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
 
 
         Map<String, Object> data = new HashMap<>();

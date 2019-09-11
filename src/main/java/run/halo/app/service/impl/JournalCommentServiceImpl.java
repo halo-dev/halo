@@ -49,7 +49,7 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
     @Override
     public void validateTarget(Integer journalId) {
         if (!journalRepository.existsById(journalId)) {
-            throw new NotFoundException("该日志不存在或已删除").setErrorData(journalId);
+            throw new NotFoundException("查询不到该日志信息").setErrorData(journalId);
         }
     }
 

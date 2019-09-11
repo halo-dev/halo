@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
  * Menu param.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 4/3/19
  */
 @Data
@@ -37,4 +38,7 @@ public class MenuParam implements InputConverter<Menu> {
     private String icon;
 
     private Integer parentId;
+
+    @Size(max = 255, message = "菜单分组的字符长度不能超过 {max}")
+    private String team;
 }

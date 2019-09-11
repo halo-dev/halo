@@ -66,10 +66,10 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // Whether the blog has initialized
         Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
-        if (haloProperties.isProductionEnv() && isInstalled) {
+        /*if (haloProperties.isProductionEnv() && isInstalled) {
             // Skip
             return;
-        }
+        }*/
 
         try {
             String themeClassPath = ResourceUtils.CLASSPATH_URL_PREFIX + ThemeService.THEME_FOLDER;
@@ -80,7 +80,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
             Path source;
 
-            if (themeUri.getScheme().equalsIgnoreCase("jar")) {
+            if ("jar".equalsIgnoreCase(themeUri.getScheme())) {
                 // Create new file system for jar
                 FileSystem fileSystem = FileSystems.newFileSystem(themeUri, Collections.emptyMap());
                 source = fileSystem.getPath("/BOOT-INF/classes/" + ThemeService.THEME_FOLDER);
@@ -91,7 +91,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             // Create theme folder
             Path themePath = themeService.getBasePath();
 
-            if (!haloProperties.isProductionEnv() || Files.notExists(themePath)) {
+            // Fix the problem that the project cannot start after moving to a new server
+            if (!haloProperties.isProductionEnv() || Files.notExists(themePath) || !isInstalled) {
                 FileUtils.copyFolder(source, themePath);
                 log.info("Copied theme folder from [{}] to [{}]", source, themePath);
             } else {

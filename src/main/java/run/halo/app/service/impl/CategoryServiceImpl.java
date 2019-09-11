@@ -154,7 +154,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     @Override
     public Category getBySlugNameOfNonNull(String slugName) {
-        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("该分类不存在").setErrorData(slugName));
+        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slugName));
     }
 
     @Override
@@ -165,10 +165,23 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     @Transactional
     public void removeCategoryAndPostCategoryBy(Integer categoryId) {
+        List<Category> categories = listByParentId(categoryId);
+        if (null != categories && categories.size() > 0) {
+            categories.forEach(category -> {
+                category.setParentId(0);
+                update(category);
+            });
+        }
         // Remove category
         removeById(categoryId);
         // Remove post categories
         postCategoryService.removeByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<Category> listByParentId(Integer id) {
+        Assert.notNull(id, "Parent id must not be null");
+        return categoryRepository.findByParentId(id);
     }
 
     @Override
