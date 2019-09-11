@@ -129,10 +129,30 @@
                   >
                     <a-list-item-meta>
                       <a
+                        v-if="item.status=='PUBLISHED'"
                         slot="title"
                         :href="options.blog_url+'/archives/'+item.url"
                         target="_blank"
                       >{{ item.title }}</a>
+                      <a
+                        v-else-if="item.status == 'INTIMATE'"
+                        slot="title"
+                        :href="options.blog_url+'/archives/'+item.url+'/password'"
+                        target="_blank"
+                      >{{ item.title }}</a>
+                      <a
+                        v-else-if="item.status=='DRAFT'"
+                        slot="title"
+                        href="javascript:void(0)"
+                        @click="handlePostPreview(item.id)"
+                      >{{ item.title }}</a>
+                      <a
+                        v-else
+                        href="javascript:void(0);"
+                        disabled
+                      >
+                        {{ text }}
+                      </a>
                     </a-list-item-meta>
                     <div>{{ item.createTime | timeAgo }}</div>
                   </a-list-item>
@@ -271,41 +291,47 @@
       title="操作日志"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="logDrawerVisiable"
+      :visible="logDrawerVisible"
       destroyOnClose
-      @close="()=>this.logDrawerVisiable = false"
+      @close="()=>this.logDrawerVisible = false"
     >
-      <a-row
-        type="flex"
-        align="middle"
+      <a-skeleton
+        active
+        :loading="logsLoading"
+        :paragraph="{rows: 18}"
       >
-        <a-col :span="24">
-          <a-list :dataSource="formattedLogsDatas">
-            <a-list-item
-              slot="renderItem"
-              slot-scope="item, index"
-              :key="index"
-            >
-              <a-list-item-meta :description="item.createTime | timeAgo">
-                <span slot="title">{{ item.type }}</span>
-              </a-list-item-meta>
-              <div>{{ item.content }}</div>
-            </a-list-item>
+        <a-row
+          type="flex"
+          align="middle"
+        >
+          <a-col :span="24">
+            <a-list :dataSource="formattedLogsDatas">
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item, index"
+                :key="index"
+              >
+                <a-list-item-meta :description="item.createTime | timeAgo">
+                  <span slot="title">{{ item.type }}</span>
+                </a-list-item-meta>
+                <div>{{ item.content }}</div>
+              </a-list-item>
 
-            <div class="page-wrapper">
-              <a-pagination
-                class="pagination"
-                :total="logPagination.total"
-                :defaultPageSize="logPagination.size"
-                :pageSizeOptions="['50', '100','150','200']"
-                showSizeChanger
-                @showSizeChange="onPaginationChange"
-                @change="onPaginationChange"
-              />
-            </div>
-          </a-list>
-        </a-col>
-      </a-row>
+              <div class="page-wrapper">
+                <a-pagination
+                  class="pagination"
+                  :total="logPagination.total"
+                  :defaultPageSize="logPagination.size"
+                  :pageSizeOptions="['50', '100','150','200']"
+                  showSizeChanger
+                  @showSizeChange="onPaginationChange"
+                  @change="onPaginationChange"
+                />
+              </div>
+            </a-list>
+          </a-col>
+        </a-row>
+      </a-skeleton>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-popconfirm
@@ -322,18 +348,18 @@
 </template>
 
 <script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import RecentCommentTab from './components/RecentCommentTab'
-import { mixin, mixinDevice } from '@/utils/mixin.js'
-import optionApi from '@/api/option'
+import countTo from 'vue-count-to'
+import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
 
 import postApi from '@/api/post'
 import logApi from '@/api/log'
 import adminApi from '@/api/admin'
 import journalApi from '@/api/journal'
-import countTo from 'vue-count-to'
-import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
 export default {
   name: 'Dashboard',
   mixins: [mixin, mixinDevice],
@@ -347,14 +373,15 @@ export default {
   data() {
     return {
       photoList: [],
-      showMoreOptions: false,
+      // showMoreOptions: false,
       startVal: 0,
       logType: logApi.logType,
       activityLoading: true,
       writeLoading: true,
       logLoading: true,
+      logsLoading: true,
       countsLoading: true,
-      logDrawerVisiable: false,
+      logDrawerVisible: false,
       postData: [],
       logData: [],
       countsData: {},
@@ -364,8 +391,6 @@ export default {
       },
       journalPhotos: [], // 日志图片集合最多九张
       logs: [],
-      options: [],
-      keys: ['blog_url'],
       logPagination: {
         page: 1,
         size: 50,
@@ -378,11 +403,6 @@ export default {
     this.getCounts()
     this.listLatestPosts()
     this.listLatestLogs()
-    this.loadOptions()
-
-    // this.interval = setInterval(() => {
-    //   this.getCounts()
-    // }, 5000)
   },
   computed: {
     formattedPostData() {
@@ -403,6 +423,12 @@ export default {
         log.type = this.logType[log.type].text
         return log
       })
+    },
+    ...mapGetters(['options'])
+  },
+  destroyed: function() {
+    if (this.logDrawerVisible) {
+      this.logDrawerVisible = false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -418,26 +444,24 @@ export default {
       this.interval = null
       this.$log.debug('Cleared interval')
     }
+    if (this.logDrawerVisible) {
+      this.logDrawerVisible = false
+    }
     next()
   },
   methods: {
-    handlerPhotoUploadSuccess(response, file) {
-      var callData = response.data.data
-      var photo = {
-        name: callData.name,
-        url: callData.path,
-        thumbnail: callData.thumbPath,
-        suffix: callData.suffix,
-        width: callData.width,
-        height: callData.height
-      }
-      this.journalPhotos.push(photo)
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
-    },
+    // handlerPhotoUploadSuccess(response, file) {
+    //   var callData = response.data.data
+    //   var photo = {
+    //     name: callData.name,
+    //     url: callData.path,
+    //     thumbnail: callData.thumbPath,
+    //     suffix: callData.suffix,
+    //     width: callData.width,
+    //     height: callData.height
+    //   }
+    //   this.journalPhotos.push(photo)
+    // },
     listLatestPosts() {
       postApi.listLatest(5).then(response => {
         this.postData = response.data.data
@@ -462,24 +486,34 @@ export default {
     },
     handleCreateJournalClick() {
       // 给属性填充数据
-      this.journal.photos = this.journalPhotos
-
+      // this.journal.photos = this.journalPhotos
+      if (!this.journal.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '内容不能为空！'
+        })
+        return
+      }
       journalApi.create(this.journal).then(response => {
         this.$message.success('发表成功！')
         this.journal = {}
-        this.photoList = []
-        this.showMoreOptions = false
+        // this.photoList = []
+        // this.showMoreOptions = false
       })
     },
-    handleUploadPhotoWallClick() {
-      // 是否显示上传照片墙组件
-      this.showMoreOptions = !this.showMoreOptions
-    },
+    // handleUploadPhotoWallClick() {
+    //   // 是否显示上传照片墙组件
+    //   this.showMoreOptions = !this.showMoreOptions
+    // },
     handleShowLogDrawer() {
-      this.logDrawerVisiable = true
+      this.logDrawerVisible = true
       this.loadLogs()
     },
     loadLogs() {
+      this.logsLoading = true
+      setTimeout(() => {
+        this.logsLoading = false
+      }, 500)
       this.logPagination.page = this.logPagination.page - 1
       logApi.pageBy(this.logPagination).then(response => {
         this.logs = response.data.data.content
@@ -493,6 +527,11 @@ export default {
         this.listLatestLogs()
       })
     },
+    handlePostPreview(postId) {
+      postApi.preview(postId).then(response => {
+        window.open(response.data, '_blank')
+      })
+    },
     onPaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.logPagination.page = page
@@ -503,12 +542,12 @@ export default {
 }
 </script>
 
-<style scoped="scoped">
-	.more-options-btn{
-		margin-left: 15px;
-		text-decoration: none;
-	}
-  a {
-    text-decoration: none;
-  }
+<style lang="less" scoped>
+/* .more-options-btn {
+  margin-left: 15px;
+  text-decoration: none;
+}
+a {
+  text-decoration: none;
+} */
 </style>

@@ -1,30 +1,14 @@
 const path = require('path')
 const webpack = require('webpack')
-// const GenerateAssetPlugin = require('generate-asset-webpack-plugin')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
-
-// var createServerConfig = function(compilation) {
-//   const configJson = {
-//     apiUrl: 'http://localhost:8090'
-//   }
-//   return JSON.stringify(configJson)
-// }
-
 // vue.config.js
 module.exports = {
   configureWebpack: {
     plugins: [
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
-      // new GenerateAssetPlugin({
-      //   filename: 'config.json',
-      //   fn: (compilation, cb) => {
-      //     cb(null, createServerConfig(compilation))
-      //   },
-      //   extraFiles: []
-      // })
     ]
   },
 
@@ -58,13 +42,6 @@ module.exports = {
   css: {
     loaderOptions: {
       less: {
-        modifyVars: {
-          /*
-          'primary-color': '#F5222D',
-          'link-color': '#F5222D',
-          'border-radius-base': '4px',
-          */
-        },
         javascriptEnabled: true
       }
     }

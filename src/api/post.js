@@ -66,6 +66,13 @@ postApi.delete = postId => {
   })
 }
 
+postApi.preview = postId => {
+  return service({
+    url: `${baseUrl}/preview/${postId}`,
+    method: 'get'
+  })
+}
+
 postApi.postStatus = {
   PUBLISHED: {
     color: 'green',
@@ -81,6 +88,11 @@ postApi.postStatus = {
     color: 'red',
     status: 'error',
     text: '回收站'
+  },
+  INTIMATE: {
+    color: 'blue',
+    status: 'success',
+    text: '私密'
   }
 }
 export default postApi

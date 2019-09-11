@@ -1,6 +1,9 @@
 <template>
   <div class="comment-tab-wrapper">
-    <a-card :bordered="false">
+    <a-card
+      :bordered="false"
+      :bodyStyle="{ padding: 0 }"
+    >
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
@@ -105,6 +108,22 @@
           :loading="loading"
           :pagination="false"
         >
+          <template
+            slot="author"
+            slot-scope="text,record"
+          >
+            <a-icon
+              type="user"
+              v-if="record.isAdmin"
+              style="margin-right: 3px;"
+            />
+            <a
+              :href="record.authorUrl"
+              target="_blank"
+              v-if="record.authorUrl"
+            >{{ text }}</a>
+            <span v-else>{{ text }}</span>
+          </template>
           <p
             class="comment-content-wrapper"
             slot="content"
@@ -116,8 +135,10 @@
             slot="status"
             slot-scope="statusProperty"
           >
-            <a-badge :status="statusProperty.status" />
-            {{ statusProperty.text }}
+            <a-badge
+              :status="statusProperty.status"
+              :text="statusProperty.text"
+            />
           </span>
           <a
             v-if="type==='posts'"
@@ -203,6 +224,13 @@
             >
               <a href="javascript:;">删除</a>
             </a-popconfirm>
+
+            <!-- <a-divider type="vertical" />
+
+            <a
+              href="javascript:;"
+              @click="handleShowDetailDrawer(record)"
+            >详情</a> -->
           </span>
         </a-table>
         <div class="page-wrapper">
@@ -223,6 +251,7 @@
       :title="'回复给：'+selectComment.author"
       v-model="replyCommentVisible"
       @close="onReplyClose"
+      destroyOnClose
     >
       <template slot="footer">
         <a-button
@@ -243,16 +272,24 @@
         </a-form-item>
       </a-form>
     </a-modal>
+    <!-- <CommentDetail
+      v-model="commentDetailVisible"
+      v-if="selectComment"
+      :comment="selectComment"
+      :type="this.type"
+    /> -->
   </div>
 </template>
 <script>
-import commentApi from '@/api/comment'
-import optionApi from '@/api/option'
+import { mapGetters } from 'vuex'
+import CommentDetail from './CommentDetail'
 import marked from 'marked'
+import commentApi from '@/api/comment'
 const postColumns = [
   {
     title: '昵称',
-    dataIndex: 'author'
+    dataIndex: 'author',
+    scopedSlots: { customRender: 'author' }
   },
   {
     title: '内容',
@@ -263,29 +300,33 @@ const postColumns = [
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
+    width: '100px',
     scopedSlots: { customRender: 'status' }
   },
   {
     title: '评论文章',
     dataIndex: 'post',
+    width: '200px',
     scopedSlots: { customRender: 'post' }
   },
   {
     title: '日期',
     dataIndex: 'createTime',
+    width: '170px',
     scopedSlots: { customRender: 'createTime' }
   },
   {
     title: '操作',
     dataIndex: 'action',
-    width: '150px',
+    width: '180px',
     scopedSlots: { customRender: 'action' }
   }
 ]
 const sheetColumns = [
   {
     title: '昵称',
-    dataIndex: 'author'
+    dataIndex: 'author',
+    scopedSlots: { customRender: 'author' }
   },
   {
     title: '内容',
@@ -296,27 +337,33 @@ const sheetColumns = [
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
+    width: '100px',
     scopedSlots: { customRender: 'status' }
   },
   {
     title: '评论页面',
     dataIndex: 'sheet',
+    width: '200px',
     scopedSlots: { customRender: 'sheet' }
   },
   {
     title: '日期',
     dataIndex: 'createTime',
+    width: '150px',
     scopedSlots: { customRender: 'createTime' }
   },
   {
     title: '操作',
     dataIndex: 'action',
-    width: '150px',
+    width: '180px',
     scopedSlots: { customRender: 'action' }
   }
 ]
 export default {
   name: 'CommentTab',
+  components: {
+    CommentDetail
+  },
   props: {
     type: {
       type: String,
@@ -350,13 +397,11 @@ export default {
       replyComment: {},
       loading: false,
       commentStatus: commentApi.commentStatus,
-      options: [],
-      keys: ['blog_url']
+      commentDetailVisible: false
     }
   },
   created() {
     this.loadComments()
-    this.loadOptions()
   },
   computed: {
     formattedComments() {
@@ -365,7 +410,8 @@ export default {
         comment.content = marked(comment.content, { sanitize: true })
         return comment
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   methods: {
     loadComments() {
@@ -381,12 +427,8 @@ export default {
     },
     handleQuery() {
       this.queryParam.page = 0
+      this.pagination.current = 1
       this.loadComments()
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     },
     handleEditStatusClick(commentId, status) {
       commentApi.updateStatus(this.type, commentId, status).then(response => {
@@ -415,6 +457,13 @@ export default {
       }
     },
     handleCreateClick() {
+      if (!this.replyComment.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '评论内容不能为空！'
+        })
+        return
+      }
       commentApi.create(this.type, this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}
@@ -492,6 +541,10 @@ export default {
           name: comment.author
         }
       }
+    },
+    handleShowDetailDrawer(comment) {
+      this.selectComment = comment
+      this.commentDetailVisible = true
     }
   }
 }

@@ -12,187 +12,47 @@
         </div>
 
         <div id="editor">
-          <mavon-editor
+          <halo-editor
             ref="md"
             v-model="postToStage.originalContent"
             :boxShadow="false"
             :toolbars="toolbars"
             :ishljs="true"
             :autofocus="false"
-            @imgAdd="pictureUploadHandle"
+            @imgAdd="handleAttachmentUpload"
+            @keydown.ctrl.83.native="handleSaveDraft"
+            @keydown.meta.83.native="handleSaveDraft"
           />
         </div>
       </a-col>
     </a-row>
 
-    <a-drawer
-      title="文章设置"
-      :width="isMobile()?'100%':'460'"
-      placement="right"
-      closable
-      @close="()=>this.postSettingVisible=false"
+    <PostSetting
+      :post="postToStage"
+      :tagIds="selectedTagIds"
+      :categoryIds="selectedCategoryIds"
       :visible="postSettingVisible"
-    >
-      <div class="post-setting-drawer-content">
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">基本设置</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
-              <a-form-item
-                label="文章路径："
-                :help="options.blog_url+'/archives/' + (postToStage.url ? postToStage.url : '{auto_generate}')"
-              >
-                <a-input v-model="postToStage.url" />
-              </a-form-item>
-
-              <a-form-item
-                label="发表时间："
-              >
-                <a-date-picker
-                  showTime
-                  :defaultValue="pickerDefaultValue"
-                  format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="Select Publish Time"
-                  @change="onChange"
-                  @ok="onOk"
-                />
-              </a-form-item>
-              <a-form-item label="开启评论：">
-                <a-radio-group
-                  v-model="postToStage.disallowComment"
-                  :defaultValue="false"
-                >
-                  <a-radio :value="false">开启</a-radio>
-                  <a-radio :value="true">关闭</a-radio>
-                </a-radio-group>
-              </a-form-item>
-            </a-form>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">分类目录</h3>
-          <div class="post-setting-drawer-item">
-            <category-tree
-              v-model="selectedCategoryIds"
-              :categories="categories"
-            />
-            <div>
-              <a-form layout="vertical">
-                <a-form-item v-if="categoryForm">
-                  <category-select-tree
-                    :categories="categories"
-                    v-model="categoryToCreate.parentId"
-                  />
-                </a-form-item>
-                <a-form-item v-if="categoryForm">
-                  <a-input
-                    placeholder="分类名称"
-                    v-model="categoryToCreate.name"
-                  />
-                </a-form-item>
-                <a-form-item v-if="categoryForm">
-                  <a-input
-                    placeholder="分类路径"
-                    v-model="categoryToCreate.slugNames"
-                  />
-                </a-form-item>
-                <a-form-item>
-                  <a-button
-                    type="primary"
-                    style="marginRight: 8px"
-                    v-if="categoryForm"
-                    @click="handlerCreateCategory"
-                  >保存</a-button>
-                  <a-button
-                    type="dashed"
-                    style="marginRight: 8px"
-                    v-if="!categoryForm"
-                    @click="toggleCategoryForm"
-                  >新增</a-button>
-                  <a-button
-                    v-if="categoryForm"
-                    @click="toggleCategoryForm"
-                  >取消</a-button>
-                </a-form-item>
-              </a-form>
-            </div>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">标签</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
-              <a-form-item>
-                <TagSelect v-model="selectedTagIds" />
-              </a-form-item>
-            </a-form>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">摘要</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
-              <a-form-item>
-                <a-input
-                  type="textarea"
-                  :autosize="{ minRows: 5 }"
-                  v-model="postToStage.summary"
-                  placeholder="不填写则会自动生成"
-                />
-              </a-form-item>
-            </a-form>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">缩略图</h3>
-          <div class="post-setting-drawer-item">
-            <div class="post-thum">
-              <img
-                class="img"
-                :src="postToStage.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
-                @click="()=>this.thumDrawerVisible=true"
-              >
-              <a-button
-                class="post-thum-remove"
-                type="dashed"
-                @click="handlerRemoveThumb"
-              >移除</a-button>
-            </div>
-          </div>
-        </div>
-        <a-divider class="divider-transparent" />
-      </div>
-      <AttachmentSelectDrawer
-        v-model="thumDrawerVisible"
-        @listenToSelect="handleSelectPostThumb"
-        :drawerWidth="460"
-      />
-      <div class="bottom-control">
-        <a-button
-          style="marginRight: 8px"
-          @click="handleDraftClick"
-        >保存草稿</a-button>
-        <a-button
-          @click="handlePublishClick"
-          type="primary"
-        >发布</a-button>
-      </div>
-    </a-drawer>
+      @close="onPostSettingsClose"
+      @onRefreshPost="onRefreshPostFromSetting"
+      @onRefreshTagIds="onRefreshTagIdsFromSetting"
+      @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
+    />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
 
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
+        type="danger"
+        @click="handleSaveDraft"
+      >保存草稿</a-button>
+      <a-button
+        @click="handlePreview"
+        style="margin-left: 8px;"
+      >预览</a-button>
+      <a-button
         type="primary"
-        @click="()=>this.postSettingVisible = true"
+        @click="handleShowPostSetting"
+        style="margin-left: 8px;"
       >发布</a-button>
       <a-button
         type="dashed"
@@ -204,32 +64,26 @@
 </template>
 
 <script>
-import CategoryTree from './components/CategoryTree'
-import TagSelect from './components/TagSelect'
-import { mavonEditor } from 'mavon-editor'
-import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
-import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
-import CategorySelectTree from './components/CategorySelectTree'
-import FooterToolBar from '@/components/FooterToolbar'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { toolbars } from '@/core/const'
-import 'mavon-editor/dist/css/index.css'
-import categoryApi from '@/api/category'
-import postApi from '@/api/post'
-import optionApi from '@/api/option'
-import attachmentApi from '@/api/attachment'
+import { mapGetters } from 'vuex'
 import moment from 'moment'
+import PostSetting from './components/PostSetting'
+import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
+import FooterToolBar from '@/components/FooterToolbar'
+import { toolbars } from '@/core/const'
+import { haloEditor } from 'halo-editor'
+import 'halo-editor/dist/css/index.css'
+
+import postApi from '@/api/post'
+import attachmentApi from '@/api/attachment'
 export default {
-  components: {
-    TagSelect,
-    mavonEditor,
-    CategoryTree,
-    FooterToolBar,
-    AttachmentDrawer,
-    AttachmentSelectDrawer,
-    CategorySelectTree
-  },
   mixins: [mixin, mixinDevice],
+  components: {
+    PostSetting,
+    haloEditor,
+    FooterToolBar,
+    AttachmentDrawer
+  },
   data() {
     return {
       toolbars,
@@ -240,41 +94,14 @@ export default {
       },
       attachmentDrawerVisible: false,
       postSettingVisible: false,
-      thumDrawerVisible: false,
-      categoryForm: false,
-      categories: [],
-      selectedCategoryIds: [],
-      selectedTagIds: [],
       postToStage: {},
-      categoryToCreate: {},
-      timer: null,
-      options: [],
-      keys: ['blog_url']
+      selectedTagIds: [],
+      selectedCategoryIds: []
     }
-  },
-  created() {
-    this.loadCategories()
-    this.loadOptions()
-    clearInterval(this.timer)
-    this.timer = null
-    this.autoSaveTimer()
-  },
-  destroyed: function() {
-    clearInterval(this.timer)
-    this.timer = null
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.timer !== null) {
-      clearInterval(this.timer)
-    }
-    // Auto save the post
-    this.autoSavePost()
-    next()
   },
   beforeRouteEnter(to, from, next) {
     // Get post id from query
     const postId = to.query.postId
-
     next(vm => {
       if (postId) {
         postApi.get(postId).then(response => {
@@ -286,122 +113,108 @@ export default {
       }
     })
   },
-  computed: {
-    pickerDefaultValue() {
-      if (this.postToStage.createTime) {
-        var date = new Date(this.postToStage.createTime)
-        return moment(date, 'YYYY-MM-DD HH:mm:ss')
-      }
-      return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
+  destroyed: function() {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+    if (this.attachmentDrawerVisible) {
+      this.attachmentDrawerVisible = false
     }
   },
+  beforeRouteLeave(to, from, next) {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+    if (this.attachmentDrawerVisible) {
+      this.attachmentDrawerVisible = false
+    }
+    next()
+  },
+  computed: {
+    ...mapGetters(['options'])
+  },
   methods: {
-    loadCategories() {
-      categoryApi.listAll().then(response => {
-        this.categories = response.data.data
-      })
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
-    },
-    createOrUpdatePost(createSuccess, updateSuccess, autoSave) {
-      // Set category ids
-      this.postToStage.categoryIds = this.selectedCategoryIds
-      // Set tag ids
-      this.postToStage.tagIds = this.selectedTagIds
-
+    handleSaveDraft() {
+      this.postToStage.status = 'DRAFT'
+      if (!this.postToStage.title) {
+        this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+      }
+      if (!this.postToStage.originalContent) {
+        this.postToStage.originalContent = '开始编辑...'
+      }
       if (this.postToStage.id) {
         // Update the post
-        postApi.update(this.postToStage.id, this.postToStage, autoSave).then(response => {
+        postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
           this.$log.debug('Updated post', response.data.data)
-          if (updateSuccess) {
-            updateSuccess()
-          }
+          this.$message.success('保存草稿成功！')
         })
       } else {
         // Create the post
-        postApi.create(this.postToStage, autoSave).then(response => {
+        postApi.create(this.postToStage, false).then(response => {
           this.$log.debug('Created post', response.data.data)
-          if (createSuccess) {
-            createSuccess()
-          }
+          this.$message.success('保存草稿成功！')
           this.postToStage = response.data.data
         })
       }
     },
-    savePost() {
-      this.createOrUpdatePost(
-        () => this.$message.success('文章创建成功'),
-        () => this.$message.success('文章更新成功'),
-        false
-      )
-    },
-    autoSavePost() {
-      if (this.postToStage.title != null && this.postToStage.originalContent != null) {
-        this.createOrUpdatePost(null, null, true)
-      }
-    },
-    toggleCategoryForm() {
-      this.categoryForm = !this.categoryForm
-    },
-    handlePublishClick() {
-      this.postToStage.status = 'PUBLISHED'
-      this.savePost()
-    },
-    handleDraftClick() {
-      this.postToStage.status = 'DRAFT'
-      this.savePost()
-    },
-    handlerRemoveThumb() {
-      this.postToStage.thumbnail = null
-    },
-    handlerCreateCategory() {
-      categoryApi.create(this.categoryToCreate).then(response => {
-        this.loadCategories()
-        this.categoryToCreate = {}
-      })
-    },
-    handleSelectPostThumb(data) {
-      this.postToStage.thumbnail = encodeURI(data.path)
-      this.thumDrawerVisible = false
-    },
-    autoSaveTimer() {
-      if (this.timer == null) {
-        this.timer = setInterval(() => {
-          this.autoSavePost()
-        }, 15000)
-      }
-    },
-    pictureUploadHandle(pos, $file) {
+    handleAttachmentUpload(pos, $file) {
       var formdata = new FormData()
       formdata.append('file', $file)
-      attachmentApi.upload(formdata).then((response) => {
+      attachmentApi.upload(formdata).then(response => {
         var responseObject = response.data
 
         if (responseObject.status === 200) {
-          var MavonEditor = this.$refs.md
-          MavonEditor.$img2Url(pos, encodeURI(responseObject.data.path))
-          this.$message.success('图片上传成功')
+          var HaloEditor = this.$refs.md
+          HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
+          this.$message.success('图片上传成功！')
         } else {
           this.$message.error('图片上传失败：' + responseObject.message)
         }
       })
     },
-    onChange(value, dateString) {
-      this.postToStage.createTime = value.valueOf()
+    handleShowPostSetting() {
+      this.postSettingVisible = true
     },
-    onOk(value) {
-      this.postToStage.createTime = value.valueOf()
+    handlePreview() {
+      this.postToStage.status = 'DRAFT'
+      if (!this.postToStage.title) {
+        this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+      }
+      if (!this.postToStage.originalContent) {
+        this.postToStage.originalContent = '开始编辑...'
+      }
+      if (this.postToStage.id) {
+        // Update the post
+        postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
+          this.$log.debug('Updated post', response.data.data)
+          postApi.preview(this.postToStage.id).then(response => {
+            window.open(response.data, '_blank')
+          })
+        })
+      } else {
+        // Create the post
+        postApi.create(this.postToStage, false).then(response => {
+          this.$log.debug('Created post', response.data.data)
+          this.postToStage = response.data.data
+          postApi.preview(this.postToStage.id).then(response => {
+            window.open(response.data, '_blank')
+          })
+        })
+      }
+    },
+    // 关闭文章设置抽屉
+    onPostSettingsClose() {
+      this.postSettingVisible = false
+    },
+    onRefreshPostFromSetting(post) {
+      this.postToStage = post
+    },
+    onRefreshTagIdsFromSetting(tagIds) {
+      this.selectedTagIds = tagIds
+    },
+    onRefreshCategoryIdsFromSetting(categoryIds) {
+      this.selectedCategoryIds = categoryIds
     }
   }
 }
 </script>
-
-<style lang="less" scoped>
-.v-note-wrapper {
-  z-index: 1000;
-  min-height: 580px;
-}
-</style>

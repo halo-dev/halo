@@ -1,23 +1,28 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <meta name="robots" content="noindex,nofllow" />
-    <meta name="generator" content="Halo" />
-    <link rel="icon" href="<%= BASE_URL %>logo.png" />
-    <title>Halo Dashboard</title>
-  </head>
 
-  <body>
-    <noscript>
-      <strong
-        >We're sorry but vue-antd-pro doesn't work properly without JavaScript enabled. Please enable it to
-        continue.</strong
-      >
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="robots" content="noindex,nofllow" />
+  <meta name="generator" content="Halo" />
+  <link rel="icon" href="<%= BASE_URL %>logo.png" />
+  <title>Halo Dashboard</title>
+  <style>
+    #loader{position:absolute;top:0;right:0;bottom:0;left:0;margin:auto;border:solid 3px #e5e5e5;border-top-color:#333;border-radius:50%;width:30px;height:30px;animation:spin .6s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but vue-antd-pro doesn't work properly without JavaScript enabled. Please enable it to
+      continue.</strong>
+  </noscript>
+  <div id="app">
+    <div id="loader"></div>
+  </div>
+  <!-- built files will be auto injected -->
+</body>
+
 </html>

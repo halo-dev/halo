@@ -60,6 +60,7 @@
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="options.blog_footer_info"
+                    placeholder="支持 HTML 格式的文本"
                   />
                 </a-form-item>
                 <a-form-item>
@@ -85,26 +86,21 @@
                   label="关键词： "
                   :wrapper-col="wrapperCol"
                 >
-                  <a-tooltip
-                    :trigger="['focus']"
-                    placement="right"
-                    title="多个关键词以英文逗号隔开"
-                  >
-                    <a-input v-model="options.seo_keywords" />
-                  </a-tooltip>
+                  <a-input
+                    v-model="options.seo_keywords"
+                    placeholder="多个关键词以英文状态下的逗号隔开"
+                  />
                 </a-form-item>
                 <a-form-item
                   label="博客描述："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.seo_description" />
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.seo_description"
+                  />
                 </a-form-item>
-                <!-- <a-form-item
-                  label="百度推送 Token： "
-                  :wrapper-col="wrapperCol"
-                >
-                  <a-input v-model="options.seo_baidu_token" />
-                </a-form-item> -->
                 <a-form-item>
                   <a-button
                     type="primary"
@@ -118,6 +114,16 @@
                 <a-icon type="form" />文章设置
               </span>
               <a-form layout="vertical">
+                <a-form-item
+                  label="首页文章排序："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-select v-model="options.post_index_sort">
+                    <a-select-option value="createTime">创建时间</a-select-option>
+                    <a-select-option value="editTime">最后编辑时间</a-select-option>
+                    <a-select-option value="visits">点击量</a-select-option>
+                  </a-select>
+                </a-form-item>
                 <a-form-item
                   label="首页显示条数："
                   :wrapper-col="wrapperCol"
@@ -197,6 +203,17 @@
                   <a-switch v-model="options.comment_api_enabled" />
                 </a-form-item>
                 <a-form-item
+                  label="评论模块 JS："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 2 }"
+                    v-model="options.comment_internal_plugin_js"
+                    placeholder="该设置仅对内置的评论模块有效"
+                  />
+                </a-form-item>
+                <a-form-item
                   label="每页显示条数： "
                   :wrapper-col="wrapperCol"
                 >
@@ -235,6 +252,30 @@
               </span>
               <a-form layout="vertical">
                 <a-form-item
+                  label="上传图片时预览："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-switch v-model="options.attachment_upload_image_preview_enable" />
+                </a-form-item>
+                <a-form-item
+                  label="最大上传文件数："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="number"
+                    v-model="options.attachment_upload_max_files"
+                  />
+                </a-form-item>
+                <a-form-item
+                  label="同时上传文件数："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="number"
+                    v-model="options.attachment_upload_max_parallel_uploads"
+                  />
+                </a-form-item>
+                <a-form-item
                   label="存储位置："
                   :wrapper-col="wrapperCol"
                 >
@@ -250,20 +291,31 @@
                   </a-select>
                 </a-form-item>
                 <div
-                  class="upyunForm"
-                  v-show="upyunFormHidden"
+                  class="smmsForm"
+                  v-show="smmsFormVisible"
                 >
                   <a-form-item
-                    label="域名："
+                    label="Secret Token："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-tooltip
-                      :trigger="['focus']"
-                      placement="right"
-                      title="需要加上 http:// 或者 https://"
-                    >
-                      <a-input v-model="options.oss_upyun_domain" />
-                    </a-tooltip>
+                    <a-input
+                      v-model="options.smms_api_secret_token"
+                      placeholder="需要到 sm.ms 官网注册后获取"
+                    />
+                  </a-form-item>
+                </div>
+                <div
+                  class="upyunForm"
+                  v-show="upyunFormVisible"
+                >
+                  <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_upyun_domain"
+                      placeholder="需要加上 http:// 或者 https://"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="空间名称："
@@ -293,16 +345,37 @@
                     <a-input v-model="options.oss_upyun_source" />
                   </a-form-item>
                   <a-form-item
+                    label="图片处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_upyun_style_rule"
+                      placeholder="间隔标识符+图片处理版本名称"
+                    />
+                  </a-form-item>
+                  <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_upyun_style_rule" />
+                    <a-input
+                      v-model="options.oss_upyun_thumbnail_style_rule"
+                      placeholder="间隔标识符+图片处理版本名称，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
                   class="qnyunForm"
-                  v-show="qnyunFormHidden"
+                  v-show="qnyunFormVisible"
                 >
+                  <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_qiniu_domain"
+                      placeholder="需要加上 http:// 或者 https://"
+                    />
+                  </a-form-item>
                   <a-form-item
                     label="区域："
                     :wrapper-col="wrapperCol"
@@ -317,18 +390,6 @@
                     </a-select>
                   </a-form-item>
                   <a-form-item
-                    label="域名："
-                    :wrapper-col="wrapperCol"
-                  >
-                    <a-tooltip
-                      :trigger="['focus']"
-                      placement="right"
-                      title="需要加上 http:// 或者 https://"
-                    >
-                      <a-input v-model="options.oss_qiniu_domain" />
-                    </a-tooltip>
-                  </a-form-item>
-                  <a-form-item
                     label="Access Key："
                     :wrapper-col="wrapperCol"
                   >
@@ -338,30 +399,60 @@
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_secret_key" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_qiniu_secret_key"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_bucket" />
+                    <a-input
+                      v-model="options.oss_qiniu_bucket"
+                      placeholder="存储空间名称"
+                    />
+                  </a-form-item>
+                  <a-form-item
+                    label="图片处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_qiniu_style_rule"
+                      placeholder="样式分隔符+图片处理样式名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_style_rule" />
+                    <a-input
+                      v-model="options.oss_qiniu_thumbnail_style_rule"
+                      placeholder="样式分隔符+图片处理样式名称，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
                   class="aliyunForm"
-                  v-show="aliyunFormHidden"
+                  v-show="aliyunFormVisible"
                 >
+                  <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_aliyun_domain"
+                      placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
+                    />
+                  </a-form-item>
                   <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_bucket_name" />
+                    <a-input
+                      v-model="options.oss_aliyun_bucket_name"
+                      placeholder="存储空间名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="EndPoint（地域节点）："
@@ -379,65 +470,119 @@
                     label="Access Secret："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_access_secret" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_aliyun_access_secret"
+                    />
+                  </a-form-item>
+                  <a-form-item
+                    label="图片处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.oss_aliyun_style_rule"
+                      placeholder="请到阿里云控制台的图片处理获取"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_style_rule" />
+                    <a-input
+                      v-model="options.oss_aliyun_thumbnail_style_rule"
+                      placeholder="请到阿里云控制台的图片处理获取，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
                   class="baiduyunForm"
-                  v-show="baiduyunFormHidden"
+                  v-show="baiduyunFormVisible"
                 >
+                  <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.bos_baiduyun_domain"
+                      placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
+                    />
+                  </a-form-item>
                   <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_bucket_name" />
+                    <a-input
+                      v-model="options.bos_baiduyun_bucket_name"
+                      placeholder="存储空间名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="EndPoint（地域节点）："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_endpoint" />
+                    <a-input v-model="options.bos_baiduyun_endpoint" />
                   </a-form-item>
                   <a-form-item
                     label="Access Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_access_key" />
+                    <a-input v-model="options.bos_baiduyun_access_key" />
                   </a-form-item>
                   <a-form-item
-                    label="Access Secret："
+                    label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_access_secret" />
+                    <a-input
+                      type="password"
+                      v-model="options.bos_baiduyun_secret_key"
+                    />
+                  </a-form-item>
+                  <a-form-item
+                    label="图片处理策略："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.bos_baiduyun_style_rule"
+                      placeholder="请到百度云控制台的图片处理获取"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="缩略图处理策略："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_baiduyun_style_rule" />
+                    <a-input
+                      v-model="options.bos_baiduyun_thumbnail_style_rule"
+                      placeholder="请到百度云控制台的图片处理获取，一般为后台展示所用"
+                    />
                   </a-form-item>
                 </div>
                 <div
                   class="tencentyunForm"
-                  v-show="tencentyunFormHidden"
+                  v-show="tencentyunFormVisible"
                 >
+                  <a-form-item
+                    label="绑定域名："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-input
+                      v-model="options.cos_tencentyun_domain"
+                      placeholder="如不填写，路径根域名将为 Bucket + 区域地址"
+                    />
+                  </a-form-item>
                   <a-form-item
                     label="Bucket："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_tencentyun_bucket_name" />
+                    <a-input
+                      v-model="options.cos_tencentyun_bucket_name"
+                      placeholder="存储桶名称"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="区域："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-select v-model="options.oss_tencentyun_region">
+                    <a-select v-model="options.cos_tencentyun_region">
                       <a-select-option value="ap-beijing-1">北京一区</a-select-option>
                       <a-select-option value="ap-beijing">北京</a-select-option>
                       <a-select-option value="ap-shanghai">上海（华东）</a-select-option>
@@ -450,19 +595,16 @@
                     label="Secret Id："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_tencentyun_access_key" />
+                    <a-input v-model="options.cos_tencentyun_secret_id" />
                   </a-form-item>
                   <a-form-item
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_tencentyun_access_secret" />
-                  </a-form-item>
-                  <a-form-item
-                    label="缩略图处理策略："
-                    :wrapper-col="wrapperCol"
-                  >
-                    <a-input v-model="options.oss_tencentyun_style_rule" />
+                    <a-input
+                      type="password"
+                      v-model="options.cos_tencentyun_secret_key"
+                    />
                   </a-form-item>
                 </div>
                 <a-form-item>
@@ -518,13 +660,11 @@
                         label="邮箱密码："
                         :wrapper-col="wrapperCol"
                       >
-                        <a-tooltip
-                          :trigger="['focus']"
-                          placement="right"
-                          title="部分邮箱可能是授权码"
-                        >
-                          <a-input v-model="options.email_password" />
-                        </a-tooltip>
+                        <a-input
+                          v-model="options.email_password"
+                          type="password"
+                          placeholder="部分邮箱可能是授权码"
+                        />
                       </a-form-item>
                       <a-form-item
                         label="发件人："
@@ -580,7 +720,7 @@
             </a-tab-pane>
             <a-tab-pane key="api">
               <span slot="tab">
-                <a-icon type="align-left" />API 设置
+                <a-icon type="thunderbolt" />API 设置
               </span>
               <a-form layout="vertical">
                 <a-form-item
@@ -609,6 +749,15 @@
               </span>
               <a-form layout="vertical">
                 <a-form-item
+                  label="CDN 加速域名："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    v-model="options.blog_cdn_domain"
+                    placeholder="请确保已经正确配置好了 CDN"
+                  />
+                </a-form-item>
+                <a-form-item
                   label="自定义 head："
                   :wrapper-col="wrapperCol"
                 >
@@ -616,6 +765,7 @@
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="options.blog_custom_head"
+                    placeholder="将放置于每个页面的<head></head>标签中"
                   />
                 </a-form-item>
                 <a-form-item
@@ -626,8 +776,20 @@
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="options.blog_statistics_code"
+                    placeholder="第三方网站统计的代码，如：Google Analytics、百度统计、CNZZ 等"
                   />
                 </a-form-item>
+                <!-- <a-form-item
+                  label="黑名单 IP："
+                  :wrapper-col="wrapperCol"
+                >
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.blog_ip_blacklist"
+                    placeholder="多个 IP 地址换行隔开"
+                  />
+                </a-form-item> -->
                 <a-form-item>
                   <a-button
                     type="primary"
@@ -655,10 +817,10 @@
 </template>
 <script>
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
+import { mapActions } from 'vuex'
 import optionApi from '@/api/option'
 import mailApi from '@/api/mail'
 import attachmentApi from '@/api/attachment'
-import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -673,11 +835,12 @@ export default {
         sm: { span: 12 },
         xs: { span: 24 }
       },
-      upyunFormHidden: false,
-      qnyunFormHidden: false,
-      aliyunFormHidden: false,
-      baiduyunFormHidden: false,
-      tencentyunFormHidden: false,
+      smmsFormVisible: false,
+      upyunFormVisible: false,
+      qnyunFormVisible: false,
+      aliyunFormVisible: false,
+      baiduyunFormVisible: false,
+      tencentyunFormVisible: false,
       logoDrawerVisible: false,
       faviconDrawerVisible: false,
       options: [],
@@ -685,18 +848,290 @@ export default {
     }
   },
   mounted() {
-    this.loadOptions()
+    this.loadFormOptions()
+  },
+  destroyed: function() {
+    if (this.faviconDrawerVisible) {
+      this.faviconDrawerVisible = false
+    }
+    if (this.logoDrawerVisible) {
+      this.logoDrawerVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.faviconDrawerVisible) {
+      this.faviconDrawerVisible = false
+    }
+    if (this.logoDrawerVisible) {
+      this.logoDrawerVisible = false
+    }
+    next()
   },
   methods: {
-    ...mapActions(['loadUser']),
-    loadOptions() {
+    ...mapActions(['loadUser', 'loadOptions']),
+    loadFormOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
         this.handleAttachChange(this.options['attachment_type'])
       })
     },
     handleSaveOptions() {
+      if (!this.options.blog_title) {
+        this.$notification['error']({
+          message: '提示',
+          description: '博客标题不能为空！'
+        })
+        return
+      }
+
+      if (!this.options.blog_url) {
+        this.$notification['error']({
+          message: '提示',
+          description: '博客地址不能为空！'
+        })
+        return
+      }
+
+      // 新评论通知和回复通知验证
+      if (this.options.comment_new_notice || this.options.comment_reply_notice) {
+        if (!this.options.email_enabled) {
+          this.$notification['error']({
+            message: '提示',
+            description: '新评论通知或回复通知需要打开和配置 SMTP 服务！'
+          })
+          return
+        }
+      }
+
+      // 附件配置验证
+      switch (this.options.attachment_type) {
+        case 'SMMS':
+          if (!this.options.smms_api_secret_token) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Token不能为空！'
+            })
+            return
+          }
+          break
+        case 'UPYUN':
+          if (!this.options.oss_upyun_domain) {
+            this.$notification['error']({
+              message: '提示',
+              description: '域名不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_bucket) {
+            this.$notification['error']({
+              message: '提示',
+              description: '空间名称不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_operator) {
+            this.$notification['error']({
+              message: '提示',
+              description: '操作员名称不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_password) {
+            this.$notification['error']({
+              message: '提示',
+              description: '操作员密码不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_upyun_source) {
+            this.$notification['error']({
+              message: '提示',
+              description: '文件目录不能为空！'
+            })
+            return
+          }
+          break
+        case 'QNYUN':
+          if (!this.options.oss_qiniu_domain) {
+            this.$notification['error']({
+              message: '提示',
+              description: '域名不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_qiniu_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_qiniu_secret_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_qiniu_bucket) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          break
+        case 'ALIYUN':
+          if (!this.options.oss_aliyun_bucket_name) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_aliyun_endpoint) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'EndPoint（地域节点） 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_aliyun_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.oss_aliyun_access_secret) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Secret 不能为空！'
+            })
+            return
+          }
+          break
+        case 'BAIDUYUN':
+          if (!this.options.bos_baiduyun_bucket_name) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          if (!this.options.bos_baiduyun_endpoint) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'EndPoint（地域节点） 不能为空！'
+            })
+            return
+          }
+          if (!this.options.bos_baiduyun_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.bos_baiduyun_secret_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Key 不能为空！'
+            })
+            return
+          }
+          break
+        case 'TENCENTYUN':
+          if (!this.options.cos_tencentyun_bucket_name) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          if (!this.options.cos_tencentyun_region) {
+            this.$notification['error']({
+              message: '提示',
+              description: '区域不能为空！'
+            })
+            return
+          }
+          if (!this.options.cos_tencentyun_secret_id) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Id 不能为空！'
+            })
+            return
+          }
+          if (!this.options.cos_tencentyun_secret_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Secret Key 不能为空！'
+            })
+            return
+          }
+          break
+      }
+
+      // SMTP 配置验证
+      if (this.options.email_enabled) {
+        if (!this.options.email_host) {
+          this.$notification['error']({
+            message: '提示',
+            description: 'SMTP 地址不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_protocol) {
+          this.$notification['error']({
+            message: '提示',
+            description: '发送协议不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_ssl_port) {
+          this.$notification['error']({
+            message: '提示',
+            description: 'SSL 端口不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_username) {
+          this.$notification['error']({
+            message: '提示',
+            description: '邮箱账号不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_password) {
+          this.$notification['error']({
+            message: '提示',
+            description: '邮箱密码不能为空！'
+          })
+          return
+        }
+        if (!this.options.email_from_name) {
+          this.$notification['error']({
+            message: '提示',
+            description: '发件人不能为空！'
+          })
+          return
+        }
+      }
+
+      // API 配置验证
+      if (this.options.api_enabled) {
+        if (!this.options.api_access_key) {
+          this.$notification['error']({
+            message: '提示',
+            description: 'Access key 不能为空！'
+          })
+          return
+        }
+      }
+
       optionApi.save(this.options).then(response => {
+        this.loadFormOptions()
         this.loadOptions()
         this.loadUser()
         this.$message.success('保存成功！')
@@ -705,47 +1140,60 @@ export default {
     handleAttachChange(e) {
       switch (e) {
         case 'LOCAL':
+          this.upyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
+          this.smmsFormVisible = false
+          break
         case 'SMMS':
-          this.upyunFormHidden = false
-          this.qnyunFormHidden = false
-          this.aliyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = true
+          this.upyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'UPYUN':
-          this.upyunFormHidden = true
-          this.qnyunFormHidden = false
-          this.aliyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.upyunFormVisible = true
+          this.qnyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'QNYUN':
-          this.qnyunFormHidden = true
-          this.upyunFormHidden = false
-          this.aliyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.qnyunFormVisible = true
+          this.upyunFormVisible = false
+          this.aliyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'ALIYUN':
-          this.aliyunFormHidden = true
-          this.qnyunFormHidden = false
-          this.upyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.aliyunFormVisible = true
+          this.qnyunFormVisible = false
+          this.upyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = false
           break
         case 'BAIDUYUN':
-          this.aliyunFormHidden = false
-          this.qnyunFormHidden = false
-          this.upyunFormHidden = false
-          this.baiduyunFormHidden = true
-          this.tencentyunFormHidden = false
+          this.smmsFormVisible = false
+          this.aliyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.upyunFormVisible = false
+          this.baiduyunFormVisible = true
+          this.tencentyunFormVisible = false
           break
         case 'TENCENTYUN':
-          this.aliyunFormHidden = false
-          this.qnyunFormHidden = false
-          this.upyunFormHidden = false
-          this.baiduyunFormHidden = false
-          this.tencentyunFormHidden = true
+          this.smmsFormVisible = false
+          this.aliyunFormVisible = false
+          this.qnyunFormVisible = false
+          this.upyunFormVisible = false
+          this.baiduyunFormVisible = false
+          this.tencentyunFormVisible = true
           break
       }
     },
@@ -754,6 +1202,27 @@ export default {
       this.logoDrawerVisible = false
     },
     handleTestMailClick() {
+      if (!this.mailParam.to) {
+        this.$notification['error']({
+          message: '提示',
+          description: '收件人不能为空！'
+        })
+        return
+      }
+      if (!this.mailParam.subject) {
+        this.$notification['error']({
+          message: '提示',
+          description: '主题不能为空！'
+        })
+        return
+      }
+      if (!this.mailParam.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '内容不能为空！'
+        })
+        return
+      }
       mailApi.testMail(this.mailParam).then(response => {
         this.$message.info(response.data.message)
       })

@@ -3,7 +3,7 @@
     title="附件详情"
     :width="isMobile()?'100%':'460'"
     closable
-    :visible="visiable"
+    :visible="visible"
     destroyOnClose
     @close="onClose"
   >
@@ -19,13 +19,21 @@
         >
           <div class="attach-detail-img">
             <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
-            <img :src="attachment.path" v-show="photoPreviewVisible">
+            <a :href="attachment.path" target="_blank">
+              <img
+                :src="attachment.path"
+                v-show="photoPreviewVisible"
+                style="width: 100%;"
+              >
+            </a>
             <video-player
               class="video-player-box"
               v-show="videoPreviewVisible"
               ref="videoPlayer"
               :options="playerOptions"
-              :playsinline="true">
+              :playsinline="true"
+              style="width: 100%;"
+            >
             </video-player>
           </div>
         </a-skeleton>
@@ -154,10 +162,10 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { videoPlayer } from 'vue-video-player'
+import 'video.js/dist/video-js.css'
 import attachmentApi from '@/api/attachment'
 import photoApi from '@/api/photo'
-import 'video.js/dist/video-js.css'
-import { videoPlayer } from 'vue-video-player'
 
 export default {
   name: 'AttachmentDetailDrawer',
@@ -182,10 +190,12 @@ export default {
         controls: true,
         loop: false,
         playbackRates: [0.7, 1.0, 1.5, 2.0],
-        sources: [{
-          type: 'video/mp4',
-          src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
-        }],
+        sources: [
+          {
+            type: 'video/mp4',
+            src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
+          }
+        ],
         poster: '/static/images/author.jpg',
         width: document.documentElement.clientWidth,
         notSupportedMessage: '此视频暂无法播放，请稍后再试'
@@ -193,7 +203,7 @@ export default {
     }
   },
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
@@ -206,7 +216,7 @@ export default {
       required: false,
       default: false
     },
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: true
@@ -221,7 +231,7 @@ export default {
     }
   },
   watch: {
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       this.$log.debug('old value', oldValue)
       this.$log.debug('new value', newValue)
       if (newValue) {
@@ -253,6 +263,13 @@ export default {
       this.editable = !this.editable
     },
     doUpdateAttachment() {
+      if (!this.attachment.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '附件名称不能为空！'
+        })
+        return
+      }
       attachmentApi.update(this.attachment.id, this.attachment).then(response => {
         this.$log.debug('Updated attachment', response.data.data)
         this.$message.success('附件修改成功！')
@@ -339,12 +356,3 @@ export default {
   }
 }
 </script>
-
-<style scope>
-.attach-detail-img img {
-  width: 100%;
-}
-.video-player-box {
-  width: 100%;
-}
-</style>

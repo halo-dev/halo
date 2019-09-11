@@ -4,7 +4,7 @@
       :title="title"
       :width="isMobile()?'100%':drawerWidth"
       closable
-      :visible="visiable"
+      :visible="visible"
       destroyOnClose
       @close="onClose"
     >
@@ -34,7 +34,11 @@
               :key="index"
               @click="handleSelectAttachment(item)"
             >
-              <img :src="item.thumbPath">
+              <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
+              <img
+                :src="item.thumbPath"
+                v-show="handleJudgeMediaType(item)"
+              >
             </div>
           </a-col>
         </a-skeleton>
@@ -67,18 +71,12 @@
       v-model="uploadVisible"
       :footer="null"
       :afterClose="onUploadClose"
+      destroyOnClose
     >
-      <upload
-        name="file"
-        multiple
-        :uploadHandler="attachmentUploadHandler"
-      >
-        <p class="ant-upload-drag-icon">
-          <a-icon type="inbox" />
-        </p>
-        <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
-        <p class="ant-upload-hint">支持单个或批量上传</p>
-      </upload>
+      <FilePondUpload
+        ref="upload"
+        :uploadHandler="uploadHandler"
+      ></FilePondUpload>
     </a-modal>
   </div>
 </template>
@@ -91,11 +89,11 @@ export default {
   name: 'AttachmentSelectDrawer',
   mixins: [mixin, mixinDevice],
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: false
@@ -126,7 +124,7 @@ export default {
         sort: ''
       },
       attachments: [],
-      attachmentUploadHandler: attachmentApi.upload
+      uploadHandler: attachmentApi.upload
     }
   },
   created() {
@@ -134,7 +132,7 @@ export default {
     this.loadAttachments()
   },
   watch: {
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
       }
@@ -174,8 +172,26 @@ export default {
       this.loadAttachments()
     },
     onUploadClose() {
+      this.$refs.upload.handleClearFileList()
       this.loadSkeleton()
       this.loadAttachments()
+    },
+    handleJudgeMediaType(attachment) {
+      var mediaType = attachment.mediaType
+      // 判断文件类型
+      if (mediaType) {
+        var prefix = mediaType.split('/')[0]
+
+        if (prefix === 'image') {
+          // 是图片
+          return true
+        } else {
+          // 非图片
+          return false
+        }
+      }
+      // 没有获取到文件返回false
+      return false
     },
     onClose() {
       this.$emit('close', false)
@@ -183,22 +199,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scope>
-.attach-item {
-  width: 50%;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 28%;
-  overflow: hidden;
-  float: left;
-  cursor: pointer;
-  img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
-</style>

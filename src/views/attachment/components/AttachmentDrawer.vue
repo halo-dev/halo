@@ -4,7 +4,7 @@
       title="附件库"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="visiable"
+      :visible="visible"
       destroyOnClose
       @close="onClose"
     >
@@ -36,7 +36,11 @@
               :key="index"
               @click="handleShowDetailDrawer(item)"
             >
-              <img :src="item.thumbPath">
+              <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
+              <img
+                :src="item.thumbPath"
+                v-show="handleJudgeMediaType(item)"
+              >
             </div>
           </a-col>
         </a-skeleton>
@@ -51,12 +55,12 @@
       </div>
 
       <AttachmentDetailDrawer
-        v-model="detailVisiable"
+        v-model="detailVisible"
         v-if="selectedAttachment"
         :attachment="selectedAttachment"
         @delete="handleDelete"
       />
-      <a-divider class="divider-transparent"/>
+      <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-button
           @click="handleShowUploadModal"
@@ -70,26 +74,20 @@
       v-model="uploadVisible"
       :footer="null"
       :afterClose="onUploadClose"
+      destroyOnClose
     >
-      <upload
-        name="file"
-        multiple
-        :uploadHandler="attachmentUploadHandler"
-      >
-        <p class="ant-upload-drag-icon">
-          <a-icon type="inbox" />
-        </p>
-        <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
-        <p class="ant-upload-hint">支持单个或批量上传</p>
-      </upload>
+      <FilePondUpload
+        ref="upload"
+        :uploadHandler="uploadHandler"
+      ></FilePondUpload>
     </a-modal>
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import attachmentApi from '@/api/attachment'
 import AttachmentDetailDrawer from './AttachmentDetailDrawer'
+import attachmentApi from '@/api/attachment'
 
 export default {
   name: 'AttachmentDrawer',
@@ -98,11 +96,11 @@ export default {
     AttachmentDetailDrawer
   },
   model: {
-    prop: 'visiable',
+    prop: 'visible',
     event: 'close'
   },
   props: {
-    visiable: {
+    visible: {
       type: Boolean,
       required: false,
       default: false
@@ -111,7 +109,7 @@ export default {
   data() {
     return {
       attachmentType: attachmentApi.type,
-      detailVisiable: false,
+      detailVisible: false,
       attachmentDrawerVisible: false,
       uploadVisible: false,
       skeletonLoading: true,
@@ -128,7 +126,7 @@ export default {
       },
       attachments: [],
       selectedAttachment: {},
-      attachmentUploadHandler: attachmentApi.upload
+      uploadHandler: attachmentApi.upload
     }
   },
   computed: {
@@ -144,7 +142,7 @@ export default {
     this.loadAttachments()
   },
   watch: {
-    visiable: function(newValue, oldValue) {
+    visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
       }
@@ -163,7 +161,7 @@ export default {
     handleShowDetailDrawer(attachment) {
       this.selectedAttachment = attachment
       this.$log.debug('Show detail of', attachment)
-      this.detailVisiable = true
+      this.detailVisible = true
     },
     loadAttachments(isSearch) {
       this.queryParam.page = this.pagination.page - 1
@@ -183,11 +181,29 @@ export default {
       this.loadAttachments()
     },
     onUploadClose() {
+      this.$refs.upload.handleClearFileList()
       this.loadSkeleton()
       this.loadAttachments()
     },
     handleDelete() {
       this.loadAttachments()
+    },
+    handleJudgeMediaType(attachment) {
+      var mediaType = attachment.mediaType
+      // 判断文件类型
+      if (mediaType) {
+        var prefix = mediaType.split('/')[0]
+
+        if (prefix === 'image') {
+          // 是图片
+          return true
+        } else {
+          // 非图片
+          return false
+        }
+      }
+      // 没有获取到文件返回false
+      return false
     },
     onClose() {
       this.$emit('close', false)
@@ -195,22 +211,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scope>
-.attach-item {
-  width: 50%;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 28%;
-  overflow: hidden;
-  float: left;
-  cursor: pointer;
-  img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
-</style>

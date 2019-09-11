@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title">
+        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -64,7 +64,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="所有标签">
+        <a-card title="所有标签" :bodyStyle="{ padding: '16px' }">
           <a-tooltip
             placement="topLeft"
             v-for="tag in tags"
@@ -132,6 +132,13 @@ export default {
       })
     },
     createOrUpdateTag() {
+      if (!this.tagToCreate.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '标签名称不能为空！'
+        })
+        return
+      }
       if (this.tagToCreate.id) {
         tagApi.update(this.tagToCreate.id, this.tagToCreate).then(response => {
           this.$message.success('更新成功！')

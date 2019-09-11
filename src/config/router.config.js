@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { BasicLayout, RouteView, BlankLayout, PageView } from '@/layouts'
+import { BasicLayout, PageView } from '@/layouts'
 
 export const asyncRouterMap = [
   {
@@ -217,6 +217,12 @@ export const constantRouterMap = [
     name: 'Install',
     meta: { title: '安装向导' },
     component: () => import('@/views/system/Installation')
+  },
+  {
+    path: '/password/reset',
+    name: 'ResetPassword',
+    meta: { title: '重置密码' },
+    component: () => import('@/views/user/ResetPassword')
   },
   {
     path: '/404',

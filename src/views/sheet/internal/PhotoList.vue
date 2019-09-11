@@ -9,7 +9,10 @@
         :span="24"
         class="search-box"
       >
-        <a-card :bordered="false">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
@@ -26,9 +29,15 @@
                   :sm="24"
                 >
                   <a-form-item label="分组">
-                    <a-select>
-                      <a-select-option value="11">11</a-select-option>
-                      <a-select-option value="22">22</a-select-option>
+                    <a-select
+                      v-model="queryParam.team"
+                      @change="loadPhotos(true)"
+                    >
+                      <a-select-option
+                        v-for="(item,index) in teams"
+                        :key="index"
+                        :value="item"
+                      >{{ item }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -61,7 +70,7 @@
       </a-col>
       <a-col :span="24">
         <a-list
-          :grid="{ gutter: 12, xs: 1, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
+          :grid="{ gutter: 12, xs: 2, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
           :dataSource="photos"
           :loading="listLoading"
         >
@@ -80,7 +89,7 @@
               </div>
               <a-card-meta>
                 <ellipsis
-                  :length="isMobile()?36:18"
+                  :length="isMobile()?12:16"
                   tooltip
                   slot="description"
                 >{{ item.name }}</ellipsis>
@@ -104,7 +113,7 @@
       title="图片详情"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="drawerVisiable"
+      :visible="drawerVisible"
       destroyOnClose
       @close="onDrawerClose"
     >
@@ -272,8 +281,8 @@
 </template>
 
 <script>
-import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import photoApi from '@/api/photo'
 
 export default {
@@ -283,12 +292,13 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      drawerVisiable: false,
+      drawerVisible: false,
       drawerLoading: false,
       listLoading: true,
       thumDrawerVisible: false,
       photo: {},
       photos: [],
+      teams: [],
       editable: false,
       pagination: {
         page: 1,
@@ -299,12 +309,14 @@ export default {
         page: 0,
         size: 18,
         sort: null,
-        keyword: null
+        keyword: null,
+        team: null
       }
     }
   },
   created() {
     this.loadPhotos()
+    this.loadTeams()
   },
   methods: {
     loadPhotos(isSearch) {
@@ -319,6 +331,11 @@ export default {
         this.photos = response.data.data.content
         this.pagination.total = response.data.data.total
         this.listLoading = false
+      })
+    },
+    loadTeams() {
+      photoApi.listTeams().then(response => {
+        this.teams = response.data.data
       })
     },
     handleCreateOrUpdate() {
@@ -338,7 +355,7 @@ export default {
     },
     showDrawer(photo) {
       this.photo = photo
-      this.drawerVisiable = true
+      this.drawerVisible = true
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
@@ -348,7 +365,7 @@ export default {
     },
     handleAddClick() {
       this.editable = true
-      this.drawerVisiable = true
+      this.drawerVisible = true
     },
     handleEditClick() {
       this.editable = true
@@ -365,14 +382,17 @@ export default {
     },
     selectPhotoThumb(data) {
       this.photo.url = encodeURI(data.path)
+      this.photo.thumbnail = encodeURI(data.thumbPath)
       this.thumDrawerVisible = false
     },
     resetParam() {
       this.queryParam.keyword = null
+      this.queryParam.team = null
       this.loadPhotos()
+      this.loadTeams()
     },
     onDrawerClose() {
-      this.drawerVisiable = false
+      this.drawerVisible = false
       this.photo = {}
       this.editable = false
     }

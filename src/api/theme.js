@@ -11,9 +11,16 @@ themeApi.listAll = () => {
   })
 }
 
-themeApi.listFiles = () => {
+themeApi.listFilesActivated = () => {
   return service({
-    url: `${baseUrl}/files`,
+    url: `${baseUrl}/activation/files`,
+    method: 'get'
+  })
+}
+
+themeApi.listFiles = themeId => {
+  return service({
+    url: `${baseUrl}/${themeId}/files`,
     method: 'get'
   })
 }
@@ -41,7 +48,7 @@ themeApi.getActivatedTheme = () => {
 
 themeApi.update = themeId => {
   return service({
-    url: `${baseUrl}/${themeId}`,
+    url: `${baseUrl}/fetching/${themeId}`,
     timeout: 60000,
     method: 'put'
   })
@@ -94,6 +101,17 @@ themeApi.upload = (formData, uploadProgress, cancelToken) => {
   })
 }
 
+themeApi.updateByUpload = (formData, uploadProgress, cancelToken, themeId) => {
+  return service({
+    url: `${baseUrl}/upload/${themeId}`,
+    timeout: 86400000, // 24 hours
+    data: formData, // form data
+    onUploadProgress: uploadProgress,
+    cancelToken: cancelToken,
+    method: 'put'
+  })
+}
+
 themeApi.fetching = url => {
   return service({
     url: `${baseUrl}/fetching`,
@@ -115,13 +133,34 @@ themeApi.getContent = path => {
   })
 }
 
-themeApi.saveContent = (path, content) => {
+themeApi.getContent = (themeId, path) => {
   return service({
-    url: `${baseUrl}/files/content`,
+    url: `${baseUrl}/${themeId}/files/content`,
     params: {
       path: path
     },
-    data: content,
+    method: 'get'
+  })
+}
+
+themeApi.saveContent = (path, content) => {
+  return service({
+    url: `${baseUrl}/files/content`,
+    data: {
+      path: path,
+      content: content
+    },
+    method: 'put'
+  })
+}
+
+themeApi.saveContent = (themeId, path, content) => {
+  return service({
+    url: `${baseUrl}/${themeId}/files/content`,
+    data: {
+      path: path,
+      content: content
+    },
     method: 'put'
   })
 }

@@ -1,10 +1,10 @@
 <template>
   <div>
     <a-row
-      class="height-100"
       type="flex"
       justify="center"
       align="middle"
+      style="height: 100vh;"
     >
       <a-col
         :xl="8"
@@ -16,7 +16,7 @@
           <a-card
             :bordered="false"
             title="Halo 安装向导"
-            class="install-card"
+            style="box-shadow: 0px 10px 20px 0px rgba(236, 236, 236, 0.86);"
           >
 
             <a-steps :current="stepCurrent">
@@ -91,7 +91,7 @@
                 <a-input
                   v-model="installation.password"
                   type="password"
-                  placeholder="用户密码"
+                  placeholder="用户密码（8-100位）"
                   v-decorator="[
                     'password',
                     {rules: [{ required: true, message: '请输入密码（8-100位）' }]}
@@ -189,12 +189,14 @@
               class="install-action"
               type="flex"
               justify="space-between"
+              style="margin-top: 1rem;"
             >
               <div>
                 <a-button
                   class="previus-button"
                   v-if="stepCurrent != 0"
                   @click="stepCurrent--"
+                  style="margin-right: 1rem;"
                 >上一步</a-button>
                 <a-button
                   type="primary"
@@ -218,7 +220,6 @@
 
 <script>
 import adminApi from '@/api/admin'
-import optionApi from '@/api/option'
 import recoveryApi from '@/api/recovery'
 
 export default {
@@ -244,8 +245,7 @@ export default {
       migrationUploadName: 'file',
       migrationData: null,
       stepCurrent: 0,
-      bloggerForm: this.$form.createForm(this),
-      keys: ['is_installed']
+      bloggerForm: this.$form.createForm(this)
     }
   },
   created() {
@@ -254,8 +254,8 @@ export default {
   },
   methods: {
     verifyIsInstall() {
-      optionApi.listAll(this.keys).then(response => {
-        if (response.data.data.is_installed) {
+      adminApi.isInstalled().then(response => {
+        if (response.data.data) {
           this.$router.push({ name: 'Login' })
         }
       })
@@ -292,7 +292,7 @@ export default {
         this.$log.debug('Installation response', response)
         this.$message.success('安装成功！')
         setTimeout(() => {
-          this.$router.push({ name: 'Dashboard' })
+          this.$router.push({ name: 'Login' })
         }, 300)
       })
     },
@@ -322,20 +322,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.height-100 {
-  height: 100vh;
-}
-
-.install-action {
-  margin-top: 1rem;
-}
-.previus-button {
-  margin-right: 1rem;
-}
-
-.install-card {
-  box-shadow: 0px 10px 20px 0px rgba(236, 236, 236, 0.86);
-}
-</style>

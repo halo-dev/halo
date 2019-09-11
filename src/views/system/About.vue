@@ -2,10 +2,14 @@
   <div class="page-header-index-wide">
     <a-row>
       <a-col :span="24">
-        <a-card :bordered="false">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <a-card
             :bordered="false"
             class="environment-info"
+            :bodyStyle="{ padding: '16px' }"
           >
             <template slot="title">
               环境信息
@@ -39,7 +43,7 @@
               </a-button>
             </a-popconfirm>
 
-            <ul>
+            <ul style="margin: 0;padding: 0;list-style: none;">
               <li>Server 版本：{{ environments.version }}</li>
               <li>Admin 版本：{{ adminVersion }}</li>
               <li>数据库：{{ environments.database }}</li>
@@ -50,16 +54,19 @@
             <a
               href="https://github.com/halo-dev"
               target="_blank"
+              style="margin-right: 10px;"
             >开源地址
               <a-icon type="link" /></a>
             <a
               href="https://halo.run/guide"
               target="_blank"
+              style="margin-right: 10px;"
             >用户文档
               <a-icon type="link" /></a>
             <a
               href="https://bbs.halo.run"
               target="_blank"
+              style="margin-right: 10px;"
             >在线社区
               <a-icon type="link" /></a>
           </a-card>
@@ -67,6 +74,7 @@
           <a-card
             title="开发者"
             :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
           >
             <a
               :href="item.github"
@@ -90,6 +98,7 @@
           <a-card
             title="时间轴"
             :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
           >
             <a-timeline>
               <a-timeline-item>...</a-timeline-item>
@@ -107,6 +116,7 @@
 
 <script>
 import adminApi from '@/api/admin'
+import axios from 'axios'
 export default {
   data() {
     return {
@@ -145,6 +155,10 @@ export default {
         }
       ],
       steps: [
+        {
+          date: '2019-09-11',
+          content: 'Halo v1.1.0 发布'
+        },
         {
           date: '2019-07-09',
           content: 'Halo v1.0.3 发布'
@@ -199,6 +213,7 @@ export default {
   },
   created() {
     this.getEnvironments()
+    this.checkUpdate()
   },
   computed: {
     updateText() {
@@ -229,7 +244,8 @@ export default {
       const text = `Server 版本：${this.environments.version}
 Admin 版本：${this.adminVersion}
 数据库：${this.environments.database}
-运行模式：${this.environments.mode}`
+运行模式：${this.environments.mode}
+UA 信息：${navigator.userAgent}`
       this.$copyText(text)
         .then(message => {
           console.log('copy', message)
@@ -239,25 +255,64 @@ Admin 版本：${this.adminVersion}
           console.log('copy.err', err)
           this.$message.error('复制失败！')
         })
+    },
+    async checkUpdate() {
+      const _this = this
+
+      axios
+        .get('https://api.github.com/repos/halo-dev/halo/releases/latest')
+        .then(response => {
+          const data = response.data
+          if (data.draft || data.prerelease) {
+            return
+          }
+          const current = _this.calculateIntValue(_this.environments.version)
+          const latest = _this.calculateIntValue(data.name)
+          if (current >= latest) {
+            return
+          }
+          const title = '新版本提醒'
+          const content = '检测到新版本：' + data.name + '，点击下方按钮查看最新版本。'
+          const url = data.html_url
+          this.$notification.open({
+            message: title,
+            description: content,
+            icon: <a-icon type="smile" style="color: #108ee9" />,
+            btn: h => {
+              return h(
+                'a-button',
+                {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => window.open(url, '_blank')
+                  }
+                },
+                '去看看'
+              )
+            }
+          })
+        })
+        .catch(function(error) {
+          console.error('Check update fail', error)
+        })
+    },
+    calculateIntValue(version) {
+      version = version.replace(/v/g, '')
+      const ss = version.split('.')
+      if (ss == null || ss.length !== 3) {
+        return -1
+      }
+      const major = parseInt(ss[0])
+      const minor = parseInt(ss[1])
+      const micro = parseInt(ss[2])
+      if (isNaN(major) || isNaN(minor) || isNaN(micro)) {
+        return -1
+      }
+      return major * 1000000 + minor * 1000 + micro
     }
   }
 }
 </script>
-<style lang="less" scope>
-ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.environment-info {
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  a {
-    margin-right: 10px;
-  }
-}
-</style>

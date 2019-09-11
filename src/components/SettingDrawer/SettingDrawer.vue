@@ -8,7 +8,6 @@
       closable
       @close="onClose"
       :visible="visible"
-      :zIndex="9999"
     >
       <div class="setting-drawer-index-content">
         <div :style="{ marginBottom: '24px' }">
@@ -114,6 +113,77 @@
           </div>
         </div>
         <a-divider />
+        <div :style="{ marginTop: '24px' }">
+          <a-list :split="false">
+            <a-list-item>
+              <a-tooltip slot="actions">
+                <template slot="title">
+                  该设定仅 [顶部栏导航] 时有效
+                </template>
+                <a-select
+                  size="small"
+                  style="width: 80px;"
+                  :defaultValue="contentWidth"
+                  @change="handleContentWidthChange"
+                >
+                  <a-select-option value="Fixed">固定</a-select-option>
+                  <a-select-option
+                    value="Fluid"
+                    v-if="layoutMode != 'sidemenu'"
+                  >流式</a-select-option>
+                </a-select>
+              </a-tooltip>
+              <a-list-item-meta>
+                <div slot="title">内容区域宽度</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch
+                slot="actions"
+                size="small"
+                :defaultChecked="fixedHeader"
+                @change="handleFixedHeader"
+              />
+              <a-list-item-meta>
+                <div slot="title">固定 Header</div>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch
+                slot="actions"
+                size="small"
+                :disabled="!fixedHeader"
+                :defaultChecked="autoHideHeader"
+                @change="handleFixedHeaderHidden"
+              />
+              <a-list-item-meta>
+                <a-tooltip
+                  slot="title"
+                  placement="left"
+                >
+                  <template slot="title">固定 Header 时可配置</template>
+                  <div :style="{ opacity: !fixedHeader ? '0.5' : '1' }">下滑时隐藏 Header</div>
+                </a-tooltip>
+              </a-list-item-meta>
+            </a-list-item>
+            <a-list-item>
+              <a-switch
+                slot="actions"
+                size="small"
+                :disabled="(layoutMode === 'topmenu')"
+                :defaultChecked="fixSiderbar"
+                @change="handleFixSiderbar"
+              />
+              <a-list-item-meta>
+                <div
+                  slot="title"
+                  :style="{ opacity: (layoutMode==='topmenu') ? '0.5' : '1' }"
+                >固定侧边菜单</div>
+              </a-list-item-meta>
+            </a-list-item>
+          </a-list>
+        </div>
+        <a-divider />
       </div>
     </a-drawer>
   </div>
@@ -122,7 +192,7 @@
 <script>
 import SettingItem from '@/components/SettingDrawer/SettingItem'
 import config from '@/config/defaultSettings'
-import { updateTheme, colorList } from '@/components/Tools/setting'
+import { updateTheme, colorList } from './setting'
 import { mixin, mixinDevice } from '@/utils/mixin'
 
 export default {
@@ -161,9 +231,10 @@ export default {
     handleLayout(mode) {
       this.baseConfig.layout = mode
       this.$store.dispatch('ToggleLayoutMode', mode)
-      // 因为顶部菜单不能固定左侧菜单栏，所以强制关闭
-      //
       this.handleFixSiderbar(false)
+      if (mode === 'sidemenu') {
+        this.handleContentWidthChange('Fixed')
+      }
     },
     handleContentWidthChange(type) {
       this.baseConfig.contentWidth = type

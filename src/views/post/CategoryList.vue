@@ -9,7 +9,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title">
+        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -68,7 +68,7 @@
         :xs="24"
         :style="{ 'padding-bottom': '1rem' }"
       >
-        <a-card title="分类列表">
+        <a-card title="分类列表" :bodyStyle="{ padding: '16px' }">
           <a-table
             :columns="columns"
             :dataSource="categories"
@@ -206,6 +206,13 @@ export default {
       })
     },
     createOrUpdateCategory() {
+      if (!this.categoryToCreate.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '分类名称不能为空！'
+        })
+        return
+      }
       if (this.categoryToCreate.id) {
         categoryApi.update(this.categoryToCreate.id, this.categoryToCreate).then(response => {
           this.$message.success('更新成功！')
@@ -232,9 +239,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.category-tree {
-  margin-top: 1rem;
-}
-</style>

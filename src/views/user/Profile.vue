@@ -6,7 +6,10 @@
         :md="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :bordered="false">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <div class="profile-center-avatarHolder">
             <a-tooltip
               placement="right"
@@ -149,8 +152,7 @@
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import userApi from '@/api/user'
 import adminApi from '@/api/admin'
-import optionApi from '@/api/option'
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import MD5 from 'md5.js'
 
 export default {
@@ -168,20 +170,18 @@ export default {
         newPassword: null,
         confirmPassword: null
       },
-      attachment: {},
-      options: [],
-      keys: ['blog_url']
+      attachment: {}
     }
   },
   computed: {
     passwordUpdateButtonDisabled() {
       return !(this.passwordParam.oldPassword && this.passwordParam.newPassword)
-    }
+    },
+    ...mapGetters(['options'])
   },
   created() {
     this.loadUser()
     this.getCounts()
-    this.loadOptions()
   },
   methods: {
     ...mapMutations({ setUser: 'SET_USER' }),
@@ -189,11 +189,6 @@ export default {
       userApi.getProfile().then(response => {
         this.user = response.data.data
         this.profileLoading = false
-      })
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
       })
     },
     getCounts() {
@@ -208,9 +203,35 @@ export default {
         this.$message.error('确认密码和新密码不匹配！')
         return
       }
-      userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {})
+      userApi.updatePassword(this.passwordParam.oldPassword, this.passwordParam.newPassword).then(response => {
+        this.$message.success('密码修改成功！')
+        this.passwordParam.oldPassword = null
+        this.passwordParam.newPassword = null
+        this.passwordParam.confirmPassword = null
+      })
     },
     handleUpdateProfile() {
+      if (!this.user.username) {
+        this.$notification['error']({
+          message: '提示',
+          description: '用户名不能为空！'
+        })
+        return
+      }
+      if (!this.user.nickname) {
+        this.$notification['error']({
+          message: '提示',
+          description: '用户昵称不能为空！'
+        })
+        return
+      }
+      if (!this.user.email) {
+        this.$notification['error']({
+          message: '提示',
+          description: '邮箱不能为空！'
+        })
+        return
+      }
       userApi.updateProfile(this.user).then(response => {
         this.user = response.data.data
         this.setUser(Object.assign({}, this.user))

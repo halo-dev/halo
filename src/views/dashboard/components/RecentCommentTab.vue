@@ -18,9 +18,22 @@
             :href="item.authorUrl"
             target="_blank"
           >{{ item.author }}</a> 发表在 《<a
+            v-if="item.post.status=='PUBLISHED'"
             :href="options.blog_url+'/archives/'+item.post.url"
             target="_blank"
-          >{{ item.post.title }}</a>》
+          >{{ item.post.title }}</a><a
+            v-else-if="item.post.status=='INTIMATE'"
+            :href="options.blog_url+'/archives/'+item.post.url+'/password'"
+            target="_blank"
+          >{{ item.post.title }}</a><a
+            v-else-if="item.post.status=='DRAFT'"
+            href="javascript:void(0)"
+            @click="handlePostPreview(item.post.id)"
+          >{{ item.post.title }}</a><a
+            v-else
+            href="javascript:void(0)"
+          >{{ item.post.title }}</a>
+          》
         </template>
         <template
           slot="author"
@@ -30,8 +43,16 @@
             :href="item.authorUrl"
             target="_blank"
           >{{ item.author }}</a> 发表在 《<a
+            v-if="item.sheet.status=='PUBLISHED'"
             :href="options.blog_url+'/s/'+item.sheet.url"
             target="_blank"
+          >{{ item.sheet.title }}</a><a
+            v-else-if="item.sheet.status=='DRAFT'"
+            href="javascript:void(0)"
+            @click="handleSheetPreview(item.sheet.id)"
+          >{{ item.sheet.title }}</a><a
+            v-else
+            href="javascript:void(0)"
           >{{ item.sheet.title }}</a>》
         </template>
         <!-- <template slot="actions">
@@ -54,8 +75,10 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
-import optionApi from '@/api/option'
+import postApi from '@/api/post'
+import sheetApi from '@/api/sheet'
 
 import marked from 'marked'
 export default {
@@ -73,9 +96,7 @@ export default {
   data() {
     return {
       comments: [],
-      loading: false,
-      options: [],
-      keys: ['blog_url']
+      loading: false
     }
   },
   computed: {
@@ -84,23 +105,28 @@ export default {
         comment.content = marked(comment.content, { sanitize: true })
         return comment
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   created() {
     this.loadComments()
-    this.loadOptions()
   },
   methods: {
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
-    },
     loadComments() {
       this.loading = true
       commentApi.latestComment(this.type, 5, 'PUBLISHED').then(response => {
         this.comments = response.data.data
         this.loading = false
+      })
+    },
+    handlePostPreview(postId) {
+      postApi.preview(postId).then(response => {
+        window.open(response.data, '_blank')
+      })
+    },
+    handleSheetPreview(sheetId) {
+      sheetApi.preview(sheetId).then(response => {
+        window.open(response.data, '_blank')
       })
     }
   }

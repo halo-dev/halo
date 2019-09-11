@@ -1,6 +1,9 @@
 <template>
   <div class="page-header-index-wide">
-    <a-card :bordered="false">
+    <a-card
+      :bordered="false"
+      :bodyStyle="{ padding: '16px' }"
+    >
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
@@ -89,7 +92,7 @@
             </a-menu-item>
             <a-menu-item
               key="2"
-              v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='DRAFT'"
+              v-if="queryParam.status === 'PUBLISHED' || queryParam.status ==='DRAFT' || queryParam.status === 'INTIMATE'"
             >
               <a
                 href="javascript:void(0);"
@@ -128,33 +131,68 @@
           :loading="postsLoading"
           :pagination="false"
         >
-          <!-- ellipsis内嵌a标签后文本会被置空
-           <ellipsis
-            :length="25"
-            tooltip
-            slot="postTitle"
-            slot-scope="text,record"
-          >
-          {{ text }}
-          </ellipsis> -->
           <span
             slot="postTitle"
             slot-scope="text,record"
-            class="post-title"
+            style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
+            <a-icon
+              type="pushpin"
+              v-if="record.topPriority!=0"
+              theme="twoTone"
+              twoToneColor="red"
+              style="margin-right: 3px;"
+            />
             <a
+              v-if="record.status=='PUBLISHED'"
               :href="options.blog_url+'/archives/'+record.url"
               target="_blank"
+              style="text-decoration: none;"
             >
-              <a-tooltip placement="topLeft" :title="'点击预览 '+text">{{ text }}</a-tooltip>
+              <a-tooltip
+                placement="top"
+                :title="'点击访问【'+text+'】'"
+              >{{ text }}</a-tooltip>
+            </a>
+            <a
+              v-else-if="record.status == 'INTIMATE'"
+              :href="options.blog_url+'/archives/'+record.url+'/password'"
+              target="_blank"
+              style="text-decoration: none;"
+            >
+              <a-tooltip
+                placement="top"
+                :title="'点击访问【'+text+'】'"
+              >{{ text }}</a-tooltip>
+            </a>
+            <a
+              v-else-if="record.status=='DRAFT'"
+              href="javascript:void(0)"
+              style="text-decoration: none;"
+              @click="handlePreview(record.id)"
+            >
+              <a-tooltip
+                placement="topLeft"
+                :title="'点击预览【'+text+'】'"
+              >{{ text }}</a-tooltip>
+            </a>
+            <a
+              v-else
+              href="javascript:void(0);"
+              style="text-decoration: none;"
+              disabled
+            >
+              {{ text }}
             </a>
           </span>
           <span
             slot="status"
             slot-scope="statusProperty"
           >
-            <a-badge :status="statusProperty.status" />
-            {{ statusProperty.text }}
+            <a-badge
+              :status="statusProperty.status"
+              :text="statusProperty.text"
+            />
           </span>
 
           <span
@@ -165,6 +203,7 @@
               v-for="(category,index) in categoriesOfPost"
               :key="index"
               color="blue"
+              style="margin-bottom: 8px"
             >{{ category.name }}</a-tag>
           </span>
 
@@ -176,13 +215,45 @@
               v-for="(tag, index) in tags"
               :key="index"
               color="green"
+              style="margin-bottom: 8px"
             >{{ tag.name }}</a-tag>
+          </span>
+
+          <span
+            slot="commentCount"
+            slot-scope="commentCount"
+          >
+            <a-badge
+              :count="commentCount"
+              :numberStyle="{backgroundColor: '#f38181'} "
+              :showZero="true"
+              :overflowCount="999"
+            />
+          </span>
+
+          <span
+            slot="visits"
+            slot-scope="visits"
+          >
+            <a-badge
+              :count="visits"
+              :numberStyle="{backgroundColor: '#00e0ff'} "
+              :showZero="true"
+              :overflowCount="9999"
+            />
           </span>
 
           <span
             slot="createTime"
             slot-scope="createTime"
-          >{{ createTime | timeAgo }}</span>
+          >
+            <a-tooltip placement="top">
+              <template slot="title">
+                {{ createTime | moment }}
+              </template>
+              {{ createTime | timeAgo }}
+            </a-tooltip>
+          </span>
 
           <span
             slot="action"
@@ -191,7 +262,7 @@
             <a
               href="javascript:;"
               @click="handleEditClick(post)"
-              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
+              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT' || post.status === 'INTIMATE'"
             >编辑</a>
             <a-popconfirm
               :title="'你确定要发布【' + post.title + '】文章？'"
@@ -210,7 +281,7 @@
               @confirm="handleEditStatusClick(post.id,'RECYCLE')"
               okText="确定"
               cancelText="取消"
-              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT'"
+              v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT' || post.status === 'INTIMATE'"
             >
               <a href="javascript:;">回收站</a>
             </a-popconfirm>
@@ -229,7 +300,7 @@
 
             <a
               href="javascript:;"
-              @click="handlePostSettingsDrawer(post)"
+              @click="handleShowPostSettings(post)"
             >设置</a>
           </span>
         </a-table>
@@ -246,164 +317,32 @@
       </div>
     </a-card>
 
-    <a-drawer
-      title="文章设置"
-      :width="isMobile()?'100%':'460'"
-      placement="right"
-      closable
-      @close="onPostSettingsClose"
+    <PostSetting
+      :post="selectedPost"
+      :tagIds="selectedTagIds"
+      :categoryIds="selectedCategoryIds"
+      :needTitle="true"
+      :saveDraftButton="false"
+      :savePublishButton="false"
+      :saveButton="true"
       :visible="postSettingVisible"
-    >
-      <div class="post-setting-drawer-content">
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">基本设置</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
-              <a-form-item label="文章标题：">
-                <a-input v-model="selectedPost.title" />
-              </a-form-item>
-              <a-form-item
-                label="文章路径："
-                :help="options.blog_url+'/archives/' + (selectedPost.url ? selectedPost.url : '{auto_generate}')"
-              >
-                <a-input v-model="selectedPost.url" />
-              </a-form-item>
-              <a-form-item label="开启评论：">
-                <a-radio-group
-                  v-model="selectedPost.disallowComment"
-                  :defaultValue="false"
-                >
-                  <a-radio :value="false">开启</a-radio>
-                  <a-radio :value="true">关闭</a-radio>
-                </a-radio-group>
-              </a-form-item>
-            </a-form>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">分类目录</h3>
-          <div class="post-setting-drawer-item">
-            <category-tree
-              v-model="selectedCategoryIds"
-              :categories="categories"
-            />
-            <div>
-              <a-form layout="vertical">
-                <a-form-item v-if="categoryForm">
-                  <category-select-tree
-                    :categories="categories"
-                    v-model="categoryToCreate.parentId"
-                  />
-                </a-form-item>
-                <a-form-item v-if="categoryForm">
-                  <a-input
-                    placeholder="分类名称"
-                    v-model="categoryToCreate.name"
-                  />
-                </a-form-item>
-                <a-form-item v-if="categoryForm">
-                  <a-input
-                    placeholder="分类路径"
-                    v-model="categoryToCreate.slugNames"
-                  />
-                </a-form-item>
-                <a-form-item>
-                  <a-button
-                    type="primary"
-                    style="marginRight: 8px"
-                    v-if="categoryForm"
-                    @click="handlerCreateCategory"
-                  >保存</a-button>
-                  <a-button
-                    type="dashed"
-                    style="marginRight: 8px"
-                    v-if="!categoryForm"
-                    @click="toggleCategoryForm"
-                  >新增</a-button>
-                  <a-button
-                    v-if="categoryForm"
-                    @click="toggleCategoryForm"
-                  >取消</a-button>
-                </a-form-item>
-              </a-form>
-            </div>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">标签</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
-              <a-form-item>
-                <TagSelect v-model="selectedTagIds" />
-              </a-form-item>
-            </a-form>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">摘要</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
-              <a-form-item>
-                <a-input
-                  type="textarea"
-                  :autosize="{ minRows: 5 }"
-                  v-model="selectedPost.summary"
-                  placeholder="不填写则会自动生成"
-                />
-              </a-form-item>
-            </a-form>
-          </div>
-        </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">缩略图</h3>
-          <div class="post-setting-drawer-item">
-            <div class="post-thum">
-              <img
-                class="img"
-                :src="selectedPost.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
-                @click="()=>this.thumDrawerVisible=true"
-              >
-              <a-button
-                class="post-thum-remove"
-                type="dashed"
-                @click="handlerRemoveThumb"
-              >移除</a-button>
-            </div>
-          </div>
-        </div>
-        <a-divider class="divider-transparent" />
-      </div>
-      <AttachmentSelectDrawer
-        v-model="thumDrawerVisible"
-        @listenToSelect="handleSelectPostThumb"
-        :drawerWidth="460"
-      />
-      <div class="bottom-control">
-        <a-button
-          @click="handleSavePostSettingsClick"
-          type="primary"
-        >保存</a-button>
-      </div>
-    </a-drawer>
+      @close="onPostSettingsClose"
+      @onRefreshPost="onRefreshPostFromSetting"
+      @onRefreshTagIds="onRefreshTagIdsFromSetting"
+      @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
+    />
   </div>
 </template>
 
 <script>
-import categoryApi from '@/api/category'
-import postApi from '@/api/post'
-import optionApi from '@/api/option'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import PostSetting from './components/PostSetting'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import TagSelect from './components/TagSelect'
 import CategoryTree from './components/CategoryTree'
+import { mapGetters } from 'vuex'
+import categoryApi from '@/api/category'
+import postApi from '@/api/post'
 const columns = [
   {
     title: '标题',
@@ -415,10 +354,11 @@ const columns = [
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
+    width: '100px',
     scopedSlots: { customRender: 'status' }
   },
   {
-    title: '分类目录',
+    title: '分类',
     dataIndex: 'categories',
     scopedSlots: { customRender: 'categories' }
   },
@@ -428,16 +368,21 @@ const columns = [
     scopedSlots: { customRender: 'tags' }
   },
   {
-    title: '评论量',
-    dataIndex: 'commentCount'
+    title: '评论',
+    width: '70px',
+    dataIndex: 'commentCount',
+    scopedSlots: { customRender: 'commentCount' }
   },
   {
-    title: '访问量',
-    dataIndex: 'visits'
+    title: '访问',
+    width: '70px',
+    dataIndex: 'visits',
+    scopedSlots: { customRender: 'visits' }
   },
   {
     title: '发布时间',
     dataIndex: 'createTime',
+    width: '170px',
     scopedSlots: { customRender: 'createTime' }
   },
   {
@@ -451,7 +396,8 @@ export default {
   components: {
     AttachmentSelectDrawer,
     TagSelect,
-    CategoryTree
+    CategoryTree,
+    PostSetting
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -478,14 +424,9 @@ export default {
       posts: [],
       postsLoading: false,
       postSettingVisible: false,
-      thumDrawerVisible: false,
       selectedPost: {},
-      selectedCategoryIds: [],
       selectedTagIds: [],
-      categoryForm: false,
-      categoryToCreate: {},
-      options: [],
-      keys: ['blog_url']
+      selectedCategoryIds: []
     }
   },
   computed: {
@@ -494,12 +435,23 @@ export default {
         post.statusProperty = this.postStatus[post.status]
         return post
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   created() {
-    this.loadCategories()
     this.loadPosts()
-    this.loadOptions()
+    this.loadCategories()
+  },
+  destroyed: function() {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.postSettingVisible) {
+      this.postSettingVisible = false
+    }
+    next()
   },
   methods: {
     loadPosts() {
@@ -517,11 +469,6 @@ export default {
     loadCategories() {
       categoryApi.listAll().then(response => {
         this.categories = response.data.data
-      })
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
       })
     },
     handleEditClick(post) {
@@ -553,6 +500,7 @@ export default {
     },
     handleQuery() {
       this.queryParam.page = 0
+      this.pagination.current = 1
       this.loadPosts()
     },
     handleEditStatusClick(postId, status) {
@@ -609,61 +557,34 @@ export default {
         })
       }
     },
-    // 打开文章设置抽屉
-    handlePostSettingsDrawer(post) {
-      this.postSettingVisible = true
+    handleShowPostSettings(post) {
       postApi.get(post.id).then(response => {
-        const post = response.data.data
-        this.selectedPost = post
-        this.selectedTagIds = post.tagIds
-        this.selectedCategoryIds = post.categoryIds
+        this.selectedPost = response.data.data
+        this.selectedTagIds = this.selectedPost.tagIds
+        this.selectedCategoryIds = this.selectedPost.categoryIds
+        this.postSettingVisible = true
       })
     },
-    handleSelectPostThumb(data) {
-      this.selectedPost.thumbnail = encodeURI(data.path)
-      this.thumDrawerVisible = false
-    },
-    handlerRemoveThumb() {
-      this.selectedPost.thumbnail = null
-    },
-    // 保存文章设置
-    handleSavePostSettingsClick() {
-      this.selectedPost.categoryIds = this.selectedCategoryIds
-      this.selectedPost.tagIds = this.selectedTagIds
-      postApi.update(this.selectedPost.id, this.selectedPost, false).then(response => {
-        this.$log.debug('Updated post', response.data.data)
-        this.loadPosts()
-        this.$message.success('文章更新成功')
-      })
-    },
-    toggleCategoryForm() {
-      this.categoryForm = !this.categoryForm
-    },
-    handlerCreateCategory() {
-      categoryApi.create(this.categoryToCreate).then(response => {
-        this.loadCategories()
-        this.categoryToCreate = {}
+    handlePreview(postId) {
+      postApi.preview(postId).then(response => {
+        window.open(response.data, '_blank')
       })
     },
     // 关闭文章设置抽屉
     onPostSettingsClose() {
       this.postSettingVisible = false
       this.selectedPost = {}
-      this.selectedTagIds = []
-      this.selectedCategoryIds = []
+      this.loadPosts()
+    },
+    onRefreshPostFromSetting(post) {
+      this.selectedPost = post
+    },
+    onRefreshTagIdsFromSetting(tagIds) {
+      this.selectedTagIds = tagIds
+    },
+    onRefreshCategoryIdsFromSetting(categoryIds) {
+      this.selectedCategoryIds = categoryIds
     }
   }
 }
 </script>
-<style scoped>
-a {
-  text-decoration: none;
-}
-.post-title {
-  max-width: 150px;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style>

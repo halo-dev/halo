@@ -2,36 +2,65 @@
   <div class="page-header-index-wide">
     <a-row>
       <a-col :span="24">
-        <a-card :bordered="false">
+        <a-card
+          :bordered="false"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword"/>
+                    <a-input v-model="queryParam.keyword" />
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <a-form-item label="状态">
-                    <a-select placeholder="请选择状态">
-                      <a-select-option value="1">公开</a-select-option>
-                      <a-select-option value="0">私密</a-select-option>
+                    <a-select
+                      placeholder="请选择状态"
+                      v-model="queryParam.type"
+                      @change="loadJournals(true)"
+                    >
+                      <a-select-option
+                        v-for="type in Object.keys(journalType)"
+                        :key="type"
+                        :value="type"
+                      >{{ journalType[type].text }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col :md="6" :sm="24">
+                <a-col
+                  :md="6"
+                  :sm="24"
+                >
                   <span class="table-page-search-submitButtons">
-                    <a-button type="primary" @click="loadJournals(true)">查询</a-button>
-                    <a-button style="margin-left: 8px;" @click="resetParam">重置</a-button>
+                    <a-button
+                      type="primary"
+                      @click="loadJournals(true)"
+                    >查询</a-button>
+                    <a-button
+                      style="margin-left: 8px;"
+                      @click="resetParam"
+                    >重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
           <div class="table-operator">
-            <a-button type="primary" icon="plus" @click="handleNew">写日志</a-button>
+            <a-button
+              type="primary"
+              icon="plus"
+              @click="handleNew"
+            >写日志</a-button>
           </div>
-          <a-divider/>
+          <a-divider />
           <div style="margin-top:15px">
             <a-list
               itemLayout="vertical"
@@ -39,7 +68,11 @@
               :dataSource="journals"
               :loading="listLoading"
             >
-              <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item, index"
+                :key="index"
+              >
                 <!-- 日志图片集合 -->
                 <!-- <a-card
                   hoverable
@@ -51,25 +84,51 @@
                   <img alt="example" :src="photo.thumbnail" slot="cover">
                 </a-card> -->
 
-                <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancelPreview">
+                <!-- <a-modal
+                  :visible="previewVisible"
+                  :footer="null"
+                  @cancel="handleCancelPreview"
+                >
                   <img
                     :alt="previewPhoto.name + previewPhoto.description"
                     style="width: 100%"
                     :src="previewPhoto.url"
                   >
-                </a-modal>
+                </a-modal> -->
 
                 <template slot="actions">
                   <span>
                     <a href="javascript:void(0);">
-                      <a-icon type="like-o" style="margin-right: 8px"/>
+                      <a-icon
+                        type="like-o"
+                        style="margin-right: 8px"
+                      />
                       {{ item.likes }}
                     </a>
                   </span>
                   <span>
-                    <a href="javascript:void(0);" @click="handleCommentShow(item)">
-                      <a-icon type="message" style="margin-right: 8px"/>
+                    <a
+                      href="javascript:void(0);"
+                      @click="handleCommentShow(item)"
+                    >
+                      <a-icon
+                        type="message"
+                        style="margin-right: 8px"
+                      />
                       {{ item.commentCount }}
+                    </a>
+                  </span>
+                  <span v-if="item.type=='INTIMATE'">
+                    <a
+                      href="javascript:void(0);"
+                      disabled
+                    >
+                      <a-icon type="lock" />
+                    </a>
+                  </span>
+                  <span v-else>
+                    <a href="javascript:void(0);">
+                      <a-icon type="unlock" />
                     </a>
                   </span>
                   <!-- <span>
@@ -77,8 +136,11 @@
                   </span>-->
                 </template>
                 <template slot="extra">
-                  <a href="javascript:void(0);" @click="handleEdit(item)">编辑</a>
-                  <a-divider type="vertical"/>
+                  <a
+                    href="javascript:void(0);"
+                    @click="handleEdit(item)"
+                  >编辑</a>
+                  <a-divider type="vertical" />
                   <a-popconfirm
                     title="你确定要删除这条日志？"
                     @confirm="handleDelete(item.id)"
@@ -91,7 +153,11 @@
 
                 <a-list-item-meta :description="item.content">
                   <span slot="title">{{ item.createTime | moment }}</span>
-                  <a-avatar slot="avatar" size="large" :src="user.avatar"/>
+                  <a-avatar
+                    slot="avatar"
+                    size="large"
+                    :src="user.avatar"
+                  />
                 </a-list-item-meta>
               </a-list-item>
               <div class="page-wrapper">
@@ -115,16 +181,35 @@
     <a-modal v-model="visible">
       <template slot="title">
         {{ title }}
-        <a-tooltip slot="action" title="只能输入250字">
-          <a-icon type="info-circle-o"/>
+        <a-tooltip
+          slot="action"
+          title="只能输入250字"
+        >
+          <a-icon type="info-circle-o" />
         </a-tooltip>
       </template>
       <template slot="footer">
-        <a-button key="submit" type="primary" @click="createOrUpdateJournal">发布</a-button>
+        <a-button
+          key="submit"
+          type="primary"
+          @click="createOrUpdateJournal"
+        >发布</a-button>
       </template>
       <a-form layout="vertical">
         <a-form-item>
-          <a-input type="textarea" :autosize="{ minRows: 8 }" v-model="journal.content"/>
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="journal.content"
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-switch
+            checkedChildren="公开"
+            unCheckedChildren="私密"
+            v-model="isPublic"
+            defaultChecked
+          />
         </a-form-item>
         <!-- <a-form-item v-show="showMoreOptions">
           <UploadPhoto
@@ -154,11 +239,19 @@
       v-model="selectCommentVisible"
     >
       <template slot="footer">
-        <a-button key="submit" type="primary" @click="handleReplyComment">回复</a-button>
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleReplyComment"
+        >回复</a-button>
       </template>
       <a-form layout="vertical">
         <a-form-item>
-          <a-input type="textarea" :autosize="{ minRows: 8 }" v-model="replyComment.content"/>
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="replyComment.content"
+          />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -168,20 +261,27 @@
       title="评论列表"
       :width="isMobile()?'100%':'460'"
       closable
-      :visible="commentVisiable"
+      :visible="commentVisible"
       destroyOnClose
-      @close="()=>this.commentVisiable = false"
+      @close="()=>this.commentVisible = false"
     >
-      <a-row type="flex" align="middle">
+      <a-row
+        type="flex"
+        align="middle"
+      >
         <a-col :span="24">
           <a-comment>
-            <a-avatar :src="user.avatar" :alt="user.nickname" slot="avatar"/>
+            <a-avatar
+              :src="user.avatar"
+              :alt="user.nickname"
+              slot="avatar"
+            />
             <p slot="content">{{ journal.content }}</p>
 
             <span slot="datetime">{{ journal.createTime | moment }}</span>
           </a-comment>
         </a-col>
-        <a-divider/>
+        <a-divider />
         <a-col :span="24">
           <journal-comment-tree
             v-for="(comment,index) in comments"
@@ -199,29 +299,30 @@
 <script>
 import JournalCommentTree from './components/JournalCommentTree'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
 import journalApi from '@/api/journal'
 import journalCommentApi from '@/api/journalComment'
-import userApi from '@/api/user'
 import UploadPhoto from '@/components/Upload/UploadPhoto.vue'
 export default {
   mixins: [mixin, mixinDevice],
   components: { JournalCommentTree, UploadPhoto },
   data() {
     return {
-      plusPhotoVisible: true,
-      photoList: [], // 编辑图片时回显所需对象
-      previewVisible: false,
+      journalType: journalApi.journalType,
+      // plusPhotoVisible: true,
+      // photoList: [], // 编辑图片时回显所需对象
+      // previewVisible: false,
       showMoreOptions: false,
-      previewPhoto: {
-        // 图片预览信息临时对象
-        name: '',
-        description: '',
-        url: ''
-      },
+      // previewPhoto: {
+      //   // 图片预览信息临时对象
+      //   name: '',
+      //   description: '',
+      //   url: ''
+      // },
       title: '发表',
       listLoading: false,
       visible: false,
-      commentVisiable: false,
+      commentVisible: false,
       selectCommentVisible: false,
       pagination: {
         page: 1,
@@ -232,50 +333,49 @@ export default {
         page: 0,
         size: 10,
         sort: null,
-        keyword: null
+        keyword: null,
+        type: null
       },
       journals: [],
       comments: [],
-      journal: {
-        id: undefined,
-        content: '',
-        photos: []
-      },
+      journal: {},
+      isPublic: true,
       journalPhotos: [], // 日志图片集合最多九张
       selectComment: null,
-      replyComment: {},
-      user: {}
+      replyComment: {}
     }
   },
   created() {
     this.loadJournals()
-    this.loadUser()
+  },
+  computed: {
+    ...mapGetters(['user'])
   },
   methods: {
-    handleCancelPreview() {
-      this.previewVisible = false
-    },
-    handlerPhotoPreview(photo) {
-      // 日志图片预览
-      this.previewVisible = true
-      this.previewPhoto = photo
-    },
-    handlerPhotoUploadSuccess(response, file) {
-      var callData = response.data.data
-      var photo = {
-        name: callData.name,
-        url: callData.path,
-        thumbnail: callData.thumbPath,
-        suffix: callData.suffix,
-        width: callData.width,
-        height: callData.height
-      }
-      this.journalPhotos.push(photo)
-    },
-    handleUploadPhotoWallClick() {
-      // 是否显示上传照片墙组件
-      this.showMoreOptions = !this.showMoreOptions
-    },
+    // handleCancelPreview() {
+    //   this.previewVisible = false
+    // },
+    // handlerPhotoPreview(photo) {
+    //   // 日志图片预览
+    //   this.previewVisible = true
+    //   this.previewPhoto = photo
+    // },
+    // handlerPhotoUploadSuccess(response, file) {
+    //   var callData = response.data.data
+    //   var photo = {
+    //     name: callData.name,
+    //     url: callData.path,
+    //     thumbnail: callData.thumbPath,
+    //     suffix: callData.suffix,
+    //     width: callData.width,
+    //     height: callData.height
+    //   }
+    //   this.journalPhotos.push(photo)
+    // },
+    // handleUploadPhotoWallClick() {
+    //   // 是否显示上传照片墙组件
+    //   this.showMoreOptions = !this.showMoreOptions
+    // },
     loadJournals(isSearch) {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -290,28 +390,23 @@ export default {
         this.listLoading = false
       })
     },
-    loadUser() {
-      userApi.getProfile().then(response => {
-        this.user = response.data.data
-      })
-    },
     handleNew() {
       this.title = '新建'
       this.visible = true
       this.journal = {}
 
       // 显示图片上传框
-      this.plusPhotoVisible = true
-      this.photoList = []
+      // this.plusPhotoVisible = true
+      // this.photoList = []
     },
     handleEdit(item) {
       this.title = '编辑'
       this.journal = item
+      this.isPublic = item.type !== 'INTIMATE'
       this.visible = true
-
       // 为编辑时需要回显图片数组赋值,并隐藏图片上传框
-      this.plusPhotoVisible = false
-      this.photoList = item.photos
+      // this.plusPhotoVisible = false
+      // this.photoList = item.photos
     },
     handleDelete(id) {
       journalApi.delete(id).then(response => {
@@ -323,7 +418,7 @@ export default {
       this.journal = journal
       journalApi.commentTree(this.journal.id).then(response => {
         this.comments = response.data.data.content
-        this.commentVisiable = true
+        this.commentVisible = true
       })
     },
     handleCommentReplyClick(comment) {
@@ -349,18 +444,29 @@ export default {
     },
     createOrUpdateJournal() {
       // 给属性填充数据
-      this.journal.photos = this.journalPhotos
+      // this.journal.photos = this.journalPhotos
+      this.journal.type = this.isPublic ? 'PUBLIC' : 'INTIMATE'
+
+      if (!this.journal.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '发布内容不能为空！'
+        })
+        return
+      }
 
       if (this.journal.id) {
         journalApi.update(this.journal.id, this.journal).then(response => {
           this.$message.success('更新成功！')
           this.loadJournals()
+          this.isPublic = true
         })
       } else {
         journalApi.create(this.journal).then(response => {
           this.$message.success('发表成功！')
           this.loadJournals()
-          this.photoList = []
+          // this.photoList = []
+          this.isPublic = true
         })
       }
       this.visible = false
@@ -373,21 +479,21 @@ export default {
     },
     resetParam() {
       this.queryParam.keyword = null
+      this.queryParam.type = null
       this.loadJournals()
     }
   }
 }
 </script>
 <style scoped="scoped">
-.more-options-btn {
+/* .more-options-btn {
   margin-left: 15px;
   text-decoration: none;
 }
 
-/* 日志图片卡片样式 */
 .photo-card {
   width: 104px;
   display: inline-block;
   margin-right: 5px;
-}
+} */
 </style>

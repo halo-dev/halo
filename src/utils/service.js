@@ -8,7 +8,7 @@ import router from '@/router'
 import { isObject } from './util'
 
 const service = axios.create({
-  timeout: 5000,
+  timeout: 8000,
   withCredentials: true
 })
 
@@ -147,7 +147,7 @@ service.interceptors.response.use(
         message.error(data.message)
       }
     } else {
-      message.error('服务异常')
+      message.error('网络异常')
     }
 
     return Promise.reject(error)

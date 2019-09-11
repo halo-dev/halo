@@ -30,6 +30,7 @@
         <a-avatar
           class="avatar"
           size="small"
+          style="margin-right: 0.3rem;"
           :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
         />
       </span>
@@ -63,7 +64,6 @@
 import HeaderComment from './HeaderComment'
 import SettingDrawer from '@/components/SettingDrawer/SettingDrawer'
 import { mapActions, mapGetters } from 'vuex'
-import optionApi from '@/api/option'
 
 export default {
   name: 'UserMenu',
@@ -73,19 +73,14 @@ export default {
   },
   data() {
     return {
-      optionVisible: true,
-      options: [],
-      keys: ['blog_url']
+      optionVisible: true
     }
   },
   mounted() {
     this.optionVisible = this.$refs.drawer.visible
   },
-  created() {
-    this.loadOptions()
-  },
   computed: {
-    ...mapGetters(['user'])
+    ...mapGetters(['user', 'options'])
   },
   methods: {
     ...mapActions(['logout']),
@@ -114,18 +109,7 @@ export default {
     showOptionModal() {
       this.optionVisible = this.$refs.drawer.visible
       this.$refs.drawer.toggle()
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
-      })
     }
   }
 }
 </script>
-
-<style lang="less" scoped>
-.avatar {
-  margin-right: 0.3rem;
-}
-</style>

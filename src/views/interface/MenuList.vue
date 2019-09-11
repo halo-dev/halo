@@ -9,7 +9,10 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title">
+        <a-card
+          :title="title"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -41,6 +44,12 @@
               :style="{ display: fieldExpand ? 'block' : 'none' }"
             >
               <a-input v-model="menuToCreate.icon" />
+            </a-form-item>
+            <a-form-item
+              label="分组："
+              :style="{ display: fieldExpand ? 'block' : 'none' }"
+            >
+              <a-input v-model="menuToCreate.team" />
             </a-form-item>
             <a-form-item
               label="打开方式："
@@ -90,7 +99,10 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="所有菜单">
+        <a-card
+          title="所有菜单"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <a-table
             :columns="columns"
             :dataSource="menus"
@@ -142,6 +154,10 @@ const columns = [
     dataIndex: 'url'
   },
   {
+    title: '分组',
+    dataIndex: 'team'
+  },
+  {
     title: '排序',
     dataIndex: 'priority'
   },
@@ -159,7 +175,9 @@ export default {
       loading: false,
       columns,
       menus: [],
-      menuToCreate: {},
+      menuToCreate: {
+        target: '_self'
+      },
       fieldExpand: false
     }
   },
@@ -219,6 +237,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>

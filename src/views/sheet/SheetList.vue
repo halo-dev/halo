@@ -9,26 +9,6 @@
                 <a-icon type="pushpin" />内置页面
               </span>
 
-              <!-- TODO 移动端展示 -->
-              <!-- <a-collapse
-                :bordered="false"
-                v-if="isMobile()"
-              >
-                <a-collapse-panel
-                  v-for="(item,index) in internalSheets"
-                  :key="index"
-                >
-                  <a
-                    href="javascript:void(0);"
-                    slot="header"
-                  > {{ item.name }} </a>
-                  <div>
-                    访问路径：{{ item.url }}
-                    操作：{{ item.url }}
-                  </div>
-                </a-collapse-panel>
-              </a-collapse> -->
-
               <a-table
                 :columns="internalColumns"
                 :dataSource="internalSheets"
@@ -95,33 +75,90 @@
                 :columns="customColumns"
                 :dataSource="formattedSheets"
                 :pagination="false"
+                :loading="sheetsLoading"
               >
                 <span
                   slot="sheetTitle"
                   slot-scope="text,record"
-                  class="sheet-title"
+                  style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                 >
                   <a
+                    v-if="record.status=='PUBLISHED'"
                     :href="options.blog_url+'/s/'+record.url"
                     target="_blank"
+                    style="text-decoration: none;"
+                  >
+                    <a-tooltip
+                      placement="top"
+                      :title="'点击访问【'+text+'】'"
+                    >{{ text }}</a-tooltip>
+                  </a>
+                  <a
+                    v-else-if="record.status=='DRAFT'"
+                    href="javascript:void(0)"
+                    style="text-decoration: none;"
+                    @click="handlePreview(record.id)"
                   >
                     <a-tooltip
                       placement="topLeft"
-                      :title="'点击预览 '+text"
+                      :title="'点击预览【'+text+'】'"
                     >{{ text }}</a-tooltip>
                   </a>
+                  <a
+                    v-else
+                    href="javascript:void(0);"
+                    style="text-decoration: none;"
+                    disabled
+                  >
+                    {{ text }}
+                  </a>
                 </span>
+
                 <span
                   slot="status"
                   slot-scope="statusProperty"
                 >
-                  <a-badge :status="statusProperty.status" />
-                  {{ statusProperty.text }}
+                  <a-badge
+                    :status="statusProperty.status"
+                    :text="statusProperty.text"
+                  />
                 </span>
+
+                <span
+                  slot="commentCount"
+                  slot-scope="commentCount"
+                >
+                  <a-badge
+                    :count="commentCount"
+                    :numberStyle="{backgroundColor: '#f38181'} "
+                    :showZero="true"
+                    :overflowCount="999"
+                  />
+                </span>
+
+                <span
+                  slot="visits"
+                  slot-scope="visits"
+                >
+                  <a-badge
+                    :count="visits"
+                    :numberStyle="{backgroundColor: '#00e0ff'} "
+                    :showZero="true"
+                    :overflowCount="9999"
+                  />
+                </span>
+
                 <span
                   slot="createTime"
                   slot-scope="createTime"
-                >{{ createTime | timeAgo }}</span>
+                >
+                  <a-tooltip placement="top">
+                    <template slot="title">
+                      {{ createTime | moment }}
+                    </template>
+                    {{ createTime | timeAgo }}
+                  </a-tooltip>
+                </span>
 
                 <span
                   slot="action"
@@ -172,6 +209,12 @@
                     >更多</a>
                     <a-menu slot="overlay">
                       <a-menu-item key="1">
+                        <a
+                          href="javascript:void(0);"
+                          @click="handleShowSheetSettings(sheet)"
+                        >设置</a>
+                      </a-menu-item>
+                      <a-menu-item key="2">
                         <a-popconfirm
                           :title="'你确定要添加【' + sheet.title + '】到菜单？'"
                           @confirm="handleSheetToMenu(sheet)"
@@ -190,13 +233,23 @@
         </div>
       </a-col>
     </a-row>
+
+    <SheetSetting
+      :sheet="selectedSheet"
+      :visible="sheetSettingVisible"
+      :needTitle="true"
+      @close="onSheetSettingsClose"
+      @onRefreshSheet="onRefreshSheetFromSetting"
+    />
+
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mapGetters } from 'vuex'
+import SheetSetting from './components/SheetSetting'
 import sheetApi from '@/api/sheet'
-import optionApi from '@/api/option'
 import menuApi from '@/api/menu'
 
 const internalColumns = [
@@ -234,11 +287,13 @@ const customColumns = [
   },
   {
     title: '评论量',
-    dataIndex: 'commentCount'
+    dataIndex: 'commentCount',
+    scopedSlots: { customRender: 'commentCount' }
   },
   {
     title: '访问量',
-    dataIndex: 'visits'
+    dataIndex: 'visits',
+    scopedSlots: { customRender: 'visits' }
   },
   {
     title: '发布时间',
@@ -253,16 +308,20 @@ const customColumns = [
 ]
 export default {
   mixins: [mixin, mixinDevice],
+  components: {
+    SheetSetting
+  },
   data() {
     return {
+      sheetsLoading: false,
       sheetStatus: sheetApi.sheetStatus,
       internalColumns,
       customColumns,
+      selectedSheet: {},
+      sheetSettingVisible: false,
       internalSheets: [],
       sheets: [],
-      options: [],
-      menu: {},
-      keys: ['blog_url']
+      menu: {}
     }
   },
   computed: {
@@ -271,27 +330,35 @@ export default {
         sheet.statusProperty = this.sheetStatus[sheet.status]
         return sheet
       })
-    }
+    },
+    ...mapGetters(['options'])
   },
   created() {
     this.loadSheets()
     this.loadInternalSheets()
-    this.loadOptions()
+  },
+  destroyed: function() {
+    if (this.sheetSettingVisible) {
+      this.sheetSettingVisible = false
+    }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.sheetSettingVisible) {
+      this.sheetSettingVisible = false
+    }
+    next()
   },
   methods: {
     loadSheets() {
+      this.sheetsLoading = true
       sheetApi.list().then(response => {
         this.sheets = response.data.data.content
+        this.sheetsLoading = false
       })
     },
     loadInternalSheets() {
       sheetApi.listInternal().then(response => {
         this.internalSheets = response.data.data
-      })
-    },
-    loadOptions() {
-      optionApi.listAll(this.keys).then(response => {
-        this.options = response.data.data
       })
     },
     handleEditClick(sheet) {
@@ -316,19 +383,26 @@ export default {
         this.$message.success('添加到菜单成功！')
         this.menu = {}
       })
+    },
+    handleShowSheetSettings(sheet) {
+      sheetApi.get(sheet.id).then(response => {
+        this.selectedSheet = response.data.data
+        this.sheetSettingVisible = true
+      })
+    },
+    handlePreview(sheetId) {
+      sheetApi.preview(sheetId).then(response => {
+        window.open(response.data, '_blank')
+      })
+    },
+    onSheetSettingsClose() {
+      this.sheetSettingVisible = false
+      this.selectedSheet = {}
+      this.loadSheets()
+    },
+    onRefreshSheetFromSetting(sheet) {
+      this.selectedSheet = sheet
     }
   }
 }
 </script>
-<style scoped>
-a {
-  text-decoration: none;
-}
-.sheet-title {
-  max-width: 300px;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style>

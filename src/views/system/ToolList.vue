@@ -27,20 +27,16 @@
         title="Markdown 文章导入"
         v-model="markdownUpload"
         :footer="null"
+        destroyOnClose
+        :afterClose="onUploadClose"
       >
-        <upload
-          name="files"
-          multiple
+        <FilePondUpload
+          ref="upload"
+          name="file"
           accept="text/markdown"
+          label="拖拽或点击选择 Markdown 文件到此处"
           :uploadHandler="uploadHandler"
-          @change="handleChange"
-        >
-          <p class="ant-upload-drag-icon">
-            <a-icon type="inbox" />
-          </p>
-          <p class="ant-upload-text">拖拽或点击选择 Markdown 文件到此处</p>
-          <p class="ant-upload-hint">支持多个文件同时上传</p>
-        </upload>
+        ></FilePondUpload>
       </a-modal>
     </div>
   </div>
@@ -69,10 +65,10 @@ export default {
       } else if (status === 'error') {
         this.$message.error(`${info.file.name} 导入失败！`)
       }
+    },
+    onUploadClose() {
+      this.$refs.upload.handleClearFileList()
     }
   }
 }
 </script>
-
-<style scoped>
-</style>

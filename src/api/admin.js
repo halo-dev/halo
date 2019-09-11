@@ -12,6 +12,13 @@ adminApi.counts = () => {
   })
 }
 
+adminApi.isInstalled = () => {
+  return service({
+    url: `${baseUrl}/is_installed`,
+    method: 'get'
+  })
+}
+
 adminApi.environments = () => {
   return service({
     url: `${baseUrl}/environments`,
@@ -49,6 +56,22 @@ adminApi.refreshToken = refreshToken => {
   return service({
     url: `${baseUrl}/refresh/${refreshToken}`,
     method: 'post'
+  })
+}
+
+adminApi.sendResetCode = param => {
+  return service({
+    url: `${baseUrl}/password/code`,
+    data: param,
+    method: 'post'
+  })
+}
+
+adminApi.resetPassword = param => {
+  return service({
+    url: `${baseUrl}/password/reset`,
+    data: param,
+    method: 'put'
   })
 }
 
