@@ -12,6 +12,7 @@ import java.util.List;
  * Attachment repository
  *
  * @author johnniang
+ * @date 2019-04-03
  */
 public interface AttachmentRepository extends BaseRepository<Attachment, Integer>, JpaSpecificationExecutor<Attachment> {
 

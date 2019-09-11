@@ -100,9 +100,14 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         return create(photoParam.convertTo());
     }
 
+    @Override
+    public List<String> listAllTeams() {
+        return photoRepository.findAllTeams();
+    }
+
     @NonNull
     private Specification<Photo> buildSpecByQuery(@NonNull PhotoQuery photoQuery) {
-        Assert.notNull(photoQuery, "Attachment query must not be null");
+        Assert.notNull(photoQuery, "Photo query must not be null");
 
         return (Specification<Photo>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();

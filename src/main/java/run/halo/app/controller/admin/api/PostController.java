@@ -1,10 +1,15 @@
 package run.halo.app.controller.admin.api;
 
+import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
@@ -13,10 +18,12 @@ import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -24,6 +31,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Post controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/19/19
  */
 @RestController
@@ -32,14 +40,27 @@ public class PostController {
 
     private final PostService postService;
 
-    public PostController(PostService postService) {
+    private final StringCacheStore cacheStore;
+
+    private final OptionService optionService;
+
+    public PostController(PostService postService,
+                          StringCacheStore cacheStore,
+                          OptionService optionService) {
         this.postService = postService;
+        this.cacheStore = cacheStore;
+        this.optionService = optionService;
     }
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<PostListVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+    public Page<PostListVO> pageBy(Integer page, Integer size,
+                                   @SortDefault.SortDefaults({
+                                           @SortDefault(sort = "topPriority", direction = DESC),
+                                           @SortDefault(sort = "createTime", direction = DESC)
+                                   }) Sort sort,
                                    PostQuery postQuery) {
+        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage);
     }
@@ -54,7 +75,7 @@ public class PostController {
     @ApiOperation("Gets a page of post by post status")
     public Page<? extends BasePostSimpleDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
                                                           @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
-                                                          @PageableDefault(sort = "editTime", direction = DESC) Pageable pageable) {
+                                                          @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> posts = postService.pageBy(status, pageable);
 
         if (more) {
@@ -116,4 +137,16 @@ public class PostController {
         postService.removeById(postId);
     }
 
+    @GetMapping("preview/{postId:\\d+}")
+    public String preview(@PathVariable("postId") Integer postId) {
+        Post post = postService.getById(postId);
+
+        String token = IdUtil.simpleUUID();
+
+        // cache preview token
+        cacheStore.putAny("preview-post-token-" + postId, token, 10, TimeUnit.MINUTES);
+
+        // build preview post url and return
+        return String.format("%s/archives/%s?preview=true&token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
+    }
 }

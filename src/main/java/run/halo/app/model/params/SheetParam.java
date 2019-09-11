@@ -11,9 +11,13 @@ import run.halo.app.utils.HaloUtils;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
+ * Sheet param.
+ *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-24
  */
 @Data
@@ -35,6 +39,8 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private Boolean disallowComment = false;
 
+    private Date createTime;
+
     @Size(max = 255, message = "Length of password must not be more than {max}")
     private String password;
 
@@ -47,37 +53,26 @@ public class SheetParam implements InputConverter<Sheet> {
     @Override
     public Sheet convertTo() {
         if (StringUtils.isBlank(url)) {
-            url = HaloUtils.normalizeUrl(title);
-        } else {
-            url = HaloUtils.normalizeUrl(url);
+            url = title.replace(".","");
         }
 
-        url = HaloUtils.initializeUrlIfBlank(url);
-
-        Sheet sheet = InputConverter.super.convertTo();
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            sheet.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+        if (null == thumbnail) {
+            thumbnail = "";
         }
 
-        return sheet;
+        return InputConverter.super.convertTo();
     }
 
     @Override
     public void update(Sheet sheet) {
         if (StringUtils.isBlank(url)) {
-            url = HaloUtils.normalizeUrl(title);
-        } else {
-            url = HaloUtils.normalizeUrl(url);
+            url = title.replace(".","");
         }
 
-        url = HaloUtils.initializeUrlIfBlank(url);
+        if (null == thumbnail) {
+            thumbnail = "";
+        }
 
         InputConverter.super.update(sheet);
-
-        // Crypt password
-        if (StringUtils.isNotBlank(password)) {
-            sheet.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
-        }
     }
 }

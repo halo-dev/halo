@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
@@ -35,7 +36,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -105,49 +105,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
     }
 
-    /**
-     * Build specification by post query.
-     *
-     * @param postQuery post query must not be null
-     * @return a post specification
-     */
-    @NonNull
-    private Specification<Post> buildSpecByQuery(@NonNull PostQuery postQuery) {
-        Assert.notNull(postQuery, "Post query must not be null");
-
-        return (Specification<Post>) (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new LinkedList<>();
-
-            if (postQuery.getStatus() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), postQuery.getStatus()));
-            }
-
-            if (postQuery.getCategoryId() != null) {
-                Subquery<Post> postSubquery = query.subquery(Post.class);
-                Root<PostCategory> postCategoryRoot = postSubquery.from(PostCategory.class);
-                postSubquery.select(postCategoryRoot.get("postId"));
-                postSubquery.where(
-                        criteriaBuilder.equal(root.get("id"), postCategoryRoot.get("postId")),
-                        criteriaBuilder.equal(postCategoryRoot.get("categoryId"), postQuery.getCategoryId()));
-                predicates.add(criteriaBuilder.exists(postSubquery));
-            }
-
-            if (postQuery.getKeyword() != null) {
-                // Format like condition
-                String likeCondition = String.format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
-
-                // Build like predicate
-                Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
-                Predicate originalContentLike = criteriaBuilder.like(root.get("originalContent"), likeCondition);
-
-                predicates.add(criteriaBuilder.or(titleLike, originalContentLike));
-            }
-
-            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
-        };
-    }
-
     @Override
+    @Transactional
     public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
         PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds);
         if (!autoSave) {
@@ -159,6 +118,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
+    @Transactional
     public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
@@ -169,34 +129,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             eventPublisher.publishEvent(logEvent);
         }
         return updatedPost;
-    }
-
-    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds) {
-        Assert.notNull(post, "Post param must not be null");
-
-        // Create or update post
-        post = super.createOrUpdateBy(post);
-
-        // List all tags
-        List<Tag> tags = tagService.listAllByIds(tagIds);
-
-        // List all categories
-        List<Category> categories = categoryService.listAllByIds(categoryIds);
-
-        // Create post tags
-        List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(tags, Tag::getId));
-
-        log.debug("Created post tags: [{}]", postTags);
-
-        // Create post categories
-        List<PostCategory> postCategories = postCategoryService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(categories, Category::getId));
-
-        log.debug("Created post categories: [{}]", postCategories);
-
-        // Convert to post detail vo
-        return convertTo(post,
-                () -> ServiceUtils.fetchProperty(postTags, PostTag::getTagId),
-                () -> ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId));
     }
 
     @Override
@@ -397,7 +329,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
         }
 
-        List<Category> categories = postCategoryService.listCategoryBy(post.getId());
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
 
         if (categories.size() > 0) {
             content.append("categories:").append("\n");
@@ -413,9 +345,13 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     public PostDetailVO convertToDetailVo(Post post) {
-        return convertTo(post,
-                () -> postTagService.listTagIdsByPostId(post.getId()),
-                () -> postCategoryService.listCategoryIdsByPostId(post.getId()));
+        // List tags
+        List<Tag> tags = postTagService.listTagsBy(post.getId());
+        // List categories
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
+
+        // Convert to detail vo
+        return convertTo(post, tags, categories);
     }
 
     @Override
@@ -494,23 +430,102 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     /**
      * Converts to post detail vo.
      *
-     * @param post                  post must not be null
-     * @param tagIdSetSupplier      tag id set supplier
-     * @param categoryIdSetSupplier category id set supplier
+     * @param post       post must not be null
+     * @param tags       tags
+     * @param categories categories
      * @return post detail vo
      */
     @NonNull
-    private PostDetailVO convertTo(@NonNull Post post, @Nullable Supplier<Set<Integer>> tagIdSetSupplier, @Nullable Supplier<Set<Integer>> categoryIdSetSupplier) {
+    private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Tag> tags, @Nullable List<Category> categories) {
         Assert.notNull(post, "Post must not be null");
 
+        // Convert to base detail vo
         PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
 
+        // Extract ids
+        Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);
+        Set<Integer> categoryIds = ServiceUtils.fetchProperty(categories, Category::getId);
+
         // Get post tag ids
-        postDetailVO.setTagIds(tagIdSetSupplier == null ? Collections.emptySet() : tagIdSetSupplier.get());
+        postDetailVO.setTagIds(tagIds);
+        postDetailVO.setTags(tagService.convertTo(tags));
 
         // Get post category ids
-        postDetailVO.setCategoryIds(categoryIdSetSupplier == null ? Collections.emptySet() : categoryIdSetSupplier.get());
+        postDetailVO.setCategoryIds(categoryIds);
+        postDetailVO.setCategories(categoryService.convertTo(categories));
 
         return postDetailVO;
+    }
+
+    /**
+     * Build specification by post query.
+     *
+     * @param postQuery post query must not be null
+     * @return a post specification
+     */
+    @NonNull
+    private Specification<Post> buildSpecByQuery(@NonNull PostQuery postQuery) {
+        Assert.notNull(postQuery, "Post query must not be null");
+
+        return (Specification<Post>) (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (postQuery.getStatus() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), postQuery.getStatus()));
+            }
+
+            if (postQuery.getCategoryId() != null) {
+                Subquery<Post> postSubquery = query.subquery(Post.class);
+                Root<PostCategory> postCategoryRoot = postSubquery.from(PostCategory.class);
+                postSubquery.select(postCategoryRoot.get("postId"));
+                postSubquery.where(
+                        criteriaBuilder.equal(root.get("id"), postCategoryRoot.get("postId")),
+                        criteriaBuilder.equal(postCategoryRoot.get("categoryId"), postQuery.getCategoryId()));
+                predicates.add(criteriaBuilder.exists(postSubquery));
+            }
+
+            if (postQuery.getKeyword() != null) {
+                // Format like condition
+                String likeCondition = String.format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
+
+                // Build like predicate
+                Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
+                Predicate originalContentLike = criteriaBuilder.like(root.get("originalContent"), likeCondition);
+
+                predicates.add(criteriaBuilder.or(titleLike, originalContentLike));
+            }
+
+            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
+    }
+
+    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        Assert.notNull(post, "Post param must not be null");
+
+        // Create or update post
+        post = super.createOrUpdateBy(post);
+
+        postTagService.removeByPostId(post.getId());
+
+        postCategoryService.removeByPostId(post.getId());
+
+        // List all tags
+        List<Tag> tags = tagService.listAllByIds(tagIds);
+
+        // List all categories
+        List<Category> categories = categoryService.listAllByIds(categoryIds);
+
+        // Create post tags
+        List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(tags, Tag::getId));
+
+        log.debug("Created post tags: [{}]", postTags);
+
+        // Create post categories
+        List<PostCategory> postCategories = postCategoryService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(categories, Category::getId));
+
+        log.debug("Created post categories: [{}]", postCategories);
+
+        // Convert to post detail vo
+        return convertTo(post, tags, categories);
     }
 }

@@ -23,6 +23,7 @@ public class BaseCommentWithParentVO extends BaseCommentDTO implements Cloneable
      */
     private BaseCommentWithParentVO parent;
 
+    @Override
     public BaseCommentWithParentVO clone() {
         try {
             return (BaseCommentWithParentVO) super.clone();

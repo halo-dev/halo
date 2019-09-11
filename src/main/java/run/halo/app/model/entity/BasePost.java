@@ -10,9 +10,10 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Post entity.
+ * Post base entity.
  *
  * @author johnniang
+ * @author ryanwang
  */
 @Data
 @Entity(name = "BasePost")
@@ -41,7 +42,7 @@ public class BasePost extends BaseEntity {
     /**
      * Post url.
      */
-    @Column(name = "url", columnDefinition = "varchar(255) not null")
+    @Column(name = "url", columnDefinition = "varchar(255) not null", unique = true)
     private String url;
 
     /**
@@ -167,6 +168,10 @@ public class BasePost extends BaseEntity {
 
         if (likes == null || likes < 0) {
             likes = 0L;
+        }
+
+        if (formatContent == null) {
+            formatContent = "";
         }
     }
 

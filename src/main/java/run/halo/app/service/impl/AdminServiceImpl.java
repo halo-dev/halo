@@ -2,7 +2,9 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.Mode;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
+import run.halo.app.model.params.ResetPasswordParam;
+import run.halo.app.model.properties.EmailProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
@@ -36,7 +40,6 @@ import run.halo.app.utils.HaloUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -75,6 +78,8 @@ public class AdminServiceImpl implements AdminService {
 
     private final LinkService linkService;
 
+    private final MailService mailService;
+
     private final StringCacheStore cacheStore;
 
     private final RestTemplate restTemplate;
@@ -96,6 +101,7 @@ public class AdminServiceImpl implements AdminService {
                             OptionService optionService,
                             UserService userService,
                             LinkService linkService,
+                            MailService mailService,
                             StringCacheStore cacheStore,
                             RestTemplate restTemplate,
                             HaloProperties haloProperties,
@@ -111,6 +117,7 @@ public class AdminServiceImpl implements AdminService {
         this.optionService = optionService;
         this.userService = userService;
         this.linkService = linkService;
+        this.mailService = mailService;
         this.cacheStore = cacheStore;
         this.restTemplate = restTemplate;
         this.haloProperties = haloProperties;
@@ -192,9 +199,70 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public void sendResetPasswordCode(ResetPasswordParam param) {
+        cacheStore.getAny("code", String.class).ifPresent(code -> {
+            throw new ServiceException("已经获取过验证码，不能重复获取");
+        });
+
+        Boolean emailEnabled = optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class, false);
+
+        if (!emailEnabled) {
+            throw new ServiceException("未启用 SMTP 服务");
+        }
+
+        if (!userService.verifyUser(param.getUsername(), param.getEmail())) {
+            throw new ServiceException("用户名或者邮箱验证错误");
+        }
+
+        // Gets random code.
+        String code = RandomUtil.randomNumbers(6);
+
+        log.info("Get reset password code:{}", code);
+
+        // Send email to administrator.
+        String content = "您正在进行密码重置操作，如不是本人操作，请尽快做好相应措施。密码重置验证码如下（五分钟有效）：\n" + code;
+        mailService.sendMail(param.getEmail(), "找回密码验证码", content);
+
+        // Cache code.
+        cacheStore.putAny("code", code, 5, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public void resetPasswordByCode(ResetPasswordParam param) {
+        if (StringUtils.isEmpty(param.getCode())) {
+            throw new ServiceException("验证码不能为空");
+        }
+
+        if (StringUtils.isEmpty(param.getPassword())) {
+            throw new ServiceException("密码不能为空");
+        }
+
+        if (!userService.verifyUser(param.getUsername(), param.getEmail())) {
+            throw new ServiceException("用户名或者邮箱验证错误");
+        }
+
+        // verify code
+        String code = cacheStore.getAny("code", String.class).orElseThrow(() -> new ServiceException("未获取过验证码"));
+        if (!code.equals(param.getCode())) {
+            throw new ServiceException("验证码不正确");
+        }
+
+        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
+
+        // reset password
+        userService.setPassword(user, param.getPassword());
+
+        // Update this user
+        userService.update(user);
+
+        // clear code cache
+        cacheStore.delete("code");
+    }
+
+    @Override
     public StatisticDTO getCount() {
         StatisticDTO statisticDTO = new StatisticDTO();
-        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
+        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED) + sheetService.countByStatus(PostStatus.PUBLISHED));
         statisticDTO.setAttachmentCount(attachmentService.count());
 
         // Handle comment count
@@ -221,8 +289,7 @@ public class AdminServiceImpl implements AdminService {
         EnvironmentDTO environmentDTO = new EnvironmentDTO();
 
         // Get application start time.
-        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-        environmentDTO.setStartTime(runtimeMXBean.getStartTime());
+        environmentDTO.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
 
         environmentDTO.setDatabase("org.h2.Driver".equals(driverClassName) ? "H2" : "MySQL");
 
@@ -323,7 +390,7 @@ public class AdminServiceImpl implements AdminService {
             String contentType = aAssetMap.getOrDefault("content_type", "").toString();
 
             Object name = aAssetMap.getOrDefault("name", "");
-            return name.toString().matches(HALO_ADMIN_VERSION_REGEX) && contentType.equalsIgnoreCase("application/zip");
+            return name.toString().matches(HALO_ADMIN_VERSION_REGEX) && "application/zip".equalsIgnoreCase(contentType);
         };
     }
 

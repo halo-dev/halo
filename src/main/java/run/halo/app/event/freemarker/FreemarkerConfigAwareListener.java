@@ -12,6 +12,7 @@ import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
@@ -98,7 +99,8 @@ public class FreemarkerConfigAwareListener {
     private void loadThemeConfig() throws TemplateModelException {
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
         configuration.setSharedVariable("theme", activatedTheme);
-        configuration.setSharedVariable("static", optionService.getBlogBaseUrl() + "/" + activatedTheme.getFolderName());
+        String baseUrl = optionService.getByPropertyOrDefault(OtherProperties.CDN_DOMAIN, String.class, optionService.getBlogBaseUrl());
+        configuration.setSharedVariable("static", baseUrl + "/" + activatedTheme.getFolderName());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }

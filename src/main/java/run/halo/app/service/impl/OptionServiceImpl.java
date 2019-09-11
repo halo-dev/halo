@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
@@ -23,6 +26,7 @@ import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
+import run.halo.app.utils.ValidationUtils;
 
 import java.util.*;
 
@@ -59,46 +63,55 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         propertyEnumMap = Collections.unmodifiableMap(PropertyEnum.getValuePropertyEnumMap());
     }
 
-    private void save(String key, String value) {
+    @Deprecated
+    @Transactional
+    private void save(@NonNull String key, @Nullable String value) {
         Assert.hasText(key, "Option key must not be blank");
-
-        if (StringUtils.isBlank(value)) {
-            // If the value is blank, remove the key
-            optionRepository.deleteByKey(key);
-            log.debug("Removed option key: [{}]", key);
-            return;
-        }
-
-        Option option = optionRepository.findByKey(key)
-                .map(anOption -> {
-                    log.debug("Updating option key: [{}], value: from [{}] to [{}]", key, anOption.getValue(), value);
-                    // Exist
-                    anOption.setValue(value);
-                    return anOption;
-                }).orElseGet(() -> {
-                    log.debug("Creating option key: [{}], value: [{}]", key, value);
-                    // Not exist
-                    Option anOption = new Option();
-                    anOption.setKey(key);
-                    anOption.setValue(value);
-                    return anOption;
-                });
-
-        // Save or update the options
-        Option savedOption = optionRepository.save(option);
-
-        log.debug("Saved option: [{}]", savedOption);
+        save(Collections.singletonMap(key, value));
     }
 
     @Override
-    public void save(Map<String, String> options) {
-        if (CollectionUtils.isEmpty(options)) {
+    @Transactional
+    public void save(Map<String, Object> optionMap) {
+        if (CollectionUtils.isEmpty(optionMap)) {
             return;
         }
 
-        options.forEach(this::save);
+        Map<String, Option> optionKeyMap = ServiceUtils.convertToMap(listAll(), Option::getKey);
 
-        publishOptionUpdatedEvent();
+        List<Option> optionsToCreate = new LinkedList<>();
+        List<Option> optionsToUpdate = new LinkedList<>();
+
+        optionMap.forEach((key, value) -> {
+            Option oldOption = optionKeyMap.get(key);
+            if (oldOption == null || !StringUtils.equals(oldOption.getValue(), value.toString())) {
+                OptionParam optionParam = new OptionParam();
+                optionParam.setKey(key);
+                optionParam.setValue(value.toString());
+                ValidationUtils.validate(optionParam);
+
+                if (oldOption == null) {
+                    // Create it
+                    optionsToCreate.add(optionParam.convertTo());
+                } else if (!StringUtils.equals(oldOption.getValue(), value.toString())) {
+                    // Update it
+                    optionParam.update(oldOption);
+                    optionsToUpdate.add(oldOption);
+                }
+            }
+        });
+
+        // Update them
+        updateInBatch(optionsToUpdate);
+
+        // Create them
+        createInBatch(optionsToCreate);
+
+        if (!CollectionUtils.isEmpty(optionsToUpdate) || !CollectionUtils.isEmpty(optionsToCreate)) {
+            // If there is something changed
+            publishOptionUpdatedEvent();
+        }
+
     }
 
     @Override
@@ -107,9 +120,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        optionParams.forEach(optionParam -> save(optionParam.getKey(), optionParam.getValue()));
-
-        publishOptionUpdatedEvent();
+        Map<String, Object> optionMap = ServiceUtils.convertToMap(optionParams, OptionParam::getKey, OptionParam::getValue);
+        save(optionMap);
     }
 
     @Override
@@ -117,8 +129,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         Assert.notNull(property, "Property must not be null");
 
         save(property.getValue(), value);
-
-        publishOptionUpdatedEvent();
     }
 
     @Override
@@ -127,9 +137,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             return;
         }
 
-        properties.forEach((property, value) -> save(property.getValue(), value));
+        Map<String, Object> optionMap = new LinkedHashMap<>();
 
-        publishOptionUpdatedEvent();
+        properties.forEach((property, value) -> optionMap.put(property.getValue(), value));
+
+        save(optionMap);
     }
 
     @Override

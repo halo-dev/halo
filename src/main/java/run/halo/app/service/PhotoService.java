@@ -64,4 +64,11 @@ public interface PhotoService extends CrudService<Photo, Integer> {
      */
     @NonNull
     Photo createBy(@NonNull PhotoParam photoParam);
+
+    /**
+     * List all teams.
+     *
+     * @return list of teams
+     */
+    List<String> listAllTeams();
 }

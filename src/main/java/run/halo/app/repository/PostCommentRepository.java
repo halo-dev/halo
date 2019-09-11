@@ -29,5 +29,6 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
             "where comment.parentId in ?1 " +
             "group by comment.parentId")
     @NonNull
+    @Override
     List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Iterable<Long> commentIds);
 }

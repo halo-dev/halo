@@ -43,6 +43,13 @@ public class MenuTagDirective implements TemplateDirectiveModel {
                 case "tree":
                     env.setVariable("menus", builder.build().wrap(menuService.listAsTree(Sort.by(DESC, "priority"))));
                     break;
+                case "listTeams":
+                    env.setVariable("teams", builder.build().wrap(menuService.listTeamVos(Sort.by(DESC, "priority"))));
+                    break;
+                case "listByTeam":
+                    String team = params.get("team").toString();
+                    env.setVariable("menus", builder.build().wrap(menuService.listByTeam(team, Sort.by(DESC, "priority"))));
+                    break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(menuService.count()));
                     break;

@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
@@ -78,7 +79,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public POST getByUrl(String url) {
         Assert.hasText(url, "Url must not be blank");
 
-        return basePostRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("该文章不存在").setErrorData(url));
+        return basePostRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -88,7 +89,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         Optional<POST> postOptional = basePostRepository.getByUrlAndStatus(url, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("The post with status " + status + " and url " + url + " was not existed").setErrorData(url));
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -137,7 +138,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public Page<POST> pageLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
-        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "editTime"));
+        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "createTime"));
 
         return listAll(latestPageable);
     }
@@ -152,7 +153,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public List<POST> listLatest(int top) {
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
-        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "editTime"));
+        PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "createTime"));
         return basePostRepository.findAllByStatus(PostStatus.PUBLISHED, latestPageable).getContent();
     }
 
@@ -173,9 +174,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
     public void increaseVisit(long visits, Integer postId) {
         Assert.isTrue(visits > 0, "Visits to increase must not be less than 1");
-        Assert.notNull(postId, "Goods id must not be null");
+        Assert.notNull(postId, "Post id must not be null");
 
         long affectedRows = basePostRepository.updateVisit(visits, postId);
 
@@ -186,6 +188,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
     public void increaseLike(long likes, Integer postId) {
         Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
         Assert.notNull(postId, "Goods id must not be null");
@@ -199,21 +202,31 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
     public void increaseVisit(Integer postId) {
         increaseVisit(1L, postId);
     }
 
     @Override
+    @Transactional
     public void increaseLike(Integer postId) {
         increaseLike(1L, postId);
     }
 
     @Override
+    @Transactional
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
 
         // Render content
-        post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+        if (post.getStatus() == PostStatus.PUBLISHED) {
+            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+        }
+
+        // if password is not empty,change status to intimate
+        if (StringUtils.isNotEmpty(post.getPassword()) && post.getStatus() != PostStatus.DRAFT) {
+            post.setStatus(PostStatus.INTIMATE);
+        }
 
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {

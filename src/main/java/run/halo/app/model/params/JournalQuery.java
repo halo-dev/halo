@@ -1,6 +1,7 @@
 package run.halo.app.model.params;
 
 import lombok.Data;
+import run.halo.app.model.enums.JournalType;
 
 /**
  * Journal query params.
@@ -15,4 +16,6 @@ public class JournalQuery {
      * Keyword.
      */
     private String keyword;
+
+    private JournalType type;
 }

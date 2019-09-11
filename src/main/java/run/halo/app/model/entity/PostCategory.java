@@ -1,7 +1,6 @@
 package run.halo.app.model.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -43,8 +42,12 @@ public class PostCategory extends BaseEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PostCategory that = (PostCategory) o;
         return categoryId.equals(that.categoryId) &&
                 postId.equals(that.postId);

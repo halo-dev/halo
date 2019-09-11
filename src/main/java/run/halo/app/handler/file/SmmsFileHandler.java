@@ -9,11 +9,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.SmmsProperties;
 import run.halo.app.model.support.UploadResult;
+import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HttpClientUtils;
 
@@ -30,9 +34,15 @@ import java.util.Objects;
 @Component
 public class SmmsFileHandler implements FileHandler {
 
+    @Deprecated
     private final static String UPLOAD_API = "https://sm.ms/api/upload";
 
+    private final static String UPLOAD_API_V2 = "https://sm.ms/api/v2/upload";
+
+    @Deprecated
     private final static String DELETE_API = "https://sm.ms/api/delete/%s";
+
+    private final static String DELETE_API_V2 = "https://sm.ms/api/v2/delete/%s";
 
     private final static String SUCCESS_CODE = "success";
 
@@ -40,13 +50,23 @@ public class SmmsFileHandler implements FileHandler {
 
     private final RestTemplate httpsRestTemplate;
 
-    public SmmsFileHandler(RestTemplate httpsRestTemplate) {
+    private final OptionService optionService;
+
+    public SmmsFileHandler(RestTemplate httpsRestTemplate,
+                           OptionService optionService) {
         this.httpsRestTemplate = httpsRestTemplate;
+        this.optionService = optionService;
     }
 
     @Override
     public UploadResult upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
+
+        String apiSecretToken = optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString();
+
+        if (StringUtils.isEmpty(apiSecretToken)) {
+            throw new ServiceException("请先设置 SM.MS 的 Secret Token");
+        }
 
         if (!FileHandler.isImageType(file.getContentType())) {
             log.error("Invalid extension: [{}]", file.getContentType());
@@ -58,6 +78,7 @@ public class SmmsFileHandler implements FileHandler {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         // Set user agent manually
         headers.set(HttpHeaders.USER_AGENT, DEFAULT_USER_AGENT);
+        headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
 
         LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
@@ -74,7 +95,7 @@ public class SmmsFileHandler implements FileHandler {
         HttpEntity<LinkedMultiValueMap<String, Object>> httpEntity = new HttpEntity<>(body, headers);
 
         // Upload file
-        ResponseEntity<SmmsResponse> mapResponseEntity = httpsRestTemplate.postForEntity(UPLOAD_API, httpEntity, SmmsResponse.class);
+        ResponseEntity<SmmsResponse> mapResponseEntity = httpsRestTemplate.postForEntity(UPLOAD_API_V2, httpEntity, SmmsResponse.class);
 
         // Check status
         if (mapResponseEntity.getStatusCode().isError()) {
@@ -117,7 +138,7 @@ public class SmmsFileHandler implements FileHandler {
         Assert.hasText(key, "Deleting key must not be blank");
 
         // Build delete url
-        String url = String.format(DELETE_API, key);
+        String url = String.format(DELETE_API_V2, key);
 
         // Set user agent manually
         HttpHeaders headers = new HttpHeaders();
