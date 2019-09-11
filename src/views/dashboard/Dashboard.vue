@@ -373,7 +373,7 @@ export default {
   data() {
     return {
       photoList: [],
-      showMoreOptions: false,
+      // showMoreOptions: false,
       startVal: 0,
       logType: logApi.logType,
       activityLoading: true,
@@ -450,18 +450,18 @@ export default {
     next()
   },
   methods: {
-    handlerPhotoUploadSuccess(response, file) {
-      var callData = response.data.data
-      var photo = {
-        name: callData.name,
-        url: callData.path,
-        thumbnail: callData.thumbPath,
-        suffix: callData.suffix,
-        width: callData.width,
-        height: callData.height
-      }
-      this.journalPhotos.push(photo)
-    },
+    // handlerPhotoUploadSuccess(response, file) {
+    //   var callData = response.data.data
+    //   var photo = {
+    //     name: callData.name,
+    //     url: callData.path,
+    //     thumbnail: callData.thumbPath,
+    //     suffix: callData.suffix,
+    //     width: callData.width,
+    //     height: callData.height
+    //   }
+    //   this.journalPhotos.push(photo)
+    // },
     listLatestPosts() {
       postApi.listLatest(5).then(response => {
         this.postData = response.data.data
@@ -498,13 +498,13 @@ export default {
         this.$message.success('发表成功！')
         this.journal = {}
         // this.photoList = []
-        this.showMoreOptions = false
+        // this.showMoreOptions = false
       })
     },
-    handleUploadPhotoWallClick() {
-      // 是否显示上传照片墙组件
-      this.showMoreOptions = !this.showMoreOptions
-    },
+    // handleUploadPhotoWallClick() {
+    //   // 是否显示上传照片墙组件
+    //   this.showMoreOptions = !this.showMoreOptions
+    // },
     handleShowLogDrawer() {
       this.logDrawerVisible = true
       this.loadLogs()

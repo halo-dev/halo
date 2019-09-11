@@ -133,9 +133,30 @@ themeApi.getContent = path => {
   })
 }
 
+themeApi.getContent = (themeId, path) => {
+  return service({
+    url: `${baseUrl}/${themeId}/files/content`,
+    params: {
+      path: path
+    },
+    method: 'get'
+  })
+}
+
 themeApi.saveContent = (path, content) => {
   return service({
     url: `${baseUrl}/files/content`,
+    data: {
+      path: path,
+      content: content
+    },
+    method: 'put'
+  })
+}
+
+themeApi.saveContent = (themeId, path, content) => {
+  return service({
+    url: `${baseUrl}/${themeId}/files/content`,
     data: {
       path: path,
       content: content

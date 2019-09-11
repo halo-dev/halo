@@ -313,12 +313,12 @@ export default {
       // photoList: [], // 编辑图片时回显所需对象
       // previewVisible: false,
       showMoreOptions: false,
-      previewPhoto: {
-        // 图片预览信息临时对象
-        name: '',
-        description: '',
-        url: ''
-      },
+      // previewPhoto: {
+      //   // 图片预览信息临时对象
+      //   name: '',
+      //   description: '',
+      //   url: ''
+      // },
       title: '发表',
       listLoading: false,
       visible: false,

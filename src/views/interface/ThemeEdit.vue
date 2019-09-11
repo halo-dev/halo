@@ -55,6 +55,7 @@
             </a-select>
           </template>
           <theme-file
+            v-if="files"
             :files="files"
             @listenToSelect="handleSelectFile"
           />
@@ -83,7 +84,7 @@ export default {
         lineNumbers: true,
         line: true
       },
-      files: [],
+      files: null,
       file: {},
       content: '',
       themes: [],
@@ -112,6 +113,7 @@ export default {
       })
     },
     onSelectTheme(themeId) {
+      this.files = null
       themeApi.listFiles(themeId).then(response => {
         this.files = response.data.data
       })
@@ -141,14 +143,14 @@ export default {
           }
         })
       }
-      themeApi.getContent(file.path).then(response => {
+      themeApi.getContent(this.selectedTheme.id,file.path).then(response => {
         this.content = response.data.data
         this.file = file
         this.buttonDisabled = false
       })
     },
     handlerSaveContent() {
-      themeApi.saveContent(this.file.path, this.content).then(response => {
+      themeApi.saveContent(this.selectedTheme.id,this.file.path, this.content).then(response => {
         this.$message.success('保存成功！')
       })
     }
