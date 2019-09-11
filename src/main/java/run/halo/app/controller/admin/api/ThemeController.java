@@ -54,7 +54,7 @@ public class ThemeController {
     }
 
     @GetMapping("{themeId}/files")
-    public List<ThemeFile> listFiles(@PathVariable("themeId") String themeId){
+    public List<ThemeFile> listFiles(@PathVariable("themeId") String themeId) {
         return themeService.listThemeFolderBy(themeId);
     }
 
@@ -63,9 +63,21 @@ public class ThemeController {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(path));
     }
 
+    @GetMapping("{themeId}/files/content")
+    public BaseResponse<String> getContentBy(@PathVariable("themeId") String themeId,
+                                             @RequestParam(name = "path") String path) {
+        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(themeId, path));
+    }
+
     @PutMapping("files/content")
     public void updateContentBy(@RequestBody ThemeContentParam param) {
         themeService.saveTemplateContent(param.getPath(), param.getContent());
+    }
+
+    @PutMapping("{themeId}/files/content")
+    public void updateContentBy(@PathVariable("themeId") String themeId,
+                                @RequestBody ThemeContentParam param) {
+        themeService.saveTemplateContent(themeId, param.getPath(), param.getContent());
     }
 
     @GetMapping("files/custom")

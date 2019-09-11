@@ -228,9 +228,36 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public String getTemplateContent(String themeId, String absolutePath) {
+        checkDirectory(themeId, absolutePath);
+
+        // Read file
+        Path path = Paths.get(absolutePath);
+        try {
+            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ServiceException("读取模板内容失败 " + absolutePath, e);
+        }
+    }
+
+    @Override
     public void saveTemplateContent(String absolutePath, String content) {
         // Check the path
         checkDirectory(absolutePath);
+
+        // Write file
+        Path path = Paths.get(absolutePath);
+        try {
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new ServiceException("保存模板内容失败 " + absolutePath, e);
+        }
+    }
+
+    @Override
+    public void saveTemplateContent(String themeId, String absolutePath, String content) {
+        // Check the path
+        checkDirectory(themeId, absolutePath);
 
         // Write file
         Path path = Paths.get(absolutePath);
@@ -702,6 +729,17 @@ public class ThemeServiceImpl implements ThemeService {
     private void checkDirectory(@NonNull String absoluteName) {
         ThemeProperty activeThemeProperty = getThemeOfNonNullBy(getActivatedThemeId());
         FileUtils.checkDirectoryTraversal(activeThemeProperty.getThemePath(), absoluteName);
+    }
+
+    /**
+     * Check if directory is valid or not.
+     *
+     * @param themeId      themeId must not be blank
+     * @param absoluteName throws when the given absolute directory name is invalid
+     */
+    private void checkDirectory(@NonNull String themeId, @NonNull String absoluteName) {
+        ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
+        FileUtils.checkDirectoryTraversal(themeProperty.getThemePath(), absoluteName);
     }
 
     /**

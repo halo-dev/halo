@@ -166,12 +166,30 @@ public interface ThemeService {
     String getTemplateContent(@NonNull String absolutePath);
 
     /**
+     * Gets template content by template absolute path and themeId.
+     *
+     * @param themeId      themeId
+     * @param absolutePath absolute path
+     * @return template content
+     */
+    String getTemplateContent(@NonNull String themeId, @NonNull String absolutePath);
+
+    /**
      * Saves template content by template absolute path.
      *
      * @param absolutePath absolute path
      * @param content      new content
      */
     void saveTemplateContent(@NonNull String absolutePath, @NonNull String content);
+
+    /**
+     * Saves template content by template absolute path and themeId.
+     *
+     * @param themeId      themeId
+     * @param absolutePath absolute path
+     * @param content      new content
+     */
+    void saveTemplateContent(@NonNull String themeId, @NonNull String absolutePath, @NonNull String content);
 
     /**
      * Deletes a theme by key.
