@@ -217,6 +217,8 @@ public class AdminServiceImpl implements AdminService {
         // Gets random code.
         String code = RandomUtil.randomNumbers(6);
 
+        log.info("Get reset password code:{}", code);
+
         // Send email to administrator.
         String content = "您正在进行密码重置操作，如不是本人操作，请尽快做好相应措施。密码重置验证码如下（五分钟有效）：\n" + code;
         mailService.sendMail(param.getEmail(), "找回密码验证码", content);
