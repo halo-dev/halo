@@ -156,6 +156,10 @@ export default {
       ],
       steps: [
         {
+          date: '2019-09-11',
+          content: 'Halo v1.1.0 发布'
+        },
+        {
           date: '2019-07-09',
           content: 'Halo v1.0.3 发布'
         },

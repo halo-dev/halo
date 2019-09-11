@@ -143,14 +143,14 @@ export default {
           }
         })
       }
-      themeApi.getContent(this.selectedTheme.id,file.path).then(response => {
+      themeApi.getContent(this.selectedTheme.id, file.path).then(response => {
         this.content = response.data.data
         this.file = file
         this.buttonDisabled = false
       })
     },
     handlerSaveContent() {
-      themeApi.saveContent(this.selectedTheme.id,this.file.path, this.content).then(response => {
+      themeApi.saveContent(this.selectedTheme.id, this.file.path, this.content).then(response => {
         this.$message.success('保存成功！')
       })
     }

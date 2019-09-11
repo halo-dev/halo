@@ -108,6 +108,22 @@
           :loading="loading"
           :pagination="false"
         >
+          <template
+            slot="author"
+            slot-scope="text,record"
+          >
+            <a-icon
+              type="user"
+              v-if="record.isAdmin"
+              style="margin-right: 3px;"
+            />
+            <a
+              :href="record.authorUrl"
+              target="_blank"
+              v-if="record.authorUrl"
+            >{{ text }}</a>
+            <span v-else>{{ text }}</span>
+          </template>
           <p
             class="comment-content-wrapper"
             slot="content"
@@ -272,7 +288,8 @@ import commentApi from '@/api/comment'
 const postColumns = [
   {
     title: '昵称',
-    dataIndex: 'author'
+    dataIndex: 'author',
+    scopedSlots: { customRender: 'author' }
   },
   {
     title: '内容',
@@ -308,7 +325,8 @@ const postColumns = [
 const sheetColumns = [
   {
     title: '昵称',
-    dataIndex: 'author'
+    dataIndex: 'author',
+    scopedSlots: { customRender: 'author' }
   },
   {
     title: '内容',

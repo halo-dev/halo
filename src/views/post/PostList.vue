@@ -141,6 +141,7 @@
               v-if="record.topPriority!=0"
               theme="twoTone"
               twoToneColor="red"
+              style="margin-right: 3px;"
             />
             <a
               v-if="record.status=='PUBLISHED'"
