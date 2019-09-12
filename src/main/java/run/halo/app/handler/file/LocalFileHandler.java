@@ -3,7 +3,6 @@ package run.halo.app.handler.file;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
@@ -31,7 +31,8 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  * Local file handler.
  *
  * @author johnniang
- * @date 3/27/19
+ * @author ryanwang
+ * @date 2019-03-27
  */
 @Slf4j
 @Component
@@ -53,6 +54,8 @@ public class LocalFileHandler implements FileHandler {
      * Thumbnail height.
      */
     private final static int THUMB_HEIGHT = 256;
+
+    ReentrantLock lock = new ReentrantLock();
 
     private final OptionService optionService;
 
@@ -135,28 +138,38 @@ public class LocalFileHandler implements FileHandler {
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSize(file.getSize());
 
+            // TODO refactor this: if image is svg ext. extension
+            boolean isSvg = "svg".equals(extension);
+
             // Check file type
-            if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                // Upload a thumbnail
-                String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
-                String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
-                Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
+            if (FileHandler.isImageType(uploadResult.getMediaType()) && !isSvg) {
+                lock.lock();
+                try {
+                    // Upload a thumbnail
+                    String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
+                    String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
+                    Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
-                // Create the thumbnail
-                Files.createFile(thumbnailPath);
+                    // Read as image
+                    BufferedImage originalImage = ImageIO.read(uploadPath.toFile());
+                    // Set width and height
+                    uploadResult.setWidth(originalImage.getWidth());
+                    uploadResult.setHeight(originalImage.getHeight());
 
-                // Generate thumbnail
-                generateThumbnail(uploadPath, thumbnailPath);
-
-                // Read as image
-                BufferedImage image = ImageIO.read(Files.newInputStream(uploadPath));
-
-                // Set width and height
-                uploadResult.setWidth(image.getWidth());
-                uploadResult.setHeight(image.getHeight());
-
-                // Set thumb path
-                uploadResult.setThumbPath(thumbnailSubFilePath);
+                    // Generate thumbnail
+                    boolean result = generateThumbnail(originalImage, thumbnailPath, extension);
+                    if (result) {
+                        // Set thumb path
+                        uploadResult.setThumbPath(thumbnailSubFilePath);
+                    } else {
+                        // If generate error
+                        uploadResult.setThumbPath(subFilePath);
+                    }
+                } finally {
+                    lock.unlock();
+                }
+            } else {
+                uploadResult.setThumbPath(subFilePath);
             }
 
             return uploadResult;
@@ -194,7 +207,7 @@ public class LocalFileHandler implements FileHandler {
         try {
             boolean deleteResult = Files.deleteIfExists(thumbnailPath);
             if (!deleteResult) {
-                log.warn("Thumbnail: [{}] way not exist", thumbnailPath.toString());
+                log.warn("Thumbnail: [{}] may not exist", thumbnailPath.toString());
             }
         } catch (IOException e) {
             throw new FileOperationException("附件缩略图 " + thumbnailName + " 删除失败", e);
@@ -206,21 +219,24 @@ public class LocalFileHandler implements FileHandler {
         return AttachmentType.LOCAL.equals(type);
     }
 
-    /**
-     * Generates thumbnail image.
-     *
-     * @param imagePath image path must not be null
-     * @param thumbPath thumbnail path must not be null
-     * @throws IOException throws if image provided is not valid
-     */
-    private void generateThumbnail(@NonNull Path imagePath, @NonNull Path thumbPath) throws IOException {
-        Assert.notNull(imagePath, "Image path must not be null");
+    private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
+        Assert.notNull(originalImage, "Image must not be null");
         Assert.notNull(thumbPath, "Thumb path must not be null");
 
-        log.info("Generating thumbnail: [{}] for image: [{}]", thumbPath.getFileName(), imagePath.getFileName());
 
-        // Convert to thumbnail and copy the thumbnail
-        Thumbnails.of(imagePath.toFile()).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
+        boolean result = false;
+        // Create the thumbnail
+        try {
+            Files.createFile(thumbPath);
+            // Convert to thumbnail and copy the thumbnail
+            log.debug("Trying to generate thumbnail: [{}]", thumbPath.toString());
+            Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
+            log.debug("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
+            result = true;
+        } catch (Throwable t) {
+            log.warn("Failed to generate thumbnail: [{}]", thumbPath);
+        }
+        return result;
     }
 
 }

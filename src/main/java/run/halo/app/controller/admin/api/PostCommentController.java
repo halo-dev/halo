@@ -13,6 +13,7 @@ import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.service.PostCommentService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -21,6 +22,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Post comment controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 3/19/19
  */
 @RestController
@@ -73,5 +75,22 @@ public class PostCommentController {
     public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
         PostComment deletedPostComment = postCommentService.removeById(commentId);
         return postCommentService.convertTo(deletedPostComment);
+    }
+
+    @GetMapping("{commentId:\\d+}")
+    @ApiOperation("Gets a post comment by comment id")
+    public PostCommentWithPostVO getBy(@PathVariable("commentId") Long commentId) {
+        PostComment comment = postCommentService.getById(commentId);
+        return postCommentService.convertToWithPostVo(comment);
+    }
+
+    @PutMapping("{commentId:\\d+}")
+    public BaseCommentDTO updateBy(@Valid @RequestBody PostCommentParam commentParam,
+                                   @PathVariable("commentId") Long commentId) {
+        PostComment commentToUpdate = postCommentService.getById(commentId);
+
+        commentParam.update(commentToUpdate);
+
+        return postCommentService.convertTo(postCommentService.update(commentToUpdate));
     }
 }

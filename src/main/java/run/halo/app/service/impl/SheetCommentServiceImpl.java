@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  * Sheet comment service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-04-24
  */
 @Service
@@ -51,7 +52,7 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     @Override
     public void validateTarget(Integer sheetId) {
         Sheet sheet = sheetRepository.findById(sheetId)
-                .orElseThrow(() -> new NotFoundException("该页面不存在或已删除").setErrorData(sheetId));
+                .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
 
         if (sheet.getDisallowComment()) {
             throw new BadRequestException("该页面已被禁止评论").setErrorData(sheetId);
@@ -59,7 +60,15 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     }
 
     @Override
-    public List<SheetCommentWithSheetVO> convertToWithPostVo(List<SheetComment> sheetComments) {
+    public SheetCommentWithSheetVO convertToWithSheetVo(SheetComment comment) {
+        Assert.notNull(comment, "SheetComment must not be null");
+        SheetCommentWithSheetVO sheetCommentWithSheetVO = new SheetCommentWithSheetVO().convertFrom(comment);
+        sheetCommentWithSheetVO.setSheet(new BasePostMinimalDTO().convertFrom(sheetRepository.getOne(comment.getPostId())));
+        return sheetCommentWithSheetVO;
+    }
+
+    @Override
+    public List<SheetCommentWithSheetVO> convertToWithSheetVo(List<SheetComment> sheetComments) {
         if (CollectionUtils.isEmpty(sheetComments)) {
             return Collections.emptyList();
         }
@@ -79,10 +88,10 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     }
 
     @Override
-    public Page<SheetCommentWithSheetVO> convertToWithPostVo(Page<SheetComment> sheetCommentPage) {
+    public Page<SheetCommentWithSheetVO> convertToWithSheetVo(Page<SheetComment> sheetCommentPage) {
         Assert.notNull(sheetCommentPage, "Sheet comment page must not be null");
 
-        return new PageImpl<>(convertToWithPostVo(sheetCommentPage.getContent()), sheetCommentPage.getPageable(), sheetCommentPage.getTotalElements());
+        return new PageImpl<>(convertToWithSheetVo(sheetCommentPage.getContent()), sheetCommentPage.getPageable(), sheetCommentPage.getTotalElements());
 
     }
 }

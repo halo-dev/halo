@@ -62,6 +62,14 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     }
 
     @Override
+    public PostCommentWithPostVO convertToWithPostVo(PostComment comment) {
+        Assert.notNull(comment, "PostComment must not be null");
+        PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
+        postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postRepository.getOne(comment.getPostId())));
+        return postCommentWithPostVO;
+    }
+
+    @Override
     public List<PostCommentWithPostVO> convertToWithPostVo(List<PostComment> postComments) {
         if (CollectionUtils.isEmpty(postComments)) {
             return Collections.emptyList();
@@ -96,7 +104,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     @Override
     public void validateTarget(Integer postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("该文章不存在或已删除").setErrorData(postId));
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
 
         if (post.getDisallowComment()) {
             throw new BadRequestException("该文章已经被禁止评论").setErrorData(postId);

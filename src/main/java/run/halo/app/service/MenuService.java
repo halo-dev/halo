@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
+import run.halo.app.model.vo.MenuTeamVO;
 import run.halo.app.model.vo.MenuVO;
 import run.halo.app.service.base.CrudService;
 
@@ -29,6 +30,24 @@ public interface MenuService extends CrudService<Menu, Integer> {
     List<MenuDTO> listDtos(@NonNull Sort sort);
 
     /**
+     * Lists menu team vos.
+     *
+     * @param sort must not be null
+     * @return a list of menu team vo
+     */
+    @NonNull
+    List<MenuTeamVO> listTeamVos(@NonNull Sort sort);
+
+    /**
+     * List menus by team.
+     *
+     * @param team team
+     * @param sort sort
+     * @return list of menus
+     */
+    List<MenuDTO> listByTeam(@NonNull String team, Sort sort);
+
+    /**
      * Creates a menu.
      *
      * @param menuParam must not be null
@@ -44,4 +63,12 @@ public interface MenuService extends CrudService<Menu, Integer> {
      * @return a menu tree
      */
     List<MenuVO> listAsTree(Sort sort);
+
+    /**
+     * Lists menu by parent id.
+     *
+     * @param id id
+     * @return a list of menu
+     */
+    List<Menu> listByParentId(@NonNull Integer id);
 }

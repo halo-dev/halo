@@ -4,6 +4,7 @@ import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
+import run.halo.app.model.params.ResetPasswordParam;
 import run.halo.app.security.token.AuthToken;
 
 /**
@@ -43,6 +44,20 @@ public interface AdminService {
     void clearToken();
 
     /**
+     * Send reset password code to administrator's email.
+     *
+     * @param param param must not be null
+     */
+    void sendResetPasswordCode(@NonNull ResetPasswordParam param);
+
+    /**
+     * Reset password by code.
+     *
+     * @param param param must not be null
+     */
+    void resetPasswordByCode(@NonNull ResetPasswordParam param);
+
+    /**
      * Get system counts.
      *
      * @return count dto
@@ -74,6 +89,7 @@ public interface AdminService {
 
     /**
      * Get spring logs.
+     *
      * @return recently logs.
      */
     String getSpringLogs();

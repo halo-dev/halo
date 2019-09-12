@@ -73,25 +73,25 @@ public class MarkdownUtils {
         if (StringUtils.isBlank(markdown)) {
             return "";
         }
-        Node document = PARSER.parse(markdown);
-        String renderedContent = RENDERER.render(document);
 
         // Render netease music short url.
         if (markdown.contains(HaloConst.NETEASE_MUSIC_PREFIX)) {
-            renderedContent = markdown.replaceAll(HaloConst.NETEASE_MUSIC_REG_PATTERN, HaloConst.NETEASE_MUSIC_IFRAME);
+            markdown = markdown.replaceAll(HaloConst.NETEASE_MUSIC_REG_PATTERN, HaloConst.NETEASE_MUSIC_IFRAME);
         }
 
         // Render bilibili video short url.
         if (markdown.contains(HaloConst.BILIBILI_VIDEO_PREFIX)) {
-            renderedContent = markdown.replaceAll(HaloConst.BILIBILI_VIDEO_REG_PATTERN, HaloConst.BILIBILI_VIDEO_IFRAME);
+            markdown = markdown.replaceAll(HaloConst.BILIBILI_VIDEO_REG_PATTERN, HaloConst.BILIBILI_VIDEO_IFRAME);
         }
 
         // Render youtube video short url.
         if (markdown.contains(HaloConst.YOUTUBE_VIDEO_PREFIX)) {
-            renderedContent = markdown.replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
+            markdown = markdown.replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
         }
 
-        return renderedContent;
+        Node document = PARSER.parse(markdown);
+
+        return RENDERER.render(document);
     }
 
     /**

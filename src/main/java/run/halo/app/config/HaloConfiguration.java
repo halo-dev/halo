@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -36,6 +37,7 @@ import java.security.NoSuchAlgorithmException;
  */
 @Configuration
 @EnableConfigurationProperties(HaloProperties.class)
+@Slf4j
 public class HaloConfiguration {
 
     private final static int TIMEOUT = 5000;
@@ -80,7 +82,6 @@ public class HaloConfiguration {
      *
      * @return Log filter registration bean
      */
-    @Bean
     public FilterRegistrationBean<LogFilter> logFilter() {
         FilterRegistrationBean<LogFilter> logFilter = new FilterRegistrationBean<>();
 
@@ -149,7 +150,10 @@ public class HaloConfiguration {
                 "/api/admin/login",
                 "/api/admin/refresh/*",
                 "/api/admin/installations",
-                "/api/admin/recoveries/migrations/*"
+                "/api/admin/recoveries/migrations/*",
+                "/api/admin/is_installed",
+                "/api/admin/password/code",
+                "/api/admin/password/reset"
         );
         adminAuthenticationFilter.setFailureHandler(
                 failureHandler);

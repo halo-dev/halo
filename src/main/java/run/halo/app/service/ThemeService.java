@@ -24,6 +24,7 @@ public interface ThemeService {
     /**
      * Theme property file name.
      */
+    @Deprecated
     String THEME_PROPERTY_FILE_NAME = "theme.yaml";
 
     /**
@@ -165,12 +166,30 @@ public interface ThemeService {
     String getTemplateContent(@NonNull String absolutePath);
 
     /**
+     * Gets template content by template absolute path and themeId.
+     *
+     * @param themeId      themeId
+     * @param absolutePath absolute path
+     * @return template content
+     */
+    String getTemplateContent(@NonNull String themeId, @NonNull String absolutePath);
+
+    /**
      * Saves template content by template absolute path.
      *
      * @param absolutePath absolute path
      * @param content      new content
      */
     void saveTemplateContent(@NonNull String absolutePath, @NonNull String content);
+
+    /**
+     * Saves template content by template absolute path and themeId.
+     *
+     * @param themeId      themeId
+     * @param absolutePath absolute path
+     * @param content      new content
+     */
+    void saveTemplateContent(@NonNull String themeId, @NonNull String absolutePath, @NonNull String content);
 
     /**
      * Deletes a theme by key.
@@ -236,6 +255,7 @@ public interface ThemeService {
      *
      * @param themeTmpPath theme temporary path must not be null
      * @return theme property
+     * @throws IOException IOException
      */
     @NonNull
     ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
@@ -262,4 +282,13 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty update(@NonNull String themeId);
+
+    /**
+     * Updates theme by theme id.
+     *
+     * @param themeId theme id must not be blank
+     * @param file    multipart file must not be null
+     * @return theme info
+     */
+    ThemeProperty update(@NonNull String themeId, @NonNull MultipartFile file);
 }

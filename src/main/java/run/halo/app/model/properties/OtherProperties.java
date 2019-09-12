@@ -9,7 +9,9 @@ package run.halo.app.model.properties;
  */
 public enum OtherProperties implements PropertyEnum {
 
-    CUSTOM_HEAD("blog_custom_head",String.class,""),
+    CDN_DOMAIN("blog_cdn_domain", String.class, ""),
+
+    CUSTOM_HEAD("blog_custom_head", String.class, ""),
 
     STATISTICS_CODE("blog_statistics_code", String.class, "");
 

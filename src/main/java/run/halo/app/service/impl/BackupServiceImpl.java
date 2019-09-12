@@ -26,7 +26,7 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public BasePostDetailDTO importMarkdowns(MultipartFile file) throws IOException {
+    public BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException {
 
         // Read markdown content.
         String markdown = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);

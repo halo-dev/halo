@@ -29,7 +29,7 @@ public interface PropertyEnum extends ValueEnum<String> {
      */
     @SuppressWarnings("unchecked")
     static <T> T convertTo(@NonNull String value, @NonNull Class<T> type) {
-        Assert.hasText(value, "Value must not be null");
+        Assert.notNull(value, "Value must not be null");
         Assert.notNull(type, "Type must not be null");
 
         if (type.isAssignableFrom(String.class)) {
@@ -57,7 +57,7 @@ public interface PropertyEnum extends ValueEnum<String> {
         }
 
         if (type.isAssignableFrom(Double.class)) {
-            return (T) Byte.valueOf(value);
+            return (T) Double.valueOf(value);
         }
 
         if (type.isAssignableFrom(Float.class)) {
