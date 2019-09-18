@@ -29,6 +29,12 @@
             >
               <a-input v-model="link.team" />
             </a-form-item>
+            <a-form-item label="排序编号：">
+              <a-input
+                type="number"
+                v-model="link.priority"
+              />
+            </a-form-item>
             <a-form-item label="描述：">
               <a-input
                 type="textarea"
@@ -128,6 +134,10 @@ const columns = [
   {
     title: '分组',
     dataIndex: 'team'
+  },
+  {
+    title: '排序',
+    dataIndex: 'priority'
   },
   {
     title: '操作',
