@@ -12,7 +12,7 @@ import run.halo.app.service.LinkService;
 
 import java.util.List;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.data.domain.Sort.Direction.ASC;
 
 /**
  * Portal link controller.
@@ -33,7 +33,7 @@ public class LinkController {
 
     @GetMapping
     @ApiOperation("List all links")
-    public List<LinkDTO> listLinks(@SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+    public List<LinkDTO> listLinks(@SortDefault(sort = "priority", direction = ASC) Sort sort) {
         return linkService.listDtos(sort);
     }
 
