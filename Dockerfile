@@ -1,15 +1,16 @@
-FROM maven:3
-LABEL maintainer="Ryan Wang<i@ryanc.cc>"
+FROM openjdk:8-jre-alpine
 
-WORKDIR /opt/halo
-ADD . /tmp
-ENV TZ=Asia/Shanghai
+VOLUME /tmp
 
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ARG JAR_FILE=build/libs/halo-1.1.0-beta.2.jar
+ARG PORT=8090
+ARG TIME_ZONE=Asia/Shanghai
 
-RUN cd /tmp && mvn package -Pci && mv target/dist/halo/* /opt/halo/ \
-    && rm -rf /tmp/* && rm -rf ~/.m2
+ENV TZ=${TIME_ZONE}
+ENV JAVA_OPTS="-Xms256m -Xmx256m"
 
-EXPOSE 8090
+COPY ${JAR_FILE} halo.jar
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/opt/halo/halo-latest.jar","--spring.profiles.active=docker"]
+EXPOSE ${PORT}
+
+ENTRYPOINT java ${JAVA_OPTS} -Djava.security.egd=file:/dev/./urandom -server -jar halo.jar

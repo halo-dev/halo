@@ -1,17 +1,19 @@
-![](https://i.loli.net/2018/12/21/5c1cd34849751.png)
+<h1 align="center"><a href="https://github.com/halo-dev" target="_blank">Halo</a></h1>
 
-> Halo 可能是最好的 Java 博客系统。
+> Halo 是一款现代化的个人独立博客系统，给习惯写博客的同学多一个选择。
+
+
 
 <p align="center">
-<a href="https://ryanc.cc"><img alt="Author" src="https://img.shields.io/badge/author-ruibaby-red.svg?style=flat-square"/></a>
 <a href="#"><img alt="JDK" src="https://img.shields.io/badge/JDK-1.8-yellow.svg?style=flat-square"/></a>
-<a href="https://github.com/ruibaby/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/ruibaby/halo.svg?style=flat-square"/></a>
-<a href="https://travis-ci.org/ruibaby/halo"><img alt="Travis CI" src="https://img.shields.io/travis/ruibaby/halo.svg?style=flat-square"/></a>
-<a href="https://hub.docker.com/r/ruibaby/halo/"><img alt="Docker Build Status" src="https://img.shields.io/docker/build/ruibaby/halo.svg?style=flat-square"/></a>
+<a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square"/></a>
+<a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo/total.svg?style=flat-square"></a>
+<a href="https://hub.docker.com/r/ruibaby/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/ruibaby/halo?style=flat-square"></a>
+<a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square"></a>
+<a href="https://travis-ci.org/halo-dev/halo"><img alt="Travis CI" src="https://img.shields.io/travis/halo-dev/halo.svg?style=flat-square"/></a>
 </p>
 
 ------------------------------
-🇨🇳简体中文 | 🇺🇸[English](./docs/README-en-US.md)
 
 ## 简介
 
@@ -19,106 +21,46 @@
 
 轻快，简洁，功能强大，使用 Java 开发的博客系统。
 
-> QQ 交流群: 162747721 | Telegram 交流群：[https://t.me/HaloBlog](https://t.me/HaloBlog) | [WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
-
-## 演示站点
-
-> 前台地址：[https://demo.halo.run](https://demo.halo.run) 
-> 后台地址：[https://demo.halo.run/admin](https://demo.halo.run/admin)
-> 用户名：admin，密码：123456
+> [官方社区](https://bbs.halo.run) | [QQ 交流群](https://jq.qq.com/?_wv=1027&k=5tnr930) | [Telegram 交流群](https://t.me/HaloBlog) | [Telegram 频道](https://t.me/halo_dev) | [WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
 
 ## 快速开始
 
-服务器快速部署：
+### 下载最新的 Halo 安装包
 
 ```bash
-# 安装 Halo
-yum install -y wget && wget -O halo-cli.sh https://git.io/fxHqp && bash halo-cli.sh -i
-
-# 更新 Halo
-bash halo-cli.sh -u
+curl -L https://github.com/halo-dev/halo/releases/download/v1.1.0/halo-1.1.0.jar --output halo-latest.jar
 ```
 
-Docker 部署：
+或者
+
 ```bash
-# 拉取镜像
-docker pull ruibaby/halo
-
-# 运行
-docker run -d --name halo -p 8090:8090 -v ~/halo:/root/halo ruibaby/halo
+wget https://github.com/halo-dev/halo/releases/download/v1.1.0/halo-1.1.0.jar -O halo-latest.jar
 ```
 
-Docker Compose 部署：
+### 启动 Halo
+
 ```bash
-# 下载 Nginx 配置文件模板
-curl https://raw.githubusercontent.com/jwilder/nginx-proxy/master/nginx.tmpl > /etc/nginx/nginx.tmpl
-
-# 获取 docker-compose.yaml 文件
-yum install -y wget && wget -O docker-compose.yaml https://git.io/fpS8N
-
-# 修改 docker-compose.yaml,修改 VIRTUAL_HOST,LETSENCRYPT_HOST 为自己的域名,修改 LETSENCRYPT_EMAIL 为自己的邮箱。
-
-# 运行
-docker-compose up -d
+java -jar halo-latest.jar
 ```
 
-> 注意：如使用 Idea，Eclipse 等IDE运行的话，需要安装Lombok插件，另外暂不支持JDK10，主题管理和主题上传会有问题。
-> 更多请参考[ Halo 使用文档 ](https://halo-doc.ryanc.cc/installation/)或者[ Wiki](https://github.com/ruibaby/halo/wiki)。
+详细文档请移步：<https://halo.run/guide>
 
 ## 博客示例
 
-[Ryan0up'S Blog](https://ryanc.cc)
+请移步： <https://github.com/halo-dev/halo/issues/26>。
 
-[SNAIL BLOG](https://slogc.cc)
+## 周边
 
-[宋浩志博客](http://songhaozhi.com)
-
-[KingYiFan'S Blog](https://blog.cnbuilder.cn)
-
-[AquanBlog](https://blog.eunji.cn/)
-
-## 主题
-
-除了内置的 [Anatole](https://github.com/hi-caicai/farbox-theme-Anatole) 和 [Material](https://github.com/viosey/hexo-theme-material) ，还有下列主题没有集成在项目里，如有需要，请自行下载之后通过后台上传上去使用。
-
-- [Vno](https://github.com/ruibaby/vno-halo) - 来自Jekyll的一款主题，作者 [Wei Wang](https://onevcat.com/)。
-- [Hux](https://github.com/ruibaby/hux-halo) - 来自Jekyll的一款主题，作者 [Xuan Huang](https://huangxuan.me/)。
-- [Story](https://github.com/ruibaby/story-halo) - 来自Typecho的一款主题，作者 [Trii Hsia](https://yumoe.com/)。
-- [NexT](https://github.com/ruibaby/next-halo) - 来自Hexo的一款主题，作者 [iissnan](https://notes.iissnan.com/)。
-- [Casper](https://github.com/ruibaby/casper-halo) - 来自Ghost的一款主题，作者 [Ghost](https://github.com/TryGhost)。
-
-> 声明：不接受任何对**移植主题**功能上的意见和建议。
+- 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
+- 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
+- 管理 APP（halo-app）：<https://github.com/halo-dev/halo-app>
+- 主题仓库：<https://halo.run/theme>
 
 ## 许可证
 
-[![license](https://img.shields.io/github/license/ruibaby/halo.svg?style=flat-square)](https://github.com/ruibaby/halo/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
 > Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议，即便是在中国。
-
-## 感谢
-
-Halo 的诞生离不开下面这些项目：
-
-- [Spring Boot](https://github.com/spring-projects/spring-boot)：Spring 的快速开发框架
-- [Freemarker](https://freemarker.apache.org/)：模板引擎，使页面静态化
-- [H2 Database](https://github.com/h2database/h2database)：嵌入式数据库，无需安装
-- [Spring-data-jpa](https://github.com/spring-projects/spring-data-jpa.git)：不需要写 sql 语句的持久层框架
-- [Ehcache](http://www.ehcache.org/)：缓存框架
-- [Lombok](https://www.projectlombok.org/)：让代码更简洁
-- [oh-my-email](https://github.com/biezhi/oh-my-email)：可能是最小的 Java 邮件发送库了，支持抄送、附件、模板等
-- [Hutool](https://github.com/looly/hutool)：一个 Java 基础工具类库
-- [Thumbnailator](https://github.com/coobird/thumbnailator)：缩略图生成库
-- [AdminLTE](https://github.com/almasaeed2010/AdminLTE)：基于 Bootstrap 的后台模板
-- [Bootstrap](https://github.com/twbs/bootstrap.git)：使用最广泛的前端 ui 框架
-- [Animate](https://github.com/daneden/animate.css.git)：非常好用的 css 动效库
-- [SimpleMDE - Markdown Editor](https://github.com/sparksuite/simplemde-markdown-editor)：简洁，功能够用，且轻量级的 Markdown 编辑器
-- [Bootstrap-FileInput](https://github.com/kartik-v/bootstrap-fileinput.git)：基于 Bootstrap 的文件上传组件
-- [Font-awesome](https://github.com/FortAwesome/Font-Awesome.git)：使用最广泛的字体图标库
-- [JQuery](https://github.com/jquery/jquery.git)：使用最广泛的 JavaScript 框架
-- [Layer](https://github.com/sentsin/layer.git)：个人认为最实用最好看的弹出层组件，没有之一
-- [JQuery-Toast](https://github.com/kamranahmedse/jquery-toast-plugin)：消息提示组件
-- [Pjax](https://github.com/defunkt/jquery-pjax.git)：pushState + ajax = pjax
-- [OwO](https://github.com/DIYgod/OwO)：前端表情库
 
 ## 捐赠
 
@@ -128,14 +70,34 @@ Halo 的诞生离不开下面这些项目：
 | :------------: |
 | <img src="https://i.loli.net/2018/12/23/5c1f68ce9b884.png" width="200"/>  |
 
-## 界面展示
+## 预览图
 
-![](https://i.loli.net/2018/12/16/5c15b6edb9a49.png)
-![](https://i.loli.net/2018/12/16/5c15b6ee08333.png)
-![](https://i.loli.net/2018/12/16/5c15b6ec853af.png)
-![](https://i.loli.net/2018/12/16/5c15b6ec50238.png)
-![](https://i.loli.net/2018/12/16/5c15b6ed4057a.png)
-![](https://i.loli.net/2018/12/16/5c15b6eb01f2d.png)
-![](https://i.loli.net/2018/12/16/5c15b6eb98898.png)
-![](https://i.loli.net/2018/12/16/5c15b6eb3b506.png)
-![](https://i.loli.net/2018/12/16/5c15b6ebf29fd.png)
+![theme-anatole.png](https://i.loli.net/2019/09/11/OQtKEWcCe8xYBph.png)
+
+![theme-walker.png](https://i.loli.net/2019/09/11/F6CjZKJX1N2x5dU.png)
+
+![theme-icarus.png](https://i.loli.net/2019/09/11/4lO2wNCLiqyIJmR.png)
+
+![theme-destiny.png](https://i.loli.net/2019/09/11/q4t86cCPUEwlGMn.png)
+
+![install.png](https://i.loli.net/2019/09/11/Iu1eMzZDg6frw97.png)
+
+![admin-login.png](https://i.loli.net/2019/09/11/3CahVJAvXngwiQu.png)
+
+![admin-dashboard.png](https://i.loli.net/2019/09/11/G5R6bOweYoiZKEv.png)
+
+![admin-posts.png](https://i.loli.net/2019/09/11/uMHSeIkmC4iPzfJ.png)
+
+![admin-post-edit.png](https://i.loli.net/2019/09/11/ucDh2tOZLJGTyHX.png)
+
+![admin-post-publish.png](https://i.loli.net/2019/09/11/UwC3ecsRpAMONgq.png)
+
+![admin-post-settings.png](https://i.loli.net/2019/09/11/bxmJ7OTirtvV4Gs.png)
+
+![admin-attachment.png](https://i.loli.net/2019/09/11/B5UlX6vAgZ3bzaJ.png)
+
+![admin-profile.png](https://i.loli.net/2019/09/11/mMageUXv5EDpfJQ.png)
+
+![admin-themes.png](https://i.loli.net/2019/09/11/FVA953Ljswd4c8G.png)
+
+![admin-options.png](https://i.loli.net/2019/09/11/TK6SeMdVj1xcrDw.png)

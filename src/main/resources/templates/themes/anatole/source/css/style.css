@@ -598,11 +598,6 @@ a:hover, a:active {
     float: left;
 }
 
-/* 默认评论样式 */
-#fb_comments_container {
-    margin: 30px;
-}
-
 /* 按钮样式 */
 a.btn {
     color: #868686;
