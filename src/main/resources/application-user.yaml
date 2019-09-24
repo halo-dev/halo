@@ -12,7 +12,7 @@ spring:
 
     # MySQL 配置，如果你需要使用 H2 Database，请注释掉该配置并取消注释上方 H2 Database 的配置。
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+#    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
 #    username: root
 #    password: 123456
 
