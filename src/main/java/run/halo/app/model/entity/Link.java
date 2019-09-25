@@ -54,12 +54,21 @@ public class Link extends BaseEntity {
     @Column(name = "team", columnDefinition = "varchar(255) default ''")
     private String team;
 
+    /**
+     * Sort.
+     */
+    @Column(name = "priority", columnDefinition = "int default 0")
+    private Integer priority;
 
     @Override
     public void prePersist() {
         super.prePersist();
 
         id = null;
+
+        if (priority == null) {
+            priority = 0;
+        }
 
         if (logo == null) {
             logo = "";
