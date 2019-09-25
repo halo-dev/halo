@@ -35,7 +35,7 @@ public class LinkController {
      * @return List
      */
     @GetMapping
-    public List<LinkDTO> listLinks(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
+    public List<LinkDTO> listLinks(@SortDefault(sort = "priority", direction = Sort.Direction.ASC) Sort sort) {
         return linkService.listDtos(sort);
     }
 

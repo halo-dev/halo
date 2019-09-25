@@ -24,4 +24,6 @@ public class LinkDTO implements OutputConverter<LinkDTO, Link> {
     private String description;
 
     private String team;
+
+    private Integer priority;
 }
