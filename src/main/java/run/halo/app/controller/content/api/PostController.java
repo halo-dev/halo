@@ -10,7 +10,6 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
@@ -55,7 +54,7 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<BasePostSimpleDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    public Page<BasePostSimpleDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         return postService.convertToSimple(postPage);
     }
@@ -71,8 +70,8 @@ public class PostController {
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId,
-                                   @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
-                                   @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+                              @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+                              @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
         PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getById(postId));
 
         if (formatDisabled) {

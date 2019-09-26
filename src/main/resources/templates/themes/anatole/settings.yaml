@@ -63,7 +63,7 @@ style:
     icon:
       name: icon
       label: 右上角图标
-      type: text
+      type: attachment
     post_title_uppper:
       name: post_title_uppper
       label: 文章标题大写
@@ -111,12 +111,12 @@ style:
     google_color:
       name: google_color
       label: 浏览器沉浸颜色
-      type: text
+      type: color
       default: '#fff'
     scrollbar:
       name: scrollbar
       label: 全局滚动条颜色
-      type: text
+      type: color
       default: '#3798e8'
     code_pretty:
       name: code_pretty

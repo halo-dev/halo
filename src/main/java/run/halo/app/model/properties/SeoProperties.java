@@ -13,8 +13,6 @@ public enum SeoProperties implements PropertyEnum {
 
     DESCRIPTION("seo_description", String.class, ""),
 
-    BAIDU_TOKEN("seo_baidu_token", String.class, ""),
-
     /**
      * 是否禁止爬虫
      */
