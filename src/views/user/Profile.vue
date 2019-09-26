@@ -31,7 +31,7 @@
           </div>
           <div class="profile-center-detail">
             <p>
-              <a-icon type="global" /><a
+              <a-icon type="link" /><a
                 :href="options.blog_url"
                 target="method"
               >{{ options.blog_url }}</a>
