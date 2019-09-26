@@ -23,6 +23,7 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
