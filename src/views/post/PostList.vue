@@ -77,7 +77,7 @@
             icon="plus"
           >写文章</a-button>
         </router-link>
-        <a-dropdown v-show="queryParam.status!=null && queryParam.status!=''">
+        <a-dropdown v-show="queryParam.status!=null && queryParam.status!='' && !isMobile()">
           <a-menu slot="overlay">
             <a-menu-item
               key="1"
@@ -120,7 +120,176 @@
         </a-dropdown>
       </div>
       <div style="margin-top:15px">
+
+        <!-- Mobile -->
+        <a-list
+          v-if="isMobile()"
+          itemLayout="vertical"
+          size="large"
+          :pagination="false"
+          :dataSource="formattedPosts"
+          :loading="postsLoading"
+        >
+          <a-list-item
+            slot="renderItem"
+            slot-scope="item, index"
+            :key="index"
+          >
+            <template slot="actions">
+              <span>
+                <a-icon type="eye" />
+                {{ item.visits }}
+              </span>
+              <span>
+                <a-icon type="message" />
+                {{ item.commentCount }}
+              </span>
+              <a-dropdown
+                placement="topLeft"
+                :trigger="['click']"
+              >
+                <span>
+                  <a-icon type="bars" />
+                </span>
+                <a-menu slot="overlay">
+                  <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT' || item.status === 'INTIMATE'">
+                    <a
+                      href="javascript:;"
+                      @click="handleEditClick(item)"
+                    >编辑</a>
+                  </a-menu-item>
+                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                    <a-popconfirm
+                      :title="'你确定要发布【' + item.title + '】文章？'"
+                      @confirm="handleEditStatusClick(item.id,'PUBLISHED')"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:;">还原</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT' || item.status === 'INTIMATE'">
+                    <a-popconfirm
+                      :title="'你确定要将【' + item.title + '】文章移到回收站？'"
+                      @confirm="handleEditStatusClick(item.id,'RECYCLE')"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:;">回收站</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                    <a-popconfirm
+                      :title="'你确定要永久删除【' + item.title + '】文章？'"
+                      @confirm="handleDeleteClick(item.id)"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:;">删除</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item>
+                    <a
+                      rel="noopener noreferrer"
+                      href="javascript:void(0);"
+                      @click="handleShowPostSettings(item)"
+                    >设置</a>
+                  </a-menu-item>
+                </a-menu>
+              </a-dropdown>
+            </template>
+            <template slot="extra">
+              <span>
+                <a-badge
+                  :status="item.statusProperty.status"
+                  :text="item.statusProperty.text"
+                />
+              </span>
+            </template>
+            <a-list-item-meta>
+              <template slot="description">
+                {{ item.createTime | moment }}
+              </template>
+              <span
+                slot="title"
+                style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+              >
+                <a-icon
+                  type="pushpin"
+                  v-if="item.topPriority!=0"
+                  theme="twoTone"
+                  twoToneColor="red"
+                  style="margin-right: 3px;"
+                />
+                <a
+                  v-if="item.status=='PUBLISHED'"
+                  :href="options.blog_url+'/archives/'+item.url"
+                  target="_blank"
+                  style="text-decoration: none;"
+                >
+                  <a-tooltip
+                    placement="top"
+                    :title="'点击访问【'+item.title+'】'"
+                  >{{ item.title }}</a-tooltip>
+                </a>
+                <a
+                  v-else-if="item.status == 'INTIMATE'"
+                  :href="options.blog_url+'/archives/'+item.url+'/password'"
+                  target="_blank"
+                  style="text-decoration: none;"
+                >
+                  <a-tooltip
+                    placement="top"
+                    :title="'点击访问【'+item.title+'】'"
+                  >{{ item.title }}</a-tooltip>
+                </a>
+                <a
+                  v-else-if="item.status=='DRAFT'"
+                  href="javascript:void(0)"
+                  style="text-decoration: none;"
+                  @click="handlePreview(item.id)"
+                >
+                  <a-tooltip
+                    placement="topLeft"
+                    :title="'点击预览【'+item.title+'】'"
+                  >{{ item.title }}</a-tooltip>
+                </a>
+                <a
+                  v-else
+                  href="javascript:void(0);"
+                  style="text-decoration: none;"
+                  disabled
+                >
+                  {{ item.title }}
+                </a>
+              </span>
+
+            </a-list-item-meta>
+            <span>
+              {{ item.summary }}...
+            </span>
+            <br />
+            <br />
+            <a-tag
+              v-for="(category,categoryIndex) in item.categories"
+              :key="'category_'+categoryIndex"
+              color="blue"
+              style="margin-bottom: 8px"
+            >{{ category.name }}</a-tag>
+            <br />
+            <a-tag
+              v-for="(tag, tagIndex) in item.tags"
+              :key="'tag_'+tagIndex"
+              color="green"
+              style="margin-bottom: 8px"
+            >{{ tag.name }}</a-tag>
+
+          </a-list-item>
+        </a-list>
+
+        <!-- Desktop -->
         <a-table
+          v-else
           :rowKey="post => post.id"
           :rowSelection="{
             onChange: onSelectionChange,

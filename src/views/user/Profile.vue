@@ -106,13 +106,22 @@
                 </span>
                 <a-form layout="vertical">
                   <a-form-item label="原密码：">
-                    <a-input-password v-model="passwordParam.oldPassword" />
+                    <a-input
+                      type="password"
+                      v-model="passwordParam.oldPassword"
+                    />
                   </a-form-item>
                   <a-form-item label="新密码：">
-                    <a-input-password v-model="passwordParam.newPassword" />
+                    <a-input
+                      type="password"
+                      v-model="passwordParam.newPassword"
+                    />
                   </a-form-item>
                   <a-form-item label="确认密码：">
-                    <a-input-password v-model="passwordParam.confirmPassword" />
+                    <a-input
+                      type="password"
+                      v-model="passwordParam.confirmPassword"
+                    />
                   </a-form-item>
                   <a-form-item>
                     <a-button

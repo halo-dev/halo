@@ -333,7 +333,10 @@
                     label="操作员密码："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input-password v-model="options.oss_upyun_password" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_upyun_password"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="文件目录："
@@ -396,7 +399,10 @@
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input-password v-model="options.oss_qiniu_secret_key" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_qiniu_secret_key"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="Bucket："
@@ -464,7 +470,10 @@
                     label="Access Secret："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input-password v-model="options.oss_aliyun_access_secret" />
+                    <a-input
+                      type="password"
+                      v-model="options.oss_aliyun_access_secret"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="图片处理策略："
@@ -523,7 +532,10 @@
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input-password v-model="options.bos_baiduyun_secret_key" />
+                    <a-input
+                      type="password"
+                      v-model="options.bos_baiduyun_secret_key"
+                    />
                   </a-form-item>
                   <a-form-item
                     label="图片处理策略："
@@ -589,7 +601,10 @@
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input-password v-model="options.cos_tencentyun_secret_key" />
+                    <a-input
+                      type="password"
+                      v-model="options.cos_tencentyun_secret_key"
+                    />
                   </a-form-item>
                 </div>
                 <a-form-item>
@@ -645,7 +660,11 @@
                         label="邮箱密码："
                         :wrapper-col="wrapperCol"
                       >
-                        <a-input-password v-model="options.email_password" />
+                        <a-input
+                          v-model="options.email_password"
+                          type="password"
+                          placeholder="部分邮箱可能是授权码"
+                        />
                       </a-form-item>
                       <a-form-item
                         label="发件人："

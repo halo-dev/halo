@@ -31,7 +31,31 @@
                 <a-input v-model="selectedPost.url" />
               </a-form-item>
               <a-form-item label="访问密码：">
-                <a-input-password v-model="selectedPost.password" />
+                <a-input
+                  v-model="selectedPost.password"
+                  v-if="passwordVisible"
+                >
+                  <a
+                    href="javascript:void(0);"
+                    slot="addonAfter"
+                    @click="togglePasswordVisible"
+                  >
+                    <a-icon type="eye-invisible" />
+                  </a>
+                </a-input>
+                <a-input
+                  type="password"
+                  v-model="selectedPost.password"
+                  v-else
+                >
+                  <a
+                    href="javascript:void(0);"
+                    slot="addonAfter"
+                    @click="togglePasswordVisible"
+                  >
+                    <a-icon type="eye" />
+                  </a>
+                </a-input>
               </a-form-item>
 
               <a-form-item label="发表时间：">
@@ -214,6 +238,7 @@ export default {
     return {
       thumbDrawerVisible: false,
       categoryFormVisible: false,
+      passwordVisible: false,
       settingLoading: true,
       selectedPost: this.post,
       selectedTagIds: this.tagIds,
@@ -392,8 +417,12 @@ export default {
         })
       }
     },
+    togglePasswordVisible() {
+      this.passwordVisible = !this.passwordVisible
+    },
     onClose() {
       this.$emit('close', false)
+      this.passwordVisible = false
     },
     onPostDateChange(value, dateString) {
       this.selectedPost.createTime = value.valueOf()
