@@ -1198,7 +1198,7 @@ export default {
       }
     },
     handleSelectLogo(data) {
-      this.options.blog_logo = encodeURI(data.path)
+      this.$set(this.options, 'blog_logo', encodeURI(data.path))
       this.logoDrawerVisible = false
     },
     handleTestMailClick() {
