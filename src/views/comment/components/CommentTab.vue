@@ -54,7 +54,7 @@
       </div>
 
       <div class="table-operator">
-        <a-dropdown v-show="queryParam.status!=null && queryParam.status!=''">
+        <a-dropdown v-show="queryParam.status!=null && queryParam.status!='' && !isMobile()">
           <a-menu slot="overlay">
             <a-menu-item
               key="1"
@@ -97,7 +97,141 @@
         </a-dropdown>
       </div>
       <div style="margin-top:15px">
+        <!-- Mobile -->
+        <a-list
+          v-if="isMobile()"
+          itemLayout="vertical"
+          size="large"
+          :pagination="false"
+          :dataSource="formattedComments"
+          :loading="loading"
+        >
+          <a-list-item
+            slot="renderItem"
+            slot-scope="item, index"
+            :key="index"
+          >
+            <template slot="actions">
+              <a-dropdown
+                placement="topLeft"
+                :trigger="['click']"
+              >
+                <span>
+                  <a-icon type="bars" />
+                </span>
+                <a-menu slot="overlay">
+                  <a-menu-item v-if="item.status === 'AUDITING'">
+                    <a
+                      href="javascript:;"
+                      @click="handleEditStatusClick(item.id,'PUBLISHED')"
+                    >通过</a>
+                  </a-menu-item>
+                  <a-menu-item v-if="item.status === 'AUDITING'">
+                    <a
+                      href="javascript:;"
+                      @click="handleReplyAndPassClick(item)"
+                    >通过并回复</a>
+                  </a-menu-item>
+                  <a-menu-item v-else-if="item.status === 'PUBLISHED'">
+                    <a
+                      href="javascript:;"
+                      @click="handleReplyClick(item)"
+                    >回复</a>
+                  </a-menu-item>
+                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                    <a-popconfirm
+                      :title="'你确定要还原该评论？'"
+                      @confirm="handleEditStatusClick(item.id,'PUBLISHED')"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:;">还原</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'AUDITING'">
+                    <a-popconfirm
+                      :title="'你确定要将该评论移到回收站？'"
+                      @confirm="handleEditStatusClick(item.id,'RECYCLE')"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:;">回收站</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                    <a-popconfirm
+                      :title="'你确定要永久删除该评论？'"
+                      @confirm="handleDeleteClick(item.id)"
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <a href="javascript:;">删除</a>
+                    </a-popconfirm>
+                  </a-menu-item>
+                </a-menu>
+              </a-dropdown>
+            </template>
+            <template slot="extra">
+              <span>
+                <a-badge
+                  :status="item.statusProperty.status"
+                  :text="item.statusProperty.text"
+                />
+              </span>
+            </template>
+            <a-list-item-meta>
+              <template slot="description">
+                发表在
+                <a
+                  v-if="type==='posts'"
+                  :href="options.blog_url+'/archives/'+item.post.url"
+                  target="_blank"
+                >《{{ item.post.title }}》</a>
+                <a
+                  v-if="type === 'sheets'"
+                  :href="options.blog_url+'/s/'+item.sheet.url"
+                  target="_blank"
+                >《{{ item.sheet.title }}》</a>
+              </template>
+              <a-avatar
+                slot="avatar"
+                size="large"
+                :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
+              />
+              <span
+                slot="title"
+                style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                v-if="item.authorUrl"
+              >
+                <a-icon
+                  type="user"
+                  v-if="item.isAdmin"
+                  style="margin-right: 3px;"
+                />&nbsp;
+                <a
+                  :href="item.authorUrl"
+                  target="_blank"
+                >{{ item.author }}</a>
+                &nbsp;<small style="color:rgba(0, 0, 0, 0.45)">{{ item.createTime | timeAgo }}</small>
+              </span>
+              <span
+                slot="title"
+                style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                v-else
+              >
+                <a-icon
+                  type="user"
+                  v-if="item.isAdmin"
+                  style="margin-right: 3px;"
+                />&nbsp;{{ item.author }}&nbsp;<small style="color:rgba(0, 0, 0, 0.45)">{{ item.createTime | timeAgo }}</small>
+              </span>
+            </a-list-item-meta>
+            <p v-html="item.content"></p>
+          </a-list-item>
+        </a-list>
+        <!-- Desktop -->
         <a-table
+          v-else
           :rowKey="comment => comment.id"
           :rowSelection="{
             onChange: onSelectionChange,
@@ -281,6 +415,7 @@
   </div>
 </template>
 <script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import CommentDetail from './CommentDetail'
 import marked from 'marked'
@@ -361,6 +496,7 @@ const sheetColumns = [
 ]
 export default {
   name: 'CommentTab',
+  mixins: [mixin, mixinDevice],
   components: {
     CommentDetail
   },
