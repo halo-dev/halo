@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "animate.css": "^3.7.0",
-    "ant-design-vue": "^1.4.0",
+    "ant-design-vue": "^1.4.1",
     "axios": "^0.18.0",
     "enquire.js": "^2.1.6",
     "filepond": "^4.7.2",

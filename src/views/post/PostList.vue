@@ -743,7 +743,9 @@ export default {
     onPostSettingsClose() {
       this.postSettingVisible = false
       this.selectedPost = {}
-      this.loadPosts()
+      setTimeout(() => {
+        this.loadPosts()
+      }, 500)
     },
     onRefreshPostFromSetting(post) {
       this.selectedPost = post

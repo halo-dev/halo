@@ -630,7 +630,9 @@ export default {
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
       this.selectedSheet = {}
-      this.loadSheets()
+      setTimeout(() => {
+        this.loadSheets()
+      }, 500)
     },
     onRefreshSheetFromSetting(sheet) {
       this.selectedSheet = sheet
