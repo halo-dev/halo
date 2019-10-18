@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+   halo:
+      image: ruibaby/halo
+      container_name: halo
+      environment:
+        - VIRTUAL_PORT=8090
+        - VIRTUAL_HOST=localhost  
+        - LETSENCRYPT_HOSTlocalhost
+        - LETSENCRYPT_EMAIL=i@example.com
+        - MAX_UPLOAD_SIZE=10m
+        - JVM_XMS=256m
+        - JVM_XMX=256m
+      volumes:
+        - ./data/logs:/home/halo/logs
+        - ./data/conf:/home/halo/conf
+        - ./data/lib:/home/halo/plugins/mysql 
+      ports:
+        - 8090:8090
