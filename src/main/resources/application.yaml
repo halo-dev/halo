@@ -1,6 +1,6 @@
 server:
   port: 8090
-  use-forward-headers: true
+  forward-headers-strategy: native
   compression:
     enabled: false
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
@@ -42,10 +42,8 @@ spring:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
-  mvc:
-    favicon:
-      enabled: false
 logging:
   level:
     run.halo.app: INFO
-  path: ${user.home}/.halo/logs
+  file:
+    path: ${user.home}/.halo/logs

@@ -7,13 +7,15 @@ import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
 import run.halo.app.repository.base.BaseCommentRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * PostComment repository.
  *
  * @author johnniang
- * @date 3/21/19
+ * @author ryanwang
+ * @date 2019-03-21
  */
 public interface PostCommentRepository extends BaseCommentRepository<PostComment> {
 
@@ -22,7 +24,7 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
             "where comment.postId in ?1 group by comment.postId")
     @NonNull
     @Override
-    List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
+    List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
     @Query("select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment.id), comment.parentId) " +
             "from PostComment comment " +
@@ -30,5 +32,5 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
             "group by comment.parentId")
     @NonNull
     @Override
-    List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Iterable<Long> commentIds);
+    List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Collection<Long> commentIds);
 }

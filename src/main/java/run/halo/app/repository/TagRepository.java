@@ -32,6 +32,7 @@ public interface TagRepository extends BaseRepository<Tag, Integer> {
 
     /**
      * Get tag by name
+     *
      * @param name name
      * @return Tag
      */
