@@ -75,7 +75,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public User getByUsernameOfNonNull(String username) {
-        return getByUsername(username).orElseThrow(() -> new NotFoundException("The username dose not exist").setErrorData(username));
+        return getByUsername(username).orElseThrow(() -> new NotFoundException("The username does not exist").setErrorData(username));
     }
 
     @Override
@@ -85,7 +85,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public User getByEmailOfNonNull(String email) {
-        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email dose not exist").setErrorData(email));
+        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email does not exist").setErrorData(email));
     }
 
     @Override
