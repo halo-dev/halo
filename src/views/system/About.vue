@@ -213,7 +213,8 @@ export default {
   },
   created() {
     this.getEnvironments()
-    this.checkUpdate()
+    this.checkServerUpdate()
+    this.checkAdminUpdate()
   },
   computed: {
     updateText() {
@@ -256,7 +257,7 @@ UA 信息：${navigator.userAgent}`
           this.$message.error('复制失败！')
         })
     },
-    async checkUpdate() {
+    async checkServerUpdate() {
       const _this = this
 
       axios
@@ -272,7 +273,7 @@ UA 信息：${navigator.userAgent}`
             return
           }
           const title = '新版本提醒'
-          const content = '检测到新版本：' + data.name + '，点击下方按钮查看最新版本。'
+          const content = '检测到 Server 新版本：' + data.name + '，点击下方按钮查看最新版本。'
           const url = data.html_url
           this.$notification.open({
             message: title,
@@ -291,6 +292,48 @@ UA 信息：${navigator.userAgent}`
                   }
                 },
                 '去看看'
+              )
+            }
+          })
+        })
+        .catch(function(error) {
+          console.error('Check update fail', error)
+        })
+    },
+    async checkAdminUpdate() {
+      const _this = this
+
+      axios
+        .get('https://api.github.com/repos/halo-dev/halo-admin/releases/latest')
+        .then(response => {
+          const data = response.data
+          if (data.draft || data.prerelease) {
+            return
+          }
+          const current = _this.calculateIntValue(_this.adminVersion)
+          const latest = _this.calculateIntValue(data.name)
+          if (current >= latest) {
+            return
+          }
+          const title = '新版本提醒'
+          const content = '检测到 Admin 新版本：' + data.name + '，点击下方按钮可直接更新为最新版本。'
+          this.$notification.open({
+            message: title,
+            description: content,
+            icon: <a-icon type="smile" style="color: #108ee9" />,
+            btn: h => {
+              return h(
+                'a-button',
+                {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => _this.confirmUpdate()
+                  }
+                },
+                '点击更新'
               )
             }
           })
