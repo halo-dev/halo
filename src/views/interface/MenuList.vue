@@ -103,7 +103,70 @@
           title="所有菜单"
           :bodyStyle="{ padding: '16px' }"
         >
+          <!-- Mobile -->
+          <a-list
+            v-if="isMobile()"
+            itemLayout="vertical"
+            size="large"
+            :pagination="false"
+            :dataSource="menus"
+            :loading="loading"
+          >
+            <a-list-item
+              slot="renderItem"
+              slot-scope="item, index"
+              :key="index"
+            >
+              <template slot="actions">
+                <a-dropdown
+                  placement="topLeft"
+                  :trigger="['click']"
+                >
+                  <span>
+                    <a-icon type="bars" />
+                  </span>
+                  <a-menu slot="overlay">
+                    <a-menu-item>
+                      <a
+                        href="javascript:;"
+                        @click="handleEditMenu(item)"
+                      >编辑</a>
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a-popconfirm
+                        :title="'你确定要删除【' + item.name + '】菜单？'"
+                        @confirm="handleDeleteMenu(item.id)"
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <a href="javascript:;">删除</a>
+                      </a-popconfirm>
+                    </a-menu-item>
+
+                  </a-menu>
+                </a-dropdown>
+              </template>
+              <template slot="extra">
+                <span>
+                  {{ item.team }}
+                </span>
+              </template>
+              <a-list-item-meta>
+                <template slot="description">
+                  {{ item.url }}
+                </template>
+                <span
+                  slot="title"
+                  style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                >
+                  {{ item.name }}
+                </span>
+              </a-list-item-meta>
+            </a-list-item>
+          </a-list>
+          <!-- Desktop -->
           <a-table
+            v-else
             :columns="columns"
             :dataSource="menus"
             :loading="loading"
@@ -141,6 +204,7 @@
 </template>
 
 <script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 import MenuSelectTree from './components/MenuSelectTree'
 import menuApi from '@/api/menu'
 const columns = [
@@ -169,6 +233,7 @@ const columns = [
 ]
 export default {
   components: { MenuSelectTree },
+  mixins: [mixin, mixinDevice],
   data() {
     return {
       formType: 'create',
