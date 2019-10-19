@@ -12,13 +12,15 @@ import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Base comment repository.
  *
  * @author johnniang
- * @date 19-4-24
+ * @author ryanwang
+ * @date 2019-04-24
  */
 @NoRepositoryBean
 public interface BaseCommentRepository<COMMENT extends BaseComment> extends BaseRepository<COMMENT, Long>, JpaSpecificationExecutor<COMMENT> {
@@ -41,7 +43,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
-    List<COMMENT> findAllByPostIdIn(@NonNull Iterable<Integer> postIds);
+    List<COMMENT> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
      * Finds all comments by post id.
@@ -63,7 +65,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
             "where comment.postId in ?1 " +
             "group by comment.postId")
     @NonNull
-    List<CommentCountProjection> countByPostIds(@NonNull Iterable<Integer> postIds);
+    List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
     /**
      * Counts by comment status.
@@ -113,7 +115,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
-    List<COMMENT> findAllByStatusAndParentIdIn(@NonNull CommentStatus status, @NonNull Iterable<Long> parentIds);
+    List<COMMENT> findAllByStatusAndParentIdIn(@NonNull CommentStatus status, @NonNull Collection<Long> parentIds);
 
     /**
      * Finds comments by post id, comment status and parent id.
@@ -133,5 +135,5 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
             "where comment.parentId in ?1 " +
             "group by comment.parentId")
     @NonNull
-    List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Iterable<Long> commentIds);
+    List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Collection<Long> commentIds);
 }

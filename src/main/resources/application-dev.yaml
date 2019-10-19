@@ -1,6 +1,6 @@
 server:
   port: 8090
-  use-forward-headers: true
+  forward-headers-strategy: native
   compression:
     enabled: false
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
@@ -40,9 +40,6 @@ spring:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
-  mvc:
-    favicon:
-      enabled: false
   cache:
     type: none
 logging:
@@ -51,7 +48,8 @@ logging:
     org.hibernate: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: INFO
     org.hibernate.type.descriptor.sql.BasicExtractor: INFO
-  path: ${user.home}/halo-dev/logs
+  file:
+    path: ${user.home}/halo-dev/logs
 
 halo:
   doc-disabled: false
