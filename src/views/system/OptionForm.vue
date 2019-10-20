@@ -298,7 +298,7 @@
                     label="Secret Token："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input
+                    <a-input-password
                       v-model="options.smms_api_secret_token"
                       placeholder="需要到 sm.ms 官网注册后获取"
                     />
@@ -333,10 +333,7 @@
                     label="操作员密码："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input
-                      type="password"
-                      v-model="options.oss_upyun_password"
-                    />
+                    <a-input-password v-model="options.oss_upyun_password" />
                   </a-form-item>
                   <a-form-item
                     label="文件目录："
@@ -393,16 +390,13 @@
                     label="Access Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_qiniu_access_key" />
+                    <a-input-password v-model="options.oss_qiniu_access_key" />
                   </a-form-item>
                   <a-form-item
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input
-                      type="password"
-                      v-model="options.oss_qiniu_secret_key"
-                    />
+                    <a-input-password v-model="options.oss_qiniu_secret_key" />
                   </a-form-item>
                   <a-form-item
                     label="Bucket："
@@ -464,16 +458,13 @@
                     label="Access Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.oss_aliyun_access_key" />
+                    <a-input-password v-model="options.oss_aliyun_access_key" />
                   </a-form-item>
                   <a-form-item
                     label="Access Secret："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input
-                      type="password"
-                      v-model="options.oss_aliyun_access_secret"
-                    />
+                    <a-input-password v-model="options.oss_aliyun_access_secret" />
                   </a-form-item>
                   <a-form-item
                     label="图片处理策略："
@@ -526,16 +517,13 @@
                     label="Access Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.bos_baiduyun_access_key" />
+                    <a-input-password v-model="options.bos_baiduyun_access_key" />
                   </a-form-item>
                   <a-form-item
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input
-                      type="password"
-                      v-model="options.bos_baiduyun_secret_key"
-                    />
+                    <a-input-password v-model="options.bos_baiduyun_secret_key" />
                   </a-form-item>
                   <a-form-item
                     label="图片处理策略："
@@ -595,16 +583,13 @@
                     label="Secret Id："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input v-model="options.cos_tencentyun_secret_id" />
+                    <a-input-password v-model="options.cos_tencentyun_secret_id" />
                   </a-form-item>
                   <a-form-item
                     label="Secret Key："
                     :wrapper-col="wrapperCol"
                   >
-                    <a-input
-                      type="password"
-                      v-model="options.cos_tencentyun_secret_key"
-                    />
+                    <a-input-password v-model="options.cos_tencentyun_secret_key" />
                   </a-form-item>
                 </div>
                 <a-form-item>
@@ -660,9 +645,8 @@
                         label="邮箱密码："
                         :wrapper-col="wrapperCol"
                       >
-                        <a-input
+                        <a-input-password
                           v-model="options.email_password"
-                          type="password"
                           placeholder="部分邮箱可能是授权码"
                         />
                       </a-form-item>
@@ -733,7 +717,7 @@
                   label="Access key："
                   :wrapper-col="wrapperCol"
                 >
-                  <a-input v-model="options.api_access_key" />
+                  <a-input-password v-model="options.api_access_key" />
                 </a-form-item>
                 <a-form-item>
                   <a-button
@@ -1198,7 +1182,7 @@ export default {
       }
     },
     handleSelectLogo(data) {
-      this.options.blog_logo = encodeURI(data.path)
+      this.$set(this.options, 'blog_logo', encodeURI(data.path))
       this.logoDrawerVisible = false
     },
     handleTestMailClick() {

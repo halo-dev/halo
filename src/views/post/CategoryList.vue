@@ -9,7 +9,10 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
+        <a-card
+          :title="title"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -68,8 +71,86 @@
         :xs="24"
         :style="{ 'padding-bottom': '1rem' }"
       >
-        <a-card title="分类列表" :bodyStyle="{ padding: '16px' }">
+        <a-card
+          title="分类列表"
+          :bodyStyle="{ padding: '16px' }"
+        >
+          <!-- Mobile -->
+          <a-list
+            v-if="isMobile()"
+            itemLayout="vertical"
+            size="large"
+            :pagination="false"
+            :dataSource="categories"
+            :loading="loading"
+          >
+            <a-list-item
+              slot="renderItem"
+              slot-scope="item, index"
+              :key="index"
+            >
+              <template slot="actions">
+                <span>
+                  <a-icon type="form" />
+                  {{ item.postCount }}
+                </span>
+                <a-dropdown
+                  placement="topLeft"
+                  :trigger="['click']"
+                >
+                  <span>
+                    <a-icon type="bars" />
+                  </span>
+                  <a-menu slot="overlay">
+                    <a-menu-item>
+                      <a
+                        href="javascript:;"
+                        @click="handleEditCategory(item)"
+                      >编辑</a>
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a-popconfirm
+                        :title="'你确定要添加【' + item.name + '】到菜单？'"
+                        @confirm="handleCategoryToMenu(item)"
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <a href="javascript:void(0);">添加到菜单</a>
+                      </a-popconfirm>
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a-popconfirm
+                        :title="'你确定要删除【' + item.name + '】分类？'"
+                        @confirm="handleDeleteCategory(item.id)"
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <a href="javascript:void(0);">删除</a>
+                      </a-popconfirm>
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
+              </template>
+              <a-list-item-meta>
+                <template slot="description">
+                  {{ item.slugName }}
+                </template>
+                <span
+                  slot="title"
+                  style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                >
+                  {{ item.name }}
+                </span>
+
+              </a-list-item-meta>
+              <span>
+                {{ item.description }}
+              </span>
+            </a-list-item>
+          </a-list>
+          <!-- Desktop -->
           <a-table
+            v-else
             :columns="columns"
             :dataSource="categories"
             :rowKey="record => record.id"
@@ -129,6 +210,7 @@
 </template>
 
 <script>
+import { mixin, mixinDevice } from '@/utils/mixin.js'
 import CategorySelectTree from './components/CategorySelectTree'
 import categoryApi from '@/api/category'
 import menuApi from '@/api/menu'
@@ -158,6 +240,7 @@ const columns = [
 ]
 export default {
   components: { CategorySelectTree },
+  mixins: [mixin, mixinDevice],
   data() {
     return {
       formType: 'create',

@@ -30,7 +30,9 @@
           :paragraph="{ rows: 18 }"
         >
           <a-col :span="24">
+            <a-empty v-if="formattedDatas.length==0"/>
             <div
+              v-else
               class="attach-item"
               v-for="(item, index) in formattedDatas"
               :key="index"

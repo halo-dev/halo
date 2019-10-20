@@ -9,7 +9,78 @@
                 <a-icon type="pushpin" />内置页面
               </span>
 
+              <!-- Mobile -->
+
+              <a-list
+                v-if="isMobile()"
+                itemLayout="vertical"
+                size="large"
+                :pagination="false"
+                :dataSource="internalSheets"
+              >
+                <a-list-item
+                  slot="renderItem"
+                  slot-scope="item, index"
+                  :key="index"
+                >
+                  <template slot="actions">
+                    <span>
+                      <router-link
+                        :to="{name:'LinkList'}"
+                        v-if="item.id==1"
+                      >
+                        <a-icon type="edit" />
+                      </router-link>
+                      <router-link
+                        :to="{name:'PhotoList'}"
+                        v-if="item.id==2"
+                      >
+                        <a-icon type="edit" />
+                      </router-link>
+                      <router-link
+                        :to="{name:'JournalList'}"
+                        v-if="item.id==3"
+                      >
+                        <a-icon type="edit" />
+                      </router-link>
+                    </span>
+                  </template>
+                  <template slot="extra">
+                    <span v-if="item.status">可用</span>
+                    <span v-else>不可用
+                      <a-tooltip
+                        slot="action"
+                        title="当前主题没有对应模板"
+                      >
+                        <a-icon type="info-circle-o" />
+                      </a-tooltip>
+                    </span>
+                  </template>
+                  <a-list-item-meta>
+                    <span
+                      slot="title"
+                      style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                    >
+                      <a
+                        :href="options.blog_url+item.url"
+                        target="_blank"
+                        v-if="item.status"
+                      >{{ item.title }}</a>
+                      <a
+                        :href="options.blog_url+item.url"
+                        target="_blank"
+                        disabled
+                        v-else
+                      >{{ item.title }}</a>
+                    </span>
+
+                  </a-list-item-meta>
+                </a-list-item>
+              </a-list>
+
+              <!-- Desktop -->
               <a-table
+                v-else
                 :columns="internalColumns"
                 :dataSource="internalSheets"
                 :pagination="false"
@@ -70,7 +141,168 @@
               <span slot="tab">
                 <a-icon type="fork" />自定义页面
               </span>
+
+              <!-- Mobile -->
+              <a-list
+                v-if="isMobile()"
+                itemLayout="vertical"
+                size="large"
+                :pagination="false"
+                :dataSource="formattedSheets"
+                :loading="sheetsLoading"
+              >
+                <a-list-item
+                  slot="renderItem"
+                  slot-scope="item, index"
+                  :key="index"
+                >
+                  <template slot="actions">
+                    <span>
+                      <a-icon type="eye" />
+                      {{ item.visits }}
+                    </span>
+                    <span>
+                      <a-icon type="message" />
+                      {{ item.commentCount }}
+                    </span>
+                    <a-dropdown
+                      placement="topLeft"
+                      :trigger="['click']"
+                    >
+                      <span>
+                        <a-icon type="bars" />
+                      </span>
+                      <a-menu slot="overlay">
+                        <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
+                          <a
+                            href="javascript:;"
+                            @click="handleEditClick(item)"
+                          >编辑</a>
+                        </a-menu-item>
+                        <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                          <a-popconfirm
+                            :title="'你确定要发布【' + item.title + '】文章？'"
+                            @confirm="handleEditStatusClick(item.id,'PUBLISHED')"
+                            okText="确定"
+                            cancelText="取消"
+                          >
+                            <a href="javascript:;">还原</a>
+                          </a-popconfirm>
+                        </a-menu-item>
+                        <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
+                          <a-popconfirm
+                            :title="'你确定要将【' + item.title + '】文章移到回收站？'"
+                            @confirm="handleEditStatusClick(item.id,'RECYCLE')"
+                            okText="确定"
+                            cancelText="取消"
+                          >
+                            <a href="javascript:;">回收站</a>
+                          </a-popconfirm>
+                        </a-menu-item>
+                        <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                          <a-popconfirm
+                            :title="'你确定要永久删除【' + item.title + '】文章？'"
+                            @confirm="handleDeleteClick(item.id)"
+                            okText="确定"
+                            cancelText="取消"
+                          >
+                            <a href="javascript:;">删除</a>
+                          </a-popconfirm>
+                        </a-menu-item>
+                        <a-menu-item>
+                          <a-popconfirm
+                            :title="'你确定要添加【' + item.title + '】到菜单？'"
+                            @confirm="handleSheetToMenu(item)"
+                            okText="确定"
+                            cancelText="取消"
+                          >
+                            <a href="javascript:void(0);">添加到菜单</a>
+                          </a-popconfirm>
+                        </a-menu-item>
+                        <a-menu-item>
+                          <a
+                            rel="noopener noreferrer"
+                            href="javascript:void(0);"
+                            @click="handleShowSheetSettings(item)"
+                          >设置</a>
+                        </a-menu-item>
+                      </a-menu>
+                    </a-dropdown>
+                  </template>
+                  <template slot="extra">
+                    <span>
+                      <a-badge
+                        :status="item.statusProperty.status"
+                        :text="item.statusProperty.text"
+                      />
+                    </span>
+                  </template>
+                  <a-list-item-meta>
+                    <template slot="description">
+                      {{ item.createTime | moment }}
+                    </template>
+                    <span
+                      slot="title"
+                      style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                    >
+                      <a-icon
+                        type="pushpin"
+                        v-if="item.topPriority!=0"
+                        theme="twoTone"
+                        twoToneColor="red"
+                        style="margin-right: 3px;"
+                      />
+                      <a
+                        v-if="item.status=='PUBLISHED'"
+                        :href="options.blog_url+'/archives/'+item.url"
+                        target="_blank"
+                        style="text-decoration: none;"
+                      >
+                        <a-tooltip
+                          placement="top"
+                          :title="'点击访问【'+item.title+'】'"
+                        >{{ item.title }}</a-tooltip>
+                      </a>
+                      <a
+                        v-else-if="item.status == 'INTIMATE'"
+                        :href="options.blog_url+'/archives/'+item.url+'/password'"
+                        target="_blank"
+                        style="text-decoration: none;"
+                      >
+                        <a-tooltip
+                          placement="top"
+                          :title="'点击访问【'+item.title+'】'"
+                        >{{ item.title }}</a-tooltip>
+                      </a>
+                      <a
+                        v-else-if="item.status=='DRAFT'"
+                        href="javascript:void(0)"
+                        style="text-decoration: none;"
+                        @click="handlePreview(item.id)"
+                      >
+                        <a-tooltip
+                          placement="topLeft"
+                          :title="'点击预览【'+item.title+'】'"
+                        >{{ item.title }}</a-tooltip>
+                      </a>
+                      <a
+                        v-else
+                        href="javascript:void(0);"
+                        style="text-decoration: none;"
+                        disabled
+                      >
+                        {{ item.title }}
+                      </a>
+                    </span>
+
+                  </a-list-item-meta>
+
+                </a-list-item>
+              </a-list>
+
+              <!-- Desktop -->
               <a-table
+                v-else
                 :rowKey="sheet => sheet.id"
                 :columns="customColumns"
                 :dataSource="formattedSheets"
@@ -398,7 +630,9 @@ export default {
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
       this.selectedSheet = {}
-      this.loadSheets()
+      setTimeout(() => {
+        this.loadSheets()
+      }, 500)
     },
     onRefreshSheetFromSetting(sheet) {
       this.selectedSheet = sheet

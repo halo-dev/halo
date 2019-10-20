@@ -317,7 +317,8 @@ export default {
       this.attachmentDrawerVisible = true
     },
     handleSelectAttachment(data) {
-      this.themeSettings[this.selectedField] = encodeURI(data.path)
+      this.$set(this.themeSettings, this.selectedField, encodeURI(data.path))
+      // this.themeSettings[this.selectedField] = encodeURI(data.path)
       this.attachmentDrawerVisible = false
     },
     toggleViewMode() {

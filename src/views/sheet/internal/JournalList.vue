@@ -101,7 +101,6 @@
                     <a href="javascript:void(0);">
                       <a-icon
                         type="like-o"
-                        style="margin-right: 8px"
                       />
                       {{ item.likes }}
                     </a>
@@ -113,7 +112,6 @@
                     >
                       <a-icon
                         type="message"
-                        style="margin-right: 8px"
                       />
                       {{ item.commentCount }}
                     </a>

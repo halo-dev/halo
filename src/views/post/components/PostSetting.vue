@@ -31,31 +31,7 @@
                 <a-input v-model="selectedPost.url" />
               </a-form-item>
               <a-form-item label="访问密码：">
-                <a-input
-                  v-model="selectedPost.password"
-                  v-if="passwordVisible"
-                >
-                  <a
-                    href="javascript:void(0);"
-                    slot="addonAfter"
-                    @click="togglePasswordVisible"
-                  >
-                    <a-icon type="eye-invisible" />
-                  </a>
-                </a-input>
-                <a-input
-                  type="password"
-                  v-model="selectedPost.password"
-                  v-else
-                >
-                  <a
-                    href="javascript:void(0);"
-                    slot="addonAfter"
-                    @click="togglePasswordVisible"
-                  >
-                    <a-icon type="eye" />
-                  </a>
-                </a-input>
+                <a-input-password v-model="selectedPost.password"/>
               </a-form-item>
 
               <a-form-item label="发表时间：">
@@ -183,7 +159,7 @@
               <a-button
                 class="post-thumb-remove"
                 type="dashed"
-                @click="handlerRemoveThumb"
+                @click="handleRemoveThumb"
               >移除</a-button>
             </div>
           </div>
@@ -239,7 +215,6 @@ export default {
       thumbDrawerVisible: false,
       categoryFormVisible: false,
       settingLoading: true,
-      passwordVisible: false,
       selectedPost: this.post,
       selectedTagIds: this.tagIds,
       selectedCategoryIds: this.categoryIds,
@@ -341,7 +316,7 @@ export default {
       this.selectedPost.thumbnail = encodeURI(data.path)
       this.thumbDrawerVisible = false
     },
-    handlerRemoveThumb() {
+    handleRemoveThumb() {
       this.selectedPost.thumbnail = null
     },
     handlerCreateCategory() {
@@ -417,12 +392,8 @@ export default {
         })
       }
     },
-    togglePasswordVisible() {
-      this.passwordVisible = !this.passwordVisible
-    },
     onClose() {
       this.$emit('close', false)
-      this.passwordVisible = false
     },
     onPostDateChange(value, dateString) {
       this.selectedPost.createTime = value.valueOf()
