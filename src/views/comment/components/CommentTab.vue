@@ -291,7 +291,14 @@
           <span
             slot="createTime"
             slot-scope="createTime"
-          >{{ createTime | timeAgo }}</span>
+          >
+            <a-tooltip placement="top">
+              <template slot="title">
+                {{ createTime | moment }}
+              </template>
+              {{ createTime | timeAgo }}
+            </a-tooltip>
+          </span>
           <span
             slot="action"
             slot-scope="text, record"
