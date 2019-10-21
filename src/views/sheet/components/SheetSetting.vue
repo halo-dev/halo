@@ -73,7 +73,7 @@
             <div class="sheet-thumb">
               <img
                 class="img"
-                :src="selectedSheet.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
+                :src="selectedSheet.thumbnail || '/placeholder.png'"
                 @click="()=>this.thumbDrawerVisible = true"
               >
               <a-button

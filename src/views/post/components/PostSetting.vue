@@ -31,31 +31,7 @@
                 <a-input v-model="selectedPost.url" />
               </a-form-item>
               <a-form-item label="访问密码：">
-                <a-input
-                  v-model="selectedPost.password"
-                  v-if="passwordVisible"
-                >
-                  <a
-                    href="javascript:void(0);"
-                    slot="addonAfter"
-                    @click="togglePasswordVisible"
-                  >
-                    <a-icon type="eye-invisible" />
-                  </a>
-                </a-input>
-                <a-input
-                  type="password"
-                  v-model="selectedPost.password"
-                  v-else
-                >
-                  <a
-                    href="javascript:void(0);"
-                    slot="addonAfter"
-                    @click="togglePasswordVisible"
-                  >
-                    <a-icon type="eye" />
-                  </a>
-                </a-input>
+                <a-input-password placeholder="input password" v-model="selectedPost.password"/>
               </a-form-item>
 
               <a-form-item label="发表时间：">
@@ -177,7 +153,7 @@
             <div class="post-thumb">
               <img
                 class="img"
-                :src="selectedPost.thumbnail || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
+                :src="selectedPost.thumbnail || '/placeholder.png'"
                 @click="()=>this.thumbDrawerVisible=true"
               >
               <a-button
@@ -238,7 +214,6 @@ export default {
     return {
       thumbDrawerVisible: false,
       categoryFormVisible: false,
-      passwordVisible: false,
       settingLoading: true,
       selectedPost: this.post,
       selectedTagIds: this.tagIds,
@@ -416,9 +391,6 @@ export default {
           this.selectedPost = response.data.data
         })
       }
-    },
-    togglePasswordVisible() {
-      this.passwordVisible = !this.passwordVisible
     },
     onClose() {
       this.$emit('close', false)
