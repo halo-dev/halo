@@ -1,11 +1,11 @@
 const types = {
   404: {
-    img: 'https://gw.alipayobjects.com/zos/rmsportal/KpnpchXsobRgLElEozzI.svg',
+    img: '/images/404.svg',
     title: '404',
     desc: '抱歉，你访问的页面不存在'
   },
   500: {
-    img: 'https://gw.alipayobjects.com/zos/rmsportal/RVRUAYdCGeYNBWoKiIwB.svg',
+    img: '/images/500.svg',
     title: '500',
     desc: '抱歉，服务器出错了'
   }

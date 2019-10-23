@@ -129,7 +129,7 @@
           >
             <div class="photo-detail-img">
               <img
-                :src="photo.url || '//i.loli.net/2019/05/05/5ccf007c0a01d.png'"
+                :src="photo.url || '/images/placeholder.png'"
                 @click="showThumbDrawer"
               >
             </div>

@@ -20,7 +20,7 @@
                 @click="handleMenuTheme('dark')"
               >
                 <img
-                  src="https://gw.alipayobjects.com/zos/rmsportal/LCkqqYNmvBEbokSDscrm.svg"
+                  src="/images/dark.svg"
                   alt="dark"
                 >
                 <div
@@ -39,7 +39,7 @@
                 @click="handleMenuTheme('light')"
               >
                 <img
-                  src="https://gw.alipayobjects.com/zos/rmsportal/jpRkZQMyYRryryPNtyIC.svg"
+                  src="/images/dark.svg"
                   alt="light"
                 >
                 <div
@@ -84,7 +84,7 @@
               @click="handleLayout('sidemenu')"
             >
               <img
-                src="https://gw.alipayobjects.com/zos/rmsportal/JopDzEhOqwOjeNTXkoje.svg"
+                src="/images/sidemenu.svg"
                 alt="sidemenu"
               >
               <div
@@ -100,7 +100,7 @@
               @click="handleLayout('topmenu')"
             >
               <img
-                src="https://gw.alipayobjects.com/zos/rmsportal/KDNDBbriJhLwuqMoxcAr.svg"
+                src="/images/topmenu.svg"
                 alt="topmenu"
               >
               <div
