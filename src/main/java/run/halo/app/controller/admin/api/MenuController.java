@@ -20,7 +20,8 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Menu controller.
  *
  * @author johnniang
- * @date 4/3/19
+ * @author ryanwang
+ * @date 2019-04-03
  */
 @RestController
 @RequestMapping("/api/admin/menus")
@@ -87,5 +88,11 @@ public class MenuController {
             });
         }
         return new MenuDTO().convertFrom(menuService.removeById(menuId));
+    }
+
+    @GetMapping("teams")
+    @ApiOperation(("List all menu teams"))
+    public List<String> teams() {
+        return menuService.listAllTeams();
     }
 }

@@ -90,7 +90,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                 .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler("/backup/**")
                 .addResourceLocations(workDir + "backup/");
-        registry.addResourceHandler("/admin/**")
+        registry.addResourceHandler(haloProperties.getAdminPath() + "/**")
                 .addResourceLocations(workDir + HALO_ADMIN_RELATIVE_PATH)
                 .addResourceLocations("classpath:/admin/");
 

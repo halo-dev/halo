@@ -3,7 +3,9 @@ package run.halo.app.controller.content;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.properties.BlogProperties;
@@ -27,19 +29,22 @@ public class MainController {
 
     private final OptionService optionService;
 
-    public MainController(UserService userService, OptionService optionService) {
+    private final HaloProperties haloProperties;
+
+    public MainController(UserService userService, OptionService optionService, HaloProperties haloProperties) {
         this.userService = userService;
         this.optionService = optionService;
+        this.haloProperties = haloProperties;
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "redirect:/admin/index.html";
+    @GetMapping("/{permlink}")
+    public String admin(@PathVariable(name = "permlink") String permlink) {
+        return "redirect:/" + permlink + "/index.html";
     }
 
     @GetMapping("/install")
     public String installation() {
-        return "redirect:/admin/index.html#install";
+        return "redirect:" + haloProperties.getAdminPath() + "/index.html#install";
     }
 
     @GetMapping("/version")

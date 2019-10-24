@@ -33,6 +33,11 @@ public class HaloProperties {
     private boolean authEnabled = true;
 
     /**
+     * Admin path.
+     */
+    private String adminPath = "/admin";
+
+    /**
      * Work directory.
      */
     private String workDir = HaloConst.USER_HOME + "/.halo/";

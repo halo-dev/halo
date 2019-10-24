@@ -113,6 +113,11 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
+    public List<String> listAllTeams() {
+        return menuRepository.findAllTeams();
+    }
+
+    @Override
     public Menu create(Menu menu) {
         nameMustNotExist(menu);
 
