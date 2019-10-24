@@ -95,6 +95,11 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         return linkRepository.exists(Example.of(link));
     }
 
+    @Override
+    public List<String> listAllTeams() {
+        return linkRepository.findAllTeams();
+    }
+
     @NonNull
     private List<LinkDTO> convertTo(@Nullable List<Link> links) {
         if (CollectionUtils.isEmpty(links)) {

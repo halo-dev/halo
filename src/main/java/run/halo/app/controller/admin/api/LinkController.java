@@ -76,4 +76,10 @@ public class LinkController {
     public void deletePermanently(@PathVariable("id") Integer id) {
         linkService.removeById(id);
     }
+
+    @GetMapping("teams")
+    @ApiOperation(("List all link teams"))
+    public List<String> teams() {
+        return linkService.listAllTeams();
+    }
 }

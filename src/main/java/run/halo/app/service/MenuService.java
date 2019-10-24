@@ -71,4 +71,11 @@ public interface MenuService extends CrudService<Menu, Integer> {
      * @return a list of menu
      */
     List<Menu> listByParentId(@NonNull Integer id);
+
+    /**
+     * List all menu teams.
+     *
+     * @return a list of teams.
+     */
+    List<String> listAllTeams();
 }
