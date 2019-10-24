@@ -26,11 +26,12 @@
             <a-form-item label="Logo：">
               <a-input v-model="link.logo" />
             </a-form-item>
-            <a-form-item
-              label="分组："
-              help="* 非必填"
-            >
-              <a-input v-model="link.team" />
+            <a-form-item label="分组：">
+              <a-auto-complete
+                :dataSource="teams"
+                v-model="link.team"
+                allowClear
+              />
             </a-form-item>
             <a-form-item label="排序编号：">
               <a-input
@@ -226,7 +227,8 @@ export default {
       loading: false,
       columns,
       links: [],
-      link: {}
+      link: {},
+      teams: []
     }
   },
   computed: {
@@ -239,6 +241,7 @@ export default {
   },
   created() {
     this.loadLinks()
+    this.loadTeams()
   },
   methods: {
     loadLinks() {
@@ -246,6 +249,11 @@ export default {
       linkApi.listAll().then(response => {
         this.links = response.data.data
         this.loading = false
+      })
+    },
+    loadTeams() {
+      linkApi.listTeams().then(response => {
+        this.teams = response.data.data
       })
     },
     handleSaveClick() {
@@ -265,18 +273,35 @@ export default {
       linkApi.delete(id).then(response => {
         this.$message.success('删除成功！')
         this.loadLinks()
+        this.loadTeams()
       })
     },
     createOrUpdateLink() {
+      if (!this.link.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '网站名称不能为空！'
+        })
+        return
+      }
+      if (!this.link.url) {
+        this.$notification['error']({
+          message: '提示',
+          description: '网站地址不能为空！'
+        })
+        return
+      }
       if (this.link.id) {
         linkApi.update(this.link.id, this.link).then(response => {
           this.$message.success('更新成功！')
           this.loadLinks()
+          this.loadTeams()
         })
       } else {
         linkApi.create(this.link).then(response => {
           this.$message.success('保存成功！')
           this.loadLinks()
+          this.loadTeams()
         })
       }
       this.handleAddLink()

@@ -41,4 +41,11 @@ linkApi.delete = linkId => {
   })
 }
 
+linkApi.listTeams = () => {
+  return service({
+    url: `${baseUrl}/teams`,
+    method: 'get'
+  })
+}
+
 export default linkApi

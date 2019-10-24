@@ -48,4 +48,11 @@ menuApi.update = (menuId, menu) => {
   })
 }
 
+menuApi.listTeams = () => {
+  return service({
+    url: `${baseUrl}/teams`,
+    method: 'get'
+  })
+}
+
 export default menuApi

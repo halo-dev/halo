@@ -216,7 +216,12 @@
                     slot="description"
                     v-if="editable"
                   >
-                    <a-input v-model="photo.team" />
+                    <a-auto-complete
+                      :dataSource="teams"
+                      v-model="photo.team"
+                      allowClear
+                      style="width:100%"
+                    />
                   </template>
                   <span
                     slot="description"
@@ -343,11 +348,13 @@ export default {
         photoApi.update(this.photo.id, this.photo).then(response => {
           this.$message.success('照片更新成功！')
           this.loadPhotos()
+          this.loadTeams()
         })
       } else {
         photoApi.create(this.photo).then(response => {
           this.$message.success('照片添加成功！')
           this.loadPhotos()
+          this.loadTeams()
           this.photo = response.data.data
         })
       }
@@ -375,6 +382,7 @@ export default {
         this.$message.success('删除成功！')
         this.onDrawerClose()
         this.loadPhotos()
+        this.loadTeams()
       })
     },
     showThumbDrawer() {
