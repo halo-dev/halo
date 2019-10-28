@@ -90,7 +90,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         String token = getTokenFromRequest(request);
 
         if (StringUtils.isBlank(token)) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("You have to login before accessing admin api"));
+            getFailureHandler().onFailure(request, response, new AuthenticationException("未登录，请登陆后访问"));
             return;
         }
 

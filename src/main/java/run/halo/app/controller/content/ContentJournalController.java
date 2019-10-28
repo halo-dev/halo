@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Journal;
+import run.halo.app.model.enums.JournalType;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
@@ -70,15 +71,15 @@ public class ContentJournalController {
      */
     @GetMapping(value = "page/{page}")
     public String journals(Model model,
-                          @PathVariable(value = "page") Integer page,
-                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+                           @PathVariable(value = "page") Integer page,
+                           @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         log.debug("Requested journal page, sort info: [{}]", sort);
 
         int pageSize = optionService.getPostPageSize();
 
         Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, sort);
 
-        Page<Journal> journals = journalService.listAll(pageable);
+        Page<Journal> journals = journalService.pageBy(JournalType.PUBLIC, pageable);
 
         int[] rainbow = PageUtil.rainbow(page, journals.getTotalPages(), 3);
 

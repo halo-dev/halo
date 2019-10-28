@@ -14,9 +14,10 @@ import run.halo.app.service.base.CrudService;
 import java.util.List;
 
 /**
- * Photo service.
+ * Photo service interface.
  *
  * @author johnniang
+ * @date 2019-03-14
  */
 public interface PhotoService extends CrudService<Photo, Integer> {
 
@@ -63,4 +64,11 @@ public interface PhotoService extends CrudService<Photo, Integer> {
      */
     @NonNull
     Photo createBy(@NonNull PhotoParam photoParam);
+
+    /**
+     * List all teams.
+     *
+     * @return list of teams
+     */
+    List<String> listAllTeams();
 }

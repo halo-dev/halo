@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * LinkService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implements LinkService {
@@ -36,12 +36,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         this.linkRepository = linkRepository;
     }
 
-    /**
-     * List link dtos.
-     *
-     * @param sort sort
-     * @return all links
-     */
     @Override
     public List<LinkDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");

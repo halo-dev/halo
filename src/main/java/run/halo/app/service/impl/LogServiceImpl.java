@@ -15,7 +15,7 @@ import run.halo.app.service.base.AbstractCrudService;
  * LogService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class LogServiceImpl extends AbstractCrudService<Log, Long> implements LogService {

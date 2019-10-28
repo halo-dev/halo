@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * Base comment service implementation.
  *
  * @author johnniang
- * @date 19-4-24
+ * @date 2019-04-24
  */
 @Slf4j
 public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extends AbstractCrudService<COMMENT, Long> implements BaseCommentService<COMMENT> {
@@ -390,7 +390,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             Assert.notNull(toCompareComment, "Comment to compare must not be null");
 
             // Get sort order
-            Sort.Order order = sort.filter(anOrder -> anOrder.getProperty().equals("id"))
+            Sort.Order order = sort.filter(anOrder -> "id".equals(anOrder.getProperty()))
                     .get()
                     .findFirst()
                     .orElseGet(() -> Sort.Order.desc("id"));
@@ -404,6 +404,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @NonNull
+    @Override
     public List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments, @Nullable Comparator<BaseCommentVO> comparator) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();

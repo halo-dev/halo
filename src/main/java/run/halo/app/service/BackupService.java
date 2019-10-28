@@ -9,7 +9,7 @@ import java.io.IOException;
  * Backup service interface.
  *
  * @author johnniang
- * @date 19-4-26
+ * @date 2019-04-26
  */
 public interface BackupService {
 
@@ -19,5 +19,5 @@ public interface BackupService {
      * @param file file
      * @return post info
      */
-    BasePostDetailDTO importMarkdowns(MultipartFile file) throws IOException;
+    BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException;
 }

@@ -33,7 +33,8 @@ import java.util.stream.Collectors;
  * Recovery service implementation.
  *
  * @author johnniang
- * @date 19-4-26
+ * @author ryanwang
+ * @date 2019-04-26
  */
 @Slf4j
 @Service
@@ -64,6 +65,10 @@ public class RecoveryServiceImpl implements RecoveryService {
 
     private final PhotoService photoService;
 
+    private final PostCategoryService postCategoryService;
+
+    private final PostTagService postTagService;
+
     public RecoveryServiceImpl(AttachmentService attachmentService,
                                PostService postService,
                                LinkService linkService,
@@ -75,7 +80,9 @@ public class RecoveryServiceImpl implements RecoveryService {
                                SheetCommentService sheetCommentService,
                                SheetCommentRepository sheetCommentRepository,
                                SheetService sheetService,
-                               PhotoService photoService) {
+                               PhotoService photoService,
+                               PostCategoryService postCategoryService,
+                               PostTagService postTagService) {
         this.attachmentService = attachmentService;
         this.postService = postService;
         this.linkService = linkService;
@@ -88,6 +95,8 @@ public class RecoveryServiceImpl implements RecoveryService {
         this.sheetCommentRepository = sheetCommentRepository;
         this.sheetService = sheetService;
         this.photoService = photoService;
+        this.postCategoryService = postCategoryService;
+        this.postTagService = postTagService;
     }
 
     @Override
@@ -191,7 +200,7 @@ public class RecoveryServiceImpl implements RecoveryService {
             String postType = postMap.getOrDefault("postType", "post").toString();
 
             try {
-                if (postType.equalsIgnoreCase("post")) {
+                if ("post".equalsIgnoreCase(postType)) {
                     // Handle post
                     result.add(handlePost(post, postMap));
                 } else {
@@ -215,8 +224,20 @@ public class RecoveryServiceImpl implements RecoveryService {
         Post createdPost = postService.createOrUpdateBy(post);
 
         Object commentsObject = postMap.get("comments");
+        Object categoriesObject = postMap.get("categories");
+        Object tagsObject = postMap.get("tags");
         // Handle comments
         List<BaseComment> baseComments = handleComment(commentsObject, createdPost.getId());
+
+        // Handle categories
+        List<Category> categories = handleCategories(categoriesObject, createdPost.getId());
+
+        log.debug("Migrated categories of post [{}]: [{}]", categories, createdPost.getId());
+
+        // Handle tags
+        List<Tag> tags = handleTags(tagsObject, createdPost.getId());
+
+        log.debug("Migrated tags of post [{}]: [{}]", tags, createdPost.getId());
 
         List<PostComment> postComments = baseComments.stream()
                 .map(baseComment -> BeanUtils.transformFrom(baseComment, PostComment.class))
@@ -372,6 +393,96 @@ public class RecoveryServiceImpl implements RecoveryService {
         return result;
     }
 
+    @NonNull
+    private List<Category> handleCategories(@Nullable Object categoriesObject, @NonNull Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        if (!(categoriesObject instanceof List)) {
+            return Collections.emptyList();
+        }
+
+        List<Object> categoryObjectList = (List<Object>) categoriesObject;
+
+        List<Category> result = new LinkedList<>();
+
+        categoryObjectList.forEach(categoryObject -> {
+            if (!(categoryObject instanceof Map)) {
+                return;
+            }
+
+            Map<String, Object> categoryMap = (Map<String, Object>) categoryObject;
+
+            String slugName = categoryMap.getOrDefault("cateUrl", "").toString();
+
+            Category category = categoryService.getBySlugName(slugName);
+
+            if (null == category) {
+                category = new Category();
+                category.setName(categoryMap.getOrDefault("cateName", "").toString());
+                category.setSlugName(slugName);
+                category.setDescription(categoryMap.getOrDefault("cateDesc", "").toString());
+                category = categoryService.create(category);
+            }
+
+            PostCategory postCategory = new PostCategory();
+            postCategory.setCategoryId(category.getId());
+            postCategory.setPostId(postId);
+            postCategoryService.create(postCategory);
+
+            try {
+                result.add(category);
+            } catch (Exception e) {
+                log.warn("Failed to migrate a category", e);
+            }
+        });
+
+        return result;
+    }
+
+    @NonNull
+    private List<Tag> handleTags(@Nullable Object tagsObject, @NonNull Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+
+        if (!(tagsObject instanceof List)) {
+            return Collections.emptyList();
+        }
+
+        List<Object> tagObjectList = (List<Object>) tagsObject;
+
+        List<Tag> result = new LinkedList<>();
+
+        tagObjectList.forEach(tagObject -> {
+            if (!(tagObject instanceof Map)) {
+                return;
+            }
+
+            Map<String, Object> tagMap = (Map<String, Object>) tagObject;
+
+            String slugName = tagMap.getOrDefault("tagUrl", "").toString();
+
+            Tag tag = tagService.getBySlugName(slugName);
+
+            if (null == tag) {
+                tag = new Tag();
+                tag.setName(tagMap.getOrDefault("tagName", "").toString());
+                tag.setSlugName(slugName);
+                tag = tagService.create(tag);
+            }
+
+            PostTag postTag = new PostTag();
+            postTag.setTagId(tag.getId());
+            postTag.setPostId(postId);
+            postTagService.create(postTag);
+
+            try {
+                result.add(tag);
+            } catch (Exception e) {
+                log.warn("Failed to migrate a tag", e);
+            }
+        });
+
+        return result;
+    }
 
     @NonNull
     private List<Menu> handleMenus(@Nullable Object menusObject) {

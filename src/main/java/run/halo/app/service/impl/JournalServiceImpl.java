@@ -12,6 +12,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
+import run.halo.app.model.enums.JournalType;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.model.params.JournalQuery;
 import run.halo.app.repository.JournalRepository;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-24
+ * @date 2019-04-24
  */
 @Service
 public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> implements JournalService {
@@ -62,6 +63,13 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
         Assert.notNull(journalQuery, "Journal query must not be null");
         Assert.notNull(pageable, "Page info must not be null");
         return journalRepository.findAll(buildSpecByQuery(journalQuery), pageable);
+    }
+
+    @Override
+    public Page<Journal> pageBy(JournalType type, Pageable pageable) {
+        Assert.notNull(type, "Journal type must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+        return journalRepository.findAllByType(type, pageable);
     }
 
     @Override
@@ -117,6 +125,10 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
 
         return (Specification<Journal>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
+
+            if (journalQuery.getType() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), journalQuery.getType()));
+            }
 
             if (journalQuery.getKeyword() != null) {
                 // Format like condition

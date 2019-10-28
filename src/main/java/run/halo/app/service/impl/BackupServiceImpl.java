@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
  * Backup service implementation.
  *
  * @author johnniang
- * @date 19-4-26
+ * @date 2019-04-26
  */
 @Service
 public class BackupServiceImpl implements BackupService {
@@ -26,7 +26,7 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public BasePostDetailDTO importMarkdowns(MultipartFile file) throws IOException {
+    public BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException {
 
         // Read markdown content.
         String markdown = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);

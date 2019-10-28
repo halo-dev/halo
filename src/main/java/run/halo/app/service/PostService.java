@@ -3,7 +3,6 @@ package run.halo.app.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
-import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
@@ -17,10 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Post service.
+ * Post service interface.
  *
  * @author johnniang
  * @author ryanwang
+ * @date 2019-03-14
  */
 public interface PostService extends BasePostService<Post> {
 
@@ -54,7 +54,6 @@ public interface PostService extends BasePostService<Post> {
      * @return post created
      */
     @NonNull
-    @Transactional
     PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
 
     /**
@@ -67,7 +66,6 @@ public interface PostService extends BasePostService<Post> {
      * @return updated post
      */
     @NonNull
-    @Transactional
     PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
 
     /**

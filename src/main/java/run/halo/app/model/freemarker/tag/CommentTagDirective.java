@@ -2,7 +2,10 @@ package run.halo.app.model.freemarker.tag;
 
 import freemarker.core.Environment;
 import freemarker.template.*;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.PostCommentService;
 
@@ -34,7 +37,8 @@ public class CommentTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "latest":
                     int top = Integer.parseInt(params.get("top").toString());
-                    env.setVariable("comments", builder.build().wrap(postCommentService.pageLatest(top)));
+                    Page<PostComment> postComments = postCommentService.pageLatest(top, CommentStatus.PUBLISHED);
+                    env.setVariable("comments", builder.build().wrap(postCommentService.convertToWithPostVo(postComments)));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(postCommentService.count()));

@@ -3,13 +3,19 @@ package run.halo.app.controller.content.api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
+import run.halo.app.model.dto.JournalDTO;
+import run.halo.app.model.dto.JournalWithCmtCountDTO;
+import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.JournalComment;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.enums.JournalType;
 import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
@@ -23,8 +29,11 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
+ * Content Journal controller.
+ *
  * @author johnniang
- * @date 19-4-26
+ * @author ryanwang
+ * @date 2019-04-26
  */
 @RestController("PortalJournalController")
 @RequestMapping("/api/content/journals")
@@ -42,6 +51,20 @@ public class JournalController {
         this.journalService = journalService;
         this.journalCommentService = journalCommentService;
         this.optionService = optionService;
+    }
+
+    @GetMapping
+    @ApiOperation("Lists journals")
+    public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+        Page<Journal> journals = journalService.pageBy(JournalType.PUBLIC, pageable);
+        return journalService.convertToCmtCountDto(journals);
+    }
+
+    @GetMapping("{journalId:\\d+}")
+    @ApiOperation("Gets a journal detail")
+    public JournalDTO getBy(@PathVariable("journalId") Integer journalId) {
+        Journal journal = journalService.getById(journalId);
+        return journalService.convertTo(journal);
     }
 
     @GetMapping("{journalId:\\d+}/comments/top_view")

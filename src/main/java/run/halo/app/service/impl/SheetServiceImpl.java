@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-24
+ * @date 2019-04-24
  */
 @Service
 public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements SheetService {
@@ -85,13 +85,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         return listAll(pageable);
     }
 
-    /**
-     * Gets sheet by post status and url.
-     *
-     * @param status post status must not be null
-     * @param url    sheet url must not be blank
-     * @return sheet info
-     */
     @Override
     public Sheet getBy(PostStatus status, String url) {
         Sheet sheet = super.getBy(status, url);
@@ -109,11 +102,12 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Assert.notNull(markdown, "Markdown document must not be null");
 
         // Render markdown to html document.
-        String content = MarkdownUtils.renderMarkdown(markdown);
+        String content = MarkdownUtils.renderHtml(markdown);
 
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 
+        // TODO
         return null;
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
  * Journal comment service interface.
  *
  * @author johnniang
- * @date 19-4-25
+ * @date 2019-04-25
  */
 public interface JournalCommentService extends BaseCommentService<JournalComment> {
 

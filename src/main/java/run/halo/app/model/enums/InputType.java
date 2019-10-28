@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
  * Input type enum.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 4/10/19
  */
 public enum InputType {
@@ -18,7 +19,11 @@ public enum InputType {
 
     SELECT,
 
-    TEXTAREA;
+    TEXTAREA,
+
+    COLOR,
+
+    ATTACHMENT;
 
     /**
      * Convert type to input type.

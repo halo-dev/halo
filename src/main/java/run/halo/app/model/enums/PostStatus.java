@@ -20,7 +20,12 @@ public enum PostStatus implements ValueEnum<Integer> {
     /**
      * Recycle status.
      */
-    RECYCLE(2);
+    RECYCLE(2),
+
+    /**
+     * Intimate status
+     */
+    INTIMATE(3);
 
     private final int value;
 

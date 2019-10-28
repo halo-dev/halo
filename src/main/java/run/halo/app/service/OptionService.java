@@ -18,9 +18,10 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Option service.
+ * Option service interface.
  *
  * @author johnniang
+ * @date 2019-03-14
  */
 public interface OptionService extends CrudService<Option, Integer> {
 
@@ -38,7 +39,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param options options
      */
     @Transactional
-    void save(@Nullable Map<String, String> options);
+    void save(@Nullable Map<String, Object> options);
 
     /**
      * SAve multiple options

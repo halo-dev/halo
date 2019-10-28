@@ -2,11 +2,8 @@
 <@head title="${post.title!} · ${options.blog_title!'Anatole'}" keywords="${post.title!},${options.seo_keywords!'Anatole'},${tagWords!}" description="${post.summary!'Anatole'}"></@head>
 <#include "module/sidebar.ftl">
 <div class="main">
-    <link href="${static!}/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
+    <link href="${static!}/source/plugins/prism/css/prism-${settings.code_pretty!'Default'}.css" type="text/css" rel="stylesheet" />
     <style>
-        code, tt {
-            font-size: 1.2em;
-        }
         table {
             border-spacing: 0;
             border-collapse: collapse;
@@ -99,5 +96,5 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="${static!}/source/plugins/prism/prism.js"></script>
+<script type="text/javascript" src="${static!}/source/plugins/prism/js/prism.js"></script>
 <@footer></@footer>

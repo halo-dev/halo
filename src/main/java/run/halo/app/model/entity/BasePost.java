@@ -5,15 +5,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.enums.PostCreateFrom;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.utils.MarkdownUtils;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Post entity.
+ * Post base entity.
  *
  * @author johnniang
+ * @author ryanwang
  */
 @Data
 @Entity(name = "BasePost")
@@ -42,7 +42,7 @@ public class BasePost extends BaseEntity {
     /**
      * Post url.
      */
-    @Column(name = "url", columnDefinition = "varchar(255) not null")
+    @Column(name = "url", columnDefinition = "varchar(255) not null", unique = true)
     private String url;
 
     /**
@@ -54,7 +54,7 @@ public class BasePost extends BaseEntity {
     /**
      * Rendered content.
      *
-     * @see MarkdownUtils#renderMarkdown(String)
+     * @see run.halo.app.utils.MarkdownUtils#renderHtml(String)
      */
     @Column(name = "format_content", columnDefinition = "text not null")
     private String formatContent;
@@ -168,6 +168,10 @@ public class BasePost extends BaseEntity {
 
         if (likes == null || likes < 0) {
             likes = 0L;
+        }
+
+        if (formatContent == null) {
+            formatContent = "";
         }
     }
 

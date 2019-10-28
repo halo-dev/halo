@@ -116,10 +116,6 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
                 overflow: hidden;
             }
         }
-
-        @media (min-width: 768px) {
-
-        }
     </style>
 </head>
 <body>
@@ -192,7 +188,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
     </ul>
 </div>
 <div id="footer">
-    该文件由<a href="${context!}" title="${options.blog_title!}">${options.blog_title!}</a>网站自动生成。
+    该文件由 <a href="${context!}" title="${options.blog_title!}">${options.blog_title!}</a> 网站自动生成。
 </div>
 </body>
 </html>

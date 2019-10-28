@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  * PhotoService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implements PhotoService {
@@ -41,12 +41,6 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         this.photoRepository = photoRepository;
     }
 
-    /**
-     * List photo dtos.
-     *
-     * @param sort sort
-     * @return all photos
-     */
     @Override
     public List<PhotoDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
@@ -54,12 +48,6 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         return listAll(sort).stream().map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo)).collect(Collectors.toList());
     }
 
-    /**
-     * Lists photo team vos.
-     *
-     * @param sort must not be null
-     * @return a list of photo team vo
-     */
     @Override
     public List<PhotoTeamVO> listTeamVos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
@@ -88,13 +76,6 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         return result;
     }
 
-    /**
-     * List photos by team.
-     *
-     * @param team team
-     * @param sort sort
-     * @return list of photos
-     */
     @Override
     public List<PhotoDTO> listByTeam(String team, Sort sort) {
         List<Photo> photos = photoRepository.findByTeam(team, sort);
@@ -119,9 +100,14 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         return create(photoParam.convertTo());
     }
 
+    @Override
+    public List<String> listAllTeams() {
+        return photoRepository.findAllTeams();
+    }
+
     @NonNull
     private Specification<Photo> buildSpecByQuery(@NonNull PhotoQuery photoQuery) {
-        Assert.notNull(photoQuery, "Attachment query must not be null");
+        Assert.notNull(photoQuery, "Photo query must not be null");
 
         return (Specification<Photo>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();

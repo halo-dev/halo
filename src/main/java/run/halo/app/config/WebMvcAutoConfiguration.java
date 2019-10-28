@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.controller.support.PageJacksonSerializer;
+import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
@@ -81,13 +81,11 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String workDir = FILE_PROTOCOL + haloProperties.getWorkDir();
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations(workDir + "static/");
         registry.addResourceHandler("/**")
                 .addResourceLocations(workDir + "templates/themes/")
                 .addResourceLocations(workDir + "templates/admin/")
-                .addResourceLocations("classpath:/admin/");
+                .addResourceLocations("classpath:/admin/")
+                .addResourceLocations(workDir + "static/");
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler("/backup/**")
@@ -122,7 +120,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         configurer.setDefaultEncoding("UTF-8");
 
         Properties properties = new Properties();
-        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common");
+        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
 
         configurer.setFreemarkerSettings(properties);
 

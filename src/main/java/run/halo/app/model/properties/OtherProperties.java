@@ -4,22 +4,16 @@ package run.halo.app.model.properties;
  * Other properties.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 4/1/19
  */
 public enum OtherProperties implements PropertyEnum {
 
-    API_ENABLED("api_enabled", Boolean.class, "false"),
+    CDN_DOMAIN("blog_cdn_domain", String.class, ""),
 
-    API_ACCESS_KEY("api_access_key", String.class, ""),
+    CUSTOM_HEAD("blog_custom_head", String.class, ""),
 
-    CUSTOM_HEAD("blog_custom_head",String.class,""),
-
-    STATISTICS_CODE("blog_statistics_code", String.class, ""),
-
-    /**
-     * 是否禁止爬虫
-     */
-    SPIDER_DISABLED("spider_disabled", Boolean.class, "false");
+    STATISTICS_CODE("blog_statistics_code", String.class, "");
 
     private final String value;
 

@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Tag Controller
+ * Tag controller.
  *
  * @author ryanwang
  * @date : 2019-03-21
@@ -91,7 +92,7 @@ public class ContentTagController {
         final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
-        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), pageable);
+        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
