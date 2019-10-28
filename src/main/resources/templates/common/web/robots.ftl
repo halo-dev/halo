@@ -3,7 +3,7 @@ User-agent: /
 Disallow: /
 <#else>
 User-agent: *
-Disallow: /admin/
+Disallow: ${adminPath!}/
 Sitemap: ${context!}/sitemap.xml
 Sitemap: ${context!}/sitemap.html
 </#if>
