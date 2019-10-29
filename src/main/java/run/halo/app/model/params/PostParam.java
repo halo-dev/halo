@@ -11,6 +11,7 @@ import run.halo.app.model.enums.PostStatus;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Set;
 
@@ -62,7 +63,7 @@ public class PostParam implements InputConverter<Post> {
     @Override
     public Post convertTo() {
         if (StringUtils.isBlank(url)) {
-            url = title.replace(".","");
+            url = URLEncoder.encode(title);
         }
         if (null == thumbnail) {
             thumbnail = "";
