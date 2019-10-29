@@ -42,6 +42,7 @@ public class MigrateHandlers {
         for (MigrateHandler migrateHandler : migrateHandlers) {
             if (migrateHandler.supportType(migrateType)) {
                 migrateHandler.migrate(file);
+                return;
             }
         }
 

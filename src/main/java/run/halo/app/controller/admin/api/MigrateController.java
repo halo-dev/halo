@@ -16,7 +16,7 @@ import run.halo.app.service.MigrateService;
  * @date 2019-10-29
  */
 @RestController
-@RequestMapping("/api/admin/migrates")
+@RequestMapping("/api/admin/migrations")
 public class MigrateController {
 
     private final MigrateService migrateService;
