@@ -151,6 +151,7 @@ public class HaloConfiguration {
                 "/api/admin/refresh/*",
                 "/api/admin/installations",
                 "/api/admin/recoveries/migrations/*",
+                "/api/admin/migrations/*",
                 "/api/admin/is_installed",
                 "/api/admin/password/code",
                 "/api/admin/password/reset"
