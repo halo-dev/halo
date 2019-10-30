@@ -179,7 +179,7 @@ public class InstallController {
     @Nullable
     private Category createDefaultCategoryIfAbsent() {
         long categoryCount = categoryService.count();
-        if (categoryCount == 0) {
+        if (categoryCount > 0) {
             return null;
         }
 
