@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author johnniang
  * @date 2019-04-26
  */
+@Deprecated
 public interface RecoveryService {
 
     /**

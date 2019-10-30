@@ -43,7 +43,7 @@ bootJar {
 
 ext {
     ohMyEmailVersion = '0.0.4'
-    hutoolVersion = '4.6.3'
+    hutoolVersion = '5.0.3'
     upyunSdkVersion = '4.0.1'
     qiniuSdkVersion = '7.2.18'
     aliyunSdkVersion = '3.4.2'
