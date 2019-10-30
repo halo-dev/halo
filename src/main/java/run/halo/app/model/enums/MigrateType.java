@@ -16,7 +16,12 @@ public enum MigrateType implements ValueEnum<Integer> {
     /**
      * WordPress
      */
-    WORDPRESS(1);
+    WORDPRESS(1),
+
+    /**
+     * cnblogs.com
+     */
+    CNBLOGS(2);
 
     private Integer value;
 
