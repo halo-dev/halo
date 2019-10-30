@@ -36,4 +36,10 @@ public class MigrateController {
     public void migrateWordPress(@RequestPart("file") MultipartFile file) {
         migrateService.migrate(file, MigrateType.WORDPRESS);
     }
+
+    @PostMapping("cnblogs")
+    @ApiOperation("Migrate from cnblogs")
+    public void migrateCnBlogs(@RequestPart("file") MultipartFile file) {
+        migrateService.migrate(file, MigrateType.CNBLOGS);
+    }
 }
