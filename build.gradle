@@ -56,6 +56,7 @@ ext {
     jgitVersion = '5.3.0.201903130848-r'
     flexmarkVersion = '0.42.12'
     thumbnailatorVersion = '0.4.8'
+    image4jVersion = '0.7zensight1'
 }
 
 dependencies {
@@ -96,7 +97,8 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-html-parser:$flexmarkVersion"
 
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
-
+    implementation "net.sf.image4j:image4j:$image4jVersion"
+    
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
 
