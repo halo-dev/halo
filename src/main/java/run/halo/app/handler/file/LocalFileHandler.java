@@ -17,16 +17,13 @@ import run.halo.app.utils.HaloUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
-import net.sf.image4j.codec.ico.ICODecoder;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
@@ -154,7 +151,7 @@ public class LocalFileHandler implements FileHandler {
                     Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
                     // Read as image
-                    BufferedImage originalImage = getImageFromFile(uploadPath.toFile(), extension);
+                    BufferedImage originalImage = ImageIO.read(uploadPath.toFile());
                     // Set width and height
                     uploadResult.setWidth(originalImage.getWidth());
                     uploadResult.setHeight(originalImage.getHeight());
@@ -240,16 +237,6 @@ public class LocalFileHandler implements FileHandler {
             log.warn("Failed to generate thumbnail: [{}]", thumbPath);
         }
         return result;
-    }
-
-    private BufferedImage getImageFromFile(File file, String extension) throws IOException {
-        log.debug("Current File type is : [{}]", extension);
-
-        if ("ico".equals(extension)) {
-            return ICODecoder.read(file).get(0);
-        } else {
-            return ImageIO.read(file);
-        }
     }
 
 }
