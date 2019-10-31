@@ -52,7 +52,7 @@ public class Attachment extends BaseEntity {
     /**
      * Attachment media type.
      */
-    @Column(name = "media_type", columnDefinition = "varchar(50) not null")
+    @Column(name = "media_type", columnDefinition = "varchar(127) not null")
     private String mediaType;
 
     /**
