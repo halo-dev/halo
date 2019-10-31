@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.UUID;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
@@ -177,7 +178,7 @@ public class HaloUtils {
         StringUtils.removeEnd(url, "html");
         StringUtils.removeEnd(url, "htm");
 
-        return SlugUtils.slugify(url);
+        return SlugUtils.slugify(url).toLowerCase(Locale.ENGLISH);
     }
 
     /**

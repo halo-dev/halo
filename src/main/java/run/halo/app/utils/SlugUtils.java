@@ -31,6 +31,6 @@ public class SlugUtils {
         String withoutWhitespace = WHITESPACE.matcher(input).replaceAll("-");
         String normalized = Normalizer.normalize(withoutWhitespace, Normalizer.Form.NFKD);
         String slug = NON_LATIN.matcher(normalized).replaceAll("");
-        return slug.toLowerCase(Locale.ENGLISH);
+        return slug;
     }
 }
