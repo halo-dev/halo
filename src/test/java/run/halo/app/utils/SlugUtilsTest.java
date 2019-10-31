@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.Assert.*;
 
 /**
@@ -16,6 +17,6 @@ public class SlugUtilsTest {
     public void makeSlugTest() {
         String slugResult = SlugUtils.slugify("Hello World");
 
-        Assert.assertThat(slugResult, equalTo("hello-world"));
+        Assert.assertThat(slugResult, equalToIgnoringCase("hello-world"));
     }
 }
