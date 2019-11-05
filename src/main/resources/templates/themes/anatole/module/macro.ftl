@@ -1,4 +1,4 @@
-<#include "/common/macro/common_macro.ftl">
+<#import "/common/macro/common_macro.ftl" as common>
 <#macro head title,keywords,description>
 <!DOCTYPE html>
 <html>
@@ -10,23 +10,22 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="renderer" content="webkit">
-    <meta name="theme-color" content="${options.anatole_style_google_color!'#fff'}">
-    <meta name="author" content="${user.userDisplayName!}" />
+    <meta name="theme-color" content="${settings.google_color!'#fff'}">
+    <meta name="author" content="${user.nickname!}" />
     <meta name="keywords" content="${keywords!}"/>
     <meta name="description" content="${description!}" />
-    <@verification></@verification>
-    <@favicon></@favicon>
-    <link href="/anatole/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/anatole/source/css/blog_basic.min.css?version=88107691fe">
-    <link href="/anatole/source/css/style.min.css" type="text/css" rel="stylesheet" />
-    <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/feed.xml">
+    <@common.globalHeader />
+    <link href="${static!}/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="${static!}/source/css/blog_basic.min.css?version=88107691fe">
+    <link href="${static!}/source/css/style.min.css" type="text/css" rel="stylesheet" />
+    <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml">
     <style>
-        <#if (options.anatole_style_post_title_lower!'true') == "false">
+        <#if !settings.post_title_uppper!true>
         .post .post-title h3 {
             text-transform: none;
         }
         </#if>
-        <#if (options.anatole_style_blog_title_lower!'true') == "false">
+        <#if !settings.blog_title_uppper!true>
         .sidebar .logo-title .title h3 {
             text-transform: none;
         }
@@ -37,18 +36,18 @@
             background-color: #eee;
         }
         ::-webkit-scrollbar-thumb {
-            background-color: ${options.anatole_style_scrollbar!'#3798e8'};
+            background-color: ${settings.scrollbar!'#3798e8'};
         }
         ::-webkit-scrollbar-track {
             background-color: #eee;
         }
-        ${options.anatole_style_self!}
+        ${settings.custom!}
     </style>
 </head>
 <body>
 </#macro>
 <#macro footer>
-<script type="text/javascript" src="/anatole/source/js/jquery.min.js"></script>
+<script type="text/javascript" src="${static!}/source/js/jquery.min.js"></script>
 <script type="text/javascript">
     var url = location.href;
     var urlstatus = false;
@@ -64,7 +63,7 @@
         $(".nav li a").eq(0).addClass('current');
     }
 
-    <#if (options.anatole_style_hitokoto!'false')=="true">
+    <#if settings.hitokoto!false>
 	  var xhr = new XMLHttpRequest();
 	  xhr.open('get', 'https://v1.hitokoto.cn');
 	  xhr.onreadystatechange = function () {
@@ -77,7 +76,7 @@
 	  xhr.send();
     </#if>
 </script>
-<@statistics></@statistics>
+<@common.statistics />
 </body>
 </html>
 </#macro>

@@ -1,0 +1,109 @@
+plugins {
+    id 'org.springframework.boot' version '2.1.7.RELEASE'
+    id "io.freefair.lombok" version "3.6.6"
+//    id 'war'
+    id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'run.halo.app'
+archivesBaseName = 'halo'
+version = '1.1.1'
+sourceCompatibility = '1.8'
+description = 'Halo, personal blog system developed in Java.'
+
+repositories {
+    maven {
+        url 'https://maven.aliyun.com/nexus/content/groups/public'
+    }
+    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    implementation {
+        exclude module: 'spring-boot-starter-tomcat'
+        exclude module: 'slf4j-log4j12'
+    }
+
+    developmentOnly
+
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+bootJar {
+    manifest {
+        attributes('Implementation-Title': 'Halo Application',
+                'Implementation-Version': version)
+    }
+}
+
+ext {
+    ohMyEmailVersion = '0.0.4'
+    hutoolVersion = '4.6.3'
+    upyunSdkVersion = '4.0.1'
+    qiniuSdkVersion = '7.2.18'
+    aliyunSdkVersion = '3.4.2'
+    baiduSdkVersion = '0.10.36'
+    qcloudSdkVersion = '5.5.7'
+    swaggerVersion = '2.9.2'
+    commonsLangVersion = '3.8.1'
+    httpclientVersion = '4.5.7'
+    dataformatYamlVersion = '2.9.2'
+    jgitVersion = '5.3.0.201903130848-r'
+    flexmarkVersion = '0.42.12'
+    thumbnailatorVersion = '0.4.8'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-undertow'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+
+    implementation "io.github.biezhi:oh-my-email:$ohMyEmailVersion"
+    implementation "cn.hutool:hutool-core:$hutoolVersion"
+    implementation "cn.hutool:hutool-crypto:$hutoolVersion"
+    implementation "cn.hutool:hutool-extra:$hutoolVersion"
+    implementation "com.upyun:java-sdk:$upyunSdkVersion"
+    implementation "com.qiniu:qiniu-java-sdk:$qiniuSdkVersion"
+    implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
+    implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
+    implementation "com.qcloud:cos_api:$qcloudSdkVersion"
+    implementation "io.springfox:springfox-swagger2:$swaggerVersion"
+    implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
+    implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
+    implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$dataformatYamlVersion"
+    implementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
+
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-autolink:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-escaped-character:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-tasklist:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-ins:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-media-tags:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-tables:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-html-parser:$flexmarkVersion"
+
+    implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
+
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'mysql:mysql-connector-java'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
