@@ -120,6 +120,7 @@ export default {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
+    window.onbeforeunload = null
   },
   beforeRouteLeave(to, from, next) {
     if (this.postSettingVisible) {
@@ -128,7 +129,25 @@ export default {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
-    next()
+    if (this.postToStage.originalContent) {
+      const answer = window.confirm('当前文章数据未保存，确定要离开吗？')
+      if (answer) {
+        next()
+      } else {
+        next(false)
+      }
+    } else {
+      next()
+    }
+  },
+  mounted() {
+    window.onbeforeunload = function(e) {
+      e = e || window.event
+      if (e) {
+        e.returnValue = '当前文章数据未保存，确定要离开吗？'
+      }
+      return '当前文章数据未保存，确定要离开吗？'
+    }
   },
   computed: {
     ...mapGetters(['options'])
