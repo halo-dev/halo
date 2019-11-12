@@ -17,6 +17,7 @@ import java.util.List;
  * Photo service interface.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-03-14
  */
 public interface PhotoService extends CrudService<Photo, Integer> {
@@ -45,6 +46,14 @@ public interface PhotoService extends CrudService<Photo, Integer> {
      * @return list of photos
      */
     List<PhotoDTO> listByTeam(@NonNull String team, Sort sort);
+
+    /**
+     * Pages photo output dtos.
+     *
+     * @param pageable page info must not be null
+     * @return a page of photo output dto
+     */
+    Page<PhotoDTO> pageBy(@NonNull Pageable pageable);
 
     /**
      * Pages photo output dtos.
