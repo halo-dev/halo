@@ -2,6 +2,7 @@ package run.halo.app.controller.content;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
@@ -11,14 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.model.dto.PhotoDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.BaseCommentVO;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.SheetCommentService;
-import run.halo.app.service.SheetService;
-import run.halo.app.service.ThemeService;
+import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -41,6 +40,8 @@ public class ContentSheetController {
 
     private final SheetCommentService sheetCommentService;
 
+    private final PhotoService photoService;
+
     private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
@@ -48,11 +49,13 @@ public class ContentSheetController {
     public ContentSheetController(SheetService sheetService,
                                   ThemeService themeService,
                                   SheetCommentService sheetCommentService,
+                                  PhotoService photoService,
                                   OptionService optionService,
                                   StringCacheStore cacheStore) {
         this.sheetService = sheetService;
         this.themeService = themeService;
         this.sheetCommentService = sheetCommentService;
+        this.photoService = photoService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
@@ -63,7 +66,26 @@ public class ContentSheetController {
      * @return template path: themes/{theme}/photos.ftl
      */
     @GetMapping(value = "/photos")
-    public String photos() {
+    public String photos(Model model,
+                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        return photos(model, 1, size);
+    }
+
+    /**
+     * Render photo page
+     *
+     * @param model model
+     * @param page  current page
+     * @param size  current page size
+     * @return template path: themes/{theme}/photos.ftl
+     */
+    @GetMapping(value = "/photos/page/{page}")
+    public String photos(Model model,
+                         @PathVariable(value = "page") Integer page,
+                         @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, size, Sort.by(DESC, "createTime"));
+        Page<PhotoDTO> photos = photoService.pageBy(pageable);
+        model.addAttribute("photos", photos);
         return themeService.render("photos");
     }
 
