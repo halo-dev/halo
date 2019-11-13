@@ -76,40 +76,40 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
     @Override
     protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (!haloProperties.isAuthEnabled()) {
-            // Set security
-            userService.getCurrentUser().ifPresent(user ->
-                    SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
-
-            // Do filter
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // Get token from request
-        String token = getTokenFromRequest(request);
-
-        if (StringUtils.isBlank(token)) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("未登录，请登陆后访问"));
-            return;
-        }
-
-        // Get user id from cache
-        Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
-
-        if (!optionalUserId.isPresent()) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("Token 已过期或不存在").setErrorData(token));
-            return;
-        }
-
-        // Get the user
-        User user = userService.getById(optionalUserId.get());
-
-        // Build user detail
-        UserDetail userDetail = new UserDetail(user);
-
-        // Set security
-        SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
+//        if (!haloProperties.isAuthEnabled()) {
+//            // Set security
+//            userService.getCurrentUser().ifPresent(user ->
+//                    SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
+//
+//            // Do filter
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+//
+//        // Get token from request
+//        String token = getTokenFromRequest(request);
+//
+//        if (StringUtils.isBlank(token)) {
+//            getFailureHandler().onFailure(request, response, new AuthenticationException("未登录，请登陆后访问"));
+//            return;
+//        }
+//
+//        // Get user id from cache
+//        Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
+//
+//        if (!optionalUserId.isPresent()) {
+//            getFailureHandler().onFailure(request, response, new AuthenticationException("Token 已过期或不存在").setErrorData(token));
+//            return;
+//        }
+//
+//        // Get the user
+//        User user = userService.getById(optionalUserId.get());
+//
+//        // Build user detail
+//        UserDetail userDetail = new UserDetail(user);
+//
+//        // Set security
+//        SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
 
         // Do filter
         filterChain.doFilter(request, response);
