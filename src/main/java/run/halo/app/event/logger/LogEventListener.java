@@ -26,6 +26,7 @@ public class LogEventListener {
     public void onApplicationEvent(LogEvent event) {
         // Convert to log
         Log logToCreate = event.getLogParam().convertTo();
+
         // Create log
         logService.create(logToCreate);
     }
