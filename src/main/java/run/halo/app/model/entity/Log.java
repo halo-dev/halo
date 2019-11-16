@@ -60,7 +60,8 @@ public class Log extends BaseEntity {
         }
 
         // Get ip address
-        ipAddress = ServletUtils.getRequestIp();
+        // ###!!! Do not get request IP from here due to asynchronous
+        // ipAddress = ServletUtils.getRequestIp();
 
         if (ipAddress == null) {
             logKey = "";
