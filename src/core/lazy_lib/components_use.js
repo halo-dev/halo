@@ -47,8 +47,7 @@ import {
   Comment,
   ConfigProvider,
   Timeline,
-  Steps,
-  Empty
+  Steps
 } from 'ant-design-vue'
 
 Vue.use(Anchor)
@@ -97,7 +96,6 @@ Vue.use(Comment)
 Vue.use(ConfigProvider)
 Vue.use(Timeline)
 Vue.use(Steps)
-Vue.use(Empty)
 
 Vue.prototype.$message = message
 Vue.prototype.$notification = notification
