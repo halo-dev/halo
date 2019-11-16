@@ -50,7 +50,7 @@
               itemLayout="horizontal"
             >
               <a-list-item>累计发表了 {{ counts.postCount || 0 }} 篇文章。</a-list-item>
-              <a-list-item>累计创建了 {{ counts.linkCount || 0 }} 个标签。</a-list-item>
+              <a-list-item>累计创建了 {{ counts.attachmentCount || 0 }} 个附件。</a-list-item>
               <a-list-item>累计获得了 {{ counts.commentCount || 0 }} 条评论。</a-list-item>
               <a-list-item>累计添加了 {{ counts.linkCount || 0 }} 个友链。</a-list-item>
               <a-list-item>文章总访问 {{ counts.visitCount || 0 }} 次。</a-list-item>
