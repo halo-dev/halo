@@ -187,7 +187,7 @@ public class ContentArchiveController {
     }
 
     @PostMapping(value = "{url}/password")
-    @CacheLock
+    @CacheLock(traceRequest = true, expired = 2)
     public String password(@PathVariable("url") String url,
                            @RequestParam(value = "password") String password) {
         Post post = postService.getBy(PostStatus.INTIMATE, url);
