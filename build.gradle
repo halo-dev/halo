@@ -1,7 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '2.2.0.RELEASE'
     id "io.freefair.lombok" version "3.6.6"
-    id 'war'
+//    id 'war'
     id 'java'
 }
 
