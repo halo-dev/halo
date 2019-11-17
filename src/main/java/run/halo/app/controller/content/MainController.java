@@ -37,10 +37,12 @@ public class MainController {
         this.haloProperties = haloProperties;
     }
 
-//    @GetMapping("/{permlink}")
-//    public String admin(@PathVariable(name = "permlink") String permlink) {
-//        return "redirect:/" + permlink + "/index.html";
-//    }
+    @GetMapping("/{permlink}")
+    @Deprecated
+    public String admin(@PathVariable(name = "permlink") String permlink) {
+        // ###WARNING!!! Here will lead to redirect to swagger-ui/index.html while accessing swagger-ui.html
+        return "redirect:/" + permlink + "/index.html";
+    }
 
     @GetMapping("/install")
     public String installation() {
