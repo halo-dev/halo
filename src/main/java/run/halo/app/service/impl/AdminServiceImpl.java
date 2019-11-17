@@ -335,46 +335,45 @@ public class AdminServiceImpl implements AdminService {
 
         Object assetsObject = responseEntity.getBody().get("assets");
 
-        if (assetsObject instanceof List) {
-            try {
-                List assets = (List) assetsObject;
-                Map assetMap = (Map) assets.stream()
-                        .filter(assetPredicate())
-                        .findFirst()
-                        .orElseThrow(() -> new ServiceException("Halo admin 最新版暂无资源文件，请稍后再试"));
-
-                Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
-                // Download the assets
-                ResponseEntity<byte[]> downloadResponseEntity = restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
-
-                if (downloadResponseEntity == null ||
-                        downloadResponseEntity.getStatusCode().isError() ||
-                        downloadResponseEntity.getBody() == null) {
-                    throw new ServiceException("Failed to request remote url: " + browserDownloadUrl.toString()).setErrorData(browserDownloadUrl.toString());
-                }
-
-                String adminTargetName = haloProperties.getWorkDir() + HALO_ADMIN_RELATIVE_PATH;
-
-                Path adminPath = Paths.get(adminTargetName);
-                Path adminBackupPath = Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
-
-                backupAndClearAdminAssetsIfPresent(adminPath, adminBackupPath);
-
-                // Create temp folder
-                Path assetTempPath = FileUtils.createTempDirectory()
-                        .resolve(assetMap.getOrDefault("name", "halo-admin-latest.zip").toString());
-
-                // Unzip
-                FileUtils.unzip(downloadResponseEntity.getBody(), assetTempPath);
-
-                // Copy it to template/admin folder
-                FileUtils.copyFolder(FileUtils.tryToSkipZipParentFolder(assetTempPath), adminPath);
-            } catch (Throwable t) {
-                log.error("Failed to update halo admin", t);
-                throw new ServiceException("更新 Halo admin 失败");
-            }
-        } else {
+        if (!(assetsObject instanceof List)) {
             throw new ServiceException("Github API 返回内容有误").setErrorData(assetsObject);
+        }
+
+        try {
+            List assets = (List) assetsObject;
+            Map assetMap = (Map) assets.stream()
+                    .filter(assetPredicate())
+                    .findFirst()
+                    .orElseThrow(() -> new ServiceException("Halo admin 最新版暂无资源文件，请稍后再试"));
+
+            Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
+            // Download the assets
+            ResponseEntity<byte[]> downloadResponseEntity = restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
+
+            if (downloadResponseEntity == null ||
+                    downloadResponseEntity.getStatusCode().isError() ||
+                    downloadResponseEntity.getBody() == null) {
+                throw new ServiceException("Failed to request remote url: " + browserDownloadUrl.toString()).setErrorData(browserDownloadUrl.toString());
+            }
+
+            String adminTargetName = haloProperties.getWorkDir() + HALO_ADMIN_RELATIVE_PATH;
+
+            Path adminPath = Paths.get(adminTargetName);
+            Path adminBackupPath = Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
+
+            backupAndClearAdminAssetsIfPresent(adminPath, adminBackupPath);
+
+            // Create temp folder
+            Path assetTempPath = FileUtils.createTempDirectory()
+                    .resolve(assetMap.getOrDefault("name", "halo-admin-latest.zip").toString());
+
+            // Unzip
+            FileUtils.unzip(downloadResponseEntity.getBody(), assetTempPath);
+
+            // Copy it to template/admin folder
+            FileUtils.copyFolder(FileUtils.tryToSkipZipParentFolder(assetTempPath), adminPath);
+        } catch (Throwable t) {
+            throw new ServiceException("更新 Halo admin 失败", t);
         }
     }
 
