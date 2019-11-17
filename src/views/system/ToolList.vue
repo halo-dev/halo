@@ -3,6 +3,15 @@
     <div class="card-content">
       <a-row :gutter="12">
         <a-col
+          :xl="12"
+          :lg="12"
+          :md="24"
+          :sm="24"
+          :xs="24"
+        >
+          <backup />
+        </a-col>
+        <a-col
           :xl="6"
           :lg="6"
           :md="12"
@@ -10,10 +19,12 @@
           :xs="24"
         >
           <a-card
-            title="Markdown 文章导入"
             :bordered="false"
             :bodyStyle="{ padding: '16px' }"
           >
+            <div slot="title">
+              <a-icon type="file-markdown" />Markdown 文章导入
+            </div>
             <p>支持 Hexo/Jekyll 文章导入并解析元数据</p>
             <a-button
               type="primary"
@@ -44,7 +55,10 @@
 
 <script>
 import backupApi from '@/api/backup'
+import Backup from './Backup'
+
 export default {
+  components: { Backup },
   data() {
     return {
       markdownUpload: false,
