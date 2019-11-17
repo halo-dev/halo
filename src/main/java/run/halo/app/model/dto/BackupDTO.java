@@ -11,13 +11,7 @@ import java.util.Date;
 @Data
 public class BackupDTO {
 
-    private String fileName;
+    private String downloadUrl;
 
-    private Date createTime;
-
-    private String fileSize;
-
-    private String fileType;
-
-    private String type;
+    private String filename;
 }

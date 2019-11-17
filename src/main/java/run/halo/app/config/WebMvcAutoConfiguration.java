@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -80,16 +81,17 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String workDir = FILE_PROTOCOL + haloProperties.getWorkDir();
+        String workDir = FILE_PROTOCOL + StringUtils.appendIfMissing(haloProperties.getWorkDir(), "/");
+        String backupDir = FILE_PROTOCOL + StringUtils.appendIfMissing(haloProperties.getBackupDir(), "/");
         registry.addResourceHandler("/**")
                 .addResourceLocations(workDir + "templates/themes/")
                 .addResourceLocations(workDir + "templates/admin/")
                 .addResourceLocations("classpath:/admin/")
                 .addResourceLocations(workDir + "static/");
-        registry.addResourceHandler("/upload/**")
+        registry.addResourceHandler(haloProperties.getUploadUrlPrefix() + "/**")
                 .addResourceLocations(workDir + "upload/");
-        registry.addResourceHandler("/backup/**")
-                .addResourceLocations(workDir + "backup/");
+        registry.addResourceHandler(haloProperties.getBackupUrlPrefix() + "/**")
+                .addResourceLocations(workDir + "backup/", backupDir);
         registry.addResourceHandler(haloProperties.getAdminPath() + "/**")
                 .addResourceLocations(workDir + HALO_ADMIN_RELATIVE_PATH)
                 .addResourceLocations("classpath:/admin/");

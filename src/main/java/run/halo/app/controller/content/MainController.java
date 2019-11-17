@@ -37,10 +37,10 @@ public class MainController {
         this.haloProperties = haloProperties;
     }
 
-    @GetMapping("/{permlink}")
-    public String admin(@PathVariable(name = "permlink") String permlink) {
-        return "redirect:/" + permlink + "/index.html";
-    }
+//    @GetMapping("/{permlink}")
+//    public String admin(@PathVariable(name = "permlink") String permlink) {
+//        return "redirect:/" + permlink + "/index.html";
+//    }
 
     @GetMapping("/install")
     public String installation() {
