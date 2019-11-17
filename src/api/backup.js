@@ -15,4 +15,29 @@ backupApi.importMarkdown = (formData, uploadProgress, cancelToken) => {
   })
 }
 
+backupApi.backupHalo = () => {
+  return service({
+    url: `${baseUrl}/halo`,
+    method: 'post',
+    timeout: 8640000 // 24 hours
+  })
+}
+
+backupApi.listHaloBackups = () => {
+  return service({
+    url: `${baseUrl}/halo`,
+    method: 'get'
+  })
+}
+
+backupApi.deleteHaloBackup = filename => {
+  return service({
+    url: `${baseUrl}/halo`,
+    params: {
+      filename: filename
+    },
+    method: 'delete'
+  })
+}
+
 export default backupApi
