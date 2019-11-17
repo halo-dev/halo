@@ -23,6 +23,11 @@ public class HaloConst {
     public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
 
     /**
+     * Halo backup prefix.
+     */
+    public final static String HALO_BACKUP_PREFIX = "halo-backup-";
+
+    /**
      * Default theme name.
      */
     public final static String DEFAULT_THEME_ID = "caicai_anatole";

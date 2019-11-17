@@ -14,4 +14,6 @@ public class BackupDTO {
     private String downloadUrl;
 
     private String filename;
+
+    private long updateTime;
 }
