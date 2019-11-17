@@ -6,13 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
+import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.service.BackupService;
 
@@ -38,6 +35,24 @@ public class BackupController {
 
     public BackupController(BackupService backupService) {
         this.backupService = backupService;
+    }
+
+    @PostMapping("halo")
+    @ApiOperation("Backup halo")
+    public BackupDTO backupHalo() {
+        return backupService.zipWorkDirectory();
+    }
+
+    @GetMapping("halo")
+    @ApiOperation("Get all backups")
+    public List<BackupDTO> listBackups() {
+        return backupService.listHaloBackups();
+    }
+
+    @DeleteMapping("halo")
+    @ApiOperation("Delete a backup")
+    public void deleteBackup(@RequestParam("filename") String filename) {
+        backupService.deleteHaloBackup(filename);
     }
 
     @PostMapping("import/markdown")

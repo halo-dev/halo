@@ -1,7 +1,9 @@
 package run.halo.app.service;
 
 import org.json.JSONObject;
+import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 
 import java.io.IOException;
@@ -27,7 +29,7 @@ public interface BackupService {
     /**
      * export posts by hexo formatter
      *
-     * @return
+     * @return json object
      */
     JSONObject exportHexoMDs();
 
@@ -38,4 +40,28 @@ public interface BackupService {
      * @param path
      */
     void exportHexoMd(List<JSONObject> posts, String path);
+
+    /**
+     * Zips work directory.
+     *
+     * @return backup dto.
+     */
+    @NonNull
+    BackupDTO zipWorkDirectory();
+
+
+    /**
+     * Lists all backups.
+     *
+     * @return backup list
+     */
+    @NonNull
+    List<BackupDTO> listHaloBackups();
+
+    /**
+     * Deletes backup.
+     *
+     * @param filename filename must not be blank
+     */
+    void deleteHaloBackup(@NonNull String filename);
 }

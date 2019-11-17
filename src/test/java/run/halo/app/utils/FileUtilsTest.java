@@ -3,6 +3,7 @@ package run.halo.app.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
+import run.halo.app.model.support.HaloConst;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,10 +83,13 @@ public class FileUtilsTest {
             FileUtils.zip(rootFolder, zipOut);
         }
 
-
         // Clear the test folder created before
         FileUtils.deleteFolder(rootFolder);
         Files.delete(zipToStore);
+    }
 
+    @Test
+    public void tempFolderTest() {
+        log.debug(HaloConst.TEMP_DIR);
     }
 }

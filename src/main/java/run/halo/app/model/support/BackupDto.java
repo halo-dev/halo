@@ -13,6 +13,7 @@ import java.util.Date;
  * @date : 2018/6/4
  */
 @Data
+@Deprecated
 public class BackupDto {
 
     /**

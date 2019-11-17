@@ -124,13 +124,26 @@ public class FileUtils {
     /**
      * Zip folder or file.
      *
-     * @param fileToZip file path to zip must not be null
+     * @param pathToZip     file path to zip must not be null
+     * @param pathOfArchive zip file path to archive must not be null
+     * @throws IOException
+     */
+    public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive) throws IOException {
+        try (ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(pathOfArchive))) {
+            zip(pathToZip, zipOut);
+        }
+    }
+
+    /**
+     * Zip folder or file.
+     *
+     * @param pathToZip file path to zip must not be null
      * @param zipOut    zip output stream must not be null
      * @throws IOException
      */
-    public static void zip(@NonNull Path fileToZip, @NonNull ZipOutputStream zipOut) throws IOException {
+    public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut) throws IOException {
         // Zip file
-        zip(fileToZip, fileToZip.getFileName().toString(), zipOut);
+        zip(pathToZip, pathToZip.getFileName().toString(), zipOut);
     }
 
     /**

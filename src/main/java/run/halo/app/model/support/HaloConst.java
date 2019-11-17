@@ -18,6 +18,11 @@ public class HaloConst {
     public final static String USER_HOME = System.getProperties().getProperty("user.home");
 
     /**
+     * Temporary directory.
+     */
+    public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
+
+    /**
      * Default theme name.
      */
     public final static String DEFAULT_THEME_ID = "caicai_anatole";

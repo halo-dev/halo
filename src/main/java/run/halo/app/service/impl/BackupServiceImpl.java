@@ -1,26 +1,39 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.io.IoUtil;
-import lombok.RequiredArgsConstructor;
+import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
+import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
+import run.halo.app.model.dto.AttachmentDTO;
+import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.service.BackupService;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,14 +48,27 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BackupServiceImpl implements BackupService {
 
     private final PostService postService;
 
     private final PostTagService postTagService;
 
-    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private final OptionService optionService;
+
+    private final HaloProperties halo;
+
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    public BackupServiceImpl(PostService postService,
+                             PostTagService postTagService,
+                             OptionService optionService,
+                             HaloProperties halo) {
+        this.postService = postService;
+        this.postTagService = postTagService;
+        this.optionService = optionService;
+        this.halo = halo;
+    }
 
     @Override
     public BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException {
@@ -117,6 +143,74 @@ public class BackupServiceImpl implements BackupService {
         });
     }
 
+    @Override
+    public BackupDTO zipWorkDirectory() {
+        // Zip work directory to temporary file
+        try {
+            // Create zip path for halo zip
+            String haloZipFileName = new StringBuilder().append("Halo-backup-")
+                    .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
+                    .append(IdUtil.simpleUUID())
+                    .append(".zip").toString();
+            // Create halo zip file
+            Path haloZipPath = Files.createFile(Paths.get(halo.getBackupDir(), haloZipFileName));
+
+            // Zip halo
+            run.halo.app.utils.FileUtils.zip(Paths.get(this.halo.getWorkDir()), haloZipPath);
+
+            // Build download url
+            String downloadUrl = buildDownloadUrl(haloZipFileName);
+
+            // Build attachment dto
+            BackupDTO backup = new BackupDTO();
+            backup.setDownloadUrl(downloadUrl);
+            backup.setFilename(haloZipFileName);
+
+            return backup;
+        } catch (IOException e) {
+            throw new ServiceException("Failed to backup halo", e);
+        }
+    }
+
+    @Override
+    public List<BackupDTO> listHaloBackups() {
+        try {
+            return Files.list(Paths.get(halo.getBackupDir())).map(backupPath -> {
+                // Get filename
+                String filename = backupPath.getFileName().toString();
+                // Build download url
+                String downloadUrl = buildDownloadUrl(filename);
+
+                // Build backup dto
+                BackupDTO backup = new BackupDTO();
+                backup.setDownloadUrl(downloadUrl);
+                backup.setFilename(filename);
+
+                return backup;
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new ServiceException("Failed to fetch backups", e);
+        }
+    }
+
+    @Override
+    public void deleteHaloBackup(String filename) {
+        Assert.hasText(filename, "File name must not be blank");
+
+        // Get backup path
+        Path backupPath = Paths.get(halo.getBackupDir(), filename);
+
+        try {
+            // Delete backup file
+            Files.delete(backupPath);
+
+        } catch (NoSuchFileException e) {
+            throw new NotFoundException("The file " + filename + " was not found", e);
+        } catch (IOException e) {
+            throw new ServiceException("Failed to delete backup", e);
+        }
+    }
+
     /**
      * Sanitizes the specified file name.
      *
@@ -128,5 +222,20 @@ public class BackupServiceImpl implements BackupService {
                 replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
                 replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~]", "").
                 replaceAll("\\s", "");
+    }
+
+    /**
+     * Builds download url.
+     *
+     * @param filename filename must not be blank
+     * @return download url
+     */
+    private String buildDownloadUrl(@NonNull String filename) {
+        Assert.hasText(filename, "File name must not be blank");
+
+        return StringUtils.joinWith("/",
+                optionService.getBlogBaseUrl(),
+                StringUtils.removeEnd(StringUtils.removeStart(halo.getBackupUrlPrefix(), "/"), "/"),
+                filename);
     }
 }
