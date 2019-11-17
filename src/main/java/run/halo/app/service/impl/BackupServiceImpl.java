@@ -15,11 +15,11 @@ import org.yaml.snakeyaml.Yaml;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
-import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.BackupService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
@@ -148,7 +148,7 @@ public class BackupServiceImpl implements BackupService {
         // Zip work directory to temporary file
         try {
             // Create zip path for halo zip
-            String haloZipFileName = new StringBuilder().append("Halo-backup-")
+            String haloZipFileName = new StringBuilder().append(HaloConst.HALO_BACKUP_PREFIX)
                     .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
                     .append(IdUtil.simpleUUID())
                     .append(".zip").toString();
@@ -158,15 +158,8 @@ public class BackupServiceImpl implements BackupService {
             // Zip halo
             run.halo.app.utils.FileUtils.zip(Paths.get(this.halo.getWorkDir()), haloZipPath);
 
-            // Build download url
-            String downloadUrl = buildDownloadUrl(haloZipFileName);
-
-            // Build attachment dto
-            BackupDTO backup = new BackupDTO();
-            backup.setDownloadUrl(downloadUrl);
-            backup.setFilename(haloZipFileName);
-
-            return backup;
+            // Build backup dto
+            return buildBackupDto(haloZipPath);
         } catch (IOException e) {
             throw new ServiceException("Failed to backup halo", e);
         }
@@ -175,19 +168,19 @@ public class BackupServiceImpl implements BackupService {
     @Override
     public List<BackupDTO> listHaloBackups() {
         try {
-            return Files.list(Paths.get(halo.getBackupDir())).map(backupPath -> {
-                // Get filename
-                String filename = backupPath.getFileName().toString();
-                // Build download url
-                String downloadUrl = buildDownloadUrl(filename);
-
-                // Build backup dto
-                BackupDTO backup = new BackupDTO();
-                backup.setDownloadUrl(downloadUrl);
-                backup.setFilename(filename);
-
-                return backup;
-            }).collect(Collectors.toList());
+            // Build backup dto
+            return Files.list(Paths.get(halo.getBackupDir()))
+                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
+                    .map(this::buildBackupDto)
+                    .sorted((leftBackup, rightBackup) -> {
+                        // Sort the result
+                        if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
+                            return 1;
+                        } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
+                            return -1;
+                        }
+                        return 0;
+                    }).collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
@@ -222,6 +215,28 @@ public class BackupServiceImpl implements BackupService {
                 replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
                 replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~]", "").
                 replaceAll("\\s", "");
+    }
+
+    /**
+     * Builds backup dto.
+     *
+     * @param backupPath backup path must not be null
+     * @return backup dto
+     */
+    private BackupDTO buildBackupDto(@NonNull Path backupPath) {
+        Assert.notNull(backupPath, "Backup path must not be null");
+
+        String backupFileName = backupPath.getFileName().toString();
+        BackupDTO backup = new BackupDTO();
+        backup.setDownloadUrl(buildDownloadUrl(backupFileName));
+        backup.setFilename(backupFileName);
+        try {
+            backup.setUpdateTime(Files.getLastModifiedTime(backupPath).toMillis());
+        } catch (IOException e) {
+            throw new ServiceException("Failed to get last modified time of " + backupPath.toString(), e);
+        }
+
+        return backup;
     }
 
     /**
