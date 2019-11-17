@@ -1,12 +1,15 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.exception.ForbiddenException;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * File utilities.
@@ -114,6 +118,54 @@ public class FileUtils {
             }
 
             zipEntry = zis.getNextEntry();
+        }
+    }
+
+    /**
+     * Zip folder or file.
+     *
+     * @param fileToZip file path to zip must not be null
+     * @param zipOut    zip output stream must not be null
+     * @throws IOException
+     */
+    public static void zip(@NonNull Path fileToZip, @NonNull ZipOutputStream zipOut) throws IOException {
+        // Zip file
+        zip(fileToZip, fileToZip.getFileName().toString(), zipOut);
+    }
+
+    /**
+     * Zip folder or file.
+     *
+     * @param fileToZip file path to zip must not be null
+     * @param fileName  file name must not be blank
+     * @param zipOut    zip output stream must not be null
+     * @throws IOException
+     */
+    private static void zip(@NonNull Path fileToZip, @NonNull String fileName, @NonNull ZipOutputStream zipOut) throws IOException {
+        if (Files.isDirectory(fileToZip)) {
+            log.debug("Try to zip folder: [{}]", fileToZip);
+            // Append with '/' if missing
+            String folderName = StringUtils.appendIfMissing(fileName, File.separator, File.separator);
+            // Create zip entry and put into zip output stream
+            zipOut.putNextEntry(new ZipEntry(folderName));
+            // Close entry for writing the next entry
+            zipOut.closeEntry();
+
+            // Iterate the sub files recursively
+            List<Path> subFiles = Files.list(fileToZip).collect(Collectors.toList());
+            for (Path subFileToZip : subFiles) {
+                zip(subFileToZip, folderName + subFileToZip.getFileName(), zipOut);
+            }
+        } else {
+            // Open file to be zipped
+            try (InputStream inputStream = Files.newInputStream(fileToZip)) {
+                // Create zip entry for target file
+                ZipEntry zipEntry = new ZipEntry(fileName);
+                // Put the entry into zip output stream
+                zipOut.putNextEntry(zipEntry);
+                // Copy
+                IOUtils.copy(inputStream, zipOut);
+            }
         }
     }
 
