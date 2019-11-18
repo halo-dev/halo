@@ -26,15 +26,14 @@
                 style="width: 100%;"
               >
             </a>
-            <video-player
-              class="video-player-box"
+            <d-player
+              ref="player"
+              :options="videoOptions"
               v-show="videoPreviewVisible"
-              ref="videoPlayer"
-              :options="playerOptions"
-              :playsinline="true"
+              class="video-player-box"
               style="width: 100%;"
             >
-            </video-player>
+            </d-player>
           </div>
         </a-skeleton>
       </a-col>
@@ -162,16 +161,16 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { videoPlayer } from 'vue-video-player'
-import 'video.js/dist/video-js.css'
 import attachmentApi from '@/api/attachment'
 import photoApi from '@/api/photo'
+import VueDPlayer from 'vue-dplayer'
+import 'vue-dplayer/dist/vue-dplayer.css'
 
 export default {
   name: 'AttachmentDetailDrawer',
   mixins: [mixin, mixinDevice],
   components: {
-    videoPlayer
+    'd-player': VueDPlayer
   },
   data() {
     return {
@@ -181,24 +180,13 @@ export default {
       photoPreviewVisible: false,
       videoPreviewVisible: false,
       nonsupportPreviewVisible: false,
-      playerOptions: {
-        // videojs options
-        muted: true,
-        language: 'zh-CN',
-        aspectRatio: '16:9',
-        fluid: true,
-        controls: true,
-        loop: false,
-        playbackRates: [0.7, 1.0, 1.5, 2.0],
-        sources: [
-          {
-            type: 'video/mp4',
-            src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
-          }
-        ],
-        poster: '/static/images/author.jpg',
-        width: document.documentElement.clientWidth,
-        notSupportedMessage: '此视频暂无法播放，请稍后再试'
+      player: {},
+      videoOptions: {
+        lang: 'zh-cn',
+        video: {
+          url: '',
+          type: 'auto'
+        }
       }
     }
   },
@@ -225,10 +213,8 @@ export default {
   created() {
     this.loadSkeleton()
   },
-  computed: {
-    player() {
-      return this.$refs.videoPlayer.player
-    }
+  mounted() {
+    this.player = this.$refs.player
   },
   watch: {
     visible: function(newValue, oldValue) {
@@ -320,39 +306,29 @@ export default {
         var prefix = mediaType.split('/')[0]
 
         if (prefix === 'video' || prefix === 'flv') {
-          this.videoPreviewVisible = true
-          this.photoPreviewVisible = false
-          this.nonsupportPreviewVisible = false
+          // 控制各个组件的显示
+          this.handlePreviewVisible(false, true, false)
+
+          // 去除视频地址后面的参数
+          var lastIndex = attachment.path.lastIndexOf('?')
+          var path = attachment.path.substring(0, lastIndex)
+
           // 设置视频地址
-          this.$set(this.playerOptions.sources, 0, {
-            type: mediaType,
-            src: attachment.path
-          })
-          console.log(this.playerOptions.sources)
+          this.$set(this.videoOptions.video, 'url', path)
+          this.$log.debug('video url', path)
         } else if (prefix === 'image') {
-          this.photoPreviewVisible = true
-          this.videoPreviewVisible = false
-          this.nonsupportPreviewVisible = false
+          this.handlePreviewVisible(true, false, false)
         } else {
-          this.nonsupportPreviewVisible = true
-          this.videoPreviewVisible = false
-          this.photoPreviewVisible = false
+          this.handlePreviewVisible(false, false, true)
         }
       }
+    },
+    handlePreviewVisible(photo, video, nonsupport) {
+      // 为了更好的使vue监听到组件变化及时刷新,方式修改组件后需要刷新才能显示一下部分
+      this.$set(this, 'photoPreviewVisible', photo)
+      this.$set(this, 'videoPreviewVisible', video)
+      this.$set(this, 'nonsupportPreviewVisible', nonsupport)
     }
-    // handleDownLoadPhoto(attachment) {
-    //   var path = attachment.path
-
-    //   var index = path.lastIndexOf('/')
-    //   var filename = path.substr(index+1, path.length)
-    //   //  chrome/firefox
-    //   var aTag = document.createElement('a')
-    //   aTag.download = filename
-    //   aTag.href = path//URL.createObjectURL(blob)
-    //   aTag.target = '_blank'
-    //   aTag.click()
-    //   URL.revokeObjectURL(aTag.href)
-    // }
   }
 }
 </script>
