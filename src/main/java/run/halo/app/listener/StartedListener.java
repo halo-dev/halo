@@ -44,7 +44,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        // save halo version to database
         this.printStartInfo();
         this.initThemes();
     }
@@ -53,7 +52,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         String blogUrl = optionService.getBlogBaseUrl();
 
         log.info("Halo started at         {}", blogUrl);
-        log.info("Halo admin started at   {}{}", blogUrl, haloProperties.getAdminPath());
+        log.info("Halo admin started at   {}/halo{}", blogUrl, haloProperties.getAdminPath());
         if (!haloProperties.isDocDisabled()) {
             log.debug("Halo doc was enable at  {}/swagger-ui.html", blogUrl);
         }
@@ -65,12 +64,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     private void initThemes() {
         // Whether the blog has initialized
         Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
-
-        /*if (haloProperties.isProductionEnv() && isInstalled) {
-            // Skip
-            return;
-        }*/
-
         try {
             String themeClassPath = ResourceUtils.CLASSPATH_URL_PREFIX + ThemeService.THEME_FOLDER;
 
@@ -94,9 +87,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             // Fix the problem that the project cannot start after moving to a new server
             if (!haloProperties.isProductionEnv() || Files.notExists(themePath) || !isInstalled) {
                 FileUtils.copyFolder(source, themePath);
-                log.info("Copied theme folder from [{}] to [{}]", source, themePath);
+                log.debug("Copied theme folder from [{}] to [{}]", source, themePath);
             } else {
-                log.info("Skipped copying theme folder due to existence of theme folder");
+                log.debug("Skipped copying theme folder due to existence of theme folder");
             }
         } catch (Exception e) {
             throw new RuntimeException("Initialize internal theme to user path error", e);

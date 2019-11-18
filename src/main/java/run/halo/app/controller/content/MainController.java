@@ -37,22 +37,21 @@ public class MainController {
         this.haloProperties = haloProperties;
     }
 
-    @GetMapping("/{permlink}")
+    @GetMapping("/halo/{permlink}")
     @Deprecated
     public String admin(@PathVariable(name = "permlink") String permlink) {
-        // ###WARNING!!! Here will lead to redirect to swagger-ui/index.html while accessing swagger-ui.html
-        return "redirect:/" + permlink + "/index.html";
+        return "redirect:/halo/" + permlink + "/index.html";
+    }
+
+    @GetMapping("/halo/version")
+    @ResponseBody
+    public String version() {
+        return HaloConst.HALO_VERSION;
     }
 
     @GetMapping("/install")
     public String installation() {
-        return "redirect:" + haloProperties.getAdminPath() + "/index.html#install";
-    }
-
-    @GetMapping("/version")
-    @ResponseBody
-    public String version() {
-        return HaloConst.HALO_VERSION;
+        return "redirect:/halo" + haloProperties.getAdminPath() + "/index.html#install";
     }
 
     @GetMapping("/avatar")
