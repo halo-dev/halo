@@ -26,7 +26,7 @@ import java.util.Objects;
  *
  * @author MyFaith
  * @author ryanwang
- * @date 2019-04-04 00:06:13
+ * @date 2019-04-04
  */
 @Slf4j
 @Component
@@ -43,27 +43,30 @@ public class AliYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
-        String ossDomain = optionService.getByPropertyOrDefault(AliYunProperties.OSS_DOMAIN, String.class, "");
-        String ossEndPoint = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ENDPOINT).toString();
-        String ossAccessKey = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_KEY).toString();
-        String ossAccessSecret = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_SECRET).toString();
-        String ossBucketName = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_BUCKET_NAME).toString();
-        String ossSource = StringUtils.join("https://", ossBucketName, "." + ossEndPoint);
-        String ossStyleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_STYLE_RULE, String.class, "");
-        String ossThumbnailStyleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+        String protocol = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_PROTOCOL).toString();
+        String domain = optionService.getByPropertyOrDefault(AliYunProperties.OSS_DOMAIN, String.class, "");
+        String endPoint = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ENDPOINT).toString();
+        String accessKey = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_KEY).toString();
+        String accessSecret = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_SECRET).toString();
+        String bucketName = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_BUCKET_NAME).toString();
+        String source = StringUtils.join(protocol, bucketName, "." + endPoint);
+        String styleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(AliYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Init OSS client
-        OSS ossClient = new OSSClientBuilder().build(ossEndPoint, ossAccessKey, ossAccessSecret);
+        OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
+
+        domain = protocol + domain;
 
         try {
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(ossDomain) ? ossDomain : ossSource, "/"), upFilePath);
+            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(domain) ? domain : source, "/"), upFilePath);
 
             // Upload
-            PutObjectResult putObjectResult = ossClient.putObject(ossBucketName, upFilePath, file.getInputStream());
+            PutObjectResult putObjectResult = ossClient.putObject(bucketName, upFilePath, file.getInputStream());
             if (putObjectResult == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
             }
@@ -71,7 +74,7 @@ public class AliYunFileHandler implements FileHandler {
             // Response result
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
-            uploadResult.setFilePath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
+            uploadResult.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
             uploadResult.setKey(upFilePath);
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
@@ -82,7 +85,7 @@ public class AliYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(StringUtils.isBlank(ossThumbnailStyleRule) ? filePath : filePath + ossThumbnailStyleRule);
+                uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
             }
 
             return uploadResult;
@@ -105,16 +108,16 @@ public class AliYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String ossEndPoint = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ENDPOINT).toString();
-        String ossAccessKey = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_KEY).toString();
-        String ossAccessSecret = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_SECRET).toString();
-        String ossBucketName = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_BUCKET_NAME).toString();
+        String endPoint = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ENDPOINT).toString();
+        String accessKey = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_KEY).toString();
+        String accessSecret = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_ACCESS_SECRET).toString();
+        String bucketName = optionService.getByPropertyOfNonNull(AliYunProperties.OSS_BUCKET_NAME).toString();
 
         // Init OSS client
-        OSS ossClient = new OSSClientBuilder().build(ossEndPoint, ossAccessKey, ossAccessSecret);
+        OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
 
         try {
-            ossClient.deleteObject(new DeleteObjectsRequest(ossBucketName).withKey(key));
+            ossClient.deleteObject(new DeleteObjectsRequest(bucketName).withKey(key));
         } catch (Exception e) {
             throw new FileOperationException("附件 " + key + " 从阿里云删除失败", e);
         } finally {

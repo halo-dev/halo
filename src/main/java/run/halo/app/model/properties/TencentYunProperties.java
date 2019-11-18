@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 /**
- * TencentYun properties.
+ * Tencent yun cos properties.
  *
  * @author wangya
  * @author ryanwang
@@ -10,9 +10,14 @@ package run.halo.app.model.properties;
 public enum TencentYunProperties implements PropertyEnum {
 
     /**
+     * Tencentyun cos domain protocol.
+     */
+    COS_PROTOCOL("cos_tencentyun_domain_protocol", String.class, "https://"),
+
+    /**
      * Tencentyun cos domain.
      */
-    COS_DOMAIN("cos_tencentyun_domain",String.class,""),
+    COS_DOMAIN("cos_tencentyun_domain", String.class, ""),
 
     /**
      * Tencentyun cos endpoint.

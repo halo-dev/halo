@@ -36,7 +36,7 @@ import static run.halo.app.handler.file.FileHandler.isImageType;
  *
  * @author johnniang
  * @author ryanwang
- * @date 3/27/19
+ * @date 2019-03-27
  */
 @Slf4j
 @Component
@@ -57,6 +57,7 @@ public class QnYunFileHandler implements FileHandler {
         String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_ACCESS_KEY).toString();
         String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_SECRET_KEY).toString();
         String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_BUCKET).toString();
+        String protocol = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_PROTOCOL).toString();
         String domain = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_DOMAIN).toString();
         String styleRule = optionService.getByPropertyOrDefault(QnYunProperties.OSS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService.getByPropertyOrDefault(QnYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
@@ -99,7 +100,7 @@ public class QnYunFileHandler implements FileHandler {
             QiNiuPutSet putSet = JsonUtils.jsonToObject(response.bodyString(), QiNiuPutSet.class);
 
             // Get file full path
-            String filePath = StringUtils.appendIfMissing(domain, "/") + putSet.getHash();
+            String filePath = protocol + StringUtils.appendIfMissing(domain, "/") + putSet.getHash();
 
             // Build upload result
             UploadResult result = new UploadResult();

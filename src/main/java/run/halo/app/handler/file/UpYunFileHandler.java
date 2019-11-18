@@ -24,7 +24,7 @@ import java.util.Objects;
  *
  * @author johnniang
  * @author ryanwang
- * @date 3/27/19
+ * @date 2019-03-27
  */
 @Slf4j
 @Component
@@ -40,17 +40,18 @@ public class UpYunFileHandler implements FileHandler {
     public UploadResult upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
-        String ossSource = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE).toString();
-        String ossPassword = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
-        String ossBucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
-        String ossDomain = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_DOMAIN).toString();
-        String ossOperator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
+        String source = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE).toString();
+        String password = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
+        String bucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
+        String protocol = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PROTOCOL).toString();
+        String domain = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_DOMAIN).toString();
+        String operator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
         // style rule can be null
-        String ossStyleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_STYLE_RULE, String.class, "");
-        String ossThumbnailStyleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+        String styleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Create up yun
-        UpYun upYun = new UpYun(ossBucket, ossOperator, ossPassword);
+        UpYun upYun = new UpYun(bucket, operator, password);
         upYun.setDebug(log.isDebugEnabled());
         upYun.setTimeout(60);
         upYun.setApiDomain(UpYun.ED_AUTO);
@@ -63,7 +64,7 @@ public class UpYunFileHandler implements FileHandler {
             // Get md5 value of the file
             String md5OfFile = DigestUtils.md5DigestAsHex(file.getInputStream());
             // Build file path
-            String upFilePath = StringUtils.appendIfMissing(ossSource, "/") + md5OfFile + '.' + extension;
+            String upFilePath = StringUtils.appendIfMissing(source, "/") + md5OfFile + '.' + extension;
             // Set md5Content
             upYun.setContentMD5(md5OfFile);
             // Write file
@@ -72,12 +73,12 @@ public class UpYunFileHandler implements FileHandler {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到又拍云失败" + upFilePath);
             }
 
-            String filePath = StringUtils.removeEnd(ossDomain, "/") + upFilePath;
+            String filePath = protocol + StringUtils.removeEnd(domain, "/") + upFilePath;
 
             // Build upload result
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
-            uploadResult.setFilePath(StringUtils.isBlank(ossStyleRule) ? filePath : filePath + ossStyleRule);
+            uploadResult.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
             uploadResult.setKey(upFilePath);
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
@@ -88,7 +89,7 @@ public class UpYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(StringUtils.isBlank(ossThumbnailStyleRule) ? filePath : filePath + ossThumbnailStyleRule);
+                uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
             }
 
             return uploadResult;
@@ -102,12 +103,12 @@ public class UpYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String ossPassword = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
-        String ossBucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
-        String ossOperator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
+        String password = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
+        String bucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
+        String operator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
 
         // Create up yun
-        UpYun upYun = new UpYun(ossBucket, ossOperator, ossPassword);
+        UpYun upYun = new UpYun(bucket, operator, password);
         // Set api domain with ED_AUTO
         upYun.setApiDomain(UpYun.ED_AUTO);
 
