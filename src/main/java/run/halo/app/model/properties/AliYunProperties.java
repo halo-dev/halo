@@ -1,18 +1,23 @@
 package run.halo.app.model.properties;
 
 /**
- * AliYun properties.
+ * Ali yun oss properties.
  *
  * @author MyFaith
  * @author ryanwang
- * @date 2019-04-04 00:00:56
+ * @date 2019-04-04
  */
 public enum AliYunProperties implements PropertyEnum {
 
     /**
+     * Aliyun oss domain protocol
+     */
+    OSS_PROTOCOL("oss_aliyun_domain_protocol", String.class, "https://"),
+
+    /**
      * Aliyun oss domain
      */
-    OSS_DOMAIN("oss_aliyun_domain",String.class,""),
+    OSS_DOMAIN("oss_aliyun_domain", String.class, ""),
 
     /**
      * Aliyun oss endpoint.

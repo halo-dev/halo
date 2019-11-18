@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 /**
- * BaiDuYun properties.
+ * Baidu yun bos properties.
  *
  * @author wangya
  * @author ryanwang
@@ -10,9 +10,14 @@ package run.halo.app.model.properties;
 public enum BaiDuYunProperties implements PropertyEnum {
 
     /**
+     * Baidu yun bos domain protocol.
+     */
+    BOS_PROTOCOL("bos_baiduyun_domain_protocol", String.class, "https://"),
+
+    /**
      * Baidu yun bos domain.
      */
-    BOS_DOMAIN("bos_baiduyun_domain",String.class,""),
+    BOS_DOMAIN("bos_baiduyun_domain", String.class, ""),
 
     /**
      * Baidu yun bos endpoint.

@@ -1,11 +1,11 @@
 package run.halo.app.model.properties;
 
 /**
- * You pai yun properties.
+ * You pai yun oss properties.
  *
  * @author johnniang
  * @author ryanwang
- * @date 3/27/19
+ * @date 2019-03-27
  */
 public enum UpYunProperties implements PropertyEnum {
 
@@ -23,6 +23,11 @@ public enum UpYunProperties implements PropertyEnum {
      * upyun oss bucket
      */
     OSS_BUCKET("oss_upyun_bucket", String.class, ""),
+
+    /**
+     * upyun oss domain protocol
+     */
+    OSS_PROTOCOL("oss_upyun_domain_protocol",String.class,"https://"),
 
     /**
      * upyun oss domain
