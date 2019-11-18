@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
@@ -41,20 +42,19 @@ import java.util.*;
 public class OptionServiceImpl extends AbstractCrudService<Option, Integer> implements OptionService {
 
     private final OptionRepository optionRepository;
-
     private final ApplicationContext applicationContext;
-
     private final StringCacheStore cacheStore;
-
     private final Map<String, PropertyEnum> propertyEnumMap;
-
     private final ApplicationEventPublisher eventPublisher;
+    private HaloProperties haloProperties;
 
-    public OptionServiceImpl(OptionRepository optionRepository,
+    public OptionServiceImpl(HaloProperties haloProperties,
+                             OptionRepository optionRepository,
                              ApplicationContext applicationContext,
                              StringCacheStore cacheStore,
                              ApplicationEventPublisher eventPublisher) {
         super(optionRepository);
+        this.haloProperties = haloProperties;
         this.optionRepository = optionRepository;
         this.applicationContext = applicationContext;
         this.cacheStore = cacheStore;
@@ -373,7 +373,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         if (StrUtil.isNotBlank(blogUrl)) {
             blogUrl = StrUtil.removeSuffix(blogUrl, "/");
         } else {
-            blogUrl = String.format("http://%s:%s", HaloUtils.getMachineIP(), serverPort);
+            if (haloProperties.isProductionEnv()) {
+                blogUrl = String.format("http://%s:%s", "127.0.0.1", serverPort);
+            } else {
+                blogUrl = String.format("http://%s:%s", HaloUtils.getMachineIP(), serverPort);
+            }
         }
 
         return blogUrl;
