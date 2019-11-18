@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
-import run.halo.app.event.post.PostSaveBeforeEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
@@ -52,7 +51,6 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  */
 @Slf4j
 @Service
-@Deprecated
 public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostService {
 
     private final PostRepository postRepository;
