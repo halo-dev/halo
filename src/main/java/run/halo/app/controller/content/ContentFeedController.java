@@ -16,7 +16,6 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
-import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
@@ -44,16 +43,13 @@ public class ContentFeedController {
     private final PostService postService;
     private final OptionService optionService;
     private final FreeMarkerConfigurer freeMarker;
-    private final HaloProperties haloProperties;
 
     public ContentFeedController(PostService postService,
                                  OptionService optionService,
-                                 FreeMarkerConfigurer freeMarker,
-                                 HaloProperties haloProperties) {
+                                 FreeMarkerConfigurer freeMarker) {
         this.postService = postService;
         this.optionService = optionService;
         this.freeMarker = freeMarker;
-        this.haloProperties = haloProperties;
     }
 
     /**
@@ -129,8 +125,6 @@ public class ContentFeedController {
     @GetMapping(value = "robots.txt", produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String robots(Model model) throws IOException, TemplateException {
-        String adminPath = haloProperties.getAdminPath();
-        model.addAttribute("adminPath", adminPath);
         Template template = freeMarker.getConfiguration().getTemplate("common/web/robots.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
