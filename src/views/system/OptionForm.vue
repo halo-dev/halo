@@ -309,12 +309,21 @@
                   v-show="upyunFormVisible"
                 >
                   <a-form-item
+                    label="绑定域名协议："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-select v-model="options.oss_upyun_domain_protocol">
+                      <a-select-option value="https://">HTTPS</a-select-option>
+                      <a-select-option value="http://">HTTP</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item
                     label="绑定域名："
                     :wrapper-col="wrapperCol"
                   >
                     <a-input
                       v-model="options.oss_upyun_domain"
-                      placeholder="需要加上 http:// 或者 https://"
+                      placeholder="无需再加上 http:// 或者 https://"
                     />
                   </a-form-item>
                   <a-form-item
@@ -365,12 +374,21 @@
                   v-show="qnyunFormVisible"
                 >
                   <a-form-item
+                    label="绑定域名协议："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-select v-model="options.oss_qiniu_domain_protocol">
+                      <a-select-option value="https://">HTTPS</a-select-option>
+                      <a-select-option value="http://">HTTP</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item
                     label="绑定域名："
                     :wrapper-col="wrapperCol"
                   >
                     <a-input
                       v-model="options.oss_qiniu_domain"
-                      placeholder="需要加上 http:// 或者 https://"
+                      placeholder="无需再加上 http:// 或者 https://"
                     />
                   </a-form-item>
                   <a-form-item
@@ -431,6 +449,15 @@
                   v-show="aliyunFormVisible"
                 >
                   <a-form-item
+                    label="绑定域名协议："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-select v-model="options.oss_aliyun_domain_protocol">
+                      <a-select-option value="https://">HTTPS</a-select-option>
+                      <a-select-option value="http://">HTTP</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item
                     label="绑定域名："
                     :wrapper-col="wrapperCol"
                   >
@@ -490,6 +517,15 @@
                   v-show="baiduyunFormVisible"
                 >
                   <a-form-item
+                    label="绑定域名协议："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-select v-model="options.bos_baiduyun_domain_protocol">
+                      <a-select-option value="https://">HTTPS</a-select-option>
+                      <a-select-option value="http://">HTTP</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item
                     label="绑定域名："
                     :wrapper-col="wrapperCol"
                   >
@@ -548,6 +584,15 @@
                   class="tencentyunForm"
                   v-show="tencentyunFormVisible"
                 >
+                  <a-form-item
+                    label="绑定域名协议："
+                    :wrapper-col="wrapperCol"
+                  >
+                    <a-select v-model="options.cos_tencentyun_domain_protocol">
+                      <a-select-option value="https://">HTTPS</a-select-option>
+                      <a-select-option value="http://">HTTP</a-select-option>
+                    </a-select>
+                  </a-form-item>
                   <a-form-item
                     label="绑定域名："
                     :wrapper-col="wrapperCol"
