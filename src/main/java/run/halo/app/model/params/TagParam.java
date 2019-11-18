@@ -4,7 +4,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.SlugUtils;
 
 import javax.validation.constraints.NotBlank;
@@ -14,7 +13,8 @@ import javax.validation.constraints.Size;
  * Tag param.
  *
  * @author johnniang
- * @date 3/20/19
+ * @author ryanwang
+ * @date 2019-03-20
  */
 @Data
 public class TagParam implements InputConverter<Tag> {
@@ -28,12 +28,8 @@ public class TagParam implements InputConverter<Tag> {
 
     @Override
     public Tag convertTo() {
-        if (StringUtils.isBlank(slugName)) {
-            // Handle slug name
-            slugName = SlugUtils.slugify(name);
-        }
 
-        slugName = HaloUtils.initializeUrlIfBlank(slugName);
+        slugName = StringUtils.isBlank(slugName) ? SlugUtils.slug(name) : SlugUtils.slug(slugName);
 
         return InputConverter.super.convertTo();
     }

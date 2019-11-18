@@ -1,17 +1,16 @@
 package run.halo.app.model.params;
 
-import cn.hutool.crypto.digest.BCrypt;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostCreateFrom;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.utils.SlugUtils;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Set;
 
@@ -20,7 +19,7 @@ import java.util.Set;
  *
  * @author johnniang
  * @author ryanwang
- * @date 3/21/19
+ * @date 2019-03-21
  */
 @Data
 public class PostParam implements InputConverter<Post> {
@@ -62,9 +61,8 @@ public class PostParam implements InputConverter<Post> {
 
     @Override
     public Post convertTo() {
-        if (StringUtils.isBlank(url)) {
-            url = URLEncoder.encode(title.replace(".",""));
-        }
+        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+
         if (null == thumbnail) {
             thumbnail = "";
         }
@@ -74,9 +72,8 @@ public class PostParam implements InputConverter<Post> {
 
     @Override
     public void update(Post post) {
-        if (StringUtils.isBlank(url)) {
-            url = URLEncoder.encode(title.replace(".",""));
-        }
+        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+
         if (null == thumbnail) {
             thumbnail = "";
         }

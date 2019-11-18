@@ -1,12 +1,11 @@
 package run.halo.app.model.params;
 
-import cn.hutool.crypto.digest.BCrypt;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.SlugUtils;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -18,7 +17,7 @@ import java.util.Date;
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-24
+ * @date 2019-4-24
  */
 @Data
 public class SheetParam implements InputConverter<Sheet> {
@@ -52,9 +51,7 @@ public class SheetParam implements InputConverter<Sheet> {
 
     @Override
     public Sheet convertTo() {
-        if (StringUtils.isBlank(url)) {
-            url = title.replace(".","");
-        }
+        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
 
         if (null == thumbnail) {
             thumbnail = "";
@@ -65,9 +62,7 @@ public class SheetParam implements InputConverter<Sheet> {
 
     @Override
     public void update(Sheet sheet) {
-        if (StringUtils.isBlank(url)) {
-            url = title.replace(".","");
-        }
+        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
 
         if (null == thumbnail) {
             thumbnail = "";
