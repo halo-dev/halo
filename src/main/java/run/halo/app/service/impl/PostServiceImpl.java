@@ -2,7 +2,6 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
+import run.halo.app.event.post.PostSaveBeforeEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
@@ -30,7 +30,10 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.service.*;
-import run.halo.app.utils.*;
+import run.halo.app.utils.DateUtils;
+import run.halo.app.utils.MarkdownUtils;
+import run.halo.app.utils.ServiceUtils;
+import run.halo.app.utils.SlugUtils;
 
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -49,6 +52,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  */
 @Slf4j
 @Service
+@Deprecated
 public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostService {
 
     private final PostRepository postRepository;
@@ -256,8 +260,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             if (null == tag) {
                                 tag = new Tag();
                                 tag.setName(ele);
-                                String slugName = SlugUtils.slugify(ele);
-                                tag.setSlugName(HaloUtils.initializeUrlIfBlank(slugName));
+                                tag.setSlugName(SlugUtils.slug(ele));
                                 tag = tagService.create(tag);
                             }
                             tagIds.add(tag.getId());
@@ -267,8 +270,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             if (null == category) {
                                 category = new Category();
                                 category.setName(ele);
-                                String slugName = SlugUtils.slugify(ele);
-                                category.setSlugName(HaloUtils.initializeUrlIfBlank(slugName));
+                                category.setSlugName(SlugUtils.slug(ele));
                                 category.setDescription(ele);
                                 category = categoryService.create(category);
                             }
@@ -290,7 +292,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         }
 
         if (StrUtil.isEmpty(post.getUrl())) {
-            post.setUrl(DateUtil.format(new Date(), "yyyyMMddHHmmss" + RandomUtil.randomNumbers(5)));
+            post.setUrl(SlugUtils.slug(post.getTitle()));
         }
 
         post.setOriginalContent(markdown);

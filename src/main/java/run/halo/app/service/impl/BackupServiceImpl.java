@@ -24,6 +24,7 @@ import run.halo.app.service.BackupService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
+import run.halo.app.utils.SlugUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -213,7 +214,7 @@ public class BackupServiceImpl implements BackupService {
     public static String sanitizeFilename(final String unsanitized) {
         return unsanitized.
                 replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~]", "").
+                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
                 replaceAll("\\s", "");
     }
 
