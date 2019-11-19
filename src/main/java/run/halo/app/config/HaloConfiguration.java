@@ -2,6 +2,7 @@ package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -29,6 +30,7 @@ import run.halo.app.utils.HttpClientUtils;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Halo configuration.
@@ -40,7 +42,8 @@ import java.security.NoSuchAlgorithmException;
 @Slf4j
 public class HaloConfiguration {
 
-    private final static int TIMEOUT = 5000;
+    @Autowired
+    HaloProperties haloProperties;
 
     @Bean
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
@@ -51,7 +54,8 @@ public class HaloConfiguration {
     @Bean
     public RestTemplate httpsRestTemplate(RestTemplateBuilder builder) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
-        httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(TIMEOUT)));
+        httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
+                (int) haloProperties.getDownloadTimeout().toMillis())));
         return httpsRestTemplate;
     }
 
