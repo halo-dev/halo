@@ -47,3 +47,6 @@ logging:
     run.halo.app: INFO
   file:
     path: ${user.home}/.halo/logs
+
+halo:
+  download-timeout: 5m
