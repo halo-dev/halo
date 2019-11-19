@@ -206,7 +206,6 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Delete backup file
             Files.delete(backupPath);
-
         } catch (NoSuchFileException e) {
             throw new NotFoundException("The file " + filename + " was not found", e);
         } catch (IOException e) {
@@ -226,16 +225,13 @@ public class BackupServiceImpl implements BackupService {
         String backupFileName = backupPath.getFileName().toString();
         BackupDTO backup = new BackupDTO();
         backup.setDownloadUrl(buildDownloadUrl(backupFileName));
+        backup.setDownloadLink(backup.getDownloadLink());
         backup.setFilename(backupFileName);
         try {
             backup.setUpdateTime(Files.getLastModifiedTime(backupPath).toMillis());
-        } catch (IOException e) {
-            throw new ServiceException("Failed to get last modified time of " + backupPath.toString(), e);
-        }
-        try {
             backup.setFileSize(Files.size(backupPath));
         } catch (IOException e) {
-            throw new ServiceException("Failed to get file size " + backupPath.toString(), e);
+            throw new ServiceException("Failed to access file " + backupPath.toString(), e);
         }
 
         return backup;
