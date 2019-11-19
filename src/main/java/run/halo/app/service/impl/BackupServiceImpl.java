@@ -24,7 +24,6 @@ import run.halo.app.service.BackupService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
-import run.halo.app.utils.SlugUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,30 +44,40 @@ import java.util.stream.Collectors;
  * Backup service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-04-26
  */
 @Service
 @Slf4j
 public class BackupServiceImpl implements BackupService {
 
-    private final PostService postService;
-
-    private final PostTagService postTagService;
-
-    private final OptionService optionService;
-
-    private final HaloProperties halo;
-
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    private final PostService postService;
+    private final PostTagService postTagService;
+    private final OptionService optionService;
+    private final HaloProperties haloProperties;
 
     public BackupServiceImpl(PostService postService,
                              PostTagService postTagService,
                              OptionService optionService,
-                             HaloProperties halo) {
+                             HaloProperties haloProperties) {
         this.postService = postService;
         this.postTagService = postTagService;
         this.optionService = optionService;
-        this.halo = halo;
+        this.haloProperties = haloProperties;
+    }
+
+    /**
+     * Sanitizes the specified file name.
+     *
+     * @param unsanitized the specified file name
+     * @return sanitized file name
+     */
+    public static String sanitizeFilename(final String unsanitized) {
+        return unsanitized.
+                replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
+                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
+                replaceAll("\\s", "");
     }
 
     @Override
@@ -154,10 +163,10 @@ public class BackupServiceImpl implements BackupService {
                     .append(IdUtil.simpleUUID())
                     .append(".zip").toString();
             // Create halo zip file
-            Path haloZipPath = Files.createFile(Paths.get(halo.getBackupDir(), haloZipFileName));
+            Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
 
             // Zip halo
-            run.halo.app.utils.FileUtils.zip(Paths.get(this.halo.getWorkDir()), haloZipPath);
+            run.halo.app.utils.FileUtils.zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
 
             // Build backup dto
             return buildBackupDto(haloZipPath);
@@ -170,7 +179,7 @@ public class BackupServiceImpl implements BackupService {
     public List<BackupDTO> listHaloBackups() {
         try {
             // Build backup dto
-            return Files.list(Paths.get(halo.getBackupDir()))
+            return Files.list(Paths.get(haloProperties.getBackupDir()))
                     .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
                     .map(this::buildBackupDto)
                     .sorted((leftBackup, rightBackup) -> {
@@ -192,7 +201,7 @@ public class BackupServiceImpl implements BackupService {
         Assert.hasText(filename, "File name must not be blank");
 
         // Get backup path
-        Path backupPath = Paths.get(halo.getBackupDir(), filename);
+        Path backupPath = Paths.get(haloProperties.getBackupDir(), filename);
 
         try {
             // Delete backup file
@@ -203,19 +212,6 @@ public class BackupServiceImpl implements BackupService {
         } catch (IOException e) {
             throw new ServiceException("Failed to delete backup", e);
         }
-    }
-
-    /**
-     * Sanitizes the specified file name.
-     *
-     * @param unsanitized the specified file name
-     * @return sanitized file name
-     */
-    public static String sanitizeFilename(final String unsanitized) {
-        return unsanitized.
-                replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
-                replaceAll("\\s", "");
     }
 
     /**
@@ -236,6 +232,11 @@ public class BackupServiceImpl implements BackupService {
         } catch (IOException e) {
             throw new ServiceException("Failed to get last modified time of " + backupPath.toString(), e);
         }
+        try {
+            backup.setFileSize(Files.size(backupPath));
+        } catch (IOException e) {
+            throw new ServiceException("Failed to get file size " + backupPath.toString(), e);
+        }
 
         return backup;
     }
@@ -251,7 +252,7 @@ public class BackupServiceImpl implements BackupService {
 
         return StringUtils.joinWith("/",
                 optionService.getBlogBaseUrl(),
-                StringUtils.removeEnd(StringUtils.removeStart(halo.getBackupUrlPrefix(), "/"), "/"),
+                StringUtils.removeEnd(StringUtils.removeStart(haloProperties.getBackupUrlPrefix(), "/"), "/"),
                 filename);
     }
 }
