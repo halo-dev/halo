@@ -46,6 +46,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-html": "^5.0.5",
     "eslint-plugin-vue": "^5.2.3",
+    "flv.js": "^1.5.0",
     "generate-asset-webpack-plugin": "^0.3.0",
     "less": "^3.10.0",
     "less-loader": "^5.0.0",

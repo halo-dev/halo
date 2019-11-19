@@ -163,8 +163,10 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import attachmentApi from '@/api/attachment'
 import photoApi from '@/api/photo'
-import VueDPlayer from 'vue-dplayer'
 import 'vue-dplayer/dist/vue-dplayer.css'
+import VueDPlayer from 'vue-dplayer'
+import flvjs from 'flv.js'
+window.flvjs = flvjs
 
 export default {
   name: 'AttachmentDetailDrawer',
