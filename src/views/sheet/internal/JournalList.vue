@@ -62,7 +62,9 @@
           </div>
           <a-divider />
           <div style="margin-top:15px">
+            <a-empty v-if="journals.length==0" />
             <a-list
+              v-else
               itemLayout="vertical"
               :pagination="false"
               :dataSource="journals"
@@ -99,9 +101,7 @@
                 <template slot="actions">
                   <span>
                     <a href="javascript:void(0);">
-                      <a-icon
-                        type="like-o"
-                      />
+                      <a-icon type="like-o" />
                       {{ item.likes }}
                     </a>
                   </span>
@@ -110,9 +110,7 @@
                       href="javascript:void(0);"
                       @click="handleCommentShow(item)"
                     >
-                      <a-icon
-                        type="message"
-                      />
+                      <a-icon type="message" />
                       {{ item.commentCount }}
                     </a>
                   </span>

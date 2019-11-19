@@ -31,7 +31,7 @@
                 <a-input v-model="selectedPost.url" />
               </a-form-item>
               <a-form-item label="访问密码：">
-                <a-input-password v-model="selectedPost.password" />
+                <a-input-password v-model="selectedPost.password" autocomplete="new-password"/>
               </a-form-item>
 
               <a-form-item label="发表时间：">

@@ -225,22 +225,6 @@ import recoveryApi from '@/api/recovery'
 export default {
   data() {
     return {
-      formItemLayout: {
-        labelCol: {
-          xs: { span: 24 },
-          sm: { span: 5 },
-          lg: { span: 4 },
-          xl: { span: 4 },
-          xxl: { span: 3 }
-        },
-        wrapperCol: {
-          xs: { span: 24 },
-          sm: { span: 19 },
-          lg: { span: 20 },
-          xl: { span: 20 },
-          xxl: { span: 21 }
-        }
-      },
       installation: {},
       migrationUploadName: 'file',
       migrationData: null,

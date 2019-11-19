@@ -77,12 +77,14 @@
                 :key="index.toString()"
                 :tab="group.label"
               >
-                <a-form layout="vertical">
+                <a-form
+                  layout="vertical"
+                  :wrapperCol="wrapperCol"
+                >
                   <a-form-item
                     v-for="(item, index1) in group.items"
                     :label="item.label + '：'"
                     :key="index1"
-                    :wrapper-col="wrapperCol"
                   >
                     <a-input
                       v-model="themeSettings[item.name]"

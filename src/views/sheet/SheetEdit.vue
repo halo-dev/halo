@@ -80,11 +80,6 @@ export default {
   data() {
     return {
       toolbars,
-      wrapperCol: {
-        xl: { span: 24 },
-        sm: { span: 24 },
-        xs: { span: 24 }
-      },
       attachmentDrawerVisible: false,
       sheetSettingVisible: false,
       sheetToStage: {}
