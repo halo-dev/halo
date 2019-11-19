@@ -8,10 +8,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.exception.ForbiddenException;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -45,11 +42,9 @@ public class FileUtils {
 
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
 
-            private Path current;
-
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                current = target.resolve(source.relativize(dir).toString());
+                Path current = target.resolve(source.relativize(dir).toString());
                 Files.createDirectories(current);
                 return FileVisitResult.CONTINUE;
             }
@@ -88,7 +83,7 @@ public class FileUtils {
      *
      * @param zis        zip input stream must not be null
      * @param targetPath target path must not be null and not empty
-     * @throws IOException
+     * @throws IOException throws when failed to access file to be unzipped
      */
     public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath) throws IOException {
         Assert.notNull(zis, "Zip input stream must not be null");
@@ -122,24 +117,26 @@ public class FileUtils {
     }
 
     /**
-     * Zip folder or file.
+     * Zips folder or file.
      *
      * @param pathToZip     file path to zip must not be null
      * @param pathOfArchive zip file path to archive must not be null
-     * @throws IOException
+     * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive) throws IOException {
-        try (ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(pathOfArchive))) {
-            zip(pathToZip, zipOut);
+        try (OutputStream outputStream = Files.newOutputStream(pathOfArchive)) {
+            try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
+                zip(pathToZip, zipOut);
+            }
         }
     }
 
     /**
-     * Zip folder or file.
+     * Zips folder or file.
      *
      * @param pathToZip file path to zip must not be null
      * @param zipOut    zip output stream must not be null
-     * @throws IOException
+     * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut) throws IOException {
         // Zip file
@@ -147,12 +144,12 @@ public class FileUtils {
     }
 
     /**
-     * Zip folder or file.
+     * Zips folder or file.
      *
      * @param fileToZip file path to zip must not be null
      * @param fileName  file name must not be blank
      * @param zipOut    zip output stream must not be null
-     * @throws IOException
+     * @throws IOException throws when failed to access file to be zipped
      */
     private static void zip(@NonNull Path fileToZip, @NonNull String fileName, @NonNull ZipOutputStream zipOut) throws IOException {
         if (Files.isDirectory(fileToZip)) {
@@ -165,20 +162,24 @@ public class FileUtils {
             zipOut.closeEntry();
 
             // Iterate the sub files recursively
-            List<Path> subFiles = Files.list(fileToZip).collect(Collectors.toList());
-            for (Path subFileToZip : subFiles) {
-                zip(subFileToZip, folderName + subFileToZip.getFileName(), zipOut);
+            try (Stream<Path> subPathStream = Files.list(fileToZip)) {
+                // There should not use foreach for stream as internal zip method will throw IOException
+                List<Path> subFiles = subPathStream.collect(Collectors.toList());
+                for (Path subFileToZip : subFiles) {
+                    // Zip children
+                    zip(subFileToZip, folderName + subFileToZip.getFileName(), zipOut);
+                }
             }
         } else {
             // Open file to be zipped
-            try (InputStream inputStream = Files.newInputStream(fileToZip)) {
-                // Create zip entry for target file
-                ZipEntry zipEntry = new ZipEntry(fileName);
-                // Put the entry into zip output stream
-                zipOut.putNextEntry(zipEntry);
-                // Copy
-                IOUtils.copy(inputStream, zipOut);
-            }
+            // Create zip entry for target file
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            // Put the entry into zip output stream
+            zipOut.putNextEntry(zipEntry);
+            // Copy file to zip output stream
+            Files.copy(fileToZip, zipOut);
+            // Close entry
+            zipOut.closeEntry();
         }
     }
 
