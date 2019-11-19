@@ -3,13 +3,26 @@
     <div class="card-content">
       <a-row :gutter="12">
         <a-col
-          :xl="12"
-          :lg="12"
-          :md="24"
+          :xl="6"
+          :lg="6"
+          :md="12"
           :sm="24"
           :xs="24"
         >
-          <backup />
+          <a-card
+            :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
+          >
+            <div slot="title">
+              <a-icon type="hdd" /> 博客备份
+            </div>
+            <p>支持备份全站数据</p>
+            <a-button
+              type="primary"
+              style="float:right"
+              @click="()=>this.backupDrawerVisible = true"
+            >备份</a-button>
+          </a-card>
         </a-col>
         <a-col
           :xl="6"
@@ -23,7 +36,7 @@
             :bodyStyle="{ padding: '16px' }"
           >
             <div slot="title">
-              <a-icon type="file-markdown" />Markdown 文章导入
+              <a-icon type="file-markdown" /> Markdown 文章导入
             </div>
             <p>支持 Hexo/Jekyll 文章导入并解析元数据</p>
             <a-button
@@ -49,18 +62,20 @@
           :uploadHandler="uploadHandler"
         ></FilePondUpload>
       </a-modal>
+      <BackupDrawer v-model="backupDrawerVisible"></BackupDrawer>
     </div>
   </div>
 </template>
 
 <script>
 import backupApi from '@/api/backup'
-import Backup from './Backup'
+import BackupDrawer from './components/BackupDrawer'
 
 export default {
-  components: { Backup },
+  components: { BackupDrawer },
   data() {
     return {
+      backupDrawerVisible: false,
       markdownUpload: false,
       uploadHandler: backupApi.importMarkdown
     }
