@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 
 
 /**
@@ -58,6 +59,11 @@ public class HaloProperties {
      * backup prefix.
      */
     private String backupUrlPrefix = "/backup";
+
+    /**
+     * Download Timeout.
+     */
+    private Duration downloadTimeout = Duration.ofSeconds(30);
 
     public HaloProperties() throws IOException {
         // Create work directory if not exist
