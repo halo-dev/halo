@@ -302,14 +302,11 @@
                     />
                   </a-form-item>
                   <a-form-item label="区域：">
-                    <a-select v-model="options.oss_qiniu_zone">
-                      <a-select-option value="auto">自动选择</a-select-option>
-                      <a-select-option value="z0">华东</a-select-option>
-                      <a-select-option value="z1">华北</a-select-option>
-                      <a-select-option value="z2">华南</a-select-option>
-                      <a-select-option value="na0">北美</a-select-option>
-                      <a-select-option value="as0">东南亚</a-select-option>
-                    </a-select>
+                    <a-auto-complete
+                      :dataSource="qiniuZones"
+                      v-model="options.oss_qiniu_zone"
+                      allowClear
+                    />
                   </a-form-item>
                   <a-form-item label="Access Key：">
                     <a-input-password v-model="options.oss_qiniu_access_key" />
@@ -447,14 +444,11 @@
                     />
                   </a-form-item>
                   <a-form-item label="区域：">
-                    <a-select v-model="options.cos_tencentyun_region">
-                      <a-select-option value="ap-beijing-1">北京一区</a-select-option>
-                      <a-select-option value="ap-beijing">北京</a-select-option>
-                      <a-select-option value="ap-shanghai">上海（华东）</a-select-option>
-                      <a-select-option value="ap-guangzhou">广州（华南）</a-select-option>
-                      <a-select-option value="ap-chengdu">成都（西南）</a-select-option>
-                      <a-select-option value="ap-chongqing">重庆</a-select-option>
-                    </a-select>
+                    <a-auto-complete
+                      :dataSource="tencentyunRegions"
+                      v-model="options.cos_tencentyun_region"
+                      allowClear
+                    />
                   </a-form-item>
                   <a-form-item label="Secret Id：">
                     <a-input-password v-model="options.cos_tencentyun_secret_id" />
@@ -666,7 +660,59 @@ export default {
       logoDrawerVisible: false,
       faviconDrawerVisible: false,
       options: [],
-      mailParam: {}
+      mailParam: {},
+      tencentyunRegions: [
+        {
+          text: '北京一区',
+          value: 'ap-beijing-1'
+        },
+        {
+          text: '北京',
+          value: 'ap-beijing'
+        },
+        {
+          text: '上海（华东）',
+          value: 'ap-shanghai'
+        },
+        {
+          text: '广州（华南）',
+          value: 'ap-guangzhou'
+        },
+        {
+          text: '成都（西南）',
+          value: 'ap-chengdu'
+        },
+        {
+          text: '重庆',
+          value: 'ap-chongqing'
+        }
+      ],
+      qiniuZones: [
+        {
+          text: '自动选择',
+          value: 'auto'
+        },
+        {
+          text: '华东',
+          value: 'z0'
+        },
+        {
+          text: '华北',
+          value: 'z1'
+        },
+        {
+          text: '华南',
+          value: 'z2'
+        },
+        {
+          text: '北美',
+          value: 'na0'
+        },
+        {
+          text: '东南亚',
+          value: 'as0'
+        }
+      ]
     }
   },
   mounted() {

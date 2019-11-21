@@ -172,12 +172,6 @@ export const asyncRouterMap = [
             component: () => import('@/views/system/OptionForm'),
             meta: { title: '博客设置', hiddenHeaderContent: false }
           },
-          // {
-          //   path: '/system/backup',
-          //   name: 'BackupList',
-          //   component: () => import('@/views/system/BackupList'),
-          //   meta: { title: '博客备份', hiddenHeaderContent: false }
-          // },
           {
             path: '/system/tools',
             name: 'ToolList',
@@ -227,6 +221,6 @@ export const constantRouterMap = [
   {
     path: '/404',
     name: 'NotFound',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
+    component: () => import('@/views/exception/404')
   }
 ]
