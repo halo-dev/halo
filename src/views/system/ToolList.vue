@@ -8,6 +8,7 @@
           :md="12"
           :sm="24"
           :xs="24"
+          :style="{ marginBottom: '12px' }"
         >
           <a-card
             :bordered="false"
@@ -30,6 +31,7 @@
           :md="12"
           :sm="24"
           :xs="24"
+          :style="{ marginBottom: '12px' }"
         >
           <a-card
             :bordered="false"
