@@ -178,22 +178,20 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public List<BackupDTO> listHaloBackups() {
-        try {
-            // Build backup dto
-            try (Stream<Path> subPathStream = Files.list(Paths.get(haloProperties.getBackupDir()))) {
-                return subPathStream
-                        .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                        .map(this::buildBackupDto)
-                        .sorted((leftBackup, rightBackup) -> {
-                            // Sort the result
-                            if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
-                                return 1;
-                            } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
-                                return -1;
-                            }
-                            return 0;
-                        }).collect(Collectors.toList());
-            }
+        // Build backup dto
+        try (Stream<Path> subPathStream = Files.list(Paths.get(haloProperties.getBackupDir()))) {
+            return subPathStream
+                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
+                    .map(this::buildBackupDto)
+                    .sorted((leftBackup, rightBackup) -> {
+                        // Sort the result
+                        if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
+                            return 1;
+                        } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
+                            return -1;
+                        }
+                        return 0;
+                    }).collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
