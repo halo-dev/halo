@@ -75,29 +75,6 @@
                 slot-scope="item, index"
                 :key="index"
               >
-                <!-- 日志图片集合 -->
-                <!-- <a-card
-                  hoverable
-                  v-for="(photo, photoIndex) in item.photos"
-                  :key="photoIndex"
-                  class="photo-card"
-                  @click="handlerPhotoPreview(photo)"
-                >
-                  <img alt="example" :src="photo.thumbnail" slot="cover">
-                </a-card> -->
-
-                <!-- <a-modal
-                  :visible="previewVisible"
-                  :footer="null"
-                  @cancel="handleCancelPreview"
-                >
-                  <img
-                    :alt="previewPhoto.name + previewPhoto.description"
-                    style="width: 100%"
-                    :src="previewPhoto.url"
-                  >
-                </a-modal> -->
-
                 <template slot="actions">
                   <span>
                     <a href="javascript:void(0);">
@@ -127,9 +104,6 @@
                       <a-icon type="unlock" />
                     </a>
                   </span>
-                  <!-- <span>
-                    From 微信
-                  </span>-->
                 </template>
                 <template slot="extra">
                   <a
@@ -207,24 +181,6 @@
             defaultChecked
           />
         </a-form-item>
-        <!-- <a-form-item v-show="showMoreOptions">
-          <UploadPhoto
-            @success="handlerPhotoUploadSuccess"
-            :photoList="photoList"
-            :plusPhotoVisible="plusPhotoVisible"
-          ></UploadPhoto>
-        </a-form-item>
-        <a-form-item>
-          <a
-            href="javascript:;"
-            class="more-options-btn"
-            type="default"
-            @click="handleUploadPhotoWallClick"
-          >
-            更多选项
-            <a-icon type="down"/>
-          </a>
-        </a-form-item> -->
       </a-form>
     </a-modal>
 
@@ -298,23 +254,12 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import journalApi from '@/api/journal'
 import journalCommentApi from '@/api/journalComment'
-import UploadPhoto from '@/components/Upload/UploadPhoto.vue'
 export default {
   mixins: [mixin, mixinDevice],
-  components: { JournalCommentTree, UploadPhoto },
+  components: { JournalCommentTree },
   data() {
     return {
       journalType: journalApi.journalType,
-      // plusPhotoVisible: true,
-      // photoList: [], // 编辑图片时回显所需对象
-      // previewVisible: false,
-      showMoreOptions: false,
-      // previewPhoto: {
-      //   // 图片预览信息临时对象
-      //   name: '',
-      //   description: '',
-      //   url: ''
-      // },
       title: '发表',
       listLoading: false,
       visible: false,
@@ -336,7 +281,6 @@ export default {
       comments: [],
       journal: {},
       isPublic: true,
-      journalPhotos: [], // 日志图片集合最多九张
       selectComment: null,
       replyComment: {}
     }
@@ -348,30 +292,6 @@ export default {
     ...mapGetters(['user'])
   },
   methods: {
-    // handleCancelPreview() {
-    //   this.previewVisible = false
-    // },
-    // handlerPhotoPreview(photo) {
-    //   // 日志图片预览
-    //   this.previewVisible = true
-    //   this.previewPhoto = photo
-    // },
-    // handlerPhotoUploadSuccess(response, file) {
-    //   var callData = response.data.data
-    //   var photo = {
-    //     name: callData.name,
-    //     url: callData.path,
-    //     thumbnail: callData.thumbPath,
-    //     suffix: callData.suffix,
-    //     width: callData.width,
-    //     height: callData.height
-    //   }
-    //   this.journalPhotos.push(photo)
-    // },
-    // handleUploadPhotoWallClick() {
-    //   // 是否显示上传照片墙组件
-    //   this.showMoreOptions = !this.showMoreOptions
-    // },
     loadJournals(isSearch) {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -390,19 +310,12 @@ export default {
       this.title = '新建'
       this.visible = true
       this.journal = {}
-
-      // 显示图片上传框
-      // this.plusPhotoVisible = true
-      // this.photoList = []
     },
     handleEdit(item) {
       this.title = '编辑'
       this.journal = item
       this.isPublic = item.type !== 'INTIMATE'
       this.visible = true
-      // 为编辑时需要回显图片数组赋值,并隐藏图片上传框
-      // this.plusPhotoVisible = false
-      // this.photoList = item.photos
     },
     handleDelete(id) {
       journalApi.delete(id).then(response => {
@@ -439,8 +352,6 @@ export default {
       })
     },
     createOrUpdateJournal() {
-      // 给属性填充数据
-      // this.journal.photos = this.journalPhotos
       this.journal.type = this.isPublic ? 'PUBLIC' : 'INTIMATE'
 
       if (!this.journal.content) {
@@ -461,7 +372,6 @@ export default {
         journalApi.create(this.journal).then(response => {
           this.$message.success('发表成功！')
           this.loadJournals()
-          // this.photoList = []
           this.isPublic = true
         })
       }
@@ -481,15 +391,3 @@ export default {
   }
 }
 </script>
-<style scoped="scoped">
-/* .more-options-btn {
-  margin-left: 15px;
-  text-decoration: none;
-}
-
-.photo-card {
-  width: 104px;
-  display: inline-block;
-  margin-right: 5px;
-} */
-</style>

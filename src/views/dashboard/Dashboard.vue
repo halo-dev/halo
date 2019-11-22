@@ -51,9 +51,6 @@
         :xs="12"
         :style="{ marginBottom: '12px' }"
       >
-        <!-- <analysis-card :loading="countsLoading" title="总访问" :number="countsData.visitCount">
-          <a-tooltip slot="action">
-        <template slot="title">文章总访问共 {{ countsData.visitCount }} 次</template>-->
         <analysis-card
           :loading="countsLoading"
           title="总访问"
@@ -68,10 +65,6 @@
                 :duration="3000"
               ></countTo>次
             </template>
-            <!-- <countTo :startVal="0" :endVal="countsData.visitCount" :duration="3000"></countTo> -->
-            <!-- <template>
-              <countTo :startVal="0" :endVal="countsData.visitCount" :duration="3000"></countTo>
-            </template>-->
             <a href="javascript:void(0);">
               <a-icon type="info-circle-o" />
             </a>
@@ -220,26 +213,11 @@
                 placeholder="写点什么吧..."
               />
             </a-form-item>
-
-            <!-- 日志图片上传 -->
-            <!-- <a-form-item v-show="showMoreOptions">
-              <UploadPhoto
-                @success="handlerPhotoUploadSuccess"
-                :photoList="photoList"
-              ></UploadPhoto>
-            </a-form-item> -->
-
             <a-form-item>
               <a-button
                 type="primary"
                 @click="handleCreateJournalClick"
               >保存</a-button>
-              <!-- <a
-                href="javascript:;"
-                class="more-options-btn"
-                type="default"
-                @click="handleUploadPhotoWallClick"
-              >更多选项<a-icon type="down" /></a> -->
             </a-form-item>
           </a-form>
         </a-card>
@@ -354,7 +332,6 @@ import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import RecentCommentTab from './components/RecentCommentTab'
 import countTo from 'vue-count-to'
-import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
 
 import postApi from '@/api/post'
 import logApi from '@/api/log'
@@ -367,12 +344,10 @@ export default {
     PageView,
     AnalysisCard,
     RecentCommentTab,
-    countTo,
-    UploadPhoto
+    countTo
   },
   data() {
     return {
-      photoList: [],
       // showMoreOptions: false,
       startVal: 0,
       logType: logApi.logType,
@@ -389,7 +364,6 @@ export default {
         content: '',
         photos: []
       },
-      journalPhotos: [], // 日志图片集合最多九张
       logs: [],
       logPagination: {
         page: 1,
@@ -450,18 +424,6 @@ export default {
     next()
   },
   methods: {
-    // handlerPhotoUploadSuccess(response, file) {
-    //   var callData = response.data.data
-    //   var photo = {
-    //     name: callData.name,
-    //     url: callData.path,
-    //     thumbnail: callData.thumbPath,
-    //     suffix: callData.suffix,
-    //     width: callData.width,
-    //     height: callData.height
-    //   }
-    //   this.journalPhotos.push(photo)
-    // },
     listLatestPosts() {
       postApi.listLatest(5).then(response => {
         this.postData = response.data.data
@@ -485,8 +447,6 @@ export default {
       this.$router.push({ name: 'PostEdit', query: { postId: post.id } })
     },
     handleCreateJournalClick() {
-      // 给属性填充数据
-      // this.journal.photos = this.journalPhotos
       if (!this.journal.content) {
         this.$notification['error']({
           message: '提示',
@@ -497,14 +457,8 @@ export default {
       journalApi.create(this.journal).then(response => {
         this.$message.success('发表成功！')
         this.journal = {}
-        // this.photoList = []
-        // this.showMoreOptions = false
       })
     },
-    // handleUploadPhotoWallClick() {
-    //   // 是否显示上传照片墙组件
-    //   this.showMoreOptions = !this.showMoreOptions
-    // },
     handleShowLogDrawer() {
       this.logDrawerVisible = true
       this.loadLogs()
@@ -541,13 +495,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-/* .more-options-btn {
-  margin-left: 15px;
-  text-decoration: none;
-}
-a {
-  text-decoration: none;
-} */
-</style>
