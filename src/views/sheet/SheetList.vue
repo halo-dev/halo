@@ -161,7 +161,7 @@
                       <a-icon type="eye" />
                       {{ item.visits }}
                     </span>
-                    <span>
+                    <span @click="handleShowSheetComments(item)">
                       <a-icon type="message" />
                       {{ item.commentCount }}
                     </span>
@@ -358,10 +358,12 @@
 
                 <span
                   slot="commentCount"
-                  slot-scope="commentCount"
+                  slot-scope="text,record"
+                  @click="handleShowSheetComments(record)"
+                  style="cursor: pointer;"
                 >
                   <a-badge
-                    :count="commentCount"
+                    :count="record.commentCount"
                     :numberStyle="{backgroundColor: '#f38181'} "
                     :showZero="true"
                     :overflowCount="999"
@@ -474,6 +476,14 @@
       @onRefreshSheet="onRefreshSheetFromSetting"
     />
 
+    <TargetCommentDrawer
+      :visible="sheetCommentVisible"
+      :title="selectedSheet.title"
+      :description="selectedSheet.summary"
+      :target="`sheets`"
+      :id="selectedSheet.id"
+      @close="onSheetCommentsClose"
+    />
   </div>
 </template>
 
@@ -481,6 +491,7 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
+import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import sheetApi from '@/api/sheet'
 import menuApi from '@/api/menu'
 
@@ -541,7 +552,8 @@ const customColumns = [
 export default {
   mixins: [mixin, mixinDevice],
   components: {
-    SheetSettingDrawer
+    SheetSettingDrawer,
+    TargetCommentDrawer
   },
   data() {
     return {
@@ -551,9 +563,11 @@ export default {
       customColumns,
       selectedSheet: {},
       sheetSettingVisible: false,
+      sheetCommentVisible: false,
       internalSheets: [],
       sheets: [],
-      menu: {}
+      menu: {},
+      sheetComments: []
     }
   },
   computed: {
@@ -622,6 +636,12 @@ export default {
         this.sheetSettingVisible = true
       })
     },
+    handleShowSheetComments(sheet) {
+      sheetApi.get(sheet.id).then(response => {
+        this.selectedSheet = response.data.data
+        this.sheetCommentVisible = true
+      })
+    },
     handlePreview(sheetId) {
       sheetApi.preview(sheetId).then(response => {
         window.open(response.data, '_blank')
@@ -629,6 +649,13 @@ export default {
     },
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
+      this.selectedSheet = {}
+      setTimeout(() => {
+        this.loadSheets()
+      }, 500)
+    },
+    onSheetCommentsClose() {
+      this.sheetCommentVisible = false
       this.selectedSheet = {}
       setTimeout(() => {
         this.loadSheets()
