@@ -80,7 +80,7 @@ public class SwaggerConfiguration {
             log.debug("Doc has been disabled");
         }
 
-        return buildApiDocket("run.halo.app.admin",
+        return buildApiDocket("run.halo.app.admin.api",
                 "run.halo.app.controller.admin",
                 "/api/admin/**")
                 .securitySchemes(adminApiKeys())
@@ -171,7 +171,9 @@ public class SwaggerConfiguration {
                 .description("Documentation for Halo API")
                 .version(HALO_VERSION)
                 .termsOfServiceUrl("https://github.com/halo-dev")
-                .contact(new Contact("RYAN0UP", "https://ryanc.cc/", "i#ryanc.cc"))
+                .contact(new Contact("halo-dev", "https://github.com/halo-dev/halo/issues", "i#ryanc.cc"))
+                .license("GNU General Public License v3.0")
+                .licenseUrl("https://github.com/halo-dev/halo/blob/master/LICENSE")
                 .build();
     }
 
