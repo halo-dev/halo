@@ -27,7 +27,7 @@
       </a-col>
     </a-row>
 
-    <PostSetting
+    <PostSettingDrawer
       :post="postToStage"
       :tagIds="selectedTagIds"
       :categoryIds="selectedCategoryIds"
@@ -67,7 +67,7 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import moment from 'moment'
-import PostSetting from './components/PostSetting'
+import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { toolbars } from '@/core/const'
@@ -79,7 +79,7 @@ import attachmentApi from '@/api/attachment'
 export default {
   mixins: [mixin, mixinDevice],
   components: {
-    PostSetting,
+    PostSettingDrawer,
     haloEditor,
     FooterToolBar,
     AttachmentDrawer

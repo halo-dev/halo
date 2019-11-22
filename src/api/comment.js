@@ -23,6 +23,14 @@ commentApi.queryComment = (target, params) => {
   })
 }
 
+commentApi.commentTree = (target, id, params) => {
+  return service({
+    url: `${baseUrl}/${target}/comments/${id}/tree_view`,
+    params: params,
+    method: 'get'
+  })
+}
+
 commentApi.updateStatus = (target, commentId, status) => {
   return service({
     url: `${baseUrl}/${target}/comments/${commentId}/status/${status}`,

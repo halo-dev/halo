@@ -202,7 +202,7 @@ import { mapGetters } from 'vuex'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 export default {
-  name: 'PostSetting',
+  name: 'PostSettingDrawer',
   mixins: [mixin, mixinDevice],
   components: {
     CategoryTree,

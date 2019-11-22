@@ -466,7 +466,7 @@
       </a-col>
     </a-row>
 
-    <SheetSetting
+    <SheetSettingDrawer
       :sheet="selectedSheet"
       :visible="sheetSettingVisible"
       :needTitle="true"
@@ -480,7 +480,7 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
-import SheetSetting from './components/SheetSetting'
+import SheetSettingDrawer from './components/SheetSettingDrawer'
 import sheetApi from '@/api/sheet'
 import menuApi from '@/api/menu'
 
@@ -541,7 +541,7 @@ const customColumns = [
 export default {
   mixins: [mixin, mixinDevice],
   components: {
-    SheetSetting
+    SheetSettingDrawer
   },
   data() {
     return {

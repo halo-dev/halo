@@ -26,7 +26,7 @@
       </a-col>
     </a-row>
 
-    <SheetSetting
+    <SheetSettingDrawer
       :sheet="sheetToStage"
       :visible="sheetSettingVisible"
       @close="onSheetSettingsClose"
@@ -62,7 +62,7 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import moment from 'moment'
 import { toolbars } from '@/core/const'
-import SheetSetting from './components/SheetSetting'
+import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import { haloEditor } from 'halo-editor'
@@ -74,7 +74,7 @@ export default {
     haloEditor,
     FooterToolBar,
     AttachmentDrawer,
-    SheetSetting
+    SheetSettingDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {

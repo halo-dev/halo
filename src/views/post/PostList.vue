@@ -140,7 +140,7 @@
                 <a-icon type="eye" />
                 {{ item.visits }}
               </span>
-              <span>
+              <span @click="handleShowPostComments(item)">
                 <a-icon type="message" />
                 {{ item.commentCount }}
               </span>
@@ -390,10 +390,12 @@
 
           <span
             slot="commentCount"
-            slot-scope="commentCount"
+            slot-scope="text,record"
+            @click="handleShowPostComments(record)"
+            style="cursor: pointer;"
           >
             <a-badge
-              :count="commentCount"
+              :count="record.commentCount"
               :numberStyle="{backgroundColor: '#f38181'} "
               :showZero="true"
               :overflowCount="999"
@@ -486,7 +488,7 @@
       </div>
     </a-card>
 
-    <PostSetting
+    <PostSettingDrawer
       :post="selectedPost"
       :tagIds="selectedTagIds"
       :categoryIds="selectedCategoryIds"
@@ -500,12 +502,22 @@
       @onRefreshTagIds="onRefreshTagIdsFromSetting"
       @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
     />
+
+    <TargetCommentDrawer
+      :visible="postCommentVisible"
+      :title="selectedPost.title"
+      :description="selectedPost.summary"
+      :target="`posts`"
+      :id="selectedPost.id"
+      @close="onPostCommentsClose"
+    />
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import PostSetting from './components/PostSetting'
+import PostSettingDrawer from './components/PostSettingDrawer'
+import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import TagSelect from './components/TagSelect'
 import CategoryTree from './components/CategoryTree'
@@ -566,7 +578,8 @@ export default {
     AttachmentSelectDrawer,
     TagSelect,
     CategoryTree,
-    PostSetting
+    PostSettingDrawer,
+    TargetCommentDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -593,9 +606,11 @@ export default {
       posts: [],
       postsLoading: false,
       postSettingVisible: false,
+      postCommentVisible: false,
       selectedPost: {},
       selectedTagIds: [],
-      selectedCategoryIds: []
+      selectedCategoryIds: [],
+      postComments: []
     }
   },
   computed: {
@@ -734,6 +749,12 @@ export default {
         this.postSettingVisible = true
       })
     },
+    handleShowPostComments(post) {
+      postApi.get(post.id).then(response => {
+        this.selectedPost = response.data.data
+        this.postCommentVisible = true
+      })
+    },
     handlePreview(postId) {
       postApi.preview(postId).then(response => {
         window.open(response.data, '_blank')
@@ -742,6 +763,13 @@ export default {
     // 关闭文章设置抽屉
     onPostSettingsClose() {
       this.postSettingVisible = false
+      this.selectedPost = {}
+      setTimeout(() => {
+        this.loadPosts()
+      }, 500)
+    },
+    onPostCommentsClose() {
+      this.postCommentVisible = false
       this.selectedPost = {}
       setTimeout(() => {
         this.loadPosts()
