@@ -85,7 +85,7 @@
                   <span>
                     <a
                       href="javascript:void(0);"
-                      @click="handleCommentShow(item)"
+                      @click="handleShowJournalComments(item)"
                     >
                       <a-icon type="message" />
                       {{ item.commentCount }}
@@ -207,63 +207,33 @@
         </a-form-item>
       </a-form>
     </a-modal>
-
-    <!-- 评论列表抽屉 -->
-    <a-drawer
-      title="评论列表"
-      :width="isMobile()?'100%':'460'"
-      closable
-      :visible="commentVisible"
-      destroyOnClose
-      @close="()=>this.commentVisible = false"
-    >
-      <a-row
-        type="flex"
-        align="middle"
-      >
-        <a-col :span="24">
-          <a-comment>
-            <a-avatar
-              :src="user.avatar"
-              :alt="user.nickname"
-              slot="avatar"
-            />
-            <p slot="content">{{ journal.content }}</p>
-
-            <span slot="datetime">{{ journal.createTime | moment }}</span>
-          </a-comment>
-        </a-col>
-        <a-divider />
-        <a-col :span="24">
-          <journal-comment-tree
-            v-for="(comment,index) in comments"
-            :key="index"
-            :comment="comment"
-            @reply="handleCommentReplyClick"
-            @delete="handleCommentDelete"
-          />
-        </a-col>
-      </a-row>
-    </a-drawer>
+    <TargetCommentDrawer
+      :visible="journalCommentVisible"
+      :title="journal.content"
+      :description="``"
+      :target="`journals`"
+      :id="journal.id"
+      @close="onJournalCommentsClose"
+    />
   </div>
 </template>
 
 <script>
-import JournalCommentTree from './components/JournalCommentTree'
+import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import journalApi from '@/api/journal'
 import journalCommentApi from '@/api/journalComment'
 export default {
   mixins: [mixin, mixinDevice],
-  components: { JournalCommentTree },
+  components: { TargetCommentDrawer },
   data() {
     return {
       journalType: journalApi.journalType,
       title: '发表',
       listLoading: false,
       visible: false,
-      commentVisible: false,
+      journalCommentVisible: false,
       selectCommentVisible: false,
       pagination: {
         page: 1,
@@ -323,12 +293,9 @@ export default {
         this.loadJournals()
       })
     },
-    handleCommentShow(journal) {
+    handleShowJournalComments(journal) {
       this.journal = journal
-      journalApi.commentTree(this.journal.id).then(response => {
-        this.comments = response.data.data.content
-        this.commentVisible = true
-      })
+      this.journalCommentVisible = true
     },
     handleCommentReplyClick(comment) {
       this.selectComment = comment
@@ -382,6 +349,10 @@ export default {
       this.pagination.page = page
       this.pagination.size = pageSize
       this.loadJournals()
+    },
+    onJournalCommentsClose() {
+      this.journal = {}
+      this.journalCommentVisible = false
     },
     resetParam() {
       this.queryParam.keyword = null
