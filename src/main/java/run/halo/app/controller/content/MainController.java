@@ -37,24 +37,23 @@ public class MainController {
         this.haloProperties = haloProperties;
     }
 
-    @GetMapping("/halo/{permlink}")
-    @Deprecated
+    @GetMapping("{permlink}")
     public String admin(@PathVariable(name = "permlink") String permlink) {
-        return "redirect:/halo/" + permlink + "/index.html";
+        return "redirect:/" + permlink + "/index.html";
     }
 
-    @GetMapping("/halo/version")
+    @GetMapping("version")
     @ResponseBody
     public String version() {
         return HaloConst.HALO_VERSION;
     }
 
-    @GetMapping("/install")
+    @GetMapping("install")
     public String installation() {
-        return "redirect:/halo" + haloProperties.getAdminPath() + "/index.html#install";
+        return "redirect:" + haloProperties.getAdminPath() + "/index.html#install";
     }
 
-    @GetMapping("/avatar")
+    @GetMapping("avatar")
     public void avatar(HttpServletResponse response) throws IOException {
         User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         if (StringUtils.isNotEmpty(user.getAvatar())) {
@@ -62,7 +61,7 @@ public class MainController {
         }
     }
 
-    @GetMapping("/logo")
+    @GetMapping("logo")
     public void logo(HttpServletResponse response) throws IOException {
         String blogLogo = optionService.getByProperty(BlogProperties.BLOG_LOGO).orElse("").toString();
         if (StringUtils.isNotEmpty(blogLogo)) {
@@ -70,7 +69,7 @@ public class MainController {
         }
     }
 
-    @GetMapping("/favicon.ico")
+    @GetMapping("favicon.ico")
     public void favicon(HttpServletResponse response) throws IOException {
         String favicon = optionService.getByProperty(BlogProperties.BLOG_FAVICON).orElse("").toString();
         if (StringUtils.isNotEmpty(favicon)) {
