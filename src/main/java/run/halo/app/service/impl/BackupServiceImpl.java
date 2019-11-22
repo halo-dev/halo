@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Backup service implementation.
@@ -177,9 +178,9 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public List<BackupDTO> listHaloBackups() {
-        try {
-            // Build backup dto
-            return Files.list(Paths.get(haloProperties.getBackupDir()))
+        // Build backup dto
+        try (Stream<Path> subPathStream = Files.list(Paths.get(haloProperties.getBackupDir()))) {
+            return subPathStream
                     .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
                     .map(this::buildBackupDto)
                     .sorted((leftBackup, rightBackup) -> {
