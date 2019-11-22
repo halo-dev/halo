@@ -2,15 +2,21 @@ package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.SheetCommentParam;
+import run.halo.app.model.vo.BaseCommentVO;
+import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.SheetCommentWithSheetVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 
 import javax.validation.Valid;
@@ -23,7 +29,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-25
+ * @date 2019-04-25
  */
 @RestController
 @RequestMapping("/api/admin/sheets/comments")
@@ -31,8 +37,12 @@ public class SheetCommentController {
 
     private final SheetCommentService sheetCommentService;
 
-    public SheetCommentController(SheetCommentService sheetCommentService) {
+    private final OptionService optionService;
+
+    public SheetCommentController(SheetCommentService sheetCommentService,
+                                  OptionService optionService) {
         this.sheetCommentService = sheetCommentService;
+        this.optionService = optionService;
     }
 
     @GetMapping
@@ -47,6 +57,22 @@ public class SheetCommentController {
                                                     @RequestParam(name = "status", required = false) CommentStatus status) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top, status);
         return sheetCommentService.convertToWithSheetVo(sheetCommentPage.getContent());
+    }
+
+    @GetMapping("{sheetId:\\d+}/tree_view")
+    @ApiOperation("Lists comments with tree view")
+    public Page<BaseCommentVO> listCommentTree(@PathVariable("sheetId") Integer sheetId,
+                                               @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        return sheetCommentService.pageVosBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+    }
+
+    @GetMapping("{sheetId:\\d+}/list_view")
+    @ApiOperation("Lists comment with list view")
+    public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
+                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        return sheetCommentService.pageWithParentVoBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @PostMapping
