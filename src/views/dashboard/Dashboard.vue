@@ -273,16 +273,16 @@
       destroyOnClose
       @close="()=>this.logDrawerVisible = false"
     >
-      <a-skeleton
-        active
-        :loading="logsLoading"
-        :paragraph="{rows: 18}"
+      <a-row
+        type="flex"
+        align="middle"
       >
-        <a-row
-          type="flex"
-          align="middle"
-        >
-          <a-col :span="24">
+        <a-col :span="24">
+          <a-skeleton
+            active
+            :loading="logsLoading"
+            :paragraph="{rows: 18}"
+          >
             <a-list :dataSource="formattedLogsDatas">
               <a-list-item
                 slot="renderItem"
@@ -294,22 +294,22 @@
                 </a-list-item-meta>
                 <div>{{ item.content }}</div>
               </a-list-item>
-
-              <div class="page-wrapper">
-                <a-pagination
-                  class="pagination"
-                  :total="logPagination.total"
-                  :defaultPageSize="logPagination.size"
-                  :pageSizeOptions="['50', '100','150','200']"
-                  showSizeChanger
-                  @showSizeChange="onPaginationChange"
-                  @change="onPaginationChange"
-                />
-              </div>
             </a-list>
-          </a-col>
-        </a-row>
-      </a-skeleton>
+          </a-skeleton>
+
+          <div class="page-wrapper">
+            <a-pagination
+              class="pagination"
+              :total="logPagination.total"
+              :defaultPageSize="50"
+              :pageSizeOptions="['50', '100','150','200']"
+              showSizeChanger
+              @showSizeChange="onPaginationChange"
+              @change="onPaginationChange"
+            />
+          </div>
+        </a-col>
+      </a-row>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-popconfirm
@@ -348,7 +348,6 @@ export default {
   },
   data() {
     return {
-      // showMoreOptions: false,
       startVal: 0,
       logType: logApi.logType,
       activityLoading: true,
@@ -366,9 +365,17 @@ export default {
       },
       logs: [],
       logPagination: {
-        page: 1,
-        size: 50,
+        current: 1,
+        pageSize: 50,
         sort: null
+      },
+      logQueryParam: {
+        page: 0,
+        size: 50,
+        sort: null,
+        keyword: null,
+        categoryId: null,
+        status: null
       },
       interval: null
     }
@@ -468,8 +475,10 @@ export default {
       setTimeout(() => {
         this.logsLoading = false
       }, 500)
-      this.logPagination.page = this.logPagination.page - 1
-      logApi.pageBy(this.logPagination).then(response => {
+      this.logQueryParam.page = this.logPagination.current - 1
+      this.logQueryParam.size = this.logPagination.pageSize
+      this.logQueryParam.sort = this.logPagination.sort
+      logApi.pageBy(this.logQueryParam).then(response => {
         this.logs = response.data.data.content
         this.logPagination.total = response.data.data.total
       })
@@ -488,8 +497,8 @@ export default {
     },
     onPaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.logPagination.page = page
-      this.logPagination.size = pageSize
+      this.logPagination.current = page
+      this.logPagination.pageSize = pageSize
       this.loadLogs()
     }
   }
