@@ -222,6 +222,8 @@ export default {
           this.$log.debug('Updated sheet', response.data.data)
           if (updateSuccess) {
             updateSuccess()
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'SheetList' })
           }
         })
       } else {
@@ -229,6 +231,8 @@ export default {
           this.$log.debug('Created sheet', response.data.data)
           if (createSuccess) {
             createSuccess()
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'SheetList' })
           }
           this.selectedSheet = response.data.data
         })

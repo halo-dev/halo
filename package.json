@@ -15,7 +15,7 @@
     "enquire.js": "^2.1.6",
     "filepond": "^4.7.2",
     "filepond-plugin-image-preview": "^4.5.0",
-    "halo-editor": "^2.7.8",
+    "halo-editor": "^2.7.6",
     "marked": "^0.7.0",
     "moment": "^2.24.0",
     "nprogress": "^0.2.0",

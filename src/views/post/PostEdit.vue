@@ -5,7 +5,6 @@
         <div style="margin-bottom: 16px">
           <a-input
             v-model="postToStage.title"
-            v-decorator="['title', { rules: [{ required: true, message: '请输入文章标题' }] }]"
             size="large"
             placeholder="请输入文章标题"
           />
@@ -36,6 +35,7 @@
       @onRefreshPost="onRefreshPostFromSetting"
       @onRefreshTagIds="onRefreshTagIdsFromSetting"
       @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
+      @onSaved="onSaved"
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
@@ -91,7 +91,8 @@ export default {
       postSettingVisible: false,
       postToStage: {},
       selectedTagIds: [],
-      selectedCategoryIds: []
+      selectedCategoryIds: [],
+      isSaved: false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -115,7 +116,9 @@ export default {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
-    window.onbeforeunload = null
+    if (window.onbeforeunload) {
+      window.onbeforeunload = null
+    }
   },
   beforeRouteLeave(to, from, next) {
     if (this.postSettingVisible) {
@@ -124,24 +127,31 @@ export default {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
-    if (this.postToStage.originalContent) {
-      const answer = window.confirm('当前文章数据未保存，确定要离开吗？')
-      if (answer) {
-        next()
-      } else {
-        next(false)
-      }
-    } else {
+
+    if (!this.postToStage.originalContent) {
       next()
+    } else if (this.isSaved) {
+      next()
+    } else {
+      this.$confirm({
+        title: '当前页面数据未保存，确定要离开吗？',
+        content: h => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
+        onOk() {
+          next()
+        },
+        onCancel() {
+          next(false)
+        }
+      })
     }
   },
   mounted() {
     window.onbeforeunload = function(e) {
       e = e || window.event
       if (e) {
-        e.returnValue = '当前文章数据未保存，确定要离开吗？'
+        e.returnValue = '当前页面数据未保存，确定要离开吗？'
       }
-      return '当前文章数据未保存，确定要离开吗？'
+      return '当前页面数据未保存，确定要离开吗？'
     }
   },
   computed: {
@@ -228,6 +238,9 @@ export default {
     },
     onRefreshCategoryIdsFromSetting(categoryIds) {
       this.selectedCategoryIds = categoryIds
+    },
+    onSaved(isSaved) {
+      this.isSaved = isSaved
     }
   }
 }

@@ -5,7 +5,6 @@
         <div style="margin-bottom: 16px">
           <a-input
             v-model="sheetToStage.title"
-            v-decorator="['title', { rules: [{ required: true, message: '请输入页面标题' }] }]"
             size="large"
             placeholder="请输入页面标题"
           />
@@ -31,6 +30,7 @@
       :visible="sheetSettingVisible"
       @close="onSheetSettingsClose"
       @onRefreshSheet="onRefreshSheetFromSetting"
+      @onSaved="onSaved"
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
@@ -82,7 +82,8 @@ export default {
       toolbars,
       attachmentDrawerVisible: false,
       sheetSettingVisible: false,
-      sheetToStage: {}
+      sheetToStage: {},
+      isSaved: false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -105,7 +106,9 @@ export default {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
-    window.onbeforeunload = null
+    if (window.onbeforeunload) {
+      window.onbeforeunload = null
+    }
   },
   beforeRouteLeave(to, from, next) {
     if (this.sheetSettingVisible) {
@@ -114,15 +117,21 @@ export default {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
-    if (this.sheetToStage.originalContent) {
-      const answer = window.confirm('当前页面数据未保存，确定要离开吗？')
-      if (answer) {
-        next()
-      } else {
-        next(false)
-      }
-    } else {
+    if (!this.sheetToStage.originalContent) {
       next()
+    } else if (this.isSaved) {
+      next()
+    } else {
+      this.$confirm({
+        title: '当前页面数据未保存，确定要离开吗？',
+        content: h => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
+        onOk() {
+          next()
+        },
+        onCancel() {
+          next(false)
+        }
+      })
     }
   },
   mounted() {
@@ -207,6 +216,9 @@ export default {
     },
     onRefreshSheetFromSetting(sheet) {
       this.sheetToStage = sheet
+    },
+    onSaved(isSaved) {
+      this.isSaved = isSaved
     }
   }
 }

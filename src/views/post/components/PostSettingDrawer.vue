@@ -377,6 +377,7 @@ export default {
           this.$log.debug('Updated post', response.data.data)
           if (updateSuccess) {
             updateSuccess()
+            this.$emit('onSaved', true)
             this.$router.push({ name: 'PostList' })
           }
         })
@@ -386,6 +387,7 @@ export default {
           this.$log.debug('Created post', response.data.data)
           if (createSuccess) {
             createSuccess()
+            this.$emit('onSaved', true)
             this.$router.push({ name: 'PostList' })
           }
           this.selectedPost = response.data.data
