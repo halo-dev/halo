@@ -41,6 +41,11 @@ spring:
       max-request-size: 10MB
   cache:
     type: none
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ['httptrace', 'metrics','env']
 logging:
   level:
     run.halo.app: DEBUG
