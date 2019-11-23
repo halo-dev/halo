@@ -3,6 +3,30 @@
     <div class="card-content">
       <a-row :gutter="12">
         <a-col
+          v-if="options.developer_mode"
+          :xl="6"
+          :lg="6"
+          :md="12"
+          :sm="24"
+          :xs="24"
+          :style="{ marginBottom: '12px' }"
+        >
+          <a-card
+            :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
+          >
+            <div slot="title">
+              <a-icon type="experiment" /> 开发者选项
+            </div>
+            <p>点击进入开发者选项页面</p>
+            <a-button
+              type="primary"
+              style="float:right"
+              @click="handleToDeveloperOptions()"
+            >进入</a-button>
+          </a-card>
+        </a-col>
+        <a-col
           :xl="6"
           :lg="6"
           :md="12"
@@ -70,6 +94,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import backupApi from '@/api/backup'
 import BackupDrawer from './components/BackupDrawer'
 
@@ -81,6 +106,9 @@ export default {
       markdownUpload: false,
       uploadHandler: backupApi.importMarkdown
     }
+  },
+  computed: {
+    ...mapGetters(['options'])
   },
   methods: {
     handleImportMarkdown() {
@@ -96,6 +124,9 @@ export default {
       } else if (status === 'error') {
         this.$message.error(`${info.file.name} 导入失败！`)
       }
+    },
+    handleToDeveloperOptions() {
+      this.$router.push({ name: 'DeveloperOptions' })
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()

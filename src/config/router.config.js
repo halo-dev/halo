@@ -167,6 +167,13 @@ export const asyncRouterMap = [
         meta: { title: '系统', icon: 'setting' },
         children: [
           {
+            path: '/system/developer/options',
+            name: 'DeveloperOptions',
+            hidden: true,
+            component: () => import('@/views/system/developer/DeveloperOptions'),
+            meta: { title: '开发者选项', hiddenHeaderContent: false }
+          },
+          {
             path: '/system/options',
             name: 'OptionForm',
             component: () => import('@/views/system/OptionForm'),
@@ -195,10 +202,6 @@ export const asyncRouterMap = [
   }
 ]
 
-/**
- * 基础路由
- * @type { *[] }
- */
 export const constantRouterMap = [
   {
     path: '/login',
