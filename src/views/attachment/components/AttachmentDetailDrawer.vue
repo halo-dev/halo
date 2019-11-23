@@ -212,9 +212,6 @@ export default {
       default: true
     }
   },
-  created() {
-    this.loadSkeleton()
-  },
   mounted() {
     this.player = this.$refs.player
   },

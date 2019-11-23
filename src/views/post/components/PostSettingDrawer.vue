@@ -31,7 +31,10 @@
                 <a-input v-model="selectedPost.url" />
               </a-form-item>
               <a-form-item label="访问密码：">
-                <a-input-password v-model="selectedPost.password" autocomplete="new-password"/>
+                <a-input-password
+                  v-model="selectedPost.password"
+                  autocomplete="new-password"
+                />
               </a-form-item>
 
               <a-form-item label="发表时间：">
@@ -261,10 +264,6 @@ export default {
       default: false
     }
   },
-  created() {
-    this.loadSkeleton()
-    this.loadCategories()
-  },
   watch: {
     post(val) {
       this.selectedPost = val
@@ -287,6 +286,7 @@ export default {
     visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
+        this.loadCategories()
       }
     }
   },

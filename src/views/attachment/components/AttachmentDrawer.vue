@@ -30,7 +30,7 @@
           :paragraph="{ rows: 18 }"
         >
           <a-col :span="24">
-            <a-empty v-if="formattedDatas.length==0"/>
+            <a-empty v-if="formattedDatas.length==0" />
             <div
               v-else
               class="attach-item"
@@ -139,14 +139,11 @@ export default {
       })
     }
   },
-  created() {
-    this.loadSkeleton()
-    this.loadAttachments()
-  },
   watch: {
     visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
+        this.loadAttachments()
       }
     }
   },

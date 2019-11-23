@@ -163,9 +163,6 @@ export default {
       }
     }
   },
-  created() {
-    this.loadSkeleton()
-  },
   computed: {
     ...mapGetters(['options'])
   },
