@@ -462,6 +462,16 @@
                   </a-dropdown>
                 </span>
               </a-table>
+              <div class="page-wrapper">
+                <a-pagination
+                  class="pagination"
+                  :total="pagination.total"
+                  :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
+                  showSizeChanger
+                  @showSizeChange="handlePaginationChange"
+                  @change="handlePaginationChange"
+                />
+              </div>
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -557,6 +567,19 @@ export default {
   },
   data() {
     return {
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        sort: null
+      },
+      queryParam: {
+        page: 0,
+        size: 10,
+        sort: null,
+        keyword: null,
+        categoryId: null,
+        status: null
+      },
       sheetsLoading: false,
       sheetStatus: sheetApi.sheetStatus,
       internalColumns,
@@ -597,8 +620,12 @@ export default {
   methods: {
     loadSheets() {
       this.sheetsLoading = true
-      sheetApi.list().then(response => {
+      this.queryParam.page = this.pagination.current - 1
+      this.queryParam.size = this.pagination.pageSize
+      this.queryParam.sort = this.pagination.sort
+      sheetApi.list(this.queryParam).then(response => {
         this.sheets = response.data.data.content
+        this.pagination.total = response.data.data.total
         this.sheetsLoading = false
       })
     },
@@ -646,6 +673,12 @@ export default {
       sheetApi.preview(sheetId).then(response => {
         window.open(response.data, '_blank')
       })
+    },
+    handlePaginationChange(page, pageSize) {
+      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
+      this.pagination.current = page
+      this.pagination.pageSize = pageSize
+      this.loadSheets()
     },
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
