@@ -144,8 +144,12 @@ export default {
       default: true
     }
   },
-  created() {
-    this.getBackups()
+  watch: {
+    visible: function(newValue, oldValue) {
+      if (newValue) {
+        this.getBackups()
+      }
+    }
   },
   methods: {
     getBackups() {
