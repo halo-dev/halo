@@ -45,6 +45,7 @@ spring:
 management:
   endpoints:
     web:
+      base-path: /api/admin/actuator
       exposure:
         include: ['httptrace', 'metrics','env']
 logging:

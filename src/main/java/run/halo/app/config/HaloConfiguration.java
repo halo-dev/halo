@@ -164,7 +164,7 @@ public class HaloConfiguration {
 
         FilterRegistrationBean<AdminAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(adminAuthenticationFilter);
-        authenticationFilter.addUrlPatterns("/api/admin/*", "/actuator/*", "/api/content/comments");
+        authenticationFilter.addUrlPatterns("/api/admin/*", "/api/content/comments");
         authenticationFilter.setOrder(1);
 
         return authenticationFilter;
