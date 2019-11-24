@@ -2,22 +2,55 @@
   <div class="page-header-index-wide">
     <a-row>
       <a-col :span="24">
-        <div class="card-container">
+        <div
+          class="card-container"
+          v-if="options.developer_mode"
+        >
           <a-tabs type="card">
-            <a-tab-pane key="general">
+            <a-tab-pane key="environment">
               <span slot="tab">
-                <a-icon type="tool" />请求追踪
+                <a-icon type="safety" />运行环境
               </span>
-              请求追踪
+              <Environment />
+            </a-tab-pane>
+            <a-tab-pane key="runtimelogs">
+              <span slot="tab">
+                <a-icon type="code" />实时日志
+              </span>
+              <RuntimeLogs />
+            </a-tab-pane>
+            <a-tab-pane key="settings">
+              <span slot="tab">
+                <a-icon type="setting" />设置
+              </span>
+              <SettingsForm />
             </a-tab-pane>
           </a-tabs>
         </div>
+        <a-alert
+          v-else
+          message="提示"
+          description="当前没有启用开发者选项，请启用之后再访问该页面！"
+          type="error"
+          showIcon
+        />
       </a-col>
     </a-row>
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
+import Environment from './tabs/Environment'
+import RuntimeLogs from './tabs/RuntimeLogs'
+import SettingsForm from './tabs/SettingsForm'
 export default {
-
+  components: {
+    Environment,
+    RuntimeLogs,
+    SettingsForm
+  },
+  computed: {
+    ...mapGetters(['options'])
+  }
 }
 </script>

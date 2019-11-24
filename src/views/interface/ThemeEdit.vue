@@ -14,7 +14,7 @@
             <a-form-item>
               <codemirror
                 v-model="content"
-                :options="options"
+                :options="codemirrorOptions"
               ></codemirror>
             </a-form-item>
             <a-form-item>
@@ -78,7 +78,7 @@ export default {
   data() {
     return {
       buttonDisabled: true,
-      options: {
+      codemirrorOptions: {
         tabSize: 4,
         mode: 'text/html',
         lineNumbers: true,
