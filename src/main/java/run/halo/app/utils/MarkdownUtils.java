@@ -35,6 +35,8 @@ import java.util.Map;
  */
 public class MarkdownUtils {
 
+    private static final int TOO_LEVELS = 255;
+
     private static final DataHolder OPTIONS = new MutableDataSet()
             .set(Parser.EXTENSIONS, Arrays.asList(
                     AttributesExtension.create(),
@@ -49,6 +51,8 @@ public class MarkdownUtils {
                     TocExtension.create(),
                     YamlFrontMatterExtension.create())
             )
+            // set toc levels
+            .set(TocExtension.LEVELS, TOO_LEVELS)
             .set(TablesExtension.WITH_CAPTION, false)
             .set(TablesExtension.COLUMN_SPANS, false)
             .set(TablesExtension.MIN_HEADER_ROWS, 1)
