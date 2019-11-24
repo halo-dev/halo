@@ -36,8 +36,9 @@
     <a-divider />
     <div class="page-wrapper">
       <a-pagination
-        :defaultPageSize="pagination.size"
+        :current="pagination.page"
         :total="pagination.total"
+        :defaultPageSize="pagination.size"
         @change="handlePaginationChange"
       ></a-pagination>
     </div>

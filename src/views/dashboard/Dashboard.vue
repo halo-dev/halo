@@ -300,12 +300,13 @@
           <div class="page-wrapper">
             <a-pagination
               class="pagination"
+              :current="logPagination.page"
               :total="logPagination.total"
-              :defaultPageSize="50"
+              :defaultPageSize="logPagination.size"
               :pageSizeOptions="['50', '100','150','200']"
               showSizeChanger
-              @showSizeChange="onPaginationChange"
-              @change="onPaginationChange"
+              @showSizeChange="handlePaginationChange"
+              @change="handlePaginationChange"
             />
           </div>
         </a-col>
@@ -365,17 +366,14 @@ export default {
       },
       logs: [],
       logPagination: {
-        current: 1,
-        pageSize: 50,
+        page: 1,
+        size: 50,
         sort: null
       },
       logQueryParam: {
         page: 0,
         size: 50,
-        sort: null,
-        keyword: null,
-        categoryId: null,
-        status: null
+        sort: null
       },
       interval: null
     }
@@ -475,8 +473,8 @@ export default {
       setTimeout(() => {
         this.logsLoading = false
       }, 500)
-      this.logQueryParam.page = this.logPagination.current - 1
-      this.logQueryParam.size = this.logPagination.pageSize
+      this.logQueryParam.page = this.logPagination.page - 1
+      this.logQueryParam.size = this.logPagination.size
       this.logQueryParam.sort = this.logPagination.sort
       logApi.pageBy(this.logQueryParam).then(response => {
         this.logs = response.data.data.content
@@ -495,10 +493,10 @@ export default {
         window.open(response.data, '_blank')
       })
     },
-    onPaginationChange(page, pageSize) {
+    handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.logPagination.current = page
-      this.logPagination.pageSize = pageSize
+      this.logPagination.page = page
+      this.logPagination.size = pageSize
       this.loadLogs()
     }
   }

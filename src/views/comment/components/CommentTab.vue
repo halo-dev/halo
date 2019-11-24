@@ -23,7 +23,7 @@
                 <a-select
                   v-model="queryParam.status"
                   placeholder="请选择评论状态"
-                  @change="handleQuery"
+                  @change="handleQuery()"
                 >
                   <a-select-option
                     v-for="status in Object.keys(commentStatus)"
@@ -41,11 +41,11 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
-                  @click="handleQuery"
+                  @click="handleQuery()"
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
-                  @click="handleResetParam"
+                  @click="handleResetParam()"
                 >重置</a-button>
               </span>
             </a-col>
@@ -377,7 +377,9 @@
         <div class="page-wrapper">
           <a-pagination
             class="pagination"
+            :current="pagination.page"
             :total="pagination.total"
+            :defaultPageSize="pagination.size"
             :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
             showSizeChanger
             @showSizeChange="handlePaginationChange"
@@ -522,8 +524,8 @@ export default {
       columns: this.type === 'posts' ? postColumns : sheetColumns,
       replyCommentVisible: false,
       pagination: {
-        current: 1,
-        pageSize: 10,
+        page: 1,
+        size: 10,
         sort: null
       },
       queryParam: {
@@ -559,8 +561,8 @@ export default {
   methods: {
     loadComments() {
       this.loading = true
-      this.queryParam.page = this.pagination.current - 1
-      this.queryParam.size = this.pagination.pageSize
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
       commentApi.queryComment(this.type, this.queryParam).then(response => {
         this.comments = response.data.data.content
@@ -569,9 +571,7 @@ export default {
       })
     },
     handleQuery() {
-      this.queryParam.page = 0
-      this.pagination.current = 1
-      this.loadComments()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleEditStatusClick(commentId, status) {
       commentApi.updateStatus(this.type, commentId, status).then(response => {
@@ -617,14 +617,14 @@ export default {
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.pagination.current = page
-      this.pagination.pageSize = pageSize
+      this.pagination.page = page
+      this.pagination.size = pageSize
       this.loadComments()
     },
     handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.status = null
-      this.loadComments()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handlePublishMore() {
       if (this.selectedRowKeys.length <= 0) {

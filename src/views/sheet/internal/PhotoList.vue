@@ -31,7 +31,7 @@
                   <a-form-item label="分组">
                     <a-select
                       v-model="queryParam.team"
-                      @change="loadPhotos(true)"
+                      @change="handleQuery()"
                     >
                       <a-select-option
                         v-for="(item,index) in teams"
@@ -48,11 +48,11 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
-                      @click="loadPhotos(true)"
+                      @click="handleQuery()"
                     >查询</a-button>
                     <a-button
                       style="margin-left: 8px;"
-                      @click="resetParam"
+                      @click="resetParam()"
                     >重置</a-button>
                   </span>
                 </a-col>
@@ -101,6 +101,7 @@
     </a-row>
     <div class="page-wrapper">
       <a-pagination
+        :current="pagination.page"
         :total="pagination.total"
         :defaultPageSize="pagination.size"
         :pageSizeOptions="['18', '36', '54','72','90','108']"
@@ -324,19 +325,19 @@ export default {
     this.loadTeams()
   },
   methods: {
-    loadPhotos(isSearch) {
+    loadPhotos() {
+      this.listLoading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      if (isSearch) {
-        this.queryParam.page = 0
-      }
-      this.listLoading = true
       photoApi.query(this.queryParam).then(response => {
         this.photos = response.data.data.content
         this.pagination.total = response.data.data.total
         this.listLoading = false
       })
+    },
+    handleQuery() {
+      this.handlePaginationChange(1, this.pagination.size)
     },
     loadTeams() {
       photoApi.listTeams().then(response => {
@@ -396,7 +397,7 @@ export default {
     resetParam() {
       this.queryParam.keyword = null
       this.queryParam.team = null
-      this.loadPhotos()
+      this.handlePaginationChange(1, this.pagination.size)
       this.loadTeams()
     },
     onDrawerClose() {

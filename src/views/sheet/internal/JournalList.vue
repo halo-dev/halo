@@ -25,7 +25,7 @@
                     <a-select
                       placeholder="请选择状态"
                       v-model="queryParam.type"
-                      @change="loadJournals(true)"
+                      @change="handleQuery()"
                     >
                       <a-select-option
                         v-for="type in Object.keys(journalType)"
@@ -42,11 +42,11 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
-                      @click="loadJournals(true)"
+                      @click="handleQuery()"
                     >查询</a-button>
                     <a-button
                       style="margin-left: 8px;"
-                      @click="resetParam"
+                      @click="resetParam()"
                     >重置</a-button>
                   </span>
                 </a-col>
@@ -133,12 +133,13 @@
               <div class="page-wrapper">
                 <a-pagination
                   class="pagination"
+                  :current="pagination.page"
                   :total="pagination.total"
                   :defaultPageSize="pagination.size"
                   :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
                   showSizeChanger
-                  @showSizeChange="onPaginationChange"
-                  @change="onPaginationChange"
+                  @showSizeChange="handlePaginationChange"
+                  @change="handlePaginationChange"
                 />
               </div>
             </a-list>
@@ -262,19 +263,19 @@ export default {
     ...mapGetters(['user'])
   },
   methods: {
-    loadJournals(isSearch) {
+    loadJournals() {
+      this.listLoading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      if (isSearch) {
-        this.queryParam.page = 0
-      }
-      this.listLoading = true
       journalApi.query(this.queryParam).then(response => {
         this.journals = response.data.data.content
         this.pagination.total = response.data.data.total
         this.listLoading = false
       })
+    },
+    handleQuery() {
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleNew() {
       this.title = '新建'
@@ -344,7 +345,7 @@ export default {
       }
       this.visible = false
     },
-    onPaginationChange(page, pageSize) {
+    handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.page = page
       this.pagination.size = pageSize
@@ -357,7 +358,7 @@ export default {
     resetParam() {
       this.queryParam.keyword = null
       this.queryParam.type = null
-      this.loadJournals()
+      this.handlePaginationChange(1, this.pagination.size)
     }
   }
 }

@@ -15,7 +15,7 @@
         <a-input-search
           placeholder="搜索附件"
           v-model="queryParam.keyword"
-          @search="loadAttachments(true)"
+          @search="handleQuery()"
           enterButton
         />
       </a-row>
@@ -50,8 +50,9 @@
       <a-divider />
       <div class="page-wrapper">
         <a-pagination
-          :defaultPageSize="pagination.size"
+          :current="pagination.page"
           :total="pagination.total"
+          :defaultPageSize="pagination.size"
           @change="handlePaginationChange"
         ></a-pagination>
       </div>
@@ -122,7 +123,7 @@ export default {
       },
       queryParam: {
         page: 0,
-        size: 18,
+        size: 12,
         sort: null,
         keyword: null
       },
@@ -162,17 +163,17 @@ export default {
       this.$log.debug('Show detail of', attachment)
       this.detailVisible = true
     },
-    loadAttachments(isSearch) {
+    loadAttachments() {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      if (isSearch) {
-        this.queryParam.page = 0
-      }
       attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
       })
+    },
+    handleQuery() {
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handlePaginationChange(page, pageSize) {
       this.pagination.page = page
@@ -182,7 +183,7 @@ export default {
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
       this.loadSkeleton()
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleDelete() {
       this.loadAttachments()

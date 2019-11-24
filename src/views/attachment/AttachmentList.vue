@@ -32,7 +32,7 @@
                   <a-form-item label="存储位置">
                     <a-select
                       v-model="queryParam.attachmentType"
-                      @change="handleQuery"
+                      @change="handleQuery()"
                     >
                       <a-select-option
                         v-for="item in Object.keys(attachmentType)"
@@ -49,7 +49,7 @@
                   <a-form-item label="文件类型">
                     <a-select
                       v-model="queryParam.mediaType"
-                      @change="handleQuery"
+                      @change="handleQuery()"
                     >
                       <a-select-option
                         v-for="(item,index) in mediaTypes"
@@ -66,11 +66,11 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
-                      @click="handleQuery"
+                      @click="handleQuery()"
                     >查询</a-button>
                     <a-button
                       style="margin-left: 8px;"
-                      @click="handleResetParam"
+                      @click="handleResetParam()"
                     >重置</a-button>
                   </span>
                 </a-col>
@@ -124,6 +124,7 @@
     <div class="page-wrapper">
       <a-pagination
         class="pagination"
+        :current="pagination.page"
         :total="pagination.total"
         :defaultPageSize="pagination.size"
         :pageSizeOptions="['18', '36', '54','72','90','108']"
@@ -246,17 +247,15 @@ export default {
       this.queryParam.keyword = null
       this.queryParam.mediaType = null
       this.queryParam.attachmentType = null
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
       this.loadMediaTypes()
     },
     handleQuery() {
-      this.queryParam.page = 0
-      this.pagination.page = 1
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
       this.loadMediaTypes()
     },
     handleJudgeMediaType(attachment) {
