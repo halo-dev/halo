@@ -234,6 +234,7 @@
           v-else
           :rowKey="comment => comment.id"
           :rowSelection="{
+            selectedRowKeys: selectedRowKeys,
             onChange: onSelectionChange,
             getCheckboxProps: getCheckboxProps
           }"
@@ -571,6 +572,7 @@ export default {
       })
     },
     handleQuery() {
+      this.handleClearRowKeys()
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleEditStatusClick(commentId, status) {
@@ -624,6 +626,7 @@ export default {
     handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.status = null
+      this.handleClearRowKeys()
       this.handlePaginationChange(1, this.pagination.size)
     },
     handlePublishMore() {
@@ -668,6 +671,9 @@ export default {
         })
       }
     },
+    handleClearRowKeys() {
+      this.selectedRowKeys = []
+    },
     onReplyClose() {
       this.replyComment = {}
       this.selectComment = {}
@@ -680,7 +686,7 @@ export default {
     getCheckboxProps(comment) {
       return {
         props: {
-          disabled: comment.status === 'RECYCLE',
+          disabled: this.queryParam.status == null || this.queryParam.status === '',
           name: comment.author
         }
       }

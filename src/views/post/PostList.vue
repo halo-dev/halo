@@ -292,6 +292,7 @@
           v-else
           :rowKey="post => post.id"
           :rowSelection="{
+            selectedRowKeys: selectedRowKeys,
             onChange: onSelectionChange,
             getCheckboxProps: getCheckboxProps
           }"
@@ -665,7 +666,7 @@ export default {
     getCheckboxProps(post) {
       return {
         props: {
-          disabled: post.status === 'RECYCLE',
+          disabled: this.queryParam.status == null || this.queryParam.status === '',
           name: post.title
         }
       }
@@ -680,9 +681,11 @@ export default {
       this.queryParam.keyword = null
       this.queryParam.categoryId = null
       this.queryParam.status = null
+      this.handleClearRowKeys()
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleQuery() {
+      this.handleClearRowKeys()
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleEditStatusClick(postId, status) {
@@ -757,6 +760,9 @@ export default {
       postApi.preview(postId).then(response => {
         window.open(response.data, '_blank')
       })
+    },
+    handleClearRowKeys() {
+      this.selectedRowKeys = []
     },
     // 关闭文章设置抽屉
     onPostSettingsClose() {
