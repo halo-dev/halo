@@ -10,34 +10,44 @@ package run.halo.app.model.properties;
 public enum TencentYunProperties implements PropertyEnum {
 
     /**
-     * Tencentyun cos domain protocol.
+     * Tencent yun cos domain protocol.
      */
     COS_PROTOCOL("cos_tencentyun_domain_protocol", String.class, "https://"),
 
     /**
-     * Tencentyun cos domain.
+     * Tencent yun cos domain.
      */
     COS_DOMAIN("cos_tencentyun_domain", String.class, ""),
 
     /**
-     * Tencentyun cos endpoint.
+     * Tencent yun cos endpoint.
      */
     COS_REGION("cos_tencentyun_region", String.class, ""),
 
     /**
-     * Tencentyun cos bucket name.
+     * Tencent yun cos bucket name.
      */
     COS_BUCKET_NAME("cos_tencentyun_bucket_name", String.class, ""),
 
     /**
-     * Tencentyun cos secret id.
+     * Tencent yun cos secret id.
      */
     COS_SECRET_ID("cos_tencentyun_secret_id", String.class, ""),
 
     /**
-     * Tencentyun cos secret key.
+     * Tencent yun cos secret key.
      */
-    COS_SECRET_KEY("cos_tencentyun_secret_key", String.class, "");
+    COS_SECRET_KEY("cos_tencentyun_secret_key", String.class, ""),
+
+    /**
+     * Tencent yun cos style rule.
+     */
+    COS_STYLE_RULE("cos_tencentyun_style_rule", String.class, ""),
+
+    /**
+     * Tencent yun cos thumbnail style rule.
+     */
+    COS_THUMBNAIL_STYLE_RULE("cos_tencentyun_thumbnail_style_rule", String.class, "");
 
     private final String value;
 
