@@ -7,7 +7,7 @@ package run.halo.app.model.properties;
  * @author ryanwang
  * @date 2019-07-19
  */
-public enum BaiDuYunProperties implements PropertyEnum {
+public enum BaiduBosProperties implements PropertyEnum {
 
     /**
      * Baidu yun bos domain protocol.
@@ -55,7 +55,7 @@ public enum BaiDuYunProperties implements PropertyEnum {
 
     private final String defaultValue;
 
-    BaiDuYunProperties(String value, Class<?> type, String defaultValue) {
+    BaiduBosProperties(String value, Class<?> type, String defaultValue) {
         this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);

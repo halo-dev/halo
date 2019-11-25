@@ -10,7 +10,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.properties.UpYunProperties;
+import run.halo.app.model.properties.UpOssProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
@@ -28,11 +28,11 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-public class UpYunFileHandler implements FileHandler {
+public class UpOssFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
-    public UpYunFileHandler(OptionService optionService) {
+    public UpOssFileHandler(OptionService optionService) {
         this.optionService = optionService;
     }
 
@@ -40,15 +40,15 @@ public class UpYunFileHandler implements FileHandler {
     public UploadResult upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
-        String source = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_SOURCE).toString();
-        String password = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
-        String bucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
-        String protocol = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PROTOCOL).toString();
-        String domain = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_DOMAIN).toString();
-        String operator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
+        String source = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_SOURCE).toString();
+        String password = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_PASSWORD).toString();
+        String bucket = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_BUCKET).toString();
+        String protocol = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_PROTOCOL).toString();
+        String domain = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_DOMAIN).toString();
+        String operator = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_OPERATOR).toString();
         // style rule can be null
-        String styleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_STYLE_RULE, String.class, "");
-        String thumbnailStyleRule = optionService.getByPropertyOrDefault(UpYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+        String styleRule = optionService.getByPropertyOrDefault(UpOssProperties.OSS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(UpOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Create up yun
         UpYun upYun = new UpYun(bucket, operator, password);
@@ -103,9 +103,9 @@ public class UpYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String password = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_PASSWORD).toString();
-        String bucket = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_BUCKET).toString();
-        String operator = optionService.getByPropertyOfNonNull(UpYunProperties.OSS_OPERATOR).toString();
+        String password = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_PASSWORD).toString();
+        String bucket = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_BUCKET).toString();
+        String operator = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_OPERATOR).toString();
 
         // Create up yun
         UpYun upYun = new UpYun(bucket, operator, password);

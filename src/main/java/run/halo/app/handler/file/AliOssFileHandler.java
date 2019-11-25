@@ -1,10 +1,9 @@
 package run.halo.app.handler.file;
 
-
-import com.baidubce.auth.DefaultBceCredentials;
-import com.baidubce.services.bos.BosClient;
-import com.baidubce.services.bos.BosClientConfiguration;
-import com.baidubce.services.bos.model.PutObjectResponse;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.model.DeleteObjectsRequest;
+import com.aliyun.oss.model.PutObjectResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -13,7 +12,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.properties.BaiDuYunProperties;
+import run.halo.app.model.properties.AliOssProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
@@ -23,19 +22,19 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 /**
- * BaiDuYun file handler.
+ * AliYun file handler.
  *
- * @author wangya
+ * @author MyFaith
  * @author ryanwang
- * @date 2019-07-20
+ * @date 2019-04-04
  */
 @Slf4j
 @Component
-public class BaiDuYunFileHandler implements FileHandler {
+public class AliOssFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
-    public BaiDuYunFileHandler(OptionService optionService) {
+    public AliOssFileHandler(OptionService optionService) {
         this.optionService = optionService;
     }
 
@@ -44,22 +43,18 @@ public class BaiDuYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
-        Object protocol = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_PROTOCOL);
-        String domain = optionService.getByPropertyOrDefault(BaiDuYunProperties.BOS_DOMAIN, String.class, "");
-        String endPoint = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_ENDPOINT).toString();
-        String accessKey = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_SECRET_KEY).toString();
-        String bucketName = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_BUCKET_NAME).toString();
-        String styleRule = optionService.getByPropertyOrDefault(BaiDuYunProperties.BOS_STYLE_RULE, String.class, "");
-        String thumbnailStyleRule = optionService.getByPropertyOrDefault(BaiDuYunProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "");
+        String protocol = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_PROTOCOL).toString();
+        String domain = optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "");
+        String endPoint = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
+        String accessKey = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
+        String accessSecret = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
+        String bucketName = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
         String source = StringUtils.join(protocol, bucketName, "." + endPoint);
-
-        BosClientConfiguration config = new BosClientConfiguration();
-        config.setCredentials(new DefaultBceCredentials(accessKey, secretKey));
-        config.setEndpoint(endPoint);
+        String styleRule = optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Init OSS client
-        BosClient client = new BosClient(config);
+        OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
 
         domain = protocol + domain;
 
@@ -71,9 +66,9 @@ public class BaiDuYunFileHandler implements FileHandler {
             String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(domain) ? domain : source, "/"), upFilePath);
 
             // Upload
-            PutObjectResponse putObjectResponseFromInputStream = client.putObject(bucketName, upFilePath, file.getInputStream());
-            if (putObjectResponseFromInputStream == null) {
-                throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到百度云失败 ");
+            PutObjectResult putObjectResult = ossClient.putObject(bucketName, upFilePath, file.getInputStream());
+            if (putObjectResult == null) {
+                throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
             }
 
             // Response result
@@ -95,10 +90,17 @@ public class BaiDuYunFileHandler implements FileHandler {
 
             return uploadResult;
         } catch (Exception e) {
-            throw new FileOperationException("附件 " + file.getOriginalFilename() + " 上传失败(百度云)", e);
+            e.printStackTrace();
         } finally {
-            client.shutdown();
+            ossClient.shutdown();
         }
+
+        // Build result
+        UploadResult result = new UploadResult();
+
+        log.info("File: [{}] uploaded successfully", file.getOriginalFilename());
+
+        return result;
     }
 
     @Override
@@ -106,29 +108,25 @@ public class BaiDuYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String endPoint = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_ENDPOINT).toString();
-        String accessKey = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_SECRET_KEY).toString();
-        String bucketName = optionService.getByPropertyOfNonNull(BaiDuYunProperties.BOS_BUCKET_NAME).toString();
-
-        BosClientConfiguration config = new BosClientConfiguration();
-        config.setCredentials(new DefaultBceCredentials(accessKey, secretKey));
-        config.setEndpoint(endPoint);
+        String endPoint = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
+        String accessKey = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
+        String accessSecret = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
+        String bucketName = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
 
         // Init OSS client
-        BosClient client = new BosClient(config);
+        OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
 
         try {
-            client.deleteObject(bucketName, key);
+            ossClient.deleteObject(new DeleteObjectsRequest(bucketName).withKey(key));
         } catch (Exception e) {
-            throw new FileOperationException("附件 " + key + " 从百度云删除失败", e);
+            throw new FileOperationException("附件 " + key + " 从阿里云删除失败", e);
         } finally {
-            client.shutdown();
+            ossClient.shutdown();
         }
     }
 
     @Override
     public boolean supportType(AttachmentType type) {
-        return AttachmentType.BAIDUYUN.equals(type);
+        return AttachmentType.ALIYUN.equals(type);
     }
 }

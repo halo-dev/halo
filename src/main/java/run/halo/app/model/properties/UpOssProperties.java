@@ -7,7 +7,7 @@ package run.halo.app.model.properties;
  * @author ryanwang
  * @date 2019-03-27
  */
-public enum UpYunProperties implements PropertyEnum {
+public enum UpOssProperties implements PropertyEnum {
 
     /**
      * upyun oss source
@@ -53,7 +53,7 @@ public enum UpYunProperties implements PropertyEnum {
     private String value;
     private Class<?> type;
 
-    UpYunProperties(String value, Class<?> type, String defaultValue) {
+    UpOssProperties(String value, Class<?> type, String defaultValue) {
         this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);

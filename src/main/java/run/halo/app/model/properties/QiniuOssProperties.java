@@ -7,7 +7,7 @@ package run.halo.app.model.properties;
  * @author ryanwang
  * @date 2019-03-26
  */
-public enum QnYunProperties implements PropertyEnum {
+public enum QiniuOssProperties implements PropertyEnum {
 
     /**
      * Qiniu yun oss zone.
@@ -55,7 +55,7 @@ public enum QnYunProperties implements PropertyEnum {
 
     private final String defaultValue;
 
-    QnYunProperties(String value, Class<?> type, String defaultValue) {
+    QiniuOssProperties(String value, Class<?> type, String defaultValue) {
         this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);

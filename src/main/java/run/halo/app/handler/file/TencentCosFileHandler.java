@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.properties.TencentYunProperties;
+import run.halo.app.model.properties.TencentCosProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
@@ -34,11 +34,11 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-public class TencentYunFileHandler implements FileHandler {
+public class TencentCosFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
-    public TencentYunFileHandler(OptionService optionService) {
+    public TencentCosFileHandler(OptionService optionService) {
         this.optionService = optionService;
     }
 
@@ -47,15 +47,15 @@ public class TencentYunFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
-        String protocol = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_PROTOCOL).toString();
-        String domain = optionService.getByPropertyOrDefault(TencentYunProperties.COS_DOMAIN, String.class, "");
-        String region = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_REGION).toString();
-        String secretId = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_ID).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_KEY).toString();
-        String bucketName = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_BUCKET_NAME).toString();
+        String protocol = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_PROTOCOL).toString();
+        String domain = optionService.getByPropertyOrDefault(TencentCosProperties.COS_DOMAIN, String.class, "");
+        String region = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_REGION).toString();
+        String secretId = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_ID).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_KEY).toString();
+        String bucketName = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString();
         String source = StringUtils.join(protocol, bucketName, ".cos." + region + ".myqcloud.com");
-        String styleRule = optionService.getByPropertyOrDefault(TencentYunProperties.COS_STYLE_RULE, String.class, "");
-        String thumbnailStyleRule = optionService.getByPropertyOrDefault(TencentYunProperties.COS_THUMBNAIL_STYLE_RULE, String.class, "");
+        String styleRule = optionService.getByPropertyOrDefault(TencentCosProperties.COS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(TencentCosProperties.COS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         //get file attribute
         long size = file.getSize();
@@ -119,10 +119,10 @@ public class TencentYunFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String region = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_REGION).toString();
-        String secretId = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_ID).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_KEY).toString();
-        String bucketName = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_BUCKET_NAME).toString();
+        String region = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_REGION).toString();
+        String secretId = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_ID).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_KEY).toString();
+        String bucketName = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString();
 
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         Region regionConfig = new Region(region);
