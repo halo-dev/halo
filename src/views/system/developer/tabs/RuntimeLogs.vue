@@ -13,7 +13,10 @@
       </a-skeleton>
     </a-form-item>
     <a-form-item>
-      <a-button type="primary" style="margin-right: 8px;">下载</a-button>
+      <a-button
+        type="primary"
+        style="margin-right: 8px;"
+      >下载</a-button>
       <a-button
         type="dash"
         @click="()=>this.loadLogs()"
