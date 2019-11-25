@@ -456,6 +456,18 @@
                   <a-form-item label="Secret Key：">
                     <a-input-password v-model="options.cos_tencentyun_secret_key" />
                   </a-form-item>
+                  <a-form-item label="图片处理策略：">
+                    <a-input
+                      v-model="options.cos_tencentyun_style_rule"
+                      placeholder="请到腾讯云控制台的图片处理获取"
+                    />
+                  </a-form-item>
+                  <a-form-item label="缩略图处理策略：">
+                    <a-input
+                      v-model="options.cos_tencentyun_thumbnail_style_rule"
+                      placeholder="请到腾讯云控制台的图片处理获取，一般为后台展示所用"
+                    />
+                  </a-form-item>
                 </div>
                 <a-form-item>
                   <a-button
