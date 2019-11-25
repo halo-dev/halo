@@ -49,6 +49,7 @@ public class MarkdownUtils {
                     TocExtension.create(),
                     YamlFrontMatterExtension.create())
             )
+            .set(TocExtension.LEVELS, 255)
             .set(TablesExtension.WITH_CAPTION, false)
             .set(TablesExtension.COLUMN_SPANS, false)
             .set(TablesExtension.MIN_HEADER_ROWS, 1)
