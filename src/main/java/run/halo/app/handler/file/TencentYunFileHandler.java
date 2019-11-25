@@ -54,6 +54,8 @@ public class TencentYunFileHandler implements FileHandler {
         String secretKey = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_SECRET_KEY).toString();
         String bucketName = optionService.getByPropertyOfNonNull(TencentYunProperties.COS_BUCKET_NAME).toString();
         String source = StringUtils.join(protocol, bucketName, ".cos." + region + ".myqcloud.com");
+        String styleRule = optionService.getByPropertyOrDefault(TencentYunProperties.COS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(TencentYunProperties.COS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         //get file attribute
         long size = file.getSize();
@@ -90,7 +92,7 @@ public class TencentYunFileHandler implements FileHandler {
             // Response result
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
-            uploadResult.setFilePath(filePath);
+            uploadResult.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
             uploadResult.setKey(upFilePath);
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
@@ -101,7 +103,7 @@ public class TencentYunFileHandler implements FileHandler {
                 BufferedImage image = ImageIO.read(file.getInputStream());
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(filePath);
+                uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
             }
 
             return uploadResult;

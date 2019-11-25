@@ -54,8 +54,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         log.info("Halo started at         {}", blogUrl);
         log.info("Halo admin started at   {}{}", blogUrl, haloProperties.getAdminPath());
         if (!haloProperties.isDocDisabled()) {
-            log.debug("Halo doc was enable at  {}/swagger-ui.html", blogUrl);
+            log.debug("Halo api doc was enabled at  {}/swagger-ui.html", blogUrl);
         }
+        log.info("Halo has started successfully!");
     }
 
     /**
