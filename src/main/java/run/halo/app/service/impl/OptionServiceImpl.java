@@ -324,7 +324,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public Zone getQnYunZone() {
-        return getByProperty(QnYunProperties.OSS_ZONE).map(qiniuZone -> {
+        return getByProperty(QiniuOssProperties.OSS_ZONE).map(qiniuZone -> {
 
             Zone zone;
             switch (qiniuZone.toString()) {

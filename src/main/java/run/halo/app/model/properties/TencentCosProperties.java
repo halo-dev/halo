@@ -7,7 +7,7 @@ package run.halo.app.model.properties;
  * @author ryanwang
  * @date 2019-07-25
  */
-public enum TencentYunProperties implements PropertyEnum {
+public enum TencentCosProperties implements PropertyEnum {
 
     /**
      * Tencent yun cos domain protocol.
@@ -55,7 +55,7 @@ public enum TencentYunProperties implements PropertyEnum {
 
     private final String defaultValue;
 
-    TencentYunProperties(String value, Class<?> type, String defaultValue) {
+    TencentCosProperties(String value, Class<?> type, String defaultValue) {
         this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);

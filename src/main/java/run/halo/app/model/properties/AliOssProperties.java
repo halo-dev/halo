@@ -7,7 +7,7 @@ package run.halo.app.model.properties;
  * @author ryanwang
  * @date 2019-04-04
  */
-public enum AliYunProperties implements PropertyEnum {
+public enum AliOssProperties implements PropertyEnum {
 
     /**
      * Aliyun oss domain protocol
@@ -55,7 +55,7 @@ public enum AliYunProperties implements PropertyEnum {
 
     private final String defaultValue;
 
-    AliYunProperties(String value, Class<?> type, String defaultValue) {
+    AliOssProperties(String value, Class<?> type, String defaultValue) {
         this.defaultValue = defaultValue;
         if (!PropertyEnum.isSupportedType(type)) {
             throw new IllegalArgumentException("Unsupported blog property type: " + type);

@@ -17,7 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
-import run.halo.app.model.properties.QnYunProperties;
+import run.halo.app.model.properties.QiniuOssProperties;
 import run.halo.app.model.support.QiNiuPutSet;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
@@ -40,11 +40,11 @@ import static run.halo.app.handler.file.FileHandler.isImageType;
  */
 @Slf4j
 @Component
-public class QnYunFileHandler implements FileHandler {
+public class QiniuOssFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
-    public QnYunFileHandler(OptionService optionService) {
+    public QiniuOssFileHandler(OptionService optionService) {
         this.optionService = optionService;
     }
 
@@ -54,13 +54,13 @@ public class QnYunFileHandler implements FileHandler {
 
         // Get all config
         Zone zone = optionService.getQnYunZone();
-        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_SECRET_KEY).toString();
-        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_BUCKET).toString();
-        String protocol = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_PROTOCOL).toString();
-        String domain = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_DOMAIN).toString();
-        String styleRule = optionService.getByPropertyOrDefault(QnYunProperties.OSS_STYLE_RULE, String.class, "");
-        String thumbnailStyleRule = optionService.getByPropertyOrDefault(QnYunProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+        String accessKey = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_ACCESS_KEY).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_SECRET_KEY).toString();
+        String bucket = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString();
+        String protocol = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_PROTOCOL).toString();
+        String domain = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_DOMAIN).toString();
+        String styleRule = optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Create configuration
         Configuration configuration = new Configuration(zone);
@@ -133,9 +133,9 @@ public class QnYunFileHandler implements FileHandler {
 
         // Get all config
         Zone zone = optionService.getQnYunZone();
-        String accessKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_SECRET_KEY).toString();
-        String bucket = optionService.getByPropertyOfNonNull(QnYunProperties.OSS_BUCKET).toString();
+        String accessKey = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_ACCESS_KEY).toString();
+        String secretKey = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_SECRET_KEY).toString();
+        String bucket = optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString();
 
         // Create configuration
         Configuration configuration = new Configuration(zone);
