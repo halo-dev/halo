@@ -14,7 +14,7 @@ export const asyncRouterMap = [
         path: '/dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/Dashboard'),
-        meta: { title: '仪表盘', icon: 'dashboard', hiddenHeaderContent: false }
+        meta: { title: '仪表盘', icon: 'dashboard', hiddenHeaderContent: false, keepAlive: false }
       },
 
       // posts
