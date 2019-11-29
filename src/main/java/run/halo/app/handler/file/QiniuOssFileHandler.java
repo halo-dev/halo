@@ -155,6 +155,6 @@ public class QiniuOssFileHandler implements FileHandler {
 
     @Override
     public boolean supportType(AttachmentType type) {
-        return AttachmentType.QNYUN.equals(type);
+        return AttachmentType.QINIUOSS.equals(type);
     }
 }

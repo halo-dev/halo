@@ -142,6 +142,6 @@ public class TencentCosFileHandler implements FileHandler {
 
     @Override
     public boolean supportType(AttachmentType type) {
-        return AttachmentType.TENCENTYUN.equals(type);
+        return AttachmentType.TENCENTCOS.equals(type);
     }
 }
