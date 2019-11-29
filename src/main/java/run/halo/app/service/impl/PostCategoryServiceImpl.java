@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryWithPostCountDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -98,12 +99,24 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     @Override
     public List<Post> listPostBy(Integer categoryId, PostStatus status) {
         Assert.notNull(categoryId, "Category id must not be null");
-        Assert.notNull(categoryId, "Post status must not be null");
+        Assert.notNull(status, "Post status must not be null");
 
         // Find all post ids
         Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
 
         return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<Post> listPostBy(String slug, PostStatus status) {
+        Assert.notNull(slug, "Category slug must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Category category = categoryRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+
+        Set<Integer> postsIds = postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
+
+        return postRepository.findAllById(postsIds);
     }
 
     @Override
@@ -120,7 +133,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     @Override
     public Page<Post> pagePostBy(Integer categoryId, PostStatus status, Pageable pageable) {
         Assert.notNull(categoryId, "Category id must not be null");
-        Assert.notNull(categoryId, "Post status must not be null");
+        Assert.notNull(status, "Post status must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
