@@ -18,7 +18,7 @@
         :src="avatar"
         :alt="comment.author"
       />
-      <p slot="content">{{ comment.content }}</p>
+      <p slot="content" v-html="comment.content"></p>
       <template v-if="comment.children">
         <TargetCommentTree
           v-for="(child, index) in comment.children"

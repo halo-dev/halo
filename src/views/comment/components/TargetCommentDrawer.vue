@@ -25,7 +25,7 @@
         <a-empty v-if="comments.length==0" />
         <TargetCommentTree
           v-else
-          v-for="(comment, index) in comments"
+          v-for="(comment, index) in formattedComments"
           :key="index"
           :comment="comment"
           @reply="handleCommentReply"
@@ -48,6 +48,7 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import TargetCommentTree from './TargetCommentTree'
 import commentApi from '@/api/comment'
+import marked from 'marked'
 export default {
   name: 'TargetCommentDrawer',
   mixins: [mixin, mixinDevice],
@@ -104,6 +105,14 @@ export default {
       }
     }
   },
+  computed: {
+    formattedComments() {
+      return this.comments.map(comment => {
+        comment.content = marked(comment.content, { sanitize: true })
+        return comment
+      })
+    }
+  },
   methods: {
     loadComments() {
       this.queryParam.page = this.pagination.page - 1
@@ -123,6 +132,12 @@ export default {
     handleCommentDelete() {},
 
     onClose() {
+      this.comments = []
+      this.pagination = {
+        page: 1,
+        size: 10,
+        sort: ''
+      }
       this.$emit('close', false)
     }
   }

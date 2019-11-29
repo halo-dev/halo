@@ -14,7 +14,7 @@
                   :sm="24"
                 >
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword" />
+                    <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()"/>
                   </a-form-item>
                 </a-col>
                 <a-col
