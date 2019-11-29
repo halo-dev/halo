@@ -14,6 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_HEADER_NAME;
+
 /**
  * Filter for CORS.
  *
@@ -21,7 +24,7 @@ import java.io.IOException;
  */
 public class CorsFilter extends GenericFilterBean {
 
-    private final static String ALLOW_HEADERS = StringUtils.joinWith(",", HttpHeaders.CONTENT_TYPE, AdminAuthenticationFilter.ADMIN_TOKEN_HEADER_NAME);
+    private final static String ALLOW_HEADERS = StringUtils.joinWith(",", HttpHeaders.CONTENT_TYPE, ADMIN_TOKEN_HEADER_NAME, API_ACCESS_KEY_HEADER_NAME);
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

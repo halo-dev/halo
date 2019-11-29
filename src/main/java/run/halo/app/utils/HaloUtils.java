@@ -5,9 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Objects;
 import java.util.UUID;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
@@ -25,6 +29,17 @@ public class HaloUtils {
     private static final String RE_HTML_MARK = "(<[^<]*?>)|(<[\\s]*?/[^<]*?>)|(<[^<]*?/[\\s]*?>)";
 
     public static final String URL_SEPARATOR = "/";
+
+    /**
+     * Gets current http servlet request.
+     *
+     * @return current http servlet request
+     */
+    @NonNull
+    public static HttpServletRequest getHttpServletRequest() {
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
+                .getRequest();
+    }
 
     @NonNull
     public static String ensureBoth(@NonNull String string, @NonNull String bothfix) {
