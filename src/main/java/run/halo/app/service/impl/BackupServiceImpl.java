@@ -7,6 +7,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -24,9 +26,11 @@ import run.halo.app.service.BackupService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
+import run.halo.app.utils.HaloUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -125,10 +129,8 @@ public class BackupServiceImpl implements BackupService {
 
             if (StringUtils.isNotBlank(post.getPassword())) {
                 passwords.add(one);
-                continue;
             } else if (post.getDeleted()) {
                 drafts.add(one);
-                continue;
             } else {
                 posts.add(one);
             }
@@ -159,10 +161,10 @@ public class BackupServiceImpl implements BackupService {
         // Zip work directory to temporary file
         try {
             // Create zip path for halo zip
-            String haloZipFileName = new StringBuilder().append(HaloConst.HALO_BACKUP_PREFIX)
-                    .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")))
-                    .append(IdUtil.simpleUUID())
-                    .append(".zip").toString();
+            String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) +
+                    IdUtil.simpleUUID() +
+                    ".zip";
             // Create halo zip file
             Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
 
@@ -198,19 +200,39 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public void deleteHaloBackup(String filename) {
-        Assert.hasText(filename, "File name must not be blank");
+    public void deleteHaloBackup(String fileName) {
+        Assert.hasText(fileName, "File name must not be blank");
 
         // Get backup path
-        Path backupPath = Paths.get(haloProperties.getBackupDir(), filename);
+        Path backupPath = Paths.get(haloProperties.getBackupDir(), fileName);
 
         try {
             // Delete backup file
             Files.delete(backupPath);
         } catch (NoSuchFileException e) {
-            throw new NotFoundException("The file " + filename + " was not found", e);
+            throw new NotFoundException("The file " + fileName + " was not found", e);
         } catch (IOException e) {
             throw new ServiceException("Failed to delete backup", e);
+        }
+    }
+
+    @Override
+    public Resource loadFileAsResource(String fileName) {
+        Assert.hasText(fileName, "Backup file name must not be blank");
+
+        // Get backup file path
+        Path backupFilePath = Paths.get(haloProperties.getBackupDir(), fileName).normalize();
+        try {
+            // Build url resource
+            Resource backupResource = new UrlResource(backupFilePath.toUri());
+            if (!backupResource.exists()) {
+                // If the backup resouce is not exist
+                throw new NotFoundException("The file " + fileName + " was not found");
+            }
+            // Return the backup resource
+            return backupResource;
+        } catch (MalformedURLException e) {
+            throw new NotFoundException("The file " + fileName + " was not found", e);
         }
     }
 
@@ -226,7 +248,7 @@ public class BackupServiceImpl implements BackupService {
         String backupFileName = backupPath.getFileName().toString();
         BackupDTO backup = new BackupDTO();
         backup.setDownloadUrl(buildDownloadUrl(backupFileName));
-        backup.setDownloadLink(backup.getDownloadLink());
+        backup.setDownloadLink(backup.getDownloadUrl());
         backup.setFilename(backupFileName);
         try {
             backup.setUpdateTime(Files.getLastModifiedTime(backupPath).toMillis());
@@ -247,9 +269,6 @@ public class BackupServiceImpl implements BackupService {
     private String buildDownloadUrl(@NonNull String filename) {
         Assert.hasText(filename, "File name must not be blank");
 
-        return StringUtils.joinWith("/",
-                optionService.getBlogBaseUrl(),
-                StringUtils.removeEnd(StringUtils.removeStart(haloProperties.getBackupUrlPrefix(), "/"), "/"),
-                filename);
+        return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), "api/admin/backups/halo", filename);
     }
 }
