@@ -222,10 +222,7 @@
                   />
                 </a-form-item>
                 <a-form-item label="存储位置：">
-                  <a-select
-                    @change="handleAttachChange"
-                    v-model="options.attachment_type"
-                  >
+                  <a-select v-model="options.attachment_type">
                     <a-select-option
                       v-for="item in Object.keys(attachmentType)"
                       :key="item"
@@ -234,8 +231,8 @@
                   </a-select>
                 </a-form-item>
                 <div
-                  class="smmsForm"
-                  v-show="smmsFormVisible"
+                  id="smmsForm"
+                  v-show="options.attachment_type === 'SMMS'"
                 >
                   <a-form-item label="Secret Token：">
                     <a-input-password
@@ -245,8 +242,8 @@
                   </a-form-item>
                 </div>
                 <div
-                  class="upyunForm"
-                  v-show="upyunFormVisible"
+                  id="upOssForm"
+                  v-show="options.attachment_type === 'UPOSS'"
                 >
                   <a-form-item label="绑定域名协议：">
                     <a-select v-model="options.oss_upyun_domain_protocol">
@@ -286,8 +283,8 @@
                   </a-form-item>
                 </div>
                 <div
-                  class="qnyunForm"
-                  v-show="qnyunFormVisible"
+                  id="qiniuOssForm"
+                  v-show="options.attachment_type === 'QINIUOSS'"
                 >
                   <a-form-item label="绑定域名协议：">
                     <a-select v-model="options.oss_qiniu_domain_protocol">
@@ -303,7 +300,7 @@
                   </a-form-item>
                   <a-form-item label="区域：">
                     <a-auto-complete
-                      :dataSource="qiniuZones"
+                      :dataSource="qiniuOssZones"
                       v-model="options.oss_qiniu_zone"
                       allowClear
                     />
@@ -334,8 +331,8 @@
                   </a-form-item>
                 </div>
                 <div
-                  class="aliyunForm"
-                  v-show="aliyunFormVisible"
+                  id="aliOssForm"
+                  v-show="options.attachment_type === 'ALIOSS'"
                 >
                   <a-form-item label="绑定域名协议：">
                     <a-select v-model="options.oss_aliyun_domain_protocol">
@@ -378,8 +375,8 @@
                   </a-form-item>
                 </div>
                 <div
-                  class="baiduyunForm"
-                  v-show="baiduyunFormVisible"
+                  id="baiduBosForm"
+                  v-show="options.attachment_type === 'BAIDUBOS'"
                 >
                   <a-form-item label="绑定域名协议：">
                     <a-select v-model="options.bos_baiduyun_domain_protocol">
@@ -422,8 +419,8 @@
                   </a-form-item>
                 </div>
                 <div
-                  class="tencentyunForm"
-                  v-show="tencentyunFormVisible"
+                  id="tencentCosForm"
+                  v-show="options.attachment_type === 'TENCENTCOS'"
                 >
                   <a-form-item label="绑定域名协议：">
                     <a-select v-model="options.cos_tencentyun_domain_protocol">
@@ -445,7 +442,7 @@
                   </a-form-item>
                   <a-form-item label="区域：">
                     <a-auto-complete
-                      :dataSource="tencentyunRegions"
+                      :dataSource="tencentCosRegions"
                       v-model="options.cos_tencentyun_region"
                       allowClear
                     />
@@ -663,17 +660,11 @@ export default {
         sm: { span: 12 },
         xs: { span: 24 }
       },
-      smmsFormVisible: false,
-      upyunFormVisible: false,
-      qnyunFormVisible: false,
-      aliyunFormVisible: false,
-      baiduyunFormVisible: false,
-      tencentyunFormVisible: false,
       logoDrawerVisible: false,
       faviconDrawerVisible: false,
       options: [],
       mailParam: {},
-      tencentyunRegions: [
+      tencentCosRegions: [
         {
           text: '北京一区',
           value: 'ap-beijing-1'
@@ -699,7 +690,7 @@ export default {
           value: 'ap-chongqing'
         }
       ],
-      qiniuZones: [
+      qiniuOssZones: [
         {
           text: '自动选择',
           value: 'auto'
@@ -752,7 +743,6 @@ export default {
     loadFormOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
-        this.handleAttachChange(this.options['attachment_type'])
       })
     },
     handleSaveOptions() {
@@ -794,7 +784,7 @@ export default {
             return
           }
           break
-        case 'UPYUN':
+        case 'UPOSS':
           if (!this.options.oss_upyun_domain) {
             this.$notification['error']({
               message: '提示',
@@ -831,7 +821,7 @@ export default {
             return
           }
           break
-        case 'QNYUN':
+        case 'QINIUOSS':
           if (!this.options.oss_qiniu_domain) {
             this.$notification['error']({
               message: '提示',
@@ -861,7 +851,7 @@ export default {
             return
           }
           break
-        case 'ALIYUN':
+        case 'ALIOSS':
           if (!this.options.oss_aliyun_bucket_name) {
             this.$notification['error']({
               message: '提示',
@@ -891,7 +881,7 @@ export default {
             return
           }
           break
-        case 'BAIDUYUN':
+        case 'BAIDUBOS':
           if (!this.options.bos_baiduyun_bucket_name) {
             this.$notification['error']({
               message: '提示',
@@ -921,7 +911,7 @@ export default {
             return
           }
           break
-        case 'TENCENTYUN':
+        case 'TENCENTCOS':
           if (!this.options.cos_tencentyun_bucket_name) {
             this.$notification['error']({
               message: '提示',
@@ -1016,66 +1006,6 @@ export default {
         this.loadUser()
         this.$message.success('保存成功！')
       })
-    },
-    handleAttachChange(e) {
-      switch (e) {
-        case 'LOCAL':
-          this.upyunFormVisible = false
-          this.qnyunFormVisible = false
-          this.aliyunFormVisible = false
-          this.baiduyunFormVisible = false
-          this.tencentyunFormVisible = false
-          this.smmsFormVisible = false
-          break
-        case 'SMMS':
-          this.smmsFormVisible = true
-          this.upyunFormVisible = false
-          this.qnyunFormVisible = false
-          this.aliyunFormVisible = false
-          this.baiduyunFormVisible = false
-          this.tencentyunFormVisible = false
-          break
-        case 'UPYUN':
-          this.smmsFormVisible = false
-          this.upyunFormVisible = true
-          this.qnyunFormVisible = false
-          this.aliyunFormVisible = false
-          this.baiduyunFormVisible = false
-          this.tencentyunFormVisible = false
-          break
-        case 'QNYUN':
-          this.smmsFormVisible = false
-          this.qnyunFormVisible = true
-          this.upyunFormVisible = false
-          this.aliyunFormVisible = false
-          this.baiduyunFormVisible = false
-          this.tencentyunFormVisible = false
-          break
-        case 'ALIYUN':
-          this.smmsFormVisible = false
-          this.aliyunFormVisible = true
-          this.qnyunFormVisible = false
-          this.upyunFormVisible = false
-          this.baiduyunFormVisible = false
-          this.tencentyunFormVisible = false
-          break
-        case 'BAIDUYUN':
-          this.smmsFormVisible = false
-          this.aliyunFormVisible = false
-          this.qnyunFormVisible = false
-          this.upyunFormVisible = false
-          this.baiduyunFormVisible = true
-          this.tencentyunFormVisible = false
-          break
-        case 'TENCENTYUN':
-          this.smmsFormVisible = false
-          this.aliyunFormVisible = false
-          this.qnyunFormVisible = false
-          this.upyunFormVisible = false
-          this.baiduyunFormVisible = false
-          this.tencentyunFormVisible = true
-          break
-      }
     },
     handleSelectLogo(data) {
       this.$set(this.options, 'blog_logo', encodeURI(data.path))

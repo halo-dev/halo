@@ -76,23 +76,23 @@ attachmentApi.type = {
     type: 'smms',
     text: 'SM.MS'
   },
-  UPYUN: {
+  UPOSS: {
     type: 'upyun',
     text: '又拍云'
   },
-  QNYUN: {
+  QINIUOSS: {
     type: 'qnyun',
     text: '七牛云'
   },
-  ALIYUN: {
+  ALIOSS: {
     type: 'aliyun',
     text: '阿里云'
   },
-  BAIDUYUN: {
+  BAIDUBOS: {
     type: 'baiduyun',
     text: '百度云'
   },
-  TENCENTYUN: {
+  TENCENTCOS: {
     type: 'tencentyun',
     text: '腾讯云'
   }
