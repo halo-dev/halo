@@ -1,4 +1,4 @@
-package run.halo.app.model.freemarker.method;
+package run.halo.app.core.freemarker.method;
 
 import cn.hutool.core.util.RandomUtil;
 import freemarker.template.Configuration;

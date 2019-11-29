@@ -1,4 +1,4 @@
-package run.halo.app.model.freemarker.tag;
+package run.halo.app.core.freemarker.tag;
 
 import freemarker.core.Environment;
 import freemarker.template.*;
