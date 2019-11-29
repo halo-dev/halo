@@ -129,6 +129,6 @@ public class BaiduBosFileHandler implements FileHandler {
 
     @Override
     public boolean supportType(AttachmentType type) {
-        return AttachmentType.BAIDUYUN.equals(type);
+        return AttachmentType.BAIDUBOS.equals(type);
     }
 }

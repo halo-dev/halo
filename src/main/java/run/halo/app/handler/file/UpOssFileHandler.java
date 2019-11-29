@@ -125,6 +125,6 @@ public class UpOssFileHandler implements FileHandler {
 
     @Override
     public boolean supportType(AttachmentType type) {
-        return AttachmentType.UPYUN.equals(type);
+        return AttachmentType.UPOSS.equals(type);
     }
 }

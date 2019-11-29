@@ -127,6 +127,6 @@ public class AliOssFileHandler implements FileHandler {
 
     @Override
     public boolean supportType(AttachmentType type) {
-        return AttachmentType.ALIYUN.equals(type);
+        return AttachmentType.ALIOSS.equals(type);
     }
 }
