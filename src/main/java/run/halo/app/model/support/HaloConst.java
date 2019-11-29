@@ -1,6 +1,9 @@
 package run.halo.app.model.support;
 
+import org.springframework.http.HttpHeaders;
+
 import java.io.File;
+import java.time.Duration;
 
 /**
  * <pre>
@@ -105,6 +108,33 @@ public class HaloConst {
     public final static String HALO_ADMIN_RELATIVE_PATH = "templates/admin/";
 
     public final static String HALO_ADMIN_RELATIVE_BACKUP_PATH = "templates/admin-backup/";
+
+    /**
+     * Content token header name.
+     */
+    public final static String API_ACCESS_KEY_HEADER_NAME = "API-" + HttpHeaders.AUTHORIZATION;
+
+    /**
+     * Admin token header name.
+     */
+    public final static String ADMIN_TOKEN_HEADER_NAME = "ADMIN-" + HttpHeaders.AUTHORIZATION;
+
+    /**
+     * Admin token param name.
+     */
+    public final static String ADMIN_TOKEN_QUERY_NAME = "admin_token";
+
+    /**
+     * Temporary token.
+     */
+    public final static String TEMP_TOKEN = "temp_token";
+
+    /**
+     * Content api token param name
+     */
+    public final static String API_ACCESS_KEY_QUERY_NAME = "api_access_key";
+
+    public final static Duration TEMP_TOKEN_EXPIRATION = Duration.ofDays(7);
 
     static {
         // Set version

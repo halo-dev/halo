@@ -13,6 +13,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.support.UserDetail;
@@ -33,7 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static run.halo.app.model.support.HaloConst.HALO_VERSION;
+import static run.halo.app.model.support.HaloConst.*;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 /**
@@ -123,8 +124,8 @@ public class SwaggerConfiguration {
 
     private List<ApiKey> adminApiKeys() {
         return Arrays.asList(
-                new ApiKey("Token from header", AdminAuthenticationFilter.ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
-                new ApiKey("Token from query", AdminAuthenticationFilter.ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
+                new ApiKey("Token from header", ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
+                new ApiKey("Token from query", ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
         );
     }
 
@@ -139,8 +140,8 @@ public class SwaggerConfiguration {
 
     private List<ApiKey> contentApiKeys() {
         return Arrays.asList(
-                new ApiKey("Access key from header", ApiAuthenticationFilter.API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
-                new ApiKey("Access key from query", ApiAuthenticationFilter.API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())
+                new ApiKey("Access key from header", API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
+                new ApiKey("Access key from query", API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())
         );
     }
 

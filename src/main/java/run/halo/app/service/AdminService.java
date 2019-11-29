@@ -23,10 +23,6 @@ public interface AdminService {
 
     int REFRESH_TOKEN_EXPIRED_DAYS = 30;
 
-    String ACCESS_TOKEN_CACHE_PREFIX = "halo.admin.access_token.";
-
-    String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
-
     String LOGS_PATH = "logs/spring.log";
 
     /**

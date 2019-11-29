@@ -51,7 +51,8 @@ public class HaloConfiguration {
     }
 
     @Bean
-    public RestTemplate httpsRestTemplate(RestTemplateBuilder builder) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
+            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
         httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
                 (int) haloProperties.getDownloadTimeout().toMillis())));
@@ -97,8 +98,9 @@ public class HaloConfiguration {
 
     @Bean
     public FilterRegistrationBean<ContentFilter> contentFilter(HaloProperties haloProperties,
-                                                               OptionService optionService) {
-        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService);
+                                                               OptionService optionService,
+                                                               StringCacheStore cacheStore) {
+        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService, cacheStore);
         contentFilter.setFailureHandler(new ContentAuthenticationFailureHandler());
         contentFilter.addExcludeUrlPatterns("/api/**", "/install", "/version", "/admin/**", "/js/**", "/css/**");
 
@@ -113,8 +115,9 @@ public class HaloConfiguration {
     @Bean
     public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties,
                                                                                    ObjectMapper objectMapper,
-                                                                                   OptionService optionService) {
-        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService);
+                                                                                   OptionService optionService,
+                                                                                   StringCacheStore cacheStore) {
+        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService, cacheStore);
         apiFilter.addExcludeUrlPatterns(
                 "/api/content/*/comments",
                 "/api/content/**/comments/**",

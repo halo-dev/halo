@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
+import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
@@ -22,6 +24,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.BackupService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
@@ -31,6 +34,7 @@ import run.halo.app.utils.HaloUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -42,8 +46,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static run.halo.app.model.support.HaloConst.*;
 
 /**
  * Backup service implementation.
@@ -57,18 +64,23 @@ import java.util.stream.Stream;
 public class BackupServiceImpl implements BackupService {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String BACKUP_TOKEN_KEY_PREFIX = "backup-token-";
+
     private final PostService postService;
     private final PostTagService postTagService;
     private final OptionService optionService;
+    private final StringCacheStore cacheStore;
     private final HaloProperties haloProperties;
 
     public BackupServiceImpl(PostService postService,
                              PostTagService postTagService,
                              OptionService optionService,
+                             StringCacheStore stringCacheStore,
                              HaloProperties haloProperties) {
         this.postService = postService;
         this.postTagService = postTagService;
         this.optionService = optionService;
+        this.cacheStore = stringCacheStore;
         this.haloProperties = haloProperties;
     }
 
@@ -162,9 +174,8 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Create zip path for halo zip
             String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) +
-                    IdUtil.simpleUUID() +
-                    ".zip";
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
+                    IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
 
@@ -247,14 +258,16 @@ public class BackupServiceImpl implements BackupService {
 
         String backupFileName = backupPath.getFileName().toString();
         BackupDTO backup = new BackupDTO();
-        backup.setDownloadUrl(buildDownloadUrl(backupFileName));
-        backup.setDownloadLink(backup.getDownloadUrl());
-        backup.setFilename(backupFileName);
         try {
+            backup.setDownloadUrl(buildDownloadUrl(backupFileName));
+            backup.setDownloadLink(backup.getDownloadUrl());
+            backup.setFilename(backupFileName);
             backup.setUpdateTime(Files.getLastModifiedTime(backupPath).toMillis());
             backup.setFileSize(Files.size(backupPath));
         } catch (IOException e) {
-            throw new ServiceException("Failed to access file " + backupPath.toString(), e);
+            throw new ServiceException("Failed to access file " + backupPath, e);
+        } catch (URISyntaxException e) {
+            throw new ServiceException("Failed to generate download link for file: " + backupPath, e);
         }
 
         return backup;
@@ -266,9 +279,36 @@ public class BackupServiceImpl implements BackupService {
      * @param filename filename must not be blank
      * @return download url
      */
-    private String buildDownloadUrl(@NonNull String filename) {
+    private String buildDownloadUrl(@NonNull String filename) throws URISyntaxException {
         Assert.hasText(filename, "File name must not be blank");
 
-        return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), "api/admin/backups/halo", filename);
+        // Composite http url
+        String backupFullUrl = HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), "api/admin/backups/halo", filename);
+
+        // Get temp token
+        String tempToken = cacheStore.get(buildBackupTokenKey(filename)).orElseGet(() -> {
+            String token = buildTempToken(1);
+            // Cache this projection
+            cacheStore.putIfAbsent(buildBackupTokenKey(filename), token, TEMP_TOKEN_EXPIRATION.toDays(), TimeUnit.DAYS);
+            return token;
+        });
+
+        return new URIBuilder(backupFullUrl).addParameter(TEMP_TOKEN, tempToken).toString();
+    }
+
+    private String buildBackupTokenKey(String backupFileName) {
+        return BACKUP_TOKEN_KEY_PREFIX + backupFileName;
+    }
+
+    private String buildTempToken(@NonNull Object value) {
+        Assert.notNull(value, "Temp token value must not be null");
+
+        // Generate temp token
+        String tempToken = HaloUtils.randomUUIDWithoutDash();
+
+        // Cache the token
+        cacheStore.putIfAbsent(SecurityUtils.buildTempTokenKey(tempToken), value.toString(), TEMP_TOKEN_EXPIRATION.toDays(), TimeUnit.DAYS);
+
+        return tempToken;
     }
 }
