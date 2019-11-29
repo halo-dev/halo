@@ -1,6 +1,7 @@
 package run.halo.app.service;
 
 import org.json.JSONObject;
+import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.dto.BackupDTO;
@@ -61,7 +62,16 @@ public interface BackupService {
     /**
      * Deletes backup.
      *
-     * @param filename filename must not be blank
+     * @param fileName filename must not be blank
      */
-    void deleteHaloBackup(@NonNull String filename);
+    void deleteHaloBackup(@NonNull String fileName);
+
+    /**
+     * Loads file as resource.
+     *
+     * @param fileName backup file name must not be blank.
+     * @return resource of the given file
+     */
+    @NonNull
+    Resource loadFileAsResource(@NonNull String fileName);
 }

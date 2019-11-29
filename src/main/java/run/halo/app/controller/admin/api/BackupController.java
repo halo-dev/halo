@@ -6,6 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONObject;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
@@ -13,6 +17,7 @@ import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.service.BackupService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,6 +52,28 @@ public class BackupController {
     @ApiOperation("Get all backups")
     public List<BackupDTO> listBackups() {
         return backupService.listHaloBackups();
+    }
+
+    @GetMapping("halo/{fileName:.+}")
+    @ApiOperation("Download backup file")
+    public ResponseEntity<Resource> downloadBackup(@PathVariable("fileName") String fileName, HttpServletRequest request) {
+        log.info("Try to download backup file: [{}]", fileName);
+
+        // Load file as resource
+        Resource backupResource = backupService.loadFileAsResource(fileName);
+
+        String contentType = "application/octet-stream";
+        // Try to determine file's content type
+        try {
+            contentType = request.getServletContext().getMimeType(backupResource.getFile().getAbsolutePath());
+        } catch (IOException e) {
+            log.warn("Could not determine file type", e);
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + backupResource.getFilename() + "\"")
+                .body(backupResource);
     }
 
     @DeleteMapping("halo")

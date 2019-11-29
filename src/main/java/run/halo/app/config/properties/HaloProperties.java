@@ -2,13 +2,14 @@ package run.halo.app.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import run.halo.app.model.support.HaloConst;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
+
+import static run.halo.app.model.support.HaloConst.*;
+import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 
 /**
@@ -38,27 +39,22 @@ public class HaloProperties {
     /**
      * Admin path.
      */
-    private String adminPath = "/admin";
+    private String adminPath = "admin";
 
     /**
      * Halo backup directory.(Not recommended to modify this config);
      */
-    private String backupDir = HaloConst.TEMP_DIR + "/halo-backup/";
+    private String backupDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup" + FILE_SEPARATOR;
 
     /**
      * Work directory.
      */
-    private String workDir = HaloConst.USER_HOME + "/.halo/";
+    private String workDir = ensureSuffix(USER_HOME, FILE_SEPARATOR) + ".halo" + FILE_SEPARATOR;
 
     /**
      * Upload prefix.
      */
-    private String uploadUrlPrefix = "/upload";
-
-    /**
-     * backup prefix.
-     */
-    private String backupUrlPrefix = "/backup";
+    private String uploadUrlPrefix = "upload";
 
     /**
      * Download Timeout.
