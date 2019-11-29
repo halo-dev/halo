@@ -1,11 +1,11 @@
-package run.halo.app.model.freemarker.tag;
+package run.halo.app.core.freemarker.tag;
 
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.service.PhotoService;
+import run.halo.app.service.MenuService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,19 +13,21 @@ import java.util.Map;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Freemarker custom tag of photo.
+ * Freemarker custom tag of menu.
  *
  * @author ryanwang
- * @date : 2019/4/21
+ * @date : 2019/3/22
  */
 @Component
-public class PhotoTagDirective implements TemplateDirectiveModel {
+public class MenuTagDirective implements TemplateDirectiveModel {
 
-    private final PhotoService photoService;
+    private static final String METHOD_KEY = "method";
 
-    public PhotoTagDirective(Configuration configuration, PhotoService photoService) {
-        this.photoService = photoService;
-        configuration.setSharedVariable("photoTag", this);
+    private final MenuService menuService;
+
+    public MenuTagDirective(Configuration configuration, MenuService menuService) {
+        this.menuService = menuService;
+        configuration.setSharedVariable("menuTag", this);
     }
 
     @Override
@@ -36,17 +38,20 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    env.setVariable("photos", builder.build().wrap(photoService.listAll()));
+                    env.setVariable("menus", builder.build().wrap(menuService.listAll()));
+                    break;
+                case "tree":
+                    env.setVariable("menus", builder.build().wrap(menuService.listAsTree(Sort.by(DESC, "priority"))));
                     break;
                 case "listTeams":
-                    env.setVariable("teams", builder.build().wrap(photoService.listTeamVos(Sort.by(DESC, "createTime"))));
+                    env.setVariable("teams", builder.build().wrap(menuService.listTeamVos(Sort.by(DESC, "priority"))));
                     break;
                 case "listByTeam":
                     String team = params.get("team").toString();
-                    env.setVariable("photos", builder.build().wrap(photoService.listByTeam(team, Sort.by(DESC, "createTime"))));
+                    env.setVariable("menus", builder.build().wrap(menuService.listByTeam(team, Sort.by(DESC, "priority"))));
                     break;
                 case "count":
-                    env.setVariable("count", builder.build().wrap(photoService.count()));
+                    env.setVariable("count", builder.build().wrap(menuService.count()));
                     break;
                 default:
                     break;

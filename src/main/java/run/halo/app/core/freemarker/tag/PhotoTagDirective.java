@@ -1,11 +1,11 @@
-package run.halo.app.model.freemarker.tag;
+package run.halo.app.core.freemarker.tag;
 
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.service.LinkService;
+import run.halo.app.service.PhotoService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,19 +13,19 @@ import java.util.Map;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Freemarker custom tag of link.
+ * Freemarker custom tag of photo.
  *
  * @author ryanwang
- * @date : 2019/3/22
+ * @date : 2019/4/21
  */
 @Component
-public class LinkTagDirective implements TemplateDirectiveModel {
+public class PhotoTagDirective implements TemplateDirectiveModel {
 
-    private final LinkService linkService;
+    private final PhotoService photoService;
 
-    public LinkTagDirective(Configuration configuration, LinkService linkService) {
-        this.linkService = linkService;
-        configuration.setSharedVariable("linkTag", this);
+    public PhotoTagDirective(Configuration configuration, PhotoService photoService) {
+        this.photoService = photoService;
+        configuration.setSharedVariable("photoTag", this);
     }
 
     @Override
@@ -36,13 +36,17 @@ public class LinkTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    env.setVariable("links", builder.build().wrap(linkService.listAll()));
+                    env.setVariable("photos", builder.build().wrap(photoService.listAll()));
                     break;
                 case "listTeams":
-                    env.setVariable("teams", builder.build().wrap(linkService.listTeamVos(Sort.by(DESC, "createTime"))));
+                    env.setVariable("teams", builder.build().wrap(photoService.listTeamVos(Sort.by(DESC, "createTime"))));
+                    break;
+                case "listByTeam":
+                    String team = params.get("team").toString();
+                    env.setVariable("photos", builder.build().wrap(photoService.listByTeam(team, Sort.by(DESC, "createTime"))));
                     break;
                 case "count":
-                    env.setVariable("count", builder.build().wrap(linkService.count()));
+                    env.setVariable("count", builder.build().wrap(photoService.count()));
                     break;
                 default:
                     break;
