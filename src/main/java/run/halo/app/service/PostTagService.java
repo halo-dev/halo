@@ -74,6 +74,16 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
     List<Post> listPostsBy(@NonNull Integer tagId, @NonNull PostStatus status);
 
     /**
+     * Lists posts by tag slug and post status.
+     *
+     * @param slug   tag slug must not be null
+     * @param status post status
+     * @return a list of post
+     */
+    @NonNull
+    List<Post> listPostsBy(@NonNull String slug, @NonNull PostStatus status);
+
+    /**
      * Pages posts by tag id.
      *
      * @param tagId    must not be null
