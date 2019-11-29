@@ -16,6 +16,11 @@ import java.util.List;
 @Component
 public class RandomMethod implements TemplateMethodModelEx {
 
+    /**
+     * Constructor.
+     *
+     * @param configuration injected by spring.
+     */
     public RandomMethod(Configuration configuration) {
         configuration.setSharedVariable("randomMethod", this);
     }
@@ -29,6 +34,9 @@ public class RandomMethod implements TemplateMethodModelEx {
      */
     @Override
     public Object exec(List arguments) throws TemplateModelException {
+        if (arguments.size() != 2) {
+            throw new TemplateModelException("Wrong arguments! 2 arguments are needed");
+        }
         SimpleNumber argOne = (SimpleNumber) arguments.get(0);
         SimpleNumber argTwo = (SimpleNumber) arguments.get(1);
         int start = argOne.getAsNumber().intValue();

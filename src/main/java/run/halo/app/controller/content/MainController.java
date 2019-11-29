@@ -3,7 +3,6 @@ package run.halo.app.controller.content;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.ServiceException;
@@ -13,6 +12,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -24,6 +24,16 @@ import java.io.IOException;
  */
 @Controller
 public class MainController {
+
+    /**
+     * Index redirect uri.
+     */
+    private final static String INDEX_REDIRECT_URI = "index.html";
+
+    /**
+     * Install redirect uri.
+     */
+    private final static String INSTALL_REDIRECT_URI = INDEX_REDIRECT_URI + "#install";
 
     private final UserService userService;
 
@@ -37,9 +47,10 @@ public class MainController {
         this.haloProperties = haloProperties;
     }
 
-    @GetMapping("{permlink}")
-    public String admin(@PathVariable(name = "permlink") String permlink) {
-        return "redirect:/" + permlink + "/index.html";
+    @GetMapping("${halo.admin-path:admin}")
+    public void admin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String adminIndexRedirectUri = StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/") + INDEX_REDIRECT_URI;
+        response.sendRedirect(adminIndexRedirectUri);
     }
 
     @GetMapping("version")
@@ -49,8 +60,9 @@ public class MainController {
     }
 
     @GetMapping("install")
-    public String installation() {
-        return "redirect:" + haloProperties.getAdminPath() + "/index.html#install";
+    public void installation(HttpServletResponse response) throws IOException {
+        String installRedirectUri = StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/") + INSTALL_REDIRECT_URI;
+        response.sendRedirect(installRedirectUri);
     }
 
     @GetMapping("avatar")
@@ -76,4 +88,5 @@ public class MainController {
             response.sendRedirect(favicon);
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package run.halo.app.controller.core;
 
+import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -68,7 +69,11 @@ public class CommonController extends AbstractErrorController {
     public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
         HttpStatus status = getStatus(request);
 
-        log.error("Error path: [{}], status: [{}]", getErrorPath(), status);
+        log.error("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
+                request.getRequestURL(),
+                request.getRequestURI(),
+                request.getMethod(),
+                ServletUtil.getClientIP(request));
 
         handleCustomException(request);
 
