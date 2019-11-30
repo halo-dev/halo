@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
@@ -183,7 +184,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
         if (!tokenCountOptional.isPresent()) {
             // If the token is not found
-            return false;
+            throw new ForbiddenException("The temporary token has been expired").setErrorData(tempToken);
         }
 
         log.info("Got valid temp token: [{}]", tempToken);
