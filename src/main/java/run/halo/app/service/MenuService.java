@@ -48,6 +48,15 @@ public interface MenuService extends CrudService<Menu, Integer> {
     List<MenuDTO> listByTeam(@NonNull String team, Sort sort);
 
     /**
+     * List menus by team as tree.
+     *
+     * @param team team
+     * @param sort sort
+     * @return list of tree menus
+     */
+    List<MenuVO> listByTeamAsTree(@NonNull String team, Sort sort);
+
+    /**
      * Creates a menu.
      *
      * @param menuParam must not be null
@@ -62,7 +71,7 @@ public interface MenuService extends CrudService<Menu, Integer> {
      * @param sort sort info must not be null
      * @return a menu tree
      */
-    List<MenuVO> listAsTree(Sort sort);
+    List<MenuVO> listAsTree(@NonNull Sort sort);
 
     /**
      * Lists menu by parent id.
