@@ -14,7 +14,8 @@ import java.util.List;
  * Post list vo.
  *
  * @author johnniang
- * @date 3/19/19
+ * @author guqing
+ * @date 2019-03-19
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
