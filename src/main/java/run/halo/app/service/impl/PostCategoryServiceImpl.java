@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-19
  */
 @Service

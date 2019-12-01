@@ -23,7 +23,8 @@ import java.util.Collections;
  * The method executed after the application is started.
  *
  * @author ryanwang
- * @date : 2018/12/5
+ * @author guqing
+ * @date : 2018-12-05
  */
 @Slf4j
 @Configuration

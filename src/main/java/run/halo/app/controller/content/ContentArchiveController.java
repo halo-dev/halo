@@ -34,6 +34,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Blog archive page controller
  *
  * @author ryanwang
+ * @author guqing
  * @date : 2019-03-17
  */
 @Slf4j

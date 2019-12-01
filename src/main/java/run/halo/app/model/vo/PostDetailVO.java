@@ -18,7 +18,8 @@ import java.util.Set;
  * Post vo.
  *
  * @author johnniang
- * @date 3/21/19
+ * @author guqing
+ * @date 2019-03-21
  */
 @Data
 @ToString(callSuper = true)
