@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.ArchiveMonthVO;
@@ -50,6 +51,19 @@ public interface PostService extends BasePostService<Post> {
      * @param post        post must not be null
      * @param tagIds      tag id set
      * @param categoryIds category id set
+     * @param postMetas   post metas
+     * @param autoSave    autoSave
+     * @return post created
+     */
+    @NonNull
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave);
+
+    /**
+     * Creates post by post param.
+     *
+     * @param post        post must not be null
+     * @param tagIds      tag id set
+     * @param categoryIds category id set
      * @param autoSave    autoSave
      * @return post created
      */
@@ -66,7 +80,7 @@ public interface PostService extends BasePostService<Post> {
      * @return updated post
      */
     @NonNull
-    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
+    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave);
 
     /**
      * Gets post by post status and url.

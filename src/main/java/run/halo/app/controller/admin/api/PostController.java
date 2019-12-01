@@ -13,7 +13,9 @@ import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostMetaParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
@@ -102,8 +104,7 @@ public class PostController {
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Convert to
         Post post = postParam.convertTo();
-
-        return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), autoSave);
+        return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
     }
 
     @PutMapping("{postId:\\d+}")
@@ -114,8 +115,7 @@ public class PostController {
         Post postToUpdate = postService.getById(postId);
 
         postParam.update(postToUpdate);
-
-        return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(), autoSave);
+        return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
     }
 
     @PutMapping("{postId:\\d+}/status/{status}")

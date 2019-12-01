@@ -56,3 +56,4 @@ logging:
 
 halo:
   download-timeout: 5m
+  doc-disabled: false

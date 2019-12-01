@@ -16,6 +16,7 @@ import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.BaseCommentVO;
@@ -46,6 +47,8 @@ public class ContentArchiveController {
 
     private final PostCategoryService postCategoryService;
 
+    private final PostMetaService postMetaService;
+
     private final PostTagService postTagService;
 
     private final PostCommentService postCommentService;
@@ -57,6 +60,7 @@ public class ContentArchiveController {
     public ContentArchiveController(PostService postService,
                                     ThemeService themeService,
                                     PostCategoryService postCategoryService,
+                                    PostMetaService postMetaService,
                                     PostTagService postTagService,
                                     PostCommentService postCommentService,
                                     OptionService optionService,
@@ -64,6 +68,7 @@ public class ContentArchiveController {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
+        this.postMetaService = postMetaService;
         this.postTagService = postTagService;
         this.postCommentService = postCommentService;
         this.optionService = optionService;
@@ -157,12 +162,14 @@ public class ContentArchiveController {
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
+        List<PostMeta> postMetas = postMetaService.listPostMetasBy(post.getId());
 
         Page<BaseCommentVO> comments = postCommentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
 
         model.addAttribute("is_post", true);
         model.addAttribute("post", postService.convertToDetailVo(post));
         model.addAttribute("categories", categories);
+        model.addAttribute("postMetas", postMetas);
         model.addAttribute("tags", tags);
         model.addAttribute("comments", comments);
 
