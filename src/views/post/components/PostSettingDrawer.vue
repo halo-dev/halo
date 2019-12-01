@@ -167,6 +167,29 @@
             </div>
           </div>
         </div>
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">元数据</h3>
+          <a-form-item
+            v-for="(postMeta, index) in selectedPostMetas"
+            :key="index"
+            :prop="'postMetas.' + index + '.value'"
+          >
+            <a-row :gutter="10">
+              <a-col :span="11">
+                <a-input v-model="postMeta.key"><i slot="addonBefore">K</i></a-input>
+              </a-col>
+              <a-col :span="11">
+                <a-input v-model="postMeta.value"><i slot="addonBefore">V</i></a-input>
+              </a-col>
+              <a-col :span="2">
+                <a-icon type="close" @click.prevent="removePostMeta(postMeta)"/>
+              </a-col>
+            </a-row>
+          </a-form-item>
+          <a-form-item>
+            <a-button @click="addPostMeta">新增</a-button>
+          </a-form-item>
+        </div>
         <a-divider class="divider-transparent" />
       </div>
     </a-skeleton>
@@ -238,6 +261,10 @@ export default {
       type: Array,
       required: true
     },
+    postMetas: {
+      type: Array,
+      required: true
+    },
     visible: {
       type: Boolean,
       required: false,
@@ -283,6 +310,9 @@ export default {
     selectedCategoryIds(val) {
       this.$emit('onRefreshCategoryIds', val)
     },
+    selectedPostMetas(val) {
+      this.$emit('onRefreshPostMetas', val)
+    },
     visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
@@ -291,6 +321,11 @@ export default {
     }
   },
   computed: {
+    selectedPostMetas() {
+      // 不能将selectedPostMetas直接定义在data里
+      // 还没有获取到值就渲染视图,可以直接使用postMetas
+      return this.postMetas
+    },
     pickerDefaultValue() {
       if (this.selectedPost.createTime) {
         var date = new Date(this.selectedPost.createTime)
@@ -370,6 +405,8 @@ export default {
       this.selectedPost.categoryIds = this.selectedCategoryIds
       // Set tag ids
       this.selectedPost.tagIds = this.selectedTagIds
+      // Set post metas
+      this.selectedPost.postMetas = this.selectedPostMetas
 
       if (this.selectedPost.id) {
         // Update the post
@@ -402,6 +439,18 @@ export default {
     },
     onPostDateOk(value) {
       this.selectedPost.createTime = value.valueOf()
+    },
+    removePostMeta(item) {
+      var index = this.selectedPostMetas.indexOf(item)
+      if (index !== -1) {
+        this.selectedPostMetas.splice(index, 1)
+      }
+    },
+    addPostMeta() {
+      this.selectedPostMetas.push({
+        value: '',
+        key: ''
+      })
     }
   }
 }

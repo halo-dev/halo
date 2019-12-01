@@ -495,6 +495,7 @@
       :post="selectedPost"
       :tagIds="selectedTagIds"
       :categoryIds="selectedCategoryIds"
+      :postMetas="selectedPostMetas"
       :needTitle="true"
       :saveDraftButton="false"
       :savePublishButton="false"
@@ -504,6 +505,7 @@
       @onRefreshPost="onRefreshPostFromSetting"
       @onRefreshTagIds="onRefreshTagIdsFromSetting"
       @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
+      @onRefreshPostMetas="onRefreshPostMetasFromSetting"
     />
 
     <TargetCommentDrawer
@@ -605,6 +607,10 @@ export default {
       columns,
       selectedRowKeys: [],
       categories: [],
+      selectedPostMetas: [{
+        key: '',
+        value: ''
+      }],
       posts: [],
       postsLoading: false,
       postSettingVisible: false,
@@ -747,6 +753,8 @@ export default {
         this.selectedPost = response.data.data
         this.selectedTagIds = this.selectedPost.tagIds
         this.selectedCategoryIds = this.selectedPost.categoryIds
+        this.selectedPostMetaIds = this.selectedPost.postMetaIds
+        this.selectedPostMetas = this.selectedPost.postMetas
         this.postSettingVisible = true
       })
     },
@@ -787,6 +795,9 @@ export default {
     },
     onRefreshCategoryIdsFromSetting(categoryIds) {
       this.selectedCategoryIds = categoryIds
+    },
+    onRefreshPostMetasFromSetting(postMetas) {
+      this.selectedPostMetas = postMetas
     }
   }
 }
