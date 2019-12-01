@@ -2,8 +2,10 @@ package run.halo.app.model.params;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostCreateFrom;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.utils.SlugUtils;
@@ -12,6 +14,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -59,6 +62,8 @@ public class PostParam implements InputConverter<Post> {
 
     private Set<Integer> categoryIds;
 
+    private Set<PostMetaParam> postMetas;
+
     @Override
     public Post convertTo() {
         url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
@@ -79,5 +84,18 @@ public class PostParam implements InputConverter<Post> {
         }
 
         InputConverter.super.update(post);
+    }
+
+    public Set<PostMeta> getPostMetas() {
+        Set<PostMeta> postMetaSet = new HashSet<>();
+        if(CollectionUtils.isEmpty(postMetas)) {
+            return postMetaSet;
+        }
+
+        for(PostMetaParam postMetaParam : postMetas) {
+            PostMeta postMeta = postMetaParam.convertTo();
+            postMetaSet.add(postMeta);
+        }
+        return postMetaSet;
     }
 }

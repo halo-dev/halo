@@ -18,6 +18,7 @@ import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.model.dto.CategoryDTO;
+import run.halo.app.model.dto.PostMetaDTO;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
@@ -67,6 +68,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final PostMetaService postMetaService;
+
     public PostServiceImpl(PostRepository postRepository,
                            TagService tagService,
                            CategoryService categoryService,
@@ -74,7 +77,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                            PostCategoryService postCategoryService,
                            PostCommentService postCommentService,
                            ApplicationEventPublisher eventPublisher,
-                           OptionService optionService) {
+                           OptionService optionService,
+                           PostMetaService postMetaService) {
         super(postRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
@@ -83,6 +87,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         this.postCategoryService = postCategoryService;
         this.postCommentService = postCommentService;
         this.eventPublisher = eventPublisher;
+        this.postMetaService = postMetaService;
     }
 
     @Override
@@ -109,8 +114,19 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     @Transactional
+    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave) {
+        PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds, postMetas);
+        if (!autoSave) {
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
+        return createdPost;
+    }
+
+    @Override
     public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
-        PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds);
+        PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds, null);
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
@@ -121,10 +137,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     @Transactional
-    public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
+    public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave) {
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
-        PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds);
+        PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, postMetas);
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(), LogType.POST_EDITED, updatedPost.getTitle());
@@ -227,6 +243,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Set<Integer> tagIds = new HashSet<>();
 
         Set<Integer> categoryIds = new HashSet<>();
+
         if (frontMatter.size() > 0) {
             for (String key : frontMatter.keySet()) {
                 elementValue = frontMatter.get(key);
@@ -309,6 +326,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public String exportMarkdown(Post post) {
         Assert.notNull(post, "Post must not be null");
 
+
         StrBuilder content = new StrBuilder("---\n");
 
         content.append("type: ").append("post").append("\n");
@@ -338,6 +356,15 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
         }
 
+        List<PostMeta> postMetas = postMetaService.listPostMetasBy(post.getId());
+
+        if (postMetas.size() > 0) {
+            content.append("postMetas:").append("\n");
+            for (PostMeta postMeta : postMetas) {
+                content.append("  - ").append(postMeta.getKey()).append(" :  ").append(postMeta.getValue()).append("\n");
+            }
+        }
+
         content.append("---\n\n");
         content.append(post.getOriginalContent());
         return content.toString();
@@ -349,9 +376,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         // List categories
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
-
+        // List postMetas
+        List<PostMeta> postMetas = postMetaService.listPostMetasBy(post.getId());
         // Convert to detail vo
-        return convertTo(post, tags, categories);
+        return convertTo(post, tags, categories, postMetas);
     }
 
     @Override
@@ -369,6 +397,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<PostCategory> postCategories = postCategoryService.removeByPostId(postId);
 
         log.debug("Removed post categories: [{}]", postCategories);
+
+        List<PostMeta> postMetas = postMetaService.removeByPostId(postId);
+        log.debug("Removed post metas: [{}]", postMetas);
 
         Post deletedPost = super.removeById(postId);
 
@@ -395,6 +426,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Get comment count
         Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
 
+        // Get post meta list map
+        Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaListMap(postIds);
+
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
@@ -420,6 +454,14 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .map(category -> (CategoryDTO) new CategoryDTO().convertFrom(category))
                     .collect(Collectors.toList()));
 
+            // Set post metas
+            postListVO.setPostMetas(Optional.ofNullable(postMetaListMap.get(post.getId()))
+                    .orElseGet(LinkedList::new)
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .map(postMeta -> (PostMetaDTO) new PostMetaDTO().convertFrom(postMeta))
+                    .collect(Collectors.toList()));
+
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
@@ -433,10 +475,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
      * @param post       post must not be null
      * @param tags       tags
      * @param categories categories
+     * @param postMetaList postMetas
      * @return post detail vo
      */
     @NonNull
-    private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Tag> tags, @Nullable List<Category> categories) {
+    private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Tag> tags, @Nullable List<Category> categories, List<PostMeta> postMetaList) {
         Assert.notNull(post, "Post must not be null");
 
         // Convert to base detail vo
@@ -445,6 +488,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Extract ids
         Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);
         Set<Integer> categoryIds = ServiceUtils.fetchProperty(categories, Category::getId);
+        Set<Long> postMetaIds = ServiceUtils.fetchProperty(postMetaList, PostMeta::getId);
 
         // Get post tag ids
         postDetailVO.setTagIds(tagIds);
@@ -454,6 +498,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         postDetailVO.setCategoryIds(categoryIds);
         postDetailVO.setCategories(categoryService.convertTo(categories));
 
+        // Get post meta ids
+        postDetailVO.setPostMetaIds(postMetaIds);
+        postDetailVO.setPostMetas(postMetaService.convertTo(postMetaList));
         return postDetailVO;
     }
 
@@ -499,7 +546,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         };
     }
 
-    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds) {
+    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas) {
         Assert.notNull(post, "Post param must not be null");
 
         // Create or update post
@@ -525,7 +572,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         log.debug("Created post categories: [{}]", postCategories);
 
+        // Create post meta data
+        List<PostMeta> postMetaList = postMetaService.createOrUpdateByPostId(post.getId(), postMetas);
+        log.debug("Created post postMetas: [{}]", postMetaList);
+
         // Convert to post detail vo
-        return convertTo(post, tags, categories);
+        return convertTo(post, tags, categories, postMetaList);
     }
 }
