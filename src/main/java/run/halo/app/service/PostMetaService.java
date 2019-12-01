@@ -26,7 +26,7 @@ public interface PostMetaService extends BaseMetaService<PostMeta> {
      * @param postMetas post metas must not be null
      * @return a list of post meta
      */
-    List<PostMeta> createOrUpdateByPostId(@NonNull Integer postId, @NonNull Set<PostMeta> postMetas);
+    List<PostMeta> createOrUpdateByPostId(@NonNull Integer postId, Set<PostMeta> postMetas);
 
     /**
      * Lists post metas by post id.
