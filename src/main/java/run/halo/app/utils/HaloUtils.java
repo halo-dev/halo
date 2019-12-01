@@ -30,17 +30,6 @@ public class HaloUtils {
 
     public static final String URL_SEPARATOR = "/";
 
-    /**
-     * Gets current http servlet request.
-     *
-     * @return current http servlet request
-     */
-    @NonNull
-    public static HttpServletRequest getHttpServletRequest() {
-        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
-                .getRequest();
-    }
-
     @NonNull
     public static String ensureBoth(@NonNull String string, @NonNull String bothfix) {
         return ensureBoth(string, bothfix, bothfix);

@@ -10,10 +10,10 @@
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">您在《${page!}》的留言:
                     <br />
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;padding:10px 20px;background:#f8f8f8;margin:0">${baseContent!}</p>
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">${replyAuthor!} 给你的回复:
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">${replyAuthor!} 给您的回复:
                     <br />
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;padding:10px 20px;background:#f8f8f8;margin:0">${replyContent!}</p>
-                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">你可以点击
+                <p style="color: #6e6e6e;font-size:13px;line-height:24px;">您可以点击
                     <a href="${url!}">查看完整内容</a>
                 </p>
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">欢迎再度光临
