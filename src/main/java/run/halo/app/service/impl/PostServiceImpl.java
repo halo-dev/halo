@@ -557,6 +557,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         postCategoryService.removeByPostId(post.getId());
 
+        postMetaService.removeByPostId(post.getId());
+
         // List all tags
         List<Tag> tags = tagService.listAllByIds(tagIds);
 
