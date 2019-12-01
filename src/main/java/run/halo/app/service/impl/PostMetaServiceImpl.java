@@ -47,7 +47,6 @@ public class PostMetaServiceImpl extends BaseMetaServiceImpl<PostMeta> implement
     @Override
     public List<PostMeta> createOrUpdateByPostId(Integer postId, Set<PostMeta> postMetas) {
         Assert.notNull(postId, "Post id must not be null");
-        Assert.notNull(postMetas, "Post metas must not be null");
         if (CollectionUtils.isEmpty(postMetas)) {
             return Collections.emptyList();
         }
