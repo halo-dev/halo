@@ -428,7 +428,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
 
         // Get post meta list map
-        Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaListMap(postIds);
+        Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
 
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
