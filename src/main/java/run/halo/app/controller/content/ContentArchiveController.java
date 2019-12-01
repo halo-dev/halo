@@ -163,15 +163,15 @@ public class ContentArchiveController {
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
-        List<PostMeta> postMetas = postMetaService.listPostMetasBy(post.getId());
+        List<PostMeta> metas = postMetaService.listPostMetasBy(post.getId());
 
         Page<BaseCommentVO> comments = postCommentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
 
         model.addAttribute("is_post", true);
         model.addAttribute("post", postService.convertToDetailVo(post));
         model.addAttribute("categories", categories);
-        model.addAttribute("postMetas", postMetas);
         model.addAttribute("tags", tags);
+        model.addAttribute("metas", postMetaService.convertToMap(metas));
         model.addAttribute("comments", comments);
 
         if (preview) {
