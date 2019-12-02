@@ -77,23 +77,23 @@ attachmentApi.type = {
     text: 'SM.MS'
   },
   UPOSS: {
-    type: 'upyun',
+    type: 'uposs',
     text: '又拍云'
   },
   QINIUOSS: {
-    type: 'qnyun',
+    type: 'qiniuoss',
     text: '七牛云'
   },
   ALIOSS: {
-    type: 'aliyun',
+    type: 'alioss',
     text: '阿里云'
   },
   BAIDUBOS: {
-    type: 'baiduyun',
+    type: 'baidubos',
     text: '百度云'
   },
   TENCENTCOS: {
-    type: 'tencentyun',
+    type: 'tencentcos',
     text: '腾讯云'
   }
 }

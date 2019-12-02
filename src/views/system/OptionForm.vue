@@ -160,7 +160,7 @@
                 <a-form-item label="评论回复通知对方：">
                   <a-switch v-model="options.comment_reply_notice" />
                 </a-form-item>
-                <a-form-item label="API 评论开关：">
+                <a-form-item label="API 评论开关：" help="* 关闭之后将无法进行评论">
                   <a-switch v-model="options.comment_api_enabled" />
                 </a-form-item>
                 <a-form-item label="评论模块 JS：">

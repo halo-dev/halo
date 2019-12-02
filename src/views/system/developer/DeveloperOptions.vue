@@ -13,11 +13,17 @@
               </span>
               <Environment />
             </a-tab-pane>
-            <a-tab-pane key="runtimelogs">
+            <a-tab-pane key="runtimeLogs">
               <span slot="tab">
                 <a-icon type="code" />实时日志
               </span>
               <RuntimeLogs />
+            </a-tab-pane>
+            <a-tab-pane key="optionsList">
+              <span slot="tab">
+                <a-icon type="code" />系统变量
+              </span>
+              <OptionsList />
             </a-tab-pane>
             <a-tab-pane key="settings">
               <span slot="tab">
@@ -43,11 +49,13 @@ import { mapGetters } from 'vuex'
 import Environment from './tabs/Environment'
 import RuntimeLogs from './tabs/RuntimeLogs'
 import SettingsForm from './tabs/SettingsForm'
+import OptionsList from './tabs/OptionsList'
 export default {
   components: {
     Environment,
     RuntimeLogs,
-    SettingsForm
+    SettingsForm,
+    OptionsList
   },
   computed: {
     ...mapGetters(['options'])
