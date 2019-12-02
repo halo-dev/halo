@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 /**
- * You pai yun oss properties.
+ * Upyun oss properties.
  *
  * @author johnniang
  * @author ryanwang

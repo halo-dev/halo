@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 /**
- * Tencent yun cos properties.
+ * Tencent cos properties.
  *
  * @author wangya
  * @author ryanwang
@@ -10,44 +10,44 @@ package run.halo.app.model.properties;
 public enum TencentCosProperties implements PropertyEnum {
 
     /**
-     * Tencent yun cos domain protocol.
+     * Tencent cos domain protocol.
      */
-    COS_PROTOCOL("cos_tencentyun_domain_protocol", String.class, "https://"),
+    COS_PROTOCOL("cos_tencent_domain_protocol", String.class, "https://"),
 
     /**
-     * Tencent yun cos domain.
+     * Tencent cos domain.
      */
-    COS_DOMAIN("cos_tencentyun_domain", String.class, ""),
+    COS_DOMAIN("cos_tencent_domain", String.class, ""),
 
     /**
-     * Tencent yun cos endpoint.
+     * Tencent cos endpoint.
      */
-    COS_REGION("cos_tencentyun_region", String.class, ""),
+    COS_REGION("cos_tencent_region", String.class, ""),
 
     /**
-     * Tencent yun cos bucket name.
+     * Tencent cos bucket name.
      */
-    COS_BUCKET_NAME("cos_tencentyun_bucket_name", String.class, ""),
+    COS_BUCKET_NAME("cos_tencent_bucket_name", String.class, ""),
 
     /**
-     * Tencent yun cos secret id.
+     * Tencent cos secret id.
      */
-    COS_SECRET_ID("cos_tencentyun_secret_id", String.class, ""),
+    COS_SECRET_ID("cos_tencent_secret_id", String.class, ""),
 
     /**
-     * Tencent yun cos secret key.
+     * Tencent cos secret key.
      */
-    COS_SECRET_KEY("cos_tencentyun_secret_key", String.class, ""),
+    COS_SECRET_KEY("cos_tencent_secret_key", String.class, ""),
 
     /**
-     * Tencent yun cos style rule.
+     * Tencent cos style rule.
      */
-    COS_STYLE_RULE("cos_tencentyun_style_rule", String.class, ""),
+    COS_STYLE_RULE("cos_tencent_style_rule", String.class, ""),
 
     /**
-     * Tencent yun cos thumbnail style rule.
+     * Tencent cos thumbnail style rule.
      */
-    COS_THUMBNAIL_STYLE_RULE("cos_tencentyun_thumbnail_style_rule", String.class, "");
+    COS_THUMBNAIL_STYLE_RULE("cos_tencent_thumbnail_style_rule", String.class, "");
 
     private final String value;
 

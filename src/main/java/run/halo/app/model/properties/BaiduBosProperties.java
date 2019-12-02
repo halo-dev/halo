@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 /**
- * Baidu yun bos properties.
+ * Baidu bos properties.
  *
  * @author wangya
  * @author ryanwang
@@ -10,44 +10,44 @@ package run.halo.app.model.properties;
 public enum BaiduBosProperties implements PropertyEnum {
 
     /**
-     * Baidu yun bos domain protocol.
+     * Baidu bos domain protocol.
      */
-    BOS_PROTOCOL("bos_baiduyun_domain_protocol", String.class, "https://"),
+    BOS_PROTOCOL("bos_baidu_domain_protocol", String.class, "https://"),
 
     /**
-     * Baidu yun bos domain.
+     * Baidu bos domain.
      */
-    BOS_DOMAIN("bos_baiduyun_domain", String.class, ""),
+    BOS_DOMAIN("bos_baidu_domain", String.class, ""),
 
     /**
-     * Baidu yun bos endpoint.
+     * Baidu bos endpoint.
      */
-    BOS_ENDPOINT("bos_baiduyun_endpoint", String.class, ""),
+    BOS_ENDPOINT("bos_baidu_endpoint", String.class, ""),
 
     /**
-     * Baidu yun bos bucket name.
+     * Baidu bos bucket name.
      */
-    BOS_BUCKET_NAME("bos_baiduyun_bucket_name", String.class, ""),
+    BOS_BUCKET_NAME("bos_baidu_bucket_name", String.class, ""),
 
     /**
-     * Baidu yun bos access key.
+     * Baidu bos access key.
      */
-    BOS_ACCESS_KEY("bos_baiduyun_access_key", String.class, ""),
+    BOS_ACCESS_KEY("bos_baidu_access_key", String.class, ""),
 
     /**
-     * Baidu yun bos secret key.
+     * Baidu bos secret key.
      */
-    BOS_SECRET_KEY("bos_baiduyun_secret_key", String.class, ""),
+    BOS_SECRET_KEY("bos_baidu_secret_key", String.class, ""),
 
     /**
-     * Baidu yun bos style rule.
+     * Baidu bos style rule.
      */
-    BOS_STYLE_RULE("bos_baiduyun_style_rule", String.class, ""),
+    BOS_STYLE_RULE("bos_baidu_style_rule", String.class, ""),
 
     /**
-     * Baidu yun bos thumbnail style rule.
+     * Baidu bos thumbnail style rule.
      */
-    BOS_THUMBNAIL_STYLE_RULE("bos_baiduyun_thumbnail_style_rule", String.class, "");
+    BOS_THUMBNAIL_STYLE_RULE("bos_baidu_thumbnail_style_rule", String.class, "");
 
     private final String value;
 
