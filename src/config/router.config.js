@@ -35,7 +35,7 @@ export const asyncRouterMap = [
             path: '/posts/write',
             name: 'PostEdit',
             component: () => import('@/views/post/PostEdit'),
-            meta: { title: '写文章', hiddenHeaderContent: false }
+            meta: { title: '写文章', hiddenHeaderContent: false, keepAlive: false }
           },
           {
             path: '/categories',
@@ -70,7 +70,7 @@ export const asyncRouterMap = [
             path: '/sheets/write',
             name: 'SheetEdit',
             component: () => import('@/views/sheet/SheetEdit'),
-            meta: { title: '新建页面', hiddenHeaderContent: false }
+            meta: { title: '新建页面', hiddenHeaderContent: false, keepAlive: false }
           },
           {
             path: '/sheets/links',

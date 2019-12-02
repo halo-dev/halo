@@ -86,6 +86,11 @@
                     :label="item.label + '：'"
                     :key="index1"
                   >
+                    <p
+                      v-if="item.description && item.description!=''"
+                      slot="help"
+                      v-html="item.description"
+                    ></p>
                     <a-input
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
