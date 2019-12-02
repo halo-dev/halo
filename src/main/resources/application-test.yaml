@@ -35,6 +35,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  flyway:
+    locations: classpath:/migration
+    baseline-on-migrate: true
+    baseline-version: 1
   servlet:
     multipart:
       max-file-size: 10MB
