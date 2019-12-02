@@ -335,41 +335,41 @@
                   v-show="options.attachment_type === 'ALIOSS'"
                 >
                   <a-form-item label="绑定域名协议：">
-                    <a-select v-model="options.oss_aliyun_domain_protocol">
+                    <a-select v-model="options.oss_ali_domain_protocol">
                       <a-select-option value="https://">HTTPS</a-select-option>
                       <a-select-option value="http://">HTTP</a-select-option>
                     </a-select>
                   </a-form-item>
                   <a-form-item label="绑定域名：">
                     <a-input
-                      v-model="options.oss_aliyun_domain"
+                      v-model="options.oss_ali_domain"
                       placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
                     />
                   </a-form-item>
                   <a-form-item label="Bucket：">
                     <a-input
-                      v-model="options.oss_aliyun_bucket_name"
+                      v-model="options.oss_ali_bucket_name"
                       placeholder="存储空间名称"
                     />
                   </a-form-item>
                   <a-form-item label="EndPoint（地域节点）：">
-                    <a-input v-model="options.oss_aliyun_endpoint" />
+                    <a-input v-model="options.oss_ali_endpoint" />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.oss_aliyun_access_key" />
+                    <a-input-password v-model="options.oss_ali_access_key" />
                   </a-form-item>
                   <a-form-item label="Access Secret：">
-                    <a-input-password v-model="options.oss_aliyun_access_secret" />
+                    <a-input-password v-model="options.oss_ali_access_secret" />
                   </a-form-item>
                   <a-form-item label="图片处理策略：">
                     <a-input
-                      v-model="options.oss_aliyun_style_rule"
+                      v-model="options.oss_ali_style_rule"
                       placeholder="请到阿里云控制台的图片处理获取"
                     />
                   </a-form-item>
                   <a-form-item label="缩略图处理策略：">
                     <a-input
-                      v-model="options.oss_aliyun_thumbnail_style_rule"
+                      v-model="options.oss_ali_thumbnail_style_rule"
                       placeholder="请到阿里云控制台的图片处理获取，一般为后台展示所用"
                     />
                   </a-form-item>
@@ -379,41 +379,41 @@
                   v-show="options.attachment_type === 'BAIDUBOS'"
                 >
                   <a-form-item label="绑定域名协议：">
-                    <a-select v-model="options.bos_baiduyun_domain_protocol">
+                    <a-select v-model="options.bos_baidu_domain_protocol">
                       <a-select-option value="https://">HTTPS</a-select-option>
                       <a-select-option value="http://">HTTP</a-select-option>
                     </a-select>
                   </a-form-item>
                   <a-form-item label="绑定域名：">
                     <a-input
-                      v-model="options.bos_baiduyun_domain"
+                      v-model="options.bos_baidu_domain"
                       placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
                     />
                   </a-form-item>
                   <a-form-item label="Bucket：">
                     <a-input
-                      v-model="options.bos_baiduyun_bucket_name"
+                      v-model="options.bos_baidu_bucket_name"
                       placeholder="存储空间名称"
                     />
                   </a-form-item>
                   <a-form-item label="EndPoint（地域节点）：">
-                    <a-input v-model="options.bos_baiduyun_endpoint" />
+                    <a-input v-model="options.bos_baidu_endpoint" />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.bos_baiduyun_access_key" />
+                    <a-input-password v-model="options.bos_baidu_access_key" />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.bos_baiduyun_secret_key" />
+                    <a-input-password v-model="options.bos_baidu_secret_key" />
                   </a-form-item>
                   <a-form-item label="图片处理策略：">
                     <a-input
-                      v-model="options.bos_baiduyun_style_rule"
+                      v-model="options.bos_baidu_style_rule"
                       placeholder="请到百度云控制台的图片处理获取"
                     />
                   </a-form-item>
                   <a-form-item label="缩略图处理策略：">
                     <a-input
-                      v-model="options.bos_baiduyun_thumbnail_style_rule"
+                      v-model="options.bos_baidu_thumbnail_style_rule"
                       placeholder="请到百度云控制台的图片处理获取，一般为后台展示所用"
                     />
                   </a-form-item>
@@ -423,45 +423,45 @@
                   v-show="options.attachment_type === 'TENCENTCOS'"
                 >
                   <a-form-item label="绑定域名协议：">
-                    <a-select v-model="options.cos_tencentyun_domain_protocol">
+                    <a-select v-model="options.cos_tencent_domain_protocol">
                       <a-select-option value="https://">HTTPS</a-select-option>
                       <a-select-option value="http://">HTTP</a-select-option>
                     </a-select>
                   </a-form-item>
                   <a-form-item label="绑定域名：">
                     <a-input
-                      v-model="options.cos_tencentyun_domain"
+                      v-model="options.cos_tencent_domain"
                       placeholder="如不填写，路径根域名将为 Bucket + 区域地址"
                     />
                   </a-form-item>
                   <a-form-item label="Bucket：">
                     <a-input
-                      v-model="options.cos_tencentyun_bucket_name"
+                      v-model="options.cos_tencent_bucket_name"
                       placeholder="存储桶名称"
                     />
                   </a-form-item>
                   <a-form-item label="区域：">
                     <a-auto-complete
                       :dataSource="tencentCosRegions"
-                      v-model="options.cos_tencentyun_region"
+                      v-model="options.cos_tencent_region"
                       allowClear
                     />
                   </a-form-item>
                   <a-form-item label="Secret Id：">
-                    <a-input-password v-model="options.cos_tencentyun_secret_id" />
+                    <a-input-password v-model="options.cos_tencent_secret_id" />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.cos_tencentyun_secret_key" />
+                    <a-input-password v-model="options.cos_tencent_secret_key" />
                   </a-form-item>
                   <a-form-item label="图片处理策略：">
                     <a-input
-                      v-model="options.cos_tencentyun_style_rule"
+                      v-model="options.cos_tencent_style_rule"
                       placeholder="请到腾讯云控制台的图片处理获取"
                     />
                   </a-form-item>
                   <a-form-item label="缩略图处理策略：">
                     <a-input
-                      v-model="options.cos_tencentyun_thumbnail_style_rule"
+                      v-model="options.cos_tencent_thumbnail_style_rule"
                       placeholder="请到腾讯云控制台的图片处理获取，一般为后台展示所用"
                     />
                   </a-form-item>
@@ -852,28 +852,28 @@ export default {
           }
           break
         case 'ALIOSS':
-          if (!this.options.oss_aliyun_bucket_name) {
+          if (!this.options.oss_ali_bucket_name) {
             this.$notification['error']({
               message: '提示',
               description: 'Bucket 不能为空！'
             })
             return
           }
-          if (!this.options.oss_aliyun_endpoint) {
+          if (!this.options.oss_ali_endpoint) {
             this.$notification['error']({
               message: '提示',
               description: 'EndPoint（地域节点） 不能为空！'
             })
             return
           }
-          if (!this.options.oss_aliyun_access_key) {
+          if (!this.options.oss_ali_access_key) {
             this.$notification['error']({
               message: '提示',
               description: 'Access Key 不能为空！'
             })
             return
           }
-          if (!this.options.oss_aliyun_access_secret) {
+          if (!this.options.oss_ali_access_secret) {
             this.$notification['error']({
               message: '提示',
               description: 'Access Secret 不能为空！'
@@ -882,28 +882,28 @@ export default {
           }
           break
         case 'BAIDUBOS':
-          if (!this.options.bos_baiduyun_bucket_name) {
+          if (!this.options.bos_baidu_bucket_name) {
             this.$notification['error']({
               message: '提示',
               description: 'Bucket 不能为空！'
             })
             return
           }
-          if (!this.options.bos_baiduyun_endpoint) {
+          if (!this.options.bos_baidu_endpoint) {
             this.$notification['error']({
               message: '提示',
               description: 'EndPoint（地域节点） 不能为空！'
             })
             return
           }
-          if (!this.options.bos_baiduyun_access_key) {
+          if (!this.options.bos_baidu_access_key) {
             this.$notification['error']({
               message: '提示',
               description: 'Access Key 不能为空！'
             })
             return
           }
-          if (!this.options.bos_baiduyun_secret_key) {
+          if (!this.options.bos_baidu_secret_key) {
             this.$notification['error']({
               message: '提示',
               description: 'Secret Key 不能为空！'
@@ -912,28 +912,28 @@ export default {
           }
           break
         case 'TENCENTCOS':
-          if (!this.options.cos_tencentyun_bucket_name) {
+          if (!this.options.cos_tencent_bucket_name) {
             this.$notification['error']({
               message: '提示',
               description: 'Bucket 不能为空！'
             })
             return
           }
-          if (!this.options.cos_tencentyun_region) {
+          if (!this.options.cos_tencent_region) {
             this.$notification['error']({
               message: '提示',
               description: '区域不能为空！'
             })
             return
           }
-          if (!this.options.cos_tencentyun_secret_id) {
+          if (!this.options.cos_tencent_secret_id) {
             this.$notification['error']({
               message: '提示',
               description: 'Secret Id 不能为空！'
             })
             return
           }
-          if (!this.options.cos_tencentyun_secret_key) {
+          if (!this.options.cos_tencent_secret_key) {
             this.$notification['error']({
               message: '提示',
               description: 'Secret Key 不能为空！'
