@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 /**
- * Qi niu yun oss properties.
+ * Qiniu oss properties.
  *
  * @author johnniang
  * @author ryanwang
@@ -10,42 +10,42 @@ package run.halo.app.model.properties;
 public enum QiniuOssProperties implements PropertyEnum {
 
     /**
-     * Qiniu yun oss zone.
+     * Qiniu oss zone.
      */
     OSS_ZONE("oss_qiniu_zone", String.class, "auto"),
 
     /**
-     * Qiniu yun oss access key.
+     * Qiniu oss access key.
      */
     OSS_ACCESS_KEY("oss_qiniu_access_key", String.class, ""),
 
     /**
-     * Qiniu yun oss secret key.
+     * Qiniu oss secret key.
      */
     OSS_SECRET_KEY("oss_qiniu_secret_key", String.class, ""),
 
     /**
-     * Qiniu yun oss domain protocol.
+     * Qiniu oss domain protocol.
      */
     OSS_PROTOCOL("oss_qiniu_domain_protocol", String.class, "https://"),
 
     /**
-     * Qiniu yun oss domain.
+     * Qiniu oss domain.
      */
     OSS_DOMAIN("oss_qiniu_domain", String.class, ""),
 
     /**
-     * Qiniu yun oss bucket.
+     * Qiniu oss bucket.
      */
     OSS_BUCKET("oss_qiniu_bucket", String.class, ""),
 
     /**
-     * Qiniu yun oss style rule.
+     * Qiniu oss style rule.
      */
     OSS_STYLE_RULE("oss_qiniu_style_rule", String.class, ""),
 
     /**
-     * Qiniu yun oss thumbnail style rule.
+     * Qiniu oss thumbnail style rule.
      */
     OSS_THUMBNAIL_STYLE_RULE("oss_qiniu_thumbnail_style_rule", String.class, "");
 
