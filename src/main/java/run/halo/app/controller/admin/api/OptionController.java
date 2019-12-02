@@ -1,21 +1,29 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.OptionDTO;
+import run.halo.app.model.dto.OptionListDTO;
 import run.halo.app.model.params.OptionParam;
+import run.halo.app.model.params.OptionQuery;
 import run.halo.app.service.OptionService;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 /**
  * Option Controller.
  *
  * @author johnniang
- * @date 3/20/19
+ * @author ryanwang
+ * @date 2019-03-20
  */
 @RestController
 @RequestMapping("/api/admin/options")
@@ -45,6 +53,13 @@ public class OptionController {
         }
 
         return optionService.listOptions(keys);
+    }
+
+    @GetMapping("list_view")
+    @ApiOperation("Lists all options with list view")
+    public Page<OptionListDTO> listAllWithListView(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                                   OptionQuery optionQuery) {
+        return optionService.pageDtosBy(pageable, optionQuery);
     }
 
     @PostMapping("map_view/saving")

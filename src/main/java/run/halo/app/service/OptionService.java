@@ -1,14 +1,18 @@
 package run.halo.app.service;
 
 import com.qiniu.common.Zone;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
+import run.halo.app.model.dto.OptionListDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
+import run.halo.app.model.params.OptionQuery;
 import run.halo.app.model.properties.PropertyEnum;
 import run.halo.app.service.base.CrudService;
 
@@ -91,6 +95,15 @@ public interface OptionService extends CrudService<Option, Integer> {
      */
     @NonNull
     List<OptionDTO> listDtos();
+
+    /**
+     * Pages option output dtos.
+     *
+     * @param pageable    page info must not be null
+     * @param optionQuery optionQuery
+     * @return a page of option output dto
+     */
+    Page<OptionListDTO> pageDtosBy(@NonNull Pageable pageable, OptionQuery optionQuery);
 
     /**
      * Get option by key
@@ -301,4 +314,12 @@ public interface OptionService extends CrudService<Option, Integer> {
      */
     long getBirthday();
 
+    /**
+     * Converts to option output dto.
+     *
+     * @param option option must not be null
+     * @return an option output dto
+     */
+    @NonNull
+    OptionListDTO convertToDto(@NonNull Option option);
 }
