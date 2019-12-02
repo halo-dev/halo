@@ -57,6 +57,7 @@ ext {
     flexmarkVersion = '0.42.12'
     thumbnailatorVersion = '0.4.8'
     image4jVersion = '0.7zensight1'
+    flywayVersion = '6.1.0'
 }
 
 dependencies {
@@ -98,9 +99,11 @@ dependencies {
 
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
     implementation "net.sf.image4j:image4j:$image4jVersion"
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
+
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
