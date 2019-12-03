@@ -40,6 +40,8 @@ import run.halo.app.utils.HaloUtils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -443,12 +445,22 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public String getSpringLogs() {
-        File file = new File(haloProperties.getWorkDir(), LOGS_PATH);
+    public String getApplicationConfig() {
+        File file = new File(haloProperties.getWorkDir(), APPLICATION_CONFIG_NAME);
         if (!file.exists()) {
-            return "暂无日志";
+            return "";
         }
         FileReader reader = new FileReader(file);
         return reader.readString();
+    }
+
+    @Override
+    public void updateApplicationConfig(String content) {
+        Path path = Paths.get(haloProperties.getWorkDir(), APPLICATION_CONFIG_NAME);
+        try {
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new ServiceException("保存配置文件失败", e);
+        }
     }
 }

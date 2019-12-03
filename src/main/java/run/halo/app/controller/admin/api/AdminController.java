@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.Application;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
@@ -100,9 +101,20 @@ public class AdminController {
         adminService.updateAdminAssets();
     }
 
-    @GetMapping("spring/logs")
-    @ApiOperation("Get application logs")
-    public BaseResponse<String> getSpringLogs() {
-        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getSpringLogs());
+    @GetMapping("spring/application.yaml")
+    @ApiOperation("Get application config content")
+    public BaseResponse<String> getSpringApplicationConfig() {
+        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getApplicationConfig());
+    }
+
+    @PutMapping("spring/application.yaml/update")
+    @ApiOperation("Update application config content")
+    public void updateSpringApplicationConfig(@RequestParam(name = "content") String content) {
+        adminService.updateApplicationConfig(content);
+    }
+
+    @PostMapping("/spring/restart")
+    public void restartApplication() {
+        Application.restart();
     }
 }
