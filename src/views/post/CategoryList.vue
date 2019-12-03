@@ -300,13 +300,11 @@ export default {
         categoryApi.update(this.categoryToCreate.id, this.categoryToCreate).then(response => {
           this.$message.success('更新成功！')
           this.loadCategories()
-          this.categoryToCreate = {}
         })
       } else {
         categoryApi.create(this.categoryToCreate).then(response => {
           this.$message.success('保存成功！')
           this.loadCategories()
-          this.categoryToCreate = {}
         })
       }
       this.handleAddCategory()
