@@ -14,7 +14,9 @@ import java.util.Date;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class OptionListDTO extends OptionDTO {
+public class OptionSimpleDTO extends OptionDTO {
+
+    private Integer id;
 
     private OptionType type;
 

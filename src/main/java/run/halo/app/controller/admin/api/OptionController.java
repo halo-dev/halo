@@ -7,7 +7,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.OptionDTO;
-import run.halo.app.model.dto.OptionListDTO;
+import run.halo.app.model.dto.OptionSimpleDTO;
+import run.halo.app.model.entity.Option;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
 import run.halo.app.service.OptionService;
@@ -57,9 +58,35 @@ public class OptionController {
 
     @GetMapping("list_view")
     @ApiOperation("Lists all options with list view")
-    public Page<OptionListDTO> listAllWithListView(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-                                                   OptionQuery optionQuery) {
+    public Page<OptionSimpleDTO> listAllWithListView(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+                                                     OptionQuery optionQuery) {
         return optionService.pageDtosBy(pageable, optionQuery);
+    }
+
+    @GetMapping("{id:\\d+}")
+    @ApiOperation("Get option detail by id")
+    public OptionSimpleDTO getBy(@PathVariable("id") Integer id) {
+        Option option = optionService.getById(id);
+        return optionService.convertToDto(option);
+    }
+
+    @PostMapping
+    @ApiOperation("Creates option")
+    public void createBy(@RequestBody @Valid OptionParam optionParam) {
+        optionService.save(optionParam);
+    }
+
+    @PutMapping("{optionId:\\d+}")
+    @ApiOperation("Updates option")
+    public void updateBy(@PathVariable("optionId") Integer optionId,
+                         @RequestBody @Valid OptionParam optionParam) {
+        optionService.update(optionId, optionParam);
+    }
+
+    @DeleteMapping("{optionId:\\d+}")
+    @ApiOperation("Deletes option")
+    public void deletePermanently(@PathVariable("optionId") Integer optionId) {
+        optionService.removePermanently(optionId);
     }
 
     @PostMapping("map_view/saving")

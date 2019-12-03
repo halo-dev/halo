@@ -20,7 +20,7 @@ import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
-import run.halo.app.model.dto.OptionListDTO;
+import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
@@ -131,6 +131,21 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public void save(OptionParam optionParam) {
+        Option option = optionParam.convertTo();
+        create(option);
+        publishOptionUpdatedEvent();
+    }
+
+    @Override
+    public void update(Integer optionId, OptionParam optionParam) {
+        Option optionToUpdate = getById(optionId);
+        optionParam.update(optionToUpdate);
+        update(optionToUpdate);
+        publishOptionUpdatedEvent();
+    }
+
+    @Override
     public void saveProperty(PropertyEnum property, String value) {
         Assert.notNull(property, "Property must not be null");
 
@@ -221,12 +236,19 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public Page<OptionListDTO> pageDtosBy(Pageable pageable, OptionQuery optionQuery) {
+    public Page<OptionSimpleDTO> pageDtosBy(Pageable pageable, OptionQuery optionQuery) {
         Assert.notNull(pageable, "Page info must not be null");
 
         Page<Option> optionPage = optionRepository.findAll(buildSpecByQuery(optionQuery), pageable);
 
         return optionPage.map(this::convertToDto);
+    }
+
+    @Override
+    public Option removePermanently(Integer id) {
+        Option deletedOption = removeById(id);
+        publishOptionUpdatedEvent();
+        return deletedOption;
     }
 
     @NonNull
@@ -439,10 +461,10 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
-    public OptionListDTO convertToDto(Option option) {
+    public OptionSimpleDTO convertToDto(Option option) {
         Assert.notNull(option, "Option must not be null");
 
-        return new OptionListDTO().convertFrom(option);
+        return new OptionSimpleDTO().convertFrom(option);
     }
 
     private void cleanCache() {

@@ -8,7 +8,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
-import run.halo.app.model.dto.OptionListDTO;
+import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
@@ -46,12 +46,27 @@ public interface OptionService extends CrudService<Option, Integer> {
     void save(@Nullable Map<String, Object> options);
 
     /**
-     * SAve multiple options
+     * Save multiple options
      *
      * @param optionParams option params
      */
     @Transactional
     void save(@Nullable List<OptionParam> optionParams);
+
+    /**
+     * Save single option.
+     *
+     * @param optionParam option param
+     */
+    void save(@Nullable OptionParam optionParam);
+
+    /**
+     * Update option by id.
+     *
+     * @param optionId    option id must not be null.
+     * @param optionParam option param must not be null.
+     */
+    void update(@NonNull Integer optionId, @NonNull OptionParam optionParam);
 
     /**
      * Saves a property.
@@ -103,7 +118,16 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @param optionQuery optionQuery
      * @return a page of option output dto
      */
-    Page<OptionListDTO> pageDtosBy(@NonNull Pageable pageable, OptionQuery optionQuery);
+    Page<OptionSimpleDTO> pageDtosBy(@NonNull Pageable pageable, OptionQuery optionQuery);
+
+    /**
+     * Removes option permanently.
+     *
+     * @param id option id must not be null
+     * @return option detail deleted
+     */
+    @NonNull
+    Option removePermanently(@NonNull Integer id);
 
     /**
      * Get option by key
@@ -321,5 +345,5 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return an option output dto
      */
     @NonNull
-    OptionListDTO convertToDto(@NonNull Option option);
+    OptionSimpleDTO convertToDto(@NonNull Option option);
 }
