@@ -8,7 +8,7 @@ import router from '@/router'
 import { isObject } from './util'
 
 const service = axios.create({
-  timeout: 8000,
+  timeout: 10000,
   withCredentials: true
 })
 
