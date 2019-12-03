@@ -23,7 +23,7 @@ public interface AdminService {
 
     int REFRESH_TOKEN_EXPIRED_DAYS = 30;
 
-    String LOGS_PATH = "logs/spring.log";
+    String APPLICATION_CONFIG_NAME = "application.yaml";
 
     /**
      * Authenticates.
@@ -84,9 +84,16 @@ public interface AdminService {
     void updateAdminAssets();
 
     /**
-     * Get spring logs.
+     * Get application.yaml content.
      *
-     * @return recently logs.
+     * @return application.yaml content
      */
-    String getSpringLogs();
+    String getApplicationConfig();
+
+    /**
+     * Save application.yaml content.
+     *
+     * @param content new content
+     */
+    void updateApplicationConfig(String content);
 }
