@@ -292,7 +292,8 @@ export default {
       this.handlePaginationChange(1, this.pagination.size)
     },
     onFormClose() {
-      ;(this.formVisible = false), (this.optionToStage = {})
+      this.formVisible = false
+      this.optionToStage = {}
     },
     createOrUpdateOption() {
       if (!this.optionToStage.key) {
