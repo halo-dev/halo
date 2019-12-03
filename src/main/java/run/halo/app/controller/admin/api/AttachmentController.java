@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.params.AttachmentParam;
@@ -75,9 +76,15 @@ public class AttachmentController {
      * @param id id
      */
     @DeleteMapping("{id:\\d+}")
-    @ApiOperation("Delete attachment by id")
+    @ApiOperation("Delete attachment permanently by id")
     public AttachmentDTO deletePermanently(@PathVariable("id") Integer id) {
         return attachmentService.convertToDto(attachmentService.removePermanently(id));
+    }
+
+    @DeleteMapping
+    @ApiOperation("Delete attachments permanently in batch by id array")
+    public List<Attachment> deletePermanentlyInBatch(@RequestBody List<Integer> ids) {
+        return attachmentService.removePermanently(ids);
     }
 
     @PostMapping("upload")

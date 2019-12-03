@@ -10,6 +10,7 @@ import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.base.CrudService;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -48,6 +49,15 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      */
     @NonNull
     Attachment removePermanently(@NonNull Integer id);
+
+    /**
+     * Removes attachment permanently in batch.
+     *
+     * @param ids attachment ids must not be null
+     * @return attachment detail list deleted
+     */
+    @NonNull
+    List<Attachment> removePermanently(@NonNull Collection<Integer> ids);
 
     /**
      * Converts to attachment output dto.
