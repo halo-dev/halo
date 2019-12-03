@@ -170,7 +170,11 @@
           <a-input v-model="optionToStage.key" />
         </a-form-item>
         <a-form-item label="Value：">
-          <a-input v-model="optionToStage.value" />
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 5 }"
+            v-model="optionToStage.value"
+          />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -211,7 +215,7 @@ const columns = [
   {
     title: '操作',
     dataIndex: 'action',
-    width: '180px',
+    width: '120px',
     scopedSlots: { customRender: 'action' }
   }
 ]

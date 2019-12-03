@@ -21,9 +21,15 @@
             </a-tab-pane>
             <a-tab-pane key="optionsList">
               <span slot="tab">
-                <a-icon type="code" />系统变量
+                <a-icon type="table" />系统变量
               </span>
               <OptionsList />
+            </a-tab-pane>
+            <a-tab-pane key="applicationConfig">
+              <span slot="tab">
+                <a-icon type="file-protect" />配置文件
+              </span>
+              <ApplicationConfig />
             </a-tab-pane>
             <a-tab-pane key="settings">
               <span slot="tab">
@@ -50,12 +56,14 @@ import Environment from './tabs/Environment'
 import RuntimeLogs from './tabs/RuntimeLogs'
 import SettingsForm from './tabs/SettingsForm'
 import OptionsList from './tabs/OptionsList'
+import ApplicationConfig from './tabs/ApplicationConfig'
 export default {
   components: {
     Environment,
     RuntimeLogs,
     SettingsForm,
-    OptionsList
+    OptionsList,
+    ApplicationConfig
   },
   computed: {
     ...mapGetters(['options'])

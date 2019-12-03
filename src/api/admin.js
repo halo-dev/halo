@@ -82,4 +82,29 @@ adminApi.updateAdminAssets = () => {
     timeout: 600 * 1000
   })
 }
+
+adminApi.getApplicationConfig = () => {
+  return service({
+    url: `${baseUrl}/spring/application.yaml`,
+    method: 'get'
+  })
+}
+
+adminApi.updateApplicationConfig = content => {
+  return service({
+    url: `${baseUrl}/spring/application.yaml/update`,
+    params: {
+      content: content
+    },
+    method: 'put'
+  })
+}
+
+adminApi.restartApplication = () => {
+  return service({
+    url: `${baseUrl}/spring/restart`,
+    method: 'post'
+  })
+}
+
 export default adminApi
