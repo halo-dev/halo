@@ -170,6 +170,10 @@ public class BasePost extends BaseEntity {
             likes = 0L;
         }
 
+        if (originalContent == null) {
+            originalContent = "";
+        }
+
         if (formatContent == null) {
             formatContent = "";
         }

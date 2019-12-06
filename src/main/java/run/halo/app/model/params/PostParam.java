@@ -36,7 +36,6 @@ public class PostParam implements InputConverter<Post> {
 
     private String url;
 
-    @NotBlank(message = "文章内容不能为空")
     private String originalContent;
 
     private String summary;

@@ -101,7 +101,7 @@ dependencies {
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
 
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2:1.4.196'
     runtimeOnly 'mysql:mysql-connector-java'
 
 
