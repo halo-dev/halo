@@ -25,6 +25,7 @@
                 <img
                   :alt="item.name"
                   :src="item.screenshots"
+                  loading="lazy"
                 >
               </div>
               <template

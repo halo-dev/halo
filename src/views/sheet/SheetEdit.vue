@@ -152,9 +152,6 @@ export default {
       if (!this.sheetToStage.title) {
         this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
-      if (!this.sheetToStage.originalContent) {
-        this.sheetToStage.originalContent = '开始编辑...'
-      }
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)

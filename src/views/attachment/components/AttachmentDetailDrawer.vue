@@ -24,6 +24,7 @@
                 :src="attachment.path"
                 v-show="photoPreviewVisible"
                 style="width: 100%;"
+                loading="lazy"
               >
             </a>
             <d-player

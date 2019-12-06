@@ -170,9 +170,6 @@ export default {
       if (!this.postToStage.title) {
         this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
-      if (!this.postToStage.originalContent) {
-        this.postToStage.originalContent = '开始编辑...'
-      }
       if (this.postToStage.id) {
         // Update the post
         postApi.update(this.postToStage.id, this.postToStage, false).then(response => {

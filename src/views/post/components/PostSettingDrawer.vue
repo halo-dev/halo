@@ -394,13 +394,6 @@ export default {
         })
         return
       }
-      if (!this.selectedPost.originalContent) {
-        this.$notification['error']({
-          message: '提示',
-          description: '文章内容不能为空！'
-        })
-        return
-      }
       // Set category ids
       this.selectedPost.categoryIds = this.selectedCategoryIds
       // Set tag ids

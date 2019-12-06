@@ -107,6 +107,7 @@
                 <img
                   :src="item.thumbPath"
                   v-show="handleJudgeMediaType(item)"
+                  loading="lazy"
                 >
               </div>
               <a-card-meta style="padding: 0.8rem;">

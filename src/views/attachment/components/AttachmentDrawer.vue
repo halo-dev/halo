@@ -42,6 +42,7 @@
               <img
                 :src="item.thumbPath"
                 v-show="handleJudgeMediaType(item)"
+                loading="lazy"
               >
             </div>
           </a-col>

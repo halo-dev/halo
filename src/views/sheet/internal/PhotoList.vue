@@ -85,7 +85,7 @@
               @click="showDrawer(item)"
             >
               <div class="photo-thumb">
-                <img :src="item.thumbnail">
+                <img :src="item.thumbnail" loading="lazy">
               </div>
               <a-card-meta>
                 <ellipsis

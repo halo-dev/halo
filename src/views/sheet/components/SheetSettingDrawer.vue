@@ -210,13 +210,6 @@ export default {
         })
         return
       }
-      if (!this.selectedSheet.originalContent) {
-        this.$notification['error']({
-          message: '提示',
-          description: '页面内容不能为空！'
-        })
-        return
-      }
       if (this.selectedSheet.id) {
         sheetApi.update(this.selectedSheet.id, this.selectedSheet, autoSave).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
