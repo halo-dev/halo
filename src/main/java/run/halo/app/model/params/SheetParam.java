@@ -30,7 +30,6 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private String url;
 
-    @NotBlank(message = "页面内容不能为空")
     private String originalContent;
 
     @Size(max = 255, message = "页面缩略图链接的字符长度不能超过 {max}")
