@@ -7,8 +7,7 @@ const adminApi = {}
 adminApi.counts = () => {
   return service({
     url: `${baseUrl}/counts`,
-    method: 'get',
-    mute: true
+    method: 'get'
   })
 }
 

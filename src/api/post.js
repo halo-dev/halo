@@ -34,7 +34,6 @@ postApi.create = (postToCreate, autoSave) => {
     url: baseUrl,
     method: 'post',
     data: postToCreate,
-    mute: autoSave,
     params: {
       autoSave: autoSave
     }

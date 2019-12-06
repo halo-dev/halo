@@ -1,6 +1,4 @@
 import axios from 'axios'
-import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
 import Vue from 'vue'
 import { message, notification } from 'ant-design-vue'
 import store from '@/store'
@@ -63,27 +61,20 @@ function getFieldValidationError(data) {
 service.interceptors.request.use(
   config => {
     config.baseURL = store.getters.apiUrl
-    if (!config.mute) {
-      NProgress.start()
-    }
     // TODO set token
     setTokenToHeader(config)
     return config
   },
   error => {
-    NProgress.remove()
     return Promise.reject(error)
   }
 )
 
 service.interceptors.response.use(
   response => {
-    NProgress.done()
     return response
   },
   error => {
-    NProgress.done()
-
     if (axios.isCancel(error)) {
       Vue.$log.debug('Cancelled uploading by user.')
       return Promise.reject(error)
