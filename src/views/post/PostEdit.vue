@@ -94,10 +94,7 @@ export default {
       postToStage: {},
       selectedTagIds: [],
       selectedCategoryIds: [],
-      selectedPostMetas: [{
-        key: '',
-        value: ''
-      }],
+      selectedPostMetas: [],
       isSaved: false
     }
   },

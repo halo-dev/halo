@@ -73,50 +73,50 @@
         <div :style="{ marginBottom: '16px' }">
           <h3 class="post-setting-drawer-title">分类目录</h3>
           <div class="post-setting-drawer-item">
-            <category-tree
-              v-model="selectedCategoryIds"
-              :categories="categories"
-            />
-            <div>
-              <a-form layout="vertical">
-                <a-form-item v-if="categoryFormVisible">
-                  <category-select-tree
-                    :categories="categories"
-                    v-model="categoryToCreate.parentId"
-                  />
-                </a-form-item>
-                <a-form-item v-if="categoryFormVisible">
-                  <a-input
-                    placeholder="分类名称"
-                    v-model="categoryToCreate.name"
-                  />
-                </a-form-item>
-                <a-form-item v-if="categoryFormVisible">
-                  <a-input
-                    placeholder="分类路径"
-                    v-model="categoryToCreate.slugNames"
-                  />
-                </a-form-item>
-                <a-form-item>
-                  <a-button
-                    type="primary"
-                    style="marginRight: 8px"
-                    v-if="categoryFormVisible"
-                    @click="handlerCreateCategory"
-                  >保存</a-button>
-                  <a-button
-                    type="dashed"
-                    style="marginRight: 8px"
-                    v-if="!categoryFormVisible"
-                    @click="toggleCategoryForm"
-                  >新增</a-button>
-                  <a-button
-                    v-if="categoryFormVisible"
-                    @click="toggleCategoryForm"
-                  >取消</a-button>
-                </a-form-item>
-              </a-form>
-            </div>
+            <a-form layout="vertical">
+              <a-form-item>
+                <category-tree
+                  v-model="selectedCategoryIds"
+                  :categories="categories"
+                />
+              </a-form-item>
+              <a-form-item v-if="categoryFormVisible">
+                <category-select-tree
+                  :categories="categories"
+                  v-model="categoryToCreate.parentId"
+                />
+              </a-form-item>
+              <a-form-item v-if="categoryFormVisible">
+                <a-input
+                  placeholder="分类名称"
+                  v-model="categoryToCreate.name"
+                />
+              </a-form-item>
+              <a-form-item v-if="categoryFormVisible">
+                <a-input
+                  placeholder="分类路径"
+                  v-model="categoryToCreate.slugNames"
+                />
+              </a-form-item>
+              <a-form-item>
+                <a-button
+                  type="primary"
+                  style="marginRight: 8px"
+                  v-if="categoryFormVisible"
+                  @click="handlerCreateCategory"
+                >保存</a-button>
+                <a-button
+                  type="dashed"
+                  style="marginRight: 8px"
+                  v-if="!categoryFormVisible"
+                  @click="toggleCategoryForm"
+                >新增</a-button>
+                <a-button
+                  v-if="categoryFormVisible"
+                  @click="toggleCategoryForm"
+                >取消</a-button>
+              </a-form-item>
+            </a-form>
           </div>
         </div>
         <a-divider />
@@ -167,28 +167,40 @@
             </div>
           </div>
         </div>
+        <a-divider />
         <div :style="{ marginBottom: '16px' }">
           <h3 class="post-setting-drawer-title">元数据</h3>
-          <a-form-item
-            v-for="(postMeta, index) in selectedPostMetas"
-            :key="index"
-            :prop="'postMetas.' + index + '.value'"
-          >
-            <a-row :gutter="10">
-              <a-col :span="11">
-                <a-input v-model="postMeta.key"><i slot="addonBefore">K</i></a-input>
-              </a-col>
-              <a-col :span="11">
-                <a-input v-model="postMeta.value"><i slot="addonBefore">V</i></a-input>
-              </a-col>
-              <a-col :span="2">
-                <a-icon type="close" @click.prevent="removePostMeta(postMeta)"/>
-              </a-col>
-            </a-row>
-          </a-form-item>
-          <a-form-item>
-            <a-button @click="addPostMeta">新增</a-button>
-          </a-form-item>
+          <a-form layout="vertical">
+            <a-form-item
+              v-for="(postMeta, index) in selectedPostMetas"
+              :key="index"
+              :prop="'postMetas.' + index + '.value'"
+            >
+              <a-row :gutter="5">
+                <a-col :span="12">
+                  <a-input v-model="postMeta.key"><i slot="addonBefore">K</i></a-input>
+                </a-col>
+                <a-col :span="12">
+                  <a-input v-model="postMeta.value">
+                    <i slot="addonBefore">V</i>
+                    <a
+                      href="javascript:void(0);"
+                      slot="addonAfter"
+                      @click.prevent="handleRemovePostMeta(postMeta)"
+                    >
+                      <a-icon type="close" />
+                    </a>
+                  </a-input>
+                </a-col>
+              </a-row>
+            </a-form-item>
+            <a-form-item>
+              <a-button
+                type="dashed"
+                @click="handleInsertPostMeta"
+              >新增</a-button>
+            </a-form-item>
+          </a-form>
         </div>
         <a-divider class="divider-transparent" />
       </div>
@@ -227,6 +239,7 @@ import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelect
 import { mapGetters } from 'vuex'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
+import themeApi from '@/api/theme'
 export default {
   name: 'PostSettingDrawer',
   mixins: [mixin, mixinDevice],
@@ -317,6 +330,7 @@ export default {
       if (newValue) {
         this.loadSkeleton()
         this.loadCategories()
+        this.loadPresetMetasField()
       }
     }
   },
@@ -346,6 +360,21 @@ export default {
       categoryApi.listAll().then(response => {
         this.categories = response.data.data
       })
+    },
+    loadPresetMetasField() {
+      if (this.postMetas.length <= 0) {
+        themeApi.getActivatedTheme().then(response => {
+          const fields = response.data.data.postMetaField
+          if (fields && fields.length > 0) {
+            for (let i = 0, len = fields.length; i < len; i++) {
+              this.selectedPostMetas.push({
+                value: '',
+                key: fields[i]
+              })
+            }
+          }
+        })
+      }
     },
     handleSelectPostThumb(data) {
       this.selectedPost.thumbnail = encodeURI(data.path)
@@ -433,13 +462,13 @@ export default {
     onPostDateOk(value) {
       this.selectedPost.createTime = value.valueOf()
     },
-    removePostMeta(item) {
+    handleRemovePostMeta(item) {
       var index = this.selectedPostMetas.indexOf(item)
       if (index !== -1) {
         this.selectedPostMetas.splice(index, 1)
       }
     },
-    addPostMeta() {
+    handleInsertPostMeta() {
       this.selectedPostMetas.push({
         value: '',
         key: ''

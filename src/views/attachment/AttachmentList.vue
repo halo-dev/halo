@@ -80,7 +80,7 @@
           <div class="table-operator" style="margin-bottom: 0;">
             <a-button
               type="primary"
-              icon="plus"
+              icon="cloud-upload"
               @click="()=>this.uploadVisible = true"
             >上传</a-button>
           </div>
