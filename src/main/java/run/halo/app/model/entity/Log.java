@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.enums.LogType;
-import run.halo.app.utils.ServletUtils;
 
 import javax.persistence.*;
 

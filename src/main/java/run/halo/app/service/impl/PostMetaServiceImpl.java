@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -56,8 +57,10 @@ public class PostMetaServiceImpl extends BaseMetaServiceImpl<PostMeta> implement
 
         // Save post metas
         postMetas.forEach(postMeta -> {
-            postMeta.setPostId(postId);
-            postMetaRepository.save(postMeta);
+            if (StringUtils.isNotEmpty(postMeta.getValue()) && StringUtils.isNotEmpty(postMeta.getKey())) {
+                postMeta.setPostId(postId);
+                postMetaRepository.save(postMeta);
+            }
         });
         return new ArrayList<>(postMetas);
     }

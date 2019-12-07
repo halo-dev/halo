@@ -6,7 +6,6 @@ import lombok.ToString;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.enums.PostType;
 
 import java.util.Date;
 

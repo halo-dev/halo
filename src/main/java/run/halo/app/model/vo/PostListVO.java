@@ -6,7 +6,6 @@ import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.PostMetaDTO;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
-import run.halo.app.model.entity.PostMeta;
 
 import java.util.List;
 

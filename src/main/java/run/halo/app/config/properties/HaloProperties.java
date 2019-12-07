@@ -42,14 +42,14 @@ public class HaloProperties {
     private String adminPath = "admin";
 
     /**
-     * Halo backup directory.(Not recommended to modify this config);
-     */
-    private String backupDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup" + FILE_SEPARATOR;
-
-    /**
      * Work directory.
      */
     private String workDir = ensureSuffix(USER_HOME, FILE_SEPARATOR) + ".halo" + FILE_SEPARATOR;
+
+    /**
+     * Halo backup directory.(Not recommended to modify this config);
+     */
+    private String backupDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup" + FILE_SEPARATOR;
 
     /**
      * Upload prefix.

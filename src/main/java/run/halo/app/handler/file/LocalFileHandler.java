@@ -2,6 +2,7 @@ package run.halo.app.handler.file;
 
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import net.sf.image4j.codec.ico.ICODecoder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -23,10 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
-import net.sf.image4j.codec.ico.ICODecoder;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
@@ -57,12 +56,9 @@ public class LocalFileHandler implements FileHandler {
      * Thumbnail height.
      */
     private final static int THUMB_HEIGHT = 256;
-
-    ReentrantLock lock = new ReentrantLock();
-
     private final OptionService optionService;
-
     private final String workDir;
+    ReentrantLock lock = new ReentrantLock();
 
     public LocalFileHandler(OptionService optionService,
                             HaloProperties haloProperties) {

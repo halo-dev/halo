@@ -67,6 +67,7 @@ public interface CategoryService extends CrudService<Category, Integer> {
 
     /**
      * List categories by parent id.
+     *
      * @param id parent id.
      * @return list of category.
      */

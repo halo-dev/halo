@@ -88,7 +88,7 @@ public class Menu extends BaseEntity {
             parentId = 0;
         }
 
-        if(team == null){
+        if (team == null) {
             team = "";
         }
     }

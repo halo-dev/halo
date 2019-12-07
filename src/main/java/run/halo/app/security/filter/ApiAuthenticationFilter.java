@@ -18,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-import static run.halo.app.model.support.HaloConst.*;
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_QUERY_NAME;
 
 /**
  * Api authentication Filter

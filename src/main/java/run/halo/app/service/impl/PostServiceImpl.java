@@ -473,9 +473,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     /**
      * Converts to post detail vo.
      *
-     * @param post       post must not be null
-     * @param tags       tags
-     * @param categories categories
+     * @param post         post must not be null
+     * @param tags         tags
+     * @param categories   categories
      * @param postMetaList postMetas
      * @return post detail vo
      */

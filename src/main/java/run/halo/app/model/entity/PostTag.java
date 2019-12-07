@@ -1,7 +1,6 @@
 package run.halo.app.model.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
