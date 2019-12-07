@@ -24,7 +24,6 @@ import run.halo.app.service.AttachmentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.HaloUtils;
-import run.halo.app.utils.ServiceUtils;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;

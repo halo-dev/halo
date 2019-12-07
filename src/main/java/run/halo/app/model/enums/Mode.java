@@ -16,11 +16,6 @@ public enum Mode {
     DEVELOPMENT,
     TEST;
 
-    @JsonValue
-    String getValue() {
-        return this.name().toLowerCase();
-    }
-
     /**
      * Get mode from value.
      *
@@ -43,5 +38,10 @@ public enum Mode {
         }
 
         return null;
+    }
+
+    @JsonValue
+    String getValue() {
+        return this.name().toLowerCase();
     }
 }

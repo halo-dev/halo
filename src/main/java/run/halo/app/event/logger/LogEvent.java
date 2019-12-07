@@ -1,14 +1,10 @@
 package run.halo.app.event.logger;
 
 import org.springframework.context.ApplicationEvent;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.support.ServletContextScope;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.params.LogParam;
 import run.halo.app.utils.ServletUtils;
 import run.halo.app.utils.ValidationUtils;
-
-import javax.servlet.ServletContext;
 
 /**
  * @author johnniang

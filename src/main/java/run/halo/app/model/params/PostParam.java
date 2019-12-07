@@ -88,11 +88,11 @@ public class PostParam implements InputConverter<Post> {
 
     public Set<PostMeta> getPostMetas() {
         Set<PostMeta> postMetaSet = new HashSet<>();
-        if(CollectionUtils.isEmpty(postMetas)) {
+        if (CollectionUtils.isEmpty(postMetas)) {
             return postMetaSet;
         }
 
-        for(PostMetaParam postMetaParam : postMetas) {
+        for (PostMetaParam postMetaParam : postMetas) {
             PostMeta postMeta = postMetaParam.convertTo();
             postMetaSet.add(postMeta);
         }

@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.GenericFilterBean;
-import run.halo.app.security.filter.AdminAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

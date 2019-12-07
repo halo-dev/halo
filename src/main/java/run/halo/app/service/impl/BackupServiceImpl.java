@@ -50,7 +50,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static run.halo.app.model.support.HaloConst.*;
+import static run.halo.app.model.support.HaloConst.TEMP_TOKEN;
+import static run.halo.app.model.support.HaloConst.TEMP_TOKEN_EXPIRATION;
 
 /**
  * Backup service implementation.
@@ -63,9 +64,8 @@ import static run.halo.app.model.support.HaloConst.*;
 @Slf4j
 public class BackupServiceImpl implements BackupService {
 
-    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     public static final String BACKUP_TOKEN_KEY_PREFIX = "backup-token-";
-
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private final PostService postService;
     private final PostTagService postTagService;
     private final OptionService optionService;

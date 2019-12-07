@@ -27,7 +27,7 @@ public enum UpOssProperties implements PropertyEnum {
     /**
      * upyun oss domain protocol
      */
-    OSS_PROTOCOL("oss_upyun_domain_protocol",String.class,"https://"),
+    OSS_PROTOCOL("oss_upyun_domain_protocol", String.class, "https://"),
 
     /**
      * upyun oss domain
@@ -47,7 +47,7 @@ public enum UpOssProperties implements PropertyEnum {
     /**
      * upyun oss thumbnail style rule
      */
-    OSS_THUMBNAIL_STYLE_RULE("oss_upyun_thumbnail_style_rule",String.class,"");
+    OSS_THUMBNAIL_STYLE_RULE("oss_upyun_thumbnail_style_rule", String.class, "");
 
     private final String defaultValue;
     private String value;

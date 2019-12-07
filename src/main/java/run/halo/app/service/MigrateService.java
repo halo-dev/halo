@@ -18,5 +18,5 @@ public interface MigrateService {
      * @param file        multipart file must not be null
      * @param migrateType migrate type
      */
-    void migrate(@NonNull MultipartFile file,@NonNull MigrateType migrateType);
+    void migrate(@NonNull MultipartFile file, @NonNull MigrateType migrateType);
 }
