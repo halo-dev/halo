@@ -55,13 +55,8 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<PostListVO> pageBy(Integer page, Integer size,
-                                   @SortDefault.SortDefaults({
-                                           @SortDefault(sort = "topPriority", direction = DESC),
-                                           @SortDefault(sort = "createTime", direction = DESC)
-                                   }) Sort sort,
+    public Page<PostListVO> pageBy(@PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
                                    PostQuery postQuery) {
-        Pageable pageable = PageRequest.of(page, size, sort);
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage);
     }
