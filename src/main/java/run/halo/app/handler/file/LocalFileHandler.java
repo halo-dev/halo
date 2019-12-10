@@ -2,7 +2,6 @@ package run.halo.app.handler.file;
 
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
-import net.sf.image4j.codec.ico.ICODecoder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -15,10 +14,10 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -150,7 +149,7 @@ public class LocalFileHandler implements FileHandler {
                     Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
                     // Read as image
-                    BufferedImage originalImage = getImageFromFile(uploadPath.toFile(), extension);
+                    BufferedImage originalImage = ImageUtils.getImageFromFile(new FileInputStream(uploadPath.toFile()), extension);
                     // Set width and height
                     uploadResult.setWidth(originalImage.getWidth());
                     uploadResult.setHeight(originalImage.getHeight());
@@ -237,15 +236,4 @@ public class LocalFileHandler implements FileHandler {
         }
         return result;
     }
-
-    private BufferedImage getImageFromFile(File file, String extension) throws IOException {
-        log.debug("Current File type is : [{}]", extension);
-
-        if ("ico".equals(extension)) {
-            return ICODecoder.read(file).get(0);
-        } else {
-            return ImageIO.read(file);
-        }
-    }
-
 }

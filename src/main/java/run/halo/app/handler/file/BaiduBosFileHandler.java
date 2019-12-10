@@ -17,8 +17,8 @@ import run.halo.app.model.properties.BaiduBosProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
+import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
@@ -87,10 +87,14 @@ public class BaiduBosFileHandler implements FileHandler {
 
             // Handle thumbnail
             if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                BufferedImage image = ImageIO.read(file.getInputStream());
+                BufferedImage image = ImageUtils.getImageFromFile(file.getInputStream(), extension);
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
+                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
+                    uploadResult.setThumbPath(filePath);
+                } else {
+                    uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
+                }
             }
 
             return uploadResult;
