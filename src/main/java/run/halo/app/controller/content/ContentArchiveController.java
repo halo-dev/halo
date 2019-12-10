@@ -162,7 +162,7 @@ public class ContentArchiveController {
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
-        List<PostMeta> metas = postMetaService.listPostMetasBy(post.getId());
+        List<PostMeta> metas = postMetaService.listBy(post.getId());
 
         Page<BaseCommentVO> comments = postCommentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
 

@@ -2,8 +2,10 @@ package run.halo.app.model.params;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.utils.SlugUtils;
 
@@ -11,6 +13,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Sheet param.
@@ -48,6 +52,8 @@ public class SheetParam implements InputConverter<Sheet> {
     @Min(value = 0, message = "Post top priority must not be less than {value}")
     private Integer topPriority = 0;
 
+    private Set<SheetMetaParam> sheetMetas;
+
     @Override
     public Sheet convertTo() {
         url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
@@ -68,5 +74,18 @@ public class SheetParam implements InputConverter<Sheet> {
         }
 
         InputConverter.super.update(sheet);
+    }
+
+    public Set<SheetMeta> getSheetMetas() {
+        Set<SheetMeta> sheetMetasSet = new HashSet<>();
+        if (CollectionUtils.isEmpty(sheetMetas)) {
+            return sheetMetasSet;
+        }
+
+        for (SheetMetaParam sheetMetaParam : sheetMetas) {
+            SheetMeta sheetMeta = sheetMetaParam.convertTo();
+            sheetMetasSet.add(sheetMeta);
+        }
+        return sheetMetasSet;
     }
 }

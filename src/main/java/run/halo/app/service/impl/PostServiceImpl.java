@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
+import run.halo.app.model.dto.BaseMetaDTO;
 import run.halo.app.model.dto.CategoryDTO;
-import run.halo.app.model.dto.PostMetaDTO;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
@@ -357,7 +357,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
         }
 
-        List<PostMeta> postMetas = postMetaService.listPostMetasBy(post.getId());
+        List<PostMeta> postMetas = postMetaService.listBy(post.getId());
 
         if (postMetas.size() > 0) {
             content.append("postMetas:").append("\n");
@@ -378,7 +378,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // List categories
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         // List postMetas
-        List<PostMeta> postMetas = postMetaService.listPostMetasBy(post.getId());
+        List<PostMeta> postMetas = postMetaService.listBy(post.getId());
         // Convert to detail vo
         return convertTo(post, tags, categories, postMetas);
     }
@@ -460,7 +460,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .orElseGet(LinkedList::new)
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(postMeta -> (PostMetaDTO) new PostMetaDTO().convertFrom(postMeta))
+                    .map(postMeta -> (BaseMetaDTO) new BaseMetaDTO().convertFrom(postMeta))
                     .collect(Collectors.toList()));
 
             // Set comment count
@@ -556,8 +556,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         postTagService.removeByPostId(post.getId());
 
         postCategoryService.removeByPostId(post.getId());
-
-        postMetaService.removeByPostId(post.getId());
 
         // List all tags
         List<Tag> tags = tagService.listAllByIds(tagIds);

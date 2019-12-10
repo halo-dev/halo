@@ -89,9 +89,9 @@ public class UpOssFileHandler implements FileHandler {
                 BufferedImage image = ImageUtils.getImageFromFile(file.getInputStream(), extension);
                 uploadResult.setWidth(image.getWidth());
                 uploadResult.setHeight(image.getHeight());
-                if(ImageUtils.EXTENSION_ICO.equals(extension)){
+                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
                     uploadResult.setThumbPath(filePath);
-                }else {
+                } else {
                     uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
                 }
             }

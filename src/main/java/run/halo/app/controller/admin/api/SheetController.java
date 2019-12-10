@@ -8,10 +8,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.InternalSheetDTO;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.SheetParam;
+import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
@@ -49,9 +49,9 @@ public class SheetController {
 
     @GetMapping("{sheetId:\\d+}")
     @ApiOperation("Gets a sheet")
-    public BasePostDetailDTO getBy(@PathVariable("sheetId") Integer sheetId) {
+    public SheetDetailVO getBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.getById(sheetId);
-        return sheetService.convertToDetail(sheet);
+        return sheetService.convertToDetailVo(sheet);
     }
 
     @GetMapping
@@ -69,15 +69,15 @@ public class SheetController {
 
     @PostMapping
     @ApiOperation("Creates a sheet")
-    public BasePostDetailDTO createBy(@RequestBody @Valid SheetParam sheetParam,
-                                      @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
-        Sheet sheet = sheetService.createBy(sheetParam.convertTo(), autoSave);
-        return sheetService.convertToDetail(sheet);
+    public SheetDetailVO createBy(@RequestBody @Valid SheetParam sheetParam,
+                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        Sheet sheet = sheetService.createBy(sheetParam.convertTo(), sheetParam.getSheetMetas(), autoSave);
+        return sheetService.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}")
     @ApiOperation("Updates a sheet")
-    public BasePostDetailDTO updateBy(
+    public SheetDetailVO updateBy(
             @PathVariable("sheetId") Integer sheetId,
             @RequestBody @Valid SheetParam sheetParam,
             @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
@@ -85,9 +85,9 @@ public class SheetController {
 
         sheetParam.update(sheetToUpdate);
 
-        Sheet sheet = sheetService.updateBy(sheetToUpdate, autoSave);
+        Sheet sheet = sheetService.updateBy(sheetToUpdate, sheetParam.getSheetMetas(), autoSave);
 
-        return sheetService.convertToDetail(sheet);
+        return sheetService.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}/{status}")
@@ -105,9 +105,9 @@ public class SheetController {
 
     @DeleteMapping("{sheetId:\\d+}")
     @ApiOperation("Deletes a sheet")
-    public BasePostDetailDTO deleteBy(@PathVariable("sheetId") Integer sheetId) {
+    public SheetDetailVO deleteBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.removeById(sheetId);
-        return sheetService.convertToDetail(sheet);
+        return sheetService.convertToDetailVo(sheet);
     }
 
     @GetMapping("preview/{sheetId:\\d+}")
