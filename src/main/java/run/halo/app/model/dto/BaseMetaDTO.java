@@ -4,20 +4,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.dto.base.OutputConverter;
-import run.halo.app.model.entity.PostMeta;
+import run.halo.app.model.entity.BaseMeta;
 
 import java.util.Date;
 
 /**
- * Post meta output dto.
+ * Base meta Dto.
  *
- * @author guqing
- * @date 2019-11-30
+ * @author ryanwang
+ * @date 2019-12-10
  */
 @Data
 @ToString
 @EqualsAndHashCode
-public class PostMetaDTO implements OutputConverter<PostMetaDTO, PostMeta> {
+public class BaseMetaDTO implements OutputConverter<BaseMetaDTO, BaseMeta> {
     private Long id;
 
     private Integer postId;

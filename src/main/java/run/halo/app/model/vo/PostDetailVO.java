@@ -3,8 +3,8 @@ package run.halo.app.model.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import run.halo.app.model.dto.BaseMetaDTO;
 import run.halo.app.model.dto.CategoryDTO;
-import run.halo.app.model.dto.PostMetaDTO;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 
@@ -33,6 +33,6 @@ public class PostDetailVO extends BasePostDetailDTO {
 
     private Set<Long> postMetaIds;
 
-    private List<PostMetaDTO> postMetas;
+    private List<BaseMetaDTO> postMetas;
 }
 

@@ -1,30 +1,30 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.text.StrBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
+import run.halo.app.exception.AlreadyExistsException;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.InternalSheetDTO;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.repository.SheetRepository;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.SheetCommentService;
-import run.halo.app.service.SheetService;
-import run.halo.app.service.ThemeService;
+import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Sheet service implementation.
@@ -33,6 +33,7 @@ import java.util.Set;
  * @author ryanwang
  * @date 2019-04-24
  */
+@Slf4j
 @Service
 public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements SheetService {
 
@@ -42,23 +43,43 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     private final SheetCommentService sheetCommentService;
 
+    private final SheetMetaService sheetMetaService;
+
     private final ThemeService themeService;
 
     public SheetServiceImpl(SheetRepository sheetRepository,
                             ApplicationEventPublisher eventPublisher,
                             SheetCommentService sheetCommentService,
                             OptionService optionService,
+                            SheetMetaService sheetMetaService,
                             ThemeService themeService) {
         super(sheetRepository, optionService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
+        this.sheetMetaService = sheetMetaService;
         this.themeService = themeService;
     }
 
     @Override
     public Sheet createBy(Sheet sheet, boolean autoSave) {
         Sheet createdSheet = createOrUpdateBy(sheet);
+        if (!autoSave) {
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED, createdSheet.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
+        return createdSheet;
+    }
+
+    @Override
+    public Sheet createBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
+        Sheet createdSheet = createOrUpdateBy(sheet);
+
+        // Create sheet meta data
+        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(sheet.getId(), sheetMetas);
+        log.debug("Created sheet metas: [{}]", sheetMetaList);
+
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED, createdSheet.getTitle());
@@ -79,6 +100,23 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
+    public Sheet updateBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
+
+        Sheet updatedSheet = createOrUpdateBy(sheet);
+
+        // Create sheet meta data
+        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(updatedSheet.getId(), sheetMetas);
+        log.debug("Created sheet metas: [{}]", sheetMetaList);
+
+        if (!autoSave) {
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED, updatedSheet.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
+        return updatedSheet;
+    }
+
+    @Override
     public Page<Sheet> pageBy(Pageable pageable) {
         Assert.notNull(pageable, "Page info must not be null");
 
@@ -86,8 +124,20 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
+    public Sheet getByUrl(String url) {
+        Assert.hasText(url, "Url must not be blank");
+
+        return sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
+    }
+
+    @Override
     public Sheet getBy(PostStatus status, String url) {
-        Sheet sheet = super.getBy(status, url);
+        Assert.notNull(status, "Post status must not be null");
+        Assert.hasText(url, "Post url must not be blank");
+
+        Optional<Sheet> postOptional = sheetRepository.getByUrlAndStatus(url, status);
+
+        Sheet sheet = postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
 
         if (PostStatus.PUBLISHED.equals(status)) {
             // Log it
@@ -199,4 +249,46 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         });
     }
 
+    @Override
+    public SheetDetailVO convertToDetailVo(Sheet sheet) {
+        // List sheetMetas
+        List<SheetMeta> sheetMetas = sheetMetaService.listBy(sheet.getId());
+        // Convert to detail vo
+        return convertTo(sheet, sheetMetas);
+    }
+
+    @NonNull
+    private SheetDetailVO convertTo(@NonNull Sheet sheet, List<SheetMeta> sheetMetas) {
+        Assert.notNull(sheet, "Sheet must not be null");
+
+        // Convert to base detail vo
+        SheetDetailVO sheetDetailVO = new SheetDetailVO().convertFrom(sheet);
+
+        Set<Long> sheetMetaIds = ServiceUtils.fetchProperty(sheetMetas, SheetMeta::getId);
+
+        // Get sheet meta ids
+        sheetDetailVO.setSheetMetaIds(sheetMetaIds);
+        sheetDetailVO.setSheetMetas(sheetMetaService.convertTo(sheetMetas));
+        return sheetDetailVO;
+    }
+
+    @Override
+    protected void urlMustNotExist(Sheet sheet) {
+        Assert.notNull(sheet, "Sheet must not be null");
+
+        // Get url count
+        boolean exist;
+
+        if (ServiceUtils.isEmptyId(sheet.getId())) {
+            // The sheet will be created
+            exist = sheetRepository.existsByUrl(sheet.getUrl());
+        } else {
+            // The sheet will be updated
+            exist = sheetRepository.existsByIdNotAndUrl(sheet.getId(), sheet.getUrl());
+        }
+
+        if (exist) {
+            throw new AlreadyExistsException("页面路径 " + sheet.getUrl() + " 已存在");
+        }
+    }
 }

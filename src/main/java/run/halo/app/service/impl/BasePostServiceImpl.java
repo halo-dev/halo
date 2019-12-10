@@ -342,7 +342,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
      * @param post post must not be null
      */
     protected void urlMustNotExist(@NonNull POST post) {
-        Assert.notNull(post, "Sheet must not be null");
+        Assert.notNull(post, "Post must not be null");
 
         // Get url count
         boolean exist;

@@ -25,7 +25,6 @@ import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 import run.halo.app.utils.JsonUtils;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
