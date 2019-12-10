@@ -753,7 +753,6 @@ export default {
         this.selectedPost = response.data.data
         this.selectedTagIds = this.selectedPost.tagIds
         this.selectedCategoryIds = this.selectedPost.categoryIds
-        this.selectedPostMetaIds = this.selectedPost.postMetaIds
         this.selectedPostMetas = this.selectedPost.postMetas
         this.postSettingVisible = true
       })

@@ -482,10 +482,12 @@
 
     <SheetSettingDrawer
       :sheet="selectedSheet"
+      :sheetMetas="selectedSheetMetas"
       :visible="sheetSettingVisible"
       :needTitle="true"
       @close="onSheetSettingsClose"
       @onRefreshSheet="onRefreshSheetFromSetting"
+      @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"
     />
 
     <TargetCommentDrawer
@@ -587,6 +589,7 @@ export default {
       internalColumns,
       customColumns,
       selectedSheet: {},
+      selectedSheetMetas: [],
       sheetSettingVisible: false,
       sheetCommentVisible: false,
       internalSheets: [],
@@ -661,6 +664,7 @@ export default {
     handleShowSheetSettings(sheet) {
       sheetApi.get(sheet.id).then(response => {
         this.selectedSheet = response.data.data
+        this.selectedSheetMetas = this.selectedSheet.sheetMetas
         this.sheetSettingVisible = true
       })
     },
@@ -697,6 +701,9 @@ export default {
     },
     onRefreshSheetFromSetting(sheet) {
       this.selectedSheet = sheet
+    },
+    onRefreshSheetMetasFromSetting(sheetMetas) {
+      this.selectedSheetMetas = sheetMetas
     }
   }
 }

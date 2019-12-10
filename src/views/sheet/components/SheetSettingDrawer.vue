@@ -84,6 +84,41 @@
             </div>
           </div>
         </div>
+        <a-divider />
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">元数据</h3>
+          <a-form layout="vertical">
+            <a-form-item
+              v-for="(sheetMeta, index) in selectedSheetMetas"
+              :key="index"
+              :prop="'sheetMeta.' + index + '.value'"
+            >
+              <a-row :gutter="5">
+                <a-col :span="12">
+                  <a-input v-model="sheetMeta.key"><i slot="addonBefore">K</i></a-input>
+                </a-col>
+                <a-col :span="12">
+                  <a-input v-model="sheetMeta.value">
+                    <i slot="addonBefore">V</i>
+                    <a
+                      href="javascript:void(0);"
+                      slot="addonAfter"
+                      @click.prevent="handleRemoveSheetMeta(sheetMeta)"
+                    >
+                      <a-icon type="close" />
+                    </a>
+                  </a-input>
+                </a-col>
+              </a-row>
+            </a-form-item>
+            <a-form-item>
+              <a-button
+                type="dashed"
+                @click="handleInsertSheetMeta()"
+              >新增</a-button>
+            </a-form-item>
+          </a-form>
+        </div>
         <a-divider class="divider-transparent" />
       </div>
     </a-skeleton>
@@ -130,6 +165,10 @@ export default {
       type: Object,
       required: true
     },
+    sheetMetas: {
+      type: Array,
+      required: true
+    },
     needTitle: {
       type: Boolean,
       required: false,
@@ -152,13 +191,20 @@ export default {
     selectedSheet(val) {
       this.$emit('onRefreshSheet', val)
     },
+    selectedSheetMetas(val) {
+      this.$emit('onRefreshSheetMetas', val)
+    },
     visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
+        this.loadPresetMetasField()
       }
     }
   },
   computed: {
+    selectedSheetMetas() {
+      return this.sheetMetas
+    },
     pickerDefaultValue() {
       if (this.selectedSheet.createTime) {
         var date = new Date(this.selectedSheet.createTime)
@@ -174,6 +220,21 @@ export default {
       setTimeout(() => {
         this.settingLoading = false
       }, 500)
+    },
+    loadPresetMetasField() {
+      if (this.sheetMetas.length <= 0) {
+        themeApi.getActivatedTheme().then(response => {
+          const fields = response.data.data.sheetMetaField
+          if (fields && fields.length > 0) {
+            for (let i = 0, len = fields.length; i < len; i++) {
+              this.selectedSheetMetas.push({
+                value: '',
+                key: fields[i]
+              })
+            }
+          }
+        })
+      }
     },
     loadCustomTpls() {
       themeApi.customTpls().then(response => {
@@ -210,6 +271,7 @@ export default {
         })
         return
       }
+      this.selectedSheet.sheetMetas = this.selectedSheetMetas
       if (this.selectedSheet.id) {
         sheetApi.update(this.selectedSheet.id, this.selectedSheet, autoSave).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
@@ -239,6 +301,18 @@ export default {
     },
     onSheetDateOk(value) {
       this.selectedSheet.createTime = value.valueOf()
+    },
+    handleRemoveSheetMeta(item) {
+      var index = this.selectedSheetMetas.indexOf(item)
+      if (index !== -1) {
+        this.selectedSheetMetas.splice(index, 1)
+      }
+    },
+    handleInsertSheetMeta() {
+      this.selectedSheetMetas.push({
+        value: '',
+        key: ''
+      })
     }
   }
 }
