@@ -154,10 +154,16 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public Post getBy(PostStatus status, String url) {
         Post post = super.getBy(status, url);
 
-        if (PostStatus.PUBLISHED.equals(status)) {
-            // Log it
-            eventPublisher.publishEvent(new PostVisitEvent(this, post.getId()));
-        }
+        fireVisitEvent(post.getId());
+
+        return post;
+    }
+
+    @Override
+    public Post getByUrl(String url) {
+        Post post = super.getByUrl(url);
+
+        fireVisitEvent(post.getId());
 
         return post;
     }
@@ -579,5 +585,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
+    }
+
+    private void fireVisitEvent(@NonNull Integer postId) {
+        eventPublisher.publishEvent(new PostVisitEvent(this, postId));
     }
 }

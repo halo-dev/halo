@@ -64,17 +64,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     @Override
     public Sheet createBy(Sheet sheet, boolean autoSave) {
         Sheet createdSheet = createOrUpdateBy(sheet);
-        if (!autoSave) {
-            // Log the creation
-            LogEvent logEvent = new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED, createdSheet.getTitle());
-            eventPublisher.publishEvent(logEvent);
-        }
-        return createdSheet;
-    }
-
-    @Override
-    public Sheet createBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
-        Sheet createdSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
         List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(sheet.getId(), sheetMetas);
@@ -90,18 +79,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     @Override
     public Sheet updateBy(Sheet sheet, boolean autoSave) {
-        Sheet updatedSheet = createOrUpdateBy(sheet);
-        if (!autoSave) {
-            // Log the creation
-            LogEvent logEvent = new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED, updatedSheet.getTitle());
-            eventPublisher.publishEvent(logEvent);
-        }
-        return updatedSheet;
-    }
-
-    @Override
-    public Sheet updateBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
-
         Sheet updatedSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
@@ -127,7 +104,11 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     public Sheet getByUrl(String url) {
         Assert.hasText(url, "Url must not be blank");
 
-        return sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
+        Sheet sheet = sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
+
+        fireVisitEvent(sheet.getId());
+
+        return sheet;
     }
 
     @Override
@@ -139,10 +120,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         Sheet sheet = postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
 
-        if (PostStatus.PUBLISHED.equals(status)) {
-            // Log it
-            eventPublisher.publishEvent(new SheetVisitEvent(this, sheet.getId()));
-        }
+        fireVisitEvent(sheet.getId());
 
         return sheet;
     }
@@ -247,6 +225,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
             sheetListVO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
             return sheetListVO;
         });
+    }
+
+    private void fireVisitEvent(@NonNull Integer sheetId) {
+        eventPublisher.publishEvent(new SheetVisitEvent(this, sheetId));
     }
 
     @Override

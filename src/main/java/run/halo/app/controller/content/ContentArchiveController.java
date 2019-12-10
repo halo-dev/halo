@@ -13,7 +13,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
@@ -128,7 +130,7 @@ public class ContentArchiveController {
                        Model model) {
         Post post;
         if (preview) {
-            post = postService.getBy(PostStatus.DRAFT, url);
+            post = postService.getByUrl(url);
         } else if (intimate) {
             post = postService.getBy(PostStatus.INTIMATE, url);
         } else {
@@ -141,10 +143,10 @@ public class ContentArchiveController {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
 
             // verify token
-            String cachedToken = cacheStore.getAny("preview-post-token-" + post.getId(), String.class).orElseThrow(() -> new ForbiddenException("该文章的预览链接不存在或已过期"));
+            String cachedToken = cacheStore.getAny("preview-post-token-" + post.getId(), String.class).orElseThrow(() -> new NotFoundException("该文章的预览链接不存在或已过期"));
 
             if (!cachedToken.equals(token)) {
-                throw new ForbiddenException("该文章的预览链接不存在或已过期");
+                throw new BadRequestException("预览 Token 错误");
             }
         }
 
