@@ -64,6 +64,17 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     @Override
     public Sheet createBy(Sheet sheet, boolean autoSave) {
         Sheet createdSheet = createOrUpdateBy(sheet);
+        if (!autoSave) {
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED, createdSheet.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
+        return createdSheet;
+    }
+
+    @Override
+    public Sheet createBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
+        Sheet createdSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
         List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(sheet.getId(), sheetMetas);
@@ -79,6 +90,17 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     @Override
     public Sheet updateBy(Sheet sheet, boolean autoSave) {
+        Sheet updatedSheet = createOrUpdateBy(sheet);
+        if (!autoSave) {
+            // Log the creation
+            LogEvent logEvent = new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED, updatedSheet.getTitle());
+            eventPublisher.publishEvent(logEvent);
+        }
+        return updatedSheet;
+    }
+
+    @Override
+    public Sheet updateBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
         Sheet updatedSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
