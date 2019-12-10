@@ -22,8 +22,10 @@ import run.halo.app.model.support.QiNiuPutSet;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
+import run.halo.app.utils.ImageUtils;
 import run.halo.app.utils.JsonUtils;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -114,7 +116,11 @@ public class QiniuOssFileHandler implements FileHandler {
             result.setSize(file.getSize());
 
             if (isImageType(result.getMediaType())) {
-                result.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
+                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
+                    result.setThumbPath(filePath);
+                } else {
+                    result.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
+                }
             }
 
             return result;

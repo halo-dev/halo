@@ -76,9 +76,9 @@ public class SmmsFileHandler implements FileHandler {
         HttpHeaders headers = new HttpHeaders();
         // Set content type
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        // Set user agent manually
-        headers.set(HttpHeaders.USER_AGENT, DEFAULT_USER_AGENT);
         headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
+        headers.set(HttpHeaders.USER_AGENT, DEFAULT_USER_AGENT);
+
 
         LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
@@ -89,7 +89,6 @@ public class SmmsFileHandler implements FileHandler {
             throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到 SM.MS 失败", e);
         }
 
-        body.add("ssl", false);
         body.add("format", "json");
 
         HttpEntity<LinkedMultiValueMap<String, Object>> httpEntity = new HttpEntity<>(body, headers);
@@ -109,7 +108,7 @@ public class SmmsFileHandler implements FileHandler {
         // Check error
         if (!isResponseSuccessfully(smmsResponse)) {
             log.error("Smms response detail: [{}]", smmsResponse);
-            throw new FileOperationException(smmsResponse == null ? "SM.MS 服务返回内容为空" : smmsResponse.getMsg()).setErrorData(smmsResponse);
+            throw new FileOperationException(smmsResponse == null ? "SM.MS 服务返回内容为空" : smmsResponse.getMessage()).setErrorData(smmsResponse);
         }
 
         // Get response data
@@ -180,7 +179,7 @@ public class SmmsFileHandler implements FileHandler {
 
         private String code;
 
-        private String msg;
+        private String message;
 
         private SmmsResponseData data;
 
