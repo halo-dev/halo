@@ -112,14 +112,7 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
 
     @Override
     public Map<String, Object> convertToMap(List<META> metas) {
-        if (CollectionUtils.isEmpty(metas)) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, Object> result = new HashMap<>();
-        metas.forEach(meta -> result.put(meta.getKey(), meta.getValue()));
-
-        return result;
+        return ServiceUtils.convertToMap(metas, META::getKey, META::getValue);
     }
 
 

@@ -67,7 +67,7 @@ public class MarkdownUtils {
     /**
      * Render Markdown content
      *
-     * @param content content
+     * @param markdown content
      * @return String
      */
     public static String renderHtml(String markdown) {
@@ -108,7 +108,7 @@ public class MarkdownUtils {
     /**
      * Get front-matter
      *
-     * @param content content
+     * @param markdown markdown
      * @return Map
      */
     public static Map<String, List<String>> getFrontMatter(String markdown) {

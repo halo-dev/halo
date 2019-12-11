@@ -7,6 +7,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.properties.PrimaryProperties;
@@ -15,6 +17,7 @@ import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.FileUtils;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.Collections;
@@ -76,8 +79,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             Path source;
 
             if ("jar".equalsIgnoreCase(themeUri.getScheme())) {
+
                 // Create new file system for jar
-                FileSystem fileSystem = FileSystems.newFileSystem(themeUri, Collections.emptyMap());
+                FileSystem fileSystem = getFileSystem(themeUri);
                 source = fileSystem.getPath("/BOOT-INF/classes/" + ThemeService.THEME_FOLDER);
             } else {
                 source = Paths.get(themeUri);
@@ -98,4 +102,18 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         }
     }
 
+    @NonNull
+    private FileSystem getFileSystem(@NonNull URI uri) throws IOException {
+        Assert.notNull(uri, "Uri must not be null");
+
+        FileSystem fileSystem;
+
+        try {
+            fileSystem = FileSystems.getFileSystem(uri);
+        } catch (FileSystemNotFoundException e) {
+            fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
+        }
+
+        return fileSystem;
+    }
 }

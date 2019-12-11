@@ -113,8 +113,10 @@ public class AdminController {
         adminService.updateApplicationConfig(content);
     }
 
-    @PostMapping("/spring/restart")
+    @PostMapping(value = {"halo/restart", "spring/restart"})
+    @ApiOperation("Restart halo server")
     public void restartApplication() {
         Application.restart();
     }
+
 }

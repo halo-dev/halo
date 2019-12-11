@@ -88,5 +88,4 @@ public class MainController {
             response.sendRedirect(favicon);
         }
     }
-
 }

@@ -8,6 +8,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 
 import java.util.Date;
@@ -215,4 +216,24 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
 
     @NonNull
     BasePostDetailDTO convertToDetail(@NonNull POST post);
+
+    /**
+     * Updates draft content.
+     *
+     * @param content draft content could be blank
+     * @param postId  post id must not be null
+     * @return updated post
+     */
+    @NonNull
+    POST updateDraftContent(@Nullable String content, @NonNull Integer postId);
+
+    /**
+     * Updates post status.
+     *
+     * @param status post status must not be null
+     * @param postId post id must not be null
+     * @return updated post
+     */
+    @NonNull
+    POST updateStatus(@NonNull PostStatus status, @NonNull Integer postId);
 }
