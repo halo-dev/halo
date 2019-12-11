@@ -67,8 +67,6 @@ public class CommonController extends AbstractErrorController {
      */
     @GetMapping
     public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
-        HttpStatus status = getStatus(request);
-
         log.error("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
                 request.getRequestURL(),
                 request.getRequestURI(),
@@ -81,6 +79,8 @@ public class CommonController extends AbstractErrorController {
         model.addAttribute("error", errorDetail);
 
         log.debug("Error detail: [{}]", errorDetail);
+
+        HttpStatus status = getStatus(request);
 
         if (status.equals(HttpStatus.INTERNAL_SERVER_ERROR)) {
             return contentInternalError();

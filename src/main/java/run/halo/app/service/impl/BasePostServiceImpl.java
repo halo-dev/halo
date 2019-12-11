@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -318,6 +319,65 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(post, "Post must not be null");
 
         return new BasePostDetailDTO().convertFrom(post);
+    }
+
+    @Override
+    @Transactional
+    public POST updateDraftContent(String content, Integer postId) {
+        Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
+
+        if (content == null) {
+            content = "";
+        }
+
+        POST post = getById(postId);
+
+        if (!StringUtils.equals(content, post.getOriginalContent())) {
+            // If content is different with database, then update database
+            int updatedRows = basePostRepository.updateOriginalContent(content, postId);
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update original content of post with id " + postId);
+            }
+            // Set the content
+            post.setOriginalContent(content);
+        }
+
+        return post;
+    }
+
+    @Override
+    @Transactional
+    public POST updateStatus(PostStatus status, Integer postId) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
+
+        // Get post
+        POST post = getById(postId);
+
+        if (!status.equals(post.getStatus())) {
+            // Update post
+            int updatedRows = basePostRepository.updateStatus(status, postId);
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update post status of post with id " + postId);
+            }
+
+            post.setStatus(status);
+        }
+
+        // Sync content
+        if (PostStatus.PUBLISHED.equals(status)) {
+            // If publish this post, then convert the formatted content
+            String formatContent = MarkdownUtils.renderHtml(post.getOriginalContent());
+            int updatedRows = basePostRepository.updateFormatContent(formatContent, postId);
+
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update post format content of post with id " + postId);
+            }
+
+            post.setFormatContent(formatContent);
+        }
+
+        return post;
     }
 
     @Override

@@ -142,4 +142,22 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     @Query("update BasePost p set p.likes = p.likes + :likes where p.id = :postId")
     int updateLikes(@Param("likes") long likes, @Param("postId") @NonNull Integer postId);
 
+    /**
+     * Updates post original content/
+     *
+     * @param content content could be blank but disallow to be null
+     * @param postId  post id must not be null
+     * @return updated rows
+     */
+    @Modifying
+    @Query("update BasePost p set p.originalContent = :content where p.id = :postId")
+    int updateOriginalContent(@Param("content") @NonNull String content, @Param("postId") @NonNull Integer postId);
+
+    @Modifying
+    @Query("update BasePost p set p.status = :status where p.id = :postId")
+    int updateStatus(@Param("status") @NonNull PostStatus status, @Param("postId") @NonNull Integer postId);
+
+    @Modifying
+    @Query("update BasePost p set p.formatContent = :formatContent where p.id = :postId")
+    int updateFormatContent(@Param("formatContent") @NonNull String formatContent, @Param("postId") @NonNull Integer postId);
 }
