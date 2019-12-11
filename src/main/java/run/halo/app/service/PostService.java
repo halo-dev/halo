@@ -13,6 +13,7 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.base.BasePostService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -93,6 +94,15 @@ public interface PostService extends BasePostService<Post> {
     @NonNull
     @Override
     Post getBy(@NonNull PostStatus status, @NonNull String url);
+
+    /**
+     * Removes posts in batch.
+     *
+     * @param ids ids must not be null.
+     * @return a list of deleted post.
+     */
+    @NonNull
+    List<Post> removeByIds(@NonNull Collection<Integer> ids);
 
     /**
      * Lists year archives.

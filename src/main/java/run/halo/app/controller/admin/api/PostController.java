@@ -1,7 +1,6 @@
 package run.halo.app.controller.admin.api;
 
 import cn.hutool.core.util.IdUtil;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,6 @@ import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
-import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
@@ -140,8 +138,13 @@ public class PostController {
 
     @DeleteMapping("{postId:\\d+}")
     public void deletePermanently(@PathVariable("postId") Integer postId) {
-        // Remove it
         postService.removeById(postId);
+    }
+
+    @DeleteMapping
+    @ApiOperation("Delete posts permanently in batch by id array")
+    public List<Post> deletePermanentlyInBatch(@RequestBody List<Integer> ids) {
+        return postService.removeByIds(ids);
     }
 
     @GetMapping(value = {"preview/{postId:\\d+}", "{postId:\\d+}/preview"})

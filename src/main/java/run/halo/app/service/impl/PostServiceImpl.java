@@ -15,6 +15,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.model.dto.BaseMetaDTO;
@@ -157,6 +158,14 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         fireVisitEvent(post.getId());
 
         return post;
+    }
+
+    @Override
+    public List<Post> removeByIds(Collection<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(this::removeById).collect(Collectors.toList());
     }
 
     @Override
