@@ -12,7 +12,10 @@
               :sm="24"
             >
               <a-form-item label="关键词">
-                <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()"/>
+                <a-input
+                  v-model="queryParam.keyword"
+                  @keyup.enter="handleQuery()"
+                />
               </a-form-item>
             </a-col>
             <a-col
@@ -81,11 +84,11 @@
           <a-menu slot="overlay">
             <a-menu-item
               key="1"
-              v-if="queryParam.status === 'DRAFT'"
+              v-if="queryParam.status === 'DRAFT' || queryParam.status === 'RECYCLE'"
             >
               <a
                 href="javascript:void(0);"
-                @click="handlePublishMore"
+                @click="handleEditStatusMore(postStatus.PUBLISHED.value)"
               >
                 <span>发布</span>
               </a>
@@ -96,14 +99,25 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="handleRecycleMore"
+                @click="handleEditStatusMore(postStatus.RECYCLE.value)"
               >
                 <span>移到回收站</span>
               </a>
             </a-menu-item>
             <a-menu-item
               key="3"
-              v-if="queryParam.status === 'RECYCLE'"
+              v-if="queryParam.status === 'RECYCLE' || queryParam.status === 'PUBLISHED' || queryParam.status === 'INTIMATE'"
+            >
+              <a
+                href="javascript:void(0);"
+                @click="handleEditStatusMore(postStatus.DRAFT.value)"
+              >
+                <span>草稿</span>
+              </a>
+            </a-menu-item>
+            <a-menu-item
+              key="4"
+              v-if="queryParam.status === 'RECYCLE' || queryParam.status === 'DRAFT'"
             >
               <a
                 href="javascript:void(0);"
@@ -607,10 +621,12 @@ export default {
       columns,
       selectedRowKeys: [],
       categories: [],
-      selectedPostMetas: [{
-        key: '',
-        value: ''
-      }],
+      selectedPostMetas: [
+        {
+          key: '',
+          value: ''
+        }
+      ],
       posts: [],
       postsLoading: false,
       postSettingVisible: false,
@@ -706,29 +722,15 @@ export default {
         this.loadPosts()
       })
     },
-    handlePublishMore() {
+    handleEditStatusMore(status) {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
         return
       }
       for (let index = 0; index < this.selectedRowKeys.length; index++) {
         const element = this.selectedRowKeys[index]
-        postApi.updateStatus(element, 'PUBLISHED').then(response => {
-          this.$log.debug(`postId: ${element}, status: PUBLISHED`)
-          this.selectedRowKeys = []
-          this.loadPosts()
-        })
-      }
-    },
-    handleRecycleMore() {
-      if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
-        return
-      }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        postApi.updateStatus(element, 'RECYCLE').then(response => {
-          this.$log.debug(`postId: ${element}, status: RECYCLE`)
+        postApi.updateStatus(element, status).then(response => {
+          this.$log.debug(`postId: ${element}, status: ${status}`)
           this.selectedRowKeys = []
           this.loadPosts()
         })
@@ -739,14 +741,11 @@ export default {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        postApi.delete(element).then(response => {
-          this.$log.debug(`delete: ${element}`)
-          this.selectedRowKeys = []
-          this.loadPosts()
-        })
-      }
+      postApi.deleteInBatch(this.selectedRowKeys).then(response => {
+        this.$log.debug(`delete: ${this.selectedRowKeys}`)
+        this.selectedRowKeys = []
+        this.loadPosts()
+      })
     },
     handleShowPostSettings(post) {
       postApi.get(post.id).then(response => {

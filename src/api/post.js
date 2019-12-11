@@ -65,6 +65,14 @@ postApi.delete = postId => {
   })
 }
 
+postApi.deleteInBatch = ids => {
+  return service({
+    url: `${baseUrl}`,
+    data: ids,
+    method: 'delete'
+  })
+}
+
 postApi.preview = postId => {
   return service({
     url: `${baseUrl}/preview/${postId}`,
@@ -74,21 +82,25 @@ postApi.preview = postId => {
 
 postApi.postStatus = {
   PUBLISHED: {
+    value: 'PUBLISHED',
     color: 'green',
     status: 'success',
     text: '已发布'
   },
   DRAFT: {
+    value: 'DRAFT',
     color: 'yellow',
     status: 'warning',
     text: '草稿'
   },
   RECYCLE: {
+    value: 'RECYCLE',
     color: 'red',
     status: 'error',
     text: '回收站'
   },
   INTIMATE: {
+    value: 'INTIMATE',
     color: 'blue',
     status: 'success',
     text: '私密'
