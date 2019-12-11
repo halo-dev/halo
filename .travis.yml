@@ -22,3 +22,6 @@ branches:
   only:
     - master
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
+notifications:
+  webhooks: https://fathomless-fjord-24024.herokuapp.com/notify
