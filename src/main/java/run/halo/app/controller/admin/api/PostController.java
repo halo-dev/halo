@@ -1,16 +1,19 @@
 package run.halo.app.controller.admin.api;
 
 import cn.hutool.core.util.IdUtil;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
@@ -52,10 +55,15 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<PostListVO> pageBy(@PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
-                                   PostQuery postQuery) {
+    public Page<? extends BasePostSimpleDTO> pageBy(@PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
+                                                    PostQuery postQuery,
+                                                    @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
-        return postService.convertToListVo(postPage);
+        if (more) {
+            return postService.convertToListVo(postPage);
+        }
+
+        return postService.convertToSimple(postPage);
     }
 
     @GetMapping("latest")
@@ -110,16 +118,24 @@ public class PostController {
     }
 
     @PutMapping("{postId:\\d+}/status/{status}")
-    public void updateStatusBy(
+    @ApiOperation("Update post status")
+    public BasePostMinimalDTO updateStatusBy(
             @PathVariable("postId") Integer postId,
             @PathVariable("status") PostStatus status) {
-        Post post = postService.getById(postId);
+        Post post = postService.updateStatus(status, postId);
 
-        // Set status
-        post.setStatus(status);
+        return new BasePostMinimalDTO().convertFrom(post);
+    }
 
-        // Update
-        postService.update(post);
+    @PutMapping("{postId:\\d+}/status/draft/content")
+    @ApiOperation("Update draft")
+    public BasePostDetailDTO updateDraftBy(
+            @PathVariable("postId") Integer postId,
+            @RequestBody PostContentParam contentParam) {
+        // Update draft content
+        Post post = postService.updateDraftContent(contentParam.getContent(), postId);
+
+        return new BasePostDetailDTO().convertFrom(post);
     }
 
     @DeleteMapping("{postId:\\d+}")
@@ -128,7 +144,8 @@ public class PostController {
         postService.removeById(postId);
     }
 
-    @GetMapping("preview/{postId:\\d+}")
+    @GetMapping(value = {"preview/{postId:\\d+}", "{postId:\\d+}/preview"})
+    @ApiOperation("Get preview link")
     public String preview(@PathVariable("postId") Integer postId) {
         Post post = postService.getById(postId);
 
