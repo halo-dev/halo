@@ -13,7 +13,7 @@ dist: trusty
 jobs:
   include:
     - stage: test
-      script: ./gradlew check
+      script: ./gradlew check -Dspring.profiles.active=test
     - stage: build
       script: ./gradlew clean build -x test
     - stage: Build Docker Image for Release
