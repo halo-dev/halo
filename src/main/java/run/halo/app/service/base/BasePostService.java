@@ -8,7 +8,6 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
-import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 
 import java.util.Date;
@@ -236,4 +235,14 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     POST updateStatus(@NonNull PostStatus status, @NonNull Integer postId);
+
+    /**
+     * Updates post status by ids.
+     *
+     * @param ids    post ids must not be null
+     * @param status post status must not be null
+     * @return updated posts
+     */
+    @NonNull
+    List<POST> updateStatusByIds(@NonNull List<Integer> ids, @NonNull PostStatus status);
 }
