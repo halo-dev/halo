@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row>
       <a-col :span="24">
         <div
@@ -31,6 +31,12 @@
               </span>
               <ApplicationConfig />
             </a-tab-pane>
+            <a-tab-pane key="staticStorage">
+              <span slot="tab">
+                <a-icon type="cloud" />静态存储
+              </span>
+              <StaticStorage />
+            </a-tab-pane>
             <a-tab-pane key="settings">
               <span slot="tab">
                 <a-icon type="setting" />设置
@@ -57,13 +63,15 @@ import RuntimeLogs from './tabs/RuntimeLogs'
 import SettingsForm from './tabs/SettingsForm'
 import OptionsList from './tabs/OptionsList'
 import ApplicationConfig from './tabs/ApplicationConfig'
+import StaticStorage from './tabs/StaticStorage'
 export default {
   components: {
     Environment,
     RuntimeLogs,
     SettingsForm,
     OptionsList,
-    ApplicationConfig
+    ApplicationConfig,
+    StaticStorage
   },
   computed: {
     ...mapGetters(['options'])

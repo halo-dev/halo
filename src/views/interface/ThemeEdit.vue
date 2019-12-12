@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row :gutter="12">
       <a-col
         :xl="18"
@@ -157,13 +157,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-.CodeMirror {
-  height: 560px;
-}
-.CodeMirror-gutters {
-  border-right: 1px solid #fff3f3;
-  background-color: #ffffff;
-}
-</style>

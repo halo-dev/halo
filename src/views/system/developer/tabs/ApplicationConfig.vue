@@ -84,12 +84,3 @@ export default {
   }
 }
 </script>
-<style lang="less">
-.CodeMirror {
-  height: 560px;
-}
-.CodeMirror-gutters {
-  border-right: 1px solid #fff3f3;
-  background-color: #ffffff;
-}
-</style>

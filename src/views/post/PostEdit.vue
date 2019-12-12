@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row :gutter="12">
       <a-col :span="24">
         <div style="margin-bottom: 16px">

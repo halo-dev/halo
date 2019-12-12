@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide page-header-wrapper-grid-content-main">
+  <div>
     <a-row :gutter="12">
       <a-col
         :lg="10"
@@ -106,13 +106,13 @@
                 </span>
                 <a-form layout="vertical">
                   <a-form-item label="原密码：">
-                    <a-input-password v-model="passwordParam.oldPassword"/>
+                    <a-input-password v-model="passwordParam.oldPassword" />
                   </a-form-item>
                   <a-form-item label="新密码：">
-                    <a-input-password v-model="passwordParam.newPassword"/>
+                    <a-input-password v-model="passwordParam.newPassword" />
                   </a-form-item>
                   <a-form-item label="确认密码：">
-                    <a-input-password v-model="passwordParam.confirmPassword"/>
+                    <a-input-password v-model="passwordParam.confirmPassword" />
                   </a-form-item>
                   <a-form-item>
                     <a-button
@@ -242,54 +242,47 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.page-header-wrapper-grid-content-main {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  transition: 0.3s;
+.profile-center-avatarHolder {
+  text-align: center;
+  margin-bottom: 24px;
 
-  .profile-center-avatarHolder {
-    text-align: center;
-    margin-bottom: 24px;
+  & > .avatar {
+    margin: 0 auto;
+    width: 104px;
+    height: 104px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
 
-    & > .avatar {
-      margin: 0 auto;
-      width: 104px;
-      height: 104px;
-      margin-bottom: 20px;
-      border-radius: 50%;
-      overflow: hidden;
-      cursor: pointer;
-
-      img {
-        height: 100%;
-        width: 100%;
-      }
-    }
-
-    .username {
-      color: rgba(0, 0, 0, 0.85);
-      font-size: 20px;
-      line-height: 28px;
-      font-weight: 500;
-      margin-bottom: 4px;
+    img {
+      height: 100%;
+      width: 100%;
     }
   }
 
-  .profile-center-detail {
-    p {
-      margin-bottom: 8px;
-      padding-left: 26px;
-      position: relative;
-    }
+  .username {
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+}
 
-    i {
-      position: absolute;
-      height: 14px;
-      width: 14px;
-      left: 0;
-      top: 4px;
-    }
+.profile-center-detail {
+  p {
+    margin-bottom: 8px;
+    padding-left: 26px;
+    position: relative;
+  }
+
+  i {
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 0;
+    top: 4px;
   }
 }
 </style>

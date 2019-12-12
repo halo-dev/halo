@@ -513,7 +513,7 @@ body {
 
 }
 
-.ant-table-thead > tr > th{
+.ant-table-thead>tr>th {
   background: #fff !important;
 }
 
@@ -596,6 +596,7 @@ body {
       p {
         margin-top: 1rem;
         margin-bottom: 0;
+
         img {
           width: 100%;
         }
@@ -719,13 +720,14 @@ body {
   float: left;
 }
 
-.attach-thumb {
+.attach-thumb,.photo-thumb {
   width: 100%;
   padding-bottom: 56%;
 }
 
 .attach-item,
-.attach-thumb {
+.attach-thumb,
+.photo-thumb {
   margin: 0 auto;
   position: relative;
   overflow: hidden;
@@ -787,5 +789,70 @@ body {
 .ant-tree-child-tree {
   li {
     overflow: hidden;
+  }
+}
+
+.exception {
+  min-height: 500px;
+  height: 80%;
+  align-items: center;
+  text-align: center;
+  margin-top: 150px;
+
+  .img {
+    display: inline-block;
+    padding-right: 52px;
+    zoom: 1;
+
+    img {
+      height: 360px;
+      max-width: 430px;
+    }
+  }
+
+  .content {
+    display: inline-block;
+    flex: auto;
+
+    h1 {
+      color: #434e59;
+      font-size: 72px;
+      font-weight: 600;
+      line-height: 72px;
+      margin-bottom: 24px;
+    }
+
+    .desc {
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 20px;
+      line-height: 28px;
+      margin-bottom: 16px;
+    }
+  }
+}
+
+.mobile {
+  .exception {
+    margin-top: 30px;
+
+    .img {
+      padding-right: unset;
+
+      img {
+        height: 40%;
+        max-width: 80%;
+      }
+    }
+  }
+}
+
+.vue-codemirror-wrap {
+  .CodeMirror {
+    height: 560px;
+  }
+
+  .CodeMirror-gutters {
+    border-right: 1px solid #fff3f3;
+    background-color: #ffffff;
   }
 }

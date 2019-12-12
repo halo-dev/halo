@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <div class="card-content">
       <a-row :gutter="12">
         <a-col

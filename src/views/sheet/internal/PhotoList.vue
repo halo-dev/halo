@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row
       :gutter="12"
       type="flex"
@@ -7,7 +7,7 @@
     >
       <a-col
         :span="24"
-        class="search-box"
+        style="padding-bottom: 12px;"
       >
         <a-card
           :bordered="false"
@@ -59,7 +59,7 @@
               </a-row>
             </a-form>
           </div>
-          <div class="table-operator">
+          <div class="table-operator" style="margin-bottom: 0;">
             <a-button
               type="primary"
               icon="plus"
@@ -87,7 +87,7 @@
               <div class="photo-thumb">
                 <img :src="item.thumbnail" loading="lazy">
               </div>
-              <a-card-meta>
+              <a-card-meta style="padding: 0.8rem;">
                 <ellipsis
                   :length="isMobile()?12:16"
                   tooltip
@@ -132,11 +132,13 @@
               <img
                 :src="photo.url || '/images/placeholder.png'"
                 @click="showThumbDrawer"
+                style="width: 100%;"
               >
             </div>
           </a-skeleton>
         </a-col>
-        <a-divider />
+        <a-divider style="margin: 24px 0 12px 0;"/>
+
         <a-col :span="24">
           <a-skeleton
             active
@@ -408,40 +410,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.ant-divider-horizontal {
-  margin: 24px 0 12px 0;
-}
-
-.search-box {
-  padding-bottom: 12px;
-}
-
-.photo-thumb {
-  width: 100%;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 56%;
-  overflow: hidden;
-  img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
-
-.ant-card-meta {
-  padding: 0.8rem;
-}
-
-.photo-detail-img img {
-  width: 100%;
-}
-
-.table-operator {
-  margin-bottom: 0;
-}
-</style>

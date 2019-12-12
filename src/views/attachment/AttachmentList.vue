@@ -7,7 +7,6 @@
     >
       <a-col
         :span="24"
-        class="search-box"
         style="padding-bottom: 12px;"
       >
         <a-card
