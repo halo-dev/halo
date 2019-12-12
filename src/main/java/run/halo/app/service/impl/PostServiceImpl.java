@@ -21,6 +21,7 @@ import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.model.dto.BaseMetaDTO;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
@@ -485,6 +486,25 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         });
     }
 
+    @Override
+    public Page<BasePostDetailDTO> convertToDetailDto(Page<Post> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+
+        return postPage.map(post -> {
+            BasePostDetailDTO postDetailDTO = new BasePostDetailDTO().convertFrom(post);
+            if (StringUtils.isBlank(postDetailDTO.getSummary())) {
+                postDetailDTO.setSummary(generateSummary(post.getFormatContent()));
+            }
+            return postDetailDTO;
+        });
+    }
+
+    @Override
+    public Page<PostDetailVO> convertToDetailVo(Page<Post> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+        return postPage.map(this::convertToDetailVo);
+    }
+
     /**
      * Converts to post detail vo.
      *
@@ -500,6 +520,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Convert to base detail vo
         PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
+
+        if (StringUtils.isBlank(postDetailVO.getSummary())) {
+            postDetailVO.setSummary(generateSummary(post.getFormatContent()));
+        }
 
         // Extract ids
         Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);

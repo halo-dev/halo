@@ -3,6 +3,7 @@ package run.halo.app.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
@@ -166,4 +167,19 @@ public interface PostService extends BasePostService<Post> {
     @NonNull
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
 
+    /**
+     * Converts to a page of post detail dto.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail dto
+     */
+    Page<BasePostDetailDTO> convertToDetailDto(@NonNull Page<Post> postPage);
+
+    /**
+     * Converts to a page of detail vo.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail vo
+     */
+    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
 }
