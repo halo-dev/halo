@@ -65,7 +65,7 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="handlePublishMore"
+                @click="handleEditStatusMore(commentStatus.PUBLISHED.value)"
               >
                 通过
               </a>
@@ -76,7 +76,7 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="handleRecycleMore"
+                @click="handleEditStatusMore(commentStatus.RECYCLE.value)"
               >
                 移到回收站
               </a>
@@ -632,33 +632,16 @@ export default {
       this.handleClearRowKeys()
       this.handlePaginationChange(1, this.pagination.size)
     },
-    handlePublishMore() {
+    handleEditStatusMore(status) {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        commentApi.updateStatus(this.type, element, 'PUBLISHED').then(response => {
-          this.$log.debug(`commentId: ${element}, status: PUBLISHED`)
-          this.selectedRowKeys = []
-          this.loadComments()
-        })
-      }
-    },
-    handleRecycleMore() {
-      if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
-        return
-      }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        commentApi.updateStatus(this.type, element, 'RECYCLE').then(response => {
-          this.$log.debug(`commentId: ${element}, status: RECYCLE`)
-          this.selectedRowKeys = []
-          this.loadComments()
-        })
-      }
+      commentApi.updateStatusInBatch(this.type, this.selectedRowKeys, status).then(response => {
+        this.$log.debug(`commentIds: ${this.selectedRowKeys}, status: ${status}`)
+        this.selectedRowKeys = []
+        this.loadComments()
+      })
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {

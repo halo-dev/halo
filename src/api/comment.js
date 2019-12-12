@@ -38,6 +38,17 @@ commentApi.updateStatus = (target, commentId, status) => {
   })
 }
 
+commentApi.updateStatusInBatch = (target, ids, status) => {
+  return service({
+    url: `${baseUrl}/${target}/comments/status`,
+    data: {
+      ids: ids,
+      status: status
+    },
+    method: 'put'
+  })
+}
+
 commentApi.delete = (target, commentId) => {
   return service({
     url: `${baseUrl}/${target}/comments/${commentId}`,
@@ -110,16 +121,19 @@ commentApi.createComment = (comment, type) => {
 
 commentApi.commentStatus = {
   PUBLISHED: {
+    value: 'PUBLISHED',
     color: 'green',
     status: 'success',
     text: '已发布'
   },
   AUDITING: {
+    value: 'AUDITING',
     color: 'yellow',
     status: 'warning',
     text: '待审核'
   },
   RECYCLE: {
+    value: 'RECYCLE',
     color: 'red',
     status: 'error',
     text: '回收站'
