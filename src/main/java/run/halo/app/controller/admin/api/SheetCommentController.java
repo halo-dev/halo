@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.BaseCommentUpdateStatusParam;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.enums.CommentStatus;
@@ -60,7 +61,7 @@ public class SheetCommentController {
     }
 
     @GetMapping("{sheetId:\\d+}/tree_view")
-    @ApiOperation("Lists comments with tree view")
+    @ApiOperation("Lists sheet comments with tree view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("sheetId") Integer sheetId,
                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
@@ -68,7 +69,7 @@ public class SheetCommentController {
     }
 
     @GetMapping("{sheetId:\\d+}/list_view")
-    @ApiOperation("Lists comment with list view")
+    @ApiOperation("Lists sheet comment with list view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
@@ -76,14 +77,14 @@ public class SheetCommentController {
     }
 
     @PostMapping
-    @ApiOperation("Creates a comment (new or reply)")
+    @ApiOperation("Creates a sheet comment (new or reply)")
     public BaseCommentDTO createBy(@RequestBody SheetCommentParam commentParam) {
         SheetComment createdComment = sheetCommentService.createBy(commentParam);
         return sheetCommentService.convertTo(createdComment);
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
-    @ApiOperation("Updates comment status")
+    @ApiOperation("Updates sheet comment status")
     public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
                                          @PathVariable("status") CommentStatus status) {
         // Update comment status
@@ -91,21 +92,29 @@ public class SheetCommentController {
         return sheetCommentService.convertTo(updatedSheetComment);
     }
 
+    @PutMapping("status")
+    @ApiOperation("Updates sheet comment status in batch")
+    public List<BaseCommentDTO> updateStatusInBatch(@RequestBody BaseCommentUpdateStatusParam param) {
+        List<SheetComment> comments = sheetCommentService.updateStatusByIds(param.getIds(), param.getStatus());
+        return sheetCommentService.convertTo(comments);
+    }
+
+
     @DeleteMapping("{commentId:\\d+}")
-    @ApiOperation("Deletes comment permanently and recursively")
+    @ApiOperation("Deletes sheet comment permanently and recursively")
     public BaseCommentDTO deletePermanently(@PathVariable("commentId") Long commentId) {
         SheetComment deletedSheetComment = sheetCommentService.removeById(commentId);
         return sheetCommentService.convertTo(deletedSheetComment);
     }
 
     @DeleteMapping
-    @ApiOperation("Delete post comments permanently in batch by id array")
+    @ApiOperation("Delete sheet comments permanently in batch by id array")
     public List<SheetComment> deletePermanentlyInBatch(@RequestBody List<Long> ids) {
         return sheetCommentService.removeByIds(ids);
     }
 
     @GetMapping("{commentId:\\d+}")
-    @ApiOperation("Gets a post comment by comment id")
+    @ApiOperation("Gets a sheet comment by comment id")
     public SheetCommentWithSheetVO getBy(@PathVariable("commentId") Long commentId) {
         SheetComment comment = sheetCommentService.getById(commentId);
         return sheetCommentService.convertToWithSheetVo(comment);

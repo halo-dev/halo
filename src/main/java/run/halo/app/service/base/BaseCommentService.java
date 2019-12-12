@@ -151,6 +151,16 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     COMMENT updateStatus(@NonNull Long commentId, @NonNull CommentStatus status);
 
     /**
+     * Updates comment status by ids.
+     *
+     * @param ids    comment ids must not be null
+     * @param status comment status must not be null
+     * @return updated comments
+     */
+    @NonNull
+    List<COMMENT> updateStatusByIds(@NonNull List<Long> ids, @NonNull CommentStatus status);
+
+    /**
      * Removes comments in batch.
      *
      * @param ids ids must not be null.
