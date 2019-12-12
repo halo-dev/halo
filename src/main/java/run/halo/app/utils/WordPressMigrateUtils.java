@@ -43,6 +43,7 @@ public class WordPressMigrateUtils {
         try {
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(fileInputStream);
+            saxReader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             return document.getRootElement();
         } catch (Exception e) {
             throw new RuntimeException("can not get root element");
