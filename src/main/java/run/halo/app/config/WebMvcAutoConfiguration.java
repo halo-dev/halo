@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -131,6 +132,9 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
         // Predefine configuration
         freemarker.template.Configuration configuration = configurer.createConfiguration();
+
+        configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
+
         if (haloProperties.isProductionEnv()) {
             configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         }
