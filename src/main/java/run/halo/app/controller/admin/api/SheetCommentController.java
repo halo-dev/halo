@@ -93,9 +93,15 @@ public class SheetCommentController {
 
     @DeleteMapping("{commentId:\\d+}")
     @ApiOperation("Deletes comment permanently and recursively")
-    public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
+    public BaseCommentDTO deletePermanently(@PathVariable("commentId") Long commentId) {
         SheetComment deletedSheetComment = sheetCommentService.removeById(commentId);
         return sheetCommentService.convertTo(deletedSheetComment);
+    }
+
+    @DeleteMapping
+    @ApiOperation("Delete post comments permanently in batch by id array")
+    public List<SheetComment> deletePermanentlyInBatch(@RequestBody List<Long> ids) {
+        return sheetCommentService.removeByIds(ids);
     }
 
     @GetMapping("{commentId:\\d+}")

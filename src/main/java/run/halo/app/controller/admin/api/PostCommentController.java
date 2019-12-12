@@ -98,9 +98,15 @@ public class PostCommentController {
 
     @DeleteMapping("{commentId:\\d+}")
     @ApiOperation("Deletes comment permanently and recursively")
-    public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
+    public BaseCommentDTO deletePermanently(@PathVariable("commentId") Long commentId) {
         PostComment deletedPostComment = postCommentService.removeById(commentId);
         return postCommentService.convertTo(deletedPostComment);
+    }
+
+    @DeleteMapping
+    @ApiOperation("Delete post comments permanently in batch by id array")
+    public List<PostComment> deletePermanentlyInBatch(@RequestBody List<Long> ids) {
+        return postCommentService.removeByIds(ids);
     }
 
     @GetMapping("{commentId:\\d+}")
