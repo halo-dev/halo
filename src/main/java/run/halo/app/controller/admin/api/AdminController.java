@@ -61,7 +61,6 @@ public class AdminController {
     @PostMapping("password/code")
     @ApiOperation("Send reset password verify code.")
     public void sendResetCode(@RequestBody @Valid ResetPasswordParam param) {
-       //test commit  git 
         adminService.sendResetPasswordCode(param);
     }
 
