@@ -381,6 +381,17 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
+    public List<POST> updateStatusByIds(List<Integer> ids, PostStatus status) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> {
+            return updateStatus(status, id);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public POST create(POST post) {
         // Check title
         urlMustNotExist(post);
