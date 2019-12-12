@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.BaseCommentUpdateStatusParam;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
@@ -97,10 +96,11 @@ public class PostCommentController {
         return postCommentService.convertTo(updatedPostComment);
     }
 
-    @PutMapping("status")
+    @PutMapping("status/{status}")
     @ApiOperation("Updates post comment status in batch")
-    public List<BaseCommentDTO> updateStatusInBatch(@RequestBody BaseCommentUpdateStatusParam param) {
-        List<PostComment> comments = postCommentService.updateStatusByIds(param.getIds(), param.getStatus());
+    public List<BaseCommentDTO> updateStatusInBatch(@PathVariable(name = "status") CommentStatus status,
+                                                    @RequestBody List<Long> ids) {
+        List<PostComment> comments = postCommentService.updateStatusByIds(ids, status);
         return postCommentService.convertTo(comments);
     }
 
