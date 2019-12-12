@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.BaseCommentUpdateStatusParam;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
@@ -54,7 +55,7 @@ public class PostCommentController {
     }
 
     @GetMapping("latest")
-    @ApiOperation("Pages latest comments")
+    @ApiOperation("Pages post latest comments")
     public List<PostCommentWithPostVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
                                                   @RequestParam(name = "status", required = false) CommentStatus status) {
         // Get latest comment
@@ -65,7 +66,7 @@ public class PostCommentController {
     }
 
     @GetMapping("{postId:\\d+}/tree_view")
-    @ApiOperation("Lists comments with tree view")
+    @ApiOperation("Lists post comments with tree view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("postId") Integer postId,
                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
@@ -73,7 +74,7 @@ public class PostCommentController {
     }
 
     @GetMapping("{postId:\\d+}/list_view")
-    @ApiOperation("Lists comment with list view")
+    @ApiOperation("Lists post comment with list view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
@@ -81,14 +82,14 @@ public class PostCommentController {
     }
 
     @PostMapping
-    @ApiOperation("Creates a comment (new or reply)")
+    @ApiOperation("Creates a post comment (new or reply)")
     public BaseCommentDTO createBy(@RequestBody PostCommentParam postCommentParam) {
         PostComment createdPostComment = postCommentService.createBy(postCommentParam);
         return postCommentService.convertTo(createdPostComment);
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
-    @ApiOperation("Updates comment status")
+    @ApiOperation("Updates post comment status")
     public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
                                          @PathVariable("status") CommentStatus status) {
         // Update comment status
@@ -96,8 +97,15 @@ public class PostCommentController {
         return postCommentService.convertTo(updatedPostComment);
     }
 
+    @PutMapping("status")
+    @ApiOperation("Updates post comment status in batch")
+    public List<BaseCommentDTO> updateStatusInBatch(@RequestBody BaseCommentUpdateStatusParam param) {
+        List<PostComment> comments = postCommentService.updateStatusByIds(param.getIds(), param.getStatus());
+        return postCommentService.convertTo(comments);
+    }
+
     @DeleteMapping("{commentId:\\d+}")
-    @ApiOperation("Deletes comment permanently and recursively")
+    @ApiOperation("Deletes post comment permanently and recursively")
     public BaseCommentDTO deletePermanently(@PathVariable("commentId") Long commentId) {
         PostComment deletedPostComment = postCommentService.removeById(commentId);
         return postCommentService.convertTo(deletedPostComment);

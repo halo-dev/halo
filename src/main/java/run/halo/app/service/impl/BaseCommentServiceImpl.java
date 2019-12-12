@@ -330,6 +330,16 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public List<COMMENT> updateStatusByIds(List<Long> ids, CommentStatus status) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> {
+            return updateStatus(id, status);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public List<COMMENT> removeByIds(Collection<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
