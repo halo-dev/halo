@@ -15,7 +15,6 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.params.PostStatusUpdateParam;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
@@ -126,10 +125,11 @@ public class PostController {
         return new BasePostMinimalDTO().convertFrom(post);
     }
 
-    @PutMapping("status")
+    @PutMapping("status/{status}")
     @ApiOperation("Update post status in batch")
-    public List<Post> updateStatusInBatch(@RequestBody PostStatusUpdateParam param) {
-        return postService.updateStatusByIds(param.getIds(), param.getStatus());
+    public List<Post> updateStatusInBatch(@PathVariable(name = "status") PostStatus status,
+                                          @RequestBody List<Integer> ids) {
+        return postService.updateStatusByIds(ids, status);
     }
 
     @PutMapping("{postId:\\d+}/status/draft/content")
