@@ -60,11 +60,8 @@ postApi.updateStatus = (postId, status) => {
 
 postApi.updateStatusInBatch = (ids, status) => {
   return service({
-    url: `${baseUrl}/status`,
-    data: {
-      ids: ids,
-      status: status
-    },
+    url: `${baseUrl}/status/${status}`,
+    data: ids,
     method: 'put'
   })
 }

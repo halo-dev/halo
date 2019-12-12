@@ -40,11 +40,8 @@ commentApi.updateStatus = (target, commentId, status) => {
 
 commentApi.updateStatusInBatch = (target, ids, status) => {
   return service({
-    url: `${baseUrl}/${target}/comments/status`,
-    data: {
-      ids: ids,
-      status: status
-    },
+    url: `${baseUrl}/${target}/comments/status/${status}`,
+    data: ids,
     method: 'put'
   })
 }
