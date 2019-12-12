@@ -23,7 +23,8 @@ import java.util.Map;
  * Base comment service interface.
  *
  * @author johnniang
- * @date 19-4-24
+ * @author ryanwang
+ * @date 2019-04-24
  */
 public interface BaseCommentService<COMMENT extends BaseComment> extends CrudService<COMMENT, Long> {
 
@@ -148,6 +149,15 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     COMMENT updateStatus(@NonNull Long commentId, @NonNull CommentStatus status);
+
+    /**
+     * Removes comments in batch.
+     *
+     * @param ids ids must not be null.
+     * @return a list of deleted comment.
+     */
+    @NonNull
+    List<COMMENT> removeByIds(@NonNull Collection<Long> ids);
 
     /**
      * Converts to base comment dto.

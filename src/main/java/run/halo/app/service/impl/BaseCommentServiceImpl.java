@@ -51,6 +51,7 @@ import java.util.stream.Collectors;
  * Base comment service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-04-24
  */
 @Slf4j
@@ -326,6 +327,14 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         }
 
         return updatedComment;
+    }
+
+    @Override
+    public List<COMMENT> removeByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(this::removeById).collect(Collectors.toList());
     }
 
     @Override
