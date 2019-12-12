@@ -45,6 +45,14 @@ commentApi.delete = (target, commentId) => {
   })
 }
 
+commentApi.deleteInBatch = (target, ids) => {
+  return service({
+    url: `${baseUrl}/${target}/comments`,
+    data: ids,
+    method: 'delete'
+  })
+}
+
 commentApi.create = (target, comment) => {
   return service({
     url: `${baseUrl}/${target}/comments`,

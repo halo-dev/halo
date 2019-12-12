@@ -12,7 +12,10 @@
               :sm="24"
             >
               <a-form-item label="关键词">
-                <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()"/>
+                <a-input
+                  v-model="queryParam.keyword"
+                  @keyup.enter="handleQuery()"
+                />
               </a-form-item>
             </a-col>
             <a-col
@@ -662,14 +665,11 @@ export default {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        commentApi.delete(this.type, element).then(response => {
-          this.$log.debug(`delete: ${element}`)
-          this.selectedRowKeys = []
-          this.loadComments()
-        })
-      }
+      commentApi.deleteInBatch(this.type, this.selectedRowKeys).then(response => {
+        this.$log.debug(`delete: ${this.selectedRowKeys}`)
+        this.selectedRowKeys = []
+        this.loadComments()
+      })
     },
     handleClearRowKeys() {
       this.selectedRowKeys = []
