@@ -112,7 +112,13 @@
                     v-model="options.post_index_page_size"
                   />
                 </a-form-item>
-                <a-form-item label="RSS 显示条数：">
+                <a-form-item label="RSS 内容类型：">
+                  <a-select v-model="options.rss_content_type">
+                    <a-select-option value="full">全文</a-select-option>
+                    <a-select-option value="summary">摘要</a-select-option>
+                  </a-select>
+                </a-form-item>
+                <a-form-item label="RSS 内容条数：">
                   <a-input
                     type="number"
                     v-model="options.rss_page_size"
@@ -160,7 +166,10 @@
                 <a-form-item label="评论回复通知对方：">
                   <a-switch v-model="options.comment_reply_notice" />
                 </a-form-item>
-                <a-form-item label="API 评论开关：" help="* 关闭之后将无法进行评论">
+                <a-form-item
+                  label="API 评论开关："
+                  help="* 关闭之后将无法进行评论"
+                >
                   <a-switch v-model="options.comment_api_enabled" />
                 </a-form-item>
                 <a-form-item label="评论模块 JS：">
