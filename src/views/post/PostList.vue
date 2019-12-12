@@ -727,14 +727,11 @@ export default {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        postApi.updateStatus(element, status).then(response => {
-          this.$log.debug(`postId: ${element}, status: ${status}`)
-          this.selectedRowKeys = []
-          this.loadPosts()
-        })
-      }
+      postApi.updateStatusInBatch(this.selectedRowKeys, status).then(response => {
+        this.$log.debug(`postId: ${this.selectedRowKeys}, status: ${status}`)
+        this.selectedRowKeys = []
+        this.loadPosts()
+      })
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {

@@ -58,6 +58,17 @@ postApi.updateStatus = (postId, status) => {
   })
 }
 
+postApi.updateStatusInBatch = (ids, status) => {
+  return service({
+    url: `${baseUrl}/status`,
+    data: {
+      ids: ids,
+      status: status
+    },
+    method: 'put'
+  })
+}
+
 postApi.delete = postId => {
   return service({
     url: `${baseUrl}/${postId}`,
