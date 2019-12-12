@@ -214,8 +214,13 @@ public class BackupServiceImpl implements BackupService {
     public void deleteHaloBackup(String fileName) {
         Assert.hasText(fileName, "File name must not be blank");
 
+        Path backupRootPath = Paths.get(haloProperties.getBackupDir());
+
         // Get backup path
-        Path backupPath = Paths.get(haloProperties.getBackupDir(), fileName);
+        Path backupPath = backupRootPath.resolve(fileName);
+
+        // Check directory traversal
+        run.halo.app.utils.FileUtils.checkDirectoryTraversal(backupRootPath, backupPath);
 
         try {
             // Delete backup file
