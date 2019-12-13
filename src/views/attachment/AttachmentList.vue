@@ -1,87 +1,54 @@
 <template>
   <page-view>
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
-      <a-col
-        :span="24"
-        style="padding-bottom: 12px;"
-      >
-        <a-card
-          :bordered="false"
-          :bodyStyle="{ padding: '16px' }"
-        >
+    <a-row :gutter="12" type="flex" align="middle">
+      <a-col :span="24" style="padding-bottom: 12px;">
+        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()"/>
+                    <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()" />
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="存储位置">
-                    <a-select
-                      v-model="queryParam.attachmentType"
-                      @change="handleQuery()"
-                    >
-                      <a-select-option
-                        v-for="item in Object.keys(attachmentType)"
-                        :key="item"
-                        :value="item"
-                      >{{ attachmentType[item].text }}</a-select-option>
+                    <a-select v-model="queryParam.attachmentType" @change="handleQuery()">
+                      <a-select-option v-for="item in Object.keys(attachmentType)" :key="item" :value="item">{{
+                        attachmentType[item].text
+                      }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="文件类型">
-                    <a-select
-                      v-model="queryParam.mediaType"
-                      @change="handleQuery()"
-                    >
-                      <a-select-option
-                        v-for="(item,index) in mediaTypes"
-                        :key="index"
-                        :value="item"
-                      >{{ item }}</a-select-option>
+                    <a-select v-model="queryParam.mediaType" @change="handleQuery()">
+                      <a-select-option v-for="(item, index) in mediaTypes" :key="index" :value="item">{{
+                        item
+                      }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
-                    <a-button
-                      type="primary"
-                      @click="handleQuery()"
-                    >查询</a-button>
-                    <a-button
-                      style="margin-left: 8px;"
-                      @click="handleResetParam()"
-                    >重置</a-button>
+                    <a-button type="primary" @click="handleQuery()">查询</a-button>
+                    <a-button style="margin-left: 8px;" @click="handleResetParam()">重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
           <div class="table-operator" style="margin-bottom: 0;">
-            <a-button
-              type="primary"
-              icon="cloud-upload"
-              @click="()=>this.uploadVisible = true"
-            >上传</a-button>
+            <a-button type="primary" icon="cloud-upload" @click="() => (uploadVisible = true)">上传</a-button>
+            <a-button type="primary" v-show="!supportMultipleSelection" @click="handleMultipleSelection">
+              批量选择
+            </a-button>
+            <a-button type="primary" v-show="supportMultipleSelection" @click="handleDeleteAttachmentInBatch">
+              删除
+            </a-button>
+            <a-button type="primary" v-show="supportMultipleSelection" @click="handleCancelMultipleSelection">
+              取消
+            </a-button>
           </div>
         </a-card>
       </a-col>
@@ -91,31 +58,20 @@
           :dataSource="formattedDatas"
           :loading="listLoading"
         >
-          <a-list-item
-            slot="renderItem"
-            slot-scope="item, index"
-            :key="index"
-          >
-            <a-card
-              :bodyStyle="{ padding: 0 }"
-              hoverable
-              @click="handleShowDetailDrawer(item)"
-            >
+          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+            <a-card :bodyStyle="{ padding: 0 }" hoverable @click="handleShowDetailDrawer(item)">
               <div class="attach-thumb">
                 <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
-                <img
-                  :src="item.thumbPath"
-                  v-show="handleJudgeMediaType(item)"
-                  loading="lazy"
-                >
+                <img :src="item.thumbPath" v-show="handleJudgeMediaType(item)" loading="lazy" />
               </div>
               <a-card-meta style="padding: 0.8rem;">
-                <ellipsis
-                  :length="isMobile()?12:16"
-                  tooltip
-                  slot="description"
-                >{{ item.name }}</ellipsis>
+                <ellipsis :length="isMobile() ? 12 : 16" tooltip slot="description">{{ item.name }}</ellipsis>
               </a-card-meta>
+              <a-checkbox
+                class="select-attachment-checkbox"
+                @click="handleAttachmentSelectionChanged($event, item)"
+                v-show="supportMultipleSelection"
+              ></a-checkbox>
             </a-card>
           </a-list-item>
         </a-list>
@@ -127,30 +83,21 @@
         :current="pagination.page"
         :total="pagination.total"
         :defaultPageSize="pagination.size"
-        :pageSizeOptions="['18', '36', '54','72','90','108']"
+        :pageSizeOptions="['18', '36', '54', '72', '90', '108']"
         showSizeChanger
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
       />
     </div>
-    <a-modal
-      title="上传附件"
-      v-model="uploadVisible"
-      :footer="null"
-      :afterClose="onUploadClose"
-      destroyOnClose
-    >
-      <FilePondUpload
-        ref="upload"
-        :uploadHandler="uploadHandler"
-      ></FilePondUpload>
+    <a-modal title="上传附件" v-model="uploadVisible" :footer="null" :afterClose="onUploadClose" destroyOnClose>
+      <FilePondUpload ref="upload" :uploadHandler="uploadHandler"></FilePondUpload>
     </a-modal>
     <AttachmentDetailDrawer
       v-model="drawerVisible"
       v-if="selectAttachment"
       :attachment="selectAttachment"
       :addToPhoto="true"
-      @delete="()=>this.loadAttachments()"
+      @delete="() => this.loadAttachments()"
     />
   </page-view>
 </template>
@@ -160,6 +107,7 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { PageView } from '@/layouts'
 import AttachmentDetailDrawer from './components/AttachmentDetailDrawer'
 import attachmentApi from '@/api/attachment'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -172,6 +120,8 @@ export default {
       attachmentType: attachmentApi.type,
       listLoading: true,
       uploadVisible: false,
+      supportMultipleSelection: false,
+      batchSelectedAttachments: [],
       selectAttachment: {},
       attachments: [],
       mediaTypes: [],
@@ -217,6 +167,7 @@ export default {
     next()
   },
   methods: {
+    ...mapGetters(['color']),
     loadAttachments() {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -235,7 +186,11 @@ export default {
     },
     handleShowDetailDrawer(attachment) {
       this.selectAttachment = attachment
-      this.drawerVisible = true
+      if (this.supportMultipleSelection) {
+        this.drawerVisible = false
+      } else {
+        this.drawerVisible = true
+      }
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
@@ -274,7 +229,58 @@ export default {
       }
       // 没有获取到文件返回false
       return false
+    },
+    handleMultipleSelection() {
+      this.supportMultipleSelection = true
+      // 不允许附件详情抽屉显示
+      this.drawerVisible = false
+    },
+    handleCancelMultipleSelection() {
+      this.supportMultipleSelection = false
+      this.drawerVisible = false
+      // TODO 待改进
+      this.$router.go(0)
+    },
+    handleAttachmentSelectionChanged(e, item) {
+      var isChecked = e.target.checked || false
+      var $parentNode = e.currentTarget.parentNode.parentNode || {}
+      if (isChecked) {
+        this.batchSelectedAttachments.push(item.id)
+        this.$set($parentNode.style, 'border', `2px solid ${this.color()}`)
+      } else {
+        // 从选中id集合中删除id
+        var index = this.batchSelectedAttachments.indexOf(item.id)
+        this.batchSelectedAttachments.splice(index, 1)
+        // 取消边框
+        this.$set($parentNode.style, 'border', '')
+      }
+    },
+    handleDeleteAttachmentInBatch() {
+      var that = this
+      this.$confirm({
+        title: '确定要批量删除选中的附件吗?',
+        content: '一旦删除不可恢复，请谨慎操作',
+        onOk() {
+          attachmentApi.deleteInBatch(that.batchSelectedAttachments).then(res => {
+            that.handleCancelMultipleSelection()
+            that.$message.success('删除成功')
+          })
+        },
+        onCancel() { }
+      })
     }
   }
 }
 </script>
+<style lang="less" scoped>
+.select-attachment-checkbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+}
+</style>

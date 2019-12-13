@@ -27,6 +27,17 @@ attachmentApi.delete = attachmentId => {
   })
 }
 
+attachmentApi.deleteInBatch = attachmentIds => {
+  return service({
+    url: `${baseUrl}`,
+    method: 'delete',
+    data: attachmentIds,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    }
+  })
+}
+
 attachmentApi.update = (attachmentId, attachment) => {
   return service({
     url: `${baseUrl}/${attachmentId}`,
