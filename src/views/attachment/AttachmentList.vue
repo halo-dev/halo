@@ -41,7 +41,7 @@
           <div class="table-operator" style="margin-bottom: 0;">
             <a-button type="primary" icon="cloud-upload" @click="() => (uploadVisible = true)">上传</a-button>
             <a-button type="primary" v-show="!supportMultipleSelection" @click="handleMultipleSelection">
-              批量选择
+              批量操作
             </a-button>
             <a-button type="primary" v-show="supportMultipleSelection" @click="handleDeleteAttachmentInBatch">
               删除
@@ -69,6 +69,8 @@
               </a-card-meta>
               <a-checkbox
                 class="select-attachment-checkbox"
+                :style="getCheckStatus(item.id) ? selectedAttachmentStyle : ''"
+                :checked="getCheckStatus(item.id)"
                 @click="handleAttachmentSelectionChanged($event, item)"
                 v-show="supportMultipleSelection"
               ></a-checkbox>
@@ -121,6 +123,7 @@ export default {
       listLoading: true,
       uploadVisible: false,
       supportMultipleSelection: false,
+      selectedAttachmentCheckbox: {},
       batchSelectedAttachments: [],
       selectAttachment: {},
       attachments: [],
@@ -149,6 +152,11 @@ export default {
         attachment.typeProperty = this.attachmentType[attachment.type]
         return attachment
       })
+    },
+    selectedAttachmentStyle() {
+      return {
+        border: `2px solid ${this.color()}`
+      }
     }
   },
   created() {
@@ -230,39 +238,50 @@ export default {
       // 没有获取到文件返回false
       return false
     },
+    getCheckStatus(key) {
+      return this.selectedAttachmentCheckbox[key] || false
+    },
     handleMultipleSelection() {
       this.supportMultipleSelection = true
       // 不允许附件详情抽屉显示
       this.drawerVisible = false
+      this.attachments.forEach(item => {
+        this.$set(this.selectedAttachmentCheckbox, item.id, false)
+      })
     },
     handleCancelMultipleSelection() {
       this.supportMultipleSelection = false
       this.drawerVisible = false
-      // TODO 待改进
-      this.$router.go(0)
+      this.batchSelectedAttachments = []
+      for (var key in this.selectedCheckbox) {
+        this.$set(this.selectedAttachmentCheckbox, key, false)
+      }
     },
     handleAttachmentSelectionChanged(e, item) {
       var isChecked = e.target.checked || false
-      var $parentNode = e.currentTarget.parentNode.parentNode || {}
       if (isChecked) {
+        this.$set(this.selectedAttachmentCheckbox, item.id, true)
         this.batchSelectedAttachments.push(item.id)
-        this.$set($parentNode.style, 'border', `2px solid ${this.color()}`)
       } else {
+        this.$set(this.selectedAttachmentCheckbox, item.id, false)
         // 从选中id集合中删除id
         var index = this.batchSelectedAttachments.indexOf(item.id)
         this.batchSelectedAttachments.splice(index, 1)
-        // 取消边框
-        this.$set($parentNode.style, 'border', '')
       }
     },
     handleDeleteAttachmentInBatch() {
       var that = this
+      if (this.batchSelectedAttachments.length <= 0) {
+        this.$message.success('你还未选择任何附件，先选择一个吧')
+        return
+      }
       this.$confirm({
         title: '确定要批量删除选中的附件吗?',
         content: '一旦删除不可恢复，请谨慎操作',
         onOk() {
           attachmentApi.deleteInBatch(that.batchSelectedAttachments).then(res => {
             that.handleCancelMultipleSelection()
+            that.loadAttachments()
             that.$message.success('删除成功')
           })
         },
