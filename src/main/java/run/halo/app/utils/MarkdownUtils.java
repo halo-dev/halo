@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
 import com.vladsch.flexmark.convert.html.FlexmarkHtmlParser;
+import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
 import com.vladsch.flexmark.ext.attributes.AttributesExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;
@@ -9,6 +10,7 @@ import com.vladsch.flexmark.ext.emoji.EmojiShortcutType;
 import com.vladsch.flexmark.ext.escaped.character.EscapedCharacterExtension;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
+import com.vladsch.flexmark.ext.gitlab.GitLabExtension;
 import com.vladsch.flexmark.ext.ins.InsExtension;
 import com.vladsch.flexmark.ext.media.tags.MediaTagsExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
@@ -38,6 +40,7 @@ public class MarkdownUtils {
     private static final DataHolder OPTIONS = new MutableDataSet()
             .set(Parser.EXTENSIONS, Arrays.asList(
                     AttributesExtension.create(),
+                    AnchorLinkExtension.create(),
                     AutolinkExtension.create(),
                     EmojiExtension.create(),
                     EscapedCharacterExtension.create(),
@@ -47,7 +50,8 @@ public class MarkdownUtils {
                     MediaTagsExtension.create(),
                     TablesExtension.create(),
                     TocExtension.create(),
-                    YamlFrontMatterExtension.create())
+                    YamlFrontMatterExtension.create(),
+                    GitLabExtension.create())
             )
             .set(TocExtension.LEVELS, 255)
             .set(TablesExtension.WITH_CAPTION, false)
