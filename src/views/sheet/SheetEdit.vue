@@ -18,8 +18,7 @@
             :ishljs="true"
             :autofocus="false"
             @imgAdd="handleAttachmentUpload"
-            @keydown.ctrl.83.native="handleSaveDraft"
-            @keydown.meta.83.native="handleSaveDraft"
+            @save="handleSaveDraft"
           />
         </div>
       </a-col>

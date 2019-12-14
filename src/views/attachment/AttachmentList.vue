@@ -291,15 +291,3 @@ export default {
   }
 }
 </script>
-<style lang="less" scoped>
-.select-attachment-checkbox {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 10;
-}
-</style>
