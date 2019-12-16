@@ -40,20 +40,21 @@
               <a-icon type="mail" />{{ user.email }}
             </p>
             <p>
-              <a-icon type="calendar" />{{ counts.establishDays || 0 }} 天
+              <a-icon type="calendar" />{{ statistics.establishDays || 0 }} 天
             </p>
           </div>
           <a-divider />
           <div class="general-profile">
             <a-list
-              :loading="countsLoading"
+              :loading="statisticsLoading"
               itemLayout="horizontal"
             >
-              <a-list-item>累计发表了 {{ counts.postCount || 0 }} 篇文章。</a-list-item>
-              <a-list-item>累计创建了 {{ counts.attachmentCount || 0 }} 个附件。</a-list-item>
-              <a-list-item>累计获得了 {{ counts.commentCount || 0 }} 条评论。</a-list-item>
-              <a-list-item>累计添加了 {{ counts.linkCount || 0 }} 个友链。</a-list-item>
-              <a-list-item>文章总访问 {{ counts.visitCount || 0 }} 次。</a-list-item>
+              <a-list-item>累计发表了 {{ statistics.postCount || 0 }} 篇文章。</a-list-item>
+              <a-list-item>累计创建了 {{ statistics.categoryCount || 0 }} 个分类。</a-list-item>
+              <a-list-item>累计创建了 {{ statistics.tagCount || 0 }} 个标签。</a-list-item>
+              <a-list-item>累计获得了 {{ statistics.commentCount || 0 }} 条评论。</a-list-item>
+              <a-list-item>累计添加了 {{ statistics.linkCount || 0 }} 个友链。</a-list-item>
+              <a-list-item>文章总访问 {{ statistics.visitCount || 0 }} 次。</a-list-item>
               <a-list-item></a-list-item>
             </a-list>
           </div>
@@ -142,7 +143,7 @@
 <script>
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import userApi from '@/api/user'
-import adminApi from '@/api/admin'
+import statisticsApi from '@/api/statistics'
 import { mapMutations, mapGetters } from 'vuex'
 import MD5 from 'md5.js'
 
@@ -152,10 +153,10 @@ export default {
   },
   data() {
     return {
-      countsLoading: true,
+      statisticsLoading: true,
       attachmentDrawerVisible: false,
       user: {},
-      counts: {},
+      statistics: {},
       passwordParam: {
         oldPassword: null,
         newPassword: null,
@@ -171,21 +172,15 @@ export default {
     ...mapGetters(['options'])
   },
   created() {
-    this.loadUser()
-    this.getCounts()
+    this.getStatistics()
   },
   methods: {
     ...mapMutations({ setUser: 'SET_USER' }),
-    loadUser() {
-      userApi.getProfile().then(response => {
-        this.user = response.data.data
-        this.profileLoading = false
-      })
-    },
-    getCounts() {
-      adminApi.counts().then(response => {
-        this.counts = response.data.data
-        this.countsLoading = false
+    getStatistics() {
+      statisticsApi.statisticsWithUser().then(response => {
+        this.user = response.data.data.user
+        this.statistics = response.data.data
+        this.statisticsLoading = false
       })
     },
     handleUpdatePassword() {

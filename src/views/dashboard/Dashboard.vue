@@ -12,7 +12,7 @@
         <analysis-card
           :loading="countsLoading"
           title="文章"
-          :number="countsData.postCount"
+          :number="statisticsData.postCount"
         >
           <router-link
             :to="{ name:'PostList' }"
@@ -33,7 +33,7 @@
         <analysis-card
           :loading="countsLoading"
           title="评论"
-          :number="countsData.commentCount"
+          :number="statisticsData.commentCount"
         >
           <router-link
             :to="{ name:'Comments' }"
@@ -54,14 +54,14 @@
         <analysis-card
           :loading="countsLoading"
           title="总访问"
-          :number="countsData.visitCount"
+          :number="statisticsData.visitCount"
         >
           <a-tooltip slot="action">
             <template slot="title">
               文章总访问共
               <countTo
                 :startVal="0"
-                :endVal="countsData.visitCount"
+                :endVal="statisticsData.visitCount"
                 :duration="3000"
               ></countTo>次
             </template>
@@ -82,10 +82,10 @@
         <analysis-card
           :loading="countsLoading"
           title="建立天数"
-          :number="countsData.establishDays"
+          :number="statisticsData.establishDays"
         >
           <a-tooltip slot="action">
-            <template slot="title">博客建立于 {{ countsData.birthday | moment }}</template>
+            <template slot="title">博客建立于 {{ statisticsData.birthday | moment }}</template>
             <a href="javascript:void(0);">
               <a-icon type="info-circle-o" />
             </a>
@@ -336,7 +336,7 @@ import countTo from 'vue-count-to'
 
 import postApi from '@/api/post'
 import logApi from '@/api/log'
-import adminApi from '@/api/admin'
+import statisticsApi from '@/api/statistics'
 import journalApi from '@/api/journal'
 export default {
   name: 'Dashboard',
@@ -359,7 +359,7 @@ export default {
       logDrawerVisible: false,
       postData: [],
       logData: [],
-      countsData: {},
+      statisticsData: {},
       journal: {
         content: '',
         photos: []
@@ -379,7 +379,7 @@ export default {
     }
   },
   created() {
-    this.getCounts()
+    this.getStatistics()
     this.listLatestPosts()
     this.listLatestLogs()
   },
@@ -413,7 +413,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.interval = setInterval(() => {
-        vm.getCounts()
+        vm.getStatistics()
       }, 5000)
     })
   },
@@ -442,9 +442,9 @@ export default {
         this.writeLoading = false
       })
     },
-    getCounts() {
-      adminApi.counts().then(response => {
-        this.countsData = response.data.data
+    getStatistics() {
+      statisticsApi.statistics().then(response => {
+        this.statisticsData = response.data.data
         this.countsLoading = false
       })
     },

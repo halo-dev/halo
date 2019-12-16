@@ -11,15 +11,15 @@
   "dependencies": {
     "animate.css": "^3.7.0",
     "ant-design-vue": "^1.4.10",
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "enquire.js": "^2.1.6",
-    "filepond": "^4.7.2",
+    "filepond": "^4.9.2",
     "filepond-plugin-image-preview": "^4.5.0",
     "halo-editor": "^2.8.2",
-    "marked": "^0.7.0",
+    "marked": "^0.8.0",
     "moment": "^2.24.0",
     "verte": "^0.0.12",
-    "vue": "^2.6.10",
+    "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.0",
     "vue-codemirror-lite": "^1.0.4",
     "vue-count-to": "^1.0.13",
@@ -50,7 +50,7 @@
     "less": "^3.10.0",
     "less-loader": "^5.0.0",
     "vue-svg-icon-loader": "^2.1.1",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
     "root": true,
