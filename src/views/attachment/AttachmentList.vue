@@ -40,13 +40,13 @@
           </div>
           <div class="table-operator" style="margin-bottom: 0;">
             <a-button type="primary" icon="cloud-upload" @click="() => (uploadVisible = true)">上传</a-button>
-            <a-button type="primary" v-show="!supportMultipleSelection" @click="handleMultipleSelection">
+            <a-button type="primary" icon="select" v-show="!supportMultipleSelection" @click="handleMultipleSelection">
               批量操作
             </a-button>
-            <a-button type="primary" v-show="supportMultipleSelection" @click="handleDeleteAttachmentInBatch">
+            <a-button type="danger" icon="delete" v-show="supportMultipleSelection" @click="handleDeleteAttachmentInBatch">
               删除
             </a-button>
-            <a-button type="primary" v-show="supportMultipleSelection" @click="handleCancelMultipleSelection">
+            <a-button icon="close" v-show="supportMultipleSelection" @click="handleCancelMultipleSelection">
               取消
             </a-button>
           </div>
@@ -272,7 +272,7 @@ export default {
     handleDeleteAttachmentInBatch() {
       var that = this
       if (this.batchSelectedAttachments.length <= 0) {
-        this.$message.success('你还未选择任何附件，先选择一个吧')
+        this.$message.success('你还未选择任何附件，请至少选择一个！')
         return
       }
       this.$confirm({

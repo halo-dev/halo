@@ -25,11 +25,12 @@
         <a-empty v-if="comments.length==0" />
         <TargetCommentTree
           v-else
-          v-for="(comment, index) in formattedComments"
+          v-for="(comment, index) in comments"
           :key="index"
           :comment="comment"
           @reply="handleCommentReply"
           @delete="handleCommentDelete"
+          @editStatus="handleEditStatusClick"
         />
       </a-col>
     </a-row>
@@ -42,13 +43,38 @@
         @change="handlePaginationChange"
       ></a-pagination>
     </div>
+    <a-modal
+      v-if="selectedComment"
+      :title="'回复给：'+selectedComment.author"
+      v-model="replyCommentVisible"
+      @close="onReplyClose"
+      destroyOnClose
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleCreateClick"
+        >
+          回复
+        </a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item>
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="replyComment.content"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </a-drawer>
 </template>
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import TargetCommentTree from './TargetCommentTree'
 import commentApi from '@/api/comment'
-import marked from 'marked'
 export default {
   name: 'TargetCommentDrawer',
   mixins: [mixin, mixinDevice],
@@ -56,6 +82,9 @@ export default {
   data() {
     return {
       comments: [],
+      selectedComment: {},
+      replyComment: {},
+      replyCommentVisible: false,
       pagination: {
         page: 1,
         size: 10,
@@ -105,14 +134,6 @@ export default {
       }
     }
   },
-  computed: {
-    formattedComments() {
-      return this.comments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
-        return comment
-      })
-    }
-  },
   methods: {
     loadComments() {
       this.queryParam.page = this.pagination.page - 1
@@ -128,9 +149,51 @@ export default {
       this.pagination.size = pageSize
       this.loadComments()
     },
-    handleCommentReply() {},
-    handleCommentDelete() {},
-
+    handleCommentReply(comment) {
+      this.selectedComment = comment
+      this.replyCommentVisible = true
+      this.replyComment.parentId = comment.id
+      if (this.type === 'posts') {
+        this.replyComment.postId = comment.post.id
+      } else if (this.type === 'sheets') {
+        this.replyComment.postId = comment.sheet.id
+      } else {
+        this.replyComment.postId = comment.journal.id
+      }
+    },
+    handleCreateClick() {
+      if (!this.replyComment.content) {
+        this.$notification['error']({
+          message: '提示',
+          description: '评论内容不能为空！'
+        })
+        return
+      }
+      commentApi.create(this.target, this.replyComment).then(response => {
+        this.$message.success('回复成功！')
+        this.replyComment = {}
+        this.selectedComment = {}
+        this.replyCommentVisible = false
+        this.loadComments()
+      })
+    },
+    handleEditStatusClick(comment, status) {
+      commentApi.updateStatus(this.target, comment.id, status).then(response => {
+        this.$message.success('操作成功！')
+        this.loadComments()
+      })
+    },
+    handleCommentDelete(comment) {
+      commentApi.delete(this.target, comment.id).then(response => {
+        this.$message.success('删除成功！')
+        this.loadComments()
+      })
+    },
+    onReplyClose() {
+      this.replyComment = {}
+      this.selectedComment = {}
+      this.replyCommentVisible = false
+    },
     onClose() {
       this.comments = []
       this.pagination = {

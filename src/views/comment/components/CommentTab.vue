@@ -394,8 +394,8 @@
     </a-card>
 
     <a-modal
-      v-if="selectComment"
-      :title="'回复给：'+selectComment.author"
+      v-if="selectedComment"
+      :title="'回复给：'+selectedComment.author"
       v-model="replyCommentVisible"
       @close="onReplyClose"
       destroyOnClose
@@ -421,8 +421,8 @@
     </a-modal>
     <!-- <CommentDetail
       v-model="commentDetailVisible"
-      v-if="selectComment"
-      :comment="selectComment"
+      v-if="selectedComment"
+      :comment="selectedComment"
       :type="this.type"
     /> -->
   </div>
@@ -542,7 +542,7 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       comments: [],
-      selectComment: {},
+      selectedComment: {},
       replyComment: {},
       loading: false,
       commentStatus: commentApi.commentStatus,
@@ -595,7 +595,7 @@ export default {
       this.handleEditStatusClick(comment.id, 'PUBLISHED')
     },
     handleReplyClick(comment) {
-      this.selectComment = comment
+      this.selectedComment = comment
       this.replyCommentVisible = true
       this.replyComment.parentId = comment.id
       if (this.type === 'posts') {
@@ -615,7 +615,7 @@ export default {
       commentApi.create(this.type, this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}
-        this.selectComment = {}
+        this.selectedComment = {}
         this.replyCommentVisible = false
         this.loadComments()
       })
@@ -659,7 +659,7 @@ export default {
     },
     onReplyClose() {
       this.replyComment = {}
-      this.selectComment = {}
+      this.selectedComment = {}
       this.replyCommentVisible = false
     },
     onSelectionChange(selectedRowKeys) {
@@ -675,7 +675,7 @@ export default {
       }
     },
     handleShowDetailDrawer(comment) {
-      this.selectComment = comment
+      this.selectedComment = comment
       this.commentDetailVisible = true
     }
   }

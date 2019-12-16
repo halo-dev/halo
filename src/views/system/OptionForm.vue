@@ -491,7 +491,7 @@
                 <a-tabs>
                   <a-tab-pane
                     tab="发信设置"
-                    key="1"
+                    key="smtpoptions"
                   >
                     <a-form
                       layout="vertical"
@@ -531,7 +531,7 @@
                   </a-tab-pane>
                   <a-tab-pane
                     tab="发送测试"
-                    key="2"
+                    key="smtptest"
                   >
                     <a-form
                       layout="vertical"
