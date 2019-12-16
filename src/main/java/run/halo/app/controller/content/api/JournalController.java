@@ -35,7 +35,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @author ryanwang
  * @date 2019-04-26
  */
-@RestController("PortalJournalController")
+@RestController("ApiContentJournalController")
 @RequestMapping("/api/content/journals")
 public class JournalController {
 

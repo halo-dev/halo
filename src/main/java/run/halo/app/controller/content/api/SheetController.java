@@ -35,7 +35,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @author ryanwang
  * @date 19-4-26
  */
-@RestController("PortalSheetController")
+@RestController("ApiContentSheetController")
 @RequestMapping("/api/content/sheets")
 public class SheetController {
 
