@@ -89,10 +89,31 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      *
      * @param postId   post id must not be null
      * @param pageable page info must not be null
+     * @param status   status must not be null
+     * @return a page of comment vo
+     */
+    @NonNull
+    Page<BaseCommentVO> pageVosAllBy(@NonNull Integer postId, @NonNull Pageable pageable);
+
+    /**
+     * Lists comment vos by post id.
+     *
+     * @param postId   post id must not be null
+     * @param pageable page info must not be null
      * @return a page of comment vo
      */
     @NonNull
     Page<BaseCommentVO> pageVosBy(@NonNull Integer postId, @NonNull Pageable pageable);
+
+    /**
+     * Lists comment vos by list of COMMENT.
+     *
+     * @param comments comments must not be null
+     * @param pageable page info must not be null
+     * @return a page of comment vo
+     */
+    @NonNull
+    Page<BaseCommentVO> pageVosBy(@NonNull List<COMMENT> comments, @NonNull Pageable pageable);
 
     /**
      * Lists comment with parent vo.
@@ -159,6 +180,14 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     List<COMMENT> updateStatusByIds(@NonNull List<Long> ids, @NonNull CommentStatus status);
+
+    /**
+     * Remove comments by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of comments
+     */
+    List<COMMENT> removeByPostId(@NonNull Integer postId);
 
     /**
      * Removes comments in batch.

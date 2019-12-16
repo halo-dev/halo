@@ -18,6 +18,7 @@ import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.User;
@@ -111,19 +112,27 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
-    public Page<BaseCommentVO> pageVosBy(Integer postId, Pageable pageable) {
+    public Page<BaseCommentVO> pageVosAllBy(Integer postId, Pageable pageable) {
         Assert.notNull(postId, "Post id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         log.debug("Getting comment tree view of post: [{}], page info: [{}]", postId, pageable);
 
         // List all the top comments (Caution: This list will be cleared)
-        List<COMMENT> comments = baseCommentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
+        List<COMMENT> comments = baseCommentRepository.findAllByPostId(postId);
 
-        Comparator<BaseCommentVO> commentVOComparator = buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
+        return pageVosBy(comments, pageable);
+    }
+
+    @Override
+    public Page<BaseCommentVO> pageVosBy(List<COMMENT> comments, Pageable pageable) {
+        Assert.notNull(comments, "Comments must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        Comparator<BaseCommentVO> commentComparator = buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
 
         // Convert to vo
-        List<BaseCommentVO> topComments = convertToVo(comments, commentVOComparator);
+        List<BaseCommentVO> topComments = convertToVo(comments, commentComparator);
 
         List<BaseCommentVO> pageContent;
 
@@ -145,7 +154,19 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         }
 
         return new CommentPage<>(pageContent, pageable, topComments.size(), comments.size());
+    }
 
+    @Override
+    public Page<BaseCommentVO> pageVosBy(Integer postId, Pageable pageable) {
+        Assert.notNull(postId, "Post id must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        log.debug("Getting comment tree view of post: [{}], page info: [{}]", postId, pageable);
+
+        // List all the top comments (Caution: This list will be cleared)
+        List<COMMENT> comments = baseCommentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
+
+        return pageVosBy(comments, pageable);
     }
 
     @Override
@@ -337,6 +358,27 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         return ids.stream().map(id -> {
             return updateStatus(id, status);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<COMMENT> removeByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+        return baseCommentRepository.deleteByPostId(postId);
+    }
+
+    @Override
+    public COMMENT removeById(Long id) {
+        Assert.notNull(id, "Comment id must not be null");
+
+        COMMENT comment = baseCommentRepository.findById(id).orElseThrow(() -> new NotFoundException("查询不到该评论的信息").setErrorData(id));
+
+        if (comment.getParentId() == 0) {
+            // Remove comment children.
+            List<COMMENT> comments = baseCommentRepository.deleteByParentId(id);
+            log.debug("Removed comment children: [{}]", comments);
+        }
+
+        return super.removeById(id);
     }
 
     @Override

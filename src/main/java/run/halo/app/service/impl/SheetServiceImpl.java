@@ -13,7 +13,9 @@ import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
@@ -223,7 +225,13 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     @Override
     public Sheet removeById(Integer id) {
+
+        // Remove sheet comments
+        List<SheetComment> sheetComments = sheetCommentService.removeByPostId(id);
+        log.debug("Removed sheet comments: [{}]", sheetComments);
+
         Sheet sheet = super.removeById(id);
+
         // Log it
         eventPublisher.publishEvent(new LogEvent(this, id.toString(), LogType.SHEET_DELETED, sheet.getTitle()));
 
