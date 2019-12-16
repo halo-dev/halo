@@ -59,6 +59,7 @@ public interface AdminService {
      * @return count dto
      */
     @NonNull
+    @Deprecated
     StatisticDTO getCount();
 
     /**
