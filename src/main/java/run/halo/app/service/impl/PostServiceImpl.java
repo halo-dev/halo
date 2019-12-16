@@ -415,8 +415,13 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         log.debug("Removed post categories: [{}]", postCategories);
 
+        // Remove post metas
         List<PostMeta> postMetas = postMetaService.removeByPostId(postId);
         log.debug("Removed post metas: [{}]", postMetas);
+
+        // Remove post comments
+        List<PostComment> postComments = postCommentService.removeByPostId(postId);
+        log.debug("Removed post comments: [{}]", postComments);
 
         Post deletedPost = super.removeById(postId);
 

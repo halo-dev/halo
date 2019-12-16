@@ -21,7 +21,7 @@
 
 轻快，简洁，功能强大，使用 Java 开发的博客系统。
 
-> [官方社区](https://bbs.halo.run) | [QQ 交流群](https://jq.qq.com/?_wv=1027&k=5tnr930) | [Telegram 交流群](https://t.me/HaloBlog) | [Telegram 频道](https://t.me/halo_dev) | [WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
+> [官网](https://halo.run) | [社区](https://bbs.halo.run) | [QQ 交流群](https://jq.qq.com/?_wv=1027&k=5tnr930) | [Telegram 交流群](https://t.me/HaloBlog) | [Telegram 频道](https://t.me/halo_dev)
 
 ## 快速开始
 
@@ -55,6 +55,7 @@ java -jar halo-latest.jar
 - 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
 - 管理 APP（halo-app）：<https://github.com/halo-dev/halo-app>
 - 主题仓库：<https://halo.run/theme>
+- WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
 
 ## 许可证
 

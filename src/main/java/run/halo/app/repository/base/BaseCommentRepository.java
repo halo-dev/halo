@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.entity.BaseComment;
+import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
@@ -74,6 +76,24 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return comment count
      */
     long countByStatus(@NonNull CommentStatus status);
+
+    /**
+     * Removes comments by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of comment deleted
+     */
+    @NonNull
+    List<COMMENT> deleteByPostId(@NonNull Integer postId);
+
+    /**
+     * Removes comments by parent id.
+     *
+     * @param id comment id must not be null
+     * @return a list of comment deleted
+     */
+    @NonNull
+    List<COMMENT> deleteByParentId(@NonNull Long id);
 
     /**
      * Finds comments by post id, comment status.
