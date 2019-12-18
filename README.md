@@ -2,8 +2,6 @@
 
 > Halo 是一款现代化的个人独立博客系统，给习惯写博客的同学多一个选择。
 
-
-
 <p align="center">
 <a href="#"><img alt="JDK" src="https://img.shields.io/badge/JDK-1.8-yellow.svg?style=flat-square"/></a>
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square"/></a>
@@ -22,6 +20,10 @@
 轻快，简洁，功能强大，使用 Java 开发的博客系统。
 
 > [官网](https://halo.run) | [社区](https://bbs.halo.run) | [QQ 交流群](https://jq.qq.com/?_wv=1027&k=5tnr930) | [Telegram 交流群](https://t.me/HaloBlog) | [Telegram 频道](https://t.me/halo_dev)
+
+## 声明
+
+> 本项目旨在创造一个好的产品以供人们使用（虽然现在并不是太好），并非一个所谓提供学习的项目。所以，不提供任何学习代码的帮助。所以，请不要在讨论群，issues，论坛发起任何有关代码学习的问题。当然，如果你是要参与代码贡献，我们非常欢迎。
 
 ## 快速开始
 
