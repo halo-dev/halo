@@ -13,7 +13,7 @@ dist: trusty
 jobs:
   include:
     - stage: test
-      script: ./gradlew check --args="--spring.profiles.active=test"
+      script: ./gradlew check
     - stage: build
       script: ./gradlew clean build -x test
     - stage: Build Docker Image for Release
@@ -31,7 +31,7 @@ jobs:
         on:
           tags: true
 stages:
-  - test
+#  - test
   - build
   - name: GitHub Release
     if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
