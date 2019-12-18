@@ -299,7 +299,9 @@ export default {
       })
     },
     handleUpdateTheme(themeId) {
+      const hide = this.$message.loading('更新中...', 0)
       themeApi.update(themeId).then(response => {
+        hide()
         this.$message.success('更新成功！')
         this.loadThemes()
       })
