@@ -5,10 +5,13 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.support.StaticFile;
 import run.halo.app.service.StaticStorageService;
+import run.halo.app.utils.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +41,6 @@ public class StaticStorageServiceImpl implements StaticStorageService {
 
     @Override
     public List<StaticFile> listStaticFolder() {
-        System.out.println(staticDir);
         return listStaticFileTree(staticDir);
     }
 
@@ -78,4 +80,68 @@ public class StaticStorageServiceImpl implements StaticStorageService {
         }
     }
 
+    @Override
+    public void delete(String relativePath) {
+        Assert.notNull(relativePath, "Relative path must not be null");
+
+        Path path = Paths.get(staticDir.toString(), relativePath);
+        System.out.println(path.toString());
+
+        try {
+            if (path.toFile().isDirectory()) {
+                FileUtils.deleteFolder(path);
+            } else {
+                Files.deleteIfExists(path);
+            }
+        } catch (IOException e) {
+            throw new FileOperationException("文件 " + relativePath + " 删除失败", e);
+        }
+    }
+
+    @Override
+    public void createFolder(String basePath, String folderName) {
+        Assert.notNull(folderName, "Folder name path must not be null");
+
+        Path path;
+
+        if (StringUtils.isEmpty(basePath)) {
+            path = Paths.get(staticDir.toString(), folderName);
+        } else {
+            path = Paths.get(staticDir.toString(), basePath, folderName);
+        }
+
+        if (path.toFile().exists()) {
+            throw new FileOperationException("目录 " + path.toString() + " 已存在").setErrorData(path);
+        }
+
+        try {
+            FileUtils.createIfAbsent(path);
+        } catch (IOException e) {
+            throw new FileOperationException("目录 " + path.toString() + " 创建失败", e);
+        }
+    }
+
+    @Override
+    public void update(String basePath, MultipartFile file) {
+        Assert.notNull(file, "Multipart file must not be null");
+
+        Path uploadPath;
+
+        if (StringUtils.isEmpty(basePath)) {
+            uploadPath = Paths.get(staticDir.toString(), file.getOriginalFilename());
+        } else {
+            uploadPath = Paths.get(staticDir.toString(), basePath, file.getOriginalFilename());
+        }
+
+        if (uploadPath.toFile().exists()) {
+            throw new FileOperationException("文件 " + file.getOriginalFilename() + " 已存在").setErrorData(uploadPath);
+        }
+
+        try {
+            Files.createFile(uploadPath);
+            file.transferTo(uploadPath);
+        } catch (IOException e) {
+            throw new ServiceException("上传文件失败").setErrorData(uploadPath);
+        }
+    }
 }
