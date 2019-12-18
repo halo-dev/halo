@@ -26,6 +26,16 @@ linkApi.get = linkId => {
   })
 }
 
+linkApi.getByParse = url => {
+  return service({
+    url: `${baseUrl}/parse`,
+    params: {
+      url: url
+    },
+    method: 'get'
+  })
+}
+
 linkApi.update = (linkId, link) => {
   return service({
     url: `${baseUrl}/${linkId}`,

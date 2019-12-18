@@ -40,7 +40,7 @@
           </div>
           <div class="table-operator" style="margin-bottom: 0;">
             <a-button type="primary" icon="cloud-upload" @click="() => (uploadVisible = true)">上传</a-button>
-            <a-button type="primary" icon="select" v-show="!supportMultipleSelection" @click="handleMultipleSelection">
+            <a-button icon="select" v-show="!supportMultipleSelection" @click="handleMultipleSelection">
               批量操作
             </a-button>
             <a-button type="danger" icon="delete" v-show="supportMultipleSelection" @click="handleDeleteAttachmentInBatch">
