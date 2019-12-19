@@ -56,7 +56,7 @@ public class MarkdownUtils {
             .set(TocExtension.LEVELS, 255)
             .set(TablesExtension.WITH_CAPTION, false)
             .set(TablesExtension.COLUMN_SPANS, false)
-            .set(TablesExtension.MIN_SEPARATOR_DASHES,1)
+            .set(TablesExtension.MIN_SEPARATOR_DASHES, 1)
             .set(TablesExtension.MIN_HEADER_ROWS, 1)
             .set(TablesExtension.MAX_HEADER_ROWS, 1)
             .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
