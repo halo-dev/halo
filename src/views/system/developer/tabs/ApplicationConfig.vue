@@ -30,10 +30,14 @@
             style="margin-right: 8px;"
           >保存</a-button>
         </a-popconfirm>
-        <a-button
-          type="danger"
-          @click="handleRestartApplication()"
-        >重启</a-button>
+        <a-popconfirm
+          :title="'你确定要重启吗？'"
+          okText="确定"
+          cancelText="取消"
+          @confirm="handleRestartApplication()"
+        >
+          <a-button type="danger">重启</a-button>
+        </a-popconfirm>
       </a-form-item>
     </a-form>
   </div>
