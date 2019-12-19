@@ -19,27 +19,27 @@
             <tbody class="ant-table-tbody">
               <tr>
                 <td>系统</td>
-                <td>{{ systemProperties.properties['os.name'].value }} {{ systemProperties.properties['os.version'].value }}</td>
+                <td>{{ systemProperties['os.name'].value }} {{ systemProperties['os.version'].value }}</td>
               </tr>
               <tr>
                 <td>平台</td>
-                <td>{{ systemProperties.properties['os.arch'].value }}</td>
+                <td>{{ systemProperties['os.arch'].value }}</td>
               </tr>
               <tr>
                 <td>语言</td>
-                <td>{{ systemProperties.properties['user.language'].value }}</td>
+                <td>{{ systemProperties['user.language'].value }}</td>
               </tr>
               <tr>
                 <td>时区</td>
-                <td>{{ systemProperties.properties['user.timezone'].value }}</td>
+                <td>{{ systemProperties['user.timezone'].value }}</td>
               </tr>
               <tr>
                 <td>当前用户</td>
-                <td>{{ systemProperties.properties['user.name'].value }}</td>
+                <td>{{ systemProperties['user.name'].value }}</td>
               </tr>
               <tr>
                 <td>用户目录</td>
-                <td>{{ systemProperties.properties['user.home'].value }}</td>
+                <td>{{ systemProperties['user.home'].value }}</td>
               </tr>
             </tbody>
           </table>
@@ -109,11 +109,11 @@
             <tbody class="ant-table-tbody">
               <tr>
                 <td>Java 名称</td>
-                <td>{{ systemProperties.properties['java.vm.name'].value }}</td>
+                <td>{{ systemProperties['java.vm.name'].value }}</td>
               </tr>
               <tr>
                 <td>Java 版本</td>
-                <td>{{ systemProperties.properties['java.version'].value }}</td>
+                <td>{{ systemProperties['java.version'].value }}</td>
               </tr>
               <tr>
                 <td>Java Home</td>
@@ -122,7 +122,7 @@
                     :length="isMobile() ? 50 : 256"
                     tooltip
                   >
-                    {{ systemProperties.properties['java.home'].value }}
+                    {{ systemProperties['java.home'].value }}
                   </ellipsis>
                 </td>
               </tr>
@@ -149,15 +149,11 @@
             <tbody class="ant-table-tbody">
               <tr>
                 <td>端口</td>
-                <td>{{ propertiesSourcesMap['server.ports'].properties['local.server.port'].value }}</td>
+                <td>{{ propertiesSourcesMap['server.ports']['local.server.port'].value }}</td>
               </tr>
               <tr>
                 <td>PID</td>
-                <td>{{ systemProperties.properties['PID'].value }}</td>
-              </tr>
-              <tr>
-                <td>启动模式</td>
-                <td>{{ systemProperties.properties['spring.profiles.active'].value }}</td>
+                <td>{{ systemProperties['PID'].value }}</td>
               </tr>
               <tr>
                 <td>启动时间</td>
@@ -174,7 +170,7 @@
                     :length="isMobile() ? 50 : 256"
                     tooltip
                   >
-                    {{ systemProperties.properties['user.dir'].value }}
+                    {{ systemProperties['user.dir'].value }}
                   </ellipsis>
                 </td>
               </tr>
@@ -185,7 +181,7 @@
                     :length="isMobile() ? 50 : 256"
                     tooltip
                   >
-                    {{ systemProperties.properties['LOG_FILE'].value }}
+                    {{ systemProperties['LOG_FILE'].value }}
                   </ellipsis>
                 </td>
               </tr>
@@ -207,8 +203,6 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
-import axios from 'axios'
 import actuatorApi from '@/api/actuator'
 export default {
   name: 'Environment',
@@ -216,7 +210,7 @@ export default {
   data() {
     return {
       propertiesSourcesMap: {},
-      systemProperties: {},
+      systemProperties: [],
       interval: null,
       system: {
         cpu: {
@@ -248,57 +242,46 @@ export default {
     this.loadSystemInfo()
     this.loadJvmInfo()
   },
-  computed: {
-    ...mapGetters(['options'])
-  },
   methods: {
     loadEnv() {
       actuatorApi.env().then(response => {
         const propertiesSources = response.data.propertySources
         propertiesSources.forEach(item => {
-          this.propertiesSourcesMap[item.name] = item
-          this.systemProperties = this.propertiesSourcesMap['systemProperties']
+          this.propertiesSourcesMap[item.name] = item.properties
         })
+        this.systemProperties = this.propertiesSourcesMap['systemProperties']
       })
     },
     loadSystemInfo() {
-      axios
-        .all([
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/system.cpu.count'),
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/system.cpu.usage'),
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/process.uptime'),
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/process.start.time'),
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/process.cpu.usage')
-        ])
-        .then(response => {
-          this.system.cpu.count = response[0].data.measurements[0].value
-          this.system.cpu.usage = Number(response[1].data.measurements[0].value * 100).toFixed(2)
-          this.system.process.uptime = response[2].data.measurements[0].value
-          this.system.process.startTime = response[3].data.measurements[0].value * 1000
-          this.system.process.cpuUsage = response[4].data.measurements[0].value
-        })
-        .catch(response => {
-          this.$message.error('获取服务器系统信息失败！')
-        })
+      actuatorApi.getSystemCpuCount().then(response => {
+        this.system.cpu.count = response.data.measurements[0].value
+      })
+      actuatorApi.getSystemCpuUsage().then(response => {
+        this.system.cpu.usage = Number(response.data.measurements[0].value * 100).toFixed(2)
+      })
+      actuatorApi.getProcessUptime().then(response => {
+        this.system.process.uptime = response.data.measurements[0].value
+      })
+      actuatorApi.getProcessStartTime().then(response => {
+        this.system.process.startTime = response.data.measurements[0].value * 1000
+      })
+      actuatorApi.getProcessCpuUsage().then(response => {
+        this.system.process.cpuUsage = response.data.measurements[0].value
+      })
     },
     loadJvmInfo() {
-      axios
-        .all([
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/jvm.memory.max'),
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/jvm.memory.committed'),
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/jvm.memory.used'),
-          axios.get(this.options.blog_url + '/api/admin/actuator/metrics/jvm.gc.pause')
-        ])
-        .then(r => {
-          this.jvm.memory.max = r[0].data.measurements[0].value
-          this.jvm.memory.committed = r[1].data.measurements[0].value
-          this.jvm.memory.used = r[2].data.measurements[0].value
-          this.jvm.gc.pause.count = r[3].data.measurements[0].value
-        })
-        .catch(r => {
-          console.error(r)
-          this.$message.error('获取 JVM 信息失败！')
-        })
+      actuatorApi.getJvmMemoryMax().then(response => {
+        this.jvm.memory.max = response.data.measurements[0].value
+      })
+      actuatorApi.getJvmMemoryCommitted().then(response => {
+        this.jvm.memory.committed = response.data.measurements[0].value
+      })
+      actuatorApi.getJvmMemoryUsed().then(response => {
+        this.jvm.memory.used = response.data.measurements[0].value
+      })
+      actuatorApi.getJvmGcPause().then(response => {
+        this.jvm.gc.pause.count = response.data.measurements[0].value
+      })
     },
     handleRefresh() {
       this.loadSystemInfo()

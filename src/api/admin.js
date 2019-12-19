@@ -106,4 +106,14 @@ adminApi.restartApplication = () => {
   })
 }
 
+adminApi.getLogFiles = lines => {
+  return service({
+    url: `${baseUrl}/halo/logfile`,
+    params: {
+      lines: lines
+    },
+    method: 'get'
+  })
+}
+
 export default adminApi

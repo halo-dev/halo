@@ -21,7 +21,15 @@
               label="网站地址："
               help="* 需要加上 http://"
             >
-              <a-input v-model="link.url" />
+              <a-input v-model="link.url">
+                <a
+                  href="javascript:void(0);"
+                  slot="addonAfter"
+                  @click="handleParseUrl"
+                >
+                  <a-icon type="sync" />
+                </a>
+              </a-input>
             </a-form-item>
             <a-form-item label="Logo：">
               <a-input v-model="link.logo" />
@@ -274,6 +282,11 @@ export default {
         this.$message.success('删除成功！')
         this.loadLinks()
         this.loadTeams()
+      })
+    },
+    handleParseUrl() {
+      linkApi.getByParse(this.link.url).then(response => {
+        this.link = response.data.data
       })
     },
     createOrUpdateLink() {
