@@ -23,6 +23,8 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.options.DataHolder;
 import com.vladsch.flexmark.util.options.MutableDataSet;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import run.halo.app.model.support.HaloConst;
 
 import java.util.Arrays;
@@ -61,8 +63,8 @@ public class MarkdownUtils {
             .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
             .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
             .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
-            .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.GITHUB)
-            .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.IMAGE_ONLY);
+            .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
+            .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY);
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 
@@ -76,7 +78,7 @@ public class MarkdownUtils {
      */
     public static String renderHtml(String markdown) {
         if (StringUtils.isBlank(markdown)) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         // Render netease music short url.

@@ -453,7 +453,7 @@ public class AdminServiceImpl implements AdminService {
     public String getApplicationConfig() {
         File file = new File(haloProperties.getWorkDir(), APPLICATION_CONFIG_NAME);
         if (!file.exists()) {
-            return "";
+            return StringUtils.EMPTY;
         }
         FileReader reader = new FileReader(file);
         return reader.readString();
