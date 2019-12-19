@@ -211,12 +211,6 @@ public class AdminServiceImpl implements AdminService {
             throw new ServiceException("已经获取过验证码，不能重复获取");
         });
 
-        Boolean emailEnabled = optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class, false);
-
-        if (!emailEnabled) {
-            throw new ServiceException("未启用 SMTP 服务");
-        }
-
         if (!userService.verifyUser(param.getUsername(), param.getEmail())) {
             throw new ServiceException("用户名或者邮箱验证错误");
         }
@@ -226,12 +220,18 @@ public class AdminServiceImpl implements AdminService {
 
         log.info("Get reset password code:{}", code);
 
+        // Cache code.
+        cacheStore.putAny("code", code, 5, TimeUnit.MINUTES);
+
+        Boolean emailEnabled = optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class, false);
+
+        if (!emailEnabled) {
+            throw new ServiceException("未启用 SMTP 服务，无法发送邮件，但是你可以通过系统日志找到验证码");
+        }
+
         // Send email to administrator.
         String content = "您正在进行密码重置操作，如不是本人操作，请尽快做好相应措施。密码重置验证码如下（五分钟有效）：\n" + code;
         mailService.sendMail(param.getEmail(), "找回密码验证码", content);
-
-        // Cache code.
-        cacheStore.putAny("code", code, 5, TimeUnit.MINUTES);
     }
 
     @Override
