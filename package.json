@@ -1,7 +1,6 @@
 {
   "name": "halo-admin",
   "version": "1.2.0-beta.1",
-  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -126,5 +125,16 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "description": "Halo admin client.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/halo-dev/halo-admin.git"
+  },
+  "author": "halo-dev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo-admin/issues"
+  },
+  "homepage": "https://github.com/halo-dev/halo-admin#readme"
 }

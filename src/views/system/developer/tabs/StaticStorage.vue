@@ -29,11 +29,22 @@
         <a-table
           :rowKey="record => record.name"
           :columns="columns"
-          :dataSource="statics"
+          :dataSource="sortedStatics"
           :pagination="false"
           size="middle"
           :loading="loading"
         >
+          <span
+            slot="name"
+            slot-scope="name"
+          >
+            <ellipsis
+              length="64"
+              tooltip
+            >
+              {{ name }}
+            </ellipsis>
+          </span>
           <span
             slot="createTime"
             slot-scope="createTime"
@@ -130,12 +141,12 @@ const columns = [
   {
     title: '文件名',
     dataIndex: 'name',
-    scopedSlots: { customRender: 'key' }
+    scopedSlots: { customRender: 'name' }
   },
   {
     title: '文件类型',
-    dataIndex: 'mediaType',
-    scopedSlots: { customRender: 'mediaType' }
+    dataIndex: 'mimeType',
+    scopedSlots: { customRender: 'mimeType' }
   },
   {
     title: '上传时间',
@@ -168,7 +179,13 @@ export default {
     this.loadStaticList()
   },
   computed: {
-    ...mapGetters(['options'])
+    ...mapGetters(['options']),
+    sortedStatics() {
+      const data = this.statics.slice(0)
+      return data.sort(function(a, b) {
+        return b.createTime - a.createTime
+      })
+    }
   },
   methods: {
     loadStaticList() {

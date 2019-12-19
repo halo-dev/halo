@@ -181,7 +181,7 @@
                         </a-menu-item>
                         <a-menu-item v-else-if="item.status === 'RECYCLE'">
                           <a-popconfirm
-                            :title="'你确定要发布【' + item.title + '】文章？'"
+                            :title="'你确定要发布【' + item.title + '】页面？'"
                             @confirm="handleEditStatusClick(item.id,'PUBLISHED')"
                             okText="确定"
                             cancelText="取消"
@@ -191,7 +191,7 @@
                         </a-menu-item>
                         <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
                           <a-popconfirm
-                            :title="'你确定要将【' + item.title + '】文章移到回收站？'"
+                            :title="'你确定要将【' + item.title + '】页面移到回收站？'"
                             @confirm="handleEditStatusClick(item.id,'RECYCLE')"
                             okText="确定"
                             cancelText="取消"
@@ -201,7 +201,7 @@
                         </a-menu-item>
                         <a-menu-item v-else-if="item.status === 'RECYCLE'">
                           <a-popconfirm
-                            :title="'你确定要永久删除【' + item.title + '】文章？'"
+                            :title="'你确定要永久删除【' + item.title + '】页面？'"
                             @confirm="handleDeleteClick(item.id)"
                             okText="确定"
                             cancelText="取消"
@@ -245,27 +245,9 @@
                       slot="title"
                       style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                     >
-                      <a-icon
-                        type="pushpin"
-                        v-if="item.topPriority!=0"
-                        theme="twoTone"
-                        twoToneColor="red"
-                        style="margin-right: 3px;"
-                      />
                       <a
                         v-if="item.status=='PUBLISHED'"
                         :href="options.blog_url+'/archives/'+item.url"
-                        target="_blank"
-                        style="text-decoration: none;"
-                      >
-                        <a-tooltip
-                          placement="top"
-                          :title="'点击访问【'+item.title+'】'"
-                        >{{ item.title }}</a-tooltip>
-                      </a>
-                      <a
-                        v-else-if="item.status == 'INTIMATE'"
-                        :href="options.blog_url+'/archives/'+item.url+'/password'"
                         target="_blank"
                         style="text-decoration: none;"
                       >

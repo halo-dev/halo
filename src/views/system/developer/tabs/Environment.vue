@@ -161,7 +161,7 @@
               </tr>
               <tr>
                 <td>已启动时间</td>
-                <td>{{ system.process.uptime }} 秒</td>
+                <td>{{ system.process.uptime | dayTime }} </td>
               </tr>
               <tr>
                 <td>启动目录</td>

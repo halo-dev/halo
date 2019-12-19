@@ -127,7 +127,7 @@ export default {
           title: '版本要求',
           alert: {
             type: 'warning',
-            message: '注意：要求 Halo server 版本大于 v1.1.3！你可以在 【系统 | 关于】 里面找到系统的版本信息。'
+            message: '注意：要求 Halo server 版本大于 v1.1.1！你可以在 【系统 | 关于】 里面找到系统的版本信息。'
           }
         }
       ]

@@ -13,10 +13,6 @@
       </a-skeleton>
     </a-form-item>
     <a-form-item>
-      <a-button
-        type="primary"
-        style="margin-right: 8px;"
-      >下载</a-button>
       <a-select
         defaultValue="200"
         style="margin-right: 8px;width: 100px"
@@ -28,9 +24,11 @@
         <a-select-option value="1000">1000 行</a-select-option>
       </a-select>
       <a-button
-        type="dash"
+        type="primary"
+        style="margin-right: 8px;"
         @click="()=>this.loadLogs()"
       >刷新</a-button>
+      <a-button type="dash" @click="handleDownloadLogFile()">下载</a-button>
     </a-form-item>
   </a-form>
 </template>
@@ -65,6 +63,11 @@ export default {
       adminApi.getLogFiles(this.logLines).then(response => {
         this.logContent = response.data.data
         this.loading = false
+      })
+    },
+    handleDownloadLogFile() {
+      adminApi.downloadLogFiles(this.logLines).then(response => {
+        this.$message.success('下载成功！')
       })
     },
     handleLinesChange(value) {

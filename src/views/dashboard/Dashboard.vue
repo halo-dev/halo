@@ -122,15 +122,9 @@
                   >
                     <a-list-item-meta>
                       <a
-                        v-if="item.status=='PUBLISHED'"
+                        v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
                         slot="title"
                         :href="options.blog_url+'/archives/'+item.url"
-                        target="_blank"
-                      >{{ item.title }}</a>
-                      <a
-                        v-else-if="item.status == 'INTIMATE'"
-                        slot="title"
-                        :href="options.blog_url+'/archives/'+item.url+'/password'"
                         target="_blank"
                       >{{ item.title }}</a>
                       <a

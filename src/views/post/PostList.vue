@@ -236,19 +236,8 @@
                   style="margin-right: 3px;"
                 />
                 <a
-                  v-if="item.status=='PUBLISHED'"
+                  v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
                   :href="options.blog_url+'/archives/'+item.url"
-                  target="_blank"
-                  style="text-decoration: none;"
-                >
-                  <a-tooltip
-                    placement="top"
-                    :title="'点击访问【'+item.title+'】'"
-                  >{{ item.title }}</a-tooltip>
-                </a>
-                <a
-                  v-else-if="item.status == 'INTIMATE'"
-                  :href="options.blog_url+'/archives/'+item.url+'/password'"
                   target="_blank"
                   style="text-decoration: none;"
                 >
@@ -328,19 +317,8 @@
               style="margin-right: 3px;"
             />
             <a
-              v-if="record.status=='PUBLISHED'"
+              v-if="record.status=='PUBLISHED' || record.status == 'INTIMATE'"
               :href="options.blog_url+'/archives/'+record.url"
-              target="_blank"
-              style="text-decoration: none;"
-            >
-              <a-tooltip
-                placement="top"
-                :title="'点击访问【'+text+'】'"
-              >{{ text }}</a-tooltip>
-            </a>
-            <a
-              v-else-if="record.status == 'INTIMATE'"
-              :href="options.blog_url+'/archives/'+record.url+'/password'"
               target="_blank"
               style="text-decoration: none;"
             >

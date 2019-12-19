@@ -116,4 +116,14 @@ adminApi.getLogFiles = lines => {
   })
 }
 
+adminApi.downloadLogFiles = lines => {
+  return service({
+    url: `${baseUrl}/halo/logfile/download`,
+    params: {
+      lines: lines
+    },
+    method: 'get'
+  })
+}
+
 export default adminApi

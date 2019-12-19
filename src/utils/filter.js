@@ -36,3 +36,12 @@ Vue.filter('fileSizeFormat', function(value) {
   size = size.toFixed(2)
   return size + ' ' + unitArr[index]
 })
+
+Vue.filter('dayTime', function(value) {
+  var days = Math.floor(value / 86400)
+  var hours = Math.floor((value % 86400) / 3600)
+  var minutes = Math.floor(((value % 86400) % 3600) / 60)
+  var seconds = Math.floor(((value % 86400) % 3600) % 60)
+  var duration = days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's'
+  return duration
+})
