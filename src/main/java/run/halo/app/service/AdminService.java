@@ -25,6 +25,8 @@ public interface AdminService {
 
     String APPLICATION_CONFIG_NAME = "application.yaml";
 
+    String LOG_PATH = "logs/spring.log";
+
     /**
      * Authenticates.
      *
@@ -97,4 +99,12 @@ public interface AdminService {
      * @param content new content
      */
     void updateApplicationConfig(String content);
+
+    /**
+     * Get halo logs content.
+     *
+     * @param lines lines
+     * @return logs content.
+     */
+    String getLogFiles(Long lines);
 }
