@@ -20,6 +20,9 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -156,15 +159,15 @@ public class PostController {
 
     @GetMapping(value = {"preview/{postId:\\d+}", "{postId:\\d+}/preview"})
     @ApiOperation("Get preview link")
-    public String preview(@PathVariable("postId") Integer postId) {
+    public String preview(@PathVariable("postId") Integer postId) throws UnsupportedEncodingException {
         Post post = postService.getById(postId);
 
         String token = IdUtil.simpleUUID();
 
         // cache preview token
-        cacheStore.putAny("preview-post-token-" + postId, token, 10, TimeUnit.MINUTES);
+        cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
 
         // build preview post url and return
-        return String.format("%s/archives/%s?preview=true&token=%s", optionService.getBlogBaseUrl(), post.getUrl(), token);
+        return String.format("%s/archives/%s?token=%s", optionService.getBlogBaseUrl(), URLEncoder.encode(post.getUrl(), StandardCharsets.UTF_8.name()), token);
     }
 }

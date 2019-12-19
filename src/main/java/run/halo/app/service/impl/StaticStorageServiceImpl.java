@@ -13,6 +13,7 @@ import run.halo.app.model.support.StaticFile;
 import run.halo.app.service.StaticStorageService;
 import run.halo.app.utils.FileUtils;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,8 +35,9 @@ public class StaticStorageServiceImpl implements StaticStorageService {
 
     private final HaloProperties haloProperties;
 
-    public StaticStorageServiceImpl(HaloProperties haloProperties) {
+    public StaticStorageServiceImpl(HaloProperties haloProperties) throws IOException {
         staticDir = Paths.get(haloProperties.getWorkDir(), STATIC_FOLDER);
+        FileUtils.createIfAbsent(staticDir);
         this.haloProperties = haloProperties;
     }
 
@@ -66,6 +68,7 @@ public class StaticStorageServiceImpl implements StaticStorageService {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                staticFile.setMimeType(MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path.toFile()));
                 if (Files.isDirectory(path)) {
                     staticFile.setChildren(listStaticFileTree(path));
                 }
