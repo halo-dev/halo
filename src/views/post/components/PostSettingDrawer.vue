@@ -156,7 +156,7 @@
             <div class="post-thumb">
               <img
                 class="img"
-                :src="selectedPost.thumbnail || '/images/placeholder.png'"
+                :src="selectedPost.thumbnail || '/images/placeholder.jpg'"
                 @click="()=>this.thumbDrawerVisible=true"
               >
               <a-button

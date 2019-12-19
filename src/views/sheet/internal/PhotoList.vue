@@ -130,7 +130,7 @@
           >
             <div class="photo-detail-img">
               <img
-                :src="photo.url || '/images/placeholder.png'"
+                :src="photo.url || '/images/placeholder.jpg'"
                 @click="showThumbDrawer"
                 style="width: 100%;"
               >

@@ -24,7 +24,7 @@
               <div class="theme-thumb">
                 <img
                   :alt="item.name"
-                  :src="item.screenshots"
+                  :src="item.screenshots || '/images/placeholder.jpg'"
                   loading="lazy"
                 >
               </div>
