@@ -119,4 +119,9 @@ public class AdminController {
         Application.restart();
     }
 
+    @GetMapping(value = "halo/logfile")
+    @ApiOperation("Get halo log file content.")
+    public BaseResponse<String> getLogFiles(@RequestParam("lines") Long lines) {
+        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getLogFiles(lines));
+    }
 }

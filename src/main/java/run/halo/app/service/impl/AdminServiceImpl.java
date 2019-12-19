@@ -39,6 +39,7 @@ import run.halo.app.utils.HaloUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -462,5 +463,58 @@ public class AdminServiceImpl implements AdminService {
         } catch (IOException e) {
             throw new ServiceException("保存配置文件失败", e);
         }
+    }
+
+    @Override
+    public String getLogFiles(Long lines) {
+
+        File file = new File(haloProperties.getWorkDir(), LOG_PATH);
+
+        StringBuilder result = new StringBuilder();
+
+        if (!file.exists()) {
+            return StringUtils.EMPTY;
+        }
+        long count = 0;
+
+        RandomAccessFile randomAccessFile = null;
+        try {
+            randomAccessFile = new RandomAccessFile(file, "r");
+            long length = randomAccessFile.length();
+            if (length == 0L) {
+                return StringUtils.EMPTY;
+            } else {
+                long pos = length - 1;
+                while (pos > 0) {
+                    pos--;
+                    randomAccessFile.seek(pos);
+                    if (randomAccessFile.readByte() == '\n') {
+                        String line = randomAccessFile.readLine();
+                        result.append(new String(line.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+                        result.append(StringUtils.LF);
+                        count++;
+                        if (count == lines) {
+                            break;
+                        }
+                    }
+                }
+                if (pos == 0) {
+                    randomAccessFile.seek(0);
+                    result.append(new String(randomAccessFile.readLine().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+                    result.append(StringUtils.LF);
+                }
+            }
+        } catch (Exception e) {
+            throw new ServiceException("读取日志失败", e);
+        } finally {
+            if (randomAccessFile != null) {
+                try {
+                    randomAccessFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result.toString();
     }
 }
