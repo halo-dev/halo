@@ -1,5 +1,6 @@
 package run.halo.app.controller.content;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +20,6 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
-
-import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -110,38 +109,34 @@ public class ContentSheetController {
      */
     @GetMapping(value = "/s/{url}")
     public String sheet(@PathVariable(value = "url") String url,
-                        @RequestParam(value = "preview", required = false, defaultValue = "false") boolean preview,
                         @RequestParam(value = "token", required = false) String token,
                         @RequestParam(value = "cp", defaultValue = "1") Integer cp,
                         @SortDefault(sort = "createTime", direction = DESC) Sort sort,
                         Model model) {
-        Sheet sheet = sheetService.getBy(preview ? PostStatus.DRAFT : PostStatus.PUBLISHED, url);
 
-        if (preview) {
-            // render markdown to html when preview post
+        Sheet sheet = sheetService.getByUrl(url);
+
+        if (StringUtils.isEmpty(token)) {
+            sheet = sheetService.getBy(PostStatus.PUBLISHED, url);
+        } else {
+            // render markdown to html when preview sheet
             sheet.setFormatContent(MarkdownUtils.renderHtml(sheet.getOriginalContent()));
 
             // verify token
-            String cachedToken = cacheStore.getAny("preview-sheet-token-" + sheet.getId(), String.class).orElseThrow(() -> new ForbiddenException("该页面的预览链接不存在或已过期"));
+            String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该页面的访问权限"));
 
             if (!cachedToken.equals(token)) {
-                throw new ForbiddenException("该页面的预览链接不存在或已过期");
+                throw new ForbiddenException("您没有该页面的访问权限");
             }
         }
 
         Page<BaseCommentVO> comments = sheetCommentService.pageVosBy(sheet.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
-
 
         // sheet and post all can use
         model.addAttribute("sheet", sheetService.convertToDetail(sheet));
         model.addAttribute("post", sheetService.convertToDetail(sheet));
         model.addAttribute("is_sheet", true);
         model.addAttribute("comments", comments);
-
-        if (preview) {
-            // refresh timeUnit
-            cacheStore.putAny("preview-sheet-token-" + sheet.getId(), token, 10, TimeUnit.MINUTES);
-        }
 
         if (themeService.templateExists(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate());

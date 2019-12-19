@@ -16,6 +16,7 @@ import run.halo.app.security.token.AuthToken;
 import run.halo.app.service.AdminService;
 import run.halo.app.service.OptionService;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**
@@ -123,5 +124,11 @@ public class AdminController {
     @ApiOperation("Get halo log file content.")
     public BaseResponse<String> getLogFiles(@RequestParam("lines") Long lines) {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getLogFiles(lines));
+    }
+
+    @GetMapping(value = "halo/logfile/download")
+    @ApiOperation("Download halo log file.")
+    public void downloadLogFiles(@RequestParam("lines") Long lines, HttpServletResponse response) {
+        adminService.downloadLogFiles(lines, response);
     }
 }

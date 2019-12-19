@@ -17,6 +17,9 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -111,15 +114,15 @@ public class SheetController {
     }
 
     @GetMapping("preview/{sheetId:\\d+}")
-    public String preview(@PathVariable("sheetId") Integer sheetId) {
+    public String preview(@PathVariable("sheetId") Integer sheetId) throws UnsupportedEncodingException {
         Sheet sheet = sheetService.getById(sheetId);
 
         String token = IdUtil.simpleUUID();
 
         // cache preview token
-        cacheStore.putAny("preview-sheet-token-" + sheetId, token, 10, TimeUnit.MINUTES);
+        cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
 
         // build preview post url and return
-        return String.format("%s/s/%s?preview=true&token=%s", optionService.getBlogBaseUrl(), sheet.getUrl(), token);
+        return String.format("%s/s/%s?token=%s", optionService.getBlogBaseUrl(), URLEncoder.encode(sheet.getUrl(), StandardCharsets.UTF_8.name()), token);
     }
 }

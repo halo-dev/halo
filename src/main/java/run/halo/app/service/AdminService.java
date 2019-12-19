@@ -7,6 +7,8 @@ import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.ResetPasswordParam;
 import run.halo.app.security.token.AuthToken;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Admin service interface.
  *
@@ -98,7 +100,7 @@ public interface AdminService {
      *
      * @param content new content
      */
-    void updateApplicationConfig(String content);
+    void updateApplicationConfig(@NonNull String content);
 
     /**
      * Get halo logs content.
@@ -106,5 +108,12 @@ public interface AdminService {
      * @param lines lines
      * @return logs content.
      */
-    String getLogFiles(Long lines);
+    String getLogFiles(@NonNull Long lines);
+
+    /**
+     * Download halo log file.
+     *
+     * @param lines lines.
+     */
+    void downloadLogFiles(@NonNull Long lines, @NonNull HttpServletResponse response);
 }

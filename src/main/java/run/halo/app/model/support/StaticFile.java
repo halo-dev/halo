@@ -24,7 +24,7 @@ public class StaticFile implements Comparator<StaticFile> {
 
     private Boolean isFile;
 
-    private String mediaType;
+    private String mimeType;
 
     private Long createTime;
 
