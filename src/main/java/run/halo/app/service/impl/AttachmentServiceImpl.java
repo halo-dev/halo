@@ -179,6 +179,11 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     }
 
     @Override
+    public List<AttachmentType> listAllType() {
+        return attachmentRepository.findAllType();
+    }
+
+    @Override
     public Attachment create(Attachment attachment) {
         Assert.notNull(attachment, "Attachment must not be null");
 
