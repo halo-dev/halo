@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.params.AttachmentParam;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.AttachmentService;
@@ -111,5 +112,11 @@ public class AttachmentController {
     @ApiOperation("Lists all of media types")
     public List<String> listMediaTypes() {
         return attachmentService.listAllMediaType();
+    }
+
+    @GetMapping("types")
+    @ApiOperation("Lists all of types.")
+    public List<AttachmentType> listTypes() {
+        return attachmentService.listAllType();
     }
 }

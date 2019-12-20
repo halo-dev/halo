@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.base.CrudService;
 
@@ -74,4 +75,11 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return list of media type
      */
     List<String> listAllMediaType();
+
+    /**
+     * List all type.
+     *
+     * @return list of type.
+     */
+    List<AttachmentType> listAllType();
 }
