@@ -237,7 +237,7 @@ export default {
       }
     },
     loadCustomTpls() {
-      themeApi.customTpls().then(response => {
+      themeApi.customSheetTpls().then(response => {
         this.customTpls = response.data.data
       })
     },

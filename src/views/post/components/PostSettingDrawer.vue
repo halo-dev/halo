@@ -65,6 +65,19 @@
                   <a-radio :value="0">否</a-radio>
                 </a-radio-group>
               </a-form-item>
+              <a-form-item label="自定义模板：">
+                <a-select v-model="selectedPost.template">
+                  <a-select-option
+                    key=""
+                    value=""
+                  >无</a-select-option>
+                  <a-select-option
+                    v-for="tpl in customTpls"
+                    :key="tpl"
+                    :value="tpl"
+                  >{{ tpl }}</a-select-option>
+                </a-select>
+              </a-form-item>
             </a-form>
           </div>
         </div>
@@ -258,7 +271,8 @@ export default {
       selectedTagIds: this.tagIds,
       selectedCategoryIds: this.categoryIds,
       categories: [],
-      categoryToCreate: {}
+      categoryToCreate: {},
+      customTpls: []
     }
   },
   props: {
@@ -331,6 +345,7 @@ export default {
         this.loadSkeleton()
         this.loadCategories()
         this.loadPresetMetasField()
+        this.loadCustomTpls()
       }
     }
   },
@@ -375,6 +390,11 @@ export default {
           }
         })
       }
+    },
+    loadCustomTpls() {
+      themeApi.customPostTpls().then(response => {
+        this.customTpls = response.data.data
+      })
     },
     handleSelectPostThumb(data) {
       this.selectedPost.thumbnail = encodeURI(data.path)

@@ -25,9 +25,16 @@ themeApi.listFiles = themeId => {
   })
 }
 
-themeApi.customTpls = () => {
+themeApi.customSheetTpls = () => {
   return service({
-    url: `${baseUrl}/files/custom`,
+    url: `${baseUrl}/activation/template/custom/sheet`,
+    method: 'get'
+  })
+}
+
+themeApi.customPostTpls = () => {
+  return service({
+    url: `${baseUrl}/activation/template/custom/post`,
     method: 'get'
   })
 }
