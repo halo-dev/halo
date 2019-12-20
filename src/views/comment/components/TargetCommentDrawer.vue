@@ -14,7 +14,10 @@
       <a-col :span="24">
         <a-list itemLayout="horizontal">
           <a-list-item>
-            <a-list-item-meta :description="description">
+            <a-list-item-meta>
+              <template slot="description">
+                <p v-html="description" class="comment-drawer-content"></p>
+              </template>
               <h3 slot="title">{{ title }}</h3>
             </a-list-item-meta>
           </a-list-item>

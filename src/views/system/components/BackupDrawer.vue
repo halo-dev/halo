@@ -91,7 +91,7 @@
         @click="handleBackupClick"
       >备份</a-button>
       <a-button
-        type="dash"
+        type="dashed"
         icon="reload"
         :loading="loading"
         @click="handleBAckupRefreshClick"

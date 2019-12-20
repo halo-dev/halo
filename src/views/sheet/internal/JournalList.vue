@@ -14,7 +14,10 @@
                   :sm="24"
                 >
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()"/>
+                    <a-input
+                      v-model="queryParam.keyword"
+                      @keyup.enter="handleQuery()"
+                    />
                   </a-form-item>
                 </a-col>
                 <a-col
@@ -121,7 +124,10 @@
                   </a-popconfirm>
                 </template>
 
-                <a-list-item-meta :description="item.content">
+                <a-list-item-meta>
+                  <template slot="description">
+                    <p v-html="item.content" class="journal-list-content"></p>
+                  </template>
                   <span slot="title">{{ item.createTime | moment }}</span>
                   <a-avatar
                     slot="avatar"
@@ -161,6 +167,10 @@
       </template>
       <template slot="footer">
         <a-button
+          type="dashed"
+          @click="()=>this.attachmentDrawerVisible = true"
+        >附件库</a-button>
+        <a-button
           key="submit"
           type="primary"
           @click="createOrUpdateJournal"
@@ -171,7 +181,7 @@
           <a-input
             type="textarea"
             :autosize="{ minRows: 8 }"
-            v-model="journal.content"
+            v-model="journal.sourceContent"
           />
         </a-form-item>
         <a-form-item>
@@ -185,49 +195,29 @@
       </a-form>
     </a-modal>
 
-    <!-- 评论回复弹窗 -->
-    <a-modal
-      v-if="selectComment"
-      :title="'回复给：'+selectComment.author"
-      v-model="selectCommentVisible"
-    >
-      <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleReplyComment"
-        >回复</a-button>
-      </template>
-      <a-form layout="vertical">
-        <a-form-item>
-          <a-input
-            type="textarea"
-            :autosize="{ minRows: 8 }"
-            v-model="replyComment.content"
-          />
-        </a-form-item>
-      </a-form>
-    </a-modal>
     <TargetCommentDrawer
       :visible="journalCommentVisible"
-      :title="journal.content"
-      :description="``"
+      :title="journal.title"
+      :description="journal.content"
       :target="`journals`"
       :id="journal.id"
       @close="onJournalCommentsClose"
     />
+
+    <AttachmentDrawer v-model="attachmentDrawerVisible" />
   </div>
 </template>
 
 <script>
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
+import AttachmentDrawer from '../../attachment/components/AttachmentDrawer'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import journalApi from '@/api/journal'
 import journalCommentApi from '@/api/journalComment'
 export default {
   mixins: [mixin, mixinDevice],
-  components: { TargetCommentDrawer },
+  components: { TargetCommentDrawer, AttachmentDrawer },
   data() {
     return {
       journalType: journalApi.journalType,
@@ -235,7 +225,7 @@ export default {
       listLoading: false,
       visible: false,
       journalCommentVisible: false,
-      selectCommentVisible: false,
+      attachmentDrawerVisible: false,
       pagination: {
         page: 1,
         size: 10,
@@ -252,7 +242,6 @@ export default {
       comments: [],
       journal: {},
       isPublic: true,
-      selectComment: null,
       replyComment: {}
     }
   },
@@ -298,21 +287,6 @@ export default {
       this.journal = journal
       this.journalCommentVisible = true
     },
-    handleCommentReplyClick(comment) {
-      this.selectComment = comment
-      this.selectCommentVisible = true
-      this.replyComment.parentId = comment.id
-      this.replyComment.postId = this.journal.id
-    },
-    handleReplyComment() {
-      journalCommentApi.create(this.replyComment).then(response => {
-        this.$message.success('回复成功！')
-        this.replyComment = {}
-        this.selectComment = {}
-        this.selectCommentVisible = false
-        this.handleCommentShow(this.journal)
-      })
-    },
     handleCommentDelete(comment) {
       journalCommentApi.delete(comment.id).then(response => {
         this.$message.success('删除成功！')
@@ -322,7 +296,7 @@ export default {
     createOrUpdateJournal() {
       this.journal.type = this.isPublic ? 'PUBLIC' : 'INTIMATE'
 
-      if (!this.journal.content) {
+      if (!this.journal.sourceContent) {
         this.$notification['error']({
           message: '提示',
           description: '发布内容不能为空！'

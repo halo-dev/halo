@@ -28,7 +28,7 @@
         style="margin-right: 8px;"
         @click="()=>this.loadLogs()"
       >刷新</a-button>
-      <a-button type="dash" @click="handleDownloadLogFile()">下载</a-button>
+      <a-button type="dashed" @click="handleDownloadLogFile()">下载</a-button>
     </a-form-item>
   </a-form>
 </template>
