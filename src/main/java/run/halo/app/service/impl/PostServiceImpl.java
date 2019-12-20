@@ -5,6 +5,8 @@ import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,7 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
@@ -73,6 +76,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final PostMetaService postMetaService;
 
+    private final OptionService optionService;
+
     public PostServiceImpl(PostRepository postRepository,
                            TagService tagService,
                            CategoryService categoryService,
@@ -80,8 +85,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                            PostCategoryService postCategoryService,
                            PostCommentService postCommentService,
                            ApplicationEventPublisher eventPublisher,
-                           OptionService optionService,
-                           PostMetaService postMetaService) {
+                           PostMetaService postMetaService,
+                           OptionService optionService) {
         super(postRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
@@ -91,6 +96,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         this.postCommentService = postCommentService;
         this.eventPublisher = eventPublisher;
         this.postMetaService = postMetaService;
+        this.optionService = optionService;
     }
 
     @Override
@@ -451,6 +457,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Get post meta list map
         Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
 
+        // Get cdn domain
+        String cdnDomain = optionService.getByPropertyOrDefault(OtherProperties.CDN_DOMAIN, String.class, StringUtils.EMPTY);
+
+        String blogUrl = optionService.getBlogBaseUrl();
+
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
@@ -486,6 +497,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
+
+            if (StringUtils.isNotEmpty(cdnDomain) && StringUtils.isNotEmpty(postListVO.getThumbnail())) {
+                postListVO.setThumbnail(postListVO.getThumbnail().replace(blogUrl, cdnDomain));
+            }
 
             return postListVO;
         });
@@ -546,6 +561,22 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Get post meta ids
         postDetailVO.setPostMetaIds(postMetaIds);
         postDetailVO.setPostMetas(postMetaService.convertTo(postMetaList));
+
+        // Get cdn domain
+        String cdnDomain = optionService.getByPropertyOrDefault(OtherProperties.CDN_DOMAIN, String.class, StringUtils.EMPTY);
+        String blogUrl = optionService.getBlogBaseUrl();
+
+        if (StringUtils.isNotEmpty(cdnDomain) && StringUtils.isNotEmpty(postDetailVO.getThumbnail())) {
+            postDetailVO.setThumbnail(postDetailVO.getThumbnail().replace(blogUrl, cdnDomain));
+        }
+
+        Document document = Jsoup.parse(postDetailVO.getFormatContent());
+        document.select("img").forEach(img -> {
+            String src = img.attr("src");
+            img.attr("src", src.replace(blogUrl, cdnDomain));
+        });
+
+        postDetailVO.setFormatContent(document.html());
         return postDetailVO;
     }
 
