@@ -80,9 +80,14 @@ public class ThemeController {
         themeService.saveTemplateContent(themeId, param.getPath(), param.getContent());
     }
 
-    @GetMapping("files/custom")
-    public Set<String> customTemplate() {
-        return themeService.listCustomTemplates(themeService.getActivatedThemeId());
+    @GetMapping("activation/template/custom/sheet")
+    public Set<String> customSheetTemplate() {
+        return themeService.listCustomTemplates(themeService.getActivatedThemeId(), ThemeService.CUSTOM_SHEET_PREFIX);
+    }
+
+    @GetMapping("activation/template/custom/post")
+    public Set<String> customPostTemplate() {
+        return themeService.listCustomTemplates(themeService.getActivatedThemeId(), ThemeService.CUSTOM_POST_PREFIX);
     }
 
     @PostMapping("{themeId}/activation")

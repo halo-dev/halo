@@ -21,6 +21,7 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
@@ -159,6 +160,10 @@ public class ContentArchiveController {
         model.addAttribute("tags", tags);
         model.addAttribute("metas", postMetaService.convertToMap(metas));
         model.addAttribute("comments", comments);
+
+        if (themeService.templateExists(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
+        }
 
         return themeService.render("post");
     }
