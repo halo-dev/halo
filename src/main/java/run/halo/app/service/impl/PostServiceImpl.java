@@ -253,9 +253,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public PostDetailVO importMarkdown(String markdown, String filename) {
         Assert.notNull(markdown, "Markdown document must not be null");
 
-        // Render markdown to html document.
-        String content = MarkdownUtils.renderHtml(markdown);
-
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 

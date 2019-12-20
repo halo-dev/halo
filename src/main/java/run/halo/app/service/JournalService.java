@@ -33,6 +33,14 @@ public interface JournalService extends CrudService<Journal, Integer> {
     Journal createBy(@NonNull JournalParam journalParam);
 
     /**
+     * Updates a journal.
+     *
+     * @param journal journal must not be null
+     * @return updated journal
+     */
+    Journal updateBy(@NonNull Journal journal);
+
+    /**
      * Gets latest journals.
      *
      * @param top max size
