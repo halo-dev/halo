@@ -53,6 +53,13 @@ attachmentApi.getMediaTypes = () => {
   })
 }
 
+attachmentApi.getTypes = () => {
+  return service({
+    url: `${baseUrl}/types`,
+    method: 'get'
+  })
+}
+
 attachmentApi.CancelToken = axios.CancelToken
 attachmentApi.isCancel = axios.isCancel
 
@@ -80,31 +87,31 @@ attachmentApi.uploads = (formDatas, uploadProgress, cancelToken) => {
 
 attachmentApi.type = {
   LOCAL: {
-    type: 'local',
+    type: 'LOCAL',
     text: '本地'
   },
   SMMS: {
-    type: 'smms',
+    type: 'SMMS',
     text: 'SM.MS'
   },
   UPOSS: {
-    type: 'uposs',
+    type: 'UPOSS',
     text: '又拍云'
   },
   QINIUOSS: {
-    type: 'qiniuoss',
+    type: 'QINIUOSS',
     text: '七牛云'
   },
   ALIOSS: {
-    type: 'alioss',
+    type: 'ALIOSS',
     text: '阿里云'
   },
   BAIDUBOS: {
-    type: 'baidubos',
+    type: 'BAIDUBOS',
     text: '百度云'
   },
   TENCENTCOS: {
-    type: 'tencentcos',
+    type: 'TENCENTCOS',
     text: '腾讯云'
   }
 }
