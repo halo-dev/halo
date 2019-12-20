@@ -21,6 +21,7 @@ import run.halo.app.repository.JournalRepository;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import javax.persistence.criteria.Predicate;
@@ -53,7 +54,19 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
     public Journal createBy(JournalParam journalParam) {
         Assert.notNull(journalParam, "Journal param must not be null");
 
-        return create(journalParam.convertTo());
+        Journal journal = journalParam.convertTo();
+        journal.setContent(MarkdownUtils.renderHtml(journal.getSourceContent()));
+
+        return create(journal);
+    }
+
+    @Override
+    public Journal updateBy(Journal journal) {
+        Assert.notNull(journal, "Journal must not be null");
+
+        journal.setContent(MarkdownUtils.renderHtml(journal.getSourceContent()));
+
+        return update(journal);
     }
 
     @Override
