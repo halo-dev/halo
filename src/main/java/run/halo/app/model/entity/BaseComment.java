@@ -12,6 +12,8 @@ import javax.persistence.*;
  * Base comment entity.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-20
  */
 @Data
 @Entity(name = "BaseComment")
@@ -80,6 +82,12 @@ public class BaseComment extends BaseEntity {
     private Boolean isAdmin;
 
     /**
+     * Allow notification.
+     */
+    @Column(name = "allow_notification", columnDefinition = "tinyint default 1")
+    private Boolean allowNotification;
+
+    /**
      * Post id.
      */
     @Column(name = "post_id", columnDefinition = "int not null")
@@ -132,6 +140,9 @@ public class BaseComment extends BaseEntity {
         if (isAdmin == null) {
             isAdmin = false;
         }
-    }
 
+        if (allowNotification == null) {
+            allowNotification = true;
+        }
+    }
 }

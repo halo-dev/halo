@@ -19,7 +19,8 @@ import java.util.Map;
  * PostComment event listener.
  *
  * @author johnniang
- * @date 19-4-23
+ * @author ryanwang
+ * @date 2019-04-23
  */
 @Slf4j
 @Component
@@ -151,6 +152,10 @@ public class CommentEventListener {
                 return;
             }
 
+            if (!baseComment.getAllowNotification()) {
+                return;
+            }
+
             baseAuthorEmail = baseComment.getEmail();
 
             Post post = postService.getById(postComment.getPostId());
@@ -175,6 +180,10 @@ public class CommentEventListener {
                 return;
             }
 
+            if (!baseComment.getAllowNotification()) {
+                return;
+            }
+
             baseAuthorEmail = baseComment.getEmail();
 
             Sheet sheet = sheetService.getById(sheetComment.getPostId());
@@ -195,6 +204,10 @@ public class CommentEventListener {
             JournalComment baseComment = journalCommentService.getById(journalComment.getParentId());
 
             if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+                return;
+            }
+
+            if (!baseComment.getAllowNotification()) {
                 return;
             }
 
