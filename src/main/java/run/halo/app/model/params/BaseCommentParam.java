@@ -15,7 +15,8 @@ import java.lang.reflect.ParameterizedType;
  * Base Comment param.
  *
  * @author johnniang
- * @date 3/22/19
+ * @author ryanwang
+ * @date 2019-03-22
  */
 @Data
 public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMENT> {
@@ -42,6 +43,8 @@ public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMEN
 
     @Min(value = 0, message = "PostComment parent id must not be less than {value}")
     private Long parentId = 0L;
+
+    private Boolean allowNotification = true;
 
     @Override
     public ParameterizedType parameterizedType() {
