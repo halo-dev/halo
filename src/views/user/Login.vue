@@ -3,7 +3,10 @@
     <div class="halo-logo animated fadeInUp">
       <span>Halo</span>
     </div>
-    <div class="animated">
+    <div
+      v-show="!apiModifyVisible"
+      class="login-form animated"
+    >
       <a-form
         layout="vertical"
         @keyup.enter.native="handleLogin"
@@ -61,32 +64,65 @@
             </a>
           </router-link>
           <a
-            @click="handleApiModifyModalOpen"
+            @click="toggleShowApiForm"
             class="tip animated fadeInUp"
             :style="{'animation-delay': '0.4s'}"
           >
-            API 设置
+            <a-icon type="setting" />
           </a>
         </a-row>
-
-        <a-modal
-          title="API 设置"
-          :visible="apiModifyVisible"
-          @ok="handleApiModifyOk"
-          @cancel="handleApiModifyCancel"
+      </a-form>
+    </div>
+    <div
+      v-show="apiModifyVisible"
+      class="api-form animated"
+    >
+      <a-form layout="vertical">
+        <a-form-item
+          class="animated fadeInUp"
+          :style="{'animation-delay': '0.1s'}"
+          extra="* 如果 halo admin 不是独立部署，请不要更改此 API"
         >
-          <a-form>
-            <a-form-item extra="如果 halo admin 不是独立部署，请不要更改此 API">
-              <a-input v-model="apiUrl"></a-input>
-            </a-form-item>
+          <a-input
+            placeholder="API 地址"
+            v-model="apiUrl"
+          >
+            <a-icon
+              slot="prefix"
+              type="api"
+              style="color: rgba(0,0,0,.25)"
+            />
+          </a-input>
+        </a-form-item>
+        <a-form-item
+          class="animated fadeInUp"
+          :style="{'animation-delay': '0.2s'}"
+        >
+          <a-button
+            :block="true"
+            @click="handleApiUrlRestore"
+          >恢复默认</a-button>
+        </a-form-item>
+        <a-form-item
+          class="animated fadeInUp"
+          :style="{'animation-delay': '0.3s'}"
+        >
+          <a-button
+            type="primary"
+            :block="true"
+            @click="handleApiModifyOk"
+          >保存设置</a-button>
+        </a-form-item>
 
-            <a-form-item>
-              <a-button @click="handleApiUrlRestore">
-                恢复默认
-              </a-button>
-            </a-form-item>
-          </a-form>
-        </a-modal>
+        <a-row>
+          <a
+            @click="toggleShowApiForm"
+            class="tip animated fadeInUp"
+            :style="{'animation-delay': '0.4s'}"
+          >
+            <a-icon type="rollback" />
+          </a>
+        </a-row>
       </a-form>
     </div>
   </div>
@@ -149,20 +185,19 @@ export default {
         this.$router.replace({ name: 'Dashboard' })
       }
     },
-    handleApiModifyModalOpen() {
-      this.apiUrl = this.defaultApiUrl
-      this.apiModifyVisible = true
-    },
     handleApiModifyOk() {
       this.setApiUrl(this.apiUrl)
-      this.apiModifyVisible = false
-    },
-    handleApiModifyCancel() {
       this.apiModifyVisible = false
     },
     handleApiUrlRestore() {
       this.restoreApiUrl()
       this.apiUrl = this.defaultApiUrl
+    },
+    toggleShowApiForm() {
+      this.apiModifyVisible = !this.apiModifyVisible
+      if (this.apiModifyVisible) {
+        this.apiUrl = this.defaultApiUrl
+      }
     },
     toggleHidden() {
       this.resetPasswordButton = !this.resetPasswordButton
