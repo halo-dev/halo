@@ -1,7 +1,7 @@
 <template>
   <div class="container-wrapper">
     <div class="halo-logo animated fadeInUp">
-      <span>Halo</span>
+      <span>Halo<small v-if="apiModifyVisible">API 设置</small></span>
     </div>
     <div
       v-show="!apiModifyVisible"
