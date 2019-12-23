@@ -1,4 +1,5 @@
 @import './index.less';
+@import './style.less';
 
 * {
   &::-webkit-scrollbar {
@@ -112,7 +113,23 @@ body {
     &.content-width-Fluid {
       .header-index-wide {
         max-width: unset;
-        margin-left: 24px;
+
+        .header-index-left {
+          flex: 1 1 1000px;
+
+          .logo {
+            margin-left: 25px;
+          }
+
+          .ant-menu.ant-menu-horizontal {
+            max-width: calc(100vw - 190px - 238px - 25px);
+            flex: 1 1 calc(100vw - 190px - 238px - 25px);
+          }
+        }
+
+        .header-index-right {
+          margin-right: 25px;
+        }
       }
 
       .page-header-index-wide {
@@ -255,7 +272,7 @@ body {
         }
 
         .ant-menu.ant-menu-horizontal {
-          flex: 1 1;
+          flex: 1 1 auto;
           white-space: normal;
         }
       }
@@ -276,16 +293,19 @@ body {
       height: 64px;
 
       .ant-menu.ant-menu-horizontal {
+        max-width: 835px;
+        flex: 0 1 835px;
         border: none;
         height: 64px;
         line-height: 64px;
       }
 
       .header-index-left {
-        flex: 1 1;
+        flex: 0 1 1000px;
         display: flex;
 
         .logo.top-nav-header {
+          flex: 0 0 165px;
           width: 165px;
           height: 64px;
           position: relative;
@@ -313,9 +333,20 @@ body {
       }
 
       .header-index-right {
-        flex: 0 0 auto;
+        flex: 0 0 238px;
+        align-self: flex-end;
         height: 64px;
         overflow: hidden;
+
+        .content-box {
+          float: right;
+          .action {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+          }
+        }
       }
     }
 
@@ -380,11 +411,10 @@ body {
 .sider {
   box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
   position: relative;
-  z-index: 10;
-  height: auto;
+  z-index: @ant-global-sider-zindex;
+  min-height: 100vh;
 
   .ant-layout-sider-children {
-    padding-top: 64px;
     overflow-y: hidden;
 
     &:hover {
@@ -398,18 +428,13 @@ body {
   }
 
   .logo {
-    position: absolute;
+    position: relative;
     text-align: center;
-    top: 0;
-    left: 0;
-    width: 100%;
     height: 64px;
-    line-height: 64px;
-    -webkit-transition: all .3s;
-    transition: all .3s;
-    background: #002140;
     overflow: hidden;
-    z-index: 9;
+    line-height: 64px;
+    background: #002140;
+    transition: all .3s;
 
     img,
     svg,
