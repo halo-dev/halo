@@ -204,6 +204,7 @@ export default {
 }
 </script>
 <style lang="less">
+@import url('../../components/animate.less');
 body {
   height: 100%;
   background-color: #f5f5f5;
