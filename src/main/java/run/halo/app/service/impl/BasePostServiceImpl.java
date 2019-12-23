@@ -33,6 +33,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -51,6 +53,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     private final BasePostRepository<POST> basePostRepository;
 
     private final OptionService optionService;
+
+    private final Pattern SUMMARY_PATTERN = Pattern.compile("\\s*|\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
                                OptionService optionService) {
@@ -436,6 +440,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(htmlContent, "html content must not be null");
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
+
+        Matcher matcher = SUMMARY_PATTERN.matcher(text);
+        text = matcher.replaceAll("");
 
         // Get summary length
         Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
