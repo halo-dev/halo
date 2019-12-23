@@ -30,7 +30,6 @@
         <a-avatar
           class="avatar"
           size="small"
-          style="margin-right: 0.3rem;"
           :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
         />
       </span>
