@@ -228,16 +228,19 @@
         style="marginRight: 8px"
         @click="handleDraftClick"
         v-if="saveDraftButton"
+        :disabled="saving"
       >保存草稿</a-button>
       <a-button
         @click="handlePublishClick"
         type="primary"
         v-if="savePublishButton"
+        :disabled="saving"
       >发布</a-button>
       <a-button
         @click="handlePublishClick"
         type="primary"
         v-if="saveButton"
+        :disabled="saving"
       >保存</a-button>
     </div>
   </a-drawer>
@@ -272,7 +275,8 @@ export default {
       selectedCategoryIds: this.categoryIds,
       categories: [],
       categoryToCreate: {},
-      customTpls: []
+      customTpls: [],
+      saving: false
     }
   },
   props: {
@@ -449,13 +453,14 @@ export default {
       this.selectedPost.tagIds = this.selectedTagIds
       // Set post metas
       this.selectedPost.postMetas = this.selectedPostMetas
-
+      this.saving = true
       if (this.selectedPost.id) {
         // Update the post
         postApi.update(this.selectedPost.id, this.selectedPost, autoSave).then(response => {
           this.$log.debug('Updated post', response.data.data)
           if (updateSuccess) {
             updateSuccess()
+            this.saving = false
             this.$emit('onSaved', true)
             this.$router.push({ name: 'PostList' })
           }
@@ -466,6 +471,7 @@ export default {
           this.$log.debug('Created post', response.data.data)
           if (createSuccess) {
             createSuccess()
+            this.saving = false
             this.$emit('onSaved', true)
             this.$router.push({ name: 'PostList' })
           }

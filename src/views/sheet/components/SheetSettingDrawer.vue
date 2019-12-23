@@ -131,10 +131,12 @@
       <a-button
         style="marginRight: 8px"
         @click="handleDraftClick"
+        :disabled="saving"
       >保存草稿</a-button>
       <a-button
         type="primary"
         @click="handlePublishClick"
+        :disabled="saving"
       >发布</a-button>
     </div>
   </a-drawer>
@@ -157,7 +159,8 @@ export default {
       thumbDrawerVisible: false,
       settingLoading: true,
       selectedSheet: this.sheet,
-      customTpls: []
+      customTpls: [],
+      saving: false
     }
   },
   props: {
@@ -272,11 +275,13 @@ export default {
         return
       }
       this.selectedSheet.sheetMetas = this.selectedSheetMetas
+      this.saving = true
       if (this.selectedSheet.id) {
         sheetApi.update(this.selectedSheet.id, this.selectedSheet, autoSave).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
           if (updateSuccess) {
             updateSuccess()
+            this.saving = false
             this.$emit('onSaved', true)
             this.$router.push({ name: 'SheetList' })
           }
@@ -286,6 +291,7 @@ export default {
           this.$log.debug('Created sheet', response.data.data)
           if (createSuccess) {
             createSuccess()
+            this.saving = false
             this.$emit('onSaved', true)
             this.$router.push({ name: 'SheetList' })
           }

@@ -39,10 +39,12 @@
       <a-button
         type="danger"
         @click="handleSaveDraft"
+        :disabled="saving"
       >保存草稿</a-button>
       <a-button
         @click="handlePreview"
         style="margin-left: 8px;"
+        :disabled="saving"
       >预览</a-button>
       <a-button
         type="primary"
@@ -86,7 +88,8 @@ export default {
       sheetToStage: {},
       selectedSheetMetas: [],
       isSaved: false,
-      contentChanges: 0
+      contentChanges: 0,
+      saving: false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -163,6 +166,7 @@ export default {
   methods: {
     handleSaveDraft() {
       this.sheetToStage.status = 'DRAFT'
+      this.saving = true
       if (!this.sheetToStage.title) {
         this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
@@ -170,12 +174,14 @@ export default {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
           this.$message.success('保存草稿成功！')
+          this.saving = false
         })
       } else {
         sheetApi.create(this.sheetToStage, false).then(response => {
           this.$log.debug('Created sheet', response.data.data)
           this.$message.success('保存草稿成功！')
           this.sheetToStage = response.data.data
+          this.saving = false
         })
       }
     },
@@ -202,14 +208,13 @@ export default {
       if (!this.sheetToStage.title) {
         this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
-      if (!this.sheetToStage.originalContent) {
-        this.sheetToStage.originalContent = '开始编辑...'
-      }
+      this.saving = true
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
           sheetApi.preview(this.sheetToStage.id).then(response => {
             window.open(response.data, '_blank')
+            this.saving = false
           })
         })
       } else {
@@ -218,6 +223,7 @@ export default {
           this.sheetToStage = response.data.data
           sheetApi.preview(this.sheetToStage.id).then(response => {
             window.open(response.data, '_blank')
+            this.saving = false
           })
         })
       }

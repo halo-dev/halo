@@ -45,10 +45,12 @@
       <a-button
         type="danger"
         @click="handleSaveDraft"
+        :disabled="saving"
       >保存草稿</a-button>
       <a-button
         @click="handlePreview"
         style="margin-left: 8px;"
+        :disabled="saving"
       >预览</a-button>
       <a-button
         type="primary"
@@ -95,7 +97,8 @@ export default {
       selectedCategoryIds: [],
       selectedPostMetas: [],
       isSaved: false,
-      contentChanges: 0
+      contentChanges: 0,
+      saving: false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -177,11 +180,13 @@ export default {
       if (!this.postToStage.title) {
         this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
+      this.saving = true
       if (this.postToStage.id) {
         // Update the post
         postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
           this.$log.debug('Updated post', response.data.data)
           this.$message.success('保存草稿成功！')
+          this.saving = false
         })
       } else {
         // Create the post
@@ -189,6 +194,7 @@ export default {
           this.$log.debug('Created post', response.data.data)
           this.$message.success('保存草稿成功！')
           this.postToStage = response.data.data
+          this.saving = false
         })
       }
     },
@@ -215,12 +221,14 @@ export default {
       if (!this.postToStage.title) {
         this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
+      this.saving = true
       if (this.postToStage.id) {
         // Update the post
         postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
           this.$log.debug('Updated post', response.data.data)
           postApi.preview(this.postToStage.id).then(response => {
             window.open(response.data, '_blank')
+            this.saving = false
           })
         })
       } else {
@@ -230,6 +238,7 @@ export default {
           this.postToStage = response.data.data
           postApi.preview(this.postToStage.id).then(response => {
             window.open(response.data, '_blank')
+            this.saving = false
           })
         })
       }
