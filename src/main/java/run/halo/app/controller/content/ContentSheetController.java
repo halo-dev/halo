@@ -133,8 +133,8 @@ public class ContentSheetController {
         Page<BaseCommentVO> comments = sheetCommentService.pageVosBy(sheet.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
 
         // sheet and post all can use
-        model.addAttribute("sheet", sheetService.convertToDetail(sheet));
-        model.addAttribute("post", sheetService.convertToDetail(sheet));
+        model.addAttribute("sheet", sheetService.convertToDetailVo(sheet));
+        model.addAttribute("post", sheetService.convertToDetailVo(sheet));
         model.addAttribute("is_sheet", true);
         model.addAttribute("comments", comments);
 
