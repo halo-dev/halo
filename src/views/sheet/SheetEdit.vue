@@ -85,7 +85,8 @@ export default {
       sheetSettingVisible: false,
       sheetToStage: {},
       selectedSheetMetas: [],
-      isSaved: false
+      isSaved: false,
+      contentChanges: 0
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -120,7 +121,7 @@ export default {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
-    if (!this.sheetToStage.originalContent) {
+    if (this.contentChanges <= 1) {
       next()
     } else if (this.isSaved) {
       next()
@@ -146,7 +147,17 @@ export default {
       return '当前页面数据未保存，确定要离开吗？'
     }
   },
+  watch: {
+    temporaryContent: function(newValue, oldValue) {
+      if (newValue) {
+        this.contentChanges++
+      }
+    }
+  },
   computed: {
+    temporaryContent() {
+      return this.sheetToStage.originalContent
+    },
     ...mapGetters(['options'])
   },
   methods: {

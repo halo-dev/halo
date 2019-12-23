@@ -94,7 +94,8 @@ export default {
       selectedTagIds: [],
       selectedCategoryIds: [],
       selectedPostMetas: [],
-      isSaved: false
+      isSaved: false,
+      contentChanges: 0
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -131,7 +132,7 @@ export default {
       this.attachmentDrawerVisible = false
     }
 
-    if (!this.postToStage.originalContent) {
+    if (this.contentChanges <= 1) {
       next()
     } else if (this.isSaved) {
       next()
@@ -157,7 +158,17 @@ export default {
       return '当前页面数据未保存，确定要离开吗？'
     }
   },
+  watch: {
+    temporaryContent: function(newValue, oldValue) {
+      if (newValue) {
+        this.contentChanges++
+      }
+    }
+  },
   computed: {
+    temporaryContent() {
+      return this.postToStage.originalContent
+    },
     ...mapGetters(['options'])
   },
   methods: {
@@ -203,9 +214,6 @@ export default {
       this.postToStage.status = 'DRAFT'
       if (!this.postToStage.title) {
         this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
-      }
-      if (!this.postToStage.originalContent) {
-        this.postToStage.originalContent = '开始编辑...'
       }
       if (this.postToStage.id) {
         // Update the post
