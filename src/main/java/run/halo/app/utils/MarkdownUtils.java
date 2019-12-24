@@ -40,7 +40,6 @@ public class MarkdownUtils {
     private static final DataHolder OPTIONS = new MutableDataSet()
             .set(Parser.EXTENSIONS, Arrays.asList(
                     AttributesExtension.create(),
-                    AnchorLinkExtension.create(),
                     AutolinkExtension.create(),
                     EmojiExtension.create(),
                     EscapedCharacterExtension.create(),
