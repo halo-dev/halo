@@ -87,7 +87,6 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-autolink:$flexmarkVersion"
-    implementation "com.vladsch.flexmark:flexmark-ext-anchorlink:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-escaped-character:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:$flexmarkVersion"
