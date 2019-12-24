@@ -36,9 +36,7 @@ spring:
       ddl-auto: update
     show-sql: true
   flyway:
-    locations: classpath:/migration
-    baseline-on-migrate: true
-    baseline-version: 1
+    enabled: false
   servlet:
     multipart:
       max-file-size: 10MB
