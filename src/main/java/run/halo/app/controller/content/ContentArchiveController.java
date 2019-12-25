@@ -172,9 +172,6 @@ public class ContentArchiveController {
     public String password(@PathVariable("url") String url,
                            Model model) {
         Post post = postService.getBy(PostStatus.INTIMATE, url);
-        if (null == post) {
-            throw new ForbiddenException("没有查询到该文章信息");
-        }
 
         model.addAttribute("url", url);
         return "common/template/post_password";
@@ -185,9 +182,6 @@ public class ContentArchiveController {
     public String password(@PathVariable("url") String url,
                            @RequestParam(value = "password") String password) {
         Post post = postService.getBy(PostStatus.INTIMATE, url);
-        if (null == post) {
-            throw new NotFoundException("查询不到该文章的信息").setErrorData(url);
-        }
 
         if (password.equals(post.getPassword())) {
             String token = IdUtil.simpleUUID();
