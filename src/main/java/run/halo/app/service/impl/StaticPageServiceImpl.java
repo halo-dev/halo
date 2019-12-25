@@ -128,9 +128,10 @@ public class StaticPageServiceImpl implements StaticPageService {
             this.generateSiteMapHtml();
             this.generateSiteMapXml();
             this.generateRobots();
+            this.generateReadme();
             this.copyThemeFolder();
             this.copyUpload();
-            this.generateReadme();
+            this.copyStatic();
         } catch (Exception e) {
             throw new ServiceException("生成静态页面失败！", e);
         }
@@ -659,6 +660,15 @@ public class StaticPageServiceImpl implements StaticPageService {
         Path path = Paths.get(pagesDir.toString(), "upload");
         FileUtils.createIfAbsent(path);
         FileUtils.copyFolder(Paths.get(haloProperties.getWorkDir(), "upload"), path);
+    }
+
+    /**
+     * Copy static folder.
+     *
+     * @throws IOException IOException
+     */
+    private void copyStatic() throws IOException {
+        FileUtils.copyFolder(Paths.get(haloProperties.getWorkDir(), "static"), pagesDir);
     }
 
     /**
