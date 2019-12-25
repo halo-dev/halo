@@ -115,6 +115,7 @@ public class StaticPageServiceImpl implements StaticPageService {
     @Override
     public void generate() {
         try {
+            this.cleanFolder();
             this.generateIndex(1);
             this.generatePost();
             this.generateArchives(1);
@@ -135,6 +136,13 @@ public class StaticPageServiceImpl implements StaticPageService {
         } catch (Exception e) {
             throw new ServiceException("生成静态页面失败！", e);
         }
+    }
+
+    /**
+     * Clean static pages folder
+     */
+    private void cleanFolder() {
+        FileUtils.deleteFolderQuietly(pagesDir);
     }
 
     /**
