@@ -31,7 +31,7 @@ jobs:
         on:
           tags: true
 stages:
-#  - test
+  - test
   - build
   - name: GitHub Release
     if: tag =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
