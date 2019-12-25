@@ -45,6 +45,7 @@
             <a-button
               type="primary"
               style="float:right"
+              @click="handleToStaticPagesManage"
             >管理</a-button>
           </a-card>
         </a-col>
@@ -149,6 +150,9 @@ export default {
     },
     handleToDeveloperOptions() {
       this.$router.push({ name: 'DeveloperOptions' })
+    },
+    handleToStaticPagesManage() {
+      this.$router.push({ name: 'StaticPagesManage' })
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
