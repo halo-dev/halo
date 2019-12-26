@@ -10,18 +10,24 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.util.Assert;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.ServiceException;
+import run.halo.app.handler.staticdeploy.StaticDeployHandlers;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.dto.PhotoDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.enums.StaticDeployType;
 import run.halo.app.model.properties.PostProperties;
+import run.halo.app.model.properties.StaticDeployProperties;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.model.support.StaticPageFile;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.model.vo.SheetDetailVO;
@@ -33,9 +39,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -79,6 +88,8 @@ public class StaticPageServiceImpl implements StaticPageService {
 
     private final FreeMarkerConfigurer freeMarkerConfigurer;
 
+    private final StaticDeployHandlers staticDeployHandlers;
+
     public StaticPageServiceImpl(PostService postService,
                                  PostCategoryService postCategoryService,
                                  PostTagService postTagService,
@@ -92,7 +103,8 @@ public class StaticPageServiceImpl implements StaticPageService {
                                  ThemeService themeService,
                                  HaloProperties haloProperties,
                                  OptionService optionService,
-                                 FreeMarkerConfigurer freeMarkerConfigurer) throws IOException {
+                                 FreeMarkerConfigurer freeMarkerConfigurer,
+                                 StaticDeployHandlers staticDeployHandlers) throws IOException {
         this.postService = postService;
         this.postCategoryService = postCategoryService;
         this.postTagService = postTagService;
@@ -107,6 +119,7 @@ public class StaticPageServiceImpl implements StaticPageService {
         this.haloProperties = haloProperties;
         this.optionService = optionService;
         this.freeMarkerConfigurer = freeMarkerConfigurer;
+        this.staticDeployHandlers = staticDeployHandlers;
 
         pagesDir = Paths.get(haloProperties.getWorkDir(), PAGES_FOLDER);
         FileUtils.createIfAbsent(pagesDir);
@@ -135,6 +148,47 @@ public class StaticPageServiceImpl implements StaticPageService {
             this.copyStatic();
         } catch (Exception e) {
             throw new ServiceException("生成静态页面失败！", e);
+        }
+    }
+
+    @Override
+    public void deploy() {
+        StaticDeployType type = getStaticDeployType();
+
+        staticDeployHandlers.deploy(type);
+    }
+
+    @Override
+    public List<StaticPageFile> listFile() {
+        return listStaticPageFileTree(pagesDir);
+    }
+
+    @Nullable
+    private List<StaticPageFile> listStaticPageFileTree(@NonNull Path topPath) {
+        Assert.notNull(topPath, "Top path must not be null");
+
+        if (!Files.isDirectory(topPath)) {
+            return null;
+        }
+
+        try (Stream<Path> pathStream = Files.list(topPath)) {
+            List<StaticPageFile> staticPageFiles = new LinkedList<>();
+
+            pathStream.forEach(path -> {
+                StaticPageFile staticPageFile = new StaticPageFile();
+                staticPageFile.setName(path.getFileName().toString());
+                staticPageFile.setIsFile(Files.isRegularFile(path));
+                if (Files.isDirectory(path)) {
+                    staticPageFile.setChildren(listStaticPageFileTree(path));
+                }
+
+                staticPageFiles.add(staticPageFile);
+            });
+
+            staticPageFiles.sort(new StaticPageFile());
+            return staticPageFiles;
+        } catch (IOException e) {
+            throw new ServiceException("Failed to list sub files", e);
         }
     }
 
@@ -713,5 +767,15 @@ public class StaticPageServiceImpl implements StaticPageService {
     private File getPageFile(String subPath) {
         Path path = Paths.get(pagesDir.toString(), subPath);
         return path.toFile();
+    }
+
+    /**
+     * Get static deploy type from options.
+     *
+     * @return static deploy type
+     */
+    @NonNull
+    private StaticDeployType getStaticDeployType() {
+        return optionService.getEnumByPropertyOrDefault(StaticDeployProperties.DEPLOY_TYPE, StaticDeployType.class, StaticDeployType.GIT);
     }
 }

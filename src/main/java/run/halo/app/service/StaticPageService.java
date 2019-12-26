@@ -1,5 +1,9 @@
 package run.halo.app.service;
 
+import run.halo.app.model.support.StaticPageFile;
+
+import java.util.List;
+
 /**
  * Static Page service interface.
  *
@@ -17,4 +21,16 @@ public interface StaticPageService {
      * Generate pages.
      */
     void generate();
+
+    /**
+     * Deploy static pages.
+     */
+    void deploy();
+
+    /**
+     * List file of generated static page.
+     *
+     * @return a list of generated static page.
+     */
+    List<StaticPageFile> listFile();
 }
