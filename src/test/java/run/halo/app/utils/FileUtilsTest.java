@@ -2,11 +2,12 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import run.halo.app.model.support.HaloConst;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -91,5 +92,20 @@ public class FileUtilsTest {
     @Test
     public void tempFolderTest() {
         log.debug(HaloConst.TEMP_DIR);
+    }
+
+    @Test
+    @Ignore
+    public void dbFileReadTest() throws IOException {
+        Path dbPath = Paths.get(HaloConst.USER_HOME + "/halo-test/db/halo.mv.db");
+
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(dbPath.toString(), "r")) {
+            randomAccessFile.seek(2283640);
+            byte[] buffer = new byte[1024];
+            int count = randomAccessFile.read(buffer, 0, buffer.length);
+            System.out.println("Count: " + count);
+            String bufString = new String(buffer);
+            System.out.println("Buffer String: " + bufString);
+        }
     }
 }
