@@ -31,6 +31,11 @@ public class HaloConst {
     public final static String HALO_BACKUP_PREFIX = "halo-backup-";
 
     /**
+     * Static pages pack prefix.
+     */
+    public final static String STATIC_PAGE_PACK_PREFIX = "static-pages-";
+
+    /**
      * Default theme name.
      */
     public final static String DEFAULT_THEME_ID = "caicai_anatole";

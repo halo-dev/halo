@@ -14,6 +14,8 @@ import java.util.List;
 @Data
 public class StaticPageFile implements Comparator<StaticPageFile> {
 
+    private String id;
+
     private String name;
 
     private Boolean isFile;

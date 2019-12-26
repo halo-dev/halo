@@ -35,6 +35,7 @@ public class Application extends SpringBootServletInitializer {
 
         // Run application
         context = SpringApplication.run(Application.class, args);
+
     }
 
     /**
