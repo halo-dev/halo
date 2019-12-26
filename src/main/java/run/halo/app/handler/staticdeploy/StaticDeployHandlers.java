@@ -26,8 +26,8 @@ public class StaticDeployHandlers {
     private final Collection<StaticDeployHandler> staticDeployHandlers = new LinkedList<>();
 
     public StaticDeployHandlers(ApplicationContext applicationContext) {
-        // Add all file handler
-        addFileHandlers(applicationContext.getBeansOfType(StaticDeployHandler.class).values());
+        // Add all static deploy handler
+        addStaticDeployHandlers(applicationContext.getBeansOfType(StaticDeployHandler.class).values());
     }
 
 
@@ -42,6 +42,7 @@ public class StaticDeployHandlers {
         for (StaticDeployHandler staticDeployHandler : staticDeployHandlers) {
             if (staticDeployHandler.supportType(staticDeployType)) {
                 staticDeployHandler.deploy();
+                return;
             }
         }
 
@@ -55,7 +56,7 @@ public class StaticDeployHandlers {
      * @return current file handlers
      */
     @NonNull
-    public StaticDeployHandlers addFileHandlers(@Nullable Collection<StaticDeployHandler> staticDeployHandlers) {
+    public StaticDeployHandlers addStaticDeployHandlers(@Nullable Collection<StaticDeployHandler> staticDeployHandlers) {
         if (!CollectionUtils.isEmpty(staticDeployHandlers)) {
             this.staticDeployHandlers.addAll(staticDeployHandlers);
         }

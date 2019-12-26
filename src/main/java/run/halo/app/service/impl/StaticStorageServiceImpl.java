@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -59,6 +60,7 @@ public class StaticStorageServiceImpl implements StaticStorageService {
 
             pathStream.forEach(path -> {
                 StaticFile staticFile = new StaticFile();
+                staticFile.setId(IdUtil.fastSimpleUUID());
                 staticFile.setName(path.getFileName().toString());
                 staticFile.setPath(path.toString());
                 staticFile.setRelativePath(StringUtils.removeStart(path.toString(), staticDir.toString()));

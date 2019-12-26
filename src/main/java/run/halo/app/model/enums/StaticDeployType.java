@@ -11,12 +11,12 @@ public enum StaticDeployType implements ValueEnum<Integer> {
     /**
      * Deploy static pages in remote git repository, such as github pages,gitee pages,coding pages.etc.
      */
-    GIT(1),
+    GIT(0),
 
     /**
      * Deploy static pages in netlify.
      */
-    NETLIFY(2);
+    NETLIFY(1);
 
     private Integer value;
 

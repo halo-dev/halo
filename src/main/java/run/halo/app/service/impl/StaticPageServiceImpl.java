@@ -1,6 +1,8 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.PageUtil;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -42,6 +44,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -123,6 +127,7 @@ public class StaticPageServiceImpl implements StaticPageService {
 
         pagesDir = Paths.get(haloProperties.getWorkDir(), PAGES_FOLDER);
         FileUtils.createIfAbsent(pagesDir);
+        Files.createDirectories(Paths.get(STATIC_PAGE_PACK_DIR));
     }
 
     @Override
@@ -159,6 +164,22 @@ public class StaticPageServiceImpl implements StaticPageService {
     }
 
     @Override
+    public Path zipStaticPagesDirectory() {
+        try {
+            String staticPagePackName = HaloConst.STATIC_PAGE_PACK_PREFIX +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
+                    IdUtil.simpleUUID().hashCode() + ".zip";
+            Path staticPageZipPath = Files.createFile(Paths.get(STATIC_PAGE_PACK_DIR, staticPagePackName));
+
+            FileUtils.zip(pagesDir, staticPageZipPath);
+
+            return staticPageZipPath;
+        } catch (IOException e) {
+            throw new ServiceException("Failed to zip static pages directory", e);
+        }
+    }
+
+    @Override
     public List<StaticPageFile> listFile() {
         return listStaticPageFileTree(pagesDir);
     }
@@ -176,6 +197,7 @@ public class StaticPageServiceImpl implements StaticPageService {
 
             pathStream.forEach(path -> {
                 StaticPageFile staticPageFile = new StaticPageFile();
+                staticPageFile.setId(IdUtil.fastSimpleUUID());
                 staticPageFile.setName(path.getFileName().toString());
                 staticPageFile.setIsFile(Files.isRegularFile(path));
                 if (Files.isDirectory(path)) {
@@ -708,9 +730,41 @@ public class StaticPageServiceImpl implements StaticPageService {
      */
     private void copyThemeFolder() throws IOException {
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
-        Path path = Paths.get(pagesDir.toString(), activatedTheme.getId());
+        Path path = Paths.get(pagesDir.toString(), activatedTheme.getFolderName());
         FileUtils.createIfAbsent(path);
         FileUtils.copyFolder(Paths.get(activatedTheme.getThemePath()), path);
+        cleanThemeFolder(Paths.get(pagesDir.toString(), activatedTheme.getFolderName()));
+    }
+
+    private void cleanThemeFolder(Path themePath) {
+        if (!Files.isDirectory(themePath)) {
+            return;
+        }
+
+        try (Stream<Path> pathStream = Files.list(themePath)) {
+
+            pathStream.forEach(path -> {
+                if (!Files.isDirectory(path)) {
+                    for (String suffix : USELESS_FILE_SUFFIX) {
+                        if (suffix.contains(FileUtil.extName(path.toFile()))) {
+                            try {
+                                Files.delete(path);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } else {
+                    if (path.getFileName().toString().contains(".git")) {
+                        FileUtils.deleteFolderQuietly(path);
+                    } else {
+                        cleanThemeFolder(path);
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new ServiceException("Failed to list sub files", e);
+        }
     }
 
     /**
