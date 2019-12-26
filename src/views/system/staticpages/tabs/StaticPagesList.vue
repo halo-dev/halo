@@ -85,20 +85,28 @@ export default {
     handleGenerate() {
       this.loading = true
       const hide = this.$message.loading('生成中...', 0)
-      staticPageApi.generate().then(response => {
-        hide()
-        this.$message.success('生成成功！')
-        this.loadStaticPageList()
-      })
+      staticPageApi
+        .generate()
+        .then(response => {
+          this.$message.success('生成成功！')
+        })
+        .finally(response => {
+          this.loadStaticPageList()
+          hide()
+        })
     },
     handleDeploy() {
       this.deployLoading = true
       const hide = this.$message.loading('部署中...', 0)
-      staticPageApi.deploy().then(response => {
-        hide()
-        this.deployLoading = false
-        this.$message.success('部署成功！')
-      })
+      staticPageApi
+        .deploy()
+        .then(response => {
+          this.$message.success('部署成功！')
+        })
+        .finally(response => {
+          this.deployLoading = false
+          hide()
+        })
     }
   }
 }
