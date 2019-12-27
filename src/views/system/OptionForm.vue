@@ -591,18 +591,20 @@
                 layout="vertical"
                 :wrapperCol="wrapperCol"
               >
-                <a-form-item label="CDN 加速域名：">
-                  <a-input
-                    v-model="options.blog_cdn_domain"
-                    placeholder="请确保已经正确配置好了 CDN"
-                  />
-                </a-form-item>
-                <a-form-item label="自定义 head：">
+                <a-form-item label="自定义全局 head：">
                   <a-input
                     type="textarea"
                     :autosize="{ minRows: 5 }"
                     v-model="options.blog_custom_head"
-                    placeholder="将放置于每个页面的<head></head>标签中"
+                    placeholder="放置于每个页面的 <head></head> 标签中"
+                  />
+                </a-form-item>
+                <a-form-item label="自定义内容页 head：">
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.blog_custom_content_head"
+                    placeholder="仅放置于内容页面的 <head></head> 标签中"
                   />
                 </a-form-item>
                 <a-form-item label="统计代码：">
