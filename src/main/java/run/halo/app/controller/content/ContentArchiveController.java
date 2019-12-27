@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.ForbiddenException;
-import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
