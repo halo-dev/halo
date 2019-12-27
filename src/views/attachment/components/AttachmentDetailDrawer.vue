@@ -19,7 +19,10 @@
         >
           <div class="attach-detail-img">
             <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
-            <a :href="attachment.path" target="_blank">
+            <a
+              :href="attachment.path"
+              target="_blank"
+            >
               <img
                 :src="attachment.path"
                 v-show="photoPreviewVisible"
@@ -288,8 +291,8 @@ export default {
     },
     handleAddToPhoto() {
       this.photo['name'] = this.attachment.name
-      this.photo['thumbnail'] = this.attachment.thumbPath
-      this.photo['url'] = this.attachment.path
+      this.photo['thumbnail'] = encodeURI(this.attachment.thumbPath)
+      this.photo['url'] = encodeURI(this.attachment.path)
       this.photo['takeTime'] = new Date().getTime()
       photoApi.create(this.photo).then(response => {
         this.$message.success('添加成功！')
