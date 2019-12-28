@@ -29,10 +29,7 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -393,6 +390,20 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         return ids.stream().map(id -> {
             return updateStatus(status, id);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BasePostDetailDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<POST> posts = listAll();
+        List<POST> replaced = new ArrayList<>();
+        posts.forEach(post -> {
+            post.setThumbnail(post.getThumbnail().replaceAll(oldUrl, newUrl));
+            post.setOriginalContent(post.getOriginalContent().replaceAll(oldUrl, newUrl));
+            post.setFormatContent(post.getFormatContent().replaceAll(oldUrl, newUrl));
+            replaced.add(post);
+        });
+        List<POST> updated = updateInBatch(replaced);
+        return updated.stream().map(this::convertToDetail).collect(Collectors.toList());
     }
 
     @Override

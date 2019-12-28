@@ -160,6 +160,17 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         return result;
     }
 
+    @Override
+    public List<ThemeSetting> replaceUrl(String oldUrl, String newUrl) {
+        List<ThemeSetting> themeSettings = listAll();
+        List<ThemeSetting> replaced = new ArrayList<>();
+        themeSettings.forEach(themeSetting -> {
+            themeSetting.setValue(themeSetting.getValue().replaceAll(oldUrl, newUrl));
+            replaced.add(themeSetting);
+        });
+        return updateInBatch(replaced);
+    }
+
     /**
      * Gets config item map. (key: item name, value: item)
      *

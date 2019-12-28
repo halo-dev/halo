@@ -184,6 +184,18 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     }
 
     @Override
+    public List<Attachment> replaceUrl(String oldUrl, String newUrl) {
+        List<Attachment> attachments = listAll();
+        List<Attachment> replaced = new ArrayList<>();
+        attachments.forEach(attachment -> {
+            attachment.setPath(attachment.getPath().replaceAll(oldUrl, newUrl));
+            attachment.setThumbPath(attachment.getThumbPath().replaceAll(oldUrl, newUrl));
+            replaced.add(attachment);
+        });
+        return updateInBatch(replaced);
+    }
+
+    @Override
     public Attachment create(Attachment attachment) {
         Assert.notNull(attachment, "Attachment must not be null");
 
