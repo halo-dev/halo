@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.ServiceException;
@@ -165,10 +166,18 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         List<ThemeSetting> themeSettings = listAll();
         List<ThemeSetting> replaced = new ArrayList<>();
         themeSettings.forEach(themeSetting -> {
-            themeSetting.setValue(themeSetting.getValue().replaceAll(oldUrl, newUrl));
+            if (StringUtils.isNotEmpty(themeSetting.getValue())) {
+                themeSetting.setValue(themeSetting.getValue().replaceAll(oldUrl, newUrl));
+            }
             replaced.add(themeSetting);
         });
         return updateInBatch(replaced);
+    }
+
+    @Override
+    @Transactional
+    public void deleteInactivated() {
+        themeSettingRepository.deleteByThemeIdIsNot(themeService.getActivatedThemeId());
     }
 
     /**

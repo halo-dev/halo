@@ -64,4 +64,9 @@ public interface ThemeSettingService {
      * @return replaced theme settings.
      */
     List<ThemeSetting> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
+
+    /**
+     * Delete unused theme setting.
+     */
+    void deleteInactivated();
 }

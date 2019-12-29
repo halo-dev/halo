@@ -589,7 +589,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         List<COMMENT> comments = listAll();
         List<COMMENT> replaced = new ArrayList<>();
         comments.forEach(comment -> {
-            comment.setAuthorUrl(comment.getAuthorUrl().replaceAll(oldUrl, newUrl));
+            if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
+                comment.setAuthorUrl(comment.getAuthorUrl().replaceAll(oldUrl, newUrl));
+            }
             replaced.add(comment);
         });
         List<COMMENT> updated = updateInBatch(replaced);
