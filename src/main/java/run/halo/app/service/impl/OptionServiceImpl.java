@@ -466,10 +466,13 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         List<Option> options = listAll();
         List<Option> replaced = new ArrayList<>();
         options.forEach(option -> {
-            option.setValue(option.getValue().replaceAll(oldUrl, newUrl));
+            if (StringUtils.isNotEmpty(option.getValue())) {
+                option.setValue(option.getValue().replaceAll(oldUrl, newUrl));
+            }
             replaced.add(option);
         });
         List<Option> updated = updateInBatch(replaced);
+        publishOptionUpdatedEvent();
         return updated.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 

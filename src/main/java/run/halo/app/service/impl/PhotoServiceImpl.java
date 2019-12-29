@@ -116,8 +116,12 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         List<Photo> photos = listAll();
         List<Photo> replaced = new ArrayList<>();
         photos.forEach(photo -> {
-            photo.setThumbnail(photo.getThumbnail().replace(oldUrl, newUrl));
-            photo.setUrl(photo.getUrl().replaceAll(oldUrl, newUrl));
+            if (StringUtils.isNotEmpty(photo.getThumbnail())) {
+                photo.setThumbnail(photo.getThumbnail().replace(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(photo.getUrl())) {
+                photo.setUrl(photo.getUrl().replaceAll(oldUrl, newUrl));
+            }
             replaced.add(photo);
         });
         List<Photo> updated = updateInBatch(replaced);

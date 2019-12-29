@@ -397,9 +397,15 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         List<POST> posts = listAll();
         List<POST> replaced = new ArrayList<>();
         posts.forEach(post -> {
-            post.setThumbnail(post.getThumbnail().replaceAll(oldUrl, newUrl));
-            post.setOriginalContent(post.getOriginalContent().replaceAll(oldUrl, newUrl));
-            post.setFormatContent(post.getFormatContent().replaceAll(oldUrl, newUrl));
+            if (StringUtils.isNotEmpty(post.getThumbnail())) {
+                post.setThumbnail(post.getThumbnail().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getOriginalContent())) {
+                post.setOriginalContent(post.getOriginalContent().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getFormatContent())) {
+                post.setFormatContent(post.getFormatContent().replaceAll(oldUrl, newUrl));
+            }
             replaced.add(post);
         });
         List<POST> updated = updateInBatch(replaced);
