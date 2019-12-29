@@ -48,6 +48,8 @@ import javax.persistence.criteria.Predicate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 /**
  * Base comment service implementation.
  *
@@ -372,10 +374,12 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         COMMENT comment = baseCommentRepository.findById(id).orElseThrow(() -> new NotFoundException("查询不到该评论的信息").setErrorData(id));
 
-        if (comment.getParentId() == 0) {
-            // Remove comment children.
-            List<COMMENT> comments = baseCommentRepository.deleteByParentId(id);
-            log.debug("Removed comment children: [{}]", comments);
+        List<COMMENT> children = listChildrenBy(comment.getPostId(), id, Sort.by(DESC, "createTime"));
+
+        if (children.size() > 0) {
+            children.forEach(child -> {
+                super.removeById(child.getId());
+            });
         }
 
         return super.removeById(id);
@@ -538,6 +542,30 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public List<COMMENT> listChildrenBy(Integer targetId, Long commentParentId, Sort sort) {
+        Assert.notNull(targetId, "Target id must not be null");
+        Assert.notNull(commentParentId, "Comment parent id must not be null");
+        Assert.notNull(sort, "Sort info must not be null");
+
+        // Get comments recursively
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByPostIdAndParentId(targetId, commentParentId);
+
+        // Create result container
+        Set<COMMENT> children = new HashSet<>();
+
+        // Get children comments
+        getChildrenRecursively(directChildren, children);
+
+        // Sort children
+        List<COMMENT> childrenList = new ArrayList<>(children);
+        childrenList.sort(Comparator.comparing(BaseComment::getId));
+
+        return childrenList;
+    }
+
+    @Override
     public <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment) {
         Assert.notNull(comment, "Base comment dto must not be null");
 
@@ -607,6 +635,32 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         // Recursively invoke
         getChildrenRecursively(directChildren, status, children);
+
+        // Add direct children to children result
+        children.addAll(topComments);
+    }
+
+    /**
+     * Get children comments recursively.
+     *
+     * @param topComments top comment list
+     * @param children    children result must not be null
+     */
+    private void getChildrenRecursively(@Nullable List<COMMENT> topComments, @NonNull Set<COMMENT> children) {
+        Assert.notNull(children, "Children comment set must not be null");
+
+        if (CollectionUtils.isEmpty(topComments)) {
+            return;
+        }
+
+        // Convert comment id set
+        Set<Long> commentIds = ServiceUtils.fetchProperty(topComments, COMMENT::getId);
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByParentIdIn(commentIds);
+
+        // Recursively invoke
+        getChildrenRecursively(directChildren, children);
 
         // Add direct children to children result
         children.addAll(topComments);
