@@ -111,13 +111,13 @@ export default {
   computed: {
     converttedPostComments() {
       return this.postComments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     },
     converttedSheetComments() {
       return this.sheetComments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     }

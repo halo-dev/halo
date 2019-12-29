@@ -11,7 +11,7 @@
             <a-menu-item key="1">
               <span
                 href="javascript:void(0);"
-                @click="handleEditStatusClick(comment,'PUBLISHED')"
+                @click="handleEditStatusClick('PUBLISHED')"
               >通过</span>
             </a-menu-item>
             <a-menu-item key="2">
@@ -22,13 +22,13 @@
 
         <span
           v-else-if="comment.status === 'PUBLISHED'"
-          @click="handleReplyClick(comment)"
+          @click="handleReplyClick"
         >回复</span>
 
         <a-popconfirm
           v-else-if="comment.status === 'RECYCLE'"
           :title="'你确定要还原该评论？'"
-          @confirm="handleEditStatusClick(comment,'PUBLISHED')"
+          @confirm="handleEditStatusClick('PUBLISHED')"
           okText="确定"
           cancelText="取消"
         >
@@ -38,7 +38,7 @@
         <a-popconfirm
           v-if="comment.status === 'PUBLISHED' || comment.status === 'AUDITING'"
           :title="'你确定要将该评论移到回收站？'"
-          @confirm="handleEditStatusClick(comment,'RECYCLE')"
+          @confirm="handleEditStatusClick('RECYCLE')"
           okText="确定"
           cancelText="取消"
         >
@@ -47,7 +47,7 @@
 
         <a-popconfirm
           :title="'你确定要永久删除该评论？'"
-          @confirm="handleDeleteClick(comment)"
+          @confirm="handleDeleteClick"
           okText="确定"
           cancelText="取消"
         >
@@ -86,8 +86,8 @@
           v-for="(child, index) in comment.children"
           :key="index"
           :comment="child"
-          @reply="handleReplyClick(child)"
-          @delete="handleDeleteClick(child)"
+          @reply="handleReplyClick"
+          @delete="handleDeleteClick"
           @editStatus="handleEditStatusClick"
         />
       </template>
@@ -110,18 +110,19 @@ export default {
       return `//cn.gravatar.com/avatar/${this.comment.gravatarMd5}/?s=256&d=mp`
     },
     content() {
-      return marked(this.comment.content, { sanitize: true })
+      return marked(this.comment.content)
     }
   },
   methods: {
-    handleReplyClick(comment) {
-      this.$emit('reply', comment)
+    handleReplyClick() {
+      console.log(this.comment)
+      this.$emit('reply', this.comment)
     },
-    handleEditStatusClick(comment, status) {
-      this.$emit('editStatus', comment, status)
+    handleEditStatusClick(status) {
+      this.$emit('editStatus', this.comment, status)
     },
-    handleDeleteClick(comment) {
-      this.$emit('delete', comment)
+    handleDeleteClick() {
+      this.$emit('delete', this.comment)
     }
   }
 }

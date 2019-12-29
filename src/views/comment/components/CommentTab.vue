@@ -556,7 +556,7 @@ export default {
     formattedComments() {
       return this.comments.map(comment => {
         comment.statusProperty = this.commentStatus[comment.status]
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     },

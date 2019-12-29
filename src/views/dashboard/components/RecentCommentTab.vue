@@ -98,7 +98,7 @@ export default {
   computed: {
     formmatedCommentData() {
       return this.comments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     },
