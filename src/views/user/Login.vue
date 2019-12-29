@@ -81,7 +81,7 @@
         <a-form-item
           class="animated fadeInUp"
           :style="{'animation-delay': '0.1s'}"
-          extra="* 如果 halo admin 不是独立部署，请不要更改此 API"
+          extra="* 如果 Admin 不是独立部署，请不要更改此 API"
         >
           <a-input
             placeholder="API 地址"

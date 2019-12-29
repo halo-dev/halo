@@ -22,7 +22,7 @@
 
         <span
           v-else-if="comment.status === 'PUBLISHED'"
-          @click="handleReplyClick"
+          @click="handleReplyClick(comment)"
         >回复</span>
 
         <a-popconfirm
@@ -86,8 +86,8 @@
           v-for="(child, index) in comment.children"
           :key="index"
           :comment="child"
-          @reply="handleReplyClick"
-          @delete="handleDeleteClick"
+          @reply="handleReplyClick(child)"
+          @delete="handleDeleteClick(child)"
           @editStatus="handleEditStatusClick"
         />
       </template>
@@ -114,8 +114,8 @@ export default {
     }
   },
   methods: {
-    handleReplyClick() {
-      this.$emit('reply', this.comment)
+    handleReplyClick(comment) {
+      this.$emit('reply', comment)
     },
     handleEditStatusClick(comment, status) {
       this.$emit('editStatus', comment, status)

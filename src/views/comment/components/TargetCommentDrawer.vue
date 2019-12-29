@@ -156,13 +156,7 @@ export default {
       this.selectedComment = comment
       this.replyCommentVisible = true
       this.replyComment.parentId = comment.id
-      if (this.type === 'posts') {
-        this.replyComment.postId = comment.post.id
-      } else if (this.type === 'sheets') {
-        this.replyComment.postId = comment.sheet.id
-      } else {
-        this.replyComment.postId = comment.journal.id
-      }
+      this.replyComment.postId = this.id
     },
     handleCreateClick() {
       if (!this.replyComment.content) {
