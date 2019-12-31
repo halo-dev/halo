@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -280,6 +281,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         // Get sheet meta ids
         sheetDetailVO.setSheetMetaIds(sheetMetaIds);
         sheetDetailVO.setSheetMetas(sheetMetaService.convertTo(sheetMetas));
+
+        if (StringUtils.isBlank(sheetDetailVO.getSummary())) {
+            sheetDetailVO.setSummary(generateSummary(sheet.getFormatContent()));
+        }
         return sheetDetailVO;
     }
 

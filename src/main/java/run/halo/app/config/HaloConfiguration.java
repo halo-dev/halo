@@ -25,6 +25,7 @@ import run.halo.app.security.handler.ContentAuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.HttpClientUtils;
 
 import java.security.KeyManagementException;
@@ -102,7 +103,16 @@ public class HaloConfiguration {
                                                                StringCacheStore cacheStore) {
         ContentFilter contentFilter = new ContentFilter(haloProperties, optionService, cacheStore);
         contentFilter.setFailureHandler(new ContentAuthenticationFailureHandler());
-        contentFilter.addExcludeUrlPatterns("/api/**", "/install", "/version", "/admin/**", "/js/**", "/css/**");
+
+        String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
+
+        contentFilter.addExcludeUrlPatterns(
+                adminPattern,
+                "/api/**",
+                "/install",
+                "/version",
+                "/js/**",
+                "/css/**");
 
         FilterRegistrationBean<ContentFilter> contentFrb = new FilterRegistrationBean<>();
         contentFrb.addUrlPatterns("/*");

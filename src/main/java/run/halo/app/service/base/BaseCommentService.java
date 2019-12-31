@@ -265,6 +265,17 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull CommentStatus status, @NonNull Sort sort);
 
     /**
+     * Lists children comments.
+     *
+     * @param targetId        target id must not be null
+     * @param commentParentId comment parent id must not be null
+     * @param sort            sort info must not be null
+     * @return a list of children comment
+     */
+    @NonNull
+    List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull Sort sort);
+
+    /**
      * Filters comment ip address.
      *
      * @param comment comment dto must not be null

@@ -1,11 +1,11 @@
 <#ftl strip_whitespace=true>
 
-<#-- 统计代码 -->
+<#-- statistics_code -->
 <#macro statistics>
     ${options.blog_statistics_code!}
 </#macro>
 
-<#-- 页脚信息 -->
+<#-- footer info -->
 <#macro footer_info>
     ${options.blog_footer_info!}
 </#macro>
@@ -14,19 +14,20 @@
     ${options.blog_custom_head!}
 </#macro>
 
-<#-- Favicon -->
+<#macro custom_content_head>
+    <#if is_post?? || is_sheet??>
+        ${options.blog_custom_content_head!}
+    </#if>
+</#macro>
+
+<#-- favicon -->
 <#macro favicon>
     <#if options.blog_favicon?? && options.blog_favicon!=''>
         <link rel="shortcut icon" type="images/x-icon" href="${options.blog_favicon!}">
     </#if>
 </#macro>
 
-<#-- 站点验证代码，已废弃 -->
-<#macro verification>
-
-</#macro>
-
-<#-- 时间格式化 几...前 -->
+<#-- time ago -->
 <#macro timeline datetime=.now>
     <#assign ct = (.now?long-datetime?long)/1000>
     <#if ct gte 31104000>${(ct/31104000)?int} 年前
@@ -46,9 +47,9 @@
         <meta name="robots" content="none">
     </#if>
     <meta name="generator" content="Halo ${version!}"/>
-    <@custom_head />
-    <@verification />
     <@favicon />
+    <@custom_head />
+    <@custom_content_head />
 </#macro>
 
 <#-- global footer -->
@@ -57,11 +58,11 @@
     <@statistics />
 </#macro>
 
-<#-- post comment module -->
-<#macro comment post,type>
+<#-- comment module -->
+<#macro comment target,type>
     <#if !post.disallowComment!false>
         <script src="//cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
         <script src="${options.comment_internal_plugin_js!'//cdn.jsdelivr.net/gh/halo-dev/halo-comment@latest/dist/halo-comment.min.js'}"></script>
-        <halo-comment id="${post.id}" type="${type}"/>
+        <halo-comment id="${target.id}" type="${type}"/>
     </#if>
 </#macro>

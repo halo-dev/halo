@@ -1,35 +1,7 @@
 <#include "module/macro.ftl">
-<@head title="${post.title!} · ${options.blog_title!'Anatole'}" keywords="${post.title!},${options.seo_keywords!'Anatole'},${tagWords!}" description="${post.summary!'Anatole'}"></@head>
+<@head title="${post.title!} · ${options.blog_title!}" keywords="${post.title!},${options.seo_keywords!},${tagWords!}" description="${post.summary!}" />
 <#include "module/sidebar.ftl">
 <div class="main">
-    <link href="${static!}/source/plugins/prism/css/prism-${settings.code_pretty!'Default'}.css" type="text/css" rel="stylesheet" />
-    <style>
-        table {
-            border-spacing: 0;
-            border-collapse: collapse;
-            margin-top: 0;
-            margin-bottom: 16px;
-            display: block;
-            width: 100%;
-            overflow: auto;
-
-        }
-        table th {
-            font-weight: 600;
-        }
-        table th,
-        table td {
-            padding: 6px 13px;
-            border: 1px solid #dfe2e5;
-        }
-        table tr {
-            background-color: #fff;
-            border-top: 1px solid #c6cbd1;
-        }
-        table tr:nth-child(2n) {
-            background-color: #f6f8fa;
-        }
-    </style>
     <#include "module/page-top.ftl">
     <div class="autopagerize_page_element">
         <div class="content">
@@ -96,5 +68,4 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="${static!}/source/plugins/prism/js/prism.js"></script>
 <@footer></@footer>

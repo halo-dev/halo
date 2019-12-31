@@ -9,7 +9,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'run.halo.app'
 archivesBaseName = 'halo'
-version = '1.2.0-beta.1'
+version = '1.2.0-beta.4'
 sourceCompatibility = '1.8'
 description = 'Halo, personal blog system developed in Java.'
 
@@ -87,7 +87,6 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-autolink:$flexmarkVersion"
-    implementation "com.vladsch.flexmark:flexmark-ext-anchorlink:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-escaped-character:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:$flexmarkVersion"

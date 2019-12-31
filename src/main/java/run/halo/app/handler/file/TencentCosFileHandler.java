@@ -53,38 +53,56 @@ public class TencentCosFileHandler implements FileHandler {
         String secretId = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_ID).toString();
         String secretKey = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_KEY).toString();
         String bucketName = optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString();
-        String source = StringUtils.join(protocol, bucketName, ".cos." + region + ".myqcloud.com");
+        String source = optionService.getByPropertyOrDefault(TencentCosProperties.COS_SOURCE, String.class, "");
         String styleRule = optionService.getByPropertyOrDefault(TencentCosProperties.COS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService.getByPropertyOrDefault(TencentCosProperties.COS_THUMBNAIL_STYLE_RULE, String.class, "");
-
-        //get file attribute
-        long size = file.getSize();
-        String contentType = file.getContentType();
 
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         Region regionConfig = new Region(region);
         ClientConfig clientConfig = new ClientConfig(regionConfig);
 
-
         // Init OSS client
         COSClient cosClient = new COSClient(cred, clientConfig);
 
-        domain = protocol + domain;
+        StringBuilder basePath = new StringBuilder(protocol);
+
+        if (StringUtils.isNotEmpty(domain)) {
+            basePath.append(domain)
+                    .append("/");
+        } else {
+            basePath.append(bucketName)
+                    .append(".cos.")
+                    .append(region)
+                    .append(".myqcloud.com")
+                    .append("/");
+        }
 
         try {
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
-            String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(domain) ? domain : source, "/"), upFilePath);
+            StringBuilder upFilePath = new StringBuilder();
+
+            if (StringUtils.isNotEmpty(source)) {
+                upFilePath.append(source)
+                        .append("/");
+            }
+
+            upFilePath.append(basename)
+                    .append("_")
+                    .append(timestamp)
+                    .append(".")
+                    .append(extension);
+
+            String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
 
             // Upload
             ObjectMetadata objectMetadata = new ObjectMetadata();
             //提前告知输入流的长度, 否则可能导致 oom
-            objectMetadata.setContentLength(size);
+            objectMetadata.setContentLength(file.getSize());
             // 设置 Content type, 默认是 application/octet-stream
-            objectMetadata.setContentType(contentType);
-            PutObjectResult putObjectResponseFromInputStream = cosClient.putObject(bucketName, upFilePath, file.getInputStream(), objectMetadata);
+            objectMetadata.setContentType(file.getContentType());
+            PutObjectResult putObjectResponseFromInputStream = cosClient.putObject(bucketName, upFilePath.toString(), file.getInputStream(), objectMetadata);
             if (putObjectResponseFromInputStream == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到腾讯云失败 ");
             }
@@ -93,7 +111,7 @@ public class TencentCosFileHandler implements FileHandler {
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
             uploadResult.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
-            uploadResult.setKey(upFilePath);
+            uploadResult.setKey(upFilePath.toString());
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
             uploadResult.setSize(file.getSize());

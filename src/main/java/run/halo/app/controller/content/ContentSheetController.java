@@ -18,6 +18,7 @@ import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.BaseCommentVO;
+import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
@@ -132,9 +133,11 @@ public class ContentSheetController {
 
         Page<BaseCommentVO> comments = sheetCommentService.pageVosBy(sheet.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
 
+        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
+
         // sheet and post all can use
-        model.addAttribute("sheet", sheetService.convertToDetail(sheet));
-        model.addAttribute("post", sheetService.convertToDetail(sheet));
+        model.addAttribute("sheet", sheetDetailVO);
+        model.addAttribute("post", sheetDetailVO);
         model.addAttribute("is_sheet", true);
         model.addAttribute("comments", comments);
 
