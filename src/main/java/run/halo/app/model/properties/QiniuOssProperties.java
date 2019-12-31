@@ -25,6 +25,11 @@ public enum QiniuOssProperties implements PropertyEnum {
     OSS_SECRET_KEY("oss_qiniu_secret_key", String.class, ""),
 
     /**
+     * Qiniu oss source
+     */
+    OSS_SOURCE("oss_qiniu_source", String.class, ""),
+
+    /**
      * Qiniu oss domain protocol.
      */
     OSS_PROTOCOL("oss_qiniu_domain_protocol", String.class, "https://"),
