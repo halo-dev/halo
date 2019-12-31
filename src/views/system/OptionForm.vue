@@ -468,6 +468,12 @@
                   <a-form-item label="Secret Key：">
                     <a-input-password v-model="options.cos_tencent_secret_key" />
                   </a-form-item>
+                  <a-form-item label="文件目录：">
+                    <a-input
+                      v-model="options.cos_tencent_source"
+                      placeholder="不填写则上传到根目录"
+                    />
+                  </a-form-item>
                   <a-form-item label="图片处理策略：">
                     <a-input
                       v-model="options.cos_tencent_style_rule"
