@@ -45,25 +45,37 @@ public class AliOssFileHandler implements FileHandler {
         // Get config
         String protocol = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_PROTOCOL).toString();
         String domain = optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "");
+        String source = optionService.getByPropertyOrDefault(AliOssProperties.OSS_SOURCE, String.class, "");
         String endPoint = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
         String accessKey = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
         String accessSecret = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
         String bucketName = optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
-        String source = StringUtils.join(protocol, bucketName, "." + endPoint);
         String styleRule = optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService.getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
 
-        domain = protocol + domain;
+        StringBuilder basePath = new StringBuilder(protocol);
+
+        if (StringUtils.isNotEmpty(domain)) {
+            basePath.append(domain)
+                    .append("/");
+        } else {
+            basePath.append(bucketName)
+                    .append(".")
+                    .append(endPoint)
+                    .append("/");
+        }
 
         try {
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
-            String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(domain) ? domain : source, "/"), upFilePath);
+            String upFilePath = StringUtils.join(source, "/", basename, "_", timestamp, ".", extension);
+            String filePath = StringUtils.join(basePath.toString(), upFilePath);
+
+            log.info(basePath.toString());
 
             // Upload
             PutObjectResult putObjectResult = ossClient.putObject(bucketName, upFilePath, file.getInputStream());
