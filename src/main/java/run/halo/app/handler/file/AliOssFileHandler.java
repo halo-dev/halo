@@ -72,13 +72,25 @@ public class AliOssFileHandler implements FileHandler {
             String basename = FilenameUtils.getBasename(file.getOriginalFilename());
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
-            String upFilePath = StringUtils.join(source, "/", basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(basePath.toString(), upFilePath);
+            StringBuilder upFilePath = new StringBuilder();
+
+            if (StringUtils.isNotEmpty(source)) {
+                upFilePath.append(source)
+                        .append("/");
+            }
+
+            upFilePath.append(basename)
+                    .append("_")
+                    .append(timestamp)
+                    .append(".")
+                    .append(extension);
+
+            String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
 
             log.info(basePath.toString());
 
             // Upload
-            PutObjectResult putObjectResult = ossClient.putObject(bucketName, upFilePath, file.getInputStream());
+            PutObjectResult putObjectResult = ossClient.putObject(bucketName, upFilePath.toString(), file.getInputStream());
             if (putObjectResult == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
             }
@@ -87,7 +99,7 @@ public class AliOssFileHandler implements FileHandler {
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
             uploadResult.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
-            uploadResult.setKey(upFilePath);
+            uploadResult.setKey(upFilePath.toString());
             uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
             uploadResult.setSize(file.getSize());
