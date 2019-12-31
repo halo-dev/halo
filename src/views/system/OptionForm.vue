@@ -320,6 +320,12 @@
                   <a-form-item label="Secret Key：">
                     <a-input-password v-model="options.oss_qiniu_secret_key" />
                   </a-form-item>
+                  <a-form-item label="文件目录：">
+                    <a-input
+                      v-model="options.oss_qiniu_source"
+                      placeholder="不填写则上传到根目录"
+                    />
+                  </a-form-item>
                   <a-form-item label="Bucket：">
                     <a-input
                       v-model="options.oss_qiniu_bucket"
