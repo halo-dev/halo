@@ -370,6 +370,12 @@
                   <a-form-item label="Access Secret：">
                     <a-input-password v-model="options.oss_ali_access_secret" />
                   </a-form-item>
+                  <a-form-item label="文件目录：">
+                    <a-input
+                      v-model="options.oss_ali_source"
+                      placeholder="不填写则上传到根目录"
+                    />
+                  </a-form-item>
                   <a-form-item label="图片处理策略：">
                     <a-input
                       v-model="options.oss_ali_style_rule"
