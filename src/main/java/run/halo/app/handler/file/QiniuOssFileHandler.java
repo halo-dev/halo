@@ -33,7 +33,7 @@ import java.util.Objects;
 import static run.halo.app.handler.file.FileHandler.isImageType;
 
 /**
- * Qi niu yun file handler.
+ * Qiniu oss file handler.
  *
  * @author johnniang
  * @author ryanwang

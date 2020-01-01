@@ -28,7 +28,7 @@ import java.util.Collections;
  *
  * @author ryanwang
  * @author guqing
- * @date : 2018-12-05
+ * @date 2018-12-05
  */
 @Slf4j
 @Configuration

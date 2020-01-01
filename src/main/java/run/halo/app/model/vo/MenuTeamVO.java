@@ -10,7 +10,7 @@ import java.util.List;
  * Menu team vo.
  *
  * @author ryanwang
- * @date : 2019/8/28
+ * @date 2019/8/28
  */
 @Data
 @ToString

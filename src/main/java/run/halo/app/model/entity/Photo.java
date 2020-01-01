@@ -11,7 +11,7 @@ import java.util.Date;
  * Photo entity
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity

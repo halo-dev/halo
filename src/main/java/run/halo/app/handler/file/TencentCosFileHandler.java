@@ -26,7 +26,7 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 /**
- * TencentYun file handler.
+ * Tencent cos file handler.
  *
  * @author wangya
  * @author ryanwang

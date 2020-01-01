@@ -15,7 +15,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.comment.CommentNewEvent;
-import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
@@ -342,14 +341,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         comment.setStatus(status);
 
         // Update comment
-        COMMENT updatedComment = update(comment);
-
-        if (CommentStatus.PUBLISHED.equals(status)) {
-            // Pass a comment
-            eventPublisher.publishEvent(new CommentPassEvent(this, commentId));
-        }
-
-        return updatedComment;
+        return update(comment);
     }
 
     @Override

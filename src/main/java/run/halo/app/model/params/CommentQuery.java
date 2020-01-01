@@ -7,7 +7,7 @@ import run.halo.app.model.enums.CommentStatus;
  * Comment query params.
  *
  * @author ryanwang
- * @date : 2019/04/18
+ * @date 2019/04/18
  */
 @Data
 public class CommentQuery {

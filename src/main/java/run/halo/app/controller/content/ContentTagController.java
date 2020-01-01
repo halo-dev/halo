@@ -23,7 +23,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Tag controller.
  *
  * @author ryanwang
- * @date : 2019-03-21
+ * @date 2019-03-21
  */
 @Controller
 @RequestMapping(value = "/tags")

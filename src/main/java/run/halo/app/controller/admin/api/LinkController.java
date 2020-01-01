@@ -16,7 +16,7 @@ import java.util.List;
  * Link Controller
  *
  * @author ryanwang
- * @date : 2019/3/21
+ * @date 2019/3/21
  */
 @RestController
 @RequestMapping("/api/admin/links")

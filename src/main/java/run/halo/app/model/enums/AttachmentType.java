@@ -4,7 +4,7 @@ package run.halo.app.model.enums;
  * Attach origin.
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 public enum AttachmentType implements ValueEnum<Integer> {
 

@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  *
  * @author ryanwang
  * @author johnniang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Slf4j
 @Service

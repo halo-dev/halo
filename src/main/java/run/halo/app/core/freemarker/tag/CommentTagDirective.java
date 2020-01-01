@@ -16,7 +16,7 @@ import java.util.Map;
  * Freemarker custom tag of comment.
  *
  * @author ryanwang
- * @date : 2019/3/22
+ * @date 2019-03-22
  */
 @Component
 public class CommentTagDirective implements TemplateDirectiveModel {

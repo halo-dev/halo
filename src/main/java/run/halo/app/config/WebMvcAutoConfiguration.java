@@ -40,7 +40,7 @@ import static run.halo.app.utils.HaloUtils.*;
  * Mvc configuration.
  *
  * @author ryanwang
- * @date : 2018/1/2
+ * @date 2018-01-02
  */
 @Slf4j
 @Configuration

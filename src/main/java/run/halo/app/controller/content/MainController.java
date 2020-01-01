@@ -20,7 +20,7 @@ import java.io.IOException;
  * Main controller.
  *
  * @author ryanwang
- * @date : 2019-04-23
+ * @date 2019-04-23
  */
 @Controller
 public class MainController {
