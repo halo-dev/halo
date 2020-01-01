@@ -170,8 +170,6 @@ public class ContentArchiveController {
     @GetMapping(value = "{url}/password")
     public String password(@PathVariable("url") String url,
                            Model model) {
-        Post post = postService.getBy(PostStatus.INTIMATE, url);
-
         model.addAttribute("url", url);
         return "common/template/post_password";
     }
