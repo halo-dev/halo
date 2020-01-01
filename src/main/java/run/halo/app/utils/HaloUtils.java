@@ -17,7 +17,7 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  *
  * @author ryanwang
  * @author johnniang
- * @date : 2017/12/22
+ * @date 2017/12/22
  */
 @Slf4j
 public class HaloUtils {

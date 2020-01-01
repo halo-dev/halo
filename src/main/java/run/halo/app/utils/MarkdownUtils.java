@@ -32,7 +32,7 @@ import java.util.Map;
  * Markdown utils.
  *
  * @author ryanwang
- * @date : 2019/06/27
+ * @date 2019/06/27
  */
 public class MarkdownUtils {
 

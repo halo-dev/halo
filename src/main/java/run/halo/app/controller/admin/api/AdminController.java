@@ -86,6 +86,7 @@ public class AdminController {
      */
     @GetMapping("counts")
     @ApiOperation("Gets count info")
+    @Deprecated
     public StatisticDTO getCount() {
         return adminService.getCount();
     }

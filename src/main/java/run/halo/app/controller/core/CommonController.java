@@ -29,7 +29,7 @@ import java.util.Map;
  * Error page Controller
  *
  * @author ryanwang
- * @date : 2017/12/26
+ * @date 2017-12-26
  */
 @Slf4j
 @Controller
@@ -43,6 +43,8 @@ public class CommonController extends AbstractErrorController {
     private static final String ERROR_TEMPLATE = "error.ftl";
 
     private static final String DEFAULT_ERROR_PATH = "common/error/error";
+
+    private static final String COULD_NOT_RESOLVE_VIEW_WITH_NAME_PREFIX = "Could not resolve view with name '";
 
     private final ThemeService themeService;
 
@@ -167,7 +169,7 @@ public class CommonController extends AbstractErrorController {
                 request.setAttribute("javax.servlet.error.exception", rootCause);
                 request.setAttribute("javax.servlet.error.message", haloException.getMessage());
             }
-        } else if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), "Could not resolve view with name '")) {
+        } else if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), COULD_NOT_RESOLVE_VIEW_WITH_NAME_PREFIX)) {
             request.setAttribute("javax.servlet.error.status_code", HttpStatus.NOT_FOUND.value());
 
             NotFoundException viewNotFound = new NotFoundException("该路径没有对应的模板");
@@ -193,7 +195,7 @@ public class CommonController extends AbstractErrorController {
      * @param request the source request
      * @return if the stacktrace attribute should be included
      */
-    protected boolean isIncludeStackTrace(HttpServletRequest request) {
+    private boolean isIncludeStackTrace(HttpServletRequest request) {
         ErrorProperties.IncludeStacktrace include = errorProperties.getIncludeStacktrace();
         if (include == ErrorProperties.IncludeStacktrace.ALWAYS) {
             return true;

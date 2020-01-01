@@ -56,6 +56,11 @@ public class CommentEventListener {
         this.userService = userService;
     }
 
+    /**
+     * Received a new new comment event.
+     *
+     * @param newEvent new comment event.
+     */
     @Async
     @EventListener
     public void handleCommentNewEvent(CommentNewEvent newEvent) {
@@ -118,12 +123,11 @@ public class CommentEventListener {
         mailService.sendTemplateMail(user.getEmail(), "您的博客有新的评论", data, "common/mail_template/mail_notice.ftl");
     }
 
-    @Async
-    @EventListener
-    public void handleCommentPassEvent(CommentPassEvent passEvent) {
-
-    }
-
+    /**
+     * Received a new reply comment event.
+     *
+     * @param newEvent reply comment event.
+     */
     @Async
     @EventListener
     public void handleCommentReplyEvent(CommentReplyEvent replyEvent) {

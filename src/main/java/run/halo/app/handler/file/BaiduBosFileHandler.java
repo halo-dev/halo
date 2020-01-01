@@ -23,7 +23,7 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 /**
- * BaiDuYun file handler.
+ * Baidu bos file handler.
  *
  * @author wangya
  * @author ryanwang

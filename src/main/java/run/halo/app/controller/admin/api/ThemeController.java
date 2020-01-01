@@ -20,7 +20,7 @@ import java.util.Set;
  * Theme controller.
  *
  * @author ryanwang
- * @date : 2019/3/20
+ * @date 2019-03-20
  */
 @RestController
 @RequestMapping("/api/admin/themes")

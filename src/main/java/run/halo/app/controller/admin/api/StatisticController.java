@@ -11,7 +11,7 @@ import run.halo.app.service.StatisticService;
 /**
  * Statistic controller.
  *
- * @author ryan0up
+ * @author ryanwang
  * @date 2019-12-16
  */
 @RestController

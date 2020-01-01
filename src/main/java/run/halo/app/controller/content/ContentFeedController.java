@@ -32,7 +32,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * @author ryanwang
- * @date : 2019-03-21
+ * @date 2019-03-21
  */
 @Slf4j
 @Controller

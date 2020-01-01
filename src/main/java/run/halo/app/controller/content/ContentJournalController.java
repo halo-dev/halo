@@ -25,7 +25,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Blog journal page controller
  *
  * @author ryanwang
- * @date : 2019-05-04
+ * @date 2019-05-04
  */
 @Slf4j
 @Controller

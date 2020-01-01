@@ -7,7 +7,7 @@ import run.halo.app.model.enums.Mode;
  * Theme controller.
  *
  * @author ryanwang
- * @date : 2019/5/4
+ * @date 2019/5/4
  */
 @Data
 public class EnvironmentDTO {
