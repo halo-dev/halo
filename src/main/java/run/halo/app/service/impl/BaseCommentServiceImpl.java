@@ -234,6 +234,12 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public long countByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+        return baseCommentRepository.countByPostId(postId);
+    }
+
+    @Override
     public long countByStatus(CommentStatus status) {
         return baseCommentRepository.countByStatus(status);
     }
