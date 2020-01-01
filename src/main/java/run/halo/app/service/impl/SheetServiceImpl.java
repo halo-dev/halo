@@ -226,6 +226,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     @Override
     public Sheet removeById(Integer id) {
 
+        // Remove sheet metas
+        List<SheetMeta> sheetMetas = sheetMetaService.removeByPostId(id);
+        log.debug("Removed sheet metas: [{}]", sheetMetas);
+
         // Remove sheet comments
         List<SheetComment> sheetComments = sheetCommentService.removeByPostId(id);
         log.debug("Removed sheet comments: [{}]", sheetComments);
