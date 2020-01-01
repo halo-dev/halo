@@ -32,6 +32,12 @@ public interface JournalCommentRepository extends BaseCommentRepository<JournalC
     @Override
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
+    /**
+     * Finds direct children count by comment ids.
+     *
+     * @param commentIds comment ids must not be null.
+     * @return a list of CommentChildrenCountProjection
+     */
     @Query("select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment.id), comment.parentId) " +
             "from JournalComment comment " +
             "where comment.parentId in ?1 " +

@@ -22,7 +22,7 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 /**
- * AliYun file handler.
+ * Ali oss file handler.
  *
  * @author MyFaith
  * @author ryanwang

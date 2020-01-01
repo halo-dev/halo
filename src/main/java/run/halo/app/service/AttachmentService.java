@@ -19,14 +19,15 @@ import java.util.List;
  * Attachment service.
  *
  * @author johnniang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 public interface AttachmentService extends CrudService<Attachment, Integer> {
 
     /**
      * Pages attachment output dtos.
      *
-     * @param pageable page info must not be null
+     * @param pageable        page info must not be null
+     * @param attachmentQuery attachment query param.
      * @return a page of attachment output dto
      */
     @NonNull

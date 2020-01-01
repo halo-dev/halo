@@ -16,14 +16,31 @@ import java.util.Optional;
  */
 public interface SheetRepository extends BasePostRepository<Sheet> {
 
+    /**
+     * Count all sheet visits.
+     *
+     * @return visits.
+     */
     @Override
     @Query("select sum(p.visits) from Sheet p")
     Long countVisit();
 
+    /**
+     * Count all sheet likes.
+     *
+     * @return likes.
+     */
     @Override
     @Query("select sum(p.likes) from Sheet p")
     Long countLike();
 
+    /**
+     * Gets sheet by url and status.
+     *
+     * @param url    url must not be blank
+     * @param status status must not be null
+     * @return an optional of sheet.
+     */
     @NonNull
     @Override
     Optional<Sheet> getByUrlAndStatus(@NonNull String url, @NonNull PostStatus status);

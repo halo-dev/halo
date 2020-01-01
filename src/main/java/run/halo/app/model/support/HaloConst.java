@@ -11,7 +11,7 @@ import java.time.Duration;
  * </pre>
  *
  * @author ryanwang
- * @date : 2017/12/29
+ * @date 2017/12/29
  */
 public class HaloConst {
 

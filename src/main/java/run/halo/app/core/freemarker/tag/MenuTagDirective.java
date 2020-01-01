@@ -16,7 +16,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Freemarker custom tag of menu.
  *
  * @author ryanwang
- * @date : 2019/3/22
+ * @date 2019-03-22
  */
 @Component
 public class MenuTagDirective implements TemplateDirectiveModel {

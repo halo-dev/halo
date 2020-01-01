@@ -166,6 +166,12 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
     Page<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status, Long parentId, Pageable pageable);
 
 
+    /**
+     * Finds direct children count by comment ids.
+     *
+     * @param commentIds comment ids must not be null.
+     * @return a list of CommentChildrenCountProjection
+     */
     @Query("select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment.id), comment.parentId) " +
             "from BaseComment comment " +
             "where comment.parentId in ?1 " +

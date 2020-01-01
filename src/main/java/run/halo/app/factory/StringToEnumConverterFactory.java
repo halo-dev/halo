@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @author ryanwang
- * @date : 2019/3/14
+ * @date 2019-3-14
  */
 @Component
 public class StringToEnumConverterFactory implements ConverterFactory<String, Enum> {
