@@ -37,11 +37,13 @@ public class OptionController {
     }
 
     @GetMapping
+    @ApiOperation("Lists options")
     public List<OptionDTO> listAll() {
         return optionService.listDtos();
     }
 
     @PostMapping("saving")
+    @ApiOperation("Saves options")
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
         optionService.save(optionParams);
     }
@@ -64,7 +66,7 @@ public class OptionController {
     }
 
     @GetMapping("{id:\\d+}")
-    @ApiOperation("Get option detail by id")
+    @ApiOperation("Gets option detail by id")
     public OptionSimpleDTO getBy(@PathVariable("id") Integer id) {
         Option option = optionService.getById(id);
         return optionService.convertToDto(option);

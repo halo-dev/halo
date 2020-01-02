@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.SortDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +16,10 @@ import run.halo.app.model.dto.PhotoDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.SheetDetailVO;
-import run.halo.app.service.*;
+import run.halo.app.service.PhotoService;
+import run.halo.app.service.SheetService;
+import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -38,25 +38,17 @@ public class ContentSheetController {
 
     private final ThemeService themeService;
 
-    private final SheetCommentService sheetCommentService;
-
     private final PhotoService photoService;
-
-    private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
 
     public ContentSheetController(SheetService sheetService,
                                   ThemeService themeService,
-                                  SheetCommentService sheetCommentService,
                                   PhotoService photoService,
-                                  OptionService optionService,
                                   StringCacheStore cacheStore) {
         this.sheetService = sheetService;
         this.themeService = themeService;
-        this.sheetCommentService = sheetCommentService;
         this.photoService = photoService;
-        this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
 
@@ -102,17 +94,14 @@ public class ContentSheetController {
     /**
      * Render custom sheet
      *
-     * @param url     sheet url
-     * @param preview preview
-     * @param token   token
-     * @param model   model
+     * @param url   sheet url
+     * @param token view token
+     * @param model model
      * @return template path: themes/{theme}/sheet.ftl
      */
     @GetMapping(value = "/s/{url}")
     public String sheet(@PathVariable(value = "url") String url,
                         @RequestParam(value = "token", required = false) String token,
-                        @RequestParam(value = "cp", defaultValue = "1") Integer cp,
-                        @SortDefault(sort = "createTime", direction = DESC) Sort sort,
                         Model model) {
 
         Sheet sheet = sheetService.getByUrl(url);
@@ -131,15 +120,15 @@ public class ContentSheetController {
             }
         }
 
-        Page<BaseCommentVO> comments = sheetCommentService.pageVosBy(sheet.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
-
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 
         // sheet and post all can use
         model.addAttribute("sheet", sheetDetailVO);
         model.addAttribute("post", sheetDetailVO);
         model.addAttribute("is_sheet", true);
-        model.addAttribute("comments", comments);
+
+        // TODO,Will be deprecated
+        model.addAttribute("comments", Page.empty());
 
         if (themeService.templateExists(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate());

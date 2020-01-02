@@ -21,7 +21,6 @@ import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
@@ -53,8 +52,6 @@ public class ContentArchiveController {
 
     private final PostTagService postTagService;
 
-    private final PostCommentService postCommentService;
-
     private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
@@ -64,7 +61,6 @@ public class ContentArchiveController {
                                     PostCategoryService postCategoryService,
                                     PostMetaService postMetaService,
                                     PostTagService postTagService,
-                                    PostCommentService postCommentService,
                                     OptionService optionService,
                                     StringCacheStore cacheStore) {
         this.postService = postService;
@@ -72,7 +68,6 @@ public class ContentArchiveController {
         this.postCategoryService = postCategoryService;
         this.postMetaService = postMetaService;
         this.postTagService = postTagService;
-        this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
@@ -114,17 +109,14 @@ public class ContentArchiveController {
     /**
      * Render post page.
      *
-     * @param url     post slug url.
-     * @param preview preview
-     * @param token   preview token
-     * @param model   model
+     * @param url   post slug url.
+     * @param token view token.
+     * @param model model
      * @return template path: themes/{theme}/post.ftl
      */
     @GetMapping("{url}")
     public String post(@PathVariable("url") String url,
                        @RequestParam(value = "token", required = false) String token,
-                       @RequestParam(value = "cp", defaultValue = "1") Integer cp,
-                       @SortDefault(sort = "createTime", direction = DESC) Sort sort,
                        Model model) {
         Post post = postService.getByUrl(url);
 
@@ -151,14 +143,14 @@ public class ContentArchiveController {
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
 
-        Page<BaseCommentVO> comments = postCommentService.pageVosBy(post.getId(), PageRequest.of(cp, optionService.getCommentPageSize(), sort));
-
         model.addAttribute("is_post", true);
         model.addAttribute("post", postService.convertToDetailVo(post));
         model.addAttribute("categories", categories);
         model.addAttribute("tags", tags);
         model.addAttribute("metas", postMetaService.convertToMap(metas));
-        model.addAttribute("comments", comments);
+
+        // TODO,Will be deprecated
+        model.addAttribute("comments", Page.empty());
 
         if (themeService.templateExists(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());

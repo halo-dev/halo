@@ -34,7 +34,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @author johnniang
  * @author ryanwang
  * @author guqing
- * @date 3/19/19
+ * @date 2019-03-19
  */
 @RestController
 @RequestMapping("/api/admin/posts")
@@ -88,6 +88,7 @@ public class PostController {
     }
 
     @GetMapping("{postId:\\d+}")
+    @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
         Post post = postService.getById(postId);
         return postService.convertToDetailVo(post);
@@ -100,6 +101,7 @@ public class PostController {
     }
 
     @PostMapping
+    @ApiOperation("Creates a post")
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Convert to
@@ -108,6 +110,7 @@ public class PostController {
     }
 
     @PutMapping("{postId:\\d+}")
+    @ApiOperation("Updates a post")
     public PostDetailVO updateBy(@Valid @RequestBody PostParam postParam,
                                  @PathVariable("postId") Integer postId,
                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
@@ -119,7 +122,7 @@ public class PostController {
     }
 
     @PutMapping("{postId:\\d+}/status/{status}")
-    @ApiOperation("Update post status")
+    @ApiOperation("Updates post status")
     public BasePostMinimalDTO updateStatusBy(
             @PathVariable("postId") Integer postId,
             @PathVariable("status") PostStatus status) {
@@ -129,14 +132,14 @@ public class PostController {
     }
 
     @PutMapping("status/{status}")
-    @ApiOperation("Update post status in batch")
+    @ApiOperation("Updates post status in batch")
     public List<Post> updateStatusInBatch(@PathVariable(name = "status") PostStatus status,
                                           @RequestBody List<Integer> ids) {
         return postService.updateStatusByIds(ids, status);
     }
 
     @PutMapping("{postId:\\d+}/status/draft/content")
-    @ApiOperation("Update draft")
+    @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(
             @PathVariable("postId") Integer postId,
             @RequestBody PostContentParam contentParam) {
@@ -147,18 +150,19 @@ public class PostController {
     }
 
     @DeleteMapping("{postId:\\d+}")
+    @ApiOperation("Deletes a photo permanently")
     public void deletePermanently(@PathVariable("postId") Integer postId) {
         postService.removeById(postId);
     }
 
     @DeleteMapping
-    @ApiOperation("Delete posts permanently in batch by id array")
+    @ApiOperation("Deletes posts permanently in batch by id array")
     public List<Post> deletePermanentlyInBatch(@RequestBody List<Integer> ids) {
         return postService.removeByIds(ids);
     }
 
     @GetMapping(value = {"preview/{postId:\\d+}", "{postId:\\d+}/preview"})
-    @ApiOperation("Get preview link")
+    @ApiOperation("Gets a post preview link")
     public String preview(@PathVariable("postId") Integer postId) throws UnsupportedEncodingException {
         Post post = postService.getById(postId);
 
