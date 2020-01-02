@@ -91,7 +91,7 @@ adminApi.getApplicationConfig = () => {
 
 adminApi.updateApplicationConfig = content => {
   return service({
-    url: `${baseUrl}/spring/application.yaml/update`,
+    url: `${baseUrl}/spring/application.yaml`,
     params: {
       content: content
     },
