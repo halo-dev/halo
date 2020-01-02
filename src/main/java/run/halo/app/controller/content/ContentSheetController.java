@@ -28,6 +28,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Content sheet controller.
  *
  * @author ryanwang
+ * @author evanwang
  * @date 2019-03-21
  */
 @Controller
@@ -119,6 +120,7 @@ public class ContentSheetController {
                 throw new ForbiddenException("您没有该页面的访问权限");
             }
         }
+        sheetService.publishVisitEvent(sheet.getId());
 
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 

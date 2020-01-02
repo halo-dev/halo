@@ -51,6 +51,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * @author johnniang
  * @author ryanwang
  * @author guqing
+ * @author evanwang
  * @date 2019-03-14
  */
 @Slf4j
@@ -159,8 +160,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public Post getBy(PostStatus status, String url) {
         Post post = super.getBy(status, url);
 
-        fireVisitEvent(post.getId());
-
         return post;
     }
 
@@ -175,8 +174,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public Post getByUrl(String url) {
         Post post = super.getByUrl(url);
-
-        fireVisitEvent(post.getId());
 
         return post;
     }
@@ -630,7 +627,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return convertTo(post, tags, categories, postMetaList);
     }
 
-    private void fireVisitEvent(@NonNull Integer postId) {
+    @Override
+    public void publishVisitEvent(Integer postId) {
         eventPublisher.publishEvent(new PostVisitEvent(this, postId));
     }
 }
