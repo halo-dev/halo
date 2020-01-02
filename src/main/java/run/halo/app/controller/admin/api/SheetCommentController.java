@@ -46,6 +46,7 @@ public class SheetCommentController {
     }
 
     @GetMapping
+    @ApiOperation("Lists sheet comments")
     public Page<SheetCommentWithSheetVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                                 CommentQuery commentQuery) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageBy(commentQuery, pageable);
@@ -53,6 +54,7 @@ public class SheetCommentController {
     }
 
     @GetMapping("latest")
+    @ApiOperation("Lists latest sheet comments")
     public List<SheetCommentWithSheetVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
                                                     @RequestParam(name = "status", required = false) CommentStatus status) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top, status);
@@ -108,7 +110,7 @@ public class SheetCommentController {
     }
 
     @DeleteMapping
-    @ApiOperation("Delete sheet comments permanently in batch by id array")
+    @ApiOperation("Deletes sheet comments permanently in batch by id array")
     public List<SheetComment> deletePermanentlyInBatch(@RequestBody List<Long> ids) {
         return sheetCommentService.removeByIds(ids);
     }
@@ -121,6 +123,7 @@ public class SheetCommentController {
     }
 
     @PutMapping("{commentId:\\d+}")
+    @ApiOperation("Updates a sheet comment")
     public BaseCommentDTO updateBy(@Valid @RequestBody SheetCommentParam commentParam,
                                    @PathVariable("commentId") Long commentId) {
         SheetComment commentToUpdate = sheetCommentService.getById(commentId);

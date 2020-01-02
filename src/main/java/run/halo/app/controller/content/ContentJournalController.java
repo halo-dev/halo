@@ -78,7 +78,7 @@ public class ContentJournalController {
 
         int[] rainbow = PageUtil.rainbow(page, journals.getTotalPages(), 3);
 
-        model.addAttribute("is_journal", true);
+        model.addAttribute("is_journals", true);
         model.addAttribute("journals", journalService.convertToCmtCountDto(journals));
         model.addAttribute("rainbow", rainbow);
         return themeService.render("journals");

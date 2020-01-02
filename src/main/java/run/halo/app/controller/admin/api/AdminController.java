@@ -24,7 +24,7 @@ import javax.validation.Valid;
  *
  * @author johnniang
  * @author ryanwang
- * @date 3/19/19
+ * @date 2019-03-19
  */
 @Slf4j
 @RestController
@@ -41,7 +41,7 @@ public class AdminController {
     }
 
     @GetMapping(value = "/is_installed")
-    @ApiOperation("Check install status")
+    @ApiOperation("Checks Installation status")
     public boolean isInstall() {
         return optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
     }
@@ -61,13 +61,13 @@ public class AdminController {
     }
 
     @PostMapping("password/code")
-    @ApiOperation("Send reset password verify code.")
+    @ApiOperation("Sends reset password verify code")
     public void sendResetCode(@RequestBody @Valid ResetPasswordParam param) {
         adminService.sendResetPasswordCode(param);
     }
 
     @PutMapping("password/reset")
-    @ApiOperation("Reset password by verify code.")
+    @ApiOperation("Resets password by verify code")
     public void resetPassword(@RequestBody @Valid ResetPasswordParam param) {
         adminService.resetPasswordByCode(param);
     }
@@ -79,11 +79,6 @@ public class AdminController {
         return adminService.refreshToken(refreshToken);
     }
 
-    /**
-     * Get some statistics about the count of posts, the count of comments, etc.
-     *
-     * @return counts
-     */
     @GetMapping("counts")
     @ApiOperation("Gets count info")
     @Deprecated
@@ -104,31 +99,31 @@ public class AdminController {
     }
 
     @GetMapping("spring/application.yaml")
-    @ApiOperation("Get application config content")
+    @ApiOperation("Gets application config content")
     public BaseResponse<String> getSpringApplicationConfig() {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getApplicationConfig());
     }
 
-    @PutMapping("spring/application.yaml/update")
-    @ApiOperation("Update application config content")
+    @PutMapping("spring/application.yaml")
+    @ApiOperation("Updates application config content")
     public void updateSpringApplicationConfig(@RequestParam(name = "content") String content) {
         adminService.updateApplicationConfig(content);
     }
 
     @PostMapping(value = {"halo/restart", "spring/restart"})
-    @ApiOperation("Restart halo server")
+    @ApiOperation("Restarts halo server")
     public void restartApplication() {
         Application.restart();
     }
 
     @GetMapping(value = "halo/logfile")
-    @ApiOperation("Get halo log file content.")
+    @ApiOperation("Gets halo log file content")
     public BaseResponse<String> getLogFiles(@RequestParam("lines") Long lines) {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getLogFiles(lines));
     }
 
     @GetMapping(value = "halo/logfile/download")
-    @ApiOperation("Download halo log file.")
+    @ApiOperation("Downloads halo log file")
     public void downloadLogFiles(@RequestParam("lines") Long lines, HttpServletResponse response) {
         adminService.downloadLogFiles(lines, response);
     }

@@ -36,26 +36,14 @@ public class AttachmentController {
         this.attachmentService = attachmentService;
     }
 
-    /**
-     * List of attachment.
-     *
-     * @param pageable pageable
-     * @return Page<AttachmentDTO>
-     */
     @GetMapping
     public Page<AttachmentDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
                                       AttachmentQuery attachmentQuery) {
         return attachmentService.pageDtosBy(pageable, attachmentQuery);
     }
 
-    /**
-     * Get attachment by id.
-     *
-     * @param id attachment id
-     * @return AttachmentDTO
-     */
     @GetMapping("{id:\\d+}")
-    @ApiOperation("Get attachment detail by id")
+    @ApiOperation("Gets attachment detail by id")
     public AttachmentDTO getBy(@PathVariable("id") Integer id) {
         Attachment attachment = attachmentService.getById(id);
         return attachmentService.convertToDto(attachment);
@@ -70,19 +58,14 @@ public class AttachmentController {
         return new AttachmentDTO().convertFrom(attachmentService.update(attachment));
     }
 
-    /**
-     * Delete attachment by id
-     *
-     * @param id id
-     */
     @DeleteMapping("{id:\\d+}")
-    @ApiOperation("Delete attachment permanently by id")
+    @ApiOperation("Deletes attachment permanently by id")
     public AttachmentDTO deletePermanently(@PathVariable("id") Integer id) {
         return attachmentService.convertToDto(attachmentService.removePermanently(id));
     }
 
     @DeleteMapping
-    @ApiOperation("Delete attachments permanently in batch by id array")
+    @ApiOperation("Deletes attachments permanently in batch by id array")
     public List<Attachment> deletePermanentlyInBatch(@RequestBody List<Integer> ids) {
         return attachmentService.removePermanently(ids);
     }

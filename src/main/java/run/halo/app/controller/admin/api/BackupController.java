@@ -43,19 +43,19 @@ public class BackupController {
     }
 
     @PostMapping("halo")
-    @ApiOperation("Backup halo")
+    @ApiOperation("Backups halo")
     public BackupDTO backupHalo() {
         return backupService.zipWorkDirectory();
     }
 
     @GetMapping("halo")
-    @ApiOperation("Get all backups")
+    @ApiOperation("Gets all backups")
     public List<BackupDTO> listBackups() {
         return backupService.listHaloBackups();
     }
 
     @GetMapping("halo/{fileName:.+}")
-    @ApiOperation("Download backup file")
+    @ApiOperation("Downloads backup file")
     public ResponseEntity<Resource> downloadBackup(@PathVariable("fileName") String fileName, HttpServletRequest request) {
         log.info("Try to download backup file: [{}]", fileName);
 
@@ -77,7 +77,7 @@ public class BackupController {
     }
 
     @DeleteMapping("halo")
-    @ApiOperation("Delete a backup")
+    @ApiOperation("Deletes a backup")
     public void deleteBackup(@RequestParam("filename") String filename) {
         backupService.deleteHaloBackup(filename);
     }

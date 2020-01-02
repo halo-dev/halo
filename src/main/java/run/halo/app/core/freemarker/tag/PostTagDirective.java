@@ -56,6 +56,10 @@ public class PostTagDirective implements TemplateDirectiveModel {
                 case "archiveMonth":
                     env.setVariable("archives", builder.build().wrap(postService.listMonthArchives()));
                     break;
+                case "archive":
+                    String type = params.get("type").toString();
+                    env.setVariable("archives", builder.build().wrap("year".equals(type) ? postService.listYearArchives() : postService.listMonthArchives()));
+                    break;
                 case "listByCategoryId":
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
                     env.setVariable("posts", builder.build().wrap(postCategoryService.listPostBy(categoryId, PostStatus.PUBLISHED)));

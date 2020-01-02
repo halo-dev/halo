@@ -35,24 +35,18 @@ public class MenuController {
 
     @GetMapping
     @ApiOperation("Lists all menus")
-    public List<MenuDTO> listAll(@SortDefault(sort = "priority", direction = DESC) Sort sort) {
-        return menuService.listDtos(sort);
+    public List<MenuDTO> listAll(@SortDefault(sort = "team", direction = DESC) Sort sort) {
+        return menuService.listDtos(sort.and(Sort.by(ASC, "priority")));
     }
 
     @GetMapping("tree_view")
-    @ApiOperation("List as category tree")
-    public List<MenuVO> listAsTree(@SortDefault(sort = "priority", direction = ASC) Sort sort) {
-        return menuService.listAsTree(sort);
+    @ApiOperation("Lists categories as tree")
+    public List<MenuVO> listAsTree(@SortDefault(sort = "team", direction = DESC) Sort sort) {
+        return menuService.listAsTree(sort.and(Sort.by(ASC, "priority")));
     }
 
-    /**
-     * Get menu by menuId.
-     *
-     * @param menuId menuId
-     * @return MenuDTO
-     */
     @GetMapping("{menuId:\\d+}")
-    @ApiOperation("Get menu detail by id")
+    @ApiOperation("Gets menu detail by id")
     public MenuDTO getBy(@PathVariable("menuId") Integer menuId) {
         return new MenuDTO().convertFrom(menuService.getById(menuId));
     }
@@ -91,7 +85,7 @@ public class MenuController {
     }
 
     @GetMapping("teams")
-    @ApiOperation(("List all menu teams"))
+    @ApiOperation(("Lists all menu teams"))
     public List<String> teams() {
         return menuService.listAllTeams();
     }
