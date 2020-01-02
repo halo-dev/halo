@@ -67,6 +67,7 @@
             v-model="resetParam.password"
             type="password"
             placeholder="新密码"
+            autocomplete="new-password"
           >
             <a-icon
               slot="prefix"
@@ -83,6 +84,7 @@
             v-model="resetParam.confirmPassword"
             type="password"
             placeholder="确认密码"
+            autocomplete="new-password"
           >
             <a-icon
               slot="prefix"
@@ -148,9 +150,15 @@ export default {
         })
         return
       }
-      adminApi.sendResetCode(this.resetParam).then(response => {
-        this.$message.info('邮件发送成功，五分钟内有效')
-      })
+      const hide = this.$message.loading('发送中...', 0)
+      adminApi
+        .sendResetCode(this.resetParam)
+        .then(response => {
+          this.$message.info('邮件发送成功，五分钟内有效')
+        })
+        .finally(() => {
+          hide()
+        })
     },
     handleResetPassword() {
       if (!this.resetParam.username) {
