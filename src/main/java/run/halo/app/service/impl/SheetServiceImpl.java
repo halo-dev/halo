@@ -33,6 +33,7 @@ import java.util.*;
  *
  * @author johnniang
  * @author ryanwang
+ * @author evanwang
  * @date 2019-04-24
  */
 @Slf4j
@@ -130,8 +131,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         Sheet sheet = sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
 
-        fireVisitEvent(sheet.getId());
-
         return sheet;
     }
 
@@ -143,8 +142,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Optional<Sheet> postOptional = sheetRepository.getByUrlAndStatus(url, status);
 
         Sheet sheet = postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
-
-        fireVisitEvent(sheet.getId());
 
         return sheet;
     }
@@ -261,7 +258,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         });
     }
 
-    private void fireVisitEvent(@NonNull Integer sheetId) {
+    @Override
+    public void publishVisitEvent(Integer sheetId) {
         eventPublisher.publishEvent(new SheetVisitEvent(this, sheetId));
     }
 
