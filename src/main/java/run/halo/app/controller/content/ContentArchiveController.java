@@ -35,6 +35,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  *
  * @author ryanwang
  * @author guqing
+ * @author evanwang
  * @date 2019-03-17
  */
 @Slf4j
@@ -135,7 +136,7 @@ public class ContentArchiveController {
             }
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         }
-
+        postService.publishVisitEvent(post.getId());
         postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
         postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
 
