@@ -1,16 +1,13 @@
 <template>
   <a-drawer
     title="评论列表"
-    :width="isMobile()?'100%':'460'"
+    :width="isMobile() ? '100%' : '460'"
     closable
     :visible="visible"
     destroyOnClose
     @close="onClose"
   >
-    <a-row
-      type="flex"
-      align="middle"
-    >
+    <a-row type="flex" align="middle">
       <a-col :span="24">
         <a-list itemLayout="horizontal">
           <a-list-item>
@@ -25,7 +22,7 @@
       </a-col>
       <a-divider />
       <a-col :span="24">
-        <a-empty v-if="comments.length==0" />
+        <a-empty v-if="comments.length == 0" />
         <TargetCommentTree
           v-else
           v-for="(comment, index) in comments"
@@ -48,27 +45,19 @@
     </div>
     <a-modal
       v-if="selectedComment"
-      :title="'回复给：'+selectedComment.author"
+      :title="'回复给：' + selectedComment.author"
       v-model="replyCommentVisible"
       @close="onReplyClose"
       destroyOnClose
     >
       <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleCreateClick"
-        >
+        <a-button key="submit" type="primary" @click="handleCreateClick">
           回复
         </a-button>
       </template>
       <a-form layout="vertical">
         <a-form-item>
-          <a-input
-            type="textarea"
-            :autosize="{ minRows: 8 }"
-            v-model="replyComment.content"
-          />
+          <a-input type="textarea" :autosize="{ minRows: 8 }" v-model="replyComment.content" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -129,7 +118,7 @@ export default {
     }
   },
   watch: {
-    visible: function(newValue, oldValue) {
+    visible(newValue, oldValue) {
       this.$log.debug('old value', oldValue)
       this.$log.debug('new value', newValue)
       if (newValue) {
@@ -157,6 +146,8 @@ export default {
       this.replyCommentVisible = true
       this.replyComment.parentId = comment.id
       this.replyComment.postId = this.id
+
+      console.log('comment reply', this.replyComment)
     },
     handleCreateClick() {
       if (!this.replyComment.content) {
@@ -166,6 +157,8 @@ export default {
         })
         return
       }
+      console.log('target:', this.target)
+      console.log('replyComment:', this.replyComment)
       commentApi.create(this.target, this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}
