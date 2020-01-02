@@ -52,8 +52,6 @@ public class ContentArchiveController {
 
     private final PostTagService postTagService;
 
-    private final PostCommentService postCommentService;
-
     private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
@@ -63,7 +61,6 @@ public class ContentArchiveController {
                                     PostCategoryService postCategoryService,
                                     PostMetaService postMetaService,
                                     PostTagService postTagService,
-                                    PostCommentService postCommentService,
                                     OptionService optionService,
                                     StringCacheStore cacheStore) {
         this.postService = postService;
@@ -71,7 +68,6 @@ public class ContentArchiveController {
         this.postCategoryService = postCategoryService;
         this.postMetaService = postMetaService;
         this.postTagService = postTagService;
-        this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
@@ -152,6 +148,8 @@ public class ContentArchiveController {
         model.addAttribute("categories", categories);
         model.addAttribute("tags", tags);
         model.addAttribute("metas", postMetaService.convertToMap(metas));
+
+        // TODO,Will be deprecated
         model.addAttribute("comments", Page.empty());
 
         if (themeService.templateExists(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {

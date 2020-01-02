@@ -17,7 +17,9 @@ import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.SheetDetailVO;
-import run.halo.app.service.*;
+import run.halo.app.service.PhotoService;
+import run.halo.app.service.SheetService;
+import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -36,25 +38,17 @@ public class ContentSheetController {
 
     private final ThemeService themeService;
 
-    private final SheetCommentService sheetCommentService;
-
     private final PhotoService photoService;
-
-    private final OptionService optionService;
 
     private final StringCacheStore cacheStore;
 
     public ContentSheetController(SheetService sheetService,
                                   ThemeService themeService,
-                                  SheetCommentService sheetCommentService,
                                   PhotoService photoService,
-                                  OptionService optionService,
                                   StringCacheStore cacheStore) {
         this.sheetService = sheetService;
         this.themeService = themeService;
-        this.sheetCommentService = sheetCommentService;
         this.photoService = photoService;
-        this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
 
@@ -132,6 +126,8 @@ public class ContentSheetController {
         model.addAttribute("sheet", sheetDetailVO);
         model.addAttribute("post", sheetDetailVO);
         model.addAttribute("is_sheet", true);
+
+        // TODO,Will be deprecated
         model.addAttribute("comments", Page.empty());
 
         if (themeService.templateExists(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
