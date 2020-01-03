@@ -28,7 +28,10 @@
         style="margin-right: 8px;"
         @click="()=>this.loadLogs()"
       >刷新</a-button>
-      <a-button type="dashed" @click="handleDownloadLogFile()">下载</a-button>
+      <a-button
+        type="dashed"
+        @click="handleDownloadLogFile()"
+      >下载</a-button>
     </a-form-item>
   </a-form>
 </template>
@@ -36,6 +39,7 @@
 import { codemirror } from 'vue-codemirror-lite'
 import 'codemirror/mode/shell/shell.js'
 import adminApi from '@/api/admin'
+import moment from 'moment'
 export default {
   name: 'RuntimeLogs',
   components: {
@@ -66,9 +70,27 @@ export default {
       })
     },
     handleDownloadLogFile() {
-      adminApi.downloadLogFiles(this.logLines).then(response => {
-        this.$message.success('下载成功！')
-      })
+      const hide = this.$message.loading('下载中...', 0)
+      adminApi
+        .getLogFiles(this.logLines)
+        .then(response => {
+          var blob = new Blob([response.data.data])
+          var downloadElement = document.createElement('a')
+          var href = window.URL.createObjectURL(blob)
+          downloadElement.href = href
+          downloadElement.download = 'halo-log-' + moment(new Date(), 'YYYY-MM-DD-HH-mm-ss') + '.log'
+          document.body.appendChild(downloadElement)
+          downloadElement.click()
+          document.body.removeChild(downloadElement)
+          window.URL.revokeObjectURL(href)
+          this.$message.success('下载成功！')
+        })
+        .catch(() => {
+          this.$message.error('下载失败！')
+        })
+        .finally(() => {
+          hide()
+        })
     },
     handleLinesChange(value) {
       this.logLines = value

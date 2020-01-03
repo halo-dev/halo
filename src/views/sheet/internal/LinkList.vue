@@ -22,13 +22,13 @@
               help="* 需要加上 http://"
             >
               <a-input v-model="link.url">
-                <a
+                <!-- <a
                   href="javascript:void(0);"
                   slot="addonAfter"
                   @click="handleParseUrl"
                 >
                   <a-icon type="sync" />
-                </a>
+                </a> -->
               </a-input>
             </a-form-item>
             <a-form-item label="Logo：">
