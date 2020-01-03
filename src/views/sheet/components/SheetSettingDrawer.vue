@@ -68,6 +68,23 @@
         <a-divider />
 
         <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">摘要</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item>
+                <a-input
+                  type="textarea"
+                  :autosize="{ minRows: 5 }"
+                  v-model="selectedSheet.summary"
+                  placeholder="不填写则会自动生成"
+                />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
           <h3 class="post-setting-drawer-title">缩略图</h3>
           <div class="post-setting-drawer-item">
             <div class="sheet-thumb">

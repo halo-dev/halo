@@ -437,6 +437,7 @@ const postColumns = [
   {
     title: '昵称',
     dataIndex: 'author',
+    width: '150px',
     scopedSlots: { customRender: 'author' }
   },
   {
@@ -474,6 +475,7 @@ const sheetColumns = [
   {
     title: '昵称',
     dataIndex: 'author',
+    width: '150px',
     scopedSlots: { customRender: 'author' }
   },
   {

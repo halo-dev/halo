@@ -7,13 +7,19 @@
     destroyOnClose
     @close="onClose"
   >
-    <a-row type="flex" align="middle">
+    <a-row
+      type="flex"
+      align="middle"
+    >
       <a-col :span="24">
         <a-list itemLayout="horizontal">
           <a-list-item>
             <a-list-item-meta>
               <template slot="description">
-                <p v-html="description" class="comment-drawer-content"></p>
+                <p
+                  v-html="description"
+                  class="comment-drawer-content"
+                ></p>
               </template>
               <h3 slot="title">{{ title }}</h3>
             </a-list-item-meta>
@@ -51,13 +57,21 @@
       destroyOnClose
     >
       <template slot="footer">
-        <a-button key="submit" type="primary" @click="handleCreateClick">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleCreateClick"
+        >
           回复
         </a-button>
       </template>
       <a-form layout="vertical">
         <a-form-item>
-          <a-input type="textarea" :autosize="{ minRows: 8 }" v-model="replyComment.content" />
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="replyComment.content"
+          />
         </a-form-item>
       </a-form>
     </a-modal>
