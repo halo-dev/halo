@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
-import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
-import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_QUERY_NAME;
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_QUERY_NAME;
 
 /**
  * Api authentication Filter
@@ -98,6 +98,6 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
     @Override
     protected String getTokenFromRequest(@NonNull HttpServletRequest request) {
-        return getTokenFromRequest(request, ADMIN_TOKEN_QUERY_NAME, ADMIN_TOKEN_HEADER_NAME);
+        return getTokenFromRequest(request, API_ACCESS_KEY_QUERY_NAME, API_ACCESS_KEY_HEADER_NAME);
     }
 }
