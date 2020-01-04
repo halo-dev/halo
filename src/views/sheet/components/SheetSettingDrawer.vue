@@ -93,6 +93,16 @@
                 :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
                 @click="()=>this.thumbDrawerVisible = true"
               >
+
+              <a-form layout="vertial">
+                <a-form-item>
+                  <a-input
+                    v-model="selectedSheet.thumbnail"
+                    placeholder="点击缩略图选择图片，或者输入外部链接"
+                  ></a-input>
+                </a-form-item>
+              </a-form>
+
               <a-button
                 class="sheet-thumb-remove"
                 type="dashed"

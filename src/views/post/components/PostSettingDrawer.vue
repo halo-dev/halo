@@ -175,7 +175,10 @@
 
               <a-form layout="vertial">
                 <a-form-item>
-                  <a-input v-model="selectedPost.thumbnail" placeholder="点击缩略图选择图片链接，或者输入外部链接"></a-input>
+                  <a-input
+                    v-model="selectedPost.thumbnail"
+                    placeholder="点击缩略图选择图片，或者输入外部链接"
+                  ></a-input>
                 </a-form-item>
               </a-form>
 
