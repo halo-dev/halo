@@ -65,7 +65,7 @@ public class JournalCommentController {
     public Page<BaseCommentVO> listCommentTree(@PathVariable("journalId") Integer journalId,
                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return journalCommentService.pageVosAllBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{journalId:\\d+}/list_view")
