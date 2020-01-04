@@ -1,7 +1,7 @@
 <template>
   <a-card
     :loading="loading"
-    :body-style="{ padding: '18px 24px 18px' }"
+    :body-style="{ padding: '24px' }"
     :bordered="false"
   >
     <div class="analysis-card-container">

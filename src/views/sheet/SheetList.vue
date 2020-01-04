@@ -6,7 +6,7 @@
           <a-tabs type="card">
             <a-tab-pane key="internal">
               <span slot="tab">
-                <a-icon type="pushpin" />内置页面
+                <a-icon type="paper-clip" />内置页面
               </span>
 
               <!-- Mobile -->
