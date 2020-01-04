@@ -19,7 +19,7 @@
             :ishljs="true"
             :autofocus="false"
             @imgAdd="handleAttachmentUpload"
-            @save="handleSaveDraft"
+            @save="handleSaveDraft(true)"
           />
         </div>
       </a-col>
@@ -44,7 +44,7 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="danger"
-        @click="handleSaveDraft"
+        @click="handleSaveDraft(false)"
         :disabled="saving"
       >保存草稿</a-button>
       <a-button
@@ -175,7 +175,8 @@ export default {
     ...mapGetters(['options'])
   },
   methods: {
-    handleSaveDraft() {
+    handleSaveDraft(draftOnly = false) {
+      this.$log.debug('Draft only: ' + draftOnly)
       this.postToStage.status = 'DRAFT'
       if (!this.postToStage.title) {
         this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
@@ -183,11 +184,18 @@ export default {
       this.saving = true
       if (this.postToStage.id) {
         // Update the post
-        postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
-          this.$log.debug('Updated post', response.data.data)
-          this.$message.success('保存草稿成功！')
-          this.saving = false
-        })
+        if (draftOnly) {
+          postApi.updateDraft(this.postToStage.id, this.postToStage.originalContent).then(response => {
+            this.$message.success('保存草稿成功！')
+            this.saving = false
+          })
+        } else {
+          postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
+            this.$log.debug('Updated post', response.data.data)
+            this.$message.success('保存草稿成功！')
+            this.saving = false
+          })
+        }
       } else {
         // Create the post
         postApi.create(this.postToStage, false).then(response => {

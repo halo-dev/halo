@@ -51,6 +51,16 @@ postApi.update = (postId, postToUpdate, autoSave) => {
   })
 }
 
+postApi.updateDraft = (postId, content) => {
+  return service({
+    url: `${baseUrl}/${postId}/status/draft/content`,
+    method: 'put',
+    data: {
+      content: content
+    }
+  })
+}
+
 postApi.updateStatus = (postId, status) => {
   return service({
     url: `${baseUrl}/${postId}/status/${status}`,
