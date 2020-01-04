@@ -1,4 +1,4 @@
-package run.halo.app.event.comment;
+package run.halo.app.listener.comment;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import run.halo.app.event.comment.CommentNewEvent;
+import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.properties.CommentProperties;

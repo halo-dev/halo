@@ -1,9 +1,10 @@
-package run.halo.app.event.theme;
+package run.halo.app.listener.theme;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.event.options.OptionUpdatedEvent;
+import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.service.ThemeService;
 
 /**

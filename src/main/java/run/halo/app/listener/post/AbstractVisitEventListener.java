@@ -1,8 +1,9 @@
-package run.halo.app.event.post;
+package run.halo.app.listener.post;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
+import run.halo.app.event.post.AbstractVisitEvent;
 import run.halo.app.service.base.BasePostService;
 
 import java.util.Map;
