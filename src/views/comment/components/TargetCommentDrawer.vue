@@ -49,11 +49,43 @@
         @change="handlePaginationChange"
       ></a-pagination>
     </div>
+    <a-divider class="divider-transparent" />
+    <div class="bottom-control">
+      <a-button
+        type="primary"
+        @click="handleComment"
+      >评论</a-button>
+    </div>
     <a-modal
       v-if="selectedComment"
       :title="'回复给：' + selectedComment.author"
       v-model="replyCommentVisible"
       @close="onReplyClose"
+      destroyOnClose
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleCreateClick"
+        >
+          回复
+        </a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item>
+          <a-input
+            type="textarea"
+            :autosize="{ minRows: 8 }"
+            v-model="replyComment.content"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-modal
+      title="评论"
+      v-model="commentVisible"
+      @close="onCommentClose"
       destroyOnClose
     >
       <template slot="footer">
@@ -91,6 +123,7 @@ export default {
       selectedComment: {},
       replyComment: {},
       replyCommentVisible: false,
+      commentVisible: false,
       pagination: {
         page: 1,
         size: 10,
@@ -160,8 +193,10 @@ export default {
       this.replyCommentVisible = true
       this.replyComment.parentId = comment.id
       this.replyComment.postId = this.id
-
-      console.log('comment reply', this.replyComment)
+    },
+    handleComment() {
+      this.replyComment.postId = this.id
+      this.commentVisible = true
     },
     handleCreateClick() {
       if (!this.replyComment.content) {
@@ -171,13 +206,12 @@ export default {
         })
         return
       }
-      console.log('target:', this.target)
-      console.log('replyComment:', this.replyComment)
       commentApi.create(this.target, this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}
         this.selectedComment = {}
         this.replyCommentVisible = false
+        this.commentVisible = false
         this.loadComments()
       })
     },
@@ -197,6 +231,10 @@ export default {
       this.replyComment = {}
       this.selectedComment = {}
       this.replyCommentVisible = false
+    },
+    onCommentClose() {
+      this.replyComment = {}
+      this.commentVisible = false
     },
     onClose() {
       this.comments = []
