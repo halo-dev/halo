@@ -18,10 +18,6 @@ public enum CommentViolationTypeEnum {
      * 频繁
      */
     FREQUENTLY(1),
-    /**
-     * 封禁
-     */
-    BAN(2)
     ;
 
     private int type;
