@@ -7,7 +7,9 @@ import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
 import run.halo.app.repository.base.BaseCommentRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,4 +47,15 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
     @NonNull
     @Override
     List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Collection<Long> commentIds);
+
+    /**
+     * 根据时间范围和IP地址统计评论次数
+     *
+     * @param ipAddress IP地址
+     * @param startTime 起始时间
+     * @param endTime   结束时间
+     * @return 评论次数
+     */
+    @Query("SELECT COUNT(id) FROM PostComment WHERE ipAddress=?1 AND updateTime BETWEEN ?2 AND ?3 AND status <> 2")
+    int countByIpAndTime(String ipAddress, Date startTime, Date endTime);
 }

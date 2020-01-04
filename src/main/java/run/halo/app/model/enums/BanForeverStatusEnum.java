@@ -1,0 +1,22 @@
+package run.halo.app.model.enums;
+
+import lombok.Getter;
+
+/**
+ * 封禁状态
+ * @author Lei XinXin
+ * @date 2020/1/5
+ */
+@Getter
+public enum BanForeverStatusEnum {
+    /**
+     * 封禁状态
+     */
+    NORMAL(0),
+    BAN_FOREVER(1),;
+
+    private int status;
+    BanForeverStatusEnum(int status) {
+        this.status = status;
+    }
+}
