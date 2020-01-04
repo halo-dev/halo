@@ -36,6 +36,8 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private String originalContent;
 
+    private String summary;
+
     @Size(max = 255, message = "页面缩略图链接的字符长度不能超过 {max}")
     private String thumbnail;
 

@@ -109,11 +109,4 @@ public interface AdminService {
      * @return logs content.
      */
     String getLogFiles(@NonNull Long lines);
-
-    /**
-     * Download halo log file.
-     *
-     * @param lines lines.
-     */
-    void downloadLogFiles(@NonNull Long lines, @NonNull HttpServletResponse response);
 }

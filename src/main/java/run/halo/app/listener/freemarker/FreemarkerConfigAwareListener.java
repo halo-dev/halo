@@ -1,4 +1,4 @@
-package run.halo.app.event.freemarker;
+package run.halo.app.listener.freemarker;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;

@@ -121,10 +121,4 @@ public class AdminController {
     public BaseResponse<String> getLogFiles(@RequestParam("lines") Long lines) {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getLogFiles(lines));
     }
-
-    @GetMapping(value = "halo/logfile/download")
-    @ApiOperation("Downloads halo log file")
-    public void downloadLogFiles(@RequestParam("lines") Long lines, HttpServletResponse response) {
-        adminService.downloadLogFiles(lines, response);
-    }
 }

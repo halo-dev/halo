@@ -524,29 +524,4 @@ public class AdminServiceImpl implements AdminService {
         }
         return result.toString();
     }
-
-    @Override
-    public void downloadLogFiles(Long lines, HttpServletResponse response) {
-        Assert.notNull(lines, "Lines must not be null");
-        Assert.notNull(response, "HttpServletResponse must not be null");
-
-        String logFiles = getLogFiles(lines);
-        String fileName = "halo-log-" +
-                DateUtil.format(DateUtil.date(), "yyyy-MM-dd-HH-mm-ss") +
-                ".log";
-        response.setContentType("application/force-download");
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-        ServletOutputStream outputStream;
-        BufferedOutputStream bufferedOutputStream;
-        try {
-            outputStream = response.getOutputStream();
-            bufferedOutputStream = new BufferedOutputStream(outputStream);
-            bufferedOutputStream.write(logFiles.getBytes(StandardCharsets.UTF_8));
-            bufferedOutputStream.flush();
-            bufferedOutputStream.close();
-            outputStream.close();
-        } catch (IOException e) {
-            throw new ServiceException("日志下载失败", e);
-        }
-    }
 }
