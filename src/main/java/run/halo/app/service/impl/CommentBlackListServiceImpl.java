@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.CommentBlackList;
-import run.halo.app.model.enums.BanForeverStatusEnum;
 import run.halo.app.model.enums.CommentViolationTypeEnum;
 import run.halo.app.repository.CommentBlackListRepository;
 import run.halo.app.repository.PostCommentRepository;

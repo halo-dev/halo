@@ -8,15 +8,14 @@ import lombok.Getter;
  * @date 2020/1/5
  */
 @Getter
-public enum BanForeverStatusEnum {
+public enum BanStatusEnum {
     /**
      * 封禁状态
      */
-    NORMAL(0),
-    BAN_FOREVER(1),;
+    NORMAL(0),;
 
     private int status;
-    BanForeverStatusEnum(int status) {
+    BanStatusEnum(int status) {
         this.status = status;
     }
 }
