@@ -7,7 +7,6 @@
     >
       <a-col
         :span="24"
-        class="search-box"
         style="padding-bottom: 12px;"
       >
         <a-card
@@ -22,7 +21,10 @@
                   :sm="24"
                 >
                   <a-form-item label="关键词">
-                    <a-input v-model="queryParam.keyword" />
+                    <a-input
+                      v-model="queryParam.keyword"
+                      @keyup.enter="handleQuery()"
+                    />
                   </a-form-item>
                 </a-col>
                 <a-col
@@ -32,13 +34,15 @@
                   <a-form-item label="存储位置">
                     <a-select
                       v-model="queryParam.attachmentType"
-                      @change="handleQuery"
+                      @change="handleQuery()"
                     >
                       <a-select-option
-                        v-for="item in Object.keys(attachmentType)"
+                        v-for="item in types"
                         :key="item"
                         :value="item"
-                      >{{ attachmentType[item].text }}</a-select-option>
+                      >{{
+                        attachmentType[item].text
+                      }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -49,13 +53,15 @@
                   <a-form-item label="文件类型">
                     <a-select
                       v-model="queryParam.mediaType"
-                      @change="handleQuery"
+                      @change="handleQuery()"
                     >
                       <a-select-option
-                        v-for="(item,index) in mediaTypes"
+                        v-for="(item, index) in mediaTypes"
                         :key="index"
                         :value="item"
-                      >{{ item }}</a-select-option>
+                      >{{
+                        item
+                      }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -66,23 +72,48 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
-                      @click="handleQuery"
+                      @click="handleQuery()"
                     >查询</a-button>
                     <a-button
                       style="margin-left: 8px;"
-                      @click="handleResetParam"
+                      @click="handleResetParam()"
                     >重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
-          <div class="table-operator" style="margin-bottom: 0;">
+          <div
+            class="table-operator"
+            style="margin-bottom: 0;"
+          >
             <a-button
               type="primary"
-              icon="plus"
-              @click="()=>this.uploadVisible = true"
+              icon="cloud-upload"
+              @click="() => (uploadVisible = true)"
             >上传</a-button>
+            <a-button
+              icon="select"
+              v-show="!supportMultipleSelection"
+              @click="handleMultipleSelection"
+            >
+              批量操作
+            </a-button>
+            <a-button
+              type="danger"
+              icon="delete"
+              v-show="supportMultipleSelection"
+              @click="handleDeleteAttachmentInBatch"
+            >
+              删除
+            </a-button>
+            <a-button
+              icon="close"
+              v-show="supportMultipleSelection"
+              @click="handleCancelMultipleSelection"
+            >
+              取消
+            </a-button>
           </div>
         </a-card>
       </a-col>
@@ -107,15 +138,23 @@
                 <img
                   :src="item.thumbPath"
                   v-show="handleJudgeMediaType(item)"
-                >
+                  loading="lazy"
+                />
               </div>
               <a-card-meta style="padding: 0.8rem;">
                 <ellipsis
-                  :length="isMobile()?12:16"
+                  :length="isMobile() ? 12 : 16"
                   tooltip
                   slot="description"
                 >{{ item.name }}</ellipsis>
               </a-card-meta>
+              <a-checkbox
+                class="select-attachment-checkbox"
+                :style="getCheckStatus(item.id) ? selectedAttachmentStyle : ''"
+                :checked="getCheckStatus(item.id)"
+                @click="handleAttachmentSelectionChanged($event, item)"
+                v-show="supportMultipleSelection"
+              ></a-checkbox>
             </a-card>
           </a-list-item>
         </a-list>
@@ -124,9 +163,10 @@
     <div class="page-wrapper">
       <a-pagination
         class="pagination"
+        :current="pagination.page"
         :total="pagination.total"
         :defaultPageSize="pagination.size"
-        :pageSizeOptions="['18', '36', '54','72','90','108']"
+        :pageSizeOptions="['18', '36', '54', '72', '90', '108']"
         showSizeChanger
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
@@ -149,7 +189,7 @@
       v-if="selectAttachment"
       :attachment="selectAttachment"
       :addToPhoto="true"
-      @delete="()=>this.loadAttachments()"
+      @delete="() => this.loadAttachments()"
     />
   </page-view>
 </template>
@@ -159,6 +199,7 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { PageView } from '@/layouts'
 import AttachmentDetailDrawer from './components/AttachmentDetailDrawer'
 import attachmentApi from '@/api/attachment'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -171,9 +212,13 @@ export default {
       attachmentType: attachmentApi.type,
       listLoading: true,
       uploadVisible: false,
+      supportMultipleSelection: false,
+      selectedAttachmentCheckbox: {},
+      batchSelectedAttachments: [],
       selectAttachment: {},
       attachments: [],
       mediaTypes: [],
+      types: [],
       editable: false,
       pagination: {
         page: 1,
@@ -198,11 +243,17 @@ export default {
         attachment.typeProperty = this.attachmentType[attachment.type]
         return attachment
       })
+    },
+    selectedAttachmentStyle() {
+      return {
+        border: `2px solid ${this.color()}`
+      }
     }
   },
   created() {
     this.loadAttachments()
     this.loadMediaTypes()
+    this.loadTypes()
   },
   destroyed: function() {
     if (this.drawerVisible) {
@@ -216,6 +267,7 @@ export default {
     next()
   },
   methods: {
+    ...mapGetters(['color']),
     loadAttachments() {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -232,9 +284,18 @@ export default {
         this.mediaTypes = response.data.data
       })
     },
+    loadTypes() {
+      attachmentApi.getTypes().then(response => {
+        this.types = response.data.data
+      })
+    },
     handleShowDetailDrawer(attachment) {
       this.selectAttachment = attachment
-      this.drawerVisible = true
+      if (this.supportMultipleSelection) {
+        this.drawerVisible = false
+      } else {
+        this.drawerVisible = true
+      }
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
@@ -246,18 +307,18 @@ export default {
       this.queryParam.keyword = null
       this.queryParam.mediaType = null
       this.queryParam.attachmentType = null
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
       this.loadMediaTypes()
+      this.loadTypes()
     },
     handleQuery() {
-      this.queryParam.page = 0
-      this.pagination.page = 1
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
       this.loadMediaTypes()
+      this.loadTypes()
     },
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType
@@ -275,6 +336,56 @@ export default {
       }
       // 没有获取到文件返回false
       return false
+    },
+    getCheckStatus(key) {
+      return this.selectedAttachmentCheckbox[key] || false
+    },
+    handleMultipleSelection() {
+      this.supportMultipleSelection = true
+      // 不允许附件详情抽屉显示
+      this.drawerVisible = false
+      this.attachments.forEach(item => {
+        this.$set(this.selectedAttachmentCheckbox, item.id, false)
+      })
+    },
+    handleCancelMultipleSelection() {
+      this.supportMultipleSelection = false
+      this.drawerVisible = false
+      this.batchSelectedAttachments = []
+      for (var key in this.selectedCheckbox) {
+        this.$set(this.selectedAttachmentCheckbox, key, false)
+      }
+    },
+    handleAttachmentSelectionChanged(e, item) {
+      var isChecked = e.target.checked || false
+      if (isChecked) {
+        this.$set(this.selectedAttachmentCheckbox, item.id, true)
+        this.batchSelectedAttachments.push(item.id)
+      } else {
+        this.$set(this.selectedAttachmentCheckbox, item.id, false)
+        // 从选中id集合中删除id
+        var index = this.batchSelectedAttachments.indexOf(item.id)
+        this.batchSelectedAttachments.splice(index, 1)
+      }
+    },
+    handleDeleteAttachmentInBatch() {
+      var that = this
+      if (this.batchSelectedAttachments.length <= 0) {
+        this.$message.success('你还未选择任何附件，请至少选择一个！')
+        return
+      }
+      this.$confirm({
+        title: '确定要批量删除选中的附件吗?',
+        content: '一旦删除不可恢复，请谨慎操作',
+        onOk() {
+          attachmentApi.deleteInBatch(that.batchSelectedAttachments).then(res => {
+            that.handleCancelMultipleSelection()
+            that.loadAttachments()
+            that.$message.success('删除成功')
+          })
+        },
+        onCancel() {}
+      })
     }
   }
 }

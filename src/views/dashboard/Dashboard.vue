@@ -12,7 +12,7 @@
         <analysis-card
           :loading="countsLoading"
           title="文章"
-          :number="countsData.postCount"
+          :number="statisticsData.postCount"
         >
           <router-link
             :to="{ name:'PostList' }"
@@ -33,7 +33,7 @@
         <analysis-card
           :loading="countsLoading"
           title="评论"
-          :number="countsData.commentCount"
+          :number="statisticsData.commentCount"
         >
           <router-link
             :to="{ name:'Comments' }"
@@ -51,27 +51,20 @@
         :xs="12"
         :style="{ marginBottom: '12px' }"
       >
-        <!-- <analysis-card :loading="countsLoading" title="总访问" :number="countsData.visitCount">
-          <a-tooltip slot="action">
-        <template slot="title">文章总访问共 {{ countsData.visitCount }} 次</template>-->
         <analysis-card
           :loading="countsLoading"
           title="总访问"
-          :number="countsData.visitCount"
+          :number="statisticsData.visitCount"
         >
           <a-tooltip slot="action">
             <template slot="title">
               文章总访问共
               <countTo
                 :startVal="0"
-                :endVal="countsData.visitCount"
+                :endVal="statisticsData.visitCount"
                 :duration="3000"
               ></countTo>次
             </template>
-            <!-- <countTo :startVal="0" :endVal="countsData.visitCount" :duration="3000"></countTo> -->
-            <!-- <template>
-              <countTo :startVal="0" :endVal="countsData.visitCount" :duration="3000"></countTo>
-            </template>-->
             <a href="javascript:void(0);">
               <a-icon type="info-circle-o" />
             </a>
@@ -89,10 +82,10 @@
         <analysis-card
           :loading="countsLoading"
           title="建立天数"
-          :number="countsData.establishDays"
+          :number="statisticsData.establishDays"
         >
           <a-tooltip slot="action">
-            <template slot="title">博客建立于 {{ countsData.birthday | moment }}</template>
+            <template slot="title">博客建立于 {{ statisticsData.birthday | moment }}</template>
             <a href="javascript:void(0);">
               <a-icon type="info-circle-o" />
             </a>
@@ -129,15 +122,9 @@
                   >
                     <a-list-item-meta>
                       <a
-                        v-if="item.status=='PUBLISHED'"
+                        v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
                         slot="title"
                         :href="options.blog_url+'/archives/'+item.url"
-                        target="_blank"
-                      >{{ item.title }}</a>
-                      <a
-                        v-else-if="item.status == 'INTIMATE'"
-                        slot="title"
-                        :href="options.blog_url+'/archives/'+item.url+'/password'"
                         target="_blank"
                       >{{ item.title }}</a>
                       <a
@@ -216,30 +203,15 @@
               <a-input
                 type="textarea"
                 :autosize="{ minRows: 8 }"
-                v-model="journal.content"
+                v-model="journal.sourceContent"
                 placeholder="写点什么吧..."
               />
             </a-form-item>
-
-            <!-- 日志图片上传 -->
-            <!-- <a-form-item v-show="showMoreOptions">
-              <UploadPhoto
-                @success="handlerPhotoUploadSuccess"
-                :photoList="photoList"
-              ></UploadPhoto>
-            </a-form-item> -->
-
             <a-form-item>
               <a-button
                 type="primary"
                 @click="handleCreateJournalClick"
               >保存</a-button>
-              <!-- <a
-                href="javascript:;"
-                class="more-options-btn"
-                type="default"
-                @click="handleUploadPhotoWallClick"
-              >更多选项<a-icon type="down" /></a> -->
             </a-form-item>
           </a-form>
         </a-card>
@@ -295,16 +267,16 @@
       destroyOnClose
       @close="()=>this.logDrawerVisible = false"
     >
-      <a-skeleton
-        active
-        :loading="logsLoading"
-        :paragraph="{rows: 18}"
+      <a-row
+        type="flex"
+        align="middle"
       >
-        <a-row
-          type="flex"
-          align="middle"
-        >
-          <a-col :span="24">
+        <a-col :span="24">
+          <a-skeleton
+            active
+            :loading="logsLoading"
+            :paragraph="{rows: 18}"
+          >
             <a-list :dataSource="formattedLogsDatas">
               <a-list-item
                 slot="renderItem"
@@ -316,22 +288,23 @@
                 </a-list-item-meta>
                 <div>{{ item.content }}</div>
               </a-list-item>
-
-              <div class="page-wrapper">
-                <a-pagination
-                  class="pagination"
-                  :total="logPagination.total"
-                  :defaultPageSize="logPagination.size"
-                  :pageSizeOptions="['50', '100','150','200']"
-                  showSizeChanger
-                  @showSizeChange="onPaginationChange"
-                  @change="onPaginationChange"
-                />
-              </div>
             </a-list>
-          </a-col>
-        </a-row>
-      </a-skeleton>
+          </a-skeleton>
+
+          <div class="page-wrapper">
+            <a-pagination
+              class="pagination"
+              :current="logPagination.page"
+              :total="logPagination.total"
+              :defaultPageSize="logPagination.size"
+              :pageSizeOptions="['50', '100','150','200']"
+              showSizeChanger
+              @showSizeChange="handlePaginationChange"
+              @change="handlePaginationChange"
+            />
+          </div>
+        </a-col>
+      </a-row>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-popconfirm
@@ -354,11 +327,10 @@ import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import RecentCommentTab from './components/RecentCommentTab'
 import countTo from 'vue-count-to'
-import UploadPhoto from '../../components/Upload/UploadPhoto.vue'
 
 import postApi from '@/api/post'
 import logApi from '@/api/log'
-import adminApi from '@/api/admin'
+import statisticsApi from '@/api/statistics'
 import journalApi from '@/api/journal'
 export default {
   name: 'Dashboard',
@@ -367,13 +339,10 @@ export default {
     PageView,
     AnalysisCard,
     RecentCommentTab,
-    countTo,
-    UploadPhoto
+    countTo
   },
   data() {
     return {
-      photoList: [],
-      // showMoreOptions: false,
       startVal: 0,
       logType: logApi.logType,
       activityLoading: true,
@@ -384,15 +353,19 @@ export default {
       logDrawerVisible: false,
       postData: [],
       logData: [],
-      countsData: {},
+      statisticsData: {},
       journal: {
         content: '',
         photos: []
       },
-      journalPhotos: [], // 日志图片集合最多九张
       logs: [],
       logPagination: {
         page: 1,
+        size: 50,
+        sort: null
+      },
+      logQueryParam: {
+        page: 0,
         size: 50,
         sort: null
       },
@@ -400,7 +373,7 @@ export default {
     }
   },
   created() {
-    this.getCounts()
+    this.getStatistics()
     this.listLatestPosts()
     this.listLatestLogs()
   },
@@ -434,7 +407,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.interval = setInterval(() => {
-        vm.getCounts()
+        vm.getStatistics()
       }, 5000)
     })
   },
@@ -450,18 +423,6 @@ export default {
     next()
   },
   methods: {
-    // handlerPhotoUploadSuccess(response, file) {
-    //   var callData = response.data.data
-    //   var photo = {
-    //     name: callData.name,
-    //     url: callData.path,
-    //     thumbnail: callData.thumbPath,
-    //     suffix: callData.suffix,
-    //     width: callData.width,
-    //     height: callData.height
-    //   }
-    //   this.journalPhotos.push(photo)
-    // },
     listLatestPosts() {
       postApi.listLatest(5).then(response => {
         this.postData = response.data.data
@@ -475,9 +436,9 @@ export default {
         this.writeLoading = false
       })
     },
-    getCounts() {
-      adminApi.counts().then(response => {
-        this.countsData = response.data.data
+    getStatistics() {
+      statisticsApi.statistics().then(response => {
+        this.statisticsData = response.data.data
         this.countsLoading = false
       })
     },
@@ -485,9 +446,7 @@ export default {
       this.$router.push({ name: 'PostEdit', query: { postId: post.id } })
     },
     handleCreateJournalClick() {
-      // 给属性填充数据
-      // this.journal.photos = this.journalPhotos
-      if (!this.journal.content) {
+      if (!this.journal.sourceContent) {
         this.$notification['error']({
           message: '提示',
           description: '内容不能为空！'
@@ -497,14 +456,8 @@ export default {
       journalApi.create(this.journal).then(response => {
         this.$message.success('发表成功！')
         this.journal = {}
-        // this.photoList = []
-        // this.showMoreOptions = false
       })
     },
-    // handleUploadPhotoWallClick() {
-    //   // 是否显示上传照片墙组件
-    //   this.showMoreOptions = !this.showMoreOptions
-    // },
     handleShowLogDrawer() {
       this.logDrawerVisible = true
       this.loadLogs()
@@ -514,8 +467,10 @@ export default {
       setTimeout(() => {
         this.logsLoading = false
       }, 500)
-      this.logPagination.page = this.logPagination.page - 1
-      logApi.pageBy(this.logPagination).then(response => {
+      this.logQueryParam.page = this.logPagination.page - 1
+      this.logQueryParam.size = this.logPagination.size
+      this.logQueryParam.sort = this.logPagination.sort
+      logApi.pageBy(this.logQueryParam).then(response => {
         this.logs = response.data.data.content
         this.logPagination.total = response.data.data.total
       })
@@ -532,7 +487,7 @@ export default {
         window.open(response.data, '_blank')
       })
     },
-    onPaginationChange(page, pageSize) {
+    handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.logPagination.page = page
       this.logPagination.size = pageSize
@@ -541,13 +496,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-/* .more-options-btn {
-  margin-left: 15px;
-  text-decoration: none;
-}
-a {
-  text-decoration: none;
-} */
-</style>

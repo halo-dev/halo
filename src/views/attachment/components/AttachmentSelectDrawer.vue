@@ -14,6 +14,8 @@
       >
         <a-input-search
           placeholder="搜索附件"
+          v-model="queryParam.keyword"
+          @search="handleQuery()"
           enterButton
         />
       </a-row>
@@ -28,7 +30,7 @@
           :paragraph="{ rows: 18 }"
         >
           <a-col :span="24">
-            <a-empty v-if="attachments.length==0"/>
+            <a-empty v-if="attachments.length==0" />
             <div
               v-else
               class="attach-item"
@@ -40,6 +42,7 @@
               <img
                 :src="item.thumbPath"
                 v-show="handleJudgeMediaType(item)"
+                loading="lazy"
               >
             </div>
           </a-col>
@@ -48,8 +51,9 @@
       <a-divider />
       <div class="page-wrapper">
         <a-pagination
-          :defaultPageSize="pagination.size"
+          :current="pagination.page"
           :total="pagination.total"
+          :defaultPageSize="pagination.size"
           @change="handlePaginationChange"
         ></a-pagination>
       </div>
@@ -125,18 +129,21 @@ export default {
         size: 12,
         sort: ''
       },
+      queryParam: {
+        page: 0,
+        size: 12,
+        sort: null,
+        keyword: null
+      },
       attachments: [],
       uploadHandler: attachmentApi.upload
     }
-  },
-  created() {
-    this.loadSkeleton()
-    this.loadAttachments()
   },
   watch: {
     visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
+        this.loadAttachments()
       }
     }
   },
@@ -151,12 +158,16 @@ export default {
       this.uploadVisible = true
     },
     loadAttachments() {
-      const pagination = Object.assign({}, this.pagination)
-      pagination.page--
-      attachmentApi.query(pagination).then(response => {
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
+      this.queryParam.sort = this.pagination.sort
+      attachmentApi.query(this.queryParam).then(response => {
         this.attachments = response.data.data.content
         this.pagination.total = response.data.data.total
       })
+    },
+    handleQuery() {
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleSelectAttachment(item) {
       this.$emit('listenToSelect', item)
@@ -169,14 +180,10 @@ export default {
       this.pagination.size = pageSize
       this.loadAttachments()
     },
-    handleAttachmentUploadSuccess() {
-      this.$message.success('上传成功！')
-      this.loadAttachments()
-    },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
       this.loadSkeleton()
-      this.loadAttachments()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType

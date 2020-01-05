@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row :gutter="12">
       <a-col
         :xl="10"
@@ -49,7 +49,11 @@
               label="分组："
               :style="{ display: fieldExpand ? 'block' : 'none' }"
             >
-              <a-input v-model="menuToCreate.team" />
+              <a-auto-complete
+                :dataSource="teams"
+                v-model="menuToCreate.team"
+                allowClear
+              />
             </a-form-item>
             <a-form-item
               label="打开方式："
@@ -243,7 +247,8 @@ export default {
       menuToCreate: {
         target: '_self'
       },
-      fieldExpand: false
+      fieldExpand: false,
+      teams: []
     }
   },
   computed: {
@@ -256,6 +261,7 @@ export default {
   },
   created() {
     this.loadMenus()
+    this.loadTeams()
   },
   methods: {
     loadMenus() {
@@ -263,6 +269,11 @@ export default {
       menuApi.listTree().then(response => {
         this.menus = response.data.data
         this.loading = false
+      })
+    },
+    loadTeams() {
+      menuApi.listTeams().then(response => {
+        this.teams = response.data.data
       })
     },
     handleSaveClick() {
@@ -280,18 +291,35 @@ export default {
       menuApi.delete(id).then(response => {
         this.$message.success('删除成功！')
         this.loadMenus()
+        this.loadTeams()
       })
     },
     createOrUpdateMenu() {
+      if (!this.menuToCreate.name) {
+        this.$notification['error']({
+          message: '提示',
+          description: '菜单名称不能为空！'
+        })
+        return
+      }
+      if (!this.menuToCreate.url) {
+        this.$notification['error']({
+          message: '提示',
+          description: '菜单地址不能为空！'
+        })
+        return
+      }
       if (this.menuToCreate.id) {
         menuApi.update(this.menuToCreate.id, this.menuToCreate).then(response => {
           this.$message.success('更新成功！')
           this.loadMenus()
+          this.loadTeams()
         })
       } else {
         menuApi.create(this.menuToCreate).then(response => {
           this.$message.success('保存成功！')
           this.loadMenus()
+          this.loadTeams()
         })
       }
       this.handleAddMenu()

@@ -67,6 +67,7 @@
             v-model="resetParam.password"
             type="password"
             placeholder="新密码"
+            autocomplete="new-password"
           >
             <a-icon
               slot="prefix"
@@ -83,6 +84,7 @@
             v-model="resetParam.confirmPassword"
             type="password"
             placeholder="确认密码"
+            autocomplete="new-password"
           >
             <a-icon
               slot="prefix"
@@ -148,9 +150,15 @@ export default {
         })
         return
       }
-      adminApi.sendResetCode(this.resetParam).then(response => {
-        this.$message.info('邮件发送成功，五分钟内有效')
-      })
+      const hide = this.$message.loading('发送中...', 0)
+      adminApi
+        .sendResetCode(this.resetParam)
+        .then(response => {
+          this.$message.info('邮件发送成功，五分钟内有效')
+        })
+        .finally(() => {
+          hide()
+        })
     },
     handleResetPassword() {
       if (!this.resetParam.username) {
@@ -203,46 +211,3 @@ export default {
   }
 }
 </script>
-<style lang="less">
-body {
-  height: 100%;
-  background-color: #f5f5f5;
-}
-
-.container-wrapper {
-  background: #ffffff;
-  position: absolute;
-  border-radius: 5px;
-  top: 45%;
-  left: 50%;
-  margin: -160px 0 0 -160px;
-  width: 320px;
-  padding: 18px 28px 28px 28px;
-  box-shadow: -4px 7px 46px 2px rgba(0, 0, 0, 0.1);
-
-  .halo-logo {
-    margin-bottom: 20px;
-    text-align: center;
-    span {
-      vertical-align: text-bottom;
-      font-size: 38px;
-      display: inline-block;
-      font-weight: 600;
-      color: #1790fe;
-      background-image: linear-gradient(-20deg, #6e45e2 0%, #88d3ce 100%);
-      -webkit-text-fill-color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      small {
-        margin-left: 5px;
-        font-size: 35%;
-      }
-    }
-  }
-  .tip {
-    cursor: pointer;
-    margin-left: 0.5rem;
-    float: right;
-  }
-}
-</style>

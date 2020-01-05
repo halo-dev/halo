@@ -68,14 +68,41 @@
         <a-divider />
 
         <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">摘要</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item>
+                <a-input
+                  type="textarea"
+                  :autosize="{ minRows: 5 }"
+                  v-model="selectedSheet.summary"
+                  placeholder="不填写则会自动生成"
+                />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
+
+        <div :style="{ marginBottom: '16px' }">
           <h3 class="post-setting-drawer-title">缩略图</h3>
           <div class="post-setting-drawer-item">
             <div class="sheet-thumb">
               <img
                 class="img"
-                :src="selectedSheet.thumbnail || '/images/placeholder.png'"
+                :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
                 @click="()=>this.thumbDrawerVisible = true"
               >
+
+              <a-form layout="vertial">
+                <a-form-item>
+                  <a-input
+                    v-model="selectedSheet.thumbnail"
+                    placeholder="点击缩略图选择图片，或者输入外部链接"
+                  ></a-input>
+                </a-form-item>
+              </a-form>
+
               <a-button
                 class="sheet-thumb-remove"
                 type="dashed"
@@ -83,6 +110,41 @@
               >移除</a-button>
             </div>
           </div>
+        </div>
+        <a-divider />
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">元数据</h3>
+          <a-form layout="vertical">
+            <a-form-item
+              v-for="(sheetMeta, index) in selectedSheetMetas"
+              :key="index"
+              :prop="'sheetMeta.' + index + '.value'"
+            >
+              <a-row :gutter="5">
+                <a-col :span="12">
+                  <a-input v-model="sheetMeta.key"><i slot="addonBefore">K</i></a-input>
+                </a-col>
+                <a-col :span="12">
+                  <a-input v-model="sheetMeta.value">
+                    <i slot="addonBefore">V</i>
+                    <a
+                      href="javascript:void(0);"
+                      slot="addonAfter"
+                      @click.prevent="handleRemoveSheetMeta(sheetMeta)"
+                    >
+                      <a-icon type="close" />
+                    </a>
+                  </a-input>
+                </a-col>
+              </a-row>
+            </a-form-item>
+            <a-form-item>
+              <a-button
+                type="dashed"
+                @click="handleInsertSheetMeta()"
+              >新增</a-button>
+            </a-form-item>
+          </a-form>
         </div>
         <a-divider class="divider-transparent" />
       </div>
@@ -96,10 +158,12 @@
       <a-button
         style="marginRight: 8px"
         @click="handleDraftClick"
+        :disabled="saving"
       >保存草稿</a-button>
       <a-button
         type="primary"
         @click="handlePublishClick"
+        :disabled="saving"
       >发布</a-button>
     </div>
   </a-drawer>
@@ -112,7 +176,7 @@ import { mapGetters } from 'vuex'
 import themeApi from '@/api/theme'
 import sheetApi from '@/api/sheet'
 export default {
-  name: 'SheetSetting',
+  name: 'SheetSettingDrawer',
   mixins: [mixin, mixinDevice],
   components: {
     AttachmentSelectDrawer
@@ -122,12 +186,17 @@ export default {
       thumbDrawerVisible: false,
       settingLoading: true,
       selectedSheet: this.sheet,
-      customTpls: []
+      customTpls: [],
+      saving: false
     }
   },
   props: {
     sheet: {
       type: Object,
+      required: true
+    },
+    sheetMetas: {
+      type: Array,
       required: true
     },
     needTitle: {
@@ -152,13 +221,20 @@ export default {
     selectedSheet(val) {
       this.$emit('onRefreshSheet', val)
     },
+    selectedSheetMetas(val) {
+      this.$emit('onRefreshSheetMetas', val)
+    },
     visible: function(newValue, oldValue) {
       if (newValue) {
         this.loadSkeleton()
+        this.loadPresetMetasField()
       }
     }
   },
   computed: {
+    selectedSheetMetas() {
+      return this.sheetMetas
+    },
     pickerDefaultValue() {
       if (this.selectedSheet.createTime) {
         var date = new Date(this.selectedSheet.createTime)
@@ -175,8 +251,23 @@ export default {
         this.settingLoading = false
       }, 500)
     },
+    loadPresetMetasField() {
+      if (this.sheetMetas.length <= 0) {
+        themeApi.getActivatedTheme().then(response => {
+          const fields = response.data.data.sheetMetaField
+          if (fields && fields.length > 0) {
+            for (let i = 0, len = fields.length; i < len; i++) {
+              this.selectedSheetMetas.push({
+                value: '',
+                key: fields[i]
+              })
+            }
+          }
+        })
+      }
+    },
     loadCustomTpls() {
-      themeApi.customTpls().then(response => {
+      themeApi.customSheetTpls().then(response => {
         this.customTpls = response.data.data
       })
     },
@@ -210,18 +301,16 @@ export default {
         })
         return
       }
-      if (!this.selectedSheet.originalContent) {
-        this.$notification['error']({
-          message: '提示',
-          description: '页面内容不能为空！'
-        })
-        return
-      }
+      this.selectedSheet.sheetMetas = this.selectedSheetMetas
+      this.saving = true
       if (this.selectedSheet.id) {
         sheetApi.update(this.selectedSheet.id, this.selectedSheet, autoSave).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
           if (updateSuccess) {
             updateSuccess()
+            this.saving = false
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'SheetList' })
           }
         })
       } else {
@@ -229,6 +318,9 @@ export default {
           this.$log.debug('Created sheet', response.data.data)
           if (createSuccess) {
             createSuccess()
+            this.saving = false
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'SheetList' })
           }
           this.selectedSheet = response.data.data
         })
@@ -242,6 +334,18 @@ export default {
     },
     onSheetDateOk(value) {
       this.selectedSheet.createTime = value.valueOf()
+    },
+    handleRemoveSheetMeta(item) {
+      var index = this.selectedSheetMetas.indexOf(item)
+      if (index !== -1) {
+        this.selectedSheetMetas.splice(index, 1)
+      }
+    },
+    handleInsertSheetMeta() {
+      this.selectedSheetMetas.push({
+        value: '',
+        key: ''
+      })
     }
   }
 }

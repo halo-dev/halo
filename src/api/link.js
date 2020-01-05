@@ -26,6 +26,16 @@ linkApi.get = linkId => {
   })
 }
 
+linkApi.getByParse = url => {
+  return service({
+    url: `${baseUrl}/parse`,
+    params: {
+      url: url
+    },
+    method: 'get'
+  })
+}
+
 linkApi.update = (linkId, link) => {
   return service({
     url: `${baseUrl}/${linkId}`,
@@ -38,6 +48,13 @@ linkApi.delete = linkId => {
   return service({
     url: `${baseUrl}/${linkId}`,
     method: 'delete'
+  })
+}
+
+linkApi.listTeams = () => {
+  return service({
+    url: `${baseUrl}/teams`,
+    method: 'get'
   })
 }
 

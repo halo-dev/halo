@@ -1,12 +1,12 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row>
       <a-col :span="24">
         <div class="card-container">
           <a-tabs type="card">
             <a-tab-pane key="internal">
               <span slot="tab">
-                <a-icon type="pushpin" />内置页面
+                <a-icon type="paper-clip" />内置页面
               </span>
 
               <!-- Mobile -->
@@ -161,7 +161,7 @@
                       <a-icon type="eye" />
                       {{ item.visits }}
                     </span>
-                    <span>
+                    <span @click="handleShowSheetComments(item)">
                       <a-icon type="message" />
                       {{ item.commentCount }}
                     </span>
@@ -181,7 +181,7 @@
                         </a-menu-item>
                         <a-menu-item v-else-if="item.status === 'RECYCLE'">
                           <a-popconfirm
-                            :title="'你确定要发布【' + item.title + '】文章？'"
+                            :title="'你确定要发布【' + item.title + '】页面？'"
                             @confirm="handleEditStatusClick(item.id,'PUBLISHED')"
                             okText="确定"
                             cancelText="取消"
@@ -191,7 +191,7 @@
                         </a-menu-item>
                         <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
                           <a-popconfirm
-                            :title="'你确定要将【' + item.title + '】文章移到回收站？'"
+                            :title="'你确定要将【' + item.title + '】页面移到回收站？'"
                             @confirm="handleEditStatusClick(item.id,'RECYCLE')"
                             okText="确定"
                             cancelText="取消"
@@ -201,7 +201,7 @@
                         </a-menu-item>
                         <a-menu-item v-else-if="item.status === 'RECYCLE'">
                           <a-popconfirm
-                            :title="'你确定要永久删除【' + item.title + '】文章？'"
+                            :title="'你确定要永久删除【' + item.title + '】页面？'"
                             @confirm="handleDeleteClick(item.id)"
                             okText="确定"
                             cancelText="取消"
@@ -245,27 +245,9 @@
                       slot="title"
                       style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                     >
-                      <a-icon
-                        type="pushpin"
-                        v-if="item.topPriority!=0"
-                        theme="twoTone"
-                        twoToneColor="red"
-                        style="margin-right: 3px;"
-                      />
                       <a
                         v-if="item.status=='PUBLISHED'"
                         :href="options.blog_url+'/archives/'+item.url"
-                        target="_blank"
-                        style="text-decoration: none;"
-                      >
-                        <a-tooltip
-                          placement="top"
-                          :title="'点击访问【'+item.title+'】'"
-                        >{{ item.title }}</a-tooltip>
-                      </a>
-                      <a
-                        v-else-if="item.status == 'INTIMATE'"
-                        :href="options.blog_url+'/archives/'+item.url+'/password'"
                         target="_blank"
                         style="text-decoration: none;"
                       >
@@ -358,10 +340,12 @@
 
                 <span
                   slot="commentCount"
-                  slot-scope="commentCount"
+                  slot-scope="text,record"
+                  @click="handleShowSheetComments(record)"
+                  style="cursor: pointer;"
                 >
                   <a-badge
-                    :count="commentCount"
+                    :count="record.commentCount"
                     :numberStyle="{backgroundColor: '#f38181'} "
                     :showZero="true"
                     :overflowCount="999"
@@ -460,27 +444,50 @@
                   </a-dropdown>
                 </span>
               </a-table>
+              <div class="page-wrapper">
+                <a-pagination
+                  class="pagination"
+                  :current="pagination.page"
+                  :total="pagination.total"
+                  :defaultPageSize="pagination.size"
+                  :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
+                  showSizeChanger
+                  @showSizeChange="handlePaginationChange"
+                  @change="handlePaginationChange"
+                />
+              </div>
             </a-tab-pane>
           </a-tabs>
         </div>
       </a-col>
     </a-row>
 
-    <SheetSetting
+    <SheetSettingDrawer
       :sheet="selectedSheet"
+      :sheetMetas="selectedSheetMetas"
       :visible="sheetSettingVisible"
       :needTitle="true"
       @close="onSheetSettingsClose"
       @onRefreshSheet="onRefreshSheetFromSetting"
+      @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"
     />
 
+    <TargetCommentDrawer
+      :visible="sheetCommentVisible"
+      :title="selectedSheet.title"
+      :description="selectedSheet.summary"
+      :target="`sheets`"
+      :id="selectedSheet.id"
+      @close="onSheetCommentsClose"
+    />
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
-import SheetSetting from './components/SheetSetting'
+import SheetSettingDrawer from './components/SheetSettingDrawer'
+import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import sheetApi from '@/api/sheet'
 import menuApi from '@/api/menu'
 
@@ -541,16 +548,32 @@ const customColumns = [
 export default {
   mixins: [mixin, mixinDevice],
   components: {
-    SheetSetting
+    SheetSettingDrawer,
+    TargetCommentDrawer
   },
   data() {
     return {
+      pagination: {
+        page: 1,
+        size: 10,
+        sort: null
+      },
+      queryParam: {
+        page: 0,
+        size: 10,
+        sort: null,
+        keyword: null,
+        categoryId: null,
+        status: null
+      },
       sheetsLoading: false,
       sheetStatus: sheetApi.sheetStatus,
       internalColumns,
       customColumns,
       selectedSheet: {},
+      selectedSheetMetas: [],
       sheetSettingVisible: false,
+      sheetCommentVisible: false,
       internalSheets: [],
       sheets: [],
       menu: {}
@@ -583,8 +606,12 @@ export default {
   methods: {
     loadSheets() {
       this.sheetsLoading = true
-      sheetApi.list().then(response => {
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
+      this.queryParam.sort = this.pagination.sort
+      sheetApi.list(this.queryParam).then(response => {
         this.sheets = response.data.data.content
+        this.pagination.total = response.data.data.total
         this.sheetsLoading = false
       })
     },
@@ -619,13 +646,26 @@ export default {
     handleShowSheetSettings(sheet) {
       sheetApi.get(sheet.id).then(response => {
         this.selectedSheet = response.data.data
+        this.selectedSheetMetas = this.selectedSheet.sheetMetas
         this.sheetSettingVisible = true
+      })
+    },
+    handleShowSheetComments(sheet) {
+      sheetApi.get(sheet.id).then(response => {
+        this.selectedSheet = response.data.data
+        this.sheetCommentVisible = true
       })
     },
     handlePreview(sheetId) {
       sheetApi.preview(sheetId).then(response => {
         window.open(response.data, '_blank')
       })
+    },
+    handlePaginationChange(page, pageSize) {
+      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
+      this.pagination.page = page
+      this.pagination.size = pageSize
+      this.loadSheets()
     },
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
@@ -634,8 +674,18 @@ export default {
         this.loadSheets()
       }, 500)
     },
+    onSheetCommentsClose() {
+      this.sheetCommentVisible = false
+      this.selectedSheet = {}
+      setTimeout(() => {
+        this.loadSheets()
+      }, 500)
+    },
     onRefreshSheetFromSetting(sheet) {
       this.selectedSheet = sheet
+    },
+    onRefreshSheetMetasFromSetting(sheetMetas) {
+      this.selectedSheetMetas = sheetMetas
     }
   }
 }

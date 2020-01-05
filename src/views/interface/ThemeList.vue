@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row
       :gutter="12"
       type="flex"
@@ -24,7 +24,8 @@
               <div class="theme-thumb">
                 <img
                   :alt="item.name"
-                  :src="item.screenshots"
+                  :src="item.screenshots || '/images/placeholder.jpg'"
+                  loading="lazy"
                 >
               </div>
               <template
@@ -298,10 +299,16 @@ export default {
       })
     },
     handleUpdateTheme(themeId) {
-      themeApi.update(themeId).then(response => {
-        this.$message.success('更新成功！')
-        this.loadThemes()
-      })
+      const hide = this.$message.loading('更新中...', 0)
+      themeApi
+        .update(themeId)
+        .then(response => {
+          this.$message.success('更新成功！')
+          this.loadThemes()
+        })
+        .finally(() => {
+          hide()
+        })
     },
     handleDeleteTheme(key) {
       themeApi.delete(key).then(response => {

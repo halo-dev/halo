@@ -14,7 +14,7 @@ export const asyncRouterMap = [
         path: '/dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/Dashboard'),
-        meta: { title: '仪表盘', icon: 'dashboard', hiddenHeaderContent: false }
+        meta: { title: '仪表盘', icon: 'dashboard', hiddenHeaderContent: false, keepAlive: false }
       },
 
       // posts
@@ -35,7 +35,7 @@ export const asyncRouterMap = [
             path: '/posts/write',
             name: 'PostEdit',
             component: () => import('@/views/post/PostEdit'),
-            meta: { title: '写文章', hiddenHeaderContent: false }
+            meta: { title: '写文章', hiddenHeaderContent: false, keepAlive: false }
           },
           {
             path: '/categories',
@@ -70,7 +70,7 @@ export const asyncRouterMap = [
             path: '/sheets/write',
             name: 'SheetEdit',
             component: () => import('@/views/sheet/SheetEdit'),
-            meta: { title: '新建页面', hiddenHeaderContent: false }
+            meta: { title: '新建页面', hiddenHeaderContent: false, keepAlive: false }
           },
           {
             path: '/sheets/links',
@@ -167,17 +167,18 @@ export const asyncRouterMap = [
         meta: { title: '系统', icon: 'setting' },
         children: [
           {
+            path: '/system/developer/options',
+            name: 'DeveloperOptions',
+            hidden: true,
+            component: () => import('@/views/system/developer/DeveloperOptions'),
+            meta: { title: '开发者选项', hiddenHeaderContent: false }
+          },
+          {
             path: '/system/options',
             name: 'OptionForm',
             component: () => import('@/views/system/OptionForm'),
             meta: { title: '博客设置', hiddenHeaderContent: false }
           },
-          // {
-          //   path: '/system/backup',
-          //   name: 'BackupList',
-          //   component: () => import('@/views/system/BackupList'),
-          //   meta: { title: '博客备份', hiddenHeaderContent: false }
-          // },
           {
             path: '/system/tools',
             name: 'ToolList',
@@ -201,10 +202,6 @@ export const asyncRouterMap = [
   }
 ]
 
-/**
- * 基础路由
- * @type { *[] }
- */
 export const constantRouterMap = [
   {
     path: '/login',
@@ -227,6 +224,6 @@ export const constantRouterMap = [
   {
     path: '/404',
     name: 'NotFound',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
+    component: () => import('@/views/exception/404')
   }
 ]

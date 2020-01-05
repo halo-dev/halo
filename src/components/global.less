@@ -1,4 +1,5 @@
 @import './index.less';
+@import './style.less';
 
 * {
   &::-webkit-scrollbar {
@@ -112,7 +113,23 @@ body {
     &.content-width-Fluid {
       .header-index-wide {
         max-width: unset;
-        margin-left: 24px;
+
+        .header-index-left {
+          flex: 1 1 1000px;
+
+          .logo {
+            margin-left: 25px;
+          }
+
+          .ant-menu.ant-menu-horizontal {
+            max-width: calc(100vw - 190px - 238px - 25px);
+            flex: 1 1 calc(100vw - 190px - 238px - 25px);
+          }
+        }
+
+        .header-index-right {
+          margin-right: 25px;
+        }
       }
 
       .page-header-index-wide {
@@ -143,7 +160,7 @@ body {
 
   .header {
     height: 64px;
-    padding: 0 12px 0 0;
+    padding: 0;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
     position: relative;
@@ -158,7 +175,7 @@ body {
 
       .action {
         cursor: pointer;
-        padding: 0 12px;
+        padding: 0 18px;
         display: inline-block;
         transition: all .3s;
         height: 100%;
@@ -255,7 +272,7 @@ body {
         }
 
         .ant-menu.ant-menu-horizontal {
-          flex: 1 1;
+          flex: 1 1 auto;
           white-space: normal;
         }
       }
@@ -276,16 +293,19 @@ body {
       height: 64px;
 
       .ant-menu.ant-menu-horizontal {
+        max-width: 835px;
+        flex: 0 1 835px;
         border: none;
         height: 64px;
         line-height: 64px;
       }
 
       .header-index-left {
-        flex: 1 1;
+        flex: 0 1 1000px;
         display: flex;
 
         .logo.top-nav-header {
+          flex: 0 0 165px;
           width: 165px;
           height: 64px;
           position: relative;
@@ -314,8 +334,20 @@ body {
 
       .header-index-right {
         flex: 0 0 auto;
+        align-self: flex-end;
         height: 64px;
         overflow: hidden;
+
+        .content-box {
+          float: right;
+
+          .action {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
       }
     }
 
@@ -380,11 +412,10 @@ body {
 .sider {
   box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
   position: relative;
-  z-index: 10;
-  height: auto;
+  z-index: @ant-global-sider-zindex;
+  min-height: 100vh;
 
   .ant-layout-sider-children {
-    padding-top: 64px;
     overflow-y: hidden;
 
     &:hover {
@@ -398,18 +429,13 @@ body {
   }
 
   .logo {
-    position: absolute;
+    position: relative;
     text-align: center;
-    top: 0;
-    left: 0;
-    width: 100%;
     height: 64px;
-    line-height: 64px;
-    -webkit-transition: all .3s;
-    transition: all .3s;
-    background: #002140;
     overflow: hidden;
-    z-index: 9;
+    line-height: 64px;
+    background: #002140;
+    transition: all .3s;
 
     img,
     svg,
@@ -477,11 +503,6 @@ body {
 
 }
 
-// 数据列表 样式
-.table-alert {
-  margin-bottom: 16px;
-}
-
 .table-page-search-wrapper {
 
   .ant-form-inline {
@@ -516,6 +537,10 @@ body {
     white-space: nowrap;
   }
 
+}
+
+.ant-table-thead>tr>th {
+  background: #fff !important;
 }
 
 .content {
@@ -592,15 +617,24 @@ body {
 }
 
 .ant-comment-inner {
-  padding: 0 !important;
-
   .ant-comment-content {
     .ant-comment-content-detail {
       p {
         margin-top: 1rem;
         margin-bottom: 0;
+
+        img {
+          width: 100%;
+        }
       }
     }
+  }
+}
+
+.ant-comment-avatar {
+  img {
+    width: 40px !important;
+    height: 40px !important;
   }
 }
 
@@ -719,13 +753,15 @@ body {
   float: left;
 }
 
-.attach-thumb {
+.attach-thumb,
+.photo-thumb {
   width: 100%;
   padding-bottom: 56%;
 }
 
 .attach-item,
-.attach-thumb {
+.attach-thumb,
+.photo-thumb {
   margin: 0 auto;
   position: relative;
   overflow: hidden;
@@ -787,5 +823,92 @@ body {
 .ant-tree-child-tree {
   li {
     overflow: hidden;
+  }
+}
+
+.exception {
+  min-height: 500px;
+  height: 80%;
+  align-items: center;
+  text-align: center;
+  margin-top: 150px;
+
+  .img {
+    display: inline-block;
+    padding-right: 52px;
+    zoom: 1;
+
+    img {
+      height: 360px;
+      max-width: 430px;
+    }
+  }
+
+  .content {
+    display: inline-block;
+    flex: auto;
+
+    h1 {
+      color: #434e59;
+      font-size: 72px;
+      font-weight: 600;
+      line-height: 72px;
+      margin-bottom: 24px;
+    }
+
+    .desc {
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 20px;
+      line-height: 28px;
+      margin-bottom: 16px;
+    }
+  }
+}
+
+.mobile {
+  .exception {
+    margin-top: 30px;
+
+    .img {
+      padding-right: unset;
+
+      img {
+        height: 40%;
+        max-width: 80%;
+      }
+    }
+  }
+}
+
+.vue-codemirror-wrap {
+  .CodeMirror {
+    height: 560px;
+  }
+
+  .CodeMirror-gutters {
+    border-right: 1px solid #fff3f3;
+    background-color: #ffffff;
+  }
+}
+
+.select-attachment-checkbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+
+  .ant-checkbox {
+    margin-left: 4px;
+  }
+}
+
+.journal-list-content,
+.comment-drawer-content {
+  img {
+    width: 100%;
   }
 }

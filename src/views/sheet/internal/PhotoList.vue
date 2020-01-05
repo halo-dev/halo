@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row
       :gutter="12"
       type="flex"
@@ -7,7 +7,7 @@
     >
       <a-col
         :span="24"
-        class="search-box"
+        style="padding-bottom: 12px;"
       >
         <a-card
           :bordered="false"
@@ -31,7 +31,7 @@
                   <a-form-item label="分组">
                     <a-select
                       v-model="queryParam.team"
-                      @change="loadPhotos(true)"
+                      @change="handleQuery()"
                     >
                       <a-select-option
                         v-for="(item,index) in teams"
@@ -48,18 +48,18 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
-                      @click="loadPhotos(true)"
+                      @click="handleQuery()"
                     >查询</a-button>
                     <a-button
                       style="margin-left: 8px;"
-                      @click="resetParam"
+                      @click="resetParam()"
                     >重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
-          <div class="table-operator">
+          <div class="table-operator" style="margin-bottom: 0;">
             <a-button
               type="primary"
               icon="plus"
@@ -85,9 +85,9 @@
               @click="showDrawer(item)"
             >
               <div class="photo-thumb">
-                <img :src="item.thumbnail">
+                <img :src="item.thumbnail" loading="lazy">
               </div>
-              <a-card-meta>
+              <a-card-meta style="padding: 0.8rem;">
                 <ellipsis
                   :length="isMobile()?12:16"
                   tooltip
@@ -101,6 +101,7 @@
     </a-row>
     <div class="page-wrapper">
       <a-pagination
+        :current="pagination.page"
         :total="pagination.total"
         :defaultPageSize="pagination.size"
         :pageSizeOptions="['18', '36', '54','72','90','108']"
@@ -129,13 +130,15 @@
           >
             <div class="photo-detail-img">
               <img
-                :src="photo.url || '/images/placeholder.png'"
+                :src="photo.url || '/images/placeholder.jpg'"
                 @click="showThumbDrawer"
+                style="width: 100%;"
               >
             </div>
           </a-skeleton>
         </a-col>
-        <a-divider />
+        <a-divider style="margin: 24px 0 12px 0;"/>
+
         <a-col :span="24">
           <a-skeleton
             active
@@ -216,7 +219,12 @@
                     slot="description"
                     v-if="editable"
                   >
-                    <a-input v-model="photo.team" />
+                    <a-auto-complete
+                      :dataSource="teams"
+                      v-model="photo.team"
+                      allowClear
+                      style="width:100%"
+                    />
                   </template>
                   <span
                     slot="description"
@@ -319,19 +327,19 @@ export default {
     this.loadTeams()
   },
   methods: {
-    loadPhotos(isSearch) {
+    loadPhotos() {
+      this.listLoading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      if (isSearch) {
-        this.queryParam.page = 0
-      }
-      this.listLoading = true
       photoApi.query(this.queryParam).then(response => {
         this.photos = response.data.data.content
         this.pagination.total = response.data.data.total
         this.listLoading = false
       })
+    },
+    handleQuery() {
+      this.handlePaginationChange(1, this.pagination.size)
     },
     loadTeams() {
       photoApi.listTeams().then(response => {
@@ -343,11 +351,13 @@ export default {
         photoApi.update(this.photo.id, this.photo).then(response => {
           this.$message.success('照片更新成功！')
           this.loadPhotos()
+          this.loadTeams()
         })
       } else {
         photoApi.create(this.photo).then(response => {
           this.$message.success('照片添加成功！')
           this.loadPhotos()
+          this.loadTeams()
           this.photo = response.data.data
         })
       }
@@ -375,6 +385,7 @@ export default {
         this.$message.success('删除成功！')
         this.onDrawerClose()
         this.loadPhotos()
+        this.loadTeams()
       })
     },
     showThumbDrawer() {
@@ -388,7 +399,7 @@ export default {
     resetParam() {
       this.queryParam.keyword = null
       this.queryParam.team = null
-      this.loadPhotos()
+      this.handlePaginationChange(1, this.pagination.size)
       this.loadTeams()
     },
     onDrawerClose() {
@@ -399,40 +410,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.ant-divider-horizontal {
-  margin: 24px 0 12px 0;
-}
-
-.search-box {
-  padding-bottom: 12px;
-}
-
-.photo-thumb {
-  width: 100%;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 56%;
-  overflow: hidden;
-  img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
-
-.ant-card-meta {
-  padding: 0.8rem;
-}
-
-.photo-detail-img img {
-  width: 100%;
-}
-
-.table-operator {
-  margin-bottom: 0;
-}
-</style>

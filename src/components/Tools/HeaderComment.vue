@@ -9,7 +9,7 @@
     title="待审核评论"
   >
     <template slot="content">
-      <a-spin :spinning="loadding">
+      <a-spin :spinning="loading">
         <div class="custom-tab-wrapper">
           <a-tabs>
             <a-tab-pane
@@ -99,7 +99,7 @@ export default {
   name: 'HeaderComment',
   data() {
     return {
-      loadding: false,
+      loading: false,
       visible: false,
       postComments: [],
       sheetComments: []
@@ -111,13 +111,13 @@ export default {
   computed: {
     converttedPostComments() {
       return this.postComments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     },
     converttedSheetComments() {
       return this.sheetComments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     }
@@ -125,21 +125,21 @@ export default {
   methods: {
     fetchComment() {
       if (!this.visible) {
-        this.loadding = true
+        this.loading = true
         this.getComment()
       } else {
-        this.loadding = false
+        this.loading = false
       }
       this.visible = !this.visible
     },
     getComment() {
       commentApi.latestComment('posts', 5, 'AUDITING').then(response => {
         this.postComments = response.data.data
-        this.loadding = false
+        this.loading = false
       })
       commentApi.latestComment('sheets', 5, 'AUDITING').then(response => {
         this.sheetComments = response.data.data
-        this.loadding = false
+        this.loading = false
       })
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-card
       :bordered="false"
       :bodyStyle="{ padding: '16px' }"
@@ -12,7 +12,10 @@
               :sm="24"
             >
               <a-form-item label="关键词">
-                <a-input v-model="queryParam.keyword" />
+                <a-input
+                  v-model="queryParam.keyword"
+                  @keyup.enter="handleQuery()"
+                />
               </a-form-item>
             </a-col>
             <a-col
@@ -23,7 +26,7 @@
                 <a-select
                   v-model="queryParam.status"
                   placeholder="请选择文章状态"
-                  @change="handleQuery"
+                  @change="handleQuery()"
                 >
                   <a-select-option
                     v-for="status in Object.keys(postStatus)"
@@ -41,7 +44,7 @@
                 <a-select
                   v-model="queryParam.categoryId"
                   placeholder="请选择分类"
-                  @change="handleQuery"
+                  @change="handleQuery()"
                 >
                   <a-select-option
                     v-for="category in categories"
@@ -58,11 +61,11 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
-                  @click="handleQuery"
+                  @click="handleQuery()"
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
-                  @click="handleResetParam"
+                  @click="handleResetParam()"
                 >重置</a-button>
               </span>
             </a-col>
@@ -81,11 +84,11 @@
           <a-menu slot="overlay">
             <a-menu-item
               key="1"
-              v-if="queryParam.status === 'DRAFT'"
+              v-if="queryParam.status === 'DRAFT' || queryParam.status === 'RECYCLE'"
             >
               <a
                 href="javascript:void(0);"
-                @click="handlePublishMore"
+                @click="handleEditStatusMore(postStatus.PUBLISHED.value)"
               >
                 <span>发布</span>
               </a>
@@ -96,14 +99,25 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="handleRecycleMore"
+                @click="handleEditStatusMore(postStatus.RECYCLE.value)"
               >
                 <span>移到回收站</span>
               </a>
             </a-menu-item>
             <a-menu-item
               key="3"
-              v-if="queryParam.status === 'RECYCLE'"
+              v-if="queryParam.status === 'RECYCLE' || queryParam.status === 'PUBLISHED' || queryParam.status === 'INTIMATE'"
+            >
+              <a
+                href="javascript:void(0);"
+                @click="handleEditStatusMore(postStatus.DRAFT.value)"
+              >
+                <span>草稿</span>
+              </a>
+            </a-menu-item>
+            <a-menu-item
+              key="4"
+              v-if="queryParam.status === 'RECYCLE' || queryParam.status === 'DRAFT'"
             >
               <a
                 href="javascript:void(0);"
@@ -140,7 +154,7 @@
                 <a-icon type="eye" />
                 {{ item.visits }}
               </span>
-              <span>
+              <span @click="handleShowPostComments(item)">
                 <a-icon type="message" />
                 {{ item.commentCount }}
               </span>
@@ -222,19 +236,8 @@
                   style="margin-right: 3px;"
                 />
                 <a
-                  v-if="item.status=='PUBLISHED'"
+                  v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
                   :href="options.blog_url+'/archives/'+item.url"
-                  target="_blank"
-                  style="text-decoration: none;"
-                >
-                  <a-tooltip
-                    placement="top"
-                    :title="'点击访问【'+item.title+'】'"
-                  >{{ item.title }}</a-tooltip>
-                </a>
-                <a
-                  v-else-if="item.status == 'INTIMATE'"
-                  :href="options.blog_url+'/archives/'+item.url+'/password'"
                   target="_blank"
                   style="text-decoration: none;"
                 >
@@ -292,6 +295,7 @@
           v-else
           :rowKey="post => post.id"
           :rowSelection="{
+            selectedRowKeys: selectedRowKeys,
             onChange: onSelectionChange,
             getCheckboxProps: getCheckboxProps
           }"
@@ -313,19 +317,8 @@
               style="margin-right: 3px;"
             />
             <a
-              v-if="record.status=='PUBLISHED'"
+              v-if="record.status=='PUBLISHED' || record.status == 'INTIMATE'"
               :href="options.blog_url+'/archives/'+record.url"
-              target="_blank"
-              style="text-decoration: none;"
-            >
-              <a-tooltip
-                placement="top"
-                :title="'点击访问【'+text+'】'"
-              >{{ text }}</a-tooltip>
-            </a>
-            <a
-              v-else-if="record.status == 'INTIMATE'"
-              :href="options.blog_url+'/archives/'+record.url+'/password'"
               target="_blank"
               style="text-decoration: none;"
             >
@@ -390,10 +383,12 @@
 
           <span
             slot="commentCount"
-            slot-scope="commentCount"
+            slot-scope="text,record"
+            @click="handleShowPostComments(record)"
+            style="cursor: pointer;"
           >
             <a-badge
-              :count="commentCount"
+              :count="record.commentCount"
               :numberStyle="{backgroundColor: '#f38181'} "
               :showZero="true"
               :overflowCount="999"
@@ -476,7 +471,9 @@
         <div class="page-wrapper">
           <a-pagination
             class="pagination"
+            :current="pagination.page"
             :total="pagination.total"
+            :defaultPageSize="pagination.size"
             :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
             showSizeChanger
             @showSizeChange="handlePaginationChange"
@@ -486,10 +483,11 @@
       </div>
     </a-card>
 
-    <PostSetting
+    <PostSettingDrawer
       :post="selectedPost"
       :tagIds="selectedTagIds"
       :categoryIds="selectedCategoryIds"
+      :postMetas="selectedPostMetas"
       :needTitle="true"
       :saveDraftButton="false"
       :savePublishButton="false"
@@ -499,13 +497,24 @@
       @onRefreshPost="onRefreshPostFromSetting"
       @onRefreshTagIds="onRefreshTagIdsFromSetting"
       @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
+      @onRefreshPostMetas="onRefreshPostMetasFromSetting"
+    />
+
+    <TargetCommentDrawer
+      :visible="postCommentVisible"
+      :title="selectedPost.title"
+      :description="selectedPost.summary"
+      :target="`posts`"
+      :id="selectedPost.id"
+      @close="onPostCommentsClose"
     />
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import PostSetting from './components/PostSetting'
+import PostSettingDrawer from './components/PostSettingDrawer'
+import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import TagSelect from './components/TagSelect'
 import CategoryTree from './components/CategoryTree'
@@ -566,15 +575,16 @@ export default {
     AttachmentSelectDrawer,
     TagSelect,
     CategoryTree,
-    PostSetting
+    PostSettingDrawer,
+    TargetCommentDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
     return {
       postStatus: postApi.postStatus,
       pagination: {
-        current: 1,
-        pageSize: 10,
+        page: 1,
+        size: 10,
         sort: null
       },
       queryParam: {
@@ -588,11 +598,17 @@ export default {
       // 表头
       columns,
       selectedRowKeys: [],
-      selectedRows: [],
       categories: [],
+      selectedPostMetas: [
+        {
+          key: '',
+          value: ''
+        }
+      ],
       posts: [],
       postsLoading: false,
       postSettingVisible: false,
+      postCommentVisible: false,
       selectedPost: {},
       selectedTagIds: [],
       selectedCategoryIds: []
@@ -626,8 +642,8 @@ export default {
     loadPosts() {
       this.postsLoading = true
       // Set from pagination
-      this.queryParam.page = this.pagination.current - 1
-      this.queryParam.size = this.pagination.pageSize
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
       postApi.query(this.queryParam).then(response => {
         this.posts = response.data.data.content
@@ -650,27 +666,27 @@ export default {
     getCheckboxProps(post) {
       return {
         props: {
-          disabled: post.status === 'RECYCLE',
+          disabled: this.queryParam.status == null || this.queryParam.status === '',
           name: post.title
         }
       }
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.pagination.current = page
-      this.pagination.pageSize = pageSize
+      this.pagination.page = page
+      this.pagination.size = pageSize
       this.loadPosts()
     },
     handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.categoryId = null
       this.queryParam.status = null
-      this.loadPosts()
+      this.handleClearRowKeys()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleQuery() {
-      this.queryParam.page = 0
-      this.pagination.current = 1
-      this.loadPosts()
+      this.handleClearRowKeys()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleEditStatusClick(postId, status) {
       postApi.updateStatus(postId, status).then(response => {
@@ -684,54 +700,41 @@ export default {
         this.loadPosts()
       })
     },
-    handlePublishMore() {
+    handleEditStatusMore(status) {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        postApi.updateStatus(element, 'PUBLISHED').then(response => {
-          this.$log.debug(`postId: ${element}, status: PUBLISHED`)
-          this.selectedRowKeys = []
-          this.loadPosts()
-        })
-      }
-    },
-    handleRecycleMore() {
-      if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
-        return
-      }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        postApi.updateStatus(element, 'RECYCLE').then(response => {
-          this.$log.debug(`postId: ${element}, status: RECYCLE`)
-          this.selectedRowKeys = []
-          this.loadPosts()
-        })
-      }
+      postApi.updateStatusInBatch(this.selectedRowKeys, status).then(response => {
+        this.$log.debug(`postId: ${this.selectedRowKeys}, status: ${status}`)
+        this.selectedRowKeys = []
+        this.loadPosts()
+      })
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        postApi.delete(element).then(response => {
-          this.$log.debug(`delete: ${element}`)
-          this.selectedRowKeys = []
-          this.loadPosts()
-        })
-      }
+      postApi.deleteInBatch(this.selectedRowKeys).then(response => {
+        this.$log.debug(`delete: ${this.selectedRowKeys}`)
+        this.selectedRowKeys = []
+        this.loadPosts()
+      })
     },
     handleShowPostSettings(post) {
       postApi.get(post.id).then(response => {
         this.selectedPost = response.data.data
         this.selectedTagIds = this.selectedPost.tagIds
         this.selectedCategoryIds = this.selectedPost.categoryIds
+        this.selectedPostMetas = this.selectedPost.postMetas
         this.postSettingVisible = true
+      })
+    },
+    handleShowPostComments(post) {
+      postApi.get(post.id).then(response => {
+        this.selectedPost = response.data.data
+        this.postCommentVisible = true
       })
     },
     handlePreview(postId) {
@@ -739,9 +742,19 @@ export default {
         window.open(response.data, '_blank')
       })
     },
+    handleClearRowKeys() {
+      this.selectedRowKeys = []
+    },
     // 关闭文章设置抽屉
     onPostSettingsClose() {
       this.postSettingVisible = false
+      this.selectedPost = {}
+      setTimeout(() => {
+        this.loadPosts()
+      }, 500)
+    },
+    onPostCommentsClose() {
+      this.postCommentVisible = false
       this.selectedPost = {}
       setTimeout(() => {
         this.loadPosts()
@@ -755,6 +768,9 @@ export default {
     },
     onRefreshCategoryIdsFromSetting(categoryIds) {
       this.selectedCategoryIds = categoryIds
+    },
+    onRefreshPostMetasFromSetting(postMetas) {
+      this.selectedPostMetas = postMetas
     }
   }
 }

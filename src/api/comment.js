@@ -23,6 +23,14 @@ commentApi.queryComment = (target, params) => {
   })
 }
 
+commentApi.commentTree = (target, id, params) => {
+  return service({
+    url: `${baseUrl}/${target}/comments/${id}/tree_view`,
+    params: params,
+    method: 'get'
+  })
+}
+
 commentApi.updateStatus = (target, commentId, status) => {
   return service({
     url: `${baseUrl}/${target}/comments/${commentId}/status/${status}`,
@@ -30,9 +38,25 @@ commentApi.updateStatus = (target, commentId, status) => {
   })
 }
 
+commentApi.updateStatusInBatch = (target, ids, status) => {
+  return service({
+    url: `${baseUrl}/${target}/comments/status/${status}`,
+    data: ids,
+    method: 'put'
+  })
+}
+
 commentApi.delete = (target, commentId) => {
   return service({
     url: `${baseUrl}/${target}/comments/${commentId}`,
+    method: 'delete'
+  })
+}
+
+commentApi.deleteInBatch = (target, ids) => {
+  return service({
+    url: `${baseUrl}/${target}/comments`,
+    data: ids,
     method: 'delete'
   })
 }
@@ -94,16 +118,19 @@ commentApi.createComment = (comment, type) => {
 
 commentApi.commentStatus = {
   PUBLISHED: {
+    value: 'PUBLISHED',
     color: 'green',
     status: 'success',
     text: '已发布'
   },
   AUDITING: {
+    value: 'AUDITING',
     color: 'yellow',
     status: 'warning',
     text: '待审核'
   },
   RECYCLE: {
+    value: 'RECYCLE',
     color: 'red',
     status: 'error',
     text: '回收站'

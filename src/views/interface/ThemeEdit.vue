@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide">
+  <div>
     <a-row :gutter="12">
       <a-col
         :xl="18"
@@ -14,7 +14,7 @@
             <a-form-item>
               <codemirror
                 v-model="content"
-                :options="options"
+                :options="codemirrorOptions"
               ></codemirror>
             </a-form-item>
             <a-form-item>
@@ -78,7 +78,7 @@ export default {
   data() {
     return {
       buttonDisabled: true,
-      options: {
+      codemirrorOptions: {
         tabSize: 4,
         mode: 'text/html',
         lineNumbers: true,
@@ -157,13 +157,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-.CodeMirror {
-  height: 560px;
-}
-.CodeMirror-gutters {
-  border-right: 1px solid #fff3f3;
-  background-color: #ffffff;
-}
-</style>

@@ -4,9 +4,10 @@ const baseUrl = '/api/admin/sheets'
 
 const sheetApi = {}
 
-sheetApi.list = () => {
+sheetApi.list = params => {
   return service({
     url: baseUrl,
+    params: params,
     method: 'get'
   })
 }

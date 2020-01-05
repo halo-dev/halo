@@ -27,6 +27,17 @@ attachmentApi.delete = attachmentId => {
   })
 }
 
+attachmentApi.deleteInBatch = attachmentIds => {
+  return service({
+    url: `${baseUrl}`,
+    method: 'delete',
+    data: attachmentIds,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    }
+  })
+}
+
 attachmentApi.update = (attachmentId, attachment) => {
   return service({
     url: `${baseUrl}/${attachmentId}`,
@@ -38,6 +49,13 @@ attachmentApi.update = (attachmentId, attachment) => {
 attachmentApi.getMediaTypes = () => {
   return service({
     url: `${baseUrl}/media_types`,
+    method: 'get'
+  })
+}
+
+attachmentApi.getTypes = () => {
+  return service({
+    url: `${baseUrl}/types`,
     method: 'get'
   })
 }
@@ -69,31 +87,31 @@ attachmentApi.uploads = (formDatas, uploadProgress, cancelToken) => {
 
 attachmentApi.type = {
   LOCAL: {
-    type: 'local',
+    type: 'LOCAL',
     text: '本地'
   },
   SMMS: {
-    type: 'smms',
+    type: 'SMMS',
     text: 'SM.MS'
   },
-  UPYUN: {
-    type: 'upyun',
+  UPOSS: {
+    type: 'UPOSS',
     text: '又拍云'
   },
-  QNYUN: {
-    type: 'qnyun',
+  QINIUOSS: {
+    type: 'QINIUOSS',
     text: '七牛云'
   },
-  ALIYUN: {
-    type: 'aliyun',
+  ALIOSS: {
+    type: 'ALIOSS',
     text: '阿里云'
   },
-  BAIDUYUN: {
-    type: 'baiduyun',
+  BAIDUBOS: {
+    type: 'BAIDUBOS',
     text: '百度云'
   },
-  TENCENTYUN: {
-    type: 'tencentyun',
+  TENCENTCOS: {
+    type: 'TENCENTCOS',
     text: '腾讯云'
   }
 }

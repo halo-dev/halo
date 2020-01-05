@@ -18,12 +18,8 @@
             :href="item.authorUrl"
             target="_blank"
           >{{ item.author }}</a> 发表在 《<a
-            v-if="item.post.status=='PUBLISHED'"
+            v-if="item.post.status=='PUBLISHED' || item.post.status=='INTIMATE'"
             :href="options.blog_url+'/archives/'+item.post.url"
-            target="_blank"
-          >{{ item.post.title }}</a><a
-            v-else-if="item.post.status=='INTIMATE'"
-            :href="options.blog_url+'/archives/'+item.post.url+'/password'"
             target="_blank"
           >{{ item.post.title }}</a><a
             v-else-if="item.post.status=='DRAFT'"
@@ -102,7 +98,7 @@ export default {
   computed: {
     formmatedCommentData() {
       return this.comments.map(comment => {
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     },

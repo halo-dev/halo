@@ -5,6 +5,7 @@ import {
 import optionApi from '@/api/option'
 const keys = [
   'blog_url',
+  'developer_mode',
   'attachment_upload_image_preview_enable',
   'attachment_upload_max_parallel_uploads',
   'attachment_upload_max_files'

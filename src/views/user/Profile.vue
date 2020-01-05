@@ -1,5 +1,5 @@
 <template>
-  <div class="page-header-index-wide page-header-wrapper-grid-content-main">
+  <div>
     <a-row :gutter="12">
       <a-col
         :lg="10"
@@ -40,20 +40,21 @@
               <a-icon type="mail" />{{ user.email }}
             </p>
             <p>
-              <a-icon type="calendar" />{{ counts.establishDays || 0 }} 天
+              <a-icon type="calendar" />{{ statistics.establishDays || 0 }} 天
             </p>
           </div>
           <a-divider />
           <div class="general-profile">
             <a-list
-              :loading="countsLoading"
+              :loading="statisticsLoading"
               itemLayout="horizontal"
             >
-              <a-list-item>累计发表了 {{ counts.postCount || 0 }} 篇文章。</a-list-item>
-              <a-list-item>累计创建了 {{ counts.linkCount || 0 }} 个标签。</a-list-item>
-              <a-list-item>累计获得了 {{ counts.commentCount || 0 }} 条评论。</a-list-item>
-              <a-list-item>累计添加了 {{ counts.linkCount || 0 }} 个友链。</a-list-item>
-              <a-list-item>文章总访问 {{ counts.visitCount || 0 }} 次。</a-list-item>
+              <a-list-item>累计发表了 {{ statistics.postCount || 0 }} 篇文章。</a-list-item>
+              <a-list-item>累计创建了 {{ statistics.categoryCount || 0 }} 个分类。</a-list-item>
+              <a-list-item>累计创建了 {{ statistics.tagCount || 0 }} 个标签。</a-list-item>
+              <a-list-item>累计获得了 {{ statistics.commentCount || 0 }} 条评论。</a-list-item>
+              <a-list-item>累计添加了 {{ statistics.linkCount || 0 }} 个友链。</a-list-item>
+              <a-list-item>文章总访问 {{ statistics.visitCount || 0 }} 次。</a-list-item>
               <a-list-item></a-list-item>
             </a-list>
           </div>
@@ -106,13 +107,13 @@
                 </span>
                 <a-form layout="vertical">
                   <a-form-item label="原密码：">
-                    <a-input-password v-model="passwordParam.oldPassword"/>
+                    <a-input-password v-model="passwordParam.oldPassword" />
                   </a-form-item>
                   <a-form-item label="新密码：">
-                    <a-input-password v-model="passwordParam.newPassword"/>
+                    <a-input-password v-model="passwordParam.newPassword" />
                   </a-form-item>
                   <a-form-item label="确认密码：">
-                    <a-input-password v-model="passwordParam.confirmPassword"/>
+                    <a-input-password v-model="passwordParam.confirmPassword" />
                   </a-form-item>
                   <a-form-item>
                     <a-button
@@ -142,7 +143,7 @@
 <script>
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import userApi from '@/api/user'
-import adminApi from '@/api/admin'
+import statisticsApi from '@/api/statistics'
 import { mapMutations, mapGetters } from 'vuex'
 import MD5 from 'md5.js'
 
@@ -152,10 +153,10 @@ export default {
   },
   data() {
     return {
-      countsLoading: true,
+      statisticsLoading: true,
       attachmentDrawerVisible: false,
       user: {},
-      counts: {},
+      statistics: {},
       passwordParam: {
         oldPassword: null,
         newPassword: null,
@@ -171,21 +172,15 @@ export default {
     ...mapGetters(['options'])
   },
   created() {
-    this.loadUser()
-    this.getCounts()
+    this.getStatistics()
   },
   methods: {
     ...mapMutations({ setUser: 'SET_USER' }),
-    loadUser() {
-      userApi.getProfile().then(response => {
-        this.user = response.data.data
-        this.profileLoading = false
-      })
-    },
-    getCounts() {
-      adminApi.counts().then(response => {
-        this.counts = response.data.data
-        this.countsLoading = false
+    getStatistics() {
+      statisticsApi.statisticsWithUser().then(response => {
+        this.user = response.data.data.user
+        this.statistics = response.data.data
+        this.statisticsLoading = false
       })
     },
     handleUpdatePassword() {
@@ -242,54 +237,47 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.page-header-wrapper-grid-content-main {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  transition: 0.3s;
+.profile-center-avatarHolder {
+  text-align: center;
+  margin-bottom: 24px;
 
-  .profile-center-avatarHolder {
-    text-align: center;
-    margin-bottom: 24px;
+  & > .avatar {
+    margin: 0 auto;
+    width: 104px;
+    height: 104px;
+    margin-bottom: 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
 
-    & > .avatar {
-      margin: 0 auto;
-      width: 104px;
-      height: 104px;
-      margin-bottom: 20px;
-      border-radius: 50%;
-      overflow: hidden;
-      cursor: pointer;
-
-      img {
-        height: 100%;
-        width: 100%;
-      }
-    }
-
-    .username {
-      color: rgba(0, 0, 0, 0.85);
-      font-size: 20px;
-      line-height: 28px;
-      font-weight: 500;
-      margin-bottom: 4px;
+    img {
+      height: 100%;
+      width: 100%;
     }
   }
 
-  .profile-center-detail {
-    p {
-      margin-bottom: 8px;
-      padding-left: 26px;
-      position: relative;
-    }
+  .username {
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+}
 
-    i {
-      position: absolute;
-      height: 14px;
-      width: 14px;
-      left: 0;
-      top: 4px;
-    }
+.profile-center-detail {
+  p {
+    margin-bottom: 8px;
+    padding-left: 26px;
+    position: relative;
+  }
+
+  i {
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 0;
+    top: 4px;
   }
 }
 </style>

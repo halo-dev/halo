@@ -12,7 +12,10 @@
               :sm="24"
             >
               <a-form-item label="关键词">
-                <a-input v-model="queryParam.keyword" />
+                <a-input
+                  v-model="queryParam.keyword"
+                  @keyup.enter="handleQuery()"
+                />
               </a-form-item>
             </a-col>
             <a-col
@@ -23,7 +26,7 @@
                 <a-select
                   v-model="queryParam.status"
                   placeholder="请选择评论状态"
-                  @change="handleQuery"
+                  @change="handleQuery()"
                 >
                   <a-select-option
                     v-for="status in Object.keys(commentStatus)"
@@ -41,11 +44,11 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
-                  @click="handleQuery"
+                  @click="handleQuery()"
                 >查询</a-button>
                 <a-button
                   style="margin-left: 8px;"
-                  @click="handleResetParam"
+                  @click="handleResetParam()"
                 >重置</a-button>
               </span>
             </a-col>
@@ -62,7 +65,7 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="handlePublishMore"
+                @click="handleEditStatusMore(commentStatus.PUBLISHED.value)"
               >
                 通过
               </a>
@@ -73,7 +76,7 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="handleRecycleMore"
+                @click="handleEditStatusMore(commentStatus.RECYCLE.value)"
               >
                 移到回收站
               </a>
@@ -234,6 +237,7 @@
           v-else
           :rowKey="comment => comment.id"
           :rowSelection="{
+            selectedRowKeys: selectedRowKeys,
             onChange: onSelectionChange,
             getCheckboxProps: getCheckboxProps
           }"
@@ -377,7 +381,9 @@
         <div class="page-wrapper">
           <a-pagination
             class="pagination"
+            :current="pagination.page"
             :total="pagination.total"
+            :defaultPageSize="pagination.size"
             :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
             showSizeChanger
             @showSizeChange="handlePaginationChange"
@@ -388,8 +394,8 @@
     </a-card>
 
     <a-modal
-      v-if="selectComment"
-      :title="'回复给：'+selectComment.author"
+      v-if="selectedComment"
+      :title="'回复给：'+selectedComment.author"
       v-model="replyCommentVisible"
       @close="onReplyClose"
       destroyOnClose
@@ -415,8 +421,8 @@
     </a-modal>
     <!-- <CommentDetail
       v-model="commentDetailVisible"
-      v-if="selectComment"
-      :comment="selectComment"
+      v-if="selectedComment"
+      :comment="selectedComment"
       :type="this.type"
     /> -->
   </div>
@@ -431,6 +437,7 @@ const postColumns = [
   {
     title: '昵称',
     dataIndex: 'author',
+    width: '150px',
     scopedSlots: { customRender: 'author' }
   },
   {
@@ -468,6 +475,7 @@ const sheetColumns = [
   {
     title: '昵称',
     dataIndex: 'author',
+    width: '150px',
     scopedSlots: { customRender: 'author' }
   },
   {
@@ -522,8 +530,8 @@ export default {
       columns: this.type === 'posts' ? postColumns : sheetColumns,
       replyCommentVisible: false,
       pagination: {
-        current: 1,
-        pageSize: 10,
+        page: 1,
+        size: 10,
         sort: null
       },
       queryParam: {
@@ -536,7 +544,7 @@ export default {
       selectedRowKeys: [],
       selectedRows: [],
       comments: [],
-      selectComment: {},
+      selectedComment: {},
       replyComment: {},
       loading: false,
       commentStatus: commentApi.commentStatus,
@@ -550,7 +558,7 @@ export default {
     formattedComments() {
       return this.comments.map(comment => {
         comment.statusProperty = this.commentStatus[comment.status]
-        comment.content = marked(comment.content, { sanitize: true })
+        comment.content = marked(comment.content)
         return comment
       })
     },
@@ -559,8 +567,8 @@ export default {
   methods: {
     loadComments() {
       this.loading = true
-      this.queryParam.page = this.pagination.current - 1
-      this.queryParam.size = this.pagination.pageSize
+      this.queryParam.page = this.pagination.page - 1
+      this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
       commentApi.queryComment(this.type, this.queryParam).then(response => {
         this.comments = response.data.data.content
@@ -569,9 +577,8 @@ export default {
       })
     },
     handleQuery() {
-      this.queryParam.page = 0
-      this.pagination.current = 1
-      this.loadComments()
+      this.handleClearRowKeys()
+      this.handlePaginationChange(1, this.pagination.size)
     },
     handleEditStatusClick(commentId, status) {
       commentApi.updateStatus(this.type, commentId, status).then(response => {
@@ -590,7 +597,7 @@ export default {
       this.handleEditStatusClick(comment.id, 'PUBLISHED')
     },
     handleReplyClick(comment) {
-      this.selectComment = comment
+      this.selectedComment = comment
       this.replyCommentVisible = true
       this.replyComment.parentId = comment.id
       if (this.type === 'posts') {
@@ -610,67 +617,51 @@ export default {
       commentApi.create(this.type, this.replyComment).then(response => {
         this.$message.success('回复成功！')
         this.replyComment = {}
-        this.selectComment = {}
+        this.selectedComment = {}
         this.replyCommentVisible = false
         this.loadComments()
       })
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.pagination.current = page
-      this.pagination.pageSize = pageSize
+      this.pagination.page = page
+      this.pagination.size = pageSize
       this.loadComments()
     },
     handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.status = null
-      this.loadComments()
+      this.handleClearRowKeys()
+      this.handlePaginationChange(1, this.pagination.size)
     },
-    handlePublishMore() {
+    handleEditStatusMore(status) {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        commentApi.updateStatus(this.type, element, 'PUBLISHED').then(response => {
-          this.$log.debug(`commentId: ${element}, status: PUBLISHED`)
-          this.selectedRowKeys = []
-          this.loadComments()
-        })
-      }
-    },
-    handleRecycleMore() {
-      if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
-        return
-      }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        commentApi.updateStatus(this.type, element, 'RECYCLE').then(response => {
-          this.$log.debug(`commentId: ${element}, status: RECYCLE`)
-          this.selectedRowKeys = []
-          this.loadComments()
-        })
-      }
+      commentApi.updateStatusInBatch(this.type, this.selectedRowKeys, status).then(response => {
+        this.$log.debug(`commentIds: ${this.selectedRowKeys}, status: ${status}`)
+        this.selectedRowKeys = []
+        this.loadComments()
+      })
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.success('请至少选择一项！')
         return
       }
-      for (let index = 0; index < this.selectedRowKeys.length; index++) {
-        const element = this.selectedRowKeys[index]
-        commentApi.delete(this.type, element).then(response => {
-          this.$log.debug(`delete: ${element}`)
-          this.selectedRowKeys = []
-          this.loadComments()
-        })
-      }
+      commentApi.deleteInBatch(this.type, this.selectedRowKeys).then(response => {
+        this.$log.debug(`delete: ${this.selectedRowKeys}`)
+        this.selectedRowKeys = []
+        this.loadComments()
+      })
+    },
+    handleClearRowKeys() {
+      this.selectedRowKeys = []
     },
     onReplyClose() {
       this.replyComment = {}
-      this.selectComment = {}
+      this.selectedComment = {}
       this.replyCommentVisible = false
     },
     onSelectionChange(selectedRowKeys) {
@@ -680,13 +671,13 @@ export default {
     getCheckboxProps(comment) {
       return {
         props: {
-          disabled: comment.status === 'RECYCLE',
+          disabled: this.queryParam.status == null || this.queryParam.status === '',
           name: comment.author
         }
       }
     },
     handleShowDetailDrawer(comment) {
-      this.selectComment = comment
+      this.selectedComment = comment
       this.commentDetailVisible = true
     }
   }
