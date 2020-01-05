@@ -63,7 +63,7 @@ java -jar halo-latest.jar
 
 [![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
-> Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议，即便是在中国。
+> Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议。
 
 ## 贡献
 参考 [CONTRIBUTING](./CONTRIBUTING.md)。
@@ -83,8 +83,6 @@ java -jar halo-latest.jar
 ![theme-walker.png](https://i.loli.net/2019/09/11/F6CjZKJX1N2x5dU.png)
 
 ![theme-icarus.png](https://i.loli.net/2019/09/11/4lO2wNCLiqyIJmR.png)
-
-![theme-destiny.png](https://i.loli.net/2019/09/11/q4t86cCPUEwlGMn.png)
 
 ![install.png](https://i.loli.net/2019/09/11/Iu1eMzZDg6frw97.png)
 
