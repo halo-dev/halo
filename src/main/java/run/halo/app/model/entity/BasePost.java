@@ -48,7 +48,7 @@ public class BasePost extends BaseEntity {
     /**
      * Original content,not format.
      */
-    @Column(name = "original_content", columnDefinition = "text not null")
+    @Column(name = "original_content", columnDefinition = "longtext not null")
     private String originalContent;
 
     /**
@@ -56,7 +56,7 @@ public class BasePost extends BaseEntity {
      *
      * @see run.halo.app.utils.MarkdownUtils#renderHtml(String)
      */
-    @Column(name = "format_content", columnDefinition = "text not null")
+    @Column(name = "format_content", columnDefinition = "longtext not null")
     private String formatContent;
 
     /**
@@ -168,6 +168,10 @@ public class BasePost extends BaseEntity {
 
         if (likes == null || likes < 0) {
             likes = 0L;
+        }
+
+        if (originalContent == null) {
+            originalContent = "";
         }
 
         if (formatContent == null) {

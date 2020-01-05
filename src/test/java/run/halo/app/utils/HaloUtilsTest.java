@@ -2,11 +2,13 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.stream.IntStream;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -122,5 +124,23 @@ public class HaloUtilsTest {
     public void desensitizeFailureTest() {
         String plainText = " ";
         HaloUtils.desensitize(plainText, 1, 1);
+    }
+
+    @Test
+    public void compositeHttpUrl() {
+        String url = HaloUtils.compositeHttpUrl("https://halo.run", "path1", "path2");
+        assertEquals("https://halo.run/path1/path2", url);
+
+        url = HaloUtils.compositeHttpUrl("https://halo.run/", "path1", "path2");
+        assertEquals("https://halo.run/path1/path2", url);
+
+        url = HaloUtils.compositeHttpUrl("https://halo.run/", "/path1", "path2");
+        assertEquals("https://halo.run/path1/path2", url);
+
+        url = HaloUtils.compositeHttpUrl("https://halo.run/", "/path1/", "path2");
+        assertEquals("https://halo.run/path1/path2", url);
+
+        url = HaloUtils.compositeHttpUrl("https://halo.run/", "/path1/", "/path2/");
+        assertEquals("https://halo.run/path1/path2", url);
     }
 }

@@ -21,7 +21,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Category controller.
  *
  * @author johnniang
- * @date 3/21/19
+ * @date 2019-03-21
  */
 @RestController
 @RequestMapping("/api/admin/categories")

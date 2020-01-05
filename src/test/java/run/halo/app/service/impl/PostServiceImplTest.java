@@ -7,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 public class PostServiceImplTest {
 
-    String standardMdContent = "---\n" +
+    private String standardMdContent = "---\n" +
             "title: springfox-swagger2配置成功但无法访问/swagger-ui.html\n" +
             "tags:\n" +
             "  - spring boot\n" +
@@ -26,7 +27,7 @@ public class PostServiceImplTest {
             "\n" +
             "在前后端分离项目中，通常需要用到 API 文档，springfox 开发的 **[SpringFox](https://github.com/springfox/springfox)** 可以实现自动化 json API 文档。";
 
-    String nonStandardMdContent = "---\n" +
+    private String nonStandardMdContent = "---\n" +
             "title: Basic concepts of JPA\n" +
             "date: 2018-08-03 11:57:00\n" +
             "tags: ['spring', 'jpa', 'database', 'concept']\n" +
@@ -45,6 +46,7 @@ public class PostServiceImplTest {
     }
 
     @Test
+    @Transactional
     public void markdownImportTest() {
         postService.importMarkdown(standardMdContent, "standard");
         postService.importMarkdown(nonStandardMdContent, "nonStandard");

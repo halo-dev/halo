@@ -1,24 +1,27 @@
 package run.halo.app.model.params;
 
-import cn.hutool.crypto.digest.BCrypt;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.SlugUtils;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Sheet param.
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-24
+ * @date 2019-4-24
  */
 @Data
 public class SheetParam implements InputConverter<Sheet> {
@@ -31,8 +34,9 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private String url;
 
-    @NotBlank(message = "页面内容不能为空")
     private String originalContent;
+
+    private String summary;
 
     @Size(max = 255, message = "页面缩略图链接的字符长度不能超过 {max}")
     private String thumbnail;
@@ -41,7 +45,7 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private Date createTime;
 
-    @Size(max = 255, message = "Length of password must not be more than {max}")
+    @Size(max = 255, message = "页面密码的字符长度不能超过 {max}")
     private String password;
 
     @Size(max = 255, message = "Length of template must not be more than {max}")
@@ -50,11 +54,11 @@ public class SheetParam implements InputConverter<Sheet> {
     @Min(value = 0, message = "Post top priority must not be less than {value}")
     private Integer topPriority = 0;
 
+    private Set<SheetMetaParam> sheetMetas;
+
     @Override
     public Sheet convertTo() {
-        if (StringUtils.isBlank(url)) {
-            url = title.replace(".","");
-        }
+        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
 
         if (null == thumbnail) {
             thumbnail = "";
@@ -65,14 +69,25 @@ public class SheetParam implements InputConverter<Sheet> {
 
     @Override
     public void update(Sheet sheet) {
-        if (StringUtils.isBlank(url)) {
-            url = title.replace(".","");
-        }
+        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
 
         if (null == thumbnail) {
             thumbnail = "";
         }
 
         InputConverter.super.update(sheet);
+    }
+
+    public Set<SheetMeta> getSheetMetas() {
+        Set<SheetMeta> sheetMetasSet = new HashSet<>();
+        if (CollectionUtils.isEmpty(sheetMetas)) {
+            return sheetMetasSet;
+        }
+
+        for (SheetMetaParam sheetMetaParam : sheetMetas) {
+            SheetMeta sheetMeta = sheetMetaParam.convertTo();
+            sheetMetasSet.add(sheetMeta);
+        }
+        return sheetMetasSet;
     }
 }

@@ -13,8 +13,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
-import run.halo.app.security.filter.AdminAuthenticationFilter;
-import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.support.UserDetail;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.AlternateTypeRule;
@@ -33,7 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static run.halo.app.model.support.HaloConst.HALO_VERSION;
+import static run.halo.app.model.support.HaloConst.*;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 /**
@@ -80,7 +78,7 @@ public class SwaggerConfiguration {
             log.debug("Doc has been disabled");
         }
 
-        return buildApiDocket("run.halo.app.admin",
+        return buildApiDocket("run.halo.app.admin.api",
                 "run.halo.app.controller.admin",
                 "/api/admin/**")
                 .securitySchemes(adminApiKeys())
@@ -123,8 +121,8 @@ public class SwaggerConfiguration {
 
     private List<ApiKey> adminApiKeys() {
         return Arrays.asList(
-                new ApiKey("Token from header", AdminAuthenticationFilter.ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
-                new ApiKey("Token from query", AdminAuthenticationFilter.ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
+                new ApiKey("Token from header", ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
+                new ApiKey("Token from query", ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
         );
     }
 
@@ -139,8 +137,8 @@ public class SwaggerConfiguration {
 
     private List<ApiKey> contentApiKeys() {
         return Arrays.asList(
-                new ApiKey("Access key from header", ApiAuthenticationFilter.API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
-                new ApiKey("Access key from query", ApiAuthenticationFilter.API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())
+                new ApiKey("Access key from header", API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
+                new ApiKey("Access key from query", API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())
         );
     }
 
@@ -171,7 +169,9 @@ public class SwaggerConfiguration {
                 .description("Documentation for Halo API")
                 .version(HALO_VERSION)
                 .termsOfServiceUrl("https://github.com/halo-dev")
-                .contact(new Contact("RYAN0UP", "https://ryanc.cc/", "i#ryanc.cc"))
+                .contact(new Contact("halo-dev", "https://github.com/halo-dev/halo/issues", "i#ryanc.cc"))
+                .license("GNU General Public License v3.0")
+                .licenseUrl("https://github.com/halo-dev/halo/blob/master/LICENSE")
                 .build();
     }
 

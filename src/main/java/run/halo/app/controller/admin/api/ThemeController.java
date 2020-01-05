@@ -20,7 +20,7 @@ import java.util.Set;
  * Theme controller.
  *
  * @author ryanwang
- * @date : 2019/3/20
+ * @date 2019-03-20
  */
 @RestController
 @RequestMapping("/api/admin/themes")
@@ -43,46 +43,59 @@ public class ThemeController {
     }
 
     @GetMapping
-    @ApiOperation("List all themes")
+    @ApiOperation("Lists all themes")
     public Set<ThemeProperty> listAll() {
         return themeService.getThemes();
     }
 
     @GetMapping("activation/files")
+    @ApiOperation("Lists all activate theme files")
     public List<ThemeFile> listFiles() {
         return themeService.listThemeFolderBy(themeService.getActivatedThemeId());
     }
 
     @GetMapping("{themeId}/files")
+    @ApiOperation("Lists theme files by theme id")
     public List<ThemeFile> listFiles(@PathVariable("themeId") String themeId) {
         return themeService.listThemeFolderBy(themeId);
     }
 
     @GetMapping("files/content")
+    @ApiOperation("Gets template content")
     public BaseResponse<String> getContentBy(@RequestParam(name = "path") String path) {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(path));
     }
 
     @GetMapping("{themeId}/files/content")
+    @ApiOperation("Gets template content by theme id")
     public BaseResponse<String> getContentBy(@PathVariable("themeId") String themeId,
                                              @RequestParam(name = "path") String path) {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(themeId, path));
     }
 
     @PutMapping("files/content")
+    @ApiOperation("Updates template content")
     public void updateContentBy(@RequestBody ThemeContentParam param) {
         themeService.saveTemplateContent(param.getPath(), param.getContent());
     }
 
     @PutMapping("{themeId}/files/content")
+    @ApiOperation("Updates template content by theme id")
     public void updateContentBy(@PathVariable("themeId") String themeId,
                                 @RequestBody ThemeContentParam param) {
         themeService.saveTemplateContent(themeId, param.getPath(), param.getContent());
     }
 
-    @GetMapping("files/custom")
-    public Set<String> customTemplate() {
-        return themeService.listCustomTemplates(themeService.getActivatedThemeId());
+    @GetMapping("activation/template/custom/sheet")
+    @ApiOperation("Gets custom sheet templates")
+    public Set<String> customSheetTemplate() {
+        return themeService.listCustomTemplates(themeService.getActivatedThemeId(), ThemeService.CUSTOM_SHEET_PREFIX);
+    }
+
+    @GetMapping("activation/template/custom/post")
+    @ApiOperation("Gets custom post templates")
+    public Set<String> customPostTemplate() {
+        return themeService.listCustomTemplates(themeService.getActivatedThemeId(), ThemeService.CUSTOM_POST_PREFIX);
     }
 
     @PostMapping("{themeId}/activation")
@@ -141,12 +154,13 @@ public class ThemeController {
     }
 
     @PostMapping("upload")
-    @ApiOperation("Upload theme")
+    @ApiOperation("Uploads a theme")
     public ThemeProperty uploadTheme(@RequestPart("file") MultipartFile file) {
         return themeService.upload(file);
     }
 
     @PutMapping("upload/{themeId}")
+    @ApiOperation("Upgrades theme by file")
     public ThemeProperty updateThemeByUpload(@PathVariable("themeId") String themeId,
                                              @RequestPart("file") MultipartFile file) {
         return themeService.update(themeId, file);
@@ -159,8 +173,8 @@ public class ThemeController {
     }
 
     @PutMapping("fetching/{themeId}")
-    public ThemeProperty updateThemeByFetching(@PathVariable("themeId") String themeId,
-                                               @RequestPart(name = "file", required = false) MultipartFile file) {
+    @ApiOperation("Upgrades theme by remote")
+    public ThemeProperty updateThemeByFetching(@PathVariable("themeId") String themeId) {
 
         return themeService.update(themeId);
     }
@@ -172,8 +186,8 @@ public class ThemeController {
     }
 
     @GetMapping(value = "activation/template/exists")
+    @ApiOperation("Determines if template exists")
     public BaseResponse exists(@RequestParam(value = "template") String template) {
         return BaseResponse.ok(themeService.templateExists(template));
     }
-
 }

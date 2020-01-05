@@ -67,8 +67,8 @@ public class InMemoryCacheStore extends StringCacheStore {
 
         log.debug("Preparing to put key: [{}], value: [{}]", key, cacheWrapper);
 
+        lock.lock();
         try {
-            lock.lock();
             // Get the value before
             Optional<String> valueOptional = get(key);
 
@@ -98,6 +98,11 @@ public class InMemoryCacheStore extends StringCacheStore {
     public void preDestroy() {
         log.debug("Cancelling all timer tasks");
         timer.cancel();
+        clear();
+    }
+
+    private void clear() {
+        CACHE_CONTAINER.clear();
     }
 
     /**

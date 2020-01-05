@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class PathsTest {
 
-
     @Test
     public void getTest() {
         Path path = Paths.get("/home/test/", "/upload/test.txt");
